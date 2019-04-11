@@ -14,7 +14,7 @@ The key industralisation goals are:
 3. **Simplicity** – increase effective usage and minimise learning
 4. **Standardised** – increase knowledgeable resource pool
 5. **Consistency** – improve overall quality and maintainability
-6. **Flexibility** – enable innovationand evolution easily over time
+6. **Flexibility** – enable innovation and evolution easily over time
 
 <br>
 
@@ -84,7 +84,7 @@ Standardised approach, ensures consistency of implementation:
 - Greater confidence in adherence to architectural vision; minimised deviation.
 - Generation and alike enables the solution to evolve more quickly and effectively over time. 
 
-A key accelerator for _Beef_ is achieved using a flexible [code generation](./docs/codegen.md) approach. An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
+A key accelerator for _Beef_ is achieved using a flexible [code generation](./docs/Beef-Codegen-Core.md) approach. An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
 
 The **key** capabilities for _Beef_ are enabled by the following run-time assemblies:
 

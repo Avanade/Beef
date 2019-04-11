@@ -4,6 +4,8 @@ The templates are defined using XML that follows a prescribed structure. There a
 
 A template can result in none, one or many, generated output artefacts.
 
+<br>
+
 ## XML node types
 
 The following XML node types are supported:
@@ -11,13 +13,15 @@ The following XML node types are supported:
 - CDATA - these contain the actual *output-text* for the generated artefact.
 - Comment - these are supported to aid XML readibility.
 
-***
+<br>
 
-# XML elements
+## XML elements
 
 XML elements, and their hierarchy drive the code-generation; some elements are reserved to perform a specific function.
 
-## Reserved elements
+<br>
+
+### Reserved elements
 
 The following XML elements represent the language statements used by the code generator; these are further [detailed](#Language-constructs-detailed):
 - `If` - enables if/then/else conditional statements.
@@ -36,7 +40,9 @@ The following XML elements support specific outputs:
 - `Header` - standard header content for all files generated from a template.
 - `Footer` - standard footer content for all files generated from a template.
 
-## Data source elements
+<br>
+
+### Data source elements
 
 Any other element name is used to reference the same named element in the data source. The code generator will start searching down through the children until it finds a same named element. Where not found, it will the start searching from the element up through its parents until found. Finally, if still not found an appropriate exception will be thrown.
 
@@ -57,15 +63,17 @@ Following is an example:
 </Entity>
 ```
 
-***
+<br>
 
-# Var-Value
+## Var-Value
 
 There are two main means to obtain a var-value (variable value):
 - Element attribute value using dot-based notation.
 - Declared/constant value; where a string is enclosed in single quotes.
 
-## Var-Value: element attribute value
+<br>
+
+### Var-Value: element attribute value
 
 To reference any XML element attribue value for a data source element, including `Config` or `System`, a dot-based notation is used; i.e: `Element.Attribute`. For example, if an *element* is named `Entity` and the *attribute* is named `Name`, then the dot-based notation would be `Entity.Name`.
 
@@ -88,7 +96,9 @@ String-based values can be further transformed, using one of the following:
 
 The above transformations suffix the existing dot-based notation (note that the transform must also be prefixed by a colon); e.g. `Entity.Name:ToPascalCase`.
 
-## Var-value: declared/constant value
+<br>
+
+### Var-value: declared/constant value
 
 A *var-value* can be either determined using the dot-based notation desribed above, or using one of the supported value declarations:
 - `null` - null value;
@@ -97,21 +107,23 @@ A *var-value* can be either determined using the dot-based notation desribed abo
 - numeric - converted to a decimal value;
 - any other value will result in en exception being thrown.
 
-***
+<br>
 
-# Output-text
+## Output-text
 
 Any *output-text* also supports moustache formatting to enable templated value replacement. This enables a *var-value* to appear in a text string. Moustache formatting is where the *var-value* is prefixed by {{ and suffixed by }}; hence the moustache naming.
 
 For example, `'The Entity Name is {{Entity.Name}}.'` would result in the `{{Entity.Name}}` being replaced with the actual `Entity.Name` *var-value*.
 
-***
+<br>
 
-# Language constructs detailed
+## Language constructs detailed
 
 As logic statements are required to control the output the following language-like constructs are provided.
 
-## `If` element
+<br>
+
+### `If` element
 
 Enables if/then/else condition statements.
 
@@ -155,7 +167,9 @@ Following are some examples:
 </If>
 ```
 
-## `Set` element
+<br>
+
+### `Set` element
 
 Sets a named variable (using dot-based notation) with a specified *var-value*.
 
@@ -177,7 +191,9 @@ Following are some examples:
 <Set Name="System.EntityExclude" Value="false" />
 ```
 
-## `Increment` element
+<br>
+
+### `Increment` element
 
 Increments a named variable (using dot-based notation) up or down with an optional *var-value*; i.e. adds or subtracts where negative.
 
@@ -197,7 +213,9 @@ Following are some examples:
 <Increment Name="System.CountDown" Condition="System.CountDown > 0" Value="-1" />
 ```
 
-## `Exception` element
+<br>
+
+### `Exception` element
 
 Throws an expection to terminate generation.
 
@@ -219,7 +237,9 @@ Following is an example:
 <Exception Message="Entity '{{Entity.Name}}' must have a Type specified." Condition="Entity.Type == null" />
 ```
 
-## `ForEachList` element
+<br>
+
+### `ForEachList` element
 
 Iterates a list (being a string separated by a specified character).
 
@@ -244,9 +264,9 @@ Following is an example:
 </ForEachList>
 ```
 
-***
+<br>
 
-# Controlling artefact generation
+## Controlling artefact generation
 
 There are the following reserved attributes that when specified on an `Element` control the artefact generation output:
 - `OutputFileName` - specifies the output file/artefact name; uses *output-text* formatting.
