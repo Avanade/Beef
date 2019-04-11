@@ -10,11 +10,11 @@ The _Beef_ framework, and the underlying code generation, has been primarily cre
 
 The key industralisation goals are:
 1. **Value** - focus on business value, not on boilerplate
-2. **Acceleration** ñ improve velocity; reduce costs and time to market
-3. **Simplicity** ñ increase effective usage and minimise learning
-4. **Standardised** ñ increase knowledgeable resource pool
-5. **Consistency** ñ improve overall quality and maintainability
-6. **Flexibility** ñ enable innovationand evolution easily over time
+2. **Acceleration** ‚Äì improve velocity; reduce costs and time to market
+3. **Simplicity** ‚Äì increase effective usage and minimise learning
+4. **Standardised** ‚Äì increase knowledgeable resource pool
+5. **Consistency** ‚Äì improve overall quality and maintainability
+6. **Flexibility** ‚Äì enable innovationand evolution easily over time
 
 <br>
 
@@ -33,9 +33,9 @@ The conceptual architecture is as follows; with _Beef_ being targeted specifical
 The key concepts are as follows:
 
 - **Channel-agnostic** - the APIs are based around the key entities and the actions that can be performed on them. 
-  - APIs represent the key trust boundary; as such, they make no assumptions on the consumer. The APIs will always validate the request data, and house the applicationís functional business and orchestration rules.
+  - APIs represent the key trust boundary; as such, they make no assumptions on the consumer. The APIs will always validate the request data, and house the application‚Äôs functional business and orchestration rules.
   - APIs should not be developed to service a specific user interface interaction; as the APIs are agnostic to the consumer. The consumer has the responsibility of coordinating across API calls.
-- **Domain-based** ñ the APIs are based around, and encapsulate, the capabilities for a functional domain.
+- **Domain-based** ‚Äì the APIs are based around, and encapsulate, the capabilities for a functional domain.
   - Outcome of a [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design); divides capapabilities into different [Bounded Contexts](https://www.martinfowler.com/bliki/BoundedContext.html).
   - Encourages micro vs monolithic services.
 
@@ -47,11 +47,11 @@ An architectural pattern for creating domain-based APIs:
 - Is a software architecture style in which complex applications are composed of small, independent processes communicating with each other using language-agnostic APIs.
 - These services are small, highly decoupled and focus on doing a small task, facilitating a modular approach to system-building.
 - Implementation independence:
-  - **Loose coupling** ñ should have its own persistence repository; data is duplicated (synchronised), not shared; eventual consistency; no distributed transactions.
-  - **Polyglot persistence / programming** ñ use the best persistence repository to support the storage requirements; use a mix of programming languages (fit-for-purpose). Note: _Beef_ provides a C# / .NET implementation approach as one option.
+  - **Loose coupling** ‚Äì should have its own persistence repository; data is duplicated (synchronised), not shared; eventual consistency; no distributed transactions.
+  - **Polyglot persistence / programming** ‚Äì use the best persistence repository to support the storage requirements; use a mix of programming languages (fit-for-purpose). Note: _Beef_ provides a C# / .NET implementation approach as one option.
   - **Eventual consistency** - for the most part, eventual consistency is good enough; real-time distributed transactional integrity is rarely required (although generally desired). An asynchronous messaging system, such as Queues or a Service Bus, can be leveraged to orchestrate cross domain data (eventual) consistency.
 
-> ìMicroî doesnít imply number of lines of code; but a bounded concept / business capability within your Domain. - [http://herdingcode.com](http://herdingcode.com/herding-code-210-ian-cooper-on-microservices-and-the-brighter-library/)
+> ‚ÄúMicro‚Äù doesn‚Äôt imply number of lines of code; but a bounded concept / business capability within your Domain. - [http://herdingcode.com](http://herdingcode.com/herding-code-210-ian-cooper-on-microservices-and-the-brighter-library/)
 
 <br>
 
@@ -89,7 +89,7 @@ A key accelerator for _Beef_ is achieved using a flexible [code generation](./do
 The **key** capabilities for _Beef_ are enabled by the following run-time assemblies:
 
 Assembly | Description | NuGet
--|-
+-|-|-
 [`Beef.Core`](./Beef.Core) | Core foundational framework capabilities. | N/A
 [`Beef.AspNetCore.WebApi`](./Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework capabilities. | N/A
 [`Beef.Data.Database`](./Beef.Data.Database) | ADO.NET database framework capabilities. | N/A
@@ -99,7 +99,7 @@ Assembly | Description | NuGet
 The tooling / supporting capabilities for _Beef_ are enabled by the following  assemblies:
 
 Assembly | Description | NuGet
--|-
+-|-|-
 [`Beef.CodeGen.Core`](./Beef.CodeGen.Core) | Code generation capabilities (including code templates, etc). | N/A
 [`Beef.Database.Core`](./Beef.Database.Core/README.md) | Database / data management capabilities. | N/A
 [`Beef.Test.NUnit`](./Beef.Test.NUnit) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | N/A
@@ -107,7 +107,7 @@ Assembly | Description | NuGet
 An end-to-end demo set of APIs has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing:
 
 Assembly | Description | NuGet
--|-
+-|-|-
 [`Beef.Demo`](/Demo) | End-to-end demo. | N/A
 
 <br>
