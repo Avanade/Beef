@@ -100,8 +100,8 @@ The tooling / supporting capabilities for _Beef_ are enabled by the following  a
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.CodeGen.Core`](./Beef.CodeGen.Core) | Code generation capabilities (including code templates, etc). | N/A
-[`Beef.Database.Core`](./Beef.Database.Core/README.md) | Database / data management capabilities. | N/A
+[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | N/A
+[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | N/A
 [`Beef.Test.NUnit`](./Beef.Test.NUnit) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | N/A
 
 An end-to-end demo set of APIs has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing:
