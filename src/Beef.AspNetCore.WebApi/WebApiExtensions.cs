@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace Beef.AspNetCore.WebApi
@@ -17,7 +15,7 @@ namespace Beef.AspNetCore.WebApi
         /// Registers the action to <paramref name="update"/> the <see cref="ExecutionContext"/> for a request. 
         /// </summary>
         /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="update">The function to update the <see cref="ExecutionContext"/> for a request; <b>null</b> will <see cref="ExecutionContext.Reset(true)"/> the <b>ExecutionContext</b>.</param>
+        /// <param name="update">The function to update the <see cref="ExecutionContext"/> for a request; <c>null</c> will <see cref="ExecutionContext.Reset(true)"/> the <b>ExecutionContext</b>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Action<HttpContext, ExecutionContext> update = null)
         {

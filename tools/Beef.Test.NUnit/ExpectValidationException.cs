@@ -35,7 +35,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="action">The action to execute.</param>
         /// <param name="messages">The expected <see cref="MessageItemCollection"/> collection.</param>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <b>null</b>).</remarks>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
         public static void Run(Action action, MessageItemCollection messages)
         {
             Check.NotNull(action, nameof(action));
@@ -75,7 +75,7 @@ namespace Beef.Test.NUnit
         /// <param name="func">The function to execute.</param>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <b>null</b>).</remarks>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
         public static void Run(Func<Task> func, MessageItemCollection messages)
         {
             Check.NotNull(func, nameof(func));

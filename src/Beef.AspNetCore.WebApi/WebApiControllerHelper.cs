@@ -47,7 +47,7 @@ namespace Beef.AspNetCore.WebApi
         /// Sets the <see cref="HttpResponse.Headers"/> for the <see cref="PagingResult"/>.
         /// </summary>
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
-        /// <param name="paging">The <see cref="PagingResult"/> value to be added to the headers; <b>null</b> indicates to remove.</param>
+        /// <param name="paging">The <see cref="PagingResult"/> value to be added to the headers; <c>null</c> indicates to remove.</param>
         public static void SetPaging(HttpResponse response, PagingResult paging)
         {
             if (response == null)
@@ -93,7 +93,7 @@ namespace Beef.AspNetCore.WebApi
         /// Sets the <see cref="HttpResponse.Headers"/> for the <see cref="ExecutionContext"/> (see <see cref="ExecutionContext.Messages"/> and <see cref="ExecutionContext.ETag"/>).
         /// </summary>
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext"/>; where <b>null</b> then the <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> will be used.</param>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/>; where <c>null</c> then the <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> will be used.</param>
         public static void SetExecutionContext(HttpResponse response, ExecutionContext executionContext = null)
         {
             if (response == null)

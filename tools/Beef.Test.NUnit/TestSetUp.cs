@@ -189,7 +189,7 @@ namespace Beef.Test.NUnit
         public static bool ShouldContinueRunningTests { get; set; } = true;
 
         /// <summary>
-        /// Checks the <see cref="ShouldContinueRunningTests"/> and performs an <see cref="Assert"/> <see cref="Assert.Inconclusive(string)"/> where <b>false</b>.
+        /// Checks the <see cref="ShouldContinueRunningTests"/> and performs an <see cref="Assert"/> <see cref="Assert.Inconclusive(string)"/> where <c>false</c>.
         /// </summary>
         public static void ShouldContinueRunningTestsAssert()
         {

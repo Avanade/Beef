@@ -60,7 +60,7 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
         /// <param name="jsonFilePath">An optional testing JSON settings file path (e.g. <c>appsettings.json</c>) to override defined values.</param>
         /// <param name="environment">The environment to be used by the web host.</param>
-        /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <b>true</b>).</param>
+        /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
         /// <param name="testServerConfig">An optional <see cref="Action{TestServer}"/> to further configure the underlying <see cref="TestServer"/>.</param>
         public static void StartupTestServer<TStartup>(string jsonFilePath = null, string environment = DefaultEnvironment, bool addEnvironmentVariables = true, Action<TestServer> testServerConfig = null) where TStartup : class
         {
@@ -210,7 +210,7 @@ namespace Beef.Test.NUnit
         /// Create a new <see cref="AgentTester{TAgent}"/> for a named <paramref name="username"/>.
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
-        /// <param name="username">The username (<b>null</b> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
         public static AgentTester<TAgent> Create<TAgent>(string username = null) where TAgent : class
         {
@@ -223,7 +223,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
-        /// <param name="username">The username (<b>null</b> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
         public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string username = null) where TAgent : class
         {
@@ -236,7 +236,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTester"/> class using the specified details.
         /// </summary>
-        /// <param name="username">The username (<b>null</b> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         protected AgentTester(string username = null)
         {
             if (ExecutionContext.HasCurrent)
@@ -294,7 +294,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The <see cref="AgentTester"/> instance to support fluent/chaining usage.</returns>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <b>null</b>).</remarks>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
         protected void SetExpectMessages(MessageItemCollection messages)
         {
             Check.NotNull(messages, nameof(messages));
@@ -500,7 +500,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <b>null</b>).</remarks>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
         public AgentTester<TAgent> ExpectMessages(MessageItemCollection messages)
         {
             SetExpectMessages(messages);
@@ -637,7 +637,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <b>null</b>).</remarks>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
         public AgentTester<TAgent, TValue> ExpectMessages(MessageItemCollection messages)
         {
             SetExpectMessages(messages);
@@ -645,7 +645,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Expect <b>null</b> response value.
+        /// Expect <c>null</c> response value.
         /// </summary>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public AgentTester<TAgent, TValue> ExpectNullValue()
@@ -683,7 +683,7 @@ namespace Beef.Test.NUnit
         /// Expects the <see cref="IChangeLog"/> to be implemented for the response with generated values for the underlying <see cref="ChangeLog.CreatedBy"/> and <see cref="ChangeLog.CreatedDate"/> matching the specified values.
         /// </summary>
         /// <param name="createdby">The specific <see cref="ChangeLog.CreatedBy"/> value where specified; otherwise, indicates to check for user running the test (see <see cref="AgentTester.Username"/>).</param>
-        /// <param name="createdDateGreaterThan">The <see cref="DateTime"/> in which the <see cref="ChangeLog.CreatedDate"/> should be greater than; where <b>null</b> it will default to <see cref="DateTime.Now"/>.</param>
+        /// <param name="createdDateGreaterThan">The <see cref="DateTime"/> in which the <see cref="ChangeLog.CreatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public AgentTester<TAgent, TValue> ExpectChangeLogCreated(string createdby = null, DateTime? createdDateGreaterThan = null)
         {
@@ -700,7 +700,7 @@ namespace Beef.Test.NUnit
         /// Expects the <see cref="IChangeLog"/> to be implemented for the response with generated values for the underlying <see cref="ChangeLog.UpdatedBy"/> and <see cref="ChangeLog.UpdatedDate"/> matching the specified values.
         /// </summary>
         /// <param name="updatedby">The specific <see cref="ChangeLog.UpdatedBy"/> value where specified; otherwise, indicates to check for user runing the test (see <see cref="AgentTester.Username"/>).</param>
-        /// <param name="updatedDateGreaterThan">The <see cref="TimeSpan"/> in which the <see cref="ChangeLog.UpdatedDate"/> should be greater than; where <b>null</b> it will default to <see cref="DateTime.Now"/>.</param>
+        /// <param name="updatedDateGreaterThan">The <see cref="TimeSpan"/> in which the <see cref="ChangeLog.UpdatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public AgentTester<TAgent, TValue> ExpectChangeLogUpdated(string updatedby = null, DateTime? updatedDateGreaterThan = null)
         {

@@ -21,7 +21,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a named <paramref name="username"/>.
         /// </summary>
-        /// <param name="username">The username (<b>null</b> indicates to use <see cref=" AgentTester.DefaultUsername"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use <see cref=" AgentTester.DefaultUsername"/>).</param>
         /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
         public TestSetUpAttribute(string username = null, bool needsSetUp = true) : base(username ?? AgentTester.DefaultUsername)
         {

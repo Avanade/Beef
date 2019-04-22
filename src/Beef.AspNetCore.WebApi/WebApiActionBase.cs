@@ -30,21 +30,21 @@ namespace Beef.AspNetCore.WebApi
 
         /// <summary>
         /// Indicates whether the <see cref="ExecutionContext"/> <see cref="ExecutionContext.Messages"/> headers should be included for an <see cref="IBusinessException"/>
-        /// (defaults to <b>true</b>).
+        /// (defaults to <c>true</c>).
         /// </summary>
         public static bool IncludeExecutionContextMessagesForAnIBusinessException { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the exception handler function that creates a <see cref="IActionResult"/> from an <see cref="Exception"/> (defaults to <see cref="CreateResultFromException(ActionContext, Exception)"/>.
         /// </summary>
-        /// <remarks>Where no handler is specified or returns a <b>null</b> this indicates that the <see cref="Exception"/> is not handled and the exception will continue to bubble up the stack.</remarks>
+        /// <remarks>Where no handler is specified or returns a <c>null</c> this indicates that the <see cref="Exception"/> is not handled and the exception will continue to bubble up the stack.</remarks>
         public static Func<ActionContext, Exception, IActionResult> ExecuteExceptionHandler { get; set; } = CreateResultFromException;
 
         /// <summary>
         /// Creates a result for an <see cref="Exception"/>; specifically where it is a known/expected <see cref="IBusinessException"/>.
         /// </summary>
         /// <param name="exception">The <see cref="Exception"/>.</param>
-        /// <returns>The <see cref="IActionResult"/> for an <see cref="IBusinessException"/>; otherwise, <b>null</b>.</returns>
+        /// <returns>The <see cref="IActionResult"/> for an <see cref="IBusinessException"/>; otherwise, <c>null</c>.</returns>
         public static IActionResult CreateResultFromException(ActionContext context, Exception exception)
         {
             if (context == null)
@@ -112,7 +112,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="controller">The initiating <see cref="ApiController"/>.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/>.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -174,7 +174,7 @@ namespace Beef.AspNetCore.WebApi
         protected HttpStatusCode StatusCode { get; private set; }
 
         /// <summary>
-        /// Gets the alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <b>null</b>).
+        /// Gets the alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <c>null</c>).
         /// </summary>
         protected HttpStatusCode? AlternateStatusCode { get; private set; }
 
@@ -439,7 +439,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="func">The function to invoke.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -481,7 +481,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="func">The function to invoke.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -594,7 +594,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="func">The function to invoke.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/></param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -674,7 +674,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="func">The function to invoke.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/></param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -763,7 +763,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="updateFuncNoResult">The function to invoke to perform the <b>update</b> with no result.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/></param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
@@ -786,7 +786,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="updateFuncWithResult">The function to invoke to perform the <b>update</b> with a result.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/></param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
-        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <b>null</b>).</param>
+        /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
