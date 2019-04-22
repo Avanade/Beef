@@ -24,7 +24,7 @@ _Beef_ has been developed to encourage the standardisation and industrialisation
 
 <br>
 
-### API-enabled channel-agnostic architecture 
+### API-enabled domain-based channel-agnostic architecture 
 
 The conceptual architecture is as follows; with _Beef_ being targeted specifically at implementation of the API tier.
 
@@ -32,10 +32,10 @@ The conceptual architecture is as follows; with _Beef_ being targeted specifical
 
 The key concepts are as follows:
 
-- **Channel-agnostic** - the APIs are based around the key entities and the actions that can be performed on them. 
+- **Channel-agnostic** - the APIs are based around the key entities and the operations that can be performed on them: 
   - APIs represent the key trust boundary; as such, they make no assumptions on the consumer. The APIs will always validate the request data, and house the application’s functional business and orchestration rules.
   - APIs should not be developed to service a specific user interface interaction; as the APIs are agnostic to the consumer. The consumer has the responsibility of coordinating across API calls.
-- **Domain-based** – the APIs are based around, and encapsulate, the capabilities for a functional domain.
+- **Domain-based** – the APIs are based around, and encapsulate, the capabilities for a functional domain:
   - Outcome of a [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design); divides capapabilities into different [Bounded Contexts](https://www.martinfowler.com/bliki/BoundedContext.html).
   - Encourages micro vs monolithic services.
 
@@ -44,6 +44,7 @@ The key concepts are as follows:
 ### Microservices
 
 An architectural pattern for creating domain-based APIs:
+
 - Is a software architecture style in which complex applications are composed of small, independent processes communicating with each other using language-agnostic APIs.
 - These services are small, highly decoupled and focus on doing a small task, facilitating a modular approach to system-building.
 - Implementation independence:
@@ -56,6 +57,7 @@ An architectural pattern for creating domain-based APIs:
 <br>
 
 ### Tiering and layering
+
 The architecture supports a domain-based channel-agnostic microservices approach. The API service endpoints represent a light-weight facade for the Business (domain logic) tier, that is ultimately responsible for the fulfillment of the request. 
 
 The following represents the prescribed tiering and layering of the architecture:
@@ -65,9 +67,9 @@ The following represents the prescribed tiering and layering of the architecture
 Given this architecture, the .NET Solution you create using _Beef_ should adhere to the prescribed [solution structure](./docs/Solution-Structure.md).
 
 Each of the key layers above are further detailed: 
-- [Service interface](./Layer-ServiceInterface.md)
-- [Domain logic](./Layer-Manager.md)
-- [Service orchestration](./Layer-DataSvc.md)
+- [Service interface](./docs/Layer-ServiceInterface.md)
+- [Domain logic](./docs/Layer-Manager.md)
+- [Service orchestration](./docs/Layer-DataSvc.md)
 - Data access
 - Entity (DTO)
 - Service agent
@@ -76,7 +78,7 @@ Each of the key layers above are further detailed:
 
 ## Framework 
 
-A comprehensive [framework](.docs/Beef.md) has been created to support the defined architecture, to encapsulate and standardise capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
+A comprehensive **framework** has been created to support the defined architecture, to encapsulate and standardise capabilities, to achieve the desired code-generation outcomes and improve the overall developer experience.
 
 Standardised approach, ensures consistency of implementation:
 - Reduction in development effort.
@@ -84,13 +86,15 @@ Standardised approach, ensures consistency of implementation:
 - Greater confidence in adherence to architectural vision; minimised deviation.
 - Generation and alike enables the solution to evolve more quickly and effectively over time. 
 
-A key accelerator for _Beef_ is achieved using a flexible [code generation](./docs/Beef-Codegen-Core.md) approach. An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
+A key accelerator for _Beef_ is achieved using a flexible [code generation](./docs/Beef-Codegen-Core.md) approach.
+
+An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
 
 The **key** capabilities for _Beef_ are enabled by the following run-time assemblies:
 
-Assembly | Description | NuGet
+Assembly | Description | Source | NuGet
 -|-|-
-[`Beef.Core`](./Beef.Core) | Core foundational framework capabilities. | N/A
+[`Beef.Core`](./docs/Beef.Core.md) | Core foundational framework capabilities. | N/A
 [`Beef.AspNetCore.WebApi`](./Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework capabilities. | N/A
 [`Beef.Data.Database`](./Beef.Data.Database) | ADO.NET database framework capabilities. | N/A
 [`Beef.Data.EntityFrameworkCore`](./Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework capabilities. | N/A

@@ -1,0 +1,496 @@
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Entities;
+using Beef.Json;
+using NUnit.Framework;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+
+namespace Beef.Core.UnitTest.Json
+{
+    [TestFixture]
+    public class JsonEntityMergeTest
+    {
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class SubData
+        {
+            [JsonProperty("code")]
+            public string Code { get; set; }
+            [JsonProperty("text")]
+            public string Text { get; set; }
+            [JsonProperty("count")]
+            public int Count { get; set; }
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class KeyData : EntityBase
+        {
+            [JsonProperty("code")]
+            public string Code { get; set; }
+            [JsonProperty("text")]
+            public string Text { get; set; }
+            [JsonProperty("other")]
+            public string Other { get; set; }
+
+            public override bool IsInitial => throw new NotImplementedException();
+
+            public override object Clone()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool HasUniqueKey => true;
+
+            public override string[] UniqueKeyProperties => new string[] { "Code" };
+
+            public override UniqueKey UniqueKey => new UniqueKey(Code);
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class TestData
+        {
+            [JsonProperty("id")]
+            public Guid Id { get; set; }
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            public string Ignore { get; set; }
+            [JsonProperty("isValid")]
+            public bool IsValid { get; set; }
+            [JsonProperty("date")]
+            public DateTime Date { get; set; }
+            [JsonProperty("count")]
+            public int Count { get; set; }
+            [JsonProperty("amount")]
+            public decimal Amount { get; set; }
+            [JsonProperty("sub")]
+            public SubData Sub { get; set; }
+            [JsonProperty("values")]
+            public int[] Values { get; set; }
+            [JsonProperty("nokeys")]
+            public List<SubData> NoKeys { get; set; }
+            [JsonProperty("keys")]
+            public List<KeyData> Keys { get; set; }
+        }
+
+        [Test]
+        public void Merge_Nulls()
+        {
+            var td = new TestData();
+            Assert.Throws<ArgumentNullException>(() => { JsonEntityMerge.Merge<TestData>(null, td); });
+            Assert.Throws<ArgumentNullException>(() => { JsonEntityMerge.Merge<TestData>(new JArray(), null); });
+        }
+
+        [Test]
+        public void Merge_Malformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(new JArray(), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("", mi.Property);
+            Assert.AreEqual("The JSON document is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Empty()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ }"), td));
+        }
+
+        [Test]
+        public void Merge_Property_UnknownWarning()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"abcde\": 1 }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Warning, mi.Type);
+            Assert.AreEqual("abcde", mi.Property);
+            Assert.AreEqual("The JSON path is not valid for the entity.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_UnknownError()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"abcde\": 1 }"), td, new JsonEntityMergeArgs { TreatWarningsAsErrors = true, LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("abcde", mi.Property);
+            Assert.AreEqual("The JSON path is not valid for the entity.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_StringValue()
+        {
+            var td = new TestData { Name = "Fred" };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": \"Barry\" }"), td));
+            Assert.AreEqual("Barry", td.Name);
+        }
+
+        [Test]
+        public void Merge_Property_StringNull()
+        {
+            var td = new TestData { Name = "Fred" };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": null }"), td));
+            Assert.IsNull(td.Name);
+        }
+
+        [Test]
+        public void Merge_Property_StringNumberValue()
+        {
+            var td = new TestData { Name = "Fred" };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": 123 }"), td));
+            Assert.AreEqual("123", td.Name);
+        }
+
+        [Test]
+        public void Merge_Property_String_MalformedA()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": [ \"Barry\" ] }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("name", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_String_MalformedB()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": [ \"Barry\", \"Betty\" ] }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("name", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_String_MalformedC()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"name\": { \"name\": \"Betty\" } }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("name", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Bool_Malformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"isValid\": \"xxx\" }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("isValid", mi.Property);
+            Assert.AreEqual("The JSON token is malformed: String was not recognized as a valid Boolean.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_PrimitiveTypesA()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse(
+                "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58 }"
+                ), td));
+
+            Assert.AreEqual(new Guid("13512759-4f50-e911-b35c-bc83850db74d"), td.Id);
+            Assert.AreEqual("Barry", td.Name);
+            Assert.IsTrue(td.IsValid);
+            Assert.AreEqual(new DateTime(2018, 12, 31), td.Date);
+            Assert.AreEqual(12, td.Count);
+            Assert.AreEqual(132.58m, td.Amount);
+        }
+
+        [Test]
+        public void Merge_PrimitiveTypesB()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse(
+                "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58 }"
+                ), td));
+
+            Assert.AreEqual(new Guid("13512759-4f50-e911-b35c-bc83850db74d"), td.Id);
+            Assert.AreEqual("Barry", td.Name);
+            Assert.IsTrue(td.IsValid);
+            Assert.AreEqual(new DateTime(2018, 12, 31), td.Date);
+            Assert.AreEqual(12, td.Count);
+            Assert.AreEqual(132.58m, td.Amount);
+        }
+
+        [Test]
+        public void Merge_PrimitiveTypesC()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse(
+                "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58 }"
+                ), td));
+
+            Assert.AreEqual(new Guid("13512759-4f50-e911-b35c-bc83850db74d"), td.Id);
+            Assert.AreEqual("Barry", td.Name);
+            Assert.IsTrue(td.IsValid);
+            Assert.AreEqual(new DateTime(2018, 12, 31), td.Date);
+            Assert.AreEqual(12, td.Count);
+            Assert.AreEqual(132.58m, td.Amount);
+        }
+
+        [Test]
+        public void Merge_Property_SubEntityNull()
+        {
+            var td = new TestData { Sub = new SubData() };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"sub\": null }"), td));
+            Assert.IsNull(td.Sub);
+        }
+
+        [Test]
+        public void Merge_Property_SubEntityNewEmpty()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"sub\": { } }"), td));
+            Assert.IsNotNull(td.Sub);
+            Assert.IsNull(td.Sub.Code);
+            Assert.IsNull(td.Sub.Text);
+        }
+
+        [Test]
+        public void Merge_Property_SubEntityExistingEmpty()
+        {
+            var td = new TestData { Sub = new SubData() };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"sub\": { } }"), td));
+            Assert.IsNotNull(td.Sub);
+            Assert.IsNull(td.Sub.Code);
+            Assert.IsNull(td.Sub.Text);
+        }
+
+        [Test]
+        public void Merge_Property_ArrayMalformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"values\": { } }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("values", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_ArrayNull()
+        {
+            var td = new TestData { Values = new int[] { 1, 2, 3 } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"values\": null }"), td));
+            Assert.IsNull(td.Values);
+        }
+
+        [Test]
+        public void Merge_Property_ArrayEmpty()
+        {
+            var td = new TestData { Values = new int[] { 1, 2, 3 } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"values\": [] }"), td));
+            Assert.IsNotNull(td.Values);
+            Assert.AreEqual(0, td.Values.Length);
+        }
+
+        [Test]
+        public void Merge_Property_ArrayValues_NoChanges()
+        {
+            var td = new TestData { Values = new int[] { 1, 2, 3 } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"values\": [ 1, 2, 3] }"), td));
+            Assert.IsNotNull(td.Values);
+            Assert.AreEqual(3, td.Values.Length);
+        }
+
+        [Test]
+        public void Merge_Property_ArrayValues_Changes()
+        {
+            var td = new TestData { Values = new int[] { 1, 2, 3 } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"values\": [ 3, 2, 1] }"), td));
+            Assert.IsNotNull(td.Values);
+            Assert.AreEqual(3, td.Values.Length);
+            Assert.AreEqual(3, td.Values[0]);
+            Assert.AreEqual(2, td.Values[1]);
+            Assert.AreEqual(1, td.Values[2]);
+        }
+
+        [Test]
+        public void Merge_Property_ListMalformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.Error, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nokeys\": { } }"), td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("nokeys", mi.Property);
+            Assert.AreEqual("The JSON token is malformed and could not be parsed.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_NoKeys_ListNull()
+        {
+            var td = new TestData { NoKeys = new List<SubData> { new SubData() } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nokeys\": null }"), td));
+            Assert.IsNull(td.Values);
+        }
+
+        [Test]
+        public void Merge_Property_NoKeys_ListEmpty()
+        {
+            var td = new TestData { NoKeys = new List<SubData> { new SubData() } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nokeys\": [ ] }"), td));
+            Assert.IsNotNull(td.NoKeys);
+            Assert.AreEqual(0, td.NoKeys.Count);
+        }
+
+        [Test]
+        public void Merge_Property_NoKeys_ListMalformed()
+        {
+            MessageItem mi = null;
+            var td = new TestData { NoKeys = new List<SubData> { new SubData() } };
+            Assert.AreEqual(JsonEntityMergeResult.Error,
+                JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { \"count\": \"xxx\" }, null ] }"),
+                td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("nokeys[1].count", mi.Property);
+            Assert.AreEqual("The JSON token is malformed: Input string was not in a correct format.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_NoKeys_List()
+        {
+            var td = new TestData { NoKeys = new List<SubData> { new SubData() } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }"), td));
+            Assert.IsNotNull(td.NoKeys);
+            Assert.AreEqual(3, td.NoKeys.Count);
+
+            Assert.IsNotNull(td.NoKeys[0]);
+            Assert.AreEqual("abc", td.NoKeys[0].Code);
+            Assert.AreEqual("xyz", td.NoKeys[0].Text);
+
+            Assert.IsNotNull(td.NoKeys[1]);
+            Assert.IsNull(td.NoKeys[1].Code);
+            Assert.IsNull(td.NoKeys[1].Text);
+
+            Assert.IsNull(td.NoKeys[2]);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_Null()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.Error,
+                JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ null ] }"),
+                td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("keys[0]", mi.Property);
+            Assert.AreEqual("The JSON token must be an object where Unique Key value(s) are required.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_Empty()
+        {
+            MessageItem mi = null;
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.Error,
+                JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ { } ] }"),
+                td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("keys[0]", mi.Property);
+            Assert.AreEqual("The JSON object must specify the 'code' token as required for the unique key.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_ListItemNoChanges1()
+        {
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def", Other = "123" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ { \"code\": \"abc\", \"text\": \"def\" } ] }"), td));
+            Assert.IsNotNull(td.Keys);
+            Assert.AreEqual(1, td.Keys.Count);
+
+            Assert.IsNotNull(td.Keys[0]);
+            Assert.AreEqual("abc", td.Keys[0].Code);
+            Assert.AreEqual("def", td.Keys[0].Text);
+            Assert.AreEqual("123", td.Keys[0].Other);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_ListItemNoChanges2()
+        {
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def", Other = "123" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ { \"code\": \"abc\" } ] }"), td));
+            Assert.IsNotNull(td.Keys);
+            Assert.AreEqual(1, td.Keys.Count);
+
+            Assert.IsNotNull(td.Keys[0]);
+            Assert.AreEqual("abc", td.Keys[0].Code);
+            Assert.AreEqual("def", td.Keys[0].Text);
+            Assert.AreEqual("123", td.Keys[0].Other);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_ListItemWithChangesToExisting()
+        {
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" } ] }"), td));
+            Assert.IsNotNull(td.Keys);
+            Assert.AreEqual(1, td.Keys.Count);
+
+            Assert.IsNotNull(td.Keys[0]);
+            Assert.AreEqual("abc", td.Keys[0].Code);
+            Assert.AreEqual("xyz", td.Keys[0].Text);
+        }
+
+        [Test]
+        public void Merge_Property_Keys_ListItemChangedNew()
+        {
+            var td = new TestData { Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keys\": [ { \"code\": \"def\", \"text\": \"ghi\" } ] }"), td));
+            Assert.IsNotNull(td.Keys);
+            Assert.AreEqual(1, td.Keys.Count);
+
+            Assert.IsNotNull(td.Keys[0]);
+            Assert.AreEqual("def", td.Keys[0].Code);
+            Assert.AreEqual("ghi", td.Keys[0].Text);
+        }
+
+        [Test]
+        public void Merge_LoadTest_1000()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                var td = new TestData { Values = new int[] { 1, 2, 3 }, Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
+                JsonEntityMerge.Merge<TestData>(JObject.Parse(
+                    "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, " 
+                    + "\"values\": [ 1, 2, 4], \"sub\": { \"code\": \"abc\", \"text\": \"xyz\" }, \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, null, { } ], "
+                    + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }"),
+                    td);
+            }
+        }
+    }
+}
