@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Beef.Demo.CodeGen": {
+      "commandName": "Project",
+      "commandLineArgs": "entity",
+      "workingDirectory": "C:\\Users\\eric.sibly\\Innersource\\Repos\\Beef\\Demo\\Beef.Demo.CodeGen"
+    }
+  }
+}

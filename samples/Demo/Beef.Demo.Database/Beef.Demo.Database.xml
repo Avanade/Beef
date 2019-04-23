@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" RefDatabaseSchema="Ref" ConnectionString="Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True" >
+  <!-- Reference data stored procedures -->
+  <Table Name="Gender" Schema="Ref" GetAll="true" Get="true" Create="true" Update="true" />
+  
+  <!-- Master data stored procedures. -->
+  <Table Name="Person" Schema="Demo" Get="true" Create="true" Update="true" Delete="true" EfModel="true">
+    <StoredProcedure Name="GetAll" Paging="true">
+      <OrderBy Name="LastName" Order="Asc"/>
+      <OrderBy Name="FirstName" Order="Asc"/>
+    </StoredProcedure>
+    <StoredProcedure Name="GetByArgs" Paging="true">
+      <Parameter Name="FirstName" IsNullable="true" IsCollection="false" Operator="LIKE" />
+      <Parameter Name="LastName" IsNullable="true" IsCollection="false" Operator="LIKE" />
+      <Parameter Name="GenderId" IsNullable="true" IsCollection="true" />
+      <OrderBy Name="LastName" Order="Asc"/>
+      <OrderBy Name="FirstName" Order="Asc"/>
+    </StoredProcedure>
+    <StoredProcedure Name="GetDetailByArgs" Paging="true" IntoTempTable="true">
+      <Parameter Name="FirstName" IsNullable="true" IsCollection="false" Operator="LIKE" />
+      <Parameter Name="LastName" IsNullable="true" IsCollection="false" Operator="LIKE" />
+      <Parameter Name="GenderId" IsNullable="true" IsCollection="true" />
+      <OrderBy Name="LastName" Order="Asc"/>
+      <OrderBy Name="FirstName" Order="Asc"/>
+      <Execute Statement="EXEC [Demo].[spWorkHistoryGetUsingTempTable]"/>
+    </StoredProcedure>
+    <StoredProcedure Name="GetDetail" Type="Get">
+      <Execute Statement="EXEC [Demo].[spWorkHistoryGetByPersonId] @PersonId" />
+    </StoredProcedure>
+    <StoredProcedure Name="UpdateDetail" Type="Update" ReselectStatement="[Demo].[spPersonGetDetail] @PersonId">
+      <Parameter Name="WorkHistoryList" SqlType="[Demo].[udtWorkHistoryList] READONLY" />
+      <Execute Statement="EXEC [Demo].[spWorkHistoryMerge] @PersonId, @WorkHistoryList" Location="After" />
+    </StoredProcedure>
+  </Table>
+
+  <Table Name="WorkHistory" Schema="Demo" Udt="true" Tvp="WorkHistory" UdtExcludeColumns="PersonId">
+    <StoredProcedure Name="GetByPersonId" Type="GetAll">
+      <Parameter Name="PersonId" />
+      <OrderBy Name="StartDate" Order="Desc" />
+    </StoredProcedure>
+    <StoredProcedure Name="Merge" Type="Merge" MergeOverrideIdentityColumns="Name">
+      <Parameter Name="PersonId" SqlType="UNIQUEIDENTIFIER"/>
+    </StoredProcedure>
+    <StoredProcedure Name="GetUsingTempTable" Type="GetAll">
+      <Where Statement="[PersonId] IN (SELECT [PersonId] from #p)" />
+      <OrderBy Name="PersonId" Order="Asc" />
+      <OrderBy Name="StartDate" Order="Desc" />
+    </StoredProcedure>
+  </Table>
+</CodeGeneration>

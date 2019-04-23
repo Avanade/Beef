@@ -1,0 +1,7 @@
+﻿-- Migration Script
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Demo].[Person] ADD [UniqueCode] NVARCHAR(20) NULL 
+
+COMMIT TRANSACTION

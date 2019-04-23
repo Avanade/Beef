@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>Beef.Demo.Database</RootNamespace>
+    <AssemblyName>Beef.Demo.Database</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\**\*" />
+    <EmbeddedResource Include="Migrations\**\*" />
+    <EmbeddedResource Include="Data\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Migrations\20190107-162633-create-demo-person-uniquecode-index.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Beef.Demo.Database.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Schema\Demo\Stored Procedures\" />
+    <Folder Include="Schema\Ref\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\tools\Beef.Database.Core\Beef.Database.Core.csproj" />
+  </ItemGroup>
+
+</Project>

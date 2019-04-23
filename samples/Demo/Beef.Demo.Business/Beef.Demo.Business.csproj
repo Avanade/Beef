@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="DataSvc\Generated\" />
+    <Folder Include="Data\EfModel\Generated\" />
+    <Folder Include="Generated\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Core\Beef.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Data.EntityFrameworkCore\Beef.Data.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Data.OData\Beef.Data.OData.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
+  </ItemGroup>
+
+</Project>
