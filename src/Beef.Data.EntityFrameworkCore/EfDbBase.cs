@@ -88,7 +88,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
         /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <b>null</b>.</returns>
+        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
         public async Task<T> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
             if (getArgs == null)

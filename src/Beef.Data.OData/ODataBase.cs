@@ -104,7 +104,7 @@ namespace Beef.Data.OData
         /// is not valid.
         /// </summary>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
-        /// <returns>The <see cref="HttpRequestException"/> where not valid; otherwise, <b>null</b>.</returns>
+        /// <returns>The <see cref="HttpRequestException"/> where not valid; otherwise, <c>null</c>.</returns>
         public static HttpRequestException GetHttpRequestExceptionForResponse(HttpResponseMessage response)
         {
             if (response == null)
@@ -478,7 +478,7 @@ namespace Beef.Data.OData
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="getArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <b>null</b>.</returns>
+        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
         public async Task<T> GetAsync<T>(ODataArgs getArgs, params IComparable[] keys) where T : class, new()
         {
             return await ODataInvoker<T>.Default.InvokeAsync(this, async () =>
@@ -515,7 +515,7 @@ namespace Beef.Data.OData
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="getArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
-        /// <returns>The entity value where found; otherwise, <b>null</b>.</returns>
+        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
         internal async Task<T> ProcessGetResponseAsync<T>(HttpResponseMessage response, ODataArgs getArgs) where T : class, new()
         {
             if (response.StatusCode == HttpStatusCode.NotFound)

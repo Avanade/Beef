@@ -38,7 +38,7 @@ namespace Beef
         /// <returns>The value.</returns>
         public static T NotDefault<T>(T value, string paramName, string message = null)
         {
-            if (Comparer<T>.Default.Compare(value, default(T)) == 0)
+            if (Comparer<T>.Default.Compare(value, default) == 0)
                 throw new ArgumentException(message ?? "Argument with a default value is considered invalid.", paramName);
             else
                 return value;

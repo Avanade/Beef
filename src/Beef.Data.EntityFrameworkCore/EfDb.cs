@@ -22,7 +22,7 @@ namespace Beef.Data.EntityFrameworkCore
         public static TDefault Default { get => _default.Value; }
 
         /// <summary>
-        /// Invokes the <paramref name="action"/> whilst <see cref="DatabaseWildcard.Replace(string)">replacing</see> the <b>wildcard</b> characters when the <paramref name="with"/> is not <b>null</b>.
+        /// Invokes the <paramref name="action"/> whilst <see cref="DatabaseWildcard.Replace(string)">replacing</see> the <b>wildcard</b> characters when the <paramref name="with"/> is not <c>null</c>.
         /// </summary>
         /// <param name="with">The value with which to verify.</param>
         /// <param name="action">The <see cref="Action"/> to invoke when there is a valid <paramref name="with"/> value; passed the database specific wildcard value.</param>

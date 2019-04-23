@@ -2,12 +2,10 @@
 
 using Beef.Net.Http;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Beef.Data.OData
@@ -114,12 +112,12 @@ namespace Beef.Data.OData
         public ODataBatchItem[] Items { get => BatchManager.Items.ToArray(); }
 
         /// <summary>
-        /// Gets the resultant <see cref="ODataBatchItem"/> array where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <b>false</b>.
+        /// Gets the resultant <see cref="ODataBatchItem"/> array where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <c>false</c>.
         /// </summary>
         public ODataBatchItem[] ItemsInError { get => BatchManager.Items.Where(x => !x.IsSuccessStatusCode).ToArray(); }
 
         /// <summary>
-        /// Indicates whether any of the responses within the batch have an error (where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <b>false</b>). 
+        /// Indicates whether any of the responses within the batch have an error (where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <c>false</c>). 
         /// </summary>
         public bool HasItemErrors { get => BatchResponseMessage != null && BatchManager.Items.Where(x => !x.IsSuccessStatusCode).FirstOrDefault() != null; }
 
@@ -150,7 +148,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the batch <see cref="HttpRequestException"/> where not valid (see <see cref="IsSuccessStatusCode"/>).
         /// </summary>
-        /// <returns>The batch <see cref="HttpRequestException"/> where not valid; otherwise, <b>null</b>.</returns>
+        /// <returns>The batch <see cref="HttpRequestException"/> where not valid; otherwise, <c>null</c>.</returns>
         public HttpRequestException GetBatchHttpRequestException()
         {
             if (IsSuccessStatusCode)
@@ -162,7 +160,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the first <see cref="ItemsInError"/> <see cref="HttpRequestException"/> for the batch where <see cref="HasItemErrors"/>.
         /// </summary>
-        /// <returns>The first <see cref="HttpRequestException"/> where <see cref="HasItemErrors"/>; otherwise, <b>null</b>.</returns>
+        /// <returns>The first <see cref="HttpRequestException"/> where <see cref="HasItemErrors"/>; otherwise, <c>null</c>.</returns>
         public HttpRequestException GetItemsHttpRequestException()
         {
             if (!HasItemErrors || BatchResponseMessage == null)

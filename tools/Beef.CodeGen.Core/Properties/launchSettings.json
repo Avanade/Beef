@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Beef.CodeGen": {
+      "commandName": "Project",
+      "commandLineArgs": "beef.demo.xml -s  EntityWebApiCoreAgent.xml -p Company=Beef -p AppName=Demo -p ApiName=WebApi",
+      "workingDirectory": "C:\\Users\\eric.sibly\\Innersource\\Repos\\Beef\\Demo"
+    }
+  }
+}

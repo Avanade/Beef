@@ -37,7 +37,7 @@ namespace Beef.Data.OData
         bool HasHeaders { get; }
 
         /// <summary>
-        /// Indicates that a <b>null</b> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
+        /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
         /// </summary>
         bool NullOnNotFoundResponse { get; }
 
@@ -125,7 +125,7 @@ namespace Beef.Data.OData
         public HttpMethod OverrideHttpMethod { get; set; }
 
         /// <summary>
-        /// Indicates that a <b>null</b> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
+        /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
         /// </summary>
         public bool NullOnNotFoundResponse { get; set; }
 
@@ -213,7 +213,7 @@ namespace Beef.Data.OData
         /// </summary>
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
         /// <param name="propertyExpression">The <see cref="Expression"/> to the underlying property that references the related entity.</param>
-        /// <param name="odataExpandName">Specifies the OData expand name (will default to configured OData entity name where <b>null</b>).</param>
+        /// <param name="odataExpandName">Specifies the OData expand name (will default to configured OData entity name where <c>null</c>).</param>
         /// <returns>The <see cref="ODataArgs{T}"/> (enables fluent).</returns>
         public ODataArgs<T> Expand<TProperty>(Expression<Func<T, TProperty>> propertyExpression, string odataExpandName = null) where TProperty : class
         {

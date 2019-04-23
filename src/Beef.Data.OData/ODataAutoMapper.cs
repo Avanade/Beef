@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Linq.Expressions;
 using Beef.Mapper.Converters;
 using System.Collections.Generic;
-using Beef.Reflection;
 
 namespace Beef.Data.OData
 {
@@ -24,7 +23,7 @@ namespace Beef.Data.OData
         /// Indicates whether the entity <typeparamref name="TSrce"/> <see cref="Type"/> is cached.
         /// </summary>
         /// <typeparam name="TSrce">The entity <see cref="Type"/>.</typeparam>
-        /// <returns><b>true</b> indicates that the type exists within the cache; otherwise, <b>false</b>.</returns>
+        /// <returns><c>true</c> indicates that the type exists within the cache; otherwise, <c>false</c>.</returns>
         public static bool IsTypeCached<TSrce>()
         {
             return IsTypeCached(typeof(TSrce));
@@ -34,7 +33,7 @@ namespace Beef.Data.OData
         /// Indicates whether the entity <see cref="Type"/> is cached.
         /// </summary>
         /// <param name="type">The entity <see cref="Type"/>.</param>
-        /// <returns><b>true</b> indicates that the type exists within the cache; otherwise, <b>false</b>.</returns>
+        /// <returns><c>true</c> indicates that the type exists within the cache; otherwise, <c>false</c>.</returns>
         public static bool IsTypeCached(Type type)
         {
             return _cache.ContainsKey(type);

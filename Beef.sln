@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6C902314-82B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{080D0002-C5F5-400A-9B85-65DEECAD61A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beef.Core.UnitTest", "tests\Beef.Core.UnitTest\Beef.Core.UnitTest.csproj", "{8615A844-1323-4CF4-B689-402DDA2038EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Core.UnitTest", "tests\Beef.Core.UnitTest\Beef.Core.UnitTest.csproj", "{8615A844-1323-4CF4-B689-402DDA2038EB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{2733948C-DAB3-45B6-BE60-64BA3A5289F5}"
 EndProject
@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{7A307618-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Data.Database", "src\Beef.Data.Database\Beef.Data.Database.csproj", "{120BE707-CF4A-48F3-A2F6-35CB3789F8F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beef.Data.Database.UnitTest", "tests\Beef.Data.Database.UnitTest\Beef.Data.Database.UnitTest.csproj", "{518FCA77-18F9-4E91-A966-58EC50F03822}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Data.Database.UnitTest", "tests\Beef.Data.Database.UnitTest\Beef.Data.Database.UnitTest.csproj", "{518FCA77-18F9-4E91-A966-58EC50F03822}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{C9053423-A2E7-40B9-A483-2F706CFAC955}"
 EndProject
@@ -32,6 +32,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Data.OData", "src\Beef.Data.OData\Beef.Data.OData.csproj", "{8C337D6B-785F-4967-AD56-D37D84F37551}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Data.OData.UnitTest", "tests\Beef.Data.OData.UnitTest\Beef.Data.OData.UnitTest.csproj", "{4AFDA874-A1D7-4647-92A3-EA3A1B62582A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.CodeGen.Core", "tools\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj", "{3BE6ED7D-8480-4574-919F-128E37EF4641}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Database.Core", "tools\Beef.Database.Core\Beef.Database.Core.csproj", "{96E2CB96-E268-4638-9E31-138DA82E0EEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,14 @@ Global
 		{4AFDA874-A1D7-4647-92A3-EA3A1B62582A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AFDA874-A1D7-4647-92A3-EA3A1B62582A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AFDA874-A1D7-4647-92A3-EA3A1B62582A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BE6ED7D-8480-4574-919F-128E37EF4641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BE6ED7D-8480-4574-919F-128E37EF4641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BE6ED7D-8480-4574-919F-128E37EF4641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BE6ED7D-8480-4574-919F-128E37EF4641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E2CB96-E268-4638-9E31-138DA82E0EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E2CB96-E268-4638-9E31-138DA82E0EEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E2CB96-E268-4638-9E31-138DA82E0EEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E2CB96-E268-4638-9E31-138DA82E0EEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +104,8 @@ Global
 		{CD5C7225-9FDE-4156-A024-53C06240F98E} = {7A307618-3ADF-49DF-A490-A37D4404158D}
 		{8C337D6B-785F-4967-AD56-D37D84F37551} = {7A307618-3ADF-49DF-A490-A37D4404158D}
 		{4AFDA874-A1D7-4647-92A3-EA3A1B62582A} = {C9053423-A2E7-40B9-A483-2F706CFAC955}
+		{3BE6ED7D-8480-4574-919F-128E37EF4641} = {2733948C-DAB3-45B6-BE60-64BA3A5289F5}
+		{96E2CB96-E268-4638-9E31-138DA82E0EEC} = {2733948C-DAB3-45B6-BE60-64BA3A5289F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42D71086-61E6-4D31-B4B8-BFC8CC471428}

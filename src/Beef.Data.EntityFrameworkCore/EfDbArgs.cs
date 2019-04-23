@@ -28,7 +28,7 @@ namespace Beef.Data.EntityFrameworkCore
         bool SaveChanges { get; }
 
         /// <summary>
-        /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <b>true</b>).
+        /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <c>true</c>).
         /// </summary>
         bool Refresh { get; }
 
@@ -94,12 +94,12 @@ namespace Beef.Data.EntityFrameworkCore
         public PagingResult Paging { get; private set; }
 
         /// <summary>
-        /// Indicates that the underlying <see cref="DbContext"/> <see cref="T:DbContext.SaveChanges"/> is to be performed automatically (defauls to <b>true</b>);
+        /// Indicates that the underlying <see cref="DbContext"/> <see cref="T:DbContext.SaveChanges"/> is to be performed automatically (defauls to <c>true</c>);
         /// </summary>
         public bool SaveChanges { get; set; } = true;
 
         /// <summary>
-        /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <b>true</b>);
+        /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <c>true</c>);
         /// is dependent on <see cref="SaveChanges"/> being performed.
         /// </summary>
         public bool Refresh { get; set; } = true;

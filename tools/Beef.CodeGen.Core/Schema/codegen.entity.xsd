@@ -1,0 +1,1108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
+<xs:schema targetNamespace="http://schemas.beef.com/codegen/2015/01/entity" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="CodeGeneration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Entity">
+          <xs:annotation>
+            <xs:documentation>Provides the entity configuration.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Property">
+                <xs:annotation>
+                  <xs:documentation>Provides the property configuration for an entity.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>The unique property name.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Inherited" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property is inherited and therefore should not be output within the generated entity class.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="IgnoreSerialization" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property is not to be serialized.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="EmitDefaultValue" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to emit the default value when serializing (default to false).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Default" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the default value (strings will need to be delimited).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Text" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the Name (as sentence text) for the summary comments ['Gets or sets the {0}.' or 'Gets or sets a value indicating whether {0}.'].</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Type" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Defines the .NET Type (defaults to string).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DateTimeTransform" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the DateTime transformation to be performed on Set and CleanUp (defaults to DateTimeLocal).</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None"/>
+                        <xs:enumeration value="DateOnly"/>
+                        <xs:enumeration value="DateTimeLocal"/>
+                        <xs:enumeration value="DateTimeUtc"/>
+                        <xs:enumeration value="DateTimeUnspecified"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="DataFormatString" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the format string to be put into the [DisplayFormat(DataFormatString="")] data annotation.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="StringTrim" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the String trimming of white space characters to be performed on Set and CleanUp (defaults to End).</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None"/>
+                        <xs:enumeration value="Both"/>
+                        <xs:enumeration value="End"/>
+                        <xs:enumeration value="Start"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="StringTransform" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the String transformation option to be performed on Set and CleanUp (defaults to EmptyToNull).</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None"/>
+                        <xs:enumeration value="NullToEmpty"/>
+                        <xs:enumeration value="EmptyToNull"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="Nullable" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the .NET Type should be declared as Nullable&lt;T&gt;.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Immutable" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the value is immutable; cannot be changed once set.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="RefDataType" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the underlying .NET Type used for the ReferenceData identifier serialization.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="int"/>
+                        <xs:enumeration value="Guid"/>
+                        <xs:enumeration value="string"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="RefDataList" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the RefData property is to be a serializable list (ReferenceDataSidList).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="RefDataMapping" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property should use the underlying ReferenceData mapping capabilities (only use for ReferenceData entities).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="SecondaryPropertyChanged" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Name of the secondary property(s), comma delimited, that are to be notified on a property change.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="IsEntity" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the property value is another generated style entity/entityCollection.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="BubblePropertyChanged" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the value should bubble up property changes versus only recording within the sub-entity (see IsEntity) itself.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AutoCreate" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that an instance of the Type is to be automatically created/instantiated when the property is accessed (lazy instantiation).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeCleanup" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that CleanUp is not to be performed for the property within the Entity.CleanUp method.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="UniqueKey" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the property is considered part of the unique key.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="PrivateName" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The Name reformatted for private fields; i.e. 'RefData' reformatted as '_refData' (internally set).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ArgumentName" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The Name reformatted for argument parameters; i.e. 'RefData' reformatted as 'refData' (internally set).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="JsonName" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The Name for the JSON property; defaults to ArgumentName.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DisplayName" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Override the display name (DisplayAttribute[Name=]) of the property (internally set to Name as Sentence Case with spaces).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Annotation1" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Property annotation (e.g. attribute) declaration code.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Annotation2" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Property annotation (e.g. attribute) declaration code.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Annotation3" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Property annotation (e.g. attribute) declaration code.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataName" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data name where Entity.AutoImplement is selected; defaults to property name. Represents the column name for 'Database' or property name for 'OData'.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataAutoGenerated" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the UniqueKey value is automatically generated by the data source.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataConverter" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data converter class name (used where Entity.AutoImplement is selected or where specific data conversion is required).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataDatabaseMapper" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data Database mapper class name (used where Entity.AutoImplement is selected or where specific data mapping is required) for the underlying property is a complex Type.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataDatabaseIgnore" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property should be ignored (excluded) from the Database DataMapper generated output.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataEntityFrameworkMapper" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data Database mapper class name (used where Entity.AutoImplement is selected or where specific data mapping is required) for the underlying property is a complex Type.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataEntityFrameworkIgnore" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property should be ignored (excluded) from the EntityFramework DataMapper generated output.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataODataMapper" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data OData mapper class name (used where Entity.AutoImplement is selected or where specific data mapping is required) for the underlying property is a complex Type.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataODataIgnore" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the property should be ignored (excluded) from the OData DataMapper generated output.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="IsDataConverterGeneric" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the data converter is a generic class and will automatically use the corresponding Property Type.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataOperationTypes" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the Operations Types selection to enable mapping inclusion or exclusion of property (defaults to Any).</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Any"/>
+                        <xs:enumeration value="AnyExceptCreate"/>
+                        <xs:enumeration value="AnyExceptUpdate"/>
+                        <xs:enumeration value="AnyExceptGet"/>
+                        <xs:enumeration value="Get"/>
+                        <xs:enumeration value="Create"/>
+                        <xs:enumeration value="Update"/>
+                        <xs:enumeration value="Delete"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Operation">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0">
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Parameter">
+                      <xs:annotation>
+                        <xs:documentation>Provides the parameter configuration for an operation.</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:attribute name="Name" type="xs:string" use="required">
+                          <xs:annotation>
+                            <xs:documentation>The unique parameter name.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Property" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The corresponding Property name within the Entity to initially set up the Parameter characteristics.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Text" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Overrides the Name (as sentence text) for the summary comments ['The {0}.'].</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Type" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Defines the .NET Type (defaults to string).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Nullable" type="xs:boolean" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Indicates that the .NET Type should be declared as Nullable&lt;T&gt;.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="LayerPassing" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Determines the layers in which the parameters is passed (defaults to All). Where using the UniqueKey option to automatically set Parameters and the OperationType is 'Create' or 'Update' it will default to 'ToManagerSet').</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="All">
+                                <xs:annotation>
+                                  <xs:documentation>Passes the argument through all layers (default).</xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                              <xs:enumeration value="ToManager">
+                                <xs:annotation>
+                                  <xs:documentation>Only passes the argument to the Manager layer.</xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                              <xs:enumeration value="ToManagerSet">
+                                <xs:annotation>
+                                  <xs:documentation>Only passes the argument to the Manager layer and overrides the same named property within the 'value' parameter.</xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                              <xs:enumeration value="ToManagerCollSet">
+                                <xs:annotation>
+                                  <xs:documentation>Only passes the argument to the Manager layer and overrides the same named property within the 'value' collection parameter.</xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="RefDataType" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Required to identify entity as being RefData and specifies the underlying .NET Type used for the ReferenceData identifier serialization.</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="int"/>
+                              <xs:enumeration value="string"/>
+                              <xs:enumeration value="Guid"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="Default" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The default value for the paramater; must appear after all required parameters.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="PrivateName" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The Name reformatted for private fields; i.e. 'RefData' reformatted as '_refData' (internally set).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ArgumentName" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The Name reformatted for argument parameters; i.e. 'RefData' reformatted as 'refData' (internally set).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="IsMandatory" type="xs:boolean" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Indicates that a ValidationException should be thrown when the parameter value has its default value (null or zero).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Validator" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The name of the Type that will perform the value validation.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ValidatorFluent" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Fluent validator C# code to append to IsMandatory and Validator (where specified).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="DataConverter" type="xs:string" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Specifies the data converter class name (where specific data conversion is required).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="WebApiFrom" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Specifies that the parameter will be declared with the FromBodyAttribute/FromUriAttribute for the Web API method (defaults to FromUri if not specified).</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="FromUriUseProperties"/>
+                              <xs:enumeration value="FromBody"/>
+                              <xs:enumeration value="FromUri"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Name" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>The unique operation name.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Text" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the Name (as sentence text with OperationType context added) for the summary comments; needed for OperationType Custom.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Validator" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The name of the Type that will perform the value validation; only used for a 'Create' and 'Update' operation types.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="OperationType" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Defines the operation type.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Get"/>
+                        <xs:enumeration value="GetColl"/>
+                        <xs:enumeration value="Create"/>
+                        <xs:enumeration value="Update"/>
+                        <xs:enumeration value="Patch"/>
+                        <xs:enumeration value="Delete"/>
+                        <xs:enumeration value="Custom"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="ValueType" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Defines the .NET value Type for the operation (defaults to Entity); overridden where void for 'Create' and 'Update' operation types.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ReturnType" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Defines the .NET return Type for the operation (defaults to void); overridden where void for 'Get', 'GetColl', 'Create' and 'Update' operation types.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ReturnText" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Defines the text for the return type (defaults); only used for a 'Custom' operation type.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="UniqueKey" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the properties marked as a unique key are to be used as the parameters.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataSvcTransaction" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that a System.TransactionScope should be created around the DataSvc logic.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataSvcCustom" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the DataSvc logic is a custom implementation; i.e. no Data invocation logic is generated.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AuthPermission" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the permission of the ExecutionContext.IsAuthorized(permission).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AuthEntity" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the entity (permission) of the ExecutionContext.IsAuthorized(entity, action); defaults to Entity.Entity_Name where not specified.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AuthAction" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the action (permission) of the ExecutionContext.IsAuthorized(entity, action).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ManagerTransaction" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that a System.TransactionScope should be created around the Manager logic.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ManagerCustom" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the Manager logic is a custom implementation; i.e. no DataSvc invocation logic is to be generated.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiRoute" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The Web API RouteAtttribute to be appended to the route prefix.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiMethod" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the HttpMethod; defaults for each operation are Get=HttpGet, GetColl=HttpGet, Create=HttpPost, Update=HttpPut, Custom=HttpPost.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="HttpGet"/>
+                        <xs:enumeration value="HttpDelete"/>
+                        <xs:enumeration value="HttpPost"/>
+                        <xs:enumeration value="HttpPut"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiStatus" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the primary HttpStatusCode that will be returned for the operation.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="OK"/>
+                        <xs:enumeration value="Accepted"/>
+                        <xs:enumeration value="Created"/>
+                        <xs:enumeration value="NoContent"/>
+                        <xs:enumeration value="NotFound"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiAlternateStatus" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the alternate HttpStatusCode that will be returned for the operation.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="OK"/>
+                        <xs:enumeration value="Accepted"/>
+                        <xs:enumeration value="Created"/>
+                        <xs:enumeration value="NoContent"/>
+                        <xs:enumeration value="NotFound"/>
+                        <xs:enumeration value="ThrowException"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiOperationType" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies (overrides) the ExecutionContext.OperationType (CRUD denotation) where it cannot be inferred from the OperationType.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Unspecified"/>
+                        <xs:enumeration value="Create"/>
+                        <xs:enumeration value="Read"/>
+                        <xs:enumeration value="Update"/>
+                        <xs:enumeration value="Delete"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiAuthorize" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Determines whether the Web API controller should use Authorize or AllowAnonynous (default) attribute.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Authorize"/>
+                        <xs:enumeration value="AllowAnonymous"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="PatchGetOperation" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the corresponding XxxManager 'Get' operation used for a Patch; specify either 'OperationName' or 'XxxManager.OperationName' where in different XxxManager.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="PatchUpdateOperation" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Overrides the corresponding XxxManager 'Update' operation used for a Patch; specify either 'OperationName' or 'XxxManager.OperationName' where in different XxxManager.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="PagingArgs" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Add a PagingArgs argument to the operation.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="PagingArgsParams" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates the PagingArgs parameters to specifically use for the WebApi Controller (defaults to PageNumberSize).</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="PageNumberSize"/>
+                        <xs:enumeration value="PageBookmarkSize"/>
+                        <xs:enumeration value="PageNumberBookmarkSize"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeAll" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of all operations (versus specifying each).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeIData" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the IXxxData.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeData" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exlcude the creation of the operation in the XxxData.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeDataSvc" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the IXxxDataService.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeIManager" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the IXxxManager.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeManager" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the XxxManager.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeWebApi" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the Web API Controller class (XxxController.cs)</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeWebApiAgent" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the Web API Agent class (XxxAgent.cs)</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AutoImplement" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that the operation implementation can be automatically implemented using selected capability overriding the Entity.AutoImplement.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="None"/>
+                        <xs:enumeration value="Database"/>
+                        <xs:enumeration value="OData"/>
+                        <xs:enumeration value="EntityFramework"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="DatabaseStoredProc" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the database stored procedure (Entity.AutoImplement is 'Database' and Operation.AutoImplement is 'true'); defaults to 'spEntitynameOperationtype' (e.g. spPersonCreate)</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataEntityMapper" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the data mapper class name (defaults to 'Mapper')</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="EventPublish" type="xs:boolean"  use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to add logic to publish an event on the successful completion of the DataSvc layer invocation for a 'Create', 'Update' or 'Delete' (overrides any higher-level setting).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="EventSubject" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the event subject template and corresponding event action pair separated by a colon. The event subject template defaults to `Config.AppName`.`Entity.Name` plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}`. The event action defaults to `WebApiOperationType` or `OperationType` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Const">
+                <xs:annotation>
+                  <xs:documentation>Provides the constant configuration for an entity.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>The unique constant name.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Value" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>The identifier value (as an integer, Guid or string as defined by Entity.ConstType).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Text" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>The text to be used within the generated summary comments ['Represents a {0} constant value'].</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Name" type="xs:string" use="required">
+              <xs:annotation>
+                <xs:documentation>The unique entity name.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="FileName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The unique entity file name overridding the entity Name where the file name should be different.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Text" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Overrides the Name (as sentence text) for the summary comments ['Represents the {0} entity.'].</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Inherits" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The base class that the entity inherits from (defaults to EntityBase).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Implements" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The list of additional comma separated Interfaces that are to be declared.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Abstract" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the class should be defined as abstract.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Collection" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a corresponding EntityCollection class should be created.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="GenericWithT" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the class should be defined as a generic with a single parameter T.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CollectionInherits" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The base class that entity collection inherits from (defaults to EntityBaseCollection or EntityBaseKeyedCollection).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CollectionKeyed" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the entity collection is keyed for the UniqueKey properties.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CollectionResult" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a corresponding EntityCollectionResult class should be created.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CollectionResultInherits" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The base class that entity collection result inherits from (defaults to EntityCollectionResult).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Namespace" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The name of the entity namespace appended to end of the standard company.appname.Common.Entities (defaults to CodeGeneration element Namespace value).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="WebApiRoutePrefix" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The Web API RoutePrefixAtttribute for the Entity web api controller.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="WebApiAuthorize" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the Web API controller should use Authorize or AllowAnonynous (default) attribute.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Authorize"/>
+                  <xs:enumeration value="AllowAnonymous"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="EntityScope" use="optional">
+              <xs:annotation>
+                <xs:documentation>Determines whether the entity is considered Common (default) or should be scoped to the Business tier only (not accessible externally).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Common">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that this Entity will be generated within the Common project (default).</xs:documentation>
+                    </xs:annotation>
+                  </xs:enumeration>
+                  <xs:enumeration value="Business">
+                    <xs:annotation>
+                      <xs:documentation>Indicates that this Entity will be generated within the Business project only; i.e. intended for internal use and not accessible outside of this tier.</xs:documentation>
+                    </xs:annotation>
+                  </xs:enumeration>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ExcludeEntity" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Entity class (Xxx.cs).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeAll" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of all operations (versus specifying each) with the exception of ExcludeEntity.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeIData" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Data interface (IXxxData.cs).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeData" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exlcude the creation of the Data class (XxxData.cs).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeDataSvc" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the DataSvc class (XxxDataSvc.cs).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeIManager" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Manager interface (IXxxManager.cs)</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeManager" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Manager class (XxxManager.cs)</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeWebApi" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Web API Controller class (XxxController.cs)</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeWebApiAgent" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the Web API Agent class (XxxAgent.cs)</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="PrivateName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The name reformatted for private fields; i.e. 'FirstName' reformatted as '_firstName' (defaulted from Name).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ArgumentName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The name reformatted for argument parameters; i.e. 'FirstName' reformatted as 'firstName' (defaulted from Name).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="RefDataType" use="optional">
+              <xs:annotation>
+                <xs:documentation>Required to identify entity as being RefData; specifies the underlying .NET Type used for the ReferenceData identifier.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="int"/>
+                  <xs:enumeration value="Guid"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ConstType" use="optional">
+              <xs:annotation>
+                <xs:documentation>The type to be used for the Const elements/values.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="int"/>
+                  <xs:enumeration value="Guid"/>
+                  <xs:enumeration value="string"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="RefDataSortOrder" use="optional">
+              <xs:annotation>
+                <xs:documentation>Identifies the default sort order for the Reference data collection (defaults to SortOrder where not specified).</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="SortOrder"/>
+                  <xs:enumeration value="Id"/>
+                  <xs:enumeration value="Code"/>
+                  <xs:enumeration value="Text"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="DataSvcCaching" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether thread-based caching is to be performed at the DataSvc layer to improve performance (reduce internal chattiness) - defaults to true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="AutoImplement" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that the operation implementation can be automatically implemented using selected capability.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Database"/>
+                  <xs:enumeration value="OData"/>
+                  <xs:enumeration value="EntityFramework"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="DatabaseName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the database instance name (where AutoImplement is 'Database'); defaults to 'Database'.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DatabaseSchema" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the database schema (where AutoImplement is 'Database'); defaults to 'dbo'.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataDatabaseCustomMapper" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a custom Database Mapper will be created (not generated); otherwise, will be automatically generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataDatabaseMapperInheritsFrom" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the mapper that the generated Database mapper inherits from.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataODataCustomMapper" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a custom OData Mapper will be created (not generated); otherwise, will be automatically generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataODataMapperInheritsFrom" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the mapper that the generated OData mapper inherits from.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataEntityFrameworkCustomMapper" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a custom Entity Framework Mapper will be created (not generated); otherwise, will be automatically generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataEntityFrameworkInheritsFrom" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the mapper that the generated Entity Framework mapper inherits from.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EntityFrameworkName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the EntityFramework instance name (where AutoImplement is 'EntityFramework'); defaults to 'EfDb'.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EntityFrameworkEntity" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the corresponding EntityFramework entity name (required where AutoImplement is 'EntityFramework').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ODataName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the OData instance name (where AutoImplement is 'OData'); defaults to 'OData'.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ODataEntity" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the corresponding OData entity name (required where AutoImplement is 'OData').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="MapperAddStandardProperties" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that the AddStandardProperties method call is to be included for the mapper (defaults to true).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="EventPublish" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to add logic to Publish an Event on the successful completion of the DataSvc layer invocation for a 'Create', 'Update' or 'Delete' (overrides any higher-level setting).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IsInitialOverride" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to override the IsInitial result; or null to check each property to determine.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Get" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'Get' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="GetAll" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'GetAll' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Create" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'Create' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Update" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'Update' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Patch" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'Patch' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Delete" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a 'Delete' operation will be automatically generated where not otherwise specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+             <xs:attribute name="Validator" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>The name of the Type that will perform the value validation; only used for a 'Create' and 'Update' operation types (used where not specified for the Operation).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>         
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="RefDataNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>The namespace to be used for the reference data entities (adds using statement).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RefDataBusNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>The namespace to be used for the reference data entities with an EntityScope or 'Business' (adds using statement).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="AppendToNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>The name of the entity namespace appended to end of the standard company.appname.Common.Entities (defaults to null).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RefDataWebApiRoute" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>The top level reference data Web API route required for named pre-fetching.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RefDataCache" use="optional">
+        <xs:annotation>
+          <xs:documentation>Defines the cache used for the ReferenceData providers (defaults to 'ReferenceDataCache').</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="ReferenceDataCache"/>
+            <xs:enumeration value="ReferenceDataMultiTenantCache"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ValidatorLayer" use="optional">
+        <xs:annotation>
+          <xs:documentation>Defines the layer (namespace) where the Validator's are defined (defaults to 'Common').</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Common"/>
+            <xs:enumeration value="Business"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EntityUsing" use="optional">
+        <xs:annotation>
+          <xs:documentation>Defines the "using" declarations for entities (defaults to 'Common').</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Common"/>
+            <xs:enumeration value="Business"/>
+            <xs:enumeration value="All"/>
+            <xs:enumeration value="None"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="UsingNamespace1" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Entity code.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="UsingNamespace2" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Entity code.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="UsingNamespace3" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Entity code.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DataUsingNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Data code.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DatabaseUsingNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Data code where using AutoImplement of Database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ODataUsingNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Data code where using AutoImplement of OData.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="WebApiAuthorize" use="optional">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the Web API controller should use Authorize or AllowAnonynous (default) attribute.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Authorize"/>
+            <xs:enumeration value="AllowAnonymous"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="EventPublish" type="xs:boolean" use="optional">
+        <xs:annotation>
+          <xs:documentation>Indicates whether to add logic to Publish an Event on the successful completion of the DataSvc layer invocation for a 'Create', 'Update' or 'Delete' (defaults to true).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="MapperDefaultRefDataConverter" use="optional">
+        <xs:annotation>
+          <xs:documentation>Specifies the default Reference Data Converter used by the Mapper where not specifically defined (defaults to ReferenceDataInt32IdConverter).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="ReferenceDataCodeConverter"/>
+            <xs:enumeration value="ReferenceDataInt32IdConverter"/>
+            <xs:enumeration value="ReferenceDataGuidIdConverter"/>
+            <xs:enumeration value="ReferenceDataNullableInt32IdConverter"/>
+            <xs:enumeration value="ReferenceDataNullableGuidIdConverter"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

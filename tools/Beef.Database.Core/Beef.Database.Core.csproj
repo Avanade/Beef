@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+    <Version>2.1.001</Version>
+    <Authors>Beef Developers</Authors>
+    <Company>Avanade</Company>
+    <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
+    <Copyright>Avanade (c)</Copyright>
+    <PackageLicenseUrl>https://github.com/Avanade/Beef/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\eric.sibly\Source\Repos\Avanade\Beef\tools\Beef.Database.Core\Beef.Database.Core.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\DeleteAllAndResetIdent.sql" />
+    <None Remove="Resources\ScriptNew_sql.xml" />
+    <None Remove="Resources\TableInsertOrMerge_sql.xml" />
+    <None Remove="Schema\dbo\Functions\fnGetTenantId.sql" />
+    <None Remove="Schema\dbo\Functions\fnGetTimestamp.sql" />
+    <None Remove="Schema\dbo\Functions\fnGetUsername.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spSetSessionContext.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowAuthorizationException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowBusinessException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowConcurrencyException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowConflictException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowDuplicateException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowNotFoundException.sql" />
+    <None Remove="Schema\dbo\Stored Procedures\spThrowValidationException.sql" />
+    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtBigIntList.sql" />
+    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtDateTime2List.sql" />
+    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtIntList.sql" />
+    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtNVarCharList.sql" />
+    <None Remove="Schema\dbo\Types\User-Defined Table Types\udtUniqueIdentfierList.sql" />
+    <None Remove="ScriptNew.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteAllAndResetIdent.sql" />
+    <EmbeddedResource Include="Resources\ScriptNew_sql.xml" />
+    <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.xml" />
+    <EmbeddedResource Include="Schema\dbo\Functions\fnGetTenantId.sql" />
+    <EmbeddedResource Include="Schema\dbo\Functions\fnGetTimestamp.sql" />
+    <EmbeddedResource Include="Schema\dbo\Functions\fnGetUsername.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spSetSessionContext.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowAuthorizationException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowBusinessException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowDuplicateException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowConcurrencyException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowConflictException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowNotFoundException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Stored Procedures\spThrowValidationException.sql" />
+    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtBigIntList.sql" />
+    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtDateTime2List.sql" />
+    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtIntList.sql" />
+    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtNVarCharList.sql" />
+    <EmbeddedResource Include="Schema\dbo\Types\User-Defined Table Types\udtUniqueIdentfierList.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-sqlserver" Version="4.2.0" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
+    <PackageReference Include="YamlDotNet" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
+    <ProjectReference Include="..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\Beef.CodeGen.Core\Beef.CodeGen.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>System.Data</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>System.Xml</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

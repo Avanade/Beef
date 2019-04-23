@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Beef.Database.Core": {
+      "commandName": "Project",
+      "commandLineArgs": "database \"Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True\" "
+    }
+  }
+}

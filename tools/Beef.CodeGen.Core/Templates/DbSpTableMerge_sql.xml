@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
+<Template OutputGenDirName="Generated">
+  <Table>
+    <Set Name="System.IsDeleted" Value="false" />
+    <Set Name="System.OrgUnitId" Value="false" />
+    <Set Name="System.MultiTenancy" Value="false"/>
+    <Set Name="System.RowVersion" Value="false" />
+    <Set Name="System.IsAudited" Value="false" />
+    <Column>
+      <Set Name="System.IsDeleted" Condition="Column.Name == 'IsDeleted'" Value="true" />
+      <Set Name="System.OrgUnitId" Condition="Column.Name == 'OrgUnitId' and Column.IsPrimaryKey == false" Value="true" />
+      <Set Name="System.MultiTenancy" Condition="Column.Name == 'TenantId' and Column.IsPrimaryKey == false" Value="true" />
+      <Set Name="System.RowVersion" Condition="Column.Name == 'RowVersion'" Value="true" />
+      <Set Name="System.IsAudited" Condition="Column.Name == 'CreatedBy' or Column.Name == 'CreatedDate' or Column.Name == 'UpdatedBy' or Column.Name == 'UpdatedDate'" Value="true" />
+      <Set Name="Column.SkipAsInternal" Condition="Column.Name == 'IsDeleted'" Value="true" />
+      <Set Name="Column.SkipAsInternal" Condition="Column.Name == 'TenantId' and Column.IsPrimaryKey == false" Value="true" />
+    </Column>
+
+    <StoredProcedure Condition="StoredProcedure.Type == 'Merge'" OutputFileName="sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}.sql" OutputDirName="{{Table.Schema}}\Stored Procedures">
+      <![CDATA[CREATE PROCEDURE [{{Table.Schema}}].[sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}]
+]]>
+      <Parameter>
+        <If Condition="System.Index == 0">
+          <Then><![CDATA[   ]]></Then>
+          <Else><![CDATA[  ,]]></Else>
+        </If>
+        <![CDATA[@{{Parameter.Name}}]]>
+        <Set Name="System.ColumnFound" Value="false"/>
+        <Set Name="System.TableSysId" Value="Table.SysId"/>
+        <Set Name="System.ParameterName" Value="Parameter.Name"/>
+        <Set Name="System.ParameterSqlType" Value="Parameter.SqlType" />
+        <Set Name="System.ColumnName" Condition="Parameter.Column != null" Value="Parameter.Column" Otherwise="Parameter.Name"/>
+        <Set Name="System.ParameterNullable" Value="Parameter.IsNullable"/>
+        <Set Name="System.ParameterCollection" Value="Parameter.IsCollection"/>
+        <Table Condition="Table.SysId == System.TableSysId">
+          <Column Condition="Column.Name == System.ColumnName">
+            <Set Name="System.ColumnFound" Value="true"/>
+            <Set Name="Column.ParameterName" Value="System.ParameterName"/>
+            <If Condition="System.ParameterCollection == false">
+              <Then>
+                <If Condition="System.ParameterSqlType != null">
+                  <Then><![CDATA[ AS {{System.ParameterSqlType}}]]></Then>
+                  <Else>
+                    <![CDATA[ AS {{Column.Type:ToUpperCase}}]]>
+                    <If Condition="Column.Type == 'nvarchar' or Column.Type == 'varchar' or Column.Type == 'nchar' or Column.Type == 'char'">
+                      <If Condition="Column.Length > 0">
+                        <Then><![CDATA[({{Column.Length}})]]></Then>
+                        <Else><![CDATA[(MAX)]]></Else>
+                      </If>
+                    </If>
+                    <If Condition="Column.Type == 'decimal' or Column.Type == 'numeric'">
+                      <![CDATA[({{Column.Precision}}, {{Column.Scale}})]]>
+                    </If>
+                    <If Condition="Column.Type == 'time'">
+                      <If Condition="Column.Scale > 0">
+                        <Then><![CDATA[({{Column.Scale}})]]></Then>
+                      </If>
+                    </If>
+                    <If Condition="System.ParameterNullable == true">
+                      <![CDATA[ NULL = NULL]]>
+                    </If>
+                  </Else>
+                </If>
+              </Then>
+              <Else>
+                <![CDATA[s AS [dbo].[udt{{Column.Type}}list] READONLY]]>
+              </Else>
+            </If>
+          </Column>
+        </Table>
+        <If Condition="System.ColumnFound == false">
+          <If Condition="Parameter.SqlType != null">
+            <Then><![CDATA[ AS {{Parameter.SqlType}}]]></Then>
+            <Else>
+              <Exception Message="Parameter column '{{System.ColumnName}}' is not a known for table '{{Table.Name}}'."/>
+            </Else>
+          </If>
+        </If>
+        <![CDATA[
+]]>
+      </Parameter>
+      <If Condition="StoredProcedure.ParameterCount > 0">
+        <Then><![CDATA[  ,]]></Then>
+        <Else><![CDATA[   ]]></Else>
+      </If>
+      <![CDATA[@List AS [{{Table.Schema}}].[udt{{Table.Name}}List] READONLY
+AS
+BEGIN
+  /*
+   * This is automatically generated; any changes will be lost. 
+   */
+ 
+  SET NOCOUNT ON;
+  
+  BEGIN TRY
+    -- Wrap in a transaction.
+    BEGIN TRANSACTION
+
+]]>
+      <If Condition="System.IsAudited == true">
+        <![CDATA[    -- Set audit details, etc.
+    DECLARE @AuditDate DATETIME
+    DECLARE @AuditBy NVARCHAR(100)
+    EXEC @AuditDate = fnGetTimestamp @AuditDate
+    EXEC @AuditBy = fnGetUsername @AuditBy
+
+]]>
+      </If>
+      <If Condition="System.MultiTenancy == true">
+        <![CDATA[    -- Set the tenant identifier.
+    DECLARE @TenantId uniqueidentifier
+    SET @TenantId = dbo.fnGetTenantId(NULL)
+
+]]>
+      </If>
+      <If Condition="StoredProcedure.Permission != null">
+        <![CDATA[    -- Check user has permission.
+    EXEC [Sec].[spCheckUserHasPermission] ]]>
+        <If Condition="System.MultiTenancy == true">
+          <Then><![CDATA[@TenantId]]></Then>
+          <Else><![CDATA[NULL]]></Else>
+        </If>
+
+        <![CDATA[, NULL, '{{StoredProcedure.Permission:ToUpperCase}}'
+
+]]>
+      </If>
+      <If Condition="StoredProcedure.MergeOverrideIdentityColumns == null">
+        <![CDATA[    -- Check valid for merge.
+    DECLARE @ListCount INT
+    SET @ListCount = (SELECT COUNT(*) FROM @List WHERE ]]>
+        <Column Condition="Column.IsIdentity == true">
+          <![CDATA[[{{Column.Name}}] IS NOT NULL AND [{{Column.Name}}] <> ]]>
+          <If Condition="Column.Type:ToUpperCase == 'UNIQUEIDENTIFIER'">
+            <Then><![CDATA[CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')]]></Then>
+            <Else><![CDATA[0]]></Else>
+          </If>
+        </Column>
+        <![CDATA[)
+
+    DECLARE @RecordCount INT
+    SET @RecordCount = (SELECT COUNT(*) FROM @List as [list]
+      INNER JOIN [{{Table.Schema}}].[{{Table.Name}}] as [{{Table.Alias}}]
+        ON ]]>
+        <Set Name="System.AndNeeded" Value="false" />
+        <Column Condition="Column.IsIdentity == true">
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND ]]>
+          </If>
+          <![CDATA[[{{Table.Alias}}].[{{Column.Name}}] = [list].[{{Column.Name}}]]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </Column>
+        <Parameter>
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND [{{Table.Alias}}].]]>
+          </If>
+          <If Condition="Parameter.Column == null">
+            <Then><![CDATA[[{{Parameter.Name}}]]]></Then>
+            <Else><![CDATA[[{{Parameter.Column}}]]]></Else>
+          </If>
+          <![CDATA[ = @{{Parameter.Name}}]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </Parameter>
+        <If Condition="System.MultiTenancy == true">
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND ]]>
+          </If>
+          <![CDATA[[{{Table.Alias}}].[TenantId] = @TenantId]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </If>
+        <If Condition="System.RowVersion == true">
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND ]]>
+          </If>
+          <![CDATA[[{{Table.Alias}}].[RowVersion] = [list].[RowVersion]]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </If>
+        <If Condition="System.RowVersion == true">
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND ]]>
+          </If>
+          <![CDATA[[{{Table.Alias}}].[IsDeleted]= 0]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </If>
+        <Where>
+          <If Condition="System.AndNeeded == true">
+            <![CDATA[
+        AND ]]>
+          </If>
+          <![CDATA[[{{Table.Alias}}].{{Where.Statement}}]]>
+          <Set Name="System.AndNeeded" Value="true" />
+        </Where>
+        <![CDATA[)
+      
+    IF @ListCount <> @RecordCount
+    BEGIN
+      EXEC spThrowConcurrencyException
+    END
+
+]]>
+      </If>
+      <Set Name="System.ExecuteNewLine" Value="false"/>
+      <Execute Condition="Execute.Location == 'Before'">
+        <If Condition="System.Index == 0">
+          <![CDATA[    -- Execute additional (pre) statements.
+]]>
+        </If>
+        <![CDATA[    {{Execute.Statement}}
+]]>
+        <Set Name="System.ExecuteNewLine" Value="false"/>
+      </Execute>
+      <If Condition="System.ExecuteNewLine == true">
+        <![CDATA[
+]]>
+      </If>
+      <![CDATA[    -- Merge the records.
+    MERGE INTO [{{Table.Schema}}].[{{Table.Name}}] WITH (HOLDLOCK) AS [t]
+      USING @List as [s]
+        ON (]]>
+      <Set Name="System.AndNeeded" Value="false" />
+      <If Condition="StoredProcedure.MergeOverrideIdentityColumns == null">
+        <Then>
+          <Column Condition="Column.IsIdentity == true">
+            <If Condition="System.AndNeeded == true">
+              <![CDATA[
+        AND ]]>
+            </If>
+            <![CDATA[[t].[{{Column.Name}}] = [s].[{{Column.Name}}]]]>
+            <Set Name="System.AndNeeded" Value="true" />
+          </Column>
+        </Then>
+        <Else>
+          <ForEachList Name="StoredProcedure.MergeOverrideIdentityColumns">
+            <If Condition="System.AndNeeded == true">
+              <![CDATA[
+        AND ]]>
+            </If>
+            <![CDATA[[t].[{{System.Value}}] = [s].[{{System.Value}}]]]>
+            <Set Name="System.AndNeeded" Value="true" />
+          </ForEachList>
+        </Else>
+      </If>
+      <Parameter>
+        <If Condition="System.AndNeeded == true">
+          <![CDATA[
+        AND ]]>
+        </If>
+        <If Condition="Parameter.Column == null">
+          <Then><![CDATA[[t].[{{Parameter.Name}}]]]></Then>
+          <Else><![CDATA[[t].[{{Parameter.Column}}]]]></Else>
+        </If>
+        <![CDATA[ = @{{Parameter.Name}}]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </Parameter>
+      <If Condition="System.MultiTenancy == true">
+        <If Condition="System.AndNeeded == true">
+          <![CDATA[
+        AND ]]>
+        </If>
+        <![CDATA[[t].[TenantId] = @TenantId]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </If>
+      <Where>
+        <If Condition="System.AndNeeded == true">
+          <![CDATA[
+        AND ]]>
+        </If>
+        <![CDATA[[t].{{Where.Statement}}]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </Where>
+      <![CDATA[)
+      WHEN MATCHED
+        THEN UPDATE SET
+           ]]>
+      <Column Condition="Column.SkipAsInternal == false and Column.ParameterName == null and Column.Type != 'timestamp' and Column.IsIdentity == false and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.IsComputed == false">
+        <If Condition="System.Index > 0">
+          <![CDATA[
+          ,]]>
+        </If>
+        <![CDATA[[t].[{{Column.Name}}] = ]]>
+        <If Condition="Column.Name == 'UpdatedDate'">
+          <Then><![CDATA[@AuditDate]]></Then>
+          <Else>
+            <If Condition="Column.Name == 'UpdatedBy'">
+              <Then><![CDATA[@AuditBy]]></Then>
+              <Else><![CDATA[[s].[{{Column.Name}}]]]></Else>
+            </If>
+          </Else>
+        </If>
+      </Column>
+      <![CDATA[
+      WHEN NOT MATCHED BY TARGET
+        THEN INSERT (
+           ]]>
+      <Column Condition="Column.SkipAsInternal == false and Column.IsIdentity == false and Column.Type != 'timestamp' and Column.Name != 'RowVersion' and Column.Name != 'UpdatedDate' and Column.Name != 'UpdatedBy' and Column.IsComputed == false">
+        <If Condition="System.Index > 0">
+          <![CDATA[
+          ,]]>
+        </If>
+        <![CDATA[[{{Column.Name}}]]]>
+      </Column>
+      <If Condition="System.MultiTenancy == true">
+        <![CDATA[
+          ,[TenantId]]]>
+      </If>
+      <![CDATA[
+        )
+        VALUES (
+          ]]>
+      <Column Condition="Column.SkipAsInternal == false and Column.IsIdentity == false and Column.Type != 'timestamp' and Column.Name != 'RowVersion' and Column.Name != 'UpdatedDate' and Column.Name != 'UpdatedBy' and Column.IsComputed == false">
+        <If Condition="System.Index > 0">
+          <![CDATA[
+         ,]]>
+        </If>
+        <If Condition="Column.ParameterName == null">
+          <Then>
+            <If Condition="Column.Name == 'CreatedDate'">
+              <Then><![CDATA[@AuditDate]]></Then>
+              <Else>
+                <If Condition="Column.Name == 'CreatedBy'">
+                  <Then><![CDATA[@AuditBy]]></Then>
+                  <Else><![CDATA[[s].[{{Column.Name}}]]]></Else>
+                </If>
+              </Else>
+            </If>
+          </Then>
+          <Else>
+            <![CDATA[@{{Column.ParameterName}}]]>
+          </Else>
+        </If>
+      </Column>
+      <If Condition="System.MultiTenancy == true">
+        <![CDATA[
+         ,@TenantId]]>
+      </If>
+      <![CDATA[
+        )
+      WHEN NOT MATCHED BY SOURCE]]>
+      <Parameter>
+        <![CDATA[
+        AND ]]>
+        <If Condition="Parameter.Column == null">
+          <Then><![CDATA[[t].[{{Parameter.Name}}]]]></Then>
+          <Else><![CDATA[[t].[{{Parameter.Column}}]]]></Else>
+        </If>
+        <![CDATA[ = @{{Parameter.Name}}]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </Parameter>
+      <If Condition="System.MultiTenancy == true">
+        <If Condition="System.AndNeeded == true">
+          <![CDATA[
+        AND ]]>
+        </If>
+        <![CDATA[[t].[TenantId] = @TenantId]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </If>
+      <Where>
+        <If Condition="System.AndNeeded == true">
+          <![CDATA[
+        AND ]]>
+        </If>
+        <![CDATA[[t].{{Where.Statement}}]]>
+        <Set Name="System.AndNeeded" Value="true" />
+      </Where>
+      <![CDATA[
+]]>
+      <If Condition="System.IsDeleted">
+        <Then>
+          <![CDATA[        THEN UPDATE SET
+          [t].[IsDeleted] = 1]]>
+        </Then>
+        <Else>
+          <![CDATA[        THEN DELETE]]>
+        </Else>
+      </If>
+      <![CDATA[;
+]]>
+      <Execute Condition="Execute.Location == null or Execute.Location == 'After'">
+        <If Condition="System.Index == 0">
+          <![CDATA[
+  -- Execute additional statements.
+]]>
+        </If>
+        <![CDATA[    {{Execute.Statement}}
+]]>
+      </Execute>
+      <![CDATA[
+    -- Commit the transaction.
+    COMMIT TRANSACTION
+  END TRY
+  BEGIN CATCH
+    -- Rollback transaction and rethrow error.
+    IF @@TRANCOUNT > 0
+      ROLLBACK TRANSACTION;
+
+    THROW;
+  END CATCH
+END]]>
+    </StoredProcedure>
+  </Table>
+</Template>

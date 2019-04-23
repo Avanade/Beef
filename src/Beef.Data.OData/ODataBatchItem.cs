@@ -52,7 +52,7 @@ namespace Beef.Data.OData
         public bool CanGetValue { get => GetValueFunc != null; }
 
         /// <summary>
-        /// Indicates whether the batch HTTP response was successful (see <see cref="ResponseMessage"/>); will return <b>false</b> where there is no <see cref="ResponseMessage"/>.
+        /// Indicates whether the batch HTTP response was successful (see <see cref="ResponseMessage"/>); will return <c>false</c> where there is no <see cref="ResponseMessage"/>.
         /// </summary>
         public bool IsSuccessStatusCode { get => HasResponseMessage ? ResponseMessage.IsSuccessStatusCode : false; }
 
@@ -64,7 +64,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the <see cref="HttpRequestException"/> for the <see cref="ResponseMessage"/> where not valid (see <see cref="IsSuccessStatusCode"/>).
         /// </summary>
-        /// <returns>The <see cref="HttpRequestException"/> where not valid; otherwise, <b>null</b>.</returns>
+        /// <returns>The <see cref="HttpRequestException"/> where not valid; otherwise, <c>null</c>.</returns>
         public HttpRequestException GetHttpRequestException()
         {
             return HasResponseMessage ? ODataBase.GetHttpRequestExceptionForResponse(ResponseMessage) : null;
@@ -95,10 +95,10 @@ namespace Beef.Data.OData
         }
 
         /// <summary>
-        /// Gets the value from the <see cref="ResponseMessage"/> (only where <see cref="CanGetValue"/> is <b>true</b>).
+        /// Gets the value from the <see cref="ResponseMessage"/> (only where <see cref="CanGetValue"/> is <c>true</c>).
         /// </summary>
         /// <returns>The value from the response.</returns>
-        /// <remarks>Where the <see cref="HttpResponseMessage.IsSuccessStatusCode"/> is <b>false</b> an exception will be thrown.</remarks>
+        /// <remarks>Where the <see cref="HttpResponseMessage.IsSuccessStatusCode"/> is <c>false</c> an exception will be thrown.</remarks>
         public async Task<object> GetValueAsync()
         {
             if (!HasResponseMessage)
