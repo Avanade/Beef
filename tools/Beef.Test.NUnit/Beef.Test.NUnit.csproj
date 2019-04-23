@@ -1,27 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.001</Version>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
-    <FileVersion>2.1.0.0</FileVersion>
+    <Version>2.1.1</Version>
+    <AssemblyVersion>2.1.1</AssemblyVersion>
+    <FileVersion>2.1.1</FileVersion>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) NUnit extensions used for testing.</Description>
     <Copyright>Avanade (c)</Copyright>
-    <PackageLicenseUrl>https://github.com/Avanade/Beef/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Title>Business Entity Execution Framework (Beef) NUnit extensions used for testing.</Title>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\Beef.Test.NUnit.xml</DocumentationFile>
+    <DocumentationFile>.\bin\debug\Beef.Test.NUnit.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <OutputPath>bin\Debug\netcoreapp2.1\</OutputPath>
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

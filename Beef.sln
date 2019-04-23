@@ -57,6 +57,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Demo.Database", "sampl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Demo.Test", "samples\Demo\Beef.Demo.Test\Beef.Demo.Test.csproj", "{4E2D2A1D-E32E-4A69-92DD-C3256660824B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{72030FB2-0855-48FD-B903-FEB6B47B3372}"
+	ProjectSection(SolutionItems) = preProject
+		nuget-publish.ps1 = nuget-publish.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

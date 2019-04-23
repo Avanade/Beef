@@ -1,24 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.001</Version>
-    <Description>Business Entity Execution Framework (Beef) Entity Framework Core extensions.</Description>
+    <Version>2.1.1</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Business Entity Execution Framework (Beef) Entity Framework (EF) Core extensions.</Description>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Copyright>Avanade (c)</Copyright>
-    <PackageLicenseUrl>https://github.com/Avanade/Beef/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
-    <FileVersion>2.1.0.0</FileVersion>
+    <AssemblyVersion>2.1.1</AssemblyVersion>
+    <FileVersion>2.1.1</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Title>Business Entity Execution Framework (Beef) Entity Framework (EF) Core extensions.</Title>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Beef.Data.EntityFrameworkCore.xml</DocumentationFile>
+    <DocumentationFile>.\bin\debug\Beef.Data.EntityFrameworkCore.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>

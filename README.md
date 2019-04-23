@@ -92,21 +92,21 @@ An extensive framework of capabilities has also been developed to support this e
 
 The **key** capabilities for _Beef_ are enabled by the following run-time assemblies:
 
-Assembly | Description | Source | NuGet
+Assembly | Description | NuGet
 -|-|-
-[`Beef.Core`](./docs/Beef.Core.md) | Core foundational framework capabilities. | N/A
-[`Beef.AspNetCore.WebApi`](./Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework capabilities. | N/A
-[`Beef.Data.Database`](./Beef.Data.Database) | ADO.NET database framework capabilities. | N/A
-[`Beef.Data.EntityFrameworkCore`](./Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework capabilities. | N/A
-[`Beef.Data.OData`](./Beef.Data.OData) | OData consumption framework capabilities. | N/A
+[`Beef.Core`](./docs/Beef.Core.md) | Core foundational framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Core/)
+[`Beef.AspNetCore.WebApi`](./Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework capabilities. | [Link](https://www.nuget.org/packages/Beef.AspNetCore.WebApi/)
+[`Beef.Data.Database`](./Beef.Data.Database) | ADO.NET database framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.Database/)
+[`Beef.Data.EntityFrameworkCore`](./Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.EntityFrameworkCore/)
+[`Beef.Data.OData`](./Beef.Data.OData) | OData consumption framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.OData/)
 
 The tooling / supporting capabilities for _Beef_ are enabled by the following  assemblies:
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | N/A
-[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | N/A
-[`Beef.Test.NUnit`](./Beef.Test.NUnit) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | N/A
+[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | [Link](https://www.nuget.org/packages/Beef.CodeGen.Core/)
+[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | [Link](https://www.nuget.org/packages/Beef.Database.Core/)
+[`Beef.Test.NUnit`](./Beef.Test.NUnit) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | [Link](https://www.nuget.org/packages/Beef.Test.NUnit/)
 
 An end-to-end demo set of APIs has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing:
 
