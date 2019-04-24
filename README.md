@@ -66,13 +66,13 @@ The following represents the prescribed tiering and layering of the architecture
 
 Given this architecture, the .NET Solution you create using _Beef_ should adhere to the prescribed [solution structure](./docs/Solution-Structure.md).
 
-Each of the key layers above are further detailed: 
+Each of the key layers / components above are further detailed: 
 - [Service interface](./docs/Layer-ServiceInterface.md)
 - [Domain logic](./docs/Layer-Manager.md)
 - [Service orchestration](./docs/Layer-DataSvc.md)
-- Data access
-- Entity (DTO)
-- Service agent
+- [Data access](./docs/Layer-Data.md)
+- [Entity (DTO)](./docs/Layer-Entity.md)
+- [Service agent](./docs/Layer-ServiceAgent.md)
 
 <br>
 
@@ -108,11 +108,11 @@ Assembly | Description | NuGet
 [`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
 [`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
 
-A sample end-to-end demonstration of _Beef_ has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing intra-domain testing.
+The following samples are provided to guide usage:
 
-Assembly | Description | NuGet
+Sample | Description
 -|-|-
-[`Beef.Demo`](./samples/Beef.Demo) | A sample as an end-to-end demonstration. | N/A
+[`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing.
 
 <br>
 
