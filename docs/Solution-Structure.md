@@ -2,7 +2,7 @@
 
 The _Beef_ code-generation framework is somewhat opinionated around the naming of the .NET projects, their underlying .NET namespaces, and the names of the generated files themselves.
 
-There are two key attributes within the [code-generation](./Beef-CodeGen-Core.md) that drive the naming:
+There are two key attributes within the [code-generation](../tools/Beef.CodeGen.Core/README.md) that drive the naming:
 - **Company** - the company name.
 - **AppName** - the application / domain name.
 
@@ -28,27 +28,27 @@ The following represents the tiering and layering for the architecture; and ther
 
 ## Solution projects
 
-There a three primary run-time projects that make up the core of a solution based on _Beef_; including their dependencies:
+There a three primary run-time projects that make up the core of a solution based on _Beef_; including their dependencies (* denotes optional as required):
 
-Project | Description | Dependencies |
--|-
-`Company.AppName.Common` | Common / reusable components: **Entity** and **Service Agent**. These can be shared by any consumer as they only define the entity (contract) and an agent to consume the underlying API. | `Beef.Core` |
-`Company.AppName.Business` | Core business logic components: **Domain logic**, **Service orchestration** and **Data access**. This contains the internal business and data logic  (intellectual property) and should not be shared. | `Company.AppName.Common` <br>	`Beef.Core` <br> `Beef.Data.Database` <br> `Beef.Data...`
+Project | Description | Dependencies
+-|-|-
+`Company.AppName.Common` | Common / reusable components: **Entity** and **Service Agent**. These can be shared by any consumer as they only define the entity (contract) and an agent to consume the underlying API. | `Beef.Core`
+`Company.AppName.Business` | Core business logic components: **Domain logic**, **Service orchestration** and **Data access**. This contains the internal business and data logic (intellectual property) and should not be shared. | `Company.AppName.Common` <br>	`Beef.Core` <br> `Beef.Data.Database`* <br> `Beef.Data.EntityFrameworkCode`* <br> `Beef.Data.OData`*
 `Company.AppName.Api` | API end-point and operations: **Service interface**. This one of many possible host for the business logic; in this instance providing the HTTP RESTful endpoints. | `Company.AppName.Business` <br>`Beef.Core` <br> `Beef.AspNetCore.WebApi`
 
 <br>
 
-Additionally, there are two tooling projects and a testing project:
+Additionally, there are two tooling projects, and a testing project:
 
-Project | Description | Dependencies |
--|-
-`Company.AppName.CodeGen` | Entity and related code generation. |
-`Company.AppName.Database` | Database and data management. |
-`Company.AppName.Test` | Unit and intra-integration tests. |
+Project | Description | Dependencies
+-|-|-
+`Company.AppName.CodeGen` | Entity and Reference Data code generation console tool. | `Beef.CodeGen.Core`
+`Company.AppName.Database` | Database and data management console tool. | `Beef.Database.Core`
+`Company.AppName.Test` | Unit and intra-integration tests. | `Beef.Test.NUnit` <br/> `Company.AppName.Api` <br/> `Company.AppName.Database`
 
 <br>
 
-### `Company.AppName.Common`
+### Company.AppName.Common
 
 This is a _.NET **Standard** Class Library_ project and contains the common reusuable components; specifically the `Entities`, `Agents` and `ServiceAgents`. This assembly could be shared externally as part of an SDK as it largely encapsulates the logic to consume the underlying APIs and the entities that form the contracts. 
 
@@ -68,7 +68,7 @@ The underlying project folder structure will be as follows (the code generation 
 
 <br>
 
-### `Company.AppName.Business`
+### Company.AppName.Business
 
 This is a _.NET **Core** Class Library_ project and contains the primary domain business logic; being the [Domain logic](./Layer-Manager.md), [Service orchestration](./Layer-DataSvc.md) and Data access.
 
@@ -86,7 +86,7 @@ The underlying project folder structure will be as follows (the code generation 
 
 <br>
 
-### `Company.AppName.Api`
+### Company.AppName.Api
 
 This is an _ASP.NET **Core** Web Application_ project and contains the Web API logic; being the [Service interface](./Layer-ServiceInterface.md). When creating the project in _Microsoft Visual Studio_ make sure that the **API** option is selected.
 
@@ -105,7 +105,7 @@ The `Startup.cs` file will need additional start up activities performed to ensu
 
 <br>
 
-### `Company.AppName.CodeGen`
+### Company.AppName.CodeGen
 
 This is a _.NET **Core** Console Application_ project and contains the configuration for the **Entity-driven** [code generation](./Beef-CodeGen-Core.md) and the program execution stub to run.
 
@@ -132,7 +132,7 @@ class Program
 
 <br>
 
-### `Company.AppName.Database`
+### Company.AppName.Database
 
 This is a _.NET **Core** Console Application_ project and contains the database schema, data, and table-driven [code generation](./Beef-CodeGen-Core.md) configuration. Also includes the program execution stub to run.
 

@@ -94,25 +94,25 @@ The **key** capabilities for _Beef_ are enabled by the following run-time assemb
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.Core`](./src/Beef.Core) | Core foundational framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.core.svg)](https://badge.fury.io/nu/Beef.core) | [Link](./samples/Demo)
-[`Beef.AspNetCore.WebApi`](./docs/Beef-AspNetCore-WebApi.md) | ASP.NET Core Web API framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi)
-[`Beef.Data.Database`](./docs/Beef-Data-Database.md) | ADO.NET database framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database)
-[`Beef.Data.EntityFrameworkCore`](./docs/Beef-Data-EntityFrameworkCore.md) | Entity Framework (EF) Core framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
-[`Beef.Data.OData`](./docs/Beef-Data-OData.md) | OData consumption framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData)
+[`Beef.Core`](./src/Beef.Core) | Core foundational framework. | [![NuGet version](https://badge.fury.io/nu/Beef.core.svg)](https://badge.fury.io/nu/Beef.core)
+[`Beef.AspNetCore.WebApi`](./src/Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi)
+[`Beef.Data.Database`](./src/Beef.Data.Database) | ADO.NET database framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database)
+[`Beef.Data.EntityFrameworkCore`](./src/Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
+[`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData)
 
 The tooling / supporting capabilities for _Beef_ are enabled by the following  assemblies:
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core)
-[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
-[`Beef.Test.NUnit`](./docs/Beef-Test-NUnit.md) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
+[`Beef.CodeGen.Core`](./tools/Beef.CodeGen.Core) | Code generation console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core)
+[`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
+[`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
 
-An end-to-end demo set of APIs has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing:
+A sample end-to-end demonstration of _Beef_ has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing intra-domain testing.
 
-Assembly | Description | NuGet | Source
--|-|-|-
-[`Beef.Demo`](./docs/Beef-Demo.md) | A sample as an end-to-end demonstration. | N/A | [Link](./samples/Demo)
+Assembly | Description | NuGet
+-|-|-
+[`Beef.Demo`](./samples/Beef.Demo) | A sample as an end-to-end demonstration. | N/A
 
 <br>
 
@@ -130,10 +130,10 @@ One of the easiest ways to contribute is to participate in discussions on GitHub
 ### Coding guidelines
 
 The most general guideline is that we use all the VS default settings in terms of code formatting; if it doubt, follow the coding convention of the existing code base.
-1. Use four spaces of indentation (no tabs)
-2. Use `_camelCase` for private fields
-3. Avoid `this.` unless absolutely necessary
-4. Always specify member visibility, even if it's the default (i.e. `private string _foo;` not `string _foo;`)
+1. Use four spaces of indentation (no tabs).
+2. Use `_camelCase` for private fields.
+3. Avoid `this.` unless absolutely necessary.
+4. Always specify member visibility, even if it's the default (i.e. `private string _foo;` not `string _foo;`).
 5. Open-braces (`{`) go on a new line (an `if` with single-line statement does not need braces).
 6. Use any language features available to you (expression-bodied members, throw expressions, tuples, etc.) as long as they make for readable, manageable code.
 7. All methods and properties must include the [XML documentation comments](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/xml-documentation-comments). Private methods and properties only need to specifiy the [summary](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/summary) as a minimum.
@@ -158,6 +158,6 @@ We understand there is more work to be performed in generating a higher level of
 ### Code reviews and checkins
 To help ensure that only the highest quality code makes its way into the project, please submit all your code changes to GitHub as PRs. This includes runtime code changes, unit test updates, and updates to the end-to-end demo.
 
- For example, sending a PR for just an update to a unit test might seem like a waste of time but the unit tests are just as important as the product code and as such, reviewing changes to them is also just as important. This also helps create visibility for your changes so that others can observe what is going on.
+For example, sending a PR for just an update to a unit test might seem like a waste of time but the unit tests are just as important as the product code and as such, reviewing changes to them is also just as important. This also helps create visibility for your changes so that others can observe what is going on.
 
 The advantages are numerous: improving code quality, more visibility on changes and their potential impact, avoiding duplication of effort, and creating general awareness of progress being made in various areas.

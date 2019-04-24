@@ -29,7 +29,6 @@ namespace Beef.Demo.Business.Data
             {
                 Database.Default.GetRefData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
                 {
-                    item.ExternalCode = dr.GetValue<string>("ExternalCode");
                 });
                 await Task.Delay(0);
             }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);

@@ -1,4 +1,4 @@
-﻿# `Table` element (table-driven)
+﻿# 'Table' element (table-driven)
 
 The **`Table`** element specifies that one or more stored procedures are to be generated for the specified table (or view), including other characteristics defined.
 

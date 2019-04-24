@@ -1,4 +1,4 @@
-﻿# `Entity`  element (entity-driven)
+﻿# 'Entity' element (entity-driven)
 
 The **`Entity`** element is the primary configuration for driving the entity-driven code generation.
 

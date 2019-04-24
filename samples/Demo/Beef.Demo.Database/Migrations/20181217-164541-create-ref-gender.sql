@@ -6,7 +6,6 @@ CREATE TABLE [Ref].[Gender] (
 	[Text] NVARCHAR (250) NULL,
 	[IsActive] BIT NULL,
 	[SortOrder] INT NULL,
-	[ExternalCode] NVARCHAR(50) NULL,
 	[RowVersion] TIMESTAMP NOT NULL,
 	[CreatedBy] NVARCHAR(250) NULL,
 	[CreatedDate] DATETIME2 NULL,

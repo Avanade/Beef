@@ -1,4 +1,4 @@
-﻿# `Const` element (entity-driven)
+﻿# 'Const' element (entity-driven)
 
 The **Const** element enables constant values to be defined for an entity.
 

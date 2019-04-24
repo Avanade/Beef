@@ -6,7 +6,7 @@ namespace Beef.Demo.CodeGen
     {
         static int Main(string[] args)
         {
-            return CodeGenConsoleWrapper.Create("Beef", "Demo").Supports(entity: true, database: false, refData: true).Run(args);
+            return CodeGenConsoleWrapper.Create("Beef", "Demo").Supports(entity: true, refData: true).Run(args);
         }
     }
 }

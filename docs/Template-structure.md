@@ -1,4 +1,4 @@
-﻿# Template structure
+﻿# Code-generation Template structure
 
 The templates are defined using XML that follows a prescribed structure. There are some basic language capabilities such as looping, conditions, variables, etc. to facilitate the generation output.
 

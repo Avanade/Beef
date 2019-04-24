@@ -1,4 +1,4 @@
-﻿# `Execute` element (table-driven)
+﻿# 'Execute' element (table-driven)
 
 The **`Execute`** element will add the specified statement as-is to the generated SQL.
 

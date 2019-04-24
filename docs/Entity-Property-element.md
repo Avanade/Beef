@@ -1,4 +1,4 @@
-﻿# `Property` element (entity-driven)
+﻿# 'Property' element (entity-driven)
 
 The **`Property`** element defines a property and its characteristics.
 

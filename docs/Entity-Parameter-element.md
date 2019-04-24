@@ -1,4 +1,4 @@
-﻿# `Parameter` element (entity-driven)
+﻿# 'Parameter' element (entity-driven)
 
 The **`Parameter`** element enables parameters to be configured for an Operation.
 

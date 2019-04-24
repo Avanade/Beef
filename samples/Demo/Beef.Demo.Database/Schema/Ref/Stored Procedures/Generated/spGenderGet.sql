@@ -14,7 +14,6 @@ BEGIN
        ,[g].[Text]
        ,[g].[IsActive]
        ,[g].[SortOrder]
-       ,[g].[ExternalCode]
        ,[g].[RowVersion]
        ,[g].[CreatedBy]
        ,[g].[CreatedDate]

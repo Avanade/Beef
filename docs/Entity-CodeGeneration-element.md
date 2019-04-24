@@ -1,4 +1,4 @@
-﻿# `CodeGeneration` element (entity-driven)
+﻿# 'CodeGeneration' element (entity-driven)
 
 The **`CodeGeneration`** element defines global attributes that are used to drive the underlying entity-driven code generation. 
 

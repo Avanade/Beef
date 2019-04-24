@@ -1,4 +1,4 @@
-﻿# `Where` element (table-driven)
+﻿# 'Where' element (table-driven)
 
 The **`Where`** element will add the specified where statement to the generated SQL.
 

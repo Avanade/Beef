@@ -1,4 +1,4 @@
-﻿# `Operation` element (entity-driven)
+﻿# 'Operation' element (entity-driven)
 
 The code generation for an **Operation** is primarily driven by the **`OperationType`** attribute. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as requited. Options are as follows:
 - **`Get`** - indicates a get (read) returning a single entity value.

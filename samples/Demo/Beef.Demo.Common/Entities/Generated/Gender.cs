@@ -20,15 +20,6 @@ namespace Beef.Demo.Common.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Gender : ReferenceDataBaseGuid
     {
-        #region PropertyNames
-      
-        /// <summary>
-        /// Represents the <see cref="ExternalCode"/> property name.
-        /// </summary>
-        public const string Property_ExternalCode = nameof(ExternalCode);
-
-        #endregion
-
         #region Constructor
       
         /// <summary>
@@ -39,21 +30,6 @@ namespace Beef.Demo.Common.Entities
             this.GenderConstructor();
         }
         
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the External Code.
-        /// </summary>
-        [JsonProperty("externalCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="External Code")]
-        public string ExternalCode
-        {
-            get { return GetMapping<string>(nameof(ExternalCode)); }
-            set { var __externalCode = GetMapping<string>(nameof(ExternalCode)) ?? default(string); SetValue(ref __externalCode, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_ExternalCode); SetMapping(nameof(ExternalCode), __externalCode); }
-        }
-
         #endregion
 
         #region Operator
@@ -99,7 +75,6 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Gender from)
         {
             CopyFrom((ReferenceDataBaseGuid)from);
-            this.ExternalCode = from.ExternalCode;
 
             this.OnAfterCopyFrom(from);
         }

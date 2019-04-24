@@ -1,4 +1,4 @@
-﻿# Table-driven element: `CodeGeneration`
+﻿# 'CodeGeneration' element (table-driven)
 
 The **`CodeGeneration`** element defines global attributes that are used to drive the underlying database table-driven stored procedure generation. 
 

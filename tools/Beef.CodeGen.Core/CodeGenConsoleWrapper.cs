@@ -129,8 +129,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Sets the <see cref="IsEntitySupported"/>, <see cref="IsDatabaseSupported"/> and <see cref="IsRefDataSupported"/> options.
         /// </summary>
+        /// <param name="entity">Indicates where the entity code generation should take place.</param>
+        /// <param name="database">Indicates where the database generation should take place.</param>
+        /// <param name="refData">Indicates where the reference data generation should take place.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> to support method chaining/fluent style.</returns>
-        public CodeGenConsoleWrapper Supports(bool entity = true, bool database = true, bool refData = false)
+        public CodeGenConsoleWrapper Supports(bool entity = true, bool database = false, bool refData = false)
         {
             IsEntitySupported = entity;
             IsDatabaseSupported = database;

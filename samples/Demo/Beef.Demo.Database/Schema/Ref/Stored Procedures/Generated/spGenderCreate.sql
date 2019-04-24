@@ -4,7 +4,6 @@ CREATE PROCEDURE [Ref].[spGenderCreate]
   ,@Text AS NVARCHAR(250) NULL = NULL
   ,@IsActive AS BIT NULL = NULL
   ,@SortOrder AS INT NULL = NULL
-  ,@ExternalCode AS NVARCHAR(50) NULL = NULL
   ,@CreatedBy AS NVARCHAR(250) NULL = NULL
   ,@CreatedDate AS DATETIME2 NULL = NULL
   ,@ReselectRecord AS BIT = 0
@@ -32,7 +31,6 @@ BEGIN
        ,[Text]
        ,[IsActive]
        ,[SortOrder]
-       ,[ExternalCode]
        ,[CreatedBy]
        ,[CreatedDate]
     )
@@ -42,7 +40,6 @@ BEGIN
        ,@Text
        ,@IsActive
        ,@SortOrder
-       ,@ExternalCode
        ,@CreatedBy
        ,@CreatedDate
     )

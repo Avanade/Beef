@@ -1,4 +1,4 @@
-﻿# `Parameter` element (table-driven)
+﻿# 'Parameter' element (table-driven)
 
 The **`Parameter`** element will add the specified parameters to the generated SQL; these are in addition to those that are automatically inferred by the selected stored procedure type.
 

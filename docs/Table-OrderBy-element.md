@@ -1,4 +1,4 @@
-﻿# `OrderBy` element (table-driven)
+﻿# 'OrderBy' element (table-driven)
 
 The **`OrderBy`** element will add the specified order by statement to the generated SQL query (stored procedure type `GetAll` only).
 

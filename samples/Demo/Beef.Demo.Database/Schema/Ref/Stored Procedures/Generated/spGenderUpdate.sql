@@ -4,7 +4,6 @@ CREATE PROCEDURE [Ref].[spGenderUpdate]
   ,@Text AS NVARCHAR(250) NULL = NULL
   ,@IsActive AS BIT NULL = NULL
   ,@SortOrder AS INT NULL = NULL
-  ,@ExternalCode AS NVARCHAR(50) NULL = NULL
   ,@RowVersion AS TIMESTAMP
   ,@UpdatedBy AS NVARCHAR(250) NULL = NULL
   ,@UpdatedDate AS DATETIME2 NULL = NULL
@@ -45,7 +44,6 @@ BEGIN
         ,[Text] = @Text
         ,[IsActive] = @IsActive
         ,[SortOrder] = @SortOrder
-        ,[ExternalCode] = @ExternalCode
         ,[UpdatedBy] = @UpdatedBy
         ,[UpdatedDate] = @UpdatedDate
       WHERE [GenderId] = @GenderId

@@ -39,7 +39,7 @@ The schema scripts must be marked as embedded resources, and reside under the `S
 
 The `Schema` folder is used to encourage the usage of database schemas. Therefore, directly under should be the schema name, for example `dbo` or `Ref`. Then sub-folders for the object types as per [Azure Data Studio](https://docs.microsoft.com/en-au/sql/azure-data-studio/what-is), for example `Functions`, `Stored Procedures` or `Types\User-Defined Table Types`. 
 
-Code generation is also supported / enabled using the **Beef Code-Gen** capabilities - see [link](..\Beef.CodeGen.Core\Docs\CodeGen.md) for details. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the execution.
+Code generation is also supported / enabled using the _Beef_ [Code-Gen](../Beef.CodeGen.Core/README.md) capabilities. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the execution.
 
 <br/>
 
@@ -81,7 +81,7 @@ Demo:
 
 ## Console application
 
-The `Beef.Database.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. Then simply add the `Data`, `Migrations` and `Schema` folders and embed the required resources.
+The `Beef.Database.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. Then simply add the `Data`, `Migrations` and `Schema` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as an example.
 
 <br/>
 

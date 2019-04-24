@@ -1,4 +1,4 @@
-﻿# `StoredProcedure` element (table-driven)
+﻿# 'StoredProcedure' element (table-driven)
 
 The code generation for a **Stored Procedure** is primarily driven by the `Type` attribute. This encourages a consistent implementation for the standardised  actions. Options are as follows:
 - **`Get`** - indicates a get (read) returning a single row value.
