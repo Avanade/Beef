@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Entities;
@@ -14,7 +15,7 @@ using Beef.Demo.Business;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.WebApi.Controllers
+namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
     /// Provides the <b>Gender</b> API functionality.

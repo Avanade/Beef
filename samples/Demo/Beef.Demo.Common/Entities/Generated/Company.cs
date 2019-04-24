@@ -136,7 +136,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
-        /// <returns><b>true</b> indicates is initial; otherwise, <b>false</b>.</returns>
+        /// <returns><c>true</c> indicates is initial; otherwise, <c>false</c>.</returns>
         public override bool IsInitial
         {
             get

@@ -15,7 +15,7 @@ using Beef.RefData;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
-namespace Beef.Demo.WebApi.Controllers
+namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API functionality.

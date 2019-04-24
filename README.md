@@ -94,25 +94,25 @@ The **key** capabilities for _Beef_ are enabled by the following run-time assemb
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.Core`](./docs/Beef.Core.md) | Core foundational framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Core/)
-[`Beef.AspNetCore.WebApi`](./Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework capabilities. | [Link](https://www.nuget.org/packages/Beef.AspNetCore.WebApi/)
-[`Beef.Data.Database`](./Beef.Data.Database) | ADO.NET database framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.Database/)
-[`Beef.Data.EntityFrameworkCore`](./Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.EntityFrameworkCore/)
-[`Beef.Data.OData`](./Beef.Data.OData) | OData consumption framework capabilities. | [Link](https://www.nuget.org/packages/Beef.Data.OData/)
+[`Beef.Core`](./src/Beef.Core) | Core foundational framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.core.svg)](https://badge.fury.io/nu/Beef.core) | [Link](./samples/Demo)
+[`Beef.AspNetCore.WebApi`](./docs/Beef-AspNetCore-WebApi.md) | ASP.NET Core Web API framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi)
+[`Beef.Data.Database`](./docs/Beef-Data-Database.md) | ADO.NET database framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database)
+[`Beef.Data.EntityFrameworkCore`](./docs/Beef-Data-EntityFrameworkCore.md) | Entity Framework (EF) Core framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
+[`Beef.Data.OData`](./docs/Beef-Data-OData.md) | OData consumption framework capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData)
 
 The tooling / supporting capabilities for _Beef_ are enabled by the following  assemblies:
 
 Assembly | Description | NuGet
 -|-|-
-[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | [Link](https://www.nuget.org/packages/Beef.CodeGen.Core/)
-[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | [Link](https://www.nuget.org/packages/Beef.Database.Core/)
-[`Beef.Test.NUnit`](./Beef.Test.NUnit) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | [Link](https://www.nuget.org/packages/Beef.Test.NUnit/)
+[`Beef.CodeGen.Core`](./docs/Beef-CodeGen-Core.md) | Code generation capabilities (including code templates, etc). | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core)
+[`Beef.Database.Core`](./docs/Beef-Database-Core.md) | Database / data management capabilities. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core)
+[`Beef.Test.NUnit`](./docs/Beef-Test-NUnit.md) | Simplify / standardise the unit and intra-domain integration testing of the APIs. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit)
 
 An end-to-end demo set of APIs has been provided to demonstrate the tiering & layering, code-generation, database management and automated testing:
 
-Assembly | Description | NuGet
--|-|-
-[`Beef.Demo`](/Demo) | End-to-end demo. | N/A
+Assembly | Description | NuGet | Source
+-|-|-|-
+[`Beef.Demo`](./docs/Beef-Demo.md) | A sample as an end-to-end demonstration. | N/A | [Link](./samples/Demo)
 
 <br>
 
@@ -150,6 +150,8 @@ We use [`NUnit`](https://github.com/nunit/nunit) for all unit testing.
 - Tests only need to be present for issues that need to be verified by QA (for example, not tasks).
 - If there is a scenario that is far too hard to test there does not need to be a test for it.
 - "Too hard" is determined by the team as a whole.
+
+We understand there is more work to be performed in generating a higher level of code coverage; this technical debt is on the backlog.
 
 <br>
 

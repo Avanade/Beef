@@ -44,7 +44,7 @@ namespace Beef.Demo.Business
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <b>null</b>.</returns>
+        /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Gender> GetAsync(Guid id)
         {
             return ManagerInvoker<Gender>.Default.InvokeAsync(this, async () =>

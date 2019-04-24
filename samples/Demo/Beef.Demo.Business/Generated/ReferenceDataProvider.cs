@@ -55,7 +55,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Prefetches all, or the list of <see cref="ReferenceDataBase"/> objects, where not already cached or expired.
         /// </summary>
-        /// <param name="names">The list of <see cref="ReferenceDataBase"/> names; otherwise, <b>null</b> for all.</param>
+        /// <param name="names">The list of <see cref="ReferenceDataBase"/> names; otherwise, <c>null</c> for all.</param>
         public override Task PrefetchAsync(params string[] names)
         {
             return Task.Run(() =>

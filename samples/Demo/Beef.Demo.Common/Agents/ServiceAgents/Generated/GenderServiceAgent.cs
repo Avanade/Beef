@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.WebApi;
+using Newtonsoft.Json.Linq;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
@@ -23,23 +24,26 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Gender>> GetAsync(Guid id);
+        Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions requestOptions = null);
 
         /// <summary>
         /// Creates the <see cref="Gender"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Gender>> CreateAsync(Gender value);
+        Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions requestOptions = null);
 
         /// <summary>
         /// Updates the <see cref="Gender"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id);
+        Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions requestOptions = null);
     }
 
     /// <summary>
@@ -70,10 +74,11 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Gender>> GetAsync(Guid id)
+        public Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions requestOptions = null)
         {
-            return base.GetAsync<Gender>("api/v1/demo/ref/genders/{id}", 
+            return base.GetAsync<Gender>("api/v1/demo/ref/genders/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
         }
 
@@ -81,13 +86,14 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// Creates the <see cref="Gender"/> object.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value)
+        public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions requestOptions = null)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            return base.PostAsync<Gender>("api/v1/demo/ref/genders", value, 
+            return base.PostAsync<Gender>("api/v1/demo/ref/genders", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { });
         }
 
@@ -96,13 +102,14 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id)
+        public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions requestOptions = null)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            return base.PutAsync<Gender>("api/v1/demo/ref/genders/{id}", value, 
+            return base.PutAsync<Gender>("api/v1/demo/ref/genders/{id}", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
         }
     }
