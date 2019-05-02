@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -12,8 +12,8 @@
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <AssemblyVersion>2.1.1</AssemblyVersion>
-    <FileVersion>2.1.1</FileVersion>
+    <AssemblyVersion>2.1.2</AssemblyVersion>
+    <FileVersion>2.1.2</FileVersion>
     <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

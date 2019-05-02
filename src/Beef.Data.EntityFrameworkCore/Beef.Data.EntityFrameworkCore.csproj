@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) Entity Framework (EF) Core extensions.</Description>
     <Authors>Beef Developers</Authors>
@@ -10,8 +10,8 @@
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <AssemblyVersion>2.1.1</AssemblyVersion>
-    <FileVersion>2.1.1</FileVersion>
+    <AssemblyVersion>2.1.2</AssemblyVersion>
+    <FileVersion>2.1.2</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
