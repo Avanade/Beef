@@ -119,7 +119,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Indicates whether <see cref="CommandType.Database"/> is supported (defaults to <c>true</c>).
         /// </summary>
-        public bool IsDatabaseSupported { get; set; } = true;
+        public bool IsDatabaseSupported { get; set; } = false;
 
         /// <summary>
         /// Indicates whether <see cref="CommandType.RefData"/> is supported (defaults to <c>false</c>).

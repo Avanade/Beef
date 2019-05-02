@@ -33,51 +33,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\SelectTableAlwaysGeneratedColumns.sql" />
-    <None Remove="Resources\SelectTableAndColumns.sql" />
-    <None Remove="Resources\SelectTableForeignKeys.sql" />
-    <None Remove="Resources\SelectTableGeneratedColumns.sql" />
-    <None Remove="Resources\SelectTableIdentityColumns.sql" />
-    <None Remove="Resources\SelectTablePrimaryKey.sql" />
-    <None Remove="Scripts\Database.xml" />
-    <None Remove="Scripts\EntityBusiness.xml" />
-    <None Remove="Scripts\EntityOnly.xml" />
-    <None Remove="Scripts\EntityWebApiCoreAgent.xml" />
-    <None Remove="Scripts\RefData.xml" />
-    <None Remove="Scripts\RefDataCore.xml" />
-    <None Remove="Scripts\RefDataCoreCrud.xml" />
-    <None Remove="Templates\DbEfTableModel_cs.xml" />
-    <None Remove="Templates\DbSpTableCreate_sql.xml" />
-    <None Remove="Templates\DbSpTableDelete_sql.xml" />
-    <None Remove="Templates\DbSpTableGetByArgs_sql.xml" />
-    <None Remove="Templates\DbSpTableGet_sql.xml" />
-    <None Remove="Templates\DbSpTableMerge_sql.xml" />
-    <None Remove="Templates\DbSpTableUpdate_sql.xml" />
-    <None Remove="Templates\DbSpTableUpsert_sql.xml" />
-    <None Remove="Templates\DbTvpTable_cs.xml" />
-    <None Remove="Templates\DbUdtTableList_sql.xml" />
-    <None Remove="Templates\DbVwTable_sql.xml" />
-    <None Remove="Templates\EntityDataSvc_cs.xml" />
-    <None Remove="Templates\EntityData_cs.xml" />
-    <None Remove="Templates\EntityManager_cs.xml" />
-    <None Remove="Templates\EntityWebApiAgent_cs.xml" />
-    <None Remove="Templates\EntityWebApiCoreController_cs.xml" />
-    <None Remove="Templates\EntityWebApiServiceAgent_cs.xml" />
-    <None Remove="Templates\Entity_cs.xml" />
-    <None Remove="Templates\IEntityData_cs.xml" />
-    <None Remove="Templates\IEntityManager_cs.xml" />
-    <None Remove="Templates\IReferenceDataData_cs.xml" />
-    <None Remove="Templates\ReferenceDataDataSvc_cs.xml" />
-    <None Remove="Templates\ReferenceDataData_cs.xml" />
-    <None Remove="Templates\ReferenceDataProvider_cs.xml" />
-    <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.xml" />
-    <None Remove="Templates\ReferenceDataWebApiAgent_cs.xml" />
-    <None Remove="Templates\ReferenceDataWebApiCoreController_cs.xml" />
-    <None Remove="Templates\ReferenceDataWebApiServiceAgent_cs.xml" />
-    <None Remove="Templates\ReferenceData_cs.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Resources\SelectTableAlwaysGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableAndColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableForeignKeys.sql" />
@@ -88,7 +43,6 @@
     <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
     <EmbeddedResource Include="Scripts\EntityOnly.xml" />
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
-    <EmbeddedResource Include="Scripts\RefData.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.xml" />

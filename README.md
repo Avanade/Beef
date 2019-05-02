@@ -86,7 +86,7 @@ Standardised approach, ensures consistency of implementation:
 - Greater confidence in adherence to architectural vision; minimised deviation.
 - Generation and alike enables the solution to evolve more quickly and effectively over time. 
 
-A key accelerator for _Beef_ is achieved using a flexible [code generation](./docs/Beef-Codegen-Core.md) approach.
+A key accelerator for _Beef_ is achieved using a flexible [code generation](./tools/Beef.Codegen.Core/README.md) approach.
 
 An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
 
@@ -111,7 +111,7 @@ Assembly | Description | NuGet
 The following samples are provided to guide usage:
 
 Sample | Description
--|-|-
+-|-
 [`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing.
 
 <br>

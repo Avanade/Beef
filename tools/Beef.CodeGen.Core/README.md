@@ -34,6 +34,12 @@ The _Beef_ standard templates can be found [here](./Templates).
 
 <br>
 
+## Scripts and loaders
+
+To orchestrate the code generation, in terms of the templates to be used, an XML-based script file is used. The _Beef_ standard scripts can be found [here](./Scripts).
+
+Additionally, the script can define the _loader_ `Type` which is a class that implements [`ICodeGenConfigLoader`](../../src/Beef.Core/CodeGen/ICodeGenConfigLoader.cs). The purpose of a loader is to manipulate (update) the configuration XML before processing via the templates. The _Beef_ standard loaders can be found [here](./Loaders).
+
 ## Supported code-gen
 
 The following code generation is supported:
@@ -84,6 +90,38 @@ The **Table.xml** is defined by a schema [codegen.table.xsd](../../tools/Beef.Co
 This is not intended as an all purpose database schema generation capability. It is expected that the Tables and/or Views pre-exist within the database. This database schema/catalog information is queried from the database directly to aid the generation configuration to minimise the need to replicate column configurations within the **Table.xml**.
 
 <br>
+
+## Console application
+
+The `Beef.CodeGen.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. 
+
+Then simply add the `Templates` and `Scripts` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.CodeGen) as an example.
+
+<br/>
+
+### Program.cs
+
+The `Program.cs` for the new console application should be updated similar to the following. The the `Company` and `AppName` values are specified, as well as indicating whether the `entity` and/or `refdata` commands are supported.
+
+``` csharp
+public class Program
+{
+    static int Main(string[] args)
+    {
+        return CodeGenConsoleWrapper.Create("Company", "AppName").Supports(entity: true, refData: true).Run(args);
+    }
+}
+```
+
+<br/>
+
+### Personalization and/or overridding
+
+As described above _Beef_ has a set of defined (out-of-the-box) templates and scripts - these do not have to be used, or could be maintained, to achieve an alternate outcome as required.
+
+To avoid the need to clone the solution, and update, add the `Templates` and `Scripts` folders and embed the required resources. The underlying `Beef.CodeGen.Core` will probe the embedded resources to and use the overridden version where provided, falling back on the _Beef_ version where not found. 
+
+<br/>
 
 ## What about T4?
 

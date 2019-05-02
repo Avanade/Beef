@@ -39,7 +39,7 @@ The schema scripts must be marked as embedded resources, and reside under the `S
 
 The `Schema` folder is used to encourage the usage of database schemas. Therefore, directly under should be the schema name, for example `dbo` or `Ref`. Then sub-folders for the object types as per [Azure Data Studio](https://docs.microsoft.com/en-au/sql/azure-data-studio/what-is), for example `Functions`, `Stored Procedures` or `Types\User-Defined Table Types`. 
 
-Code generation is also supported / enabled using the _Beef_ [Code-Gen](../Beef.CodeGen.Core/README.md) capabilities. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the execution.
+Code generation is also supported / enabled using the _Beef_ [Code-Gen](../Beef.CodeGen.Core/README.md) capabilities. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the code generation execution.
 
 <br/>
 
@@ -79,6 +79,18 @@ Demo:
 
 <br/>
 
+### Other considerations
+
+To simplify the database management here are some further considerations that may make life easier over time; especially where you adopt the philosophy that the underlying busines logic (within the application APIs) is primarily responsible for the consistency of the data; and the data source (the database) is being largely used for storage and advanced query:
+
+- **Nullable everything** - all columns (except) the primary key should be defined as nullable. The business logic should validate the request to ensure data is provided where mandatory. Makes changes to the database schema easier over time without this constraint.
+- **Minimise constraints** - do not use database constraints unless absolutely necessary; only leverage where the database is the best and/or most efficient means to perform; i.e. uniqueness. The business logic should validate the request to ensure that any related data is provided, is valid and consistent. 
+- **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except `dbo` or `sec` (security where used).
+- **Standardise column lengths** - use a standard set of column lengths within the database and have the business logic manage the length constraint. As such the column length must be the same or greater that what is required.
+- **JSON for schema-less** - where there is data that needs to be persisted, but rarely searched on, a schema-less approach should be considered such that a JSON object is persisted versus having to define columns. This can simplify the database requirements where the data is hierarchical in nature.
+
+<br/>
+
 ## Console application
 
 The `Beef.Database.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. Then simply add the `Data`, `Migrations` and `Schema` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as an example.
@@ -107,9 +119,9 @@ The remainder are common combinations of the above:
 
 <br/>
 
-### `Program.cs`
+### Program.cs
 
-The `Program.cs` for the new console application should be updated similar to the following. The connection string is provided as the default used at runtime. An environment variable `{Company}{AppName}ConnectionString` can be updated to override where the `{Company}` and `{AppName}` values are specified; or alternatively use the command line option `-cs "connection-string-info"`. 
+The `Program.cs` for the new console application should be updated similar to the following. The connection string is provided as the default used at runtime. An environment variable `{Company}{AppName}ConnectionString` can be updated to override (where the `{Company}` and `{AppName}` values are specified); or alternatively use the command line option `-cs "connection-string-info"`. 
 
 ``` csharp
 public class Program
