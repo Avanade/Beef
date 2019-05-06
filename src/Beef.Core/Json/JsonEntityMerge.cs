@@ -115,7 +115,12 @@ namespace Beef.Json
                         {
                             prs[i] = ier.GetProperty(Properties[i]);
                             if (prs[i] == null)
-                                throw new InvalidOperationException($"Type '{ier.Type.Name}' references a UniqueKey Property '{Properties[i]}' that does not exist.");
+                            {
+                                // Special case where the unique key may be a reference data type; i.e. points to the 'NameSid' property.
+                                prs[i] = ier.GetProperty(Properties[i] + "Sid");
+                                if (prs[i] == null)
+                                    throw new InvalidOperationException($"Type '{ier.Type.Name}' references a UniqueKey Property '{Properties[i]}' that does not exist.");
+                            }
                         }
 
                         propertyReflectors = prs;

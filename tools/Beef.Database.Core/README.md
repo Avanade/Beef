@@ -103,19 +103,19 @@ The following [commands](DatabaseExecutorCommand.cs) are automatically enabled f
 - `Drop` - drop the existing database (where it alredy exists).
 - `Create` - create the database (where it does not already exist).
 - `Migrate` - migrate the database using the **Migrations** scripts (those that have not already been executed).
-- `CodeGen` - Generates database **Schema** objects via code generation.
-- `Schema` - Drops and creates the known database **Schema** objects.
-- `Reset` - Resets the database by deleting all existing data and reseting all identities (IDENT) to 0.
-- `Data` - Inserts or merges **Data** from embedded YAML files.
+- `CodeGen` - generates database **Schema** objects via code generation.
+- `Schema` - drops and creates the known database **Schema** objects.
+- `Reset` - resets the database by deleting all existing data and reseting all identities (IDENT) to 0.
+- `Data` - inserts or merges **Data** from embedded YAML files.
 
 The remainder are common combinations of the above:
-- `All` - Performs **all** commands as follows; `Create`, `Migrate`, `CodeGen`, `Schema` and `Data`.
-- `DropAndAll` - Performs `Drop` and `All`.
-- `ResetAndAll` - Performs `Reset` and `All`.
-- `Database` - Performs only the **database** commands as follows: `Create`, `Migrate`, `Schema` and `Data`.
-- `DropAndDatabase` - Performs `Drop` and `Database`.
-- `ResetAndDatabase` - Performs `Reset` and `Database`.
-- `ScriptNew` - Creates a new script file using the defined naming convention.
+- `All` - performs **all** commands as follows; `Create`, `Migrate`, `CodeGen`, `Schema` and `Data`.
+- `DropAndAll` - performs `Drop` and `All`.
+- `ResetAndAll` - performs `Reset` and `All`.
+- `Database` - performs only the **database** commands as follows: `Create`, `Migrate`, `Schema` and `Data`.
+- `DropAndDatabase` - performs `Drop` and `Database`.
+- `ResetAndDatabase` - performs `Reset` and `Database`.
+- `ScriptNew` - preates a new script file using the defined naming convention.
 
 <br/>
 

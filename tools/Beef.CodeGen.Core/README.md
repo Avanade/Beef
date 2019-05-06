@@ -81,8 +81,8 @@ The hierarcy is as follows:
     └── StoredProcedure(s)
       └── Parameter(s)
       └── Where(s)
-      └── OrderBy
-      └── Execute
+      └── OrderBy(s)
+      └── Execute(s)
 ```
 
 The **Table.xml** is defined by a schema [codegen.table.xsd](../../tools/Beef.CodeGen.Core/Schema/codegen.table.xsd). This schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities. 
@@ -99,9 +99,20 @@ Then simply add the `Templates` and `Scripts` folders and embed the required res
 
 <br/>
 
+### Commands
+
+The following commands are automatically enabled for the console application (where set up):
+
+- `Entity` - performs code generation using the `Company.AppName.xml` configuration and [`EntityWebApiCoreAgent.xml`](./Scripts/EntityWebApiCoreAgent.xml) script.
+- `RefData` - performs code generation using the `Company.RefData.xml` configuration and [`RefDataCoreCrud.xml`](./Scripts/RefDataCoreCrud.xml) script.
+- `Database` - performs code generation using the `Company.AppName.Database.xml` configuration and [`Database.xml`](./Scripts/Database.xml) script.
+- `All` - performs all of the above (where each is supported as per set up).
+
+<br/>
+
 ### Program.cs
 
-The `Program.cs` for the new console application should be updated similar to the following. The the `Company` and `AppName` values are specified, as well as indicating whether the `entity` and/or `refdata` commands are supported.
+The `Program.cs` for the new console application should be updated similar to the following. The `Company` and `AppName` values are specified, as well as optionally indicating whether the `entity` and/or `refdata` commands are supported.
 
 ``` csharp
 public class Program

@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Json;
+using Beef.RefData;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,6 +14,16 @@ namespace Beef.Core.UnitTest.Json
     [TestFixture]
     public class JsonEntityMergeTest
     {
+        public class ReferData : ReferenceDataBaseInt
+        {
+            public override object Clone()
+            {
+                throw new NotImplementedException();
+            }
+
+            public static implicit operator ReferData(string code) => ConvertFromCode<ReferData>(code);
+        }
+
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public class SubData
         {
@@ -33,6 +44,31 @@ namespace Beef.Core.UnitTest.Json
             public string Text { get; set; }
             [JsonProperty("other")]
             public string Other { get; set; }
+
+            public override bool IsInitial => throw new NotImplementedException();
+
+            public override object Clone()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool HasUniqueKey => true;
+
+            public override string[] UniqueKeyProperties => new string[] { "Code" };
+
+            public override UniqueKey UniqueKey => new UniqueKey(Code);
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class ReferKeyData : EntityBase
+        {
+            [JsonProperty("code")]
+            public string CodeSid { get; set; }
+
+            public ReferData Code { get => CodeSid; set => CodeSid = value.Code; } 
+
+            [JsonProperty("text")]
+            public string Text { get; set; }
 
             public override bool IsInitial => throw new NotImplementedException();
 
@@ -72,6 +108,8 @@ namespace Beef.Core.UnitTest.Json
             public List<SubData> NoKeys { get; set; }
             [JsonProperty("keys")]
             public List<KeyData> Keys { get; set; }
+            [JsonProperty("refers")]
+            public List<ReferKeyData> Refers { get; set; }
         }
 
         [Test]
@@ -491,6 +529,19 @@ namespace Beef.Core.UnitTest.Json
                     + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }"),
                     td);
             }
+        }
+
+        [Test]
+        public void Merge_Property_RefData_UniqueKey()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"refers\": [ { \"code\": \"abc\", \"text\": \"xyz\" } ] }"), td));
+            Assert.IsNotNull(td.Refers);
+            Assert.AreEqual(1, td.Refers.Count);
+
+            Assert.IsNotNull(td.Refers[0]);
+            Assert.AreEqual("abc", td.Refers[0].CodeSid);
+            Assert.AreEqual("xyz", td.Refers[0].Text);
         }
     }
 }
