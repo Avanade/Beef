@@ -29,7 +29,7 @@ namespace Beef.Mapper.Converters
         /// <summary>
         /// Gets the underlying destination <see cref="Type"/> allowing for nullables.
         /// </summary>
-        Type IPropertyMapperConverter.DestUnderlyingType { get; } = typeof(String);
+        Type IPropertyMapperConverter.DestUnderlyingType { get; } = typeof(string);
 
         /// <summary>
         /// Converts the source <paramref name="value"/> to the destination equivalent.

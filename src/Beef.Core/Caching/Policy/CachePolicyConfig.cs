@@ -76,7 +76,11 @@ namespace Beef.Caching.Policy
                             pi.SetValue(policy, prop.Value);
                         else
                         {
-                            var mi = pi.PropertyType.GetMethod("TryParse", new Type[] { typeof(string), pi.PropertyType.MakeByRefType() }) ?? throw new CachePolicyConfigException($"Policy '{config.Name}' Property '{prop.Name}' type must support TryParse.");
+                            var pt = pi.PropertyType;
+                            if (pi.PropertyType.IsGenericType && pi.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                                pt = pi.PropertyType.GetGenericArguments()[0];
+
+                            var mi = pt.GetMethod("TryParse", new Type[] { typeof(string), pt.MakeByRefType() }) ?? throw new CachePolicyConfigException($"Policy '{config.Name}' Property '{prop.Name}' type must support TryParse.");
                             var args = new object[] { prop.Value, null };
                             if (!(bool)mi.Invoke(null, args))
                                 throw new CachePolicyConfigException($"Policy '{config.Name}' Property '{prop.Name}' value is not valid.");
@@ -140,7 +144,7 @@ namespace Beef.Caching.Policy
             public CachePolicyConfigPolicyProperty[] Properties { get; set; }
 
             /// <summary>
-            /// Gets or sets the related cache <see cref="Type"/> names.
+            /// Gets or sets the related cache policy names.
             /// </summary>
             public string[] Caches { get; set; }
         }
