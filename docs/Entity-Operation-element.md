@@ -5,7 +5,7 @@ The code generation for an **Operation** is primarily driven by the **`Operation
 - **`GetColl`** - indicates a get (read) returning an entity collection.
 - **`Create`** - indicates the creation of an entity.
 - **`Update`** - indicates the updating of an entity.
-- **`Patch`** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
+- **[`Patch`](./Http-Patch.md)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
 - **`Delete`** - indicates the deleting of an entity.
 - **`Custom`** - indicates a customised operation where arguments and return value will be explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer.
 
