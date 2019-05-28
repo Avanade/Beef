@@ -22,6 +22,7 @@ BEGIN
        ,[p].[UpdatedBy]
        ,[p].[UpdatedDate]
        ,[p].[UniqueCode]
+       ,[p].[EyeColorCode]
     FROM [Demo].[Person] AS [p]
     WHERE [p].[PersonId] = @PersonId
 END

@@ -51,6 +51,15 @@ namespace Beef.Demo.Common.Agents
         }
 
         /// <summary>
+        /// Gets all of the <see cref="EyeColor"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync()
+        {
+            return _serviceAgent.EyeColorGetAllAsync();      
+        }
+
+        /// <summary>
         /// Gets all of the <see cref="Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>

@@ -206,6 +206,17 @@ namespace Beef.Demo.Common.Agents
         }
 
         /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions requestOptions = null)
+        {
+            return PersonServiceAgent.AddAsync(person, requestOptions);
+        }
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>

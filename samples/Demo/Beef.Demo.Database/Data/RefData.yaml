@@ -2,3 +2,7 @@
   - $Gender:
     - M: Male
     - F: Female
+  - $EyeColor:
+    - BLUE: Blue
+    - BROWN: Brown
+    - GREEN: Green

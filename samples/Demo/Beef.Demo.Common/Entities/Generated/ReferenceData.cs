@@ -26,6 +26,11 @@ namespace Beef.Demo.Common.Entities
         public const string Property_Gender = "Gender";
 
         /// <summary>
+        /// Represents the <see cref="EyeColor"/> property name.
+        /// </summary>
+        public const string Property_EyeColor = "EyeColor";
+
+        /// <summary>
         /// Represents the <see cref="Company"/> property name.
         /// </summary>
         public const string Property_Company = "Company";
@@ -37,6 +42,7 @@ namespace Beef.Demo.Common.Entities
         public override Type[] GetAllTypes() => new Type[] 
             {
                 typeof(Gender),
+                typeof(EyeColor),
                 typeof(Company)
             };
         
@@ -56,6 +62,11 @@ namespace Beef.Demo.Common.Entities
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
         /// </summary>
         public abstract RefDataNamespace.GenderCollection Gender { get; }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.EyeColorCollection EyeColor { get; }
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.

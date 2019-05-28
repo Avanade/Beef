@@ -1,6 +1,6 @@
 # Reference Data
 
-The _Beef_ framework and runtime enable a rich, first class, support for Reference Data given its key role within an application.
+The _Beef_ framework and runtime enable a rich, first class, experience for _reference data_ given its key role within an application.
 
 <br/>
 
@@ -25,21 +25,109 @@ Example: Purchase Order, Sales Invoice, GL Posting, etc.
 
 <br/>
 
-## Anatomy of reference data
+## Base capabilities
 
-The [`ReferenceDataBase`](../src/Beef.Core/RefData/ReferenceDataBase.cs):
+The [`ReferenceDataBase`](../src/Beef.Core/RefData/ReferenceDataBase.cs) provides the base capabilities for a reference data item. The following tables describes the key properties:
 
 Property | Description
 -|-
-`Id` | The internal unique identifier as either an `int` or a `Guid`.
-`Code` | The external unique identifier as a `string`. This is the value that would be used by external parties (applications) to consume.
-`Text` | The textual `string` used for the likes of drop-downs etc. within an application.
+`Id` | The internal unique identifier as either an `int` ([`ReferenceDataBaseInt32`](../src/Beef.Core/RefData/ReferenceDataBaseInt.cs)) or a `Guid` ([`ReferenceDataBaseGuid`](../src/Beef.Core/RefData/ReferenceDataBaseGuid.cs)).
+`Code` | The unique (immutable) code as a `string`. This is primarily the value that would be used by external parties (applications) to consume. Additionally, it could be used to store the reference in the underlying data source if the above `Id` is not suitable.
+`Text` | The textual `string` used for display within an application; e.g. within a drop-down. 
 `SortOrder` | Defines the sort order within the underlying reference data collection.
-`IsActive` | Indicates whether the value is active or not.
+`IsActive` | Indicates whether the value is active or not. It is up to the application what to do when a value is not considered valid.
+... | There are other properties on this base type that can also be used; see codebase for more information.
 
-Additional properties exist that can be leveraged:
+<br/>
 
+Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer.
 
+The [`ReferenceDataCollectionBase`](../src/Beef.Core/RefData/ReferenceDataCollectionBase.cs) provides the base capabilities for a reference data collection. Including the adding, sorting and additional filtering (e.g. `ActiveList`).
 
+<br/>
 
-Additional properties can be, and should be, extended where required. The Reference Data framework will then make these available within the application to enable simple usage by a developer.
+## Reference data usage
+
+When the code generation is used to create an entity, any properties that are marked up with the `RefDataType` attribute will have code generated to enable multiple options to access the reference data values.
+
+There will be a single field and two properties (where `Xxx` is the name of the reference data item) generated. The Serialization Identifier (SID) is the selected value used for actual serialization:
+
+Name | Description
+-|-
+`XxxSid` | This is the Serialization Identifier (SID) that is used where serializing the reference data value; this is generally the unique reference data `Code`. <br/> As you can see in the sample below this property has the `JsonPropertyAttribute` specified so that this property is marked for serialization.
+`_xxxSid` | This is the private Serialization Identifier (SID) field used internally to store the `XxxSid` above.
+`Xxx` | This is the reference data object (inherits from `ReferenceDataBase`) that provides the rich capabilities that a developer would typically interact with. This value is never serialized. <br/> This is casted from the `_xxxSid` when referenced; this will force the underlying reference data to be loaded (lazy) on first access. This will result in a small performance cost, although this data is generally cached so for most access this will not be an issue. 
+
+<br/>
+
+The following represents a snippet of the generated code, for an reference data item named `Gender`:
+
+``` csharp
+private string _genderSid;
+
+/// <summary>
+/// Gets or sets the <see cref="Gender"/> using the underlying Serialization Identifier (SID).
+/// </summary>
+[JsonProperty("gender", DefaultValueHandling = DefaultValueHandling.Ignore)]
+[Display(Name="Gender")]
+public string GenderSid
+{
+    get { return this._genderSid; }
+    set { SetValue(ref this._genderSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Gender); }
+}
+
+/// <summary>
+/// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
+/// </summary>
+[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+[Display(Name="Gender")]
+public RefDataNamespace.Gender Gender
+{
+    get { return this._genderSid; }
+    set { SetValue<string>(ref this._genderSid, value, false, false, Property_Gender); }
+}
+```
+
+<br/>
+
+There are multiple means that a developer would typically interact with reference data; for example:
+
+``` csharp
+// Accessing the 'Sid' directly will bypass the object casting and offers a small performance benefit.
+person.GenderSid = "M";
+
+// Casting from string to reference data item is supported (will result in ref data load + cache on first access).
+person.Gender = "M";
+
+// Other properties can be accessed directly making the developer experience more natural.
+var text = person.Gender.Text;
+
+// Casting an invalid value will create a dummy reference data item with IsInvalid set to true.
+person.Gender = "%";
+bool isInvalid = person.Gender.IsInvalid;
+```
+
+<br/>
+
+## Caching
+
+Given the static nature of the _Reference Data_ it is an excellent candidate for caching. There is a purpose built cache ([`ReferenceDataCache`](../src/Beef.Core/RefData/Caching/ReferenceDataCache.cs)) that ensures a consistent implementation, which then gets leveraged from within the code generation process.
+
+This caching leverages the core [Caching](../src/Beef.Core/Caching) capabilities (i.e. [`CacheCoreBase`](../src/Beef.Core/Caching/CacheCorebase.cs)) within _Beef_; including one the [Policies](../src/Beef.Core/Caching/Policy) to allow automatic cache expiry/refresh.
+
+<br/>
+
+## Reference data loading
+
+As described above the _reference data_ is loaded and cached on first access (lazy loaded) to improve the overall performance. The physical load occurs within the [Data access](./Layer-Data.md) layer; whilst the caching is managed at the [Service orchestration](./Layer-DataSvc.md) layer.
+
+When the cache is empty, or expired, then a load will occur. There are two options available for the loading:
+
+1. Using the `GetRefData` purpose-built capability built into the [`DatabaseBase`](../src/Beef.Data.Database/DatabaseBase.cs). This uses the [DatabaseRefDataColumns](../src/Beef.Data.Database/DatabaseRefDataColumns.cs) to map the database columns names to the .NET properties. This can be completely code generated to minimise the developer effort.
+2. Implement as required (i.e. custom logic).
+
+<br/>
+
+## Sample
+
+There is an end-to-end example of the _reference data_ implementation within the [`Demo`](../samples/Demo).

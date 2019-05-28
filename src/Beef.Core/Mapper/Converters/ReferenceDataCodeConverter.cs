@@ -6,7 +6,7 @@ using System;
 namespace Beef.Mapper.Converters
 {
     /// <summary>
-    /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="String"/>-based <see cref="ReferenceDataBase.Code"/> conversion.
+    /// Represents a <see cref="ReferenceDataBase"/> mapper property value converter that enables <see cref="string"/>-based <see cref="ReferenceDataBase.Code"/> conversion.
     /// </summary>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
     public sealed class ReferenceDataCodeConverter<TSrceProperty> : Singleton<ReferenceDataCodeConverter<TSrceProperty>>, IPropertyMapperConverter<TSrceProperty, string> where TSrceProperty : ReferenceDataBase

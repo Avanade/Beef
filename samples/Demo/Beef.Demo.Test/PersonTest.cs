@@ -61,10 +61,11 @@ namespace Beef.Demo.Test
         {
             TestSetUp.CreateMock<IPersonData>();
             ExpectValidationException.Run(
-                () => (new PersonManager()).CreateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X" }),
+                () => (new PersonManager()).CreateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
                 "Last Name must not exceed 50 characters in length.",
                 "Gender is invalid.",
+                "Eye Color is invalid.",
                 "Birthday must be less than or equal to Today.");
         }
 
@@ -78,8 +79,9 @@ namespace Beef.Demo.Test
                     "First Name must not exceed 50 characters in length.",
                     "Last Name must not exceed 50 characters in length.",
                     "Gender is invalid.",
+                    "Eye Color is invalid.",
                     "Birthday must be less than or equal to Today.")
-                .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X" }, 1.ToGuid()));
+                .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -109,7 +111,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages("History contains duplicates; Name value 'Google' specified more than once.")
-                .Run((a) => a.Agent.UpdateDetailAsync(new PersonDetail() { FirstName = "Barry", LastName = "Smith", Birthday = DateTime.Now.AddDays(-5000), Gender = "M",
+                .Run((a) => a.Agent.UpdateDetailAsync(new PersonDetail() { FirstName = "Barry", LastName = "Smith", Birthday = DateTime.Now.AddDays(-5000), Gender = "M", EyeColor = "BROWN",
                     History = new WorkHistoryCollection { new WorkHistory { Name = "Google", StartDate = new DateTime(1990, 12, 31) },
                     new WorkHistory { Name = "Google", StartDate = new DateTime(1992, 12, 31) } } }, 1.ToGuid()));
         }
@@ -206,6 +208,7 @@ namespace Beef.Demo.Test
                 FirstName = "Brian",
                 LastName = "Smith",
                 Gender = "M",
+                EyeColor = "BLUE",
                 UniqueCode = "B2345",
                 Birthday = new DateTime(1994, 11, 07),
                 History = new WorkHistoryCollection {
@@ -904,6 +907,22 @@ namespace Beef.Demo.Test
                     "The JSON object must specify the 'name' token as required for the unique key.",
                     "The JSON token is malformed: The string 'xxx' was not recognized as a valid DateTime. There is an unknown word starting at index '0'.")
                 .Run((a) => a.Agent.PatchDetailAsync(WebApiPatchOption.MergePatch, jt, 4.ToGuid(), new WebApiRequestOptions { ETag = p.ETag }));
+        }
+
+        #endregion
+
+        #region Others
+
+        [Test, TestSetUp]
+        public void I110_Add()
+        {
+            // Do the 'Add' - which does nothing, just validates the passing of the data.
+            var res = AgentTester.Create<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.Created)
+                .Run((a) => a.Agent.AddAsync(new Person { FirstName = "Gary" }));
+
+            // Make sure the content (body) is as expected.
+            Assert.AreEqual("{\"firstName\":\"Gary\"}", res.Request.Content.ReadAsStringAsync().Result);
         }
 
         #endregion

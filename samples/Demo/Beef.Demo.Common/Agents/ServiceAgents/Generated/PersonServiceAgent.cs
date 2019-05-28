@@ -140,6 +140,14 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         Task<WebApiAgentResult<PersonDetail>> PatchDetailAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions requestOptions = null);
 
         /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
@@ -394,6 +402,18 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
 
             return base.PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
+
+        /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions requestOptions = null)
+        {
+            return base.PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Person>("person", person, WebApiArgType.FromBody) });
         }
 
         /// <summary>

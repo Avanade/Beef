@@ -48,6 +48,11 @@ namespace Beef.Demo.Common.Entities
         public const string Property_Gender = nameof(Gender);
 
         /// <summary>
+        /// Represents the <see cref="EyeColor"/> property name.
+        /// </summary>
+        public const string Property_EyeColor = nameof(EyeColor);
+
+        /// <summary>
         /// Represents the <see cref="Birthday"/> property name.
         /// </summary>
         public const string Property_Birthday = nameof(Birthday);
@@ -76,6 +81,7 @@ namespace Beef.Demo.Common.Entities
         private string _lastName;
         private string _uniqueCode;
         private string _genderSid;
+        private string _eyeColorSid;
         private DateTime _birthday;
         private Address _address;
         private string _eTag;
@@ -161,6 +167,28 @@ namespace Beef.Demo.Common.Entities
         {
             get { return this._genderSid; }
             set { SetValue<string>(ref this._genderSid, value, false, false, Property_Gender); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="EyeColor"/> using the underlying Serialization Identifier (SID).
+        /// </summary>
+        [JsonProperty("eyeColor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Eye Color")]
+        public string EyeColorSid
+        {
+            get { return this._eyeColorSid; }
+            set { SetValue(ref this._eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Display(Name="Eye Color")]
+        public RefDataNamespace.EyeColor EyeColor
+        {
+            get { return this._eyeColorSid; }
+            set { SetValue<string>(ref this._eyeColorSid, value, false, false, Property_EyeColor); }
         }
 
         /// <summary>
@@ -272,6 +300,7 @@ namespace Beef.Demo.Common.Entities
             this.LastName = from.LastName;
             this.UniqueCode = from.UniqueCode;
             this.Gender = from.Gender;
+            this.EyeColor = from.EyeColor;
             this.Birthday = from.Birthday;
             this.Address = (from.Address == null) ? null : (Address)from.Address.Clone();
             this.ETag = from.ETag;
@@ -310,6 +339,7 @@ namespace Beef.Demo.Common.Entities
             this.LastName = Cleaner.Clean(this.LastName, StringTrim.End, StringTransform.EmptyToNull);
             this.UniqueCode = Cleaner.Clean(this.UniqueCode, StringTrim.End, StringTransform.EmptyToNull);
             this.Gender = Cleaner.Clean<RefDataNamespace.Gender>(this.Gender);
+            this.EyeColor = Cleaner.Clean<RefDataNamespace.EyeColor>(this.EyeColor);
             this.Birthday = Cleaner.Clean(this.Birthday, DateTimeTransform.DateOnly);
             this.Address = Cleaner.Clean<Address>(this.Address);
             this.ETag = Cleaner.Clean(this.ETag, StringTrim.End, StringTransform.EmptyToNull);
@@ -331,6 +361,7 @@ namespace Beef.Demo.Common.Entities
                     && Cleaner.IsInitial(this.LastName)
                     && Cleaner.IsInitial(this.UniqueCode)
                     && Cleaner.IsInitial(this.Gender)
+                    && Cleaner.IsInitial(this.EyeColor)
                     && Cleaner.IsInitial(this.Birthday)
                     && Cleaner.IsInitial(this.Address)
                     && Cleaner.IsInitial(this.ETag)

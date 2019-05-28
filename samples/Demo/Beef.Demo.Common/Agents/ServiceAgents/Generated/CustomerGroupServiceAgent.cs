@@ -169,7 +169,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult> UpdateBatchAsync(CustomerGroupCollection value, RefDataNamespace.Company company, WebApiRequestOptions requestOptions = null)
         {
             return base.PutAsync("api/v1/customergroups/{company}", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<CustomerGroupCollection>("value", value), new WebApiArg<RefDataNamespace.Company>("company", company) });
+                args: new WebApiArg[] { new WebApiArg<CustomerGroupCollection>("value", value, WebApiArgType.FromBody), new WebApiArg<RefDataNamespace.Company>("company", company) });
         }
 
         /// <summary>

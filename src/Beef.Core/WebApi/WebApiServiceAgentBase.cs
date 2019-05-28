@@ -163,7 +163,7 @@ namespace Beef.WebApi
             {
                 return await WebApiInvoker<WebApiAgentResult>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return VerifyResult(result);
@@ -189,7 +189,7 @@ namespace Beef.WebApi
             {
                 return await WebApiInvoker<WebApiAgentResult<TResult>>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return new WebApiAgentResult<TResult>(VerifyResult(result));
@@ -318,7 +318,7 @@ namespace Beef.WebApi
             {
                 return await WebApiInvoker<WebApiAgentResult>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return VerifyResult(result);
@@ -344,7 +344,7 @@ namespace Beef.WebApi
             {
                 return await WebApiInvoker<WebApiAgentResult<TResult>>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return new WebApiAgentResult<TResult>(VerifyResult(result));
@@ -428,14 +428,12 @@ namespace Beef.WebApi
         public async Task<WebApiAgentResult> PostAsync(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             var uri = CreateFullUri(url, args);
-            if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
-                throw new ArgumentException("No arguments can be marked as IsFromBody where a context value is used.", nameof(args));
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiInvoker<WebApiAgentResult>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return VerifyResult(result);
@@ -457,14 +455,12 @@ namespace Beef.WebApi
         public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             var uri = CreateFullUri(url, args);
-            if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
-                throw new ArgumentException("No arguments can be marked as IsFromBody where a context value is used.", nameof(args));
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiInvoker<WebApiAgentResult<TResult>>.Default.InvokeAsync(this, async () =>
                 {
-                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault();
+                    var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return new WebApiAgentResult<TResult>(VerifyResult(result));
@@ -518,7 +514,7 @@ namespace Beef.WebApi
 
             var uri = CreateFullUri(url, args);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
-                throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
+                throw new ArgumentException("No arguments can be marked as IsFromBody for a PATCH.", nameof(args));
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
@@ -553,7 +549,7 @@ namespace Beef.WebApi
 
             var uri = CreateFullUri(url, args);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
-                throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
+                throw new ArgumentException("No arguments can be marked as IsFromBody for a PATCH.", nameof(args));
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {

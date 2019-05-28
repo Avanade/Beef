@@ -533,7 +533,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
             <![CDATA[?]]>
           </If>
           <![CDATA[>("{{Parameter.ArgumentName}}", {{Parameter.ArgumentName}}]]>
-          <If Condition="Parameter.WebApiFrom == 'Body'">
+          <If Condition="Parameter.WebApiFrom == 'FromBody'">
             <![CDATA[, WebApiArgType.FromBody]]>
           </If>
           <If Condition="Parameter.WebApiFrom == 'FromUriUseProperties'">

@@ -3,6 +3,8 @@
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref" />
 
+  <Entity Name="EyeColor" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/eyeColors" AutoImplement="Database" DatabaseSchema="Ref" />
+  
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">
     <Property Name="ExternalCode" Type="string" RefDataMapping="true" Immutable="true" />
   </Entity>

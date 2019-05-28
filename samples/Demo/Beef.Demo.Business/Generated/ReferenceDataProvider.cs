@@ -30,6 +30,14 @@ namespace Beef.Demo.Business
         }
 
         /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
+        /// </summary>
+        public override RefDataNamespace.EyeColorCollection EyeColor
+        {
+            get { return (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)]; }
+        }
+
+        /// <summary> 
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
         /// </summary>
         public override RefDataNamespace.CompanyCollection Company
@@ -65,6 +73,7 @@ namespace Beef.Demo.Business
                 if (names == null)
                 {
                     temp = this[typeof(RefDataNamespace.Gender)];
+                    temp = this[typeof(RefDataNamespace.EyeColor)];
                     temp = this[typeof(RefDataNamespace.Company)];
             
                     return;
@@ -75,6 +84,7 @@ namespace Beef.Demo.Business
                     switch (name)
                     {
                         case ReferenceData.Property_Gender: temp = this[typeof(RefDataNamespace.Gender)]; break;
+                        case ReferenceData.Property_EyeColor: temp = this[typeof(RefDataNamespace.EyeColor)]; break;
                         case ReferenceData.Property_Company: temp = this[typeof(RefDataNamespace.Company)]; break;
                     }
                 }

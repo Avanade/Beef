@@ -10,6 +10,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# NuGet publishing
+nuget-publish/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

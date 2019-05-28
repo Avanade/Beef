@@ -394,6 +394,19 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        public Task AddAsync(Person person)
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                await AddOnImplementationAsync(person);
+            });
+        }
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>

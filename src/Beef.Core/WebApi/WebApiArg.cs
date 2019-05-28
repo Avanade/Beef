@@ -86,6 +86,12 @@ namespace Beef.WebApi
         /// </summary>
         /// <returns>The URL string.</returns>
         public abstract string ToUrlQueryString();
+
+        /// <summary>
+        /// Gets the underlying value.
+        /// </summary>
+        /// <returns>The underlying value.</returns>
+        public abstract object GetValue();
     }
 
     /// <summary>
@@ -117,6 +123,12 @@ namespace Beef.WebApi
         {
             get { return Comparer<T>.Default.Compare(Value, default) == 0; }
         }
+
+        /// <summary>
+        /// Gets the underlying value.
+        /// </summary>
+        /// <returns>The underlying value.</returns>
+        public override object GetValue() => Value;
 
         /// <summary>
         /// Returns a string representation of just the <see cref="Value"/> itself.

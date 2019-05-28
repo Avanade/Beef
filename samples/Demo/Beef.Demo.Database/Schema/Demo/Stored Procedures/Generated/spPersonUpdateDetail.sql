@@ -10,6 +10,7 @@ CREATE PROCEDURE [Demo].[spPersonUpdateDetail]
   ,@UpdatedBy AS NVARCHAR(250) NULL = NULL
   ,@UpdatedDate AS DATETIME2 NULL = NULL
   ,@UniqueCode AS NVARCHAR(20) NULL = NULL
+  ,@EyeColorCode AS NVARCHAR(50) NULL = NULL
   ,@WorkHistoryList AS [Demo].[udtWorkHistoryList] READONLY
   ,@ReselectRecord AS BIT = 0
 AS
@@ -53,6 +54,7 @@ BEGIN
         ,[UpdatedBy] = @UpdatedBy
         ,[UpdatedDate] = @UpdatedDate
         ,[UniqueCode] = @UniqueCode
+        ,[EyeColorCode] = @EyeColorCode
       WHERE [PersonId] = @PersonId
 
     -- Execute additional statements.

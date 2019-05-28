@@ -50,8 +50,8 @@ namespace Beef.Data.Database
         public static string EndDateColumnName { get; set; } = ReferenceDataBase.Property_EndDate;
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.ETag"/> database column name (defaults to <see cref="ReferenceDataBase.Property_ETag"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.ETag"/> database column name (defaults to "RowVersion").
         /// </summary>
-        public static string ETagColumnName { get; set; } = ReferenceDataBase.Property_ETag;
+        public static string ETagColumnName { get; set; } = "RowVersion";
     }
 }

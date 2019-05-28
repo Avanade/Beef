@@ -104,6 +104,12 @@ namespace Beef.Demo.Business
         Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id);
 
         /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        Task AddAsync(Person person);
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>

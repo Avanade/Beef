@@ -37,6 +37,22 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.EyeColor"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
+        public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.EyeColorCollection();
+            await DataInvoker.Default.InvokeAsync(this, async () => 
+            {
+                Database.Default.GetRefData<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(__coll, "[Ref].[spEyeColorGetAll]", "EyeColorId");
+                await Task.Delay(0);
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+
+            return __coll;
+        }
+
+        /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>

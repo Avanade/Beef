@@ -58,6 +58,7 @@ namespace Beef.Demo.Test
                 FirstName = "Bill",
                 LastName = "Gates",
                 Gender = "M",
+                EyeColor = "BROWN",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = Guid.NewGuid().ToString()
             };

@@ -78,6 +78,11 @@ namespace Beef.Demo.Business.Data.EfModel
         public string UniqueCode { get; set; }
 
         /// <summary>
+        /// Gets or sets the 'EyeColorCode' column value.
+        /// </summary>
+        public string EyeColorCode { get; set; }
+
+        /// <summary>
         /// Adds the table/model configuration to the <see cref="ModelBuilder"/>.
         /// </summary>
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
@@ -100,6 +105,7 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
                 entity.Property("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
                 entity.Property("UniqueCode").HasColumnType("NVARCHAR(20)");
+                entity.Property("EyeColorCode").HasColumnType("NVARCHAR(50)");
             });
         }
     }

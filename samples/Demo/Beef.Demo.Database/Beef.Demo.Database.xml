@@ -2,6 +2,7 @@
 <CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" RefDatabaseSchema="Ref" ConnectionString="Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True" >
   <!-- Reference data stored procedures -->
   <Table Name="Gender" Schema="Ref" GetAll="true" Get="true" Create="true" Update="true" />
+  <Table Name="EyeColor" Schema="Ref" GetAll="true" />
   
   <!-- Master data stored procedures. -->
   <Table Name="Person" Schema="Demo" Get="true" Create="true" Update="true" Delete="true" EfModel="true">

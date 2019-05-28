@@ -9,6 +9,7 @@ CREATE PROCEDURE [Demo].[spPersonCreate]
   ,@CreatedBy AS NVARCHAR(250) NULL = NULL
   ,@CreatedDate AS DATETIME2 NULL = NULL
   ,@UniqueCode AS NVARCHAR(20) NULL = NULL
+  ,@EyeColorCode AS NVARCHAR(50) NULL = NULL
   ,@ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -39,6 +40,7 @@ BEGIN
        ,[CreatedBy]
        ,[CreatedDate]
        ,[UniqueCode]
+       ,[EyeColorCode]
     )
     OUTPUT inserted.PersonId INTO @InsertedIdentity
     VALUES (
@@ -51,6 +53,7 @@ BEGIN
        ,@CreatedBy
        ,@CreatedDate
        ,@UniqueCode
+       ,@EyeColorCode
     )
 
     -- Get the inserted identity.

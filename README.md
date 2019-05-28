@@ -1,6 +1,6 @@
 <br>
 
-![Logo](./docs/images/LogoPill.png "Domain-based")
+![Logo](./docs/images/LogoPill.png "Beef")
 
 <br>
 
@@ -62,7 +62,7 @@ The architecture supports a domain-based channel-agnostic microservices approach
 
 The following represents the prescribed tiering and layering of the architecture:
 
-![Layers](./docs/images/Layers.png)
+![Layers](./docs/images/Layers.png "Tiering and Layering")
 
 Given this architecture, the .NET Solution you create using _Beef_ should adhere to the prescribed [solution structure](./docs/Solution-Structure.md).
 

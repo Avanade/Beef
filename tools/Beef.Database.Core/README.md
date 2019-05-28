@@ -52,9 +52,19 @@ The data specified follows a basic indenting/levelling rule to enable:
 2. **Table** - specifies the Table name within the Schema; this will be validated to ensure it exists within the database as the underlying table schema (columns) will be inferred. The underyling rows will be [inserted](https://docs.microsoft.com/en-us/sql/t-sql/statements/insert-transact-sql) by default, by prefixing with a `$` character a [merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql) operation will be performed instead.
 3. **Rows** - each row specifies the column name and the corresponding values (except for reference data described below). The tooling will parse each column value according to the underying SQL type.
 
-*Reference Data* is treated as a special case; generally identified by being in the `Ref` schema. The first column name and value pair are treated as the `Code` and `Text` columns. Also the `IsActive` column will automatically be set to `true`, and the `SortOrder` column to the index (1-based) in which it is specified. 
+<br/>
+
+### Reference data
+
+[*Reference Data*](../../docs/Reference-Data.md) is treated as a special case; generally identified by being in the `Ref` schema. The first column name and value pair are treated as the `Code` and `Text` columns. Also the `IsActive` column will automatically be set to `true`, and the `SortOrder` column to the index (1-based) in which it is specified. 
 
 Where a column is a *Reference Data* reference the reference data code can be specified, with the identifier being determined at runtime (using a sub-query) as it is unlikely to be known at configuration time. The tooling determines this by the column name being suffixed by `Id` and a corresponding table name in the `Ref` schema; example `GenderId` column and corresponding table `Ref.Gender`.
+
+Alternatively, a *Reference Data* reference could be the code itself, typically named XxxCode (e.g. `GenderCode`). This has the advantage of decoupling the reference data references from the underlying identifier. Where data is persisted as JSON then the **code** is used; this would ensure consistency. The primary disadvantage is that the **code** absolutely becomes _immutable_ and therefore not easily changed; for the most part this would not be an issue.
+
+<br/>
+
+### Yaml configuration
 
 Example YAML configuration for *merging* reference data is as follows:
 ``` YAML
@@ -87,7 +97,7 @@ To simplify the database management here are some further considerations that ma
 - **Minimise constraints** - do not use database constraints unless absolutely necessary; only leverage where the database is the best and/or most efficient means to perform; i.e. uniqueness. The business logic should validate the request to ensure that any related data is provided, is valid and consistent. 
 - **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except `dbo` or `sec` (security where used).
 - **Standardise column lengths** - use a standard set of column lengths within the database and have the business logic manage the length constraint. As such the column length must be the same or greater that what is required.
-- **JSON for schema-less** - where there is data that needs to be persisted, but rarely searched on, a schema-less approach should be considered such that a JSON object is persisted versus having to define columns. This can simplify the database requirements where the data is hierarchical in nature.
+- **JSON for schema-less** - where there is data that needs to be persisted, but rarely searched on, a schema-less approach should be considered such that a JSON object is persisted versus having to define columns. This can further simplify the database requirements where the data is hierarchical in nature. To enable the [`ObjectToJsonConverter`](../../src/Beef.Core/Mapper/Converters/ObjectToJsonConverter.cs) should be used within the corresponding mapper (e.g. [`DatabasePropertyMapper`](../../src/Beef.Data.Database/DatabasePropertyMapper.cs)).
 
 <br/>
 
@@ -115,7 +125,9 @@ The remainder are common combinations of the above:
 - `Database` - performs only the **database** commands as follows: `Create`, `Migrate`, `Schema` and `Data`.
 - `DropAndDatabase` - performs `Drop` and `Database`.
 - `ResetAndDatabase` - performs `Reset` and `Database`.
-- `ScriptNew` - preates a new script file using the defined naming convention.
+
+There are multiple scripting options:
+- `ScriptNew` - creates a new script file using the defined naming convention.
 
 <br/>
 

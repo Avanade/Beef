@@ -386,6 +386,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.LastName);
                 Property(s => s.UniqueCode);
                 Property(s => s.Gender, "GenderId").SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default);
+                Property(s => s.EyeColorSid, "EyeColorCode");
                 Property(s => s.Birthday);
                 Property(s => s.Address).SetMapper(AddressData.DbMapper.Default);
                 AddStandardProperties();
@@ -413,6 +414,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.LastName, d => d.LastName);
                 Property(s => s.UniqueCode, d => d.UniqueCode);
                 Property(s => s.Gender, d => d.GenderId).SetConverter(ReferenceDataNullableGuidIdConverter<RefDataNamespace.Gender>.Default);
+                Property(s => s.EyeColorSid, d => d.EyeColorCode);
                 Property(s => s.Birthday, d => d.Birthday);
                 AddStandardProperties();
                 EfMapperCtor();

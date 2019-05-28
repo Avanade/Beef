@@ -212,7 +212,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <![CDATA[        #region Private
 ]]>
           </If>
-                  <![CDATA[, Task> {{Operation.PrivateName}}OnAfterAsync = null;
+          <![CDATA[, Task> {{Operation.PrivateName}}OnAfterAsync = null;
 ]]>
         </If>
         <If Condition="Operation.OperationType == 'Custom' or Operation.AutoImplement == 'None'">
@@ -224,7 +224,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[
 ]]>
         </If>
-          <![CDATA[        private Action<Exception> {{Operation.PrivateName}}OnException = null;
+        <![CDATA[        private Action<Exception> {{Operation.PrivateName}}OnException = null;
 ]]>
       </Operation>
       <If Condition="System.EndRegion == true">
@@ -824,7 +824,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
         </If>
         <Property Condition="Property.DataDatabaseIgnore == false and Property.Name != 'ETag' and Property.Name != 'ChangeLog'">
-          <![CDATA[                Property(s => s.{{Property.Name}}]]>
+          <Set Name="System.RefDataSidCodeMapping" Value="false" />
+          <If Condition="Property.RefDataType == 'string'">
+            <If Condition="Property.DataConverter == null and Config.MapperDefaultRefDataConverter == 'ReferenceDataCodeConverter'">
+              <Then>
+                <Set Name="System.RefDataSidCodeMapping" Value="true" />
+              </Then>
+              <Else>
+                <If Condition="Property.DataConverter == 'ReferenceDataCodeConverter'">
+                  <Set Name="System.RefDataSidCodeMapping" Value="true" />
+                </If>
+              </Else>
+            </If>
+          </If>
+          <If Condition="System.RefDataSidCodeMapping == true">
+            <Then>
+              <![CDATA[                Property(s => s.{{Property.Name}}Sid]]>
+            </Then>
+            <Else>
+              <![CDATA[                Property(s => s.{{Property.Name}}]]>
+            </Else>
+          </If>
           <If Condition="Property.DataName != null">
             <If Condition="Entity.AutoImplement == 'Database'">
               <![CDATA[, "{{Property.DataName}}"]]>
@@ -840,22 +860,24 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <Else><![CDATA[.SetUniqueKey(false)]]></Else>
             </If>
           </If>
-          <If Condition="Property.DataConverter == null">
-            <Then>
-              <If Condition="Property.RefDataType != null">
-                <If Condition="Config.MapperDefaultRefDataConverter != null">
-                  <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
-                  <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+          <If Condition="System.RefDataSidCodeMapping == false">
+            <If Condition="Property.DataConverter == null">
+              <Then>
+                <If Condition="Property.RefDataType != null">
+                  <If Condition="Config.MapperDefaultRefDataConverter != null">
+                    <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
+                    <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+                  </If>
                 </If>
-              </If>
-            </Then>
-            <Else>
-              <![CDATA[.SetConverter({{Property.DataConverter}}]]>
-              <If Condition="Property.IsDataConverterGeneric == true">
-                <![CDATA[<{{Property.Type}}>]]>
-              </If>
-              <![CDATA[.Default)]]>
-            </Else>
+              </Then>
+              <Else>
+                <![CDATA[.SetConverter({{Property.DataConverter}}]]>
+                <If Condition="Property.IsDataConverterGeneric == true">
+                  <![CDATA[<{{Property.Type}}>]]>
+                </If>
+                <![CDATA[.Default)]]>
+              </Else>
+            </If>
           </If>
           <If Condition="Property.DataDatabaseMapper != null">
             <![CDATA[.SetMapper({{Property.DataDatabaseMapper}}.Default)]]>
@@ -895,7 +917,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
         </If>
         <Property Condition="Property.DataODatagnore == false and Property.Name != 'ETag' and Property.Name != 'ChangeLog'">
-          <![CDATA[                Property(s => s.{{Property.Name}}]]>
+          <Set Name="System.RefDataSidCodeMapping" Value="false" />
+          <If Condition="Property.RefDataType == 'string'">
+            <If Condition="Property.DataConverter == null and Config.MapperDefaultRefDataConverter == 'ReferenceDataCodeConverter'">
+              <Then>
+                <Set Name="System.RefDataSidCodeMapping" Value="true" />
+              </Then>
+              <Else>
+                <If Condition="Property.DataConverter == 'ReferenceDataCodeConverter'">
+                  <Set Name="System.RefDataSidCodeMapping" Value="true" />
+                </If>
+              </Else>
+            </If>
+          </If>
+          <If Condition="System.RefDataSidCodeMapping == true">
+            <Then>
+              <![CDATA[                Property(s => s.{{Property.Name}}Sid]]>
+            </Then>
+            <Else>
+              <![CDATA[                Property(s => s.{{Property.Name}}]]>
+            </Else>
+          </If>
           <If Condition="Property.DataName != null">
             <![CDATA[, "{{Property.DataName}}"]]>
           </If>
@@ -909,22 +951,24 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <Else><![CDATA[.SetUniqueKey(false)]]></Else>
             </If>
           </If>
-          <If Condition="Property.DataConverter == null">
-            <Then>
-              <If Condition="Property.RefDataType != null">
-                <If Condition="Config.MapperDefaultRefDataConverter != null">
-                  <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
-                  <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+          <If Condition="System.RefDataSidCodeMapping == false">
+            <If Condition="Property.DataConverter == null">
+              <Then>
+                <If Condition="Property.RefDataType != null">
+                  <If Condition="Config.MapperDefaultRefDataConverter != null">
+                    <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
+                    <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+                  </If>
                 </If>
-              </If>
-            </Then>
-            <Else>
-              <![CDATA[.SetConverter({{Property.DataConverter}}]]>
-              <If Condition="Property.IsDataConverterGeneric == true">
-                <![CDATA[<{{Property.Type}}>]]>
-              </If>
-              <![CDATA[.Default)]]>
-            </Else>
+              </Then>
+              <Else>
+                <![CDATA[.SetConverter({{Property.DataConverter}}]]>
+                <If Condition="Property.IsDataConverterGeneric == true">
+                  <![CDATA[<{{Property.Type}}>]]>
+                </If>
+                <![CDATA[.Default)]]>
+              </Else>
+            </If>
           </If>
           <If Condition="Property.DataODataMapper != null">
             <![CDATA[.SetMapper({{Property.DataODataMapper}}.Default)]]>
@@ -960,7 +1004,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
         </If>
         <Property Condition="Property.DataEntityFrameworkIgnore == false and Property.Name != 'ETag' and Property.Name != 'ChangeLog'">
-          <![CDATA[                Property(s => s.{{Property.Name}}, d => d.]]>
+          <Set Name="System.RefDataSidCodeMapping" Value="false" />
+          <If Condition="Property.RefDataType == 'string'">
+            <If Condition="Property.DataConverter == null and Config.MapperDefaultRefDataConverter == 'ReferenceDataCodeConverter'">
+              <Then>
+                <Set Name="System.RefDataSidCodeMapping" Value="true" />
+              </Then>
+              <Else>
+                <If Condition="Property.DataConverter == 'ReferenceDataCodeConverter'">
+                  <Set Name="System.RefDataSidCodeMapping" Value="true" />
+                </If>
+              </Else>
+            </If>
+          </If>
+          <If Condition="System.RefDataSidCodeMapping == true">
+            <Then>
+              <![CDATA[                Property(s => s.{{Property.Name}}Sid, d => d.]]>
+            </Then>
+            <Else>
+              <![CDATA[                Property(s => s.{{Property.Name}}, d => d.]]>
+            </Else>
+          </If>
           <If Condition="Property.DataName == null">
             <Then>
               <![CDATA[{{Property.Name}}]]>
@@ -979,22 +1043,24 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <Else><![CDATA[.SetUniqueKey(false)]]></Else>
             </If>
           </If>
-          <If Condition="Property.DataConverter == null">
-            <Then>
-              <If Condition="Property.RefDataType != null">
-                <If Condition="Config.MapperDefaultRefDataConverter != null">
-                  <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
-                  <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+          <If Condition="System.RefDataSidCodeMapping == false">
+            <If Condition="Property.DataConverter == null">
+              <Then>
+                <If Condition="Property.RefDataType != null">
+                  <If Condition="Config.MapperDefaultRefDataConverter != null">
+                    <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
+                    <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+                  </If>
                 </If>
-              </If>
-            </Then>
-            <Else>
-              <![CDATA[.SetConverter({{Property.DataConverter}}]]>
-              <If Condition="Property.IsDataConverterGeneric == true">
-                <![CDATA[<{{Property.Type}}>]]>
-              </If>
-              <![CDATA[.Default)]]>
-            </Else>
+              </Then>
+              <Else>
+                <![CDATA[.SetConverter({{Property.DataConverter}}]]>
+                <If Condition="Property.IsDataConverterGeneric == true">
+                  <![CDATA[<{{Property.Type}}>]]>
+                </If>
+                <![CDATA[.Default)]]>
+              </Else>
+            </If>
           </If>
           <If Condition="Property.DataEntityFrameworkMapper != null">
             <![CDATA[.SetMapper({{Property.DataEntityFrameworkMapper}}.Default)]]>

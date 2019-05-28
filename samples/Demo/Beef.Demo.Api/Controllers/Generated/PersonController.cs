@@ -232,6 +232,19 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Actually validating the FromBody parameter generation.
+        /// </summary>
+        /// <param name="person">The Person (see <see cref="Person"/>).</param>
+        [HttpPost]
+        [Route("fromBody")]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        public IActionResult Add([FromBody] Person person)
+        {
+            return new WebApiPost(this, () => Factory.Create<IPersonManager>().AddAsync(person),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Created);
+        }
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>

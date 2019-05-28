@@ -26,6 +26,12 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync();
 
         /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync();
+
+        /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
@@ -71,6 +77,15 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
         {
             return base.GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", args: new WebApiArg[] { });      
+        }
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync()
+        {
+            return base.GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", args: new WebApiArg[] { });      
         }
 
         /// <summary>

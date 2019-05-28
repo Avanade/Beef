@@ -41,6 +41,19 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data entities.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/eyeColors")]
+        [ProducesResponseType(typeof(RefDataNamespace.EyeColorCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult EyeColorGetAll()
+        {
+            return new WebApiGet<RefDataNamespace.EyeColorCollection>(this, () => Task.FromResult(ReferenceData.Current.EyeColor), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data entities.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
@@ -75,6 +88,7 @@ namespace Beef.Demo.Api.Controllers
                     allNames = new List<string>
                     {
                         ReferenceData.Property_Gender,
+                        ReferenceData.Property_EyeColor,
                         ReferenceData.Property_Company,
                     };
                 }
@@ -85,6 +99,7 @@ namespace Beef.Demo.Api.Controllers
                     switch (name)
                     {
                         case ReferenceData.Property_Gender: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current[typeof(RefDataNamespace.Gender)] }); break;
+                        case ReferenceData.Property_EyeColor: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current[typeof(RefDataNamespace.EyeColor)] }); break;
                         case ReferenceData.Property_Company: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current[typeof(RefDataNamespace.Company)] }); break;
                     }
                 }

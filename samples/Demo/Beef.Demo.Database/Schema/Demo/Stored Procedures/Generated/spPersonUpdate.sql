@@ -10,6 +10,7 @@ CREATE PROCEDURE [Demo].[spPersonUpdate]
   ,@UpdatedBy AS NVARCHAR(250) NULL = NULL
   ,@UpdatedDate AS DATETIME2 NULL = NULL
   ,@UniqueCode AS NVARCHAR(20) NULL = NULL
+  ,@EyeColorCode AS NVARCHAR(50) NULL = NULL
   ,@ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -52,6 +53,7 @@ BEGIN
         ,[UpdatedBy] = @UpdatedBy
         ,[UpdatedDate] = @UpdatedDate
         ,[UniqueCode] = @UniqueCode
+        ,[EyeColorCode] = @EyeColorCode
       WHERE [PersonId] = @PersonId
 
     -- Commit the transaction.

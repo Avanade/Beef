@@ -23,6 +23,12 @@ namespace Beef.Demo.Business.Data
         Task<RefDataNamespace.GenderCollection> GenderGetAllAsync();
 
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.EyeColor"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
+        Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync();
+
+        /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
