@@ -108,6 +108,8 @@ The following commands are automatically enabled for the console application (wh
 - `Database` - performs code generation using the `Company.AppName.Database.xml` configuration and [`Database.xml`](./Scripts/Database.xml) script.
 - `All` - performs all of the above (where each is supported as per set up).
 
+There are a number of properties that support changes to these template above where they need to be overridden.
+
 <br/>
 
 ### Program.cs
@@ -125,6 +127,18 @@ public class Program
 ```
 
 <br/>
+
+To run the console application, simply specify the required command; e.g:
+```
+dotnet run entity    -- Default filename: Company.AppName.xml
+dotnet run refdata   -- Default filename: Company.RefData.xml
+dotnet run all       -- All of the above
+
+-- Override the configuration filename from the default.
+dotnet run entity -x configfilename.xml
+```
+
+</br>
 
 ### Personalization and/or overridding
 

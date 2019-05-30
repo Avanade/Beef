@@ -20,30 +20,45 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Gets the <see cref="CommandType.Entity"/> command line template.
+        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
+        /// </summary>
+        public static string EntityFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.xml";
+
+        /// <summary>
+        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
+        /// </summary>
+        public static string DatabaseFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.Database.xml";
+
+        /// <summary>
+        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
+        /// </summary>
+        public static string RefDataFileNameTemplate { get; set; } = "{{Company}}.RefData.xml";
+
+        /// <summary>
+        /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
         /// </summary>
         public static string EntityCommandLineTemplate { get; set; }
-            = "{{Company}}.{{AppName}}.xml -s EntityWebApiCoreAgent.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s EntityWebApiCoreAgent.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
-        /// Gets the <see cref="CommandType.Database"/> command line template.
+        /// Gets or sets the <see cref="CommandType.Database"/> command line template.
         /// </summary>
         public static string DatabaseCommandLineTemplate { get; set; } 
-            = "{{Company}}.{{AppName}}.Database.xml -s Database.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "-s Database.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
-        /// Gets the <see cref="CommandType.RefData"/> command line template.
+        /// Gets or sets the <see cref="CommandType.RefData"/> command line template.
         /// </summary>
         public static string RefDataCommandLineTemplate { get; set; }
-            = "{{Company}}.RefData.xml -s RefDataCoreCrud.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s RefDataCoreCrud.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
-        /// Gets the <see cref="Assembly"/> portion command line template.
+        /// Gets or sets the <see cref="Assembly"/> portion command line template.
         /// </summary>
         public static string CommandLineAssemblyTemplate { get; set; } = " -a \"{{Assembly}}\"";
 
         /// <summary>
-        /// Creates a new instance of the <see cref="CodeGenConsoleWrapper"/> class defaulting to <see cref="Assembly.GetEntryAssembly"/>.
+        /// Creates a new instance of the <see cref="CodeGenConsoleWrapper"/> class defaulting to <see cref="Assembly.GetCallingAssembly"/>.
         /// </summary>
         /// <param name="company">The company name.</param>
         /// <param name="appName">The application/domain name.</param>
@@ -52,7 +67,7 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> instance.</returns>
         public static CodeGenConsoleWrapper Create(string company, string appName, string apiName = "Api", string outDir = ".\\..")
         {
-            return new CodeGenConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly() }, company, appName, apiName, outDir);
+            return new CodeGenConsoleWrapper(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outDir);
         }
 
         /// <summary>
@@ -156,19 +171,32 @@ namespace Beef.CodeGen
 
             var cmd = app.Argument<CommandType>("command", "Execution command type: Entity, Database, RefData or All.", false).IsRequired();
             var cs = app.Option("-c|--connectionString", "Override the connection string for Database.", CommandOptionType.SingleValue);
+            var cx = app.Option("-x|--xml", "Override the filename for the configuration XML.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
+
+            var entityFileName = EntityFileNameTemplate;
+            var databaseFileName = DatabaseFileNameTemplate;
+            var refDataFileName = RefDataFileNameTemplate;
 
             app.OnExecute(() =>
             {
                 var ct = Enum.Parse<CommandType>(cmd.Value, true);
+                if (cx.HasValue())
+                {
+                    if (ct == CommandType.All)
+                        throw new CommandParsingException(app, "Command 'All' is not compatible with --xml; the command must be more specific when using a configuration XML file.");
+
+                    entityFileName = databaseFileName = refDataFileName = cx.Value();
+                }
+
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "")));
+                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(databaseFileName + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "")));
 
                 if (IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(RefDataCommandLineTemplate)));
+                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(refDataFileName + " " + RefDataCommandLineTemplate)));
 
                 if (IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(EntityCommandLineTemplate)));
+                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(entityFileName + " " + EntityCommandLineTemplate)));
             });
 
             try

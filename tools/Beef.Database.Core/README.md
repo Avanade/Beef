@@ -103,7 +103,9 @@ To simplify the database management here are some further considerations that ma
 
 ## Console application
 
-The `Beef.Database.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. Then simply add the `Data`, `Migrations` and `Schema` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as an example.
+The `Beef.Database.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. Then simply add the `Data`, `Migrations` and `Schema` folders and embed the required resources.
+
+See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as an example.
 
 <br/>
 
@@ -126,8 +128,10 @@ The remainder are common combinations of the above:
 - `DropAndDatabase` - performs `Drop` and `Database`.
 - `ResetAndDatabase` - performs `Reset` and `Database`.
 
-There are multiple scripting options:
-- `ScriptNew` - creates a new script file using the defined naming convention.
+There are multiple scripting options (create new script file in the `Migrate` folder:
+- `ScriptNew` - creates a new (skeleton) script file using the defined naming convention.
+- `ScriptNew -create Schema.Table` - creates a new table create script file for the named schema and table.
+- `ScriptNew -alter Schema.Table` - creates a new table create script file for the named schema and table.
 
 <br/>
 
@@ -145,6 +149,8 @@ public class Program
 }
 ```
 
+<br/>
+
 To automatically added artefacts as embedded resources make the following change to your `.csproj` file:
 
 ``` xml
@@ -155,9 +161,13 @@ To automatically added artefacts as embedded resources make the following change
   </ItemGroup>
 ```
 
+<br/>
+
 To run the console application, simply specify the required command; e.g:
 ```
 dotnet run dropandall
 dotnet run all
 dotnet run database -cs "Data Source=.;Initial atalog=Beef.Test;Integrated Security=True"
+
+dotnet run scriptnew -create Ref.Eyecolor
 ```
