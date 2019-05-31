@@ -55,7 +55,22 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets or sets the list of known <see cref="SqlException.Number"/> values for the <see cref="ThrowTransformedSqlException(SqlException)"/> method.
         /// </summary>
+        /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors
+        /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
         public static int[] SqlDuplicateErrorNumbers { get; set; } = new int[] { 2601, 2627 };
+
+        /// <summary>
+        /// Gets or sets the list of known <see cref="SqlException.Number"/> values that are considered transient; candidates for a retry. 
+        /// </summary>
+        /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors 
+        /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
+        public static int[] SqlTransientErrorNumbers { get; set; } = new int[] 
+        {
+            -1, -2, 701, 1204, 1205, 1222, 8645, 8651, 30053, // https://stackoverflow.com/questions/4821668/what-is-good-c-sharp-coding-style-for-catching-sqlexception-and-retrying
+            10928, 10929, 10053, 10054, 10060, 40540, 40143, 233, 64, // https://github.com/Azure/elastic-db-tools/blob/master/Src/ElasticScale.Client/ElasticScale.Common/TransientFaultHandling/Implementation/SqlDatabaseTransientErrorDetectionStrategy.cs
+            4060, 40197, 40501, 40613, 49918, 49919, 49920, 4221, // https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages
+            1222, 1421, 1807, 3928, 5030, 7604, 8628, 8654, 17197, 17830, 17889, 18486 // https://github.com/marinoscar/CommonHelpers/blob/master/SqlErrorCodes.cs
+        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBase"/> class for a <paramref name="connectionString"/> and <paramref name="provider"/>.
