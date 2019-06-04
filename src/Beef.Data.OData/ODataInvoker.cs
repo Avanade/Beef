@@ -1,37 +1,40 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Beef.Data.OData
 {
     /// <summary>
-    /// Wraps a <see cref="ODataBase"/> request enabling standard functionality to be added to all invocations. 
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="ODataBase"/> invocations
+    /// specifically exception handling (see <see cref="ODataBase.ExceptionHandler"/>).
     /// </summary>
     public class ODataInvoker : InvokerBase<ODataInvoker, ODataBase>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataInvoker"/> class.
-        /// </summary>
-        public ODataInvoker()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #region NoResult
 
         /// <summary>
-        /// Wrap the invoke synchronously.
+        /// Invokes an <paramref name="action"/> synchronously.
         /// </summary>
-        private void WrappedInvoke(InvokerArgsSync<ODataBase> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="action">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected override void WrapInvoke(object caller, Action action, ODataBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                args.WorkCallbackSync();
+                action();
             }
             catch (HttpRequestException hrex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(hrex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(hrex);
 
                 throw;
             }
@@ -39,8 +42,8 @@ namespace Beef.Data.OData
             {
                 if (tiex?.InnerException is HttpRequestException hrex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(hrex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(hrex);
                 }
 
                 throw;
@@ -48,18 +51,24 @@ namespace Beef.Data.OData
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously.
+        /// Invokes a <paramref name="func"/> asynchronously.
         /// </summary>
-        private async Task WrappedInvokeAsync(InvokerArgsAsync<ODataBase> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, ODataBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                await args.WorkCallbackAsync();
+                await func();
             }
             catch (HttpRequestException hrex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(hrex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(hrex);
 
                 throw;
             }
@@ -67,41 +76,39 @@ namespace Beef.Data.OData
             {
                 if (tiex?.InnerException is HttpRequestException hrex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(hrex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(hrex);
                 }
 
                 throw;
             }
         }
-    }
 
-    /// <summary>
-    /// Wraps a <see cref="ODataBase"/> request enabling standard functionality to be added to all invocations. 
-    /// </summary>
-    public class ODataInvoker<TResult> : InvokerBase<ODataInvoker<TResult>, ODataBase, TResult>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataInvoker{TResult}"/> class.
-        /// </summary>
-        public ODataInvoker()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #endregion
+
+        #region WithResult
 
         /// <summary>
-        /// Wrap the invoke synchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
         /// </summary>
-        private TResult WrappedInvoke(InvokerArgsSync<ODataBase, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, ODataBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                return args.WorkCallbackSync();
+                return func();
             }
             catch (HttpRequestException hrex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(hrex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(hrex);
 
                 throw;
             }
@@ -109,8 +116,8 @@ namespace Beef.Data.OData
             {
                 if (tiex?.InnerException is HttpRequestException hrex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(hrex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(hrex);
                 }
 
                 throw;
@@ -118,18 +125,26 @@ namespace Beef.Data.OData
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
         /// </summary>
-        private async Task<TResult> WrappedInvokeAsync(InvokerArgsAsync<ODataBase, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, ODataBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                return await args.WorkCallbackAsync();
+                return await func();
             }
             catch (HttpRequestException hrex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(hrex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(hrex);
 
                 throw;
             }
@@ -137,12 +152,14 @@ namespace Beef.Data.OData
             {
                 if (tiex?.InnerException is HttpRequestException hrex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(hrex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(hrex);
                 }
 
                 throw;
             }
         }
+
+        #endregion
     }
 }

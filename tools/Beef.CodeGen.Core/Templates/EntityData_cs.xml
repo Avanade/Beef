@@ -431,23 +431,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         </If>
 
         <!-- Code -->
-        <![CDATA[            return DataInvoker]]>
-        <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[<{{Entity.EntityName}}>]]></Then>
-            <Else><![CDATA[<{{Operation.ReturnType}}>]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'GetColl'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[<{{Entity.EntityCollectionResultName}}>]]></Then>
-            <Else><![CDATA[<{{Operation.ReturnType}}CollectionResult>]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[<{{Operation.ReturnType}}>]]>
-        </If>
-        <![CDATA[.Default.InvokeAsync]]>
+        <![CDATA[            return DataInvoker.Default.InvokeAsync]]>
         <If Condition="Operation.OperationType == 'Custom' or Operation.AutoImplement == 'None' or Entity.AutoImplement == null">
           <Then>
             <![CDATA[(this, () => {{Operation.Name}}OnImplementationAsync(]]>

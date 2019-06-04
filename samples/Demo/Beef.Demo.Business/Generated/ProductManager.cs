@@ -43,7 +43,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Product> GetAsync(int id)
         {
-            return ManagerInvoker<Product>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(id);
@@ -70,7 +70,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs args, PagingArgs paging)
         {
-            return ManagerInvoker<ProductCollectionResult>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(args);

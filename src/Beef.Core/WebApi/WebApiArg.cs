@@ -13,7 +13,7 @@ using System.Text;
 namespace Beef.WebApi
 {
     /// <summary>
-    /// Represents the <see cref="WebApiInvoker{TResult}"/> argument types.
+    /// Represents the <b>Web API</b> argument types.
     /// </summary>
     public enum WebApiArgType
     {
@@ -39,7 +39,7 @@ namespace Beef.WebApi
     }
 
     /// <summary>
-    /// Represents a <see cref="WebApiInvoker{TResult}"/> argument base class.
+    /// Represents a <b>Web API</b> argument base class.
     /// </summary>
     public abstract class WebApiArg
     {

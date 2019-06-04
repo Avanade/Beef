@@ -28,7 +28,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="CustomerGroup"/> object where found; otherwise, <c>null</c>.</returns>
         public static Task<CustomerGroup> GetAsync(string id, RefDataNamespace.Company company)
         {
-            return DataSvcInvoker<CustomerGroup>.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 var __key = new UniqueKey(id, company);
                 if (ExecutionContext.Current.TryGetCacheValue<CustomerGroup>(__key, out CustomerGroup __val))
@@ -48,7 +48,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="CustomerGroupCollectionResult"/>.</returns>
         public static Task<CustomerGroupCollectionResult> GetByArgsAsync(CustomerGroupArgs args, PagingArgs paging)
         {
-            return DataSvcInvoker<CustomerGroupCollectionResult>.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 var __result = await Factory.Create<ICustomerGroupData>().GetByArgsAsync(args, paging);
                 return __result;
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="CustomerGroup"/> object.</returns>
         public static Task<CustomerGroup> CreateAsync(CustomerGroup value)
         {
-            return DataSvcInvoker<CustomerGroup>.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 var __result = await Factory.Create<ICustomerGroupData>().CreateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.CustomerGroup.{id},{company}", "Create", new KeyValuePair<string, object>("id", __result.Id), new KeyValuePair<string, object>("company", __result.Company));
@@ -78,7 +78,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="CustomerGroup"/> object.</returns>
         public static Task<CustomerGroup> UpdateAsync(CustomerGroup value)
         {
-            return DataSvcInvoker<CustomerGroup>.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 var __result = await Factory.Create<ICustomerGroupData>().UpdateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.CustomerGroup.{id},{company}", "Update", new KeyValuePair<string, object>("id", __result.Id), new KeyValuePair<string, object>("company", __result.Company));

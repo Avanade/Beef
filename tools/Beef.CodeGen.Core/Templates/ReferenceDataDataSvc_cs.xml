@@ -52,11 +52,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     <![CDATA[<{{Entity.EntityCollectionName}}, ]]>
     <If Condition="Config.UseEntityData == true">
       <Then>
-        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker<{{Entity.EntityCollectionName}}>.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<I{{Entity.Name}}Data>().GetAll())));
+        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<I{{Entity.Name}}Data>().GetAll())));
 ]]>
       </Then>
       <Else>
-        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker<{{Entity.EntityCollectionName}}>.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().{{Entity.Name}}GetAllAsync())));
+        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().{{Entity.Name}}GetAllAsync())));
 ]]>
       </Else>
     </If>

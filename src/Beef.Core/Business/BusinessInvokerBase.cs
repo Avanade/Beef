@@ -1,36 +1,32 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Transactions;
 
 namespace Beef.Business
 {
     /// <summary>
-    /// Wraps an <see cref="InvokerBase{TInvoker, TParam, TResult}"/> enabling standard functionality to be added to all invocations specifically for the <b>business tier</b> that supports
-    /// a <see cref="BusinessInvokerArgs"/> to enable <see cref="DataContextScopeOption"/> and <see cref="TransactionScope"/>. 
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <b> business tier</b> invocations using
+    /// a <see cref="BusinessInvokerArgs"/> to enable <see cref="DataContextScopeOption"/> and <see cref="TransactionScope"/> options. 
     /// </summary>
-    [DebuggerStepThrough()]
     public abstract class BusinessInvokerBase<TInvoker> : InvokerBase<TInvoker, BusinessInvokerArgs> where TInvoker : BusinessInvokerBase<TInvoker>, new()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BusinessInvokerBase{T, TResult}"/> class.
-        /// </summary>
-        /// <remarks>Warning: Inheritors should note that this class uses the 
-        /// <see cref="InvokerBase{TInvoker, TParam}.SetBaseWrapper(System.Action{InvokerArgsSync{TParam}}, System.Func{InvokerArgsAsync{TParam}, Task})"/>
-        /// to enable this capability and overridding in a sub-class will mean that the underlying functionality will not be executed.</remarks>
-        public BusinessInvokerBase()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #region NoResult
 
         /// <summary>
-        /// Wrap the invoke synchronously.
+        /// Invokes an <paramref name="action"/> synchronously.
         /// </summary>
-        private void WrappedInvoke(InvokerArgsSync<BusinessInvokerArgs> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="action">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected override void WrapInvoke(object caller, Action action, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            BusinessInvokerArgs bia = args.Param ?? BusinessInvokerArgs.Default;
+            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -42,7 +38,7 @@ namespace Beef.Business
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                args.WorkCallbackSync();
+                action();
 
                 if (txn != null)
                     txn.Complete();
@@ -65,11 +61,17 @@ namespace Beef.Business
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously.
+        /// Invokes a <paramref name="func"/> asynchronously.
         /// </summary>
-        private async Task WrappedInvokeAsync(InvokerArgsAsync<BusinessInvokerArgs> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            BusinessInvokerArgs bia = args.Param ?? BusinessInvokerArgs.Default;
+            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -81,7 +83,7 @@ namespace Beef.Business
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                await args.WorkCallbackAsync();
+                await func();
 
                 if (txn != null)
                     txn.Complete();
@@ -102,34 +104,25 @@ namespace Beef.Business
                 ExecutionContext.Current.OperationType = ot;
             }
         }
-    }
 
-    /// <summary>
-    /// Wraps an <see cref="InvokerBase{TInvoker, TParam, TResult}"/> enabling standard functionality to be added to all invocations specifically for the <b>business tier</b> that supports
-    /// a <see cref="BusinessInvokerArgs"/> to enable <see cref="DataContextScopeOption"/> and <see cref="TransactionScope"/>. 
-    /// </summary>
-    [DebuggerStepThrough()]
-    public abstract class BusinessInvokerBase<TInvoker, TResult> : InvokerBase<TInvoker, BusinessInvokerArgs, TResult> where TInvoker : BusinessInvokerBase<TInvoker, TResult>, new()
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BusinessInvokerBase{T, TResult}"/> class.
-        /// </summary>
-        /// <remarks>Warning: Inheritors should note that this class uses the 
-        /// <see cref="InvokerBase{TInvoker, TParam, TResult}.SetBaseWrapper(System.Func{InvokerArgsSync{TParam, TResult}, TResult}, System.Func{InvokerArgsAsync{TParam, TResult}, Task{TResult}})"/>
-        /// to enable this capability and overridding in a sub-class will mean that the underlying functionality will not be executed.</remarks>
-        public BusinessInvokerBase()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #endregion
 
-        #region WrappedInvoke
+        #region WithResult
 
         /// <summary>
-        /// Wrap the invoke synchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
         /// </summary>
-        private TResult WrappedInvoke(InvokerArgsSync<BusinessInvokerArgs, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            BusinessInvokerArgs bia = args.Param ?? BusinessInvokerArgs.Default;
+            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -141,12 +134,12 @@ namespace Beef.Business
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                var r = args.WorkCallbackSync();
+                var result = func();
 
                 if (txn != null)
                     txn.Complete();
 
-                return r;
+                return result;
             }
             catch (Exception ex)
             {
@@ -166,11 +159,19 @@ namespace Beef.Business
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
         /// </summary>
-        private async Task<TResult> WrappedInvokeAsync(InvokerArgsAsync<BusinessInvokerArgs, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            BusinessInvokerArgs bia = args.Param ?? BusinessInvokerArgs.Default;
+            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -178,16 +179,16 @@ namespace Beef.Business
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
+                    txn = new TransactionScope(bia.TransactionScopeOption);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                var r = await args.WorkCallbackAsync();
+                var result = await func();
 
                 if (txn != null)
                     txn.Complete();
 
-                return r;
+                return result;
             }
             catch (Exception ex)
             {
@@ -210,7 +211,7 @@ namespace Beef.Business
     }
 
     /// <summary>
-    /// Provides arguments for the <see cref="BusinessInvokerBase{TInvoker, TResult}"/>.
+    /// Provides arguments for the <see cref="BusinessInvokerBase{TInvoker}"/>.
     /// </summary>
     public class BusinessInvokerArgs
     {

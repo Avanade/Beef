@@ -100,7 +100,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonCreate]");
@@ -133,7 +133,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person> GetAsync(Guid id)
         {
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGet]");
@@ -154,7 +154,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonUpdate]");
@@ -172,7 +172,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs paging)
         {
-            return DataInvoker<PersonCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetAll]", __result.Paging);
@@ -189,7 +189,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
         {
-            return DataInvoker<PersonCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 PersonCollectionResult __result = new PersonCollectionResult();
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetAll]");
@@ -208,7 +208,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataInvoker<PersonCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetByArgs]", __result.Paging);
@@ -227,7 +227,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataInvoker<PersonDetailCollectionResult>.Default.InvokeAsync(this, () => GetDetailByArgsOnImplementationAsync(args, paging),
+            return DataInvoker.Default.InvokeAsync(this, () => GetDetailByArgsOnImplementationAsync(args, paging),
                 new BusinessInvokerArgs { ExceptionHandler = _getDetailByArgsOnException });
         }
 
@@ -239,7 +239,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return DataInvoker<Person>.Default.InvokeAsync(this, () => MergeOnImplementationAsync(fromId, toId),
+            return DataInvoker.Default.InvokeAsync(this, () => MergeOnImplementationAsync(fromId, toId),
                 new BusinessInvokerArgs { ExceptionHandler = _mergeOnException });
         }
 
@@ -259,7 +259,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<PersonDetail> GetDetailAsync(Guid id)
         {
-            return DataInvoker<PersonDetail>.Default.InvokeAsync(this, () => GetDetailOnImplementationAsync(id),
+            return DataInvoker.Default.InvokeAsync(this, () => GetDetailOnImplementationAsync(id),
                 new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
         }
 
@@ -273,7 +273,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<PersonDetail>.Default.InvokeAsync(this, () => UpdateDetailOnImplementationAsync(value),
+            return DataInvoker.Default.InvokeAsync(this, () => UpdateDetailOnImplementationAsync(value),
                 new BusinessInvokerArgs { ExceptionHandler = _updateDetailOnException });
         }
 
@@ -285,7 +285,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataInvoker<PersonCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = EfMapper.Default.CreateArgs(__result.Paging);
@@ -303,7 +303,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person> GetWithEfAsync(Guid id)
         {
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = EfMapper.Default.CreateArgs();
@@ -324,7 +324,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = EfMapper.Default.CreateArgs();
@@ -345,7 +345,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Person>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Person __result = null;
                 var __dataArgs = EfMapper.Default.CreateArgs();

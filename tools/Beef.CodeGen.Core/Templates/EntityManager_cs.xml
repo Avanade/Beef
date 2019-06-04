@@ -400,23 +400,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
 
         <!-- Code -->
-        <![CDATA[            return ManagerInvoker]]>
-        <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[<{{Entity.EntityName}}>]]></Then>
-            <Else><![CDATA[<{{Operation.ReturnType}}>]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'GetColl'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[<{{Entity.EntityCollectionResultName}}>]]></Then>
-            <Else><![CDATA[<{{Operation.ReturnType}}CollectionResult>]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[<{{Operation.ReturnType}}>]]>
-        </If>
-        <![CDATA[.Default.InvokeAsync(this, async () =>
+        <![CDATA[            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
 ]]>
         <![CDATA[                ExecutionContext.Current.OperationType = OperationType.]]>

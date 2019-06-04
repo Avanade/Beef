@@ -46,7 +46,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Gender> GetAsync(Guid id)
         {
-            return DataInvoker<Gender>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
@@ -67,7 +67,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Gender>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
@@ -88,7 +88,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<Gender>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");

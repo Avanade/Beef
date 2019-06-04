@@ -27,7 +27,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public static Task<Person> CreateAsync(Person value)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().CreateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id));
@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public static Task<Person> GetAsync(Guid id)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (ExecutionContext.Current.TryGetCacheValue<Person>(__key, out Person __val))
@@ -76,7 +76,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public static Task<Person> UpdateAsync(Person value)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public static Task<PersonCollectionResult> GetAllAsync(PagingArgs paging)
         {
-            return DataSvcInvoker<PersonCollectionResult>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().GetAllAsync(paging);
                 return __result;
@@ -105,7 +105,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public static Task<PersonCollectionResult> GetAll2Async()
         {
-            return DataSvcInvoker<PersonCollectionResult>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().GetAll2Async();
                 return __result;
@@ -120,7 +120,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public static Task<PersonCollectionResult> GetByArgsAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataSvcInvoker<PersonCollectionResult>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().GetByArgsAsync(args, paging);
                 return __result;
@@ -135,7 +135,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
         public static Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataSvcInvoker<PersonDetailCollectionResult>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().GetDetailByArgsAsync(args, paging);
                 return __result;
@@ -150,7 +150,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public static Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().MergeAsync(fromId, toId);
                 await Beef.Events.Event.PublishAsync(
@@ -178,7 +178,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public static Task<PersonDetail> GetDetailAsync(Guid id)
         {
-            return DataSvcInvoker<PersonDetail>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (ExecutionContext.Current.TryGetCacheValue<PersonDetail>(__key, out PersonDetail __val))
@@ -197,7 +197,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
         public static Task<PersonDetail> UpdateDetailAsync(PersonDetail value)
         {
-            return DataSvcInvoker<PersonDetail>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateDetailAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
@@ -214,7 +214,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public static Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs args, PagingArgs paging)
         {
-            return DataSvcInvoker<PersonCollectionResult>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().GetByArgsWithEfAsync(args, paging);
                 return __result;
@@ -228,7 +228,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public static Task<Person> GetWithEfAsync(Guid id)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (ExecutionContext.Current.TryGetCacheValue<Person>(__key, out Person __val))
@@ -247,7 +247,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public static Task<Person> CreateWithEfAsync(Person value)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().CreateWithEfAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id));
@@ -263,7 +263,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public static Task<Person> UpdateWithEfAsync(Person value)
         {
-            return DataSvcInvoker<Person>.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateWithEfAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));

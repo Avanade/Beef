@@ -27,7 +27,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
         public static Task<Product> GetAsync(int id)
         {
-            return DataSvcInvoker<Product>.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (ExecutionContext.Current.TryGetCacheValue<Product>(__key, out Product __val))
@@ -47,7 +47,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
         public static Task<ProductCollectionResult> GetByArgsAsync(ProductArgs args, PagingArgs paging)
         {
-            return DataSvcInvoker<ProductCollectionResult>.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging);
                 return __result;

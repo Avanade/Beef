@@ -333,7 +333,7 @@ namespace Beef.Data.Database
         {
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker<T>.Default.Invoke(this, () =>
+            return DatabaseInvoker.Default.Invoke(this, () =>
             {
                 using (new DatabasePerformanceTimer(this))
                 {
@@ -362,7 +362,7 @@ namespace Beef.Data.Database
             DbDataReader dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker<T>.Default.Invoke(this, () =>
+            return DatabaseInvoker.Default.Invoke(this, () =>
             {
                 using (new DatabasePerformanceTimer(this))
                 {

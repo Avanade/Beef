@@ -7,9 +7,4 @@ namespace Beef.Business
     /// Wraps a <b>Manager invoke</b> enabling standard <b>business tier</b> functionality to be added to all invocations.
     /// </summary>
     public class ManagerInvoker : BusinessInvokerBase<ManagerInvoker> { }
-
-    /// <summary>
-    /// Wraps a <b>Manager invoke</b> enabling standard <b>business tier</b> functionality to be added to all invocations.
-    /// </summary>
-    public class ManagerInvoker<TResult> : BusinessInvokerBase<ManagerInvoker<TResult>, TResult> { }
 }

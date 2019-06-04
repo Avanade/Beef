@@ -57,7 +57,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private TResult ExecuteQuery<TResult>(Func<IQueryable<TModel>, TResult> execute)
         {
-            return EfDbInvoker<TDbContext, TResult>.Default.Invoke(this, () =>
+            return EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
             {
                 using (var db = new EfDbBase<TDbContext>.EfDbContextManager(_db, QueryArgs))
                 {

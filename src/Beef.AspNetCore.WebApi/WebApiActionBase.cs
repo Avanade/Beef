@@ -43,6 +43,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Creates a result for an <see cref="Exception"/>; specifically where it is a known/expected <see cref="IBusinessException"/>.
         /// </summary>
+        /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="exception">The <see cref="Exception"/>.</param>
         /// <returns>The <see cref="IActionResult"/> for an <see cref="IBusinessException"/>; otherwise, <c>null</c>.</returns>
         public static IActionResult CreateResultFromException(ActionContext context, Exception exception)
@@ -109,7 +110,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiActionBase"/> class.
         /// </summary>
-        /// <param name="controller">The initiating <see cref="ApiController"/>.</param>
+        /// <param name="controller">The initiating <see cref="ControllerBase"/>.</param>
         /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/>.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <c>null</c>).</param>
@@ -350,7 +351,7 @@ namespace Beef.AspNetCore.WebApi
         /// <item><description>The <see cref="IETag"/> value where implemented for the <typeparamref name="TResult"/>.</description></item>
         /// <item><description>Where the result is an <see cref="System.Collections.IEnumerable"/> a hash of the requesting query string and each item's <see cref="IETag"/> will be hashed.</description></item>
         /// <item><description>Otherwise, will generate by hashing the resulting JSON and requesting query string.</description></item>
-        /// </remarks>
+        /// </list></remarks>
         protected (JToken json, string etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
         {
             if (result == null)
@@ -467,6 +468,7 @@ namespace Beef.AspNetCore.WebApi
     /// </summary>
     /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
     /// <typeparam name="TColl">The result collection <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TEntity">The entity (item) <see cref="Type"/>.</typeparam>
     public sealed class WebApiGet<TResult, TColl, TEntity> : WebApiActionBase 
         where TResult : EntityCollectionResult<TColl, TEntity>
         where TColl : EntityBaseCollection<TEntity>, new()
@@ -475,7 +477,7 @@ namespace Beef.AspNetCore.WebApi
         private readonly Func<Task<TResult>> _func;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WebApiGet{TResult, TColl}"/> class.
+        /// Initializes a new instance of the <see cref="WebApiGet{TResult, TColl, TEntity}"/> class.
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
@@ -970,7 +972,7 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
-        /// Determines the <see cref="PatchOption"/> and performs initial json validation.
+        /// Determines the <see cref="WebApiPatchOption"/> and performs initial json validation.
         /// </summary>
         private async Task<(WebApiPatchOption option, JsonPatchDocument<T> patch)> PatchValidationAsync(ActionContext context)
         {

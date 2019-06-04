@@ -6,9 +6,4 @@ namespace Beef.Executors
     /// Wraps an <b>Executor invoke</b> enabling standard functionality to be added to all invocations. 
     /// </summary>
     public class ExecutorInvoker : InvokerBase<ExecutorInvoker, object> { }
-
-    /// <summary>
-    /// Wraps an <b>Executor invoke</b> enabling standard functionality to be added to all invocations. 
-    /// </summary>
-    public class ExecutorInvoker<TResult> : InvokerBase<ExecutorInvoker<TResult>, object, TResult> { }
 }

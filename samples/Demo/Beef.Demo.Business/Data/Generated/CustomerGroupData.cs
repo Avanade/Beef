@@ -58,7 +58,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="CustomerGroup"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<CustomerGroup> GetAsync(string id, RefDataNamespace.Company company)
         {
-            return DataInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
@@ -77,7 +77,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="CustomerGroupCollectionResult"/>.</returns>
         public Task<CustomerGroupCollectionResult> GetByArgsAsync(CustomerGroupArgs args, PagingArgs paging)
         {
-            return DataInvoker<CustomerGroupCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 CustomerGroupCollectionResult __result = new CustomerGroupCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);
@@ -101,7 +101,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
@@ -122,7 +122,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();

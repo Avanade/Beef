@@ -1,38 +1,40 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Data.SqlClient;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Beef.Data.Database
 {
     /// <summary>
-    /// Wraps a <see cref="DatabaseCommand"/> <b>invoke</b> enabling standard functionality to be added to all invocations. 
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="DatabaseBase"/> invocations
+    /// specifically exception handling (see <see cref="DatabaseBase.ExceptionHandler"/>).
     /// </summary>
-    /// <remarks>Any <see cref="SqlException"/> will be transformed using <see cref="DatabaseBase.ExceptionHandler"/>.</remarks>
     public class DatabaseInvoker : InvokerBase<DatabaseInvoker, DatabaseBase>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseInvoker"/> class.
-        /// </summary>
-        public DatabaseInvoker()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #region NoResult
 
         /// <summary>
-        /// Wrap the invoke synchronously.
+        /// Invokes an <paramref name="action"/> synchronously.
         /// </summary>
-        private void WrappedInvoke(InvokerArgsSync<DatabaseBase> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="action">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected override void WrapInvoke(object caller, Action action, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                args.WorkCallbackSync();
+                action();
             }
             catch (SqlException sex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(sex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(sex);
 
                 throw;
             }
@@ -40,8 +42,8 @@ namespace Beef.Data.Database
             {
                 if (tiex?.InnerException is SqlException sex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(sex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(sex);
                 }
 
                 throw;
@@ -49,18 +51,24 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously.
+        /// Invokes a <paramref name="func"/> asynchronously.
         /// </summary>
-        private async Task WrappedInvokeAsync(InvokerArgsAsync<DatabaseBase> args)
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                await args.WorkCallbackAsync();
+                await func();
             }
             catch (SqlException sex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(sex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(sex);
 
                 throw;
             }
@@ -68,42 +76,39 @@ namespace Beef.Data.Database
             {
                 if (tiex?.InnerException is SqlException sex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(sex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(sex);
                 }
 
                 throw;
             }
         }
-    }
 
-    /// <summary>
-    /// Wraps a <see cref="DatabaseCommand"/> <b>invoke</b> enabling standard functionality to be added to all invocations. 
-    /// </summary>
-    /// <remarks>Any <see cref="SqlException"/> will be transformed using <see cref="DatabaseBase.ExceptionHandler"/>.</remarks>
-    public class DatabaseInvoker<TResult> : InvokerBase<DatabaseInvoker<TResult>, DatabaseBase, TResult>
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseInvoker{TResult}"/> class.
-        /// </summary>
-        public DatabaseInvoker()
-        {
-            SetBaseWrapper((s) => WrappedInvoke(s), (a) => WrappedInvokeAsync(a));
-        }
+        #endregion
+
+        #region WithResult
 
         /// <summary>
-        /// Wrap the invoke synchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> synchronously.
         /// </summary>
-        private TResult WrappedInvoke(InvokerArgsSync<DatabaseBase, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                return args.WorkCallbackSync();
+                return func();
             }
             catch (SqlException sex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(sex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(sex);
 
                 throw;
             }
@@ -111,8 +116,8 @@ namespace Beef.Data.Database
             {
                 if (tiex?.InnerException is SqlException sex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(sex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(sex);
                 }
 
                 throw;
@@ -120,18 +125,26 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Wrap the invoke asynchronously with result.
+        /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
         /// </summary>
-        private async Task<TResult> WrappedInvokeAsync(InvokerArgsAsync<DatabaseBase, TResult> args)
+        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <param name="caller">The calling (invoking) object.</param>
+        /// <param name="func">The function to invoke.</param>
+        /// <param name="param">The optional parameter passed to the invoke.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The result.</returns>
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
-                return await args.WorkCallbackAsync();
+                return await func();
             }
             catch (SqlException sex)
             {
-                if (args.Param != null)
-                    args.Param.ExceptionHandler?.Invoke(sex);
+                if (param != null)
+                    param.ExceptionHandler?.Invoke(sex);
 
                 throw;
             }
@@ -139,12 +152,14 @@ namespace Beef.Data.Database
             {
                 if (tiex?.InnerException is SqlException sex)
                 {
-                    if (args.Param != null)
-                        args.Param.ExceptionHandler?.Invoke(sex);
+                    if (param != null)
+                        param.ExceptionHandler?.Invoke(sex);
                 }
 
                 throw;
             }
         }
+
+        #endregion
     }
 }

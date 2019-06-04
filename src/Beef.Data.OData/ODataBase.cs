@@ -481,7 +481,7 @@ namespace Beef.Data.OData
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
         public async Task<T> GetAsync<T>(ODataArgs getArgs, params IComparable[] keys) where T : class, new()
         {
-            return await ODataInvoker<T>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = await BuildGetRequestAsync(SetUpArgs<T>(getArgs), keys);
                 OnCreatingRequest(request);
@@ -545,7 +545,7 @@ namespace Beef.Data.OData
         /// <returns>The value (re-queried where specified).</returns>
         public async Task<T> CreateAsync<T>(ODataArgs saveArgs, T value) where T : class, new()
         {
-            return await ODataInvoker<T>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = await BuildCreateRequestAsync<T>(SetUpArgs<T>(saveArgs), value);
                 OnCreatingRequest(request);
@@ -599,7 +599,7 @@ namespace Beef.Data.OData
         /// <returns>The value (re-queried where specified).</returns>
         public async Task<T> UpdateAsync<T>(ODataArgs saveArgs, T value) where T : class, new()
         {
-            return await ODataInvoker<T>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = await BuildUpdateRequestAsync<T>(SetUpArgs<T>(saveArgs), value);
                 OnCreatingRequest(request);
@@ -745,7 +745,7 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<TRes> ExecuteAsync<TReq, TRes>(ODataArgs exeArgs, string pathAndQuery, TReq value)
         {
-            return await ODataInvoker<TRes>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = await BuildExecuteRequestAsync<TReq>(exeArgs, pathAndQuery, value);
                 OnCreatingRequest(request);
@@ -765,7 +765,7 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<JObject> ExecuteAsync(ODataArgs exeArgs, string pathAndQuery, JObject json)
         {
-            return await ODataInvoker<JObject>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, json);
                 OnCreatingRequest(request);

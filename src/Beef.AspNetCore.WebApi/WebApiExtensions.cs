@@ -15,7 +15,7 @@ namespace Beef.AspNetCore.WebApi
         /// Registers the action to <paramref name="update"/> the <see cref="ExecutionContext"/> for a request. 
         /// </summary>
         /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="update">The function to update the <see cref="ExecutionContext"/> for a request; <c>null</c> will <see cref="ExecutionContext.Reset(true)"/> the <b>ExecutionContext</b>.</param>
+        /// <param name="update">The function to update the <see cref="ExecutionContext"/> for a request; <c>null</c> will <see cref="ExecutionContext.Reset(bool)"/> the <b>ExecutionContext</b>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Action<HttpContext, ExecutionContext> update = null)
         {

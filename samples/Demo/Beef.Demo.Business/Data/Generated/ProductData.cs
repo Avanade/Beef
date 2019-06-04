@@ -43,7 +43,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Product> GetAsync(int id)
         {
-            return DataInvoker<Product>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Product __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs args, PagingArgs paging)
         {
-            return DataInvoker<ProductCollectionResult>.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);

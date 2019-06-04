@@ -5,5 +5,5 @@ namespace Beef.WebApi
     /// <summary>
     /// Wraps a <b>WebApi</b> invocation enabling standard functionality to be added to all invocations. 
     /// </summary>
-    public class WebApiInvoker<TResult> : InvokerBase<WebApiInvoker<TResult>, object, TResult> { }
+    public class WebApiInvoker : InvokerBase<WebApiInvoker, object> { }
 }

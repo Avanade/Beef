@@ -283,7 +283,7 @@ namespace Beef.Data.OData
                 State = ODataBatchState.Sending;
             }
 
-            return await ODataInvoker<ODataBatchResponse>.Default.InvokeAsync(this, async () =>
+            return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = OData.CreateRequestMessage(new ODataArgs(), "POST", null, "$batch");
                 request.Content = await CreateContentAsync();

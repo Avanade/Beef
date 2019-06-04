@@ -103,7 +103,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             using (var db = new EfDbContextManager(this, getArgs))
             {
-                return await EfDbInvoker<TDbContext, T>.Default.InvokeAsync(this, async () =>
+                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
                     return await FindAsync(db, getArgs, efKeys);
                 }, this);
@@ -136,7 +136,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             using (var db = new EfDbContextManager(this, saveArgs))
             {
-                return await EfDbInvoker<TDbContext, T>.Default.InvokeAsync(this, async () =>
+                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
                     var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
                     db.DbContext.Add(model);
@@ -175,7 +175,7 @@ namespace Beef.Data.EntityFrameworkCore
             
             using (var db = new EfDbContextManager(this, saveArgs))
             {
-                return await EfDbInvoker<TDbContext, T>.Default.InvokeAsync(this, async () =>
+                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
                     if (OnUpdatePreReadForNotFound)
                     {

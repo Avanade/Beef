@@ -64,7 +64,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="CustomerGroup"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<CustomerGroup> GetAsync(string id, RefDataNamespace.Company company)
         {
-            return ManagerInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(id);
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="CustomerGroupCollectionResult"/>.</returns>
         public Task<CustomerGroupCollectionResult> GetByArgsAsync(CustomerGroupArgs args, PagingArgs paging)
         {
-            return ManagerInvoker<CustomerGroupCollectionResult>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(args);
@@ -119,7 +119,7 @@ namespace Beef.Demo.Business
         /// <returns>A refreshed <see cref="CustomerGroup"/> object.</returns>
         public Task<CustomerGroup> CreateAsync(CustomerGroup value, RefDataNamespace.Company company)
         {
-            return ManagerInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 if (value != null) { value.Company = company; }
@@ -149,7 +149,7 @@ namespace Beef.Demo.Business
         /// <returns>A refreshed <see cref="CustomerGroup"/> object.</returns>
         public Task<CustomerGroup> UpdateAsync(CustomerGroup value, string id, RefDataNamespace.Company company)
         {
-            return ManagerInvoker<CustomerGroup>.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 if (value != null) { value.Id = id; value.Company = company; }

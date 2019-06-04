@@ -27,9 +27,9 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         static ReferenceDataDataSvc()
         {
-            cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker<RefDataNamespace.GenderCollection>.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().GenderGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker<RefDataNamespace.EyeColorCollection>.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().EyeColorGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker<RefDataNamespace.CompanyCollection>.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().CompanyGetAllAsync())));
+            cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().GenderGetAllAsync())));
+            cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().EyeColorGetAllAsync())));
+            cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().CompanyGetAllAsync())));
         }
 
         /// <summary>
