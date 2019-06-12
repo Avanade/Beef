@@ -13,6 +13,16 @@ namespace Beef.WebApi
     {
         private static readonly Dictionary<string, RegisteredData> _dict = new Dictionary<string, RegisteredData>();
         private static readonly object _lock = new object();
+        private static Func<RegisteredData, HttpClient> _httpClientCreate;
+
+        /// <summary>
+        /// Register a <paramref name="httpClientCreate"/> function to create the <see cref="HttpClient"/> where not previously set.
+        /// </summary>
+        /// <param name="httpClientCreate">The function to create the <see cref="HttpClient"/>.</param>
+        public static void RegisterHttpClientCreate(Func<RegisteredData, HttpClient> httpClientCreate)
+        {
+            _httpClientCreate = httpClientCreate;
+        }
 
         /// <summary>
         /// Registers the default <paramref name="client"/> and <paramref name="beforeRequest"/> for the specified .NET <paramref name="nameSpace"/>.
@@ -58,7 +68,7 @@ namespace Beef.WebApi
         /// Gets the <see cref="RegisteredData"/> using the namespace for <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> to derive the namespace for.</typeparam>
-        /// <returns></returns>
+        /// <returns>The <see cref="RegisteredData"/> where found; otherwise, <c>null</c>.</returns>
         public static RegisteredData Get<T>()
         {
             return Get(typeof(T).Namespace);
@@ -95,6 +105,9 @@ namespace Beef.WebApi
             {
                 get
                 {
+                    if (_client == null && _httpClientCreate != null)
+                        return _httpClientCreate(this);
+
                     if (_client != null)
                         return _client;
 

@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+
+- *Enhancement:* Support overridding of HttpClient creation through the WebApiServiceAgentManager - enables the likes of HttpClientFactory to be used where required.
+- *Enhancement:* Renamed WebApiInvoker to WebApiServiceAgentInvoker to make its intended purpose more explicit.
+
 ## v2.1.6
 - *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Other Invokers updated accordingly.
 

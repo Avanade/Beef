@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
@@ -62,14 +63,24 @@ namespace Beef.Demo.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
+
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
         {
             // Configure the logger.
             _logger = loggerFactory.CreateLogger("Logging");
             Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
+
+            // Register the HttpClientCreate so it uses the factory.
+            WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
+            {
+                var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
+                hc.BaseAddress = rd.BaseAddress;
+                return hc;
+            });
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

@@ -16,12 +16,11 @@ namespace Beef.WebApi
     /// <summary>
     /// Extends <see cref="WebApiServiceAgentBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities.
     /// </summary>
-    /// <remarks>Each <b>invoke</b> is wrapped by a <see cref="WebApiInvoker"/> to support additional logic where required.
+    /// <remarks>Each <b>invoke</b> is wrapped by a <see cref="WebApiServiceAgentInvoker"/> to support additional logic where required.
     /// Also, each <b>invoke</b> is further wrapped by a <see cref="WebApiPerformanceTimer"/> to capture performance diagnostics.</remarks>
     public abstract class WebApiServiceAgentBase<TDefault> : WebApiServiceAgentBase where TDefault : WebApiServiceAgentBase<TDefault>
     {
         private static readonly object _lock = new object();
-        private static TDefault _default;
         private static Func<TDefault> _create;
 
         /// <summary>
@@ -41,38 +40,16 @@ namespace Beef.WebApi
         }
 
         /// <summary>
-        /// Gets the default <see cref="WebApiServiceAgentBase{TDefault}"/> instance.
+        /// Gets or sets the default <see cref="WebApiServiceAgentBase{TDefault}"/> instance.
         /// </summary>
-        public static TDefault Default
-        {
-            get
-            {
-                if (_default != null)
-                    return _default;
-
-                lock (_lock)
-                {
-                    if (_default != null)
-                        return _default;
-
-                    if (_create == null)
-                        throw new InvalidOperationException("The Register method must be invoked and the underlying create function must return a valid instance.");
-
-                    _default = _create();
-                    if (_default == null)
-                        throw new InvalidOperationException("The Register method must be invoked and the underlying create function must return a valid instance.");
-
-                    return _default;
-                }
-            }
-        }
+        public static TDefault Default { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiServiceAgentBase{TDefault}"/> class.
         /// </summary>
         /// <param name="client">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public WebApiServiceAgentBase(HttpClient client = null, Action<HttpRequestMessage> beforeRequest = null) : base(client ?? Default?.Client, beforeRequest ?? _default?.BeforeRequest) { }
+        public WebApiServiceAgentBase(HttpClient client = null, Action<HttpRequestMessage> beforeRequest = null) : base(client ?? Default?.Client, beforeRequest ?? Default?.BeforeRequest, () => _create?.Invoke()) { }
     }
 
     /// <summary>
@@ -98,10 +75,23 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="client">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public WebApiServiceAgentBase(HttpClient client, Action<HttpRequestMessage> beforeRequest = null)
+        /// <param name="registeredCreate">The registered <i>create</i> to determine the <see cref="HttpClient"/> used where <paramref name="client"/> is <c>null</c>.</param>
+        public WebApiServiceAgentBase(HttpClient client = null, Action<HttpRequestMessage> beforeRequest = null, Func<WebApiServiceAgentBase> registeredCreate = null)
         {
-            Client = client ?? throw new ArgumentNullException(nameof(client));
-            BeforeRequest = beforeRequest;
+            if (client == null)
+            {
+                var sa = registeredCreate?.Invoke();
+                if (sa == null || sa.Client == null)
+                    throw new InvalidOperationException("The client or registeredCreate arguments must ");
+
+                Client = sa.Client;
+                BeforeRequest = sa.BeforeRequest;
+            }
+            else
+            {
+                Client = client;
+                BeforeRequest = beforeRequest;
+            }
         }
 
         /// <summary>
@@ -161,7 +151,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(url, args);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -187,7 +177,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(url, args);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Get, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -260,7 +250,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
@@ -292,7 +282,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
@@ -316,7 +306,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(url, args);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -342,7 +332,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(url, args);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Put, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -374,7 +364,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
@@ -406,7 +396,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
@@ -431,7 +421,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -458,7 +448,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var value = args?.Where(x => x.ArgType == WebApiArgType.FromBody).SingleOrDefault()?.GetValue();
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
@@ -483,7 +473,7 @@ namespace Beef.WebApi
             var uri = CreateFullUri(url, args);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Delete, uri, requestOptions: requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
@@ -518,7 +508,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var content = new StringContent(json.ToString());
                     content.Headers.ContentType = MediaTypeHeaderValue.Parse(patchOption == WebApiPatchOption.JsonPatch ? "application/json-patch+json" : "application/merge-patch+json");
@@ -553,7 +543,7 @@ namespace Beef.WebApi
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
-                return await WebApiInvoker.Default.InvokeAsync(this, async () =>
+                return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
                 {
                     var content = new StringContent(json.ToString());
                     content.Headers.ContentType = MediaTypeHeaderValue.Parse(patchOption == WebApiPatchOption.JsonPatch ? "application/json-patch+json" : "application/merge-patch+json");

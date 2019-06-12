@@ -35,9 +35,20 @@ namespace Beef.Demo.Business.Data
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 
-        private Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
+        private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
-            return Task.FromResult<Person>(null);
+            // This is an example (illustrative) of executing an Agent from an API - this should be used for cross-domain calls only; otherwise, use database (performance).
+            var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId);
+            if (pf.Value == null)
+                throw new ValidationException($"Person from does not exist.");
+
+            var pt = await new Common.Agents.PersonAgent().GetAsync(personToId);
+            if (pt.Value == null)
+                throw new ValidationException($"Person from does not exist.");
+
+            // Pretend a merge actually occured.
+
+            return pt.Value;
         }
 
         private Task MarkOnImplementationAsync()
