@@ -7,7 +7,7 @@ namespace Beef
 {
     /// <summary>
     /// Manages the automatic creation and lifetime of the likes of connections across multiple invocations within the context of an executing
-    /// <b>Thread</b> (see <see cref="ThreadStaticAttribute"/>). This enables the likes of database connections, contexts, or other expensive objects to be shared.
+    /// <b>Thread</b> (see <see cref="ExecutionContext"/>). This enables the likes of database connections, contexts, or other expensive objects to be shared.
     /// </summary>
     public class DataContextScope : IDisposable
     {

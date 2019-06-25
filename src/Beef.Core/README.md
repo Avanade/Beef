@@ -1,18 +1,20 @@
-# `Beef.Core`
+# Beef.Core
 
-This is the foundational assembly that provides the core capabilities of _Beef_.
+This is the foundational Assembly that provides the core capabilities of _Beef_. The underlying NameSpaces are desribed.
 
 <br/>
 
-## Core
+## Beef
 
-This is the base set of capabilities available within _Beef_; the following are of specific note:
+This is the base set of capabilities (classes) available within _Beef_; the following are of specific note:
 
 <br/>
 
 ### ExecutionContext
 
-This [`ExecutionContext`](./ExecutionContext.cs) a foundational class that is integral to the underlying execution. It represents a thread-bound (request) execution context - enabling the availability of the likes of `Username` at anytime. The context is passed between executing threads to ensure concurrency.
+This [`ExecutionContext`](./ExecutionContext.cs) a foundational class that is integral to the underlying execution. It represents a thread-bound (request) execution context - enabling the availability of the likes of `Username` at anytime. The context is passed between executing threads for the owning request.
+
+An implementor may choose to inherit from this class and add additional capabilities as required.
 
 <br/>
 
@@ -34,37 +36,162 @@ Exception | Description | HTTP Status | [`ErrorType`](./ErrorType.cs) | SQL
 
 ### DataContextScope
 
-### LText
-
-### Factory
-
-## Business
-
-## Caching
-
+The [`DataContextScope`](./DataContextScope.cs) manages the automatic creation and lifetime of the likes of connections across multiple invocations within the context of an executing (see [`ExecutionContext`](./ExecutionContext.cs)). This enables the likes of database connections, contexts, or other expensive objects to be shared.
 
 <br/>
 
------
+### LText and TextProvider
 
-It is composed of the following key features:
+The [`LText`](./LText.cs) represents a *localization text* key/identifier to be used by the [`TextProvider`](./TextProvider.cs) to access the underlying localized text representation. This is baked into _Beef_ whereever texts are intended to be displayed.
 
-Namespace | Description
--|-
-~ | Core or common capabilities, such as `ExecutionContext`, `IBusinessException`, `Factory`, and `DataContextScope`.
-`Business` | _Business_ tier components; specifically the invokers (see `BusinessInvokerBase`). 
-`Caching` | In-memory cache capabilities with associated policies to periodically flush.
-`CodeGen` | Core _Code Generator_ capabilities used by all tooling.
-`Diagnostics` | Basic diagnostics such as the shared `Logger` and `PerformanceTimer`.
-`Entities` | Provides the key capabilities to enable the rich _business entity_ functionality central to _Beef_.
-`Events` | Provides basic infrastucture to support a basic _event-driven_ architecture, through `Event` and `EventData`. 
-`Executors` | Execution, and corresponding trigger orchestration, to standardise the processing of long-running, batch-style, operations.
-`FlatFile` | Provides a rich framework for reading and writing fixed, and delimited, flat files.
-`Json` | Additional capabilities to process JSON, such as `JsonEntityMerge` and `JsonPropertyFilter`.
-`Mapper` | Provides the base, and entity-to-entity, class and property mapping central to _Beef_.
-`Net` | Additional `HTTP` capabilities.
-`RefData` | Provides the key capabilities to enable the rich _business reference data_ functionality central to _Beef_.
-`Reflection` | Additional reflection capabilities leveraged primarily by the _Beef_ framework.
-`Strings` | Embedded string resources used by _Beef_.
-`Validation` | Provides a rich, fluent-style, validation framework.
-`WebApi` | Provides additional capabilities to standardize the consumption of Web APIs.
+<br/>
+
+### Factory
+
+The [`Factory`](./Factory.cs) is used within _Beef_ to create concrete instances from interfaces to enables the likes for mocking for testing. There is additional capabilities within to simplify (none) configuration for primary runtime classes where the substitution pattern (default) is followed.
+
+<br/>
+
+## Beef.Business
+
+This provides classes used specifically by the primary domain _business_ logic (see [`Solution Structure`](../../docs/solution-structure.md)).
+
+<br/>
+
+## Beef.Caching
+
+This provides for basic in-memory **Caching** capabilities (see [`CacheCoreBase`](./Caching/CacheCoreBase.cs)), and corresponding **Policy** to flush and/or refresh as required (managed by [`CachePolicyManager`](./Caching/Policy/CachePolicyManager.cs)).
+
+The advantages of using memory caching is clearly performance; although, caution is required where the volume of data being cached is significant. Equally, where data must be expired at the same time across caches in the likes of a server farm. Alternates to consider are the likes of [Redis](https://redis.io/).
+
+<br/>
+
+## Beef.CodeGen
+
+The [`CodeGenerator`](./CodeGen/CodeGenerator.cs) provides the core _code generation_ capabilities used by all the tooling. 
+
+<br/>
+
+## Beef.Diagnostics
+
+Provides additional diagnostics capabilities leveraged by _Beef_; primarily the [`Logger`](./Diagnostics/Logger.cs) which enables implementation agnostic logging to be leveraged. Generally as startup the actual logging capabaility is bound (bind) to the `Logger` so that logged messages are routed and output as required. 
+
+<br/>
+
+## Beef.Entities
+
+Provides the key capabilities to enable the rich _business entity_ functionality central to _Beef_.
+
+### EntityBasicBase
+
+The [`EntityBasicBase`](./Entities/EntityBasicBase.cs) provides the basic entity capabilities:
+- Standardised `SetValue` methods to enable capabilities such as [`StringTrim`](./Entities/StringTrim.cs), [`StringTransform`](./Entities/StringTransform.cs), [`DateTimeTransform`](./Entities/DateTimeTransform.cs).
+- Property immutability support; i.e. value can not be changed once set.
+- Entity readonly support (`MakeReadOnly` and `IsReadOnly`).
+- Entity changed support (`IsChanged` and `AcceptChanges`).
+- Implements [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged) for `PropertyChanged` event.
+
+<br/>
+
+### EntityBase
+
+The [`EntityBase`](./Entities/EntityBase.cs) provides the rich entity capabilities (inherits from `EntityBasicBase`):
+- Implements [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject) for `BeginEdit`, `EndEdit` and `CancelEdit`.
+- Implements [`ICleanUp`](./Entities/ICleanUp.cs) for `CleanUp` and `IsInitial`.
+- Implements [`IUniqueKey`](./Entities/ICleanUp.cs) for `HasUniqueKey` and `UniqueKey`.
+- Implements [`IChangeTrackingLogging`](./Entities/IChangeTrackingLogging.cs) for `TrackChanges` and `ChangeTracking`.
+- Implements [`ICopyFrom`](./Entities/ICopyFrom.cs) and [`ICloneable`](./Entities/ICloneable.cs) for `CopyFrom` and `Clone` respectively.
+
+_Note_: The entity code generation will ensure that the `EntityBase` and corresponding capabilities, specifically the `SetValue`, are implemented correctly. 
+
+<br/>
+
+### EntityBaseCollection
+
+The [`EntityBaseCollection`](./Entities/EntityBaseCollection.cs) encapsulates an [`ObservableCollection<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1) to provide the base class for all entity collection enabling a consistent and rich experience.
+
+<br/>
+
+### EntityCollectionResult
+
+The [`EntityCollectionResult`](./Entities/EntityCollectionResult.cs) provides a standardised mechanism to manage a collection `Result`, that may also contain corresponding [`Paging`](./Entities/PagingResult.cs) details where required.
+
+<br/>
+
+### MessageItem and MessageItemCollection
+
+The [`MessageItem`](./Entities/MessageItem.cs) and [`MessageItemCollection`](./Entities/MessageItemCollection.cs) provide a means to manage messages ([`Type`](./Entities/MessageType.cs), `Text` and optional `Property`) used for the likes of validation error messages, etc.
+
+<br/>
+
+### ICleanUp and Cleaner
+
+The [`ICleanUp`](./Entities/ICleanUp.cs) and [`Cleaner`](./Entities/Cleaner.cs) provide a means to clean up / reset the properties of an entity in a consistent manner, and / or return an entity to a consistent state.
+
+<br/>
+
+### IUniqueKey and UniqueKey
+
+The [`IUniqueKey`](./Entities/IUniqueKey.cs) and [`UniqueKey`](./Entities/UniqueKey.cs) provide a means to define a unique key (composed of one or more properties) for an entity. This allows the `UniqueKey` for an entity to be accessed in a consistent manner that is leveraged by other capabilities within the _Beef_ framework.
+
+<br/>
+
+### Paging, IPagingResult and PagingResult
+
+The [`PagingArgs`](./Entities/PagingArgs.cs), [`IPagingResult`](./Entities/IPagingResult.cs) and [`PagingResult`](./Entities/PagingResult.cs) represents the key capabilities to support paging requests and corresponding response in a consistent manner.
+
+<br/>
+
+## Events
+
+Provides the basic infrastructure support to support a basic _event-driven_ architecture, through [`Event`](./Events/Event.cs) and [`EventData`](./Events/EventData.cs).
+
+<br/>
+
+## Executors
+
+Provide for [`Executor`](./Executors/Executor.cs), and corresponding [`Trigger`](./Executors/Triggers/Trigger.cs) orchestration, to standardise the processing of long-running, batch-style, operations.
+
+<br/>
+
+## FlatFile
+
+Provides a rich framework for [reading](./FlatFile/FileReader.cs) and [writing](./FlatFile/FileWriter.cs) [fixed](./FlatFile/FixedFileFormat.cs), and [delimited](./FlatFile/DelimitedFileFormat.cs), flat files.
+
+<br/>
+
+## Json
+
+Additional capabilities to process JSON, such as [`JsonEntityMerge`](./Json/JsonEntityMerge.cs) and [`JsonPropertyFilter`](./Json/JsonPropertyFilter.cs).
+
+<br/>
+
+## Mapper
+
+Provides the base, and entity-to-entity, class and property mapping capability central to the [data layer](../../docs/Layer-Data.md) capabilities within _Beef_. The [`IPropertyMapperConverter`](./Mapper/Converters/IPropertyMapperConverter.cs) enables property `Type` conversion.
+
+The [`EntityMapper`](./Mapper/EntityMapper.cs) provides the entity-to-entity mapping capability / implementation.
+
+<br/>
+
+## Net
+
+Additional `HTTP` capabilities, specifically [`HttpMultiPartRequestReader`](./Net/Http/HttpMultiPartRequestWriter.cs) and [`HttpMultiPartResponseReader`](./Net/Http/HttpMultiPartResponseReader.cs).
+
+<br/>
+
+## RefData
+
+Provides the key capabilities to enable the rich _reference data_ functionality central to _Beef_. This capability is further described [here](../../docs/Reference-Data.md).
+
+<br/>
+
+## Validation
+
+Provides the key capabilities to enable the rich _validation_ functionality central to _Beef_. This capability is further described [here](../../docs/Beef-Validation.md).
+
+<br/>
+
+## WebApi
+
+Provides the [service agent](../../docs/Layer-ServiceAgent.md) capabilities to standardize the invocation of APIs. The [`WebApiServiceAgentBase`](./WebApi/WebApiServiceAgentBase.cs) is essential to enable.
