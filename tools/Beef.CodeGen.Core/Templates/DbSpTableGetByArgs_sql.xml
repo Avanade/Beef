@@ -152,6 +152,9 @@ BEGIN
 ]]>
       </If>
       <![CDATA[    FROM [{{Table.Schema}}].[{{Table.Name}}] AS [{{Table.Alias}}]]]>
+      <If Condition="StoredProcedure.WithHints != null">
+        <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+      </If>
       <If Condition="Table.IsAView == false and System.OrgUnitId == true">
         <![CDATA[
     INNER JOIN [Sec].[fnGetUserOrgUnits]() AS orgunits ON [{{Table.Alias}}].[OrgUnitId] = [orgunits].[OrgUnitId]]]>

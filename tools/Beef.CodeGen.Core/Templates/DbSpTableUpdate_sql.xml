@@ -240,7 +240,11 @@ BEGIN
       </Execute>
       <![CDATA[
     -- Update the record.
-    UPDATE [{{Table.Schema}}].[{{Table.Name}}] SET
+    UPDATE [{{Table.Schema}}].[{{Table.Name}}]]]>
+    <If Condition="StoredProcedure.WithHints != null">
+      <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+    </If>
+    <![CDATA[ SET
          ]]>
       <Column Condition="Column.SkipAsInternal == false and Column.IsPrimaryKey == false and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.Name != 'RowVersion' and Column.IsComputed == false">
         <If Condition="System.Index > 0">

@@ -220,7 +220,12 @@ BEGIN
 ]]>
       </If>
       <![CDATA[    -- Merge the records.
-    MERGE INTO [{{Table.Schema}}].[{{Table.Name}}] WITH (HOLDLOCK) AS [t]
+    MERGE INTO [{{Table.Schema}}].[{{Table.Name}}]]]>
+      <If Condition="StoredProcedure.WithHints == null">
+        <Then><![CDATA[ WITH (HOLDLOCK)]]></Then>
+        <Else><![CDATA[ WITH ({{StoredProcedure.WithHints}})]]></Else>
+      </If>
+      <![CDATA[ AS [t]
       USING @List as [s]
         ON (]]>
       <Set Name="System.AndNeeded" Value="false" />

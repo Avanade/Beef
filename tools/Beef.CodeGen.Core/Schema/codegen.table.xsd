@@ -221,6 +221,11 @@
                       <xs:documentation>Overrides the column names used in the Merge statement with those specified in the comma separated list to determine whether to insert, update or delete. Defaults to the identity column name inferred from the database schema.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="WithHints" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the table hints using the SQL Server 'With ()' statement; the value specified will be used as-is; e.g. 'NOLOCK' will result in 'WITH(NOLOCK)'.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
             </xs:sequence>

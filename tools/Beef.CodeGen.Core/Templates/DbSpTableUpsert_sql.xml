@@ -208,7 +208,11 @@ BEGIN
       </Execute>
       <![CDATA[
       -- Create the record.
-      INSERT INTO [{{Table.Schema}}].[{{Table.Name}}] (
+      INSERT INTO [{{Table.Schema}}].[{{Table.Name}}]]]>
+      <If Condition="StoredProcedure.WithHints != null">
+        <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+      </If>
+      <![CDATA[ (
           ]]>
       <Column Condition="Column.SkipAsInternal == false and Column.Type != 'timestamp' and Column.Name != 'RowVersion' and Column.Name != 'UpdatedDate' and Column.Name != 'UpdatedBy' and Column.IsComputed == false">
         <If Condition="System.Index > 0">
@@ -294,7 +298,11 @@ BEGIN
       </Execute>
       <![CDATA[
       -- Update the record.
-      UPDATE [{{Table.Schema}}].[{{Table.Name}}] SET
+      UPDATE [{{Table.Schema}}].[{{Table.Name}}]]]>
+      <If Condition="StoredProcedure.WithHints != null">
+        <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+      </If>
+      <![CDATA[ SET
            ]]>
       <Column Condition="Column.SkipAsInternal == false and Column.IsPrimaryKey == false and Column.Name != 'RowVersion' and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.IsComputed == false">
         <If Condition="System.Index > 0">

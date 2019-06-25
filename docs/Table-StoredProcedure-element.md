@@ -15,7 +15,7 @@ An example is as follows:
 <Table Name="Contact" Schema="Prac" Permission="Contact">
 ```
 
-<br>
+<br/>
 
 ## Attributes
 
@@ -29,7 +29,7 @@ Attribute | Description
 **`Type`** | The stored procedure type. Options are: `Get`, `GetAll`, `Create`, `Update`, `Upsert`, `Delete` or `Merge`.
 `Permission` | The permission (fullname being name.action) override to be used for security permission checking.
 
-<br>
+<br/>
 
 ### Additional attributes
 
@@ -41,3 +41,13 @@ Attribute | Description
 `IntoTempTable` | Indicates whether to select into a #TempTable to allow other statements to get access to the selected data; a `select * from #TempTable` is also performed immediately. The temporary table is named `#`+`Table.Alias`. Only valid for a `Type` of `GetAll`.
 `ReselectStatement` | Overrides the re-select SQL statement to execute (`Create`, `Update` and `Upsert` types only).
 `MergeOverrideIdentityColumns` | Overrides the column names used in the **Merge** statement with those specified in the comma separated list to determine whether to insert, update or delete. Defaults to the identity column name inferred from the database schema.
+
+<br/>
+
+### Additional SQL Server-related attributes
+
+The following represents additional **SQL Server-related** attributes:
+
+Attribute | Description
+-|-
+`WithHints` | Specifies the [table hints](https://docs.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table) using the SQL Server `With ()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH (NOLOCK)`.

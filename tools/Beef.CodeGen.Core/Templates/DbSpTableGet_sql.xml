@@ -120,7 +120,12 @@ BEGIN
         <![CDATA[[{{Table.Alias}}].[{{Column.Name}}]]]>
       </Column>
       <![CDATA[
-    FROM [{{Table.Schema}}].[{{Table.Name}}] AS [{{Table.Alias}}]
+    FROM [{{Table.Schema}}].[{{Table.Name}}]]]>
+      <![CDATA[ AS [{{Table.Alias}}]]]>
+      <If Condition="StoredProcedure.WithHints != null">
+        <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+      </If>
+      <![CDATA[
 ]]>
       <Set Name="System.AndNeeded" Value="false" />
       <Column Condition="Column.IsPrimaryKey == true or Column.IsIdentity == true">

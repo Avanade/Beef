@@ -140,7 +140,11 @@ BEGIN
         <Then>
           <![CDATA[
     -- Delete the record.
-    DELETE FROM [{{Table.Schema}}].[{{Table.Name}}]
+    DELETE FROM [{{Table.Schema}}].[{{Table.Name}}]]]>
+    <If Condition="StoredProcedure.WithHints != null">
+      <![CDATA[ WITH ({{StoredProcedure.WithHints}})]]>
+    </If>
+    <![CDATA[
       WHERE ]]>
         </Then>
         <Else>

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.6
+- *Enhancement:* Added `WithHints` to stored procedure configuration to output `WITH(value)` [table hint](https://docs.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table).
+
 ## v2.1.5
 - *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Invoker invocation code generation updated accordingly.
 
