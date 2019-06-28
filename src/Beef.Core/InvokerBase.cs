@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Beef
 {
     /// <summary>
-    /// Wraps an <b>Invoke</b> enabling standard functionality to be added to all invocations that do not return a value. 
+    /// Wraps an <b>Invoke</b> enabling standard functionality to be added to all invocations. 
     /// </summary>
     /// <typeparam name="TInvoker">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
     /// <typeparam name="TParam">The optional parameter <see cref="Type"/> (for an <b>Invoke</b>).</typeparam>

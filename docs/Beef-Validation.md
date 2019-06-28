@@ -1,19 +1,21 @@
 ﻿# Validation
 
-## Overview
-
 A validation capability has been provided to enable a consistent approach to validations that is deeply integrated into the overall framework. The framework provides the key (common) validations, whilst also being extensible to allow additional validations to be added as required.
+
+<br/>
 
 ## Composition
 
 At the core a `Validator` can contain one or more **Rules** (provides a specific value validation), which can be further conditionally controlled by zero or more **Clauses** (provides a means to check whether a validation should occur).
+
+<br/>
 
 ### Rules
 
 All rules must inherit from	`PropertyRuleBase` which enables the following key capabilities:
 
 Capability | Description
-- | -
+-|-
 `Name` | Gets the underlying property/value name.
 `Text` | Gets/sets the friendly text name used in validation messages.
 `DependsOn()` | Adds a `DependsOnClause` (supports zero or more).
@@ -42,6 +44,8 @@ Rule | Description
 `StringRule` | Provides `string` validation including `MinLength`, `MaxLength` and `Regex`.
 `WildcardRule` | Provides `string` `Wildcard` validation.
 
+<br/>
+
 ### Clauses
 
 The following represent the available clauses:
@@ -51,6 +55,8 @@ Clause | Description
 `DependsOnClause` | Represents a depends on test clause; in that another specified property of the entity must have a non-default value to continue.
 `WhenClause` | Represents a when test clause; in that the condition must be `true` to continue.
 
+<br/>
+
 ### Extension Methods
 
 The **rules** are generally not instantiated directly, but accessed via pre-defined extension methods to provide a more simplified, natural, experience using fluent-style (method-chaining) approach to development.
@@ -58,7 +64,7 @@ The **rules** are generally not instantiated directly, but accessed via pre-defi
 The following represent the available extension methods:
 
 Extension method | Description | Underlying rule
-- | - | -
+-|-|-
 `AreValid()` | Adds a *reference data list* validation. | `ReferenceDataSidListRule`
 `Collection()` | Adds a *collection* validation. | `CollectionRule`
 `CompareProperty()` | Adds a *property comparison* validation. | `ComparePropertyRule`
@@ -82,17 +88,19 @@ Extension method | Description | Underlying rule
 Additional extension methods included are as follows:
 
 Extension method | Description
-- | -
+-|-
 `Text()` | Updates the rule friendly name text used in validation messages.
 `Common()` | Provides for integrating a common validation against a specified property.
 `Validate()` | Enables (sets up) validation for a value.
+
+<br/>
 
 ### Error messages
 
 All error messages are managed as an embedded resources accessible via the `ValidatorStrings` class; as follows:
 
 Property | Format string
-- | -
+-|-
 `AllowNegativesFormat` | {0} must not be negative.
 `CompareEqualFormat` | {0} must be equal to {2}.
 `CompareGreaterThanEqualFormat` | {0} must be greater than or equal to {2}.
@@ -121,9 +129,13 @@ Property | Format string
 
 The validation framework passes the friendly text name as `{0}`, and the validating value as `{1}` for inclusion in the final message output. Higher numbered format strings are applicable to the specific validator consuming.
 
+<br/>
+
 ## Usage
 
 There are multiple means to leverage the validation framework.
+
+<br/>
 
 ### Entity-based validator class
 
@@ -160,6 +172,8 @@ var person = new Person { Name = "Freddie", Birthday = new DateTime(1946, 09, 05
 PersonValidator.Default.Validate(person).ThrowOnError();
 ```
 
+<br/>
+
 ### Entity-based inline validator
 
 The secondary means for an entity-based validator is to define and execute inline. The `HasProperty()` is used to create a property, with a corresponding action to enable validation configuration.
@@ -176,6 +190,8 @@ Validator<Test>.Create()
     .Validate(person).ThrowOnError();
 ```
 
+<br/>
+
 ### Value-based validator
 
 Values, both entity and non-entity, can be validated directly. Examples are as follows:
@@ -189,6 +205,8 @@ person.Validate().Entity(TestValidator.Default).Run();
 // Validate a value (e.g. a string, int, DateTime, etc.) without an entity-based validator.
 person.Name.Validate().Mandatory().String(maxLength: 10).Run(throwOnError: true);
 ```
+
+<br/>
 
 ### Validation chaining
 
@@ -208,6 +226,8 @@ The following is a property that will always execute the `Mandatory` rule, and o
 Property(x => x.DateTo).Mandatory.CompareProperty(CompareOperator.GreaterThanEqual, x => x.DateFrom).DependsOn(x => x.DateFrom);
 ```
 
+<br/>
+
 ### Common validations
 
 To support reusablility of property validations a `CommonValidator` is used to enable. This allows for the validation logic to be defined once, and reused (shared) across multiple validations.
@@ -220,6 +240,8 @@ var cv = CommonValidator<string> _cv = CommonValidator<string>.Create(v => v.Str
 var v = Validator<TestData>.Create()
     .HasProperty(x => x.Text, p => p.Mandatory().Common(cv));
 ```
+
+<br/>
 
 ### Examples
 
@@ -284,9 +306,13 @@ public class PersonValidator : Validator<Person, PersonValidator>
 }
 ```
 
+<br/>
+
 ## Advanced
 
 There are additional features that enable more advanced / complex validation scenarios.
+
+<br/>
 
 ### Conditional rule set
 
@@ -326,6 +352,8 @@ var v = Validator<TestItem>.Create()
     });
 ```
 
+<br/>
+
 ### Include/inherit validators
 
 Where entities leverage inheritence, having the corresponding validators include the base (parent) classes validations rules can be advantageous (versus codifying the rules multiple times). The `IncludeBase` method enables a base validator to be included within another validator's rule set.
@@ -338,6 +366,8 @@ var r = Validator<TestData>.Create()
     .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
     .Validate(new TestData { CountB = 0 });
 ```
+
+<br/>
 
 ### Consolidating multiple validators
 

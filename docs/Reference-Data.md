@@ -113,7 +113,7 @@ bool isInvalid = person.Gender.IsInvalid;
 
 Given the static nature of the _Reference Data_ it is an excellent candidate for caching. There is a purpose built cache ([`ReferenceDataCache`](../src/Beef.Core/RefData/Caching/ReferenceDataCache.cs)) that ensures a consistent implementation, which then gets leveraged from within the code generation process.
 
-This caching leverages the core [Caching](../src/Beef.Core/Caching) capabilities (i.e. [`CacheCoreBase`](../src/Beef.Core/Caching/CacheCorebase.cs)) within _Beef_; including one the [Policies](../src/Beef.Core/Caching/Policy) to allow automatic cache expiry/refresh.
+This caching leverages the core [Caching](../src/Beef.Core/Caching) capabilities (i.e. [`CacheCoreBase`](../src/Beef.Core/Caching/CacheCorebase.cs)) within _Beef_; including one of the [Policies](../src/Beef.Core/Caching/Policy) to allow automatic cache expiry/refresh.
 
 <br/>
 

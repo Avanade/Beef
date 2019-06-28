@@ -4,7 +4,7 @@ This is the foundational Assembly that provides the core capabilities of _Beef_.
 
 <br/>
 
-## Beef
+## Beef (root) namespace
 
 This is the base set of capabilities (classes) available within _Beef_; the following are of specific note:
 
@@ -12,7 +12,7 @@ This is the base set of capabilities (classes) available within _Beef_; the foll
 
 ### ExecutionContext
 
-This [`ExecutionContext`](./ExecutionContext.cs) a foundational class that is integral to the underlying execution. It represents a thread-bound (request) execution context - enabling the availability of the likes of `Username` at anytime. The context is passed between executing threads for the owning request.
+The [`ExecutionContext`](./ExecutionContext.cs) is a foundational class that is integral to the underlying execution. It represents a thread-bound (request) execution context - enabling the availability of the likes of `Username` at anytime. The context is passed between executing threads for the owning request.
 
 An implementor may choose to inherit from this class and add additional capabilities as required.
 
@@ -36,29 +36,37 @@ Exception | Description | HTTP Status | [`ErrorType`](./ErrorType.cs) | SQL
 
 ### DataContextScope
 
-The [`DataContextScope`](./DataContextScope.cs) manages the automatic creation and lifetime of the likes of connections across multiple invocations within the context of an executing (see [`ExecutionContext`](./ExecutionContext.cs)). This enables the likes of database connections, contexts, or other expensive objects to be shared.
+The [`DataContextScope`](./DataContextScope.cs) manages the automatic creation and lifetime of the likes of connections across multiple invocations within the context of executing (see [`ExecutionContext`](./ExecutionContext.cs)) a request. This enables the likes of database connections, contexts, or other expensive objects to be shared.
 
 <br/>
 
 ### LText and TextProvider
 
-The [`LText`](./LText.cs) represents a *localization text* key/identifier to be used by the [`TextProvider`](./TextProvider.cs) to access the underlying localized text representation. This is baked into _Beef_ whereever texts are intended to be displayed.
+The [`LText`](./LText.cs) represents a *localization text* key/identifier to be used by the [`TextProvider`](./TextProvider.cs) to access the underlying localized text representation. This is baked into _Beef_ where ever end user texts are intended to be output.
 
 <br/>
 
 ### Factory
 
-The [`Factory`](./Factory.cs) is used within _Beef_ to create concrete instances from interfaces to enables the likes for mocking for testing. There is additional capabilities within to simplify (none) configuration for primary runtime classes where the substitution pattern (default) is followed.
+The [`Factory`](./Factory.cs) is used within _Beef_ to create concrete instances from interfaces to enable the likes for mocking for testing. There are additional capabilities within to simplify configuration for primary runtime classes where the substitution default naming pattern is followed.
 
 <br/>
 
-## Beef.Business
+### InvokerBase
+
+The [`InvokerBase`](./InvokerBase.cs) represents the base class that enables an `Invoke` to be wrapped so that standard functionality can be added to all invocations. For example: Retry, Circuit Breaker, Exception Handling, Database Transactions, etc.
+
+_Beef_ uses this extensively within the solution layering and other componenents such as data access to enable this capability to be easily injected into the execution pipeline. 
+
+<br/>
+
+## Beef.Business namespace
 
 This provides classes used specifically by the primary domain _business_ logic (see [`Solution Structure`](../../docs/solution-structure.md)).
 
 <br/>
 
-## Beef.Caching
+## Beef.Caching namespace
 
 This provides for basic in-memory **Caching** capabilities (see [`CacheCoreBase`](./Caching/CacheCoreBase.cs)), and corresponding **Policy** to flush and/or refresh as required (managed by [`CachePolicyManager`](./Caching/Policy/CachePolicyManager.cs)).
 
@@ -66,19 +74,19 @@ The advantages of using memory caching is clearly performance; although, caution
 
 <br/>
 
-## Beef.CodeGen
+## Beef.CodeGen namespace
 
 The [`CodeGenerator`](./CodeGen/CodeGenerator.cs) provides the core _code generation_ capabilities used by all the tooling. 
 
 <br/>
 
-## Beef.Diagnostics
+## Beef.Diagnostics namespace
 
-Provides additional diagnostics capabilities leveraged by _Beef_; primarily the [`Logger`](./Diagnostics/Logger.cs) which enables implementation agnostic logging to be leveraged. Generally as startup the actual logging capabaility is bound (bind) to the `Logger` so that logged messages are routed and output as required. 
+Provides additional diagnostics capabilities leveraged by _Beef_; primarily the [`Logger`](./Diagnostics/Logger.cs) which enables implementation agnostic logging to be leveraged. Generally at startup the actual logging capabaility is bound (bind) to the `Logger` so that logged messages are routed and output as required. 
 
 <br/>
 
-## Beef.Entities
+## Beef.Entities namespace
 
 Provides the key capabilities to enable the rich _business entity_ functionality central to _Beef_.
 
@@ -108,7 +116,7 @@ _Note_: The entity code generation will ensure that the `EntityBase` and corresp
 
 ### EntityBaseCollection
 
-The [`EntityBaseCollection`](./Entities/EntityBaseCollection.cs) encapsulates an [`ObservableCollection<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1) to provide the base class for all entity collection enabling a consistent and rich experience.
+The [`EntityBaseCollection`](./Entities/EntityBaseCollection.cs) encapsulates an [`ObservableCollection<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1) to provide the base class for all entity collections enabling a consistent and rich experience.
 
 <br/>
 
@@ -142,31 +150,31 @@ The [`PagingArgs`](./Entities/PagingArgs.cs), [`IPagingResult`](./Entities/IPagi
 
 <br/>
 
-## Events
+## Events namespace
 
 Provides the basic infrastructure support to support a basic _event-driven_ architecture, through [`Event`](./Events/Event.cs) and [`EventData`](./Events/EventData.cs).
 
 <br/>
 
-## Executors
+## Executors namespace
 
 Provide for [`Executor`](./Executors/Executor.cs), and corresponding [`Trigger`](./Executors/Triggers/Trigger.cs) orchestration, to standardise the processing of long-running, batch-style, operations.
 
 <br/>
 
-## FlatFile
+## FlatFile namespace
 
 Provides a rich framework for [reading](./FlatFile/FileReader.cs) and [writing](./FlatFile/FileWriter.cs) [fixed](./FlatFile/FixedFileFormat.cs), and [delimited](./FlatFile/DelimitedFileFormat.cs), flat files.
 
 <br/>
 
-## Json
+## Json namespace
 
 Additional capabilities to process JSON, such as [`JsonEntityMerge`](./Json/JsonEntityMerge.cs) and [`JsonPropertyFilter`](./Json/JsonPropertyFilter.cs).
 
 <br/>
 
-## Mapper
+## Mapper namespace
 
 Provides the base, and entity-to-entity, class and property mapping capability central to the [data layer](../../docs/Layer-Data.md) capabilities within _Beef_. The [`IPropertyMapperConverter`](./Mapper/Converters/IPropertyMapperConverter.cs) enables property `Type` conversion.
 
@@ -174,24 +182,24 @@ The [`EntityMapper`](./Mapper/EntityMapper.cs) provides the entity-to-entity map
 
 <br/>
 
-## Net
+## Net namespace
 
 Additional `HTTP` capabilities, specifically [`HttpMultiPartRequestReader`](./Net/Http/HttpMultiPartRequestWriter.cs) and [`HttpMultiPartResponseReader`](./Net/Http/HttpMultiPartResponseReader.cs).
 
 <br/>
 
-## RefData
+## RefData namespace
 
 Provides the key capabilities to enable the rich _reference data_ functionality central to _Beef_. This capability is further described [here](../../docs/Reference-Data.md).
 
 <br/>
 
-## Validation
+## Validation namespace
 
 Provides the key capabilities to enable the rich _validation_ functionality central to _Beef_. This capability is further described [here](../../docs/Beef-Validation.md).
 
 <br/>
 
-## WebApi
+## WebApi namespace
 
 Provides the [service agent](../../docs/Layer-ServiceAgent.md) capabilities to standardize the invocation of APIs. The [`WebApiServiceAgentBase`](./WebApi/WebApiServiceAgentBase.cs) is essential to enable.
