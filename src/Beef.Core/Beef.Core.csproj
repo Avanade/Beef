@@ -10,7 +10,7 @@
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) core framework.</Description>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
