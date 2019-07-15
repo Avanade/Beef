@@ -617,6 +617,7 @@
                       <xs:restriction base="xs:string">
                         <xs:enumeration value="None"/>
                         <xs:enumeration value="Database"/>
+                        <xs:enumeration value="DocumentDb"/>
                         <xs:enumeration value="OData"/>
                         <xs:enumeration value="EntityFramework"/>
                       </xs:restriction>
@@ -871,6 +872,7 @@
                 <xs:restriction base="xs:string">
                   <xs:enumeration value="Database"/>
                   <xs:enumeration value="OData"/>
+                  <xs:enumeration value="DocumentDb"/>
                   <xs:enumeration value="EntityFramework"/>
                 </xs:restriction>
               </xs:simpleType>
@@ -933,6 +935,16 @@
             <xs:attribute name="ODataEntity" type="xs:string" use="optional">
               <xs:annotation>
                 <xs:documentation>Specifies the corresponding OData entity name (required where AutoImplement is 'OData').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DocumentDbName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the DocumentDb instance name (where AutoImplement is 'DocumentDb'); defaults to 'DocDb'.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DocumentDbCollectionId" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the corresponding DocumentDb CollectionId (required where AutoImplement is 'DocumentDb').</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="MapperAddStandardProperties" type="xs:boolean" use="optional">
@@ -1071,6 +1083,11 @@
       <xs:attribute name="ODataUsingNamespace" type="xs:string" use="optional">
         <xs:annotation>
           <xs:documentation>Adds an additional Namespace using statement to the Data code where using AutoImplement of OData.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DocumentDbUsingNamespace" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Adds an additional Namespace using statement to the Data code where using AutoImplement of DocumentDb.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="WebApiAuthorize" use="optional">

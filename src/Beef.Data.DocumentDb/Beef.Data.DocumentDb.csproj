@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>2.1.1</Version>
+    <Authors>Beef Developers</Authors>
+    <Company>Avanade</Company>
+    <Description>Business Entity Execution Framework (Beef) CosmosDB / DocumentDB Core extensions.</Description>
+    <Copyright>Avanade (c)</Copyright>
+    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>Beef DocumentDB CosmosDB</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <DocumentationFile>.\bin\debug\Beef.Data.DocumentDb.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+  </ItemGroup>
+
+</Project>

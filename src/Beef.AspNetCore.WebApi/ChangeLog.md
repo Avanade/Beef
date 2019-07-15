@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.4
+- *Fixed:* WebApiControllerHelper.SetETag will not format where already formatted. 
+
 ## v2.1.3
 - *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Other Invokers updated accordingly.
 

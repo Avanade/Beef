@@ -15,9 +15,9 @@ namespace Beef.AspNetCore.WebApi
     public static class WebApiControllerHelper
     {
         /// <summary>
-        /// Sets the <see cref="HttpResponseMessage.Headers"/> <see cref="System.Net.Http.Headers.HttpResponseHeaders.ETag"/> where the <paramref name="value"/> implements <see cref="IETag"/>.
+        /// Sets the <see cref="HttpResponse.Headers"/> <see cref="System.Net.Http.Headers.HttpResponseHeaders.ETag"/> where the <paramref name="value"/> implements <see cref="IETag"/>.
         /// </summary>
-        /// <param name="response">The <see cref="HttpResponseMessage"/> to update.</param>
+        /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
         /// <param name="value">The value that implements the <see cref="IETag.ETag"/> (where the <paramref name="value"/> does not implement an
         /// <see cref="IETag.ETag"/> the <b>ETag</b> Header will not be set).</param>
         public static void SetETag(HttpResponse response, object value)
@@ -32,7 +32,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Sets the <see cref="HttpResponse.Headers"/> <see cref="System.Net.Http.Headers.HttpResponseHeaders.ETag"/> where the <paramref name="eTag"/> has a value.
         /// </summary>
-        /// <param name="response">The <see cref="HttpResponseMessage"/> to update.</param>
+        /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
         /// <param name="eTag">The <b>ETag</b> <see cref="String"/>.</param>
         public static void SetETag(HttpResponse response, string eTag)
         {
@@ -40,7 +40,7 @@ namespace Beef.AspNetCore.WebApi
                 throw new ArgumentNullException(nameof(response));
 
             if (!string.IsNullOrEmpty(eTag))
-                response.GetTypedHeaders().ETag = new EntityTagHeaderValue("\"" + eTag + "\"");
+                response.GetTypedHeaders().ETag = new EntityTagHeaderValue(eTag.StartsWith("\"") ? eTag : "\"" + eTag + "\"");
         }
 
         /// <summary>

@@ -96,13 +96,15 @@ The following represents the corresponding **data** attributes:
 
 Attribute | Description
 ---|---
-**`AutoImplement`** | Indicates that the implementation for the underlying [`Operations`](Entity-Operation-element.md) can be auto-implemented using the selected data source; options are `Database`, `EntityFramework` or `OData`. When selected some of the folllowing related attributes are also required (as documented). Additionally, the `AutoImplement` indicator must be selected for each **`Operation`** that is to be auto-implemented.
+**`AutoImplement`** | Indicates that the implementation for the underlying [`Operations`](Entity-Operation-element.md) can be auto-implemented using the selected data source; options are `Database`, `EntityFramework`, `DocumentDb` or `OData`. When selected some of the folllowing related attributes are also required (as documented). Additionally, the `AutoImplement` indicator must be selected for each **`Operation`** that is to be auto-implemented.
 `DatabaseName` | Specifies the .NET database wrapper instance name. Defaults to `Database` where `AutoImplement` is `Database`. 
 `DatabaseSchema` | Specifies the database schema name where `AutoImplement` is `Database`. Defaults to `dbo`.
 `EntityFrameworkName` | Specifies the entity framework instance name where `AutoImplement` is `EntityFramework`. Defaults to `EfDb`.
 `EntityFrameworkEntity` | Specifies the corresponding Entity Framework entity model name (required where `AutoImplement` is `EntityFramework`).
 `ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `OData`.
 `ODataEntity` | Specifies the corresponding OData entity name. Required where `AutoImplement` is `OData`.
+`DocumentDbName` | Specifies the .NET DocumentDb wrapper instance name where `AutoImplement` is `DocumentDb`. Defaults to `DocDb`.
+`DocumentDbCollectionId` | Specifies the DocumentDb CollectionId name where `AutoImplement` is `DocumentDb`.
 `DataDatabaseMapperInheritsFrom` | Specifies the mapper that the generated Database mapper inherits from.
 `DataODataMapperInheritsFrom` | Specifies the mapper that the generated OData mapper inherits from.
 `DataEntityFrameworkMapperInheritsFrom` | Specifies the mapper that the generated Entity Framework mapper inherits from.

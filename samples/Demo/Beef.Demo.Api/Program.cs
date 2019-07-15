@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.FileProviders;
 
 namespace Beef.Demo.Api
 {
@@ -19,7 +14,15 @@ namespace Beef.Demo.Api
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+               .ConfigureAppConfiguration((hostingContext, config) => ConfigBuilder(config, hostingContext.HostingEnvironment))
+               .UseStartup<Startup>()
+               .Build();
+
+        private static IConfigurationBuilder ConfigBuilder(IConfigurationBuilder configurationBuilder, IHostingEnvironment hostingEnvironment) =>
+            configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.json", true, false)
+                .AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables("Beef_");
     }
 }

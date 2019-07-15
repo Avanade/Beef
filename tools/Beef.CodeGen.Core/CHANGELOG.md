@@ -3,7 +3,8 @@
 Represents the **NuGet** versions.
 
 ## v2.1.6
-- *Enhancement:* Added `WithHints` to stored procedure configuration to output `WITH(value)` [table hint](https://docs.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table).
+- *Enhancement:* Added `WithHints` to stored procedure configuration to output `WITH(value)` table [hint](https://docs.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table).
+- *Enhancement:* Added support to generate data logic access using DocumentDb (CosmosDb). This follows the same pattern as Database, OData and EntityFramework. 
 
 ## v2.1.5
 - *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Invoker invocation code generation updated accordingly.

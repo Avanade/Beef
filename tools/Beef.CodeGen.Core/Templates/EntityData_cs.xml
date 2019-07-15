@@ -19,6 +19,7 @@
       <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="^{{Entity.Name}}CollectionResult" Otherwise="^{{Entity.Name}}CollectionResult&lt;T&gt;" />
       <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" Otherwise="false" />
       <Set Name="System.UsesOData" Condition="Entity.AutoImplement == 'OData'" Value="true" Otherwise="false" />
+      <Set Name="System.UsesDocumentDb" Condition="Entity.AutoImplement == 'DocumentDb'" Value="true" Otherwise="false" />
       <Set Name="System.UsesEntityFramework" Condition="Entity.AutoImplement == 'EntityFramework'" Value="true" Otherwise="false" />
       <Set Name="System.HasKey" Value="false"/>
       <Property Condition="Property.UniqueKey == true">
@@ -29,6 +30,7 @@
         <Exception Condition="System.HasKey == false" Message="Operation '{{Operation.Name}}' specifies UniqueKey where none are specified for the Entity '{{Entity.Name}}'." />
         <Set Name="System.UsesDatabase" Condition="Operation.AutoImplement == 'Database'" Value="true" />
         <Set Name="System.UsesOData" Condition="Operation.AutoImplement == 'OData'" Value="true" />
+        <Set Name="System.UsesDocumentDb" Condition="Operation.AutoImplement == 'DocumentDb'" Value="true" />
         <Set Name="System.UsesEntityFramework" Condition="Operation.AutoImplement == 'EntityFramework'" Value="true" />
       </Operation>
       <![CDATA[/*
@@ -64,6 +66,14 @@ using Beef.Business;
 ]]>
         <If Condition="Config.ODataUsingNamespace != null">
           <![CDATA[using {{Config.ODataUsingNamespace}};
+]]>
+        </If>
+      </If>
+      <If Condition="System.UsesDocumentDb == true">
+        <![CDATA[using Beef.Data.DocumentDb;
+]]>
+        <If Condition="Config.DocumentDbUsingNamespace != null">
+          <![CDATA[using {{Config.DocumentDbUsingNamespace}};
 ]]>
         </If>
       </If>
@@ -128,6 +138,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <If Condition="System.AutoImplement == 'OData'">
               <![CDATA[        private Func<IQueryable<{{Entity.EntityName}}>]]>
             </If>
+            <If Condition="System.AutoImplement == 'DocumentDb'">
+              <![CDATA[        private Func<IQueryable<{{Entity.EntityName}}>]]>
+            </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[        private Func<IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
             </If>
@@ -142,6 +155,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             </If>
             <If Condition="System.AutoImplement == 'OData'">
               <![CDATA[, IODataArgs, IQueryable<{{Entity.EntityName}}>]]>
+            </If>
+            <If Condition="System.AutoImplement == 'DocumentDb'">
+              <![CDATA[, IDocDbArgs, IQueryable<{{Entity.EntityName}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[, IEfDbArgs, IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
@@ -175,6 +191,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           </If>
           <If Condition="System.AutoImplement == 'OData'">
             <![CDATA[IODataArgs, ]]>
+          </If>
+          <If Condition="System.AutoImplement == 'DocumentDb'">
+            <![CDATA[IDocDbArgs, ]]>
           </If>
           <If Condition="System.AutoImplement == 'EntityFramework'">
             <![CDATA[IEfDbArgs, ]]>
@@ -502,8 +521,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
             </If>
-            <![CDATA[                var __dataArgs = {{System.DataEntityMapper}}]]>
-            <![CDATA[.Default.CreateArgs(]]>
+            <If Condition="System.AutoImplement == 'DocumentDb'">
+              <Then>
+                <![CDATA[                var __dataArgs = DocDbArgs.Create("{{Entity.DocumentDbCollectionId}}"]]>
+              </Then>
+              <Else>
+                <![CDATA[                var __dataArgs = {{System.DataEntityMapper}}.Default.CreateArgs(]]>
+              </Else>
+            </If>
             <If Condition="System.AutoImplement == 'Database'">
               <![CDATA["[]]>
               <If Condition="Entity.DatabaseSchema == null">
@@ -524,6 +549,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <If Condition="System.AutoImplement == 'OData'">
               <If Condition="Operation.PagingArgs == true">
                 <![CDATA[__result.Paging]]>
+              </If>
+              <![CDATA[);]]>
+            </If>
+            <If Condition="System.AutoImplement == 'DocumentDb'">
+              <If Condition="Operation.PagingArgs == true">
+                <![CDATA[, __result.Paging]]>
               </If>
               <![CDATA[);]]>
             </If>
@@ -674,6 +705,78 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                   <Else><![CDATA[{{Entity.ODataName}}]]></Else>
                 </If>
                 <![CDATA[.Default.DeleteAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <Parameter Condition="Parameter.LayerPassing == 'All'">
+                  <If Condition="System.Index > 0">
+                    <![CDATA[, ]]>
+                  </If>
+                  <If Condition="Parameter.DataConverter == null">
+                    <Then><![CDATA[{{Parameter.ArgumentName}}]]></Then>
+                    <Else>
+                      <![CDATA[{{Parameter.DataConverter}}]]>
+                      <If Condition="Parameter.IsDataConverterGeneric == true">
+                        <![CDATA[<{{Parameter.Type}}>]]>
+                      </If>
+                      <![CDATA[.Default.ConvertToDest({{Parameter.ArgumentName}})]]>
+                    </Else>
+                  </If>
+                </Parameter>
+                <![CDATA[);
+]]>
+              </If>
+            </If>
+            <If Condition="System.AutoImplement == 'DocumentDb'">
+              <If Condition="Operation.OperationType == 'Get'">
+                <If Condition="Entity.DocumentDbName == null">
+                  <Then><![CDATA[__result = await DocDb]]></Then>
+                  <Else><![CDATA[__result = await {{Entity.DocumentDbName}}]]></Else>
+                </If>
+                <![CDATA[.Default.GetAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <Parameter Condition="Parameter.LayerPassing == 'All'">
+                  <If Condition="System.Index > 0">
+                    <![CDATA[, ]]>
+                  </If>
+                  <If Condition="Parameter.DataConverter == null">
+                    <Then><![CDATA[{{Parameter.ArgumentName}}]]></Then>
+                    <Else>
+                      <![CDATA[{{Parameter.DataConverter}}]]>
+                      <If Condition="Parameter.IsDataConverterGeneric == true">
+                        <![CDATA[<{{Parameter.Type}}>]]>
+                      </If>
+                      <![CDATA[.Default.ConvertToDest({{Parameter.ArgumentName}})]]>
+                    </Else>
+                  </If>
+                </Parameter>
+                <![CDATA[);
+]]>
+              </If>
+              <If Condition="Operation.OperationType == 'GetColl'">
+                <![CDATA[__result.Result = ]]>
+                <If Condition="Entity.DocumentDbName == null">
+                  <Then><![CDATA[DocDb]]></Then>
+                  <Else><![CDATA[{{Entity.DocumentDbName}}]]></Else>
+                </If>
+                <![CDATA[.Default.Query<{{Entity.EntityName}}>(__dataArgs, q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
+                <Parameter Condition="Parameter.LayerPassing == 'All'">
+                  <![CDATA[, {{Parameter.ArgumentName}}]]>
+                </Parameter>
+                <![CDATA[, __dataArgs)).SelectQuery<{{Entity.EntityCollectionName}}>();
+]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <If Condition="Entity.DocumentDbName == null">
+                  <Then><![CDATA[__result = await DocDb]]></Then>
+                  <Else><![CDATA[__result = await {{Entity.DocumentDbName}}]]></Else>
+                </If>
+                <![CDATA[.Default.{{Operation.OperationType}}Async(__dataArgs, value);
+]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Delete'">
+                <![CDATA[await ]]>
+                <If Condition="Entity.DocumentDbName == null">
+                  <Then><![CDATA[DocDb]]></Then>
+                  <Else><![CDATA[{{Entity.DocumentDbName}}]]></Else>
+                </If>
+                <![CDATA[.Default.DeleteAsync(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
