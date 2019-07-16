@@ -66,7 +66,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => a.Agent.GetByArgsAsync(new ProductArgs { Name = "l*", Description = "*er" }));
 
-            // Check 2 are returned.
+            // Check 1 is returned.
             Assert.AreEqual(1, pcr?.Value?.Result?.Count);
             Assert.AreEqual(new string[] { "LCD HDTV" }, pcr.Value.Result.Select(x => x.Name).ToArray());
         }

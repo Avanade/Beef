@@ -64,9 +64,9 @@ namespace Beef.Data.DocumentDb
         /// <summary>
         /// Initializes a new instance of the <see cref="DocDb{TDefault}"/> class.
         /// </summary>
-        /// <param name="client">The <see cref="DocumentClient"/>.</param>
+        /// <param name="client">The <see cref="T:DocumentClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
-        public DocDb(DocumentClient client, string databaseId) : base(client, databaseId) { }
+        protected DocDb(DocumentClient client, string databaseId) : base(client, databaseId) { }
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ namespace Beef.Data.DocumentDb
         /// </summary>
         /// <param name="client">The <see cref="DocumentClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
-        public DocDbBase(DocumentClient client, string databaseId)
+        protected DocDbBase(DocumentClient client, string databaseId)
         {
             Client = Check.NotNull(client, nameof(client));
             DatabaseId = Check.NotEmpty(databaseId, nameof(databaseId));

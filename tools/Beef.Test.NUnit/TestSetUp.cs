@@ -115,7 +115,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Registers the <paramref name="setUpFunc"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Setup"/> is invoked to reset.
+        /// Registers the <paramref name="setUpFunc"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
         /// </summary>
         /// <param name="setUpFunc">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>

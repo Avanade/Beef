@@ -8,6 +8,7 @@ using KellermanSoftware.CompareNetObjects;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -55,51 +56,52 @@ namespace Beef.Test.NUnit
         #region StartupTestServer
 
         /// <summary>
-        /// Starts up the <see cref="TestServer"/> using the specified <b>API startup</b> <see cref="Type"/>.
+        /// Starts up the <see cref="TestServer"/> using the specified <b>API startup</b> <see cref="Type"/> and building the underlying configuration.
         /// </summary>
         /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
-        /// <param name="jsonFilePath">An optional testing JSON settings file path (e.g. <c>appsettings.json</c>) to override defined values.</param>
-        /// <param name="environment">The environment to be used by the web host.</param>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
+        /// <param name="environmentVariablesPrefix">Override the environment variables prexfix.</param>
         /// <param name="testServerConfig">An optional <see cref="Action{TestServer}"/> to further configure the underlying <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(string jsonFilePath = null, string environment = DefaultEnvironment, bool addEnvironmentVariables = true, Action<TestServer> testServerConfig = null) where TStartup : class
+        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string environmentVariablesPrefix = null, Action<TestServer> testServerConfig = null) where TStartup : class
         {
-            var cb = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory());
-            if (jsonFilePath != null)
-                cb.AddJsonFile(jsonFilePath);
+            var cb = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
+                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{environment}.json", true, false)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{environment}.json", true, true);
 
             if (addEnvironmentVariables)
-                cb.AddEnvironmentVariables();
+                cb.AddEnvironmentVariables(environmentVariablesPrefix);
 
-            StartupTestServer<TStartup>(environment, cb.Build(), testServerConfig);
+            StartupTestServer<TStartup>(cb.Build(), environment, testServerConfig);
         }
 
         /// <summary>
         /// Starts up the <see cref="TestServer"/> using the specified <b>API startup</b> <see cref="Type"/> and <paramref name="config"/>.
         /// </summary>
         /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        /// <param name="environment">The environment to be used by the web host.</param>
+        /// <param name = "config" > The <see cref="IConfiguration"/>.</param> 
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="testServerConfig">An optional <see cref="Action{TestServer}"/> to further configure the underlying <see cref="TestServer"/>.</param>
         public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<TestServer> testServerConfig = null) where TStartup : class
-        {
-            StartupTestServer<TStartup>(environment, config, testServerConfig);
-        }
-
-        /// <summary>
-        /// Starts up the <see cref="TestServer"/>.
-        /// </summary>
-        private static void StartupTestServer<TStartup>(string environment, IConfiguration config, Action<TestServer> testServerConfig) where TStartup : class
         {
             lock (_lock)
             {
                 if (_testServer != null)
                     throw new InvalidOperationException("The TestServer can only be started up once only.");
 
-                var testServer = new TestServer(new WebHostBuilder().UseConfiguration(Check.NotNull(config, nameof(config))).UseEnvironment(environment).UseStartup<TStartup>());
+                var whb = new WebHostBuilder()
+                    .UseEnvironment(environment)
+                    .UseConfiguration(config)
+                    .UseStartup<TStartup>();
+
+                var testServer = new TestServer(whb);
                 testServerConfig?.Invoke(testServer);
-                _testServer = testServer;
+
                 _configuration = config;
+                _testServer = testServer;
             }
         }
 
@@ -129,7 +131,7 @@ namespace Beef.Test.NUnit
             {
                 lock (_lock)
                 {
-                    if (_configuration != null)
+                    if (_testServer != null && _configuration != null)
                         return _configuration;
 
                     throw new InvalidOperationException("TestServer is not running; use StartupTestServer method to start.");
