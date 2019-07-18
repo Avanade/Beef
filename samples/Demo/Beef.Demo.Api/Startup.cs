@@ -12,7 +12,7 @@ using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.Documents.Client;
+using Cosmos = Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -40,10 +40,10 @@ namespace Beef.Demo.Api
             Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
 
             // Register the DocumentDb/CosmosDb client.
-            DocDb.Register(() =>
+            CosmosDb.Register(() =>
             {
-                var cs = config.GetSection("DocumentDb");
-                return new DocDb(new DocumentClient(new Uri(cs.GetValue<string>("EndPoint")), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+                var cs = config.GetSection("CosmosDb");
+                return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
             });
 
             // Register the test OData service.

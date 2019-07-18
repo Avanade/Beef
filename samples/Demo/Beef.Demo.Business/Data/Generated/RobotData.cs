@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
-using Beef.Data.DocumentDb;
+using Microsoft.Azure.Cosmos;
+using Beef.Data.Cosmos;
 using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
@@ -25,24 +26,24 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private Func<Guid, IDocDbArgs, Task> _getOnBeforeAsync = null;
+        private Func<Guid, ICosmosDbArgs, Task> _getOnBeforeAsync = null;
         private Func<Robot, Guid, Task> _getOnAfterAsync = null;
         private Action<Exception> _getOnException = null;
 
-        private Func<Robot, IDocDbArgs, Task> _createOnBeforeAsync = null;
+        private Func<Robot, ICosmosDbArgs, Task> _createOnBeforeAsync = null;
         private Func<Robot, Task> _createOnAfterAsync = null;
         private Action<Exception> _createOnException = null;
 
-        private Func<Robot, IDocDbArgs, Task> _updateOnBeforeAsync = null;
+        private Func<Robot, ICosmosDbArgs, Task> _updateOnBeforeAsync = null;
         private Func<Robot, Task> _updateOnAfterAsync = null;
         private Action<Exception> _updateOnException = null;
 
-        private Func<Guid, IDocDbArgs, Task> _deleteOnBeforeAsync = null;
+        private Func<Guid, ICosmosDbArgs, Task> _deleteOnBeforeAsync = null;
         private Func<Guid, Task> _deleteOnAfterAsync = null;
         private Action<Exception> _deleteOnException = null;
 
-        private Func<IQueryable<Robot>, RobotArgs, IDocDbArgs, IQueryable<Robot>> _getByArgsOnQuery = null;
-        private Func<RobotArgs, IDocDbArgs, Task> _getByArgsOnBeforeAsync = null;
+        private Func<IQueryable<Robot>, RobotArgs, ICosmosDbArgs, IQueryable<Robot>> _getByArgsOnQuery = null;
+        private Func<RobotArgs, ICosmosDbArgs, Task> _getByArgsOnBeforeAsync = null;
         private Func<RobotCollectionResult, RobotArgs, Task> _getByArgsOnAfterAsync = null;
         private Action<Exception> _getByArgsOnException = null;
 
@@ -58,9 +59,9 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = DocDbArgs.Create("Items");
+                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs);
-                __result = await DocDb.Default.GetAsync<Robot>(__dataArgs, id);
+                __result = await CosmosDb.Default.GetAsync<Robot>(__dataArgs, id);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
@@ -79,9 +80,9 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = DocDbArgs.Create("Items");
+                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs);
-                __result = await DocDb.Default.CreateAsync(__dataArgs, value);
+                __result = await CosmosDb.Default.CreateAsync(__dataArgs, value);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
@@ -100,9 +101,9 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = DocDbArgs.Create("Items");
+                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs);
-                __result = await DocDb.Default.UpdateAsync(__dataArgs, value);
+                __result = await CosmosDb.Default.UpdateAsync(__dataArgs, value);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
@@ -116,9 +117,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var __dataArgs = DocDbArgs.Create("Items");
+                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
                 if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs);
-                await DocDb.Default.DeleteAsync(__dataArgs, id);
+                await CosmosDb.Default.DeleteAsync<Robot>(__dataArgs, id);
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id);
             }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
         }
@@ -134,9 +135,9 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 RobotCollectionResult __result = new RobotCollectionResult(paging);
-                var __dataArgs = DocDbArgs.Create("Items", __result.Paging);
+                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None, __result.Paging);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
-                __result.Result = DocDb.Default.Query<Robot>(__dataArgs, q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<RobotCollection>();
+                __result.Result = CosmosDb.Default.Query<Robot>(__dataArgs, q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<RobotCollection>();
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });

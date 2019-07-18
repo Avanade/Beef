@@ -1,4 +1,4 @@
-﻿using Beef.Data.DocumentDb;
+﻿using Beef.Data.Cosmos;
 using Beef.Demo.Common.Entities;
 using System.Linq;
 
@@ -11,7 +11,7 @@ namespace Beef.Demo.Business.Data
             _getByArgsOnQuery = GetByArgsOnQuery;
         }
 
-        private IQueryable<Robot> GetByArgsOnQuery(IQueryable<Robot> q, RobotArgs args, IDocDbArgs dbArgs)
+        private IQueryable<Robot> GetByArgsOnQuery(IQueryable<Robot> q, RobotArgs args, ICosmosDbArgs dbArgs)
         {
             q = q.WhereWildcard(x => x.ModelNo, args?.ModelNo);
             q = q.WhereWildcard(x => x.SerialNo, args?.SerialNo);

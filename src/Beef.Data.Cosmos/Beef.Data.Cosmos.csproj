@@ -11,19 +11,17 @@
     <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>Beef DocumentDB CosmosDB</PackageTags>
+    <PackageTags>Beef Cosmos CosmosDB DocumentDB</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <DocumentationFile>.\bin\debug\Beef.Data.DocumentDb.xml</DocumentationFile>
+    <DocumentationFile>.\bin\debug\Beef.Data.Cosmos.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.5.1" />
   </ItemGroup>
 
   <ItemGroup>

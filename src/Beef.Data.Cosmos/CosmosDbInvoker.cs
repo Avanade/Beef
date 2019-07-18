@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Microsoft.Azure.Documents;
+using Microsoft.Azure.Cosmos;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Beef.Data.DocumentDb
+namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="DocDbBase"/> invocations
-    /// specifically exception handling (see <see cref="DocDbBase.ExceptionHandler"/>).
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="CosmosDbBase"/> invocations
+    /// specifically exception handling (see <see cref="CosmosDbBase.ExceptionHandler"/>).
     /// </summary>
-    public class DocDbInvoker : InvokerBase<DocDbInvoker, DocDbBase>
+    public class CosmosDbInvoker : InvokerBase<CosmosDbInvoker, CosmosDbBase>
     {
         #region NoResult
 
@@ -25,26 +25,23 @@ namespace Beef.Data.DocumentDb
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override void WrapInvoke(object caller, Action action, DocDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override void WrapInvoke(object caller, Action action, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
                 action();
             }
-            catch (DocumentClientException dcex)
+            catch (CosmosException cex)
             {
                 if (param != null)
-                    param.ExceptionHandler?.Invoke(dcex);
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
             catch (TargetInvocationException tiex)
             {
-                if (tiex?.InnerException is DocumentClientException dcex)
-                {
-                    if (param != null)
-                        param.ExceptionHandler?.Invoke(dcex);
-                }
+                if (tiex?.InnerException is CosmosException cex && param != null)
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
@@ -59,26 +56,23 @@ namespace Beef.Data.DocumentDb
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, DocDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
                 await func();
             }
-            catch (DocumentClientException dcex)
+            catch (CosmosException cex)
             {
                 if (param != null)
-                    param.ExceptionHandler?.Invoke(dcex);
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
             catch (TargetInvocationException tiex)
             {
-                if (tiex?.InnerException is DocumentClientException dcex)
-                {
-                    if (param != null)
-                        param.ExceptionHandler?.Invoke(dcex);
-                }
+                if (tiex?.InnerException is CosmosException cex && param != null)
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
@@ -99,26 +93,23 @@ namespace Beef.Data.DocumentDb
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, DocDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
                 return func();
             }
-            catch (DocumentClientException dcex)
+            catch (CosmosException cex)
             {
                 if (param != null)
-                    param.ExceptionHandler?.Invoke(dcex);
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
             catch (TargetInvocationException tiex)
             {
-                if (tiex?.InnerException is DocumentClientException dcex)
-                {
-                    if (param != null)
-                        param.ExceptionHandler?.Invoke(dcex);
-                }
+                if (tiex?.InnerException is CosmosException cex && param != null)
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
@@ -135,26 +126,23 @@ namespace Beef.Data.DocumentDb
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DocDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             try
             {
                 return await func();
             }
-            catch (DocumentClientException dcex)
+            catch (CosmosException cex)
             {
                 if (param != null)
-                    param.ExceptionHandler?.Invoke(dcex);
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }
             catch (TargetInvocationException tiex)
             {
-                if (tiex?.InnerException is DocumentClientException dcex)
-                {
-                    if (param != null)
-                        param.ExceptionHandler?.Invoke(dcex);
-                }
+                if (tiex?.InnerException is CosmosException cex && param != null)
+                    param.ExceptionHandler?.Invoke(cex);
 
                 throw;
             }

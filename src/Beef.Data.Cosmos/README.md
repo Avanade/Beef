@@ -1,3 +1,3 @@
-# Beef.Data.DocumentDb
+# Beef.Data.Cosmos
 
 Under construction :-|

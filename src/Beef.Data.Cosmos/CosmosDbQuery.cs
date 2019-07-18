@@ -1,32 +1,49 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
-using Microsoft.Azure.Documents.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Beef.Data.DocumentDb
+namespace Beef.Data.Cosmos
 {
+    /// <summary>
+    /// Provides common <b>DocumentDb/CosmosDb</b> query capabilities.
+    /// </summary>
+    public abstract class CosmosDbQueryBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CosmosDbQueryBase"/> class.
+        /// </summary>
+        protected CosmosDbQueryBase() { }
+
+        /// <summary>
+        /// Gets a <see cref="PagingArgs"/> with a top/take of 1.
+        /// </summary>
+        internal static PagingArgs PagingTop1 { get; } = PagingArgs.CreateSkipAndTake(0, 1);
+
+        /// <summary>
+        /// Gets a <see cref="PagingArgs"/> with a top/take of 2.
+        /// </summary>
+        internal static PagingArgs PagingTop2 { get; } = PagingArgs.CreateSkipAndTake(0, 2);
+    }
+
     /// <summary>
     /// Encapsulates a <b>DocumentDb/CosmosDb</b> query enabling all select-like capabilities.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
-    public class DocDbQuery<T> where T : class, new()
+    public class CosmosDbQuery<T> : CosmosDbQueryBase where T : class, new()
     {
-        private static readonly PagingArgs _pagingTop1 = PagingArgs.CreateSkipAndTake(0, 1);
-        private static readonly PagingArgs _pagingTop2 = PagingArgs.CreateSkipAndTake(0, 2);
-
-        private readonly DocDbBase _db;
+        private readonly CosmosDbBase _db;
         private readonly Func<IOrderedQueryable<T>, IQueryable<T>> _query;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DocDbQuery{T}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbQuery{T}"/> class.
         /// </summary>
-        /// <param name="db">The <see cref="DocDbBase"/>.</param>
-        /// <param name="queryArgs">The <see cref="DocDbArgs"/>.</param>
+        /// <param name="db">The <see cref="CosmosDbBase"/>.</param>
+        /// <param name="queryArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{T}"/>.</param>
-        internal DocDbQuery(DocDbBase db, DocDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null)
+        internal CosmosDbQuery(CosmosDbBase db, CosmosDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null)
         {
             _db = Check.NotNull(db, nameof(db));
             QueryArgs = Check.NotNull(queryArgs, nameof(queryArgs));
@@ -34,18 +51,18 @@ namespace Beef.Data.DocumentDb
         }
 
         /// <summary>
-        /// Gets the <see cref="DocDbArgs"/>.
+        /// Gets the <see cref="CosmosDbArgs"/>.
         /// </summary>
-        public DocDbArgs QueryArgs { get; private set; }
+        public CosmosDbArgs QueryArgs { get; private set; }
 
         /// <summary>
         /// Manages the DbContext and underlying query construction and lifetime.
         /// </summary>
         private void ExecuteQuery(Action<IQueryable<T>> execute)
         {
-            DocDbInvoker.Default.Invoke(this, () =>
+            CosmosDbInvoker.Default.Invoke(this, () =>
             {
-                var q = _db.Client.CreateDocumentQuery<T>(UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, QueryArgs.CollectionId), _db.GetFeedOptions(QueryArgs));
+                var q = _db.GetContainer(QueryArgs.ContainerId).GetItemLinqQueryable<T>(allowSynchronousQueryExecution: true, requestOptions: _db.GetQueryRequestOptions(QueryArgs));
                 execute(_query(q));
             }, _db);
         }
@@ -55,9 +72,9 @@ namespace Beef.Data.DocumentDb
         /// </summary>
         private T ExecuteQuery(Func<IQueryable<T>, T> execute)
         {
-            return DocDbInvoker.Default.Invoke(this, () =>
+            return CosmosDbInvoker.Default.Invoke(this, () =>
             {
-                var q = _db.Client.CreateDocumentQuery<T>(UriFactory.CreateDocumentCollectionUri(_db.DatabaseId, QueryArgs.CollectionId), _db.GetFeedOptions(QueryArgs));
+                var q = _db.GetContainer(QueryArgs.ContainerId).GetItemLinqQueryable<T>(allowSynchronousQueryExecution: true, requestOptions: _db.GetQueryRequestOptions(QueryArgs));
                 return execute(_query(q));
             }, _db);
         }
@@ -84,8 +101,8 @@ namespace Beef.Data.DocumentDb
         {
             return ExecuteQuery(q =>
             {
-                q = SetPaging(q, _pagingTop2);
-                return q.ToArray().Single();
+                q = SetPaging(q, PagingTop2);
+                return q.AsEnumerable().Single();
             });
         }
 
@@ -97,8 +114,8 @@ namespace Beef.Data.DocumentDb
         {
             return ExecuteQuery(q =>
             {
-                q = SetPaging(q, _pagingTop2);
-                return q.ToArray().SingleOrDefault();
+                q = SetPaging(q, PagingTop2);
+                return q.AsEnumerable().SingleOrDefault();
             });
         }
 
@@ -110,8 +127,8 @@ namespace Beef.Data.DocumentDb
         {
             return ExecuteQuery(q =>
             {
-                q = SetPaging(q, _pagingTop1);
-                return q.ToArray().First();
+                q = SetPaging(q, PagingTop1);
+                return q.AsEnumerable().First();
             });
         }
 
@@ -123,8 +140,8 @@ namespace Beef.Data.DocumentDb
         {
             return ExecuteQuery(q =>
             {
-                q = SetPaging(q, _pagingTop1);
-                return q.ToArray().FirstOrDefault();
+                q = SetPaging(q, PagingTop1);
+                return q.AsEnumerable().FirstOrDefault();
             });
         }
 
@@ -151,11 +168,11 @@ namespace Beef.Data.DocumentDb
         /// <param name="coll">The collection to add items to.</param>
         public void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>
         {
-            ExecuteQuery(query =>
+            ExecuteQuery(query => 
             {
-                foreach (var item in SetPaging(query, QueryArgs.Paging).ToArray())
-                { 
-                    coll.Add(_db.ETagReformatter(item));
+                foreach (var item in SetPaging(query, QueryArgs.Paging).AsEnumerable())
+                {
+                    coll.Add(CosmosDbBase.GetResponseValue<T>(item));
                 }
 
                 if (QueryArgs.Paging != null && QueryArgs.Paging.IsGetCount)

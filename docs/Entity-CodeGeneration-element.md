@@ -45,9 +45,10 @@ The following represents optional **namespace** attributes:
 Attribute | Description
 -|-
 `DataUsingNamespace` | Adds an additional Namespace using statement to the Data code.
-`DatabaseUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of Database.
-`ODataUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of OData.
-`DocumentDbUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of DocumentDb.
+`DatabaseUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'Database'.
+`EntityFrameworkUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'EntityFramework'.
+`ODataUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'OData'.
+`CosmosUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'Cosmos'.
 `UsingNamespace1` | Adds an additional Namespace using statement to the Entity code.
 `UsingNamespace2` | Adds an additional Namespace using statement to the Entity code.
 `UsingNamespace3` | Adds an additional Namespace using statement to the Entity code.
