@@ -201,7 +201,7 @@ namespace Beef.Database.Core
                 if (!TimeExecution(() =>
                 {
                     var em = ExecutionManager.Create(() => new CodeGenExecutor(_codeGenArgs)).Run();
-                    return em.StopExecutor?.Exception != null ? false : true;
+                    return em.StopExecutor?.Exception == null;
                 }))
                     return Task.CompletedTask;
             }

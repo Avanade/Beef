@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -82,7 +83,17 @@ namespace Beef.Data.Cosmos
         /// <param name="cex">The <see cref="HttpRequestException"/>.</param>
         public static void ThrowTransformedDocumentClientException(CosmosException cex)
         {
-            // TODO: Add exception logic.
+            switch (cex.StatusCode)
+            {
+                case System.Net.HttpStatusCode.NotFound:
+                    throw new NotFoundException(null, cex);
+
+                case System.Net.HttpStatusCode.Conflict:
+                    throw new DuplicateException(null, cex);
+
+                case System.Net.HttpStatusCode.PreconditionFailed:
+                    throw new ConcurrencyException(null, cex);
+            }
         }
 
         /// <summary>
@@ -110,7 +121,7 @@ namespace Beef.Data.Cosmos
             if (resp == null)
                 return resp;
 
-            if (resp is IETag etag)
+            if (resp is IETag etag && etag.ETag != null)
                 etag.ETag = (etag.ETag.StartsWith("\"") && etag.ETag.EndsWith("\"")) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
 
             return resp;
@@ -230,7 +241,7 @@ namespace Beef.Data.Cosmos
         /// <param name="queryArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T}"/>.</returns>
-        public CosmosDbQuery<T> Query<T>(CosmosDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null) where T : class, new()
+        public CosmosDbQuery<T> Query<T>(CosmosDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
         {
             return new CosmosDbQuery<T>(this, queryArgs, query);
         }
@@ -246,7 +257,7 @@ namespace Beef.Data.Cosmos
         /// <param name="getArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T> GetAsync<T>(CosmosDbArgs getArgs, params IComparable[] keys) where T : class, new()
+        public async Task<T> GetAsync<T>(CosmosDbArgs getArgs, params IComparable[] keys) where T : class, IIdentifier, new()
         {
             Check.NotNull(getArgs, nameof(getArgs));
             if (keys.Length != 1)
@@ -279,7 +290,7 @@ namespace Beef.Data.Cosmos
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The value (re-queried where specified).</returns>
-        public async Task<T> CreateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, new()
+        public async Task<T> CreateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, IIdentifier, new()
         {
             Check.NotNull(saveArgs, nameof(saveArgs));
             Check.NotNull(value, nameof(value));
@@ -296,16 +307,15 @@ namespace Beef.Data.Cosmos
                     cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
                 }
 
-                if (value is IUniqueKey uk && uk.HasUniqueKey && uk.UniqueKey.Args.Length == 1)
+                if (saveArgs.SetIdentifierOnCreate)
                 {
-                    if (saveArgs.SetUniqueKeyOnCreateWhereGuid && uk.UniqueKey.Args[0] is Guid)
-                        uk.UniqueKey.Args[0] = Guid.NewGuid();
-
-                    if (uk.UniqueKey.Args[0] == null)
-                        throw new InvalidOperationException("Entity UniqueKey.Args[0] must not be null.");
+                    if (value is IGuidIdentifier gid)
+                        gid.Id = Guid.NewGuid();
+                    else if (value is IStringIdentifier sid)
+                        sid.Id = Guid.NewGuid().ToString();
+                    else
+                        throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
                 }
-                else
-                    throw new InvalidOperationException("Entity must implement IUniqueKey with a UniqueKey (HasUniqueKey); the UniqueKey.Args must contain only a single value (length of 1).");
 
                 return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).CreateItemAsync<T>(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
             }, this);
@@ -322,7 +332,7 @@ namespace Beef.Data.Cosmos
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The value (re-queried where specified).</returns>
-        public async Task<T> UpdateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, new()
+        public async Task<T> UpdateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, IIdentifier, new()
         {
             Check.NotNull(saveArgs, nameof(saveArgs));
             Check.NotNull(value, nameof(value));
@@ -334,8 +344,13 @@ namespace Beef.Data.Cosmos
                 if (ro.IfMatchEtag == null && value is IETag etag)
                     ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
 
-                string key = (value is IUniqueKey uk && uk.HasUniqueKey && uk.UniqueKey.Args.Length == 1) ? uk.UniqueKey.Args[0].ToString() :
-                    throw new InvalidOperationException("Entity must implement IUniqueKey with a UniqueKey (HasUniqueKey); the UniqueKey.Args must contain only a single value (length of 1).");
+                string key = null;
+                if (value is IGuidIdentifier gid)
+                    key = gid.Id.ToString();
+                if (value is IIntIdentifier iid)
+                    key = iid.Id.ToString();
+                else if (value is IStringIdentifier sid)
+                    key = sid.Id;
 
                 // Need to read the record to get access to the ChangeLog readonly fields.
                 if (value is IChangeLog cl)
@@ -343,7 +358,7 @@ namespace Beef.Data.Cosmos
                     if (cl.ChangeLog == null)
                         cl.ChangeLog = new ChangeLog();
 
-                    var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs));
+                    var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
                     var orig = (IChangeLog)GetResponseValue<T>(resp);
                     cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
                     cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
@@ -354,7 +369,7 @@ namespace Beef.Data.Cosmos
                 }
 
                 // Replace/Update the value.
-                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync<T>(value, key, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
+                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync<T>(value, key, saveArgs.PartitionKey, ro));
             }, this);
         }
 
@@ -369,7 +384,7 @@ namespace Beef.Data.Cosmos
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync<T>(CosmosDbArgs saveArgs, params IComparable[] keys)
+        public async Task DeleteAsync<T>(CosmosDbArgs saveArgs, params IComparable[] keys) where T : class, IIdentifier
         {
             Check.NotNull(saveArgs, nameof(saveArgs));
             if (keys.Length != 1)

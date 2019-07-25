@@ -95,7 +95,7 @@ This is not intended as an all purpose database schema generation capability. It
 
 The `Beef.CodeGen.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. 
 
-Then simply add the `Templates` and `Scripts` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.CodeGen) as an example.
+Then simply add the `Templates` and `Scripts` folders and embed the required resources. See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as an example.
 
 <br/>
 

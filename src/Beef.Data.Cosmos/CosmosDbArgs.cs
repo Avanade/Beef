@@ -32,9 +32,9 @@ namespace Beef.Data.Cosmos
         bool NullOnNotFoundResponse { get; }
 
         /// <summary>
-        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the <see cref="System.Type"/> for the <see cref="IUniqueKey.UniqueKey"/> is a <see cref="System.Guid"/> only.
+        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the entity implements <see cref="IGuidIdentifier"/> or <see cref="IStringIdentifier"/>.
         /// </summary>
-        bool SetUniqueKeyOnCreateWhereGuid { get; }
+        bool SetIdentifierOnCreate { get; }
 
         /// <summary>
         /// Gets the <see cref="T:RequestOptions"/>.
@@ -159,8 +159,9 @@ namespace Beef.Data.Cosmos
         public bool NullOnNotFoundResponse { get; set; }
 
         /// <summary>
-        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the <see cref="System.Type"/> for the <see cref="IUniqueKey.UniqueKey"/> is a <see cref="System.Guid"/> only (defaults to <c>true</c>).
+        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the entity implements <see cref="IGuidIdentifier"/> or <see cref="IStringIdentifier"/>.
         /// </summary>
-        public bool SetUniqueKeyOnCreateWhereGuid { get; set; } = true;
+        /// <remarks>The value will be set using <see cref="System.Guid.NewGuid"/>.</remarks>
+        public bool SetIdentifierOnCreate { get; set; } = true;
     }
 }

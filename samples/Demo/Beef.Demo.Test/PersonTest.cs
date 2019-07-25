@@ -785,9 +785,9 @@ namespace Beef.Demo.Test
         public void H120_Patch_Concurrency()
         {
             // Get an existing person.
-            var p = AgentTester.Create<PersonAgent, Person>()
+            AgentTester.Create<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetAsync(3.ToGuid())).Value;
+                .Run((a) => a.Agent.GetAsync(3.ToGuid()));
 
             // Try patching the person with an invalid eTag.
             AgentTester.Create<PersonAgent, Person>()

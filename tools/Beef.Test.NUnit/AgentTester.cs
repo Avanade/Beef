@@ -325,8 +325,8 @@ namespace Beef.Test.NUnit
             if (!string.IsNullOrEmpty(Username))
                 Logger.Default.Info($"Username: {Username}");
 
-            Logger.Default.Info($"Headers: {(result.Request.Headers == null || result.Request.Headers.Count() == 0 ? "none" : "")}");
-            if (result.Request.Headers != null && result.Request.Headers.Count() > 0)
+            Logger.Default.Info($"Headers: {(result.Request.Headers == null || !result.Request.Headers.Any() ? "none" : "")}");
+            if (result.Request.Headers != null && result.Request.Headers.Any())
             {
                 foreach (var hdr in result.Request.Headers)
                 {
@@ -362,8 +362,8 @@ namespace Beef.Test.NUnit
             Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString())}");
 
             var hdrs = result.Response?.Headers?.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            Logger.Default.Info($"Headers: {(hdrs == null || hdrs.Count() == 0 ? "none" : "")}");
-            if (hdrs != null && hdrs.Count() > 0)
+            Logger.Default.Info($"Headers: {(hdrs == null || !hdrs.Any() ? "none" : "")}");
+            if (hdrs != null && hdrs.Any())
             {
                 foreach (var hdr in hdrs)
                 {
@@ -390,7 +390,7 @@ namespace Beef.Test.NUnit
                 {
                     json = JToken.Parse(result.Content);
                 }
-                catch (Exception) { }
+                catch (Exception) { /* This is being swallowed by design. */ }
             }
 
             TestContext.Out.Write($"Content: ");
@@ -552,7 +552,7 @@ namespace Beef.Test.NUnit
     [DebuggerStepThrough()]
     public class AgentTester<TAgent, TValue> : AgentTester where TAgent : class
     {
-        private ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();
+        private readonly ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();
         private Action<AgentTester<TAgent, TValue>> _beforeAction;
         private Action<AgentTester<TAgent, TValue>, WebApiAgentResult<TValue>> _afterAction;
         private bool _isExpectNullValue;

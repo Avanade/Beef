@@ -29,6 +29,7 @@ if ($apiKey.Length -gt 0)
         "src\Beef.Data.Database",
 	    "src\Beef.Data.EntityFrameworkCore",
 	    "src\Beef.Data.OData",
+	    "src\Beef.Data.Cosmos",
 	    "tools\Beef.CodeGen.Core",
         "tools\Beef.Database.Core",
         "tools\Beef.Test.NUnit")

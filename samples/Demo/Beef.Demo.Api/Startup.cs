@@ -22,7 +22,7 @@ namespace Beef.Demo.Api
 {
     public class Startup
     {
-        private static ILogger _logger;
+        private ILogger _logger;
 
         public Startup(IConfiguration config)
         {

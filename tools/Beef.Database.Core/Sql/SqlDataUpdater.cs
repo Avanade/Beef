@@ -18,11 +18,11 @@ namespace Beef.Database.Core.Sql
     /// </summary>
     public class SqlDataUpdater
     {
-        internal static DateTime DateTimeNow = DateTime.Now;
-        internal static string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
-        internal static string EnvironmentUsername = Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
+        internal static readonly DateTime DateTimeNow = DateTime.Now;
+        internal static readonly string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
+        internal static readonly string EnvironmentUsername = Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
 
-        private JObject _json;
+        private readonly JObject _json;
 
         /// <summary>
         /// Register the database.
@@ -191,7 +191,7 @@ namespace Beef.Database.Core.Sql
                 return jc.Children<JObject>();
             }
 
-            return null;
+            return new JObject[0];
         }
 
         /// <summary>

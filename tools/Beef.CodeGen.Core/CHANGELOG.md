@@ -4,16 +4,16 @@ Represents the **NuGet** versions.
 
 ## v2.1.6
 - *Enhancement:* Added `WithHints` to stored procedure configuration to output `WITH(value)` table [hint](https://docs.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table).
-- *Enhancement:* Added support to generate data logic access using DocumentDb (CosmosDb). This follows the same pattern as Database, OData and EntityFramework. 
+- *Enhancement:* Added support to generate data logic access using *Cosmos* DB. This follows the same pattern as *Database*, *OData* and *EntityFramework*. 
 
 ## v2.1.5
-- *Fixed:* InvokerBase was non functioning as a generic class; reimplemented. Invoker invocation code generation updated accordingly.
+- *Fixed:* `InvokerBase` was non functioning as a generic class; reimplemented. Invoker invocation code generation updated accordingly.
 
 ## v2.1.4
-- *Fixed:* FromBody not applied to ServiceAgent code generation.
+- *Fixed:* FromBody not applied to `ServiceAgent` code generation.
 
 ## v2.1.3
-- *Fixed:* CodeGenConsoleWrapper was supporting database generation by default.
+- *Fixed:* `CodeGenConsoleWrapper` was supporting database generation by default.
 
 ## v2.1.2
 - *Fixed:* Inconsistent version numbers.

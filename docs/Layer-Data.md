@@ -6,6 +6,7 @@ There are _Beef_ capabilities to encapsulate the processing for the following in
 - Database - `Beef.Data.Database`
 - EntityFramework - `Beef.Data.EntityFrameworkCore`
 - OData - `Beef.Data.OData`
+- Cosmos DB - `Beef.Data.Cosmos`
 
 <br>
 

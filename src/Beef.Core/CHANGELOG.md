@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.8
+
+- *Enhancement:* `IIdentifier` added to give base capabilites to `IIntIdentifier` and `IGuidIdentifer`. 
+- *New:* `IStringIdentifier` added to enable support for a `string`-based identifier.
+
 ## v2.1.7
 
 - *Enhancement:* Support overridding of HttpClient creation through the WebApiServiceAgentManager - enables the likes of HttpClientFactory to be used where required.

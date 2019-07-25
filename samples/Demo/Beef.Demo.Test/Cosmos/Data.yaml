@@ -1,0 +1,5 @@
+﻿items:
+  - { id: ^1, modelNo: T1000, serialNo: 123456 }
+  - { id: ^2, modelNo: T100, serialNo: A45768 }
+  - { id: ^3, modelNo: T1000, serialNo: 223456 }
+  - { id: ^4, modelNo: T100, serialNo: B45768 }

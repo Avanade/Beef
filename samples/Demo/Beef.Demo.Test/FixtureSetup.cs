@@ -20,7 +20,7 @@ namespace Beef.Demo.Test
                     typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) == 0;
             });
 
-            AgentTester.StartupTestServer<Startup>();
+            AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "Beef_");
         }
     }
 }

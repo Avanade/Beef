@@ -5,7 +5,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Beef.Demo.Api
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -18,7 +18,7 @@ namespace Beef.Demo.Api
                .UseStartup<Startup>()
                .Build();
 
-        private static IConfigurationBuilder ConfigBuilder(IConfigurationBuilder configurationBuilder, IHostingEnvironment hostingEnvironment) =>
+        private static void ConfigBuilder(IConfigurationBuilder configurationBuilder, IHostingEnvironment hostingEnvironment) =>
             configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.json", true, false)
                 .AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
                 .AddJsonFile("appsettings.json", true, true)

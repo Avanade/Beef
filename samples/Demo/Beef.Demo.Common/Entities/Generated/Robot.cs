@@ -18,7 +18,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Robot entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Robot : EntityBase, IETag, IChangeLog
+    public partial class Robot : EntityBase, IGuidIdentifier, IETag, IChangeLog
     {
         #region PropertyNames
       
