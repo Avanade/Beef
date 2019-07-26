@@ -6,6 +6,7 @@ Represents the **NuGet** versions.
 
 - *Enhancement:* `IIdentifier` added to give base capabilites to `IIntIdentifier` and `IGuidIdentifer`. 
 - *New:* `IStringIdentifier` added to enable support for a `string`-based identifier.
+- *New:* Added `ExecutionContext.PartitionKey` support.
 
 ## v2.1.7
 

@@ -15,6 +15,11 @@ namespace Beef.CodeGen
         private static Func<string, string> _pluralizer;
 
         /// <summary>
+        /// The <see cref="Regex"/> expression pattern for split strings into words.
+        /// </summary>
+        public const string WordSplitPattern = "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))";
+
+        /// <summary>
         /// The reserved system <see cref="ICodeGenConfigLoader"/> name.
         /// </summary>
         public const string SystemConfigName = "System";
@@ -93,9 +98,39 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            var s = Regex.Replace(text, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 "); // Split the string into words.
+            var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
             s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
             return char.ToUpper(s[0]) + s.Substring(1); // Make sure the first character is always upper case.
+        }
+
+        /// <summary>
+        /// Converts <paramref name="text"/> to a Snake Case ('someValueXML' would return 'some_value_xml'); splits on capitals and attempts to keep acronyms.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        public static string ToSnakeCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
+            s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+            return s.Replace(" ", "_").ToLowerInvariant(); // Replace space with _ and make lowercase.
+        }
+
+        /// <summary>
+        /// Converts <paramref name="text"/> to a Kebab Case ('someValueXML' would return 'some-value-xml'); splits on capitals and attempts to keep acronyms.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        public static string ToKebabCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
+            s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+            return s.Replace(" ", "-").ToLowerInvariant(); // Replace space with _ and make lowercase.
         }
 
         /// <summary>

@@ -176,7 +176,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             </Else>
           </If>
           <![CDATA[ {{Operation.Name}}Async(]]>
-          <If Condition="Operation.ReturnType == 'void' and Operation.ValueType == null">
+          <If Condition="Operation.ValueType == null">
             <Then><![CDATA[{{Entity.EntityName}}]]></Then>
             <Else><![CDATA[{{Operation.ValueType}}]]></Else>
           </If>

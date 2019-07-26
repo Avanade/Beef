@@ -88,6 +88,8 @@ String-based values can be further transformed, using one of the following:
 - `ToArgumentCase` - converts to 'argumentCase'.
 - `ToPascalCase` - converts to 'PascalCase'.
 - `ToCamelCase` - converts to 'camelCase'.
+- `ToSnakeCase` - converts to 'snake_case'.
+- `ToKebabCase` - converts to 'kebab-case'.
 - `ToSentenceCase` - converts to 'Sentence Case'.
 - `ToPlural` - converts to pluralised name.
 - `ToComments` - converts to comments where any embedded `{{xyz}}` string will be converted to C# see comments (as per ToSeeComments). 

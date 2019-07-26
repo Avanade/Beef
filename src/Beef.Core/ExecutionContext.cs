@@ -19,35 +19,26 @@ namespace Beef
     {
         private static readonly object _masterLock = new object();
         private static Func<ExecutionContext> _create = () => new ExecutionContext();
-        private static Func<ExecutionContext> _get;
-        private static Action<ExecutionContext> _set;
         private static AsyncLocal<ExecutionContext> _asyncLocal = new AsyncLocal<ExecutionContext>();
+        private static Func<ExecutionContext> _get = () => _asyncLocal.Value;
+        private static Action<ExecutionContext> _set = (ec) => _asyncLocal.Value = ec;
         private string _username;
         private Guid? _tenantId;
+        private string _partitionKey;
         private string _correlationId;
         private string _sessionCorrelationId;
         private DateTime _timestamp = DateTime.Now;
         private bool _timestampChanged;
         private PagingArgs _pagingArgs;
         private KeyOnlyDictionary<string> _roles;
-        private Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
-        private Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
-        private Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
+        private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
+        private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
 
         /// <summary>
         /// Gets the standard message for when changing an immutable value.
         /// </summary>
         public const string ImmutableText = "Value is immutable; cannot be changed once already set to a value.";
-
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static ExecutionContext()
-        {
-            // Default to using AsyncLocal.
-            _get = () => (ExecutionContext)_asyncLocal.Value;
-            _set = (ec) => _asyncLocal.Value = ec;
-        }
 
         /// <summary>
         /// Gets or sets the current <see cref="ExecutionContext"/> for the executing thread graph (see <see cref="AsyncLocal{T}"/>).
@@ -219,6 +210,22 @@ namespace Beef
         }
 
         /// <summary>
+        /// Gets or sets the parition key. This value is immutable.
+        /// </summary>
+        public string PartitionKey
+        {
+            get { return _partitionKey; }
+
+            set
+            {
+                if (_partitionKey != null && value != _partitionKey)
+                    throw new ArgumentException(ImmutableText);
+
+                _partitionKey = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable.
         /// </summary>
         public string CorrelationId
@@ -315,7 +322,7 @@ namespace Beef
                 return true;
             }
 
-            value = default(T);
+            value = default;
             return false;
         }
 
@@ -382,7 +389,7 @@ namespace Beef
 
         #endregion
 
-        #region
+        #region Security
 
         /// <summary>
         /// Gets the list of roles for the <see cref="Username"/> (as previously <see cref="SetRoles(IEnumerable{string})">set</see>).
@@ -453,7 +460,7 @@ namespace Beef
         /// <returns><c>true</c> where the user is in the specified role; otherwise, <c>false</c>.</returns>
         public virtual bool IsInRole(string role, bool throwAuthorizationException = false)
         {
-            var isInRole = _roles == null ? false : _roles.ContainsKey(role);
+            var isInRole = (_roles != null) && _roles.ContainsKey(role);
             if (!isInRole && throwAuthorizationException)
                 throw new AuthorizationException();
 

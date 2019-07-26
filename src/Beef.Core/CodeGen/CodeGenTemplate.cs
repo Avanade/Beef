@@ -16,8 +16,8 @@ namespace Beef.CodeGen
     /// </summary>
     internal class CodeGenTemplate
     {
-        private CodeGenerator _codeGenerator;
-        private XElement _xmlTemplate;
+        private readonly CodeGenerator _codeGenerator;
+        private readonly XElement _xmlTemplate;
         private XNode _xmlCurrent;
         private TextWriter _tw;
         private StringBuilder _sb;
@@ -173,7 +173,7 @@ namespace Beef.CodeGen
 
             string dirName = CodeGenConfig.GetXmlVal<string>(xml, "OutputDirName", null, false);
             if (dirName != null && dirName.Length > 0)
-                _eventArgs.OutputDirName = TemplateReplace(dirName, config); ;
+                _eventArgs.OutputDirName = TemplateReplace(dirName, config);
 
             _eventArgs.OutputFileName = TemplateReplace(fileName, config);
 
@@ -349,11 +349,11 @@ namespace Beef.CodeGen
                 if (lVal is bool)
                     return (bool)lVal;
 
-                if (lVal is string)
+                if (lVal is string slVal)
                 {
-                    if (((string)lVal).ToLower() == "true")
+                    if (slVal.ToLower() == "true")
                         return true;
-                    else if (((string)lVal).ToLower() == "false")
+                    else if (slVal.ToLower() == "false")
                         return false;
                 }
 
@@ -496,6 +496,8 @@ namespace Beef.CodeGen
                 case "tosentencecase": return CodeGenerator.ToSentenceCase(value);
                 case "topascalcase": return CodeGenerator.ToPascalCase(value);
                 case "tocamelcase": return CodeGenerator.ToCamelCase(value);
+                case "tosnakecase": return CodeGenerator.ToSnakeCase(value);
+                case "tokebabcase": return CodeGenerator.ToKebabCase(value);
                 case "toplural": return CodeGenerator.ToPlural(value);
                 case "tocomments": return CodeGenerator.ToComments(value);
                 case "toseecomments": return CodeGenerator.ToSeeComments(value);
@@ -569,7 +571,7 @@ namespace Beef.CodeGen
                 foreach (var item in list)
                 {
                     _codeGenerator.System.Attributes["Value"] = item;
-                    if (ExecuteIfCondition((XElement)xml, config))
+                    if (ExecuteIfCondition(xml, config))
                     {
                         _codeGenerator.System.AttributeUpdate("Index", index.ToString());
                         ExecuteXml(xml, config);
@@ -656,7 +658,7 @@ namespace Beef.CodeGen
         {
             CodeGenConfig val = GetConfig(name, config, out string propertyName);
             var oval = GetValue(value, config);
-            string sval = (oval == null) ? null : ((oval is bool) ? ((bool)oval == true ? "true" : "false") : oval.ToString());
+            string sval = (oval == null) ? null : ((oval is bool) ? ((bool)oval ? "true" : "false") : oval.ToString());
             val.AttributeUpdate(propertyName, TemplateReplace(sval, config));
         }
 

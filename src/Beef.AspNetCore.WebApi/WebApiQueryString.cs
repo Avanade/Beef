@@ -47,7 +47,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
         /// <param name="useExectionContext">Indicates whether to use the <see cref="ExecutionContext"/> value where there is already a current value (see <see cref="ExecutionContext.PagingArgs"/>).</param>
-        /// <param name="overrideExectionContext">Indicates whether to update the <see cref="ExecutionContext"/> value where there is no current value.</param>
+        /// <param name="overrideExecutionContext">Indicates whether to update the <see cref="ExecutionContext"/> value where there is no current value.</param>
         /// <returns>The <see cref="PagingArgs"/>.</returns>
         public static PagingArgs CreatePagingArgs(this ControllerBase controller, bool useExectionContext = false, bool overrideExecutionContext = true)
         {
@@ -89,8 +89,6 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the value for the named query string.
         /// </summary>
-        /// <param name="names">The list of possible names.</param>
-        /// <returns>The corresponding value.</returns>
         private static string GetNamedQueryString(ControllerBase controller, string[] names)
         {
             var q = controller.HttpContext.Request.Query.Where(x => names.Contains(x.Key, StringComparer.InvariantCultureIgnoreCase)).ToArray();
