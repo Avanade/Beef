@@ -15,15 +15,18 @@ namespace Beef.Demo.Test
     [TestFixture, NonParallelizable]
     public class RobotTest
     {
+        private IConfigurationSection _config;
+        private CosmosDbContainerSetUp _csu;
+
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
             TestSetUp.Reset(false);
 
-            var cs = AgentTester.Configuration.GetSection("CosmosDb");
-            var cc = new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey"));
+            _config = AgentTester.Configuration.GetSection("CosmosDb");
+            var cc = new Cosmos.CosmosClient(_config.GetValue<string>("EndPoint"), _config.GetValue<string>("AuthKey"));
 
-            var csu = await CosmosDbContainerSetUp.ReplaceAndOpenAsync(cc, cs.GetValue<string>("Database"),
+            _csu = await CosmosDbContainerSetUp.ReplaceAndOpenAsync(cc, _config.GetValue<string>("Database"),
                 new Cosmos.ContainerProperties
                 {
                     Id = "Items",
@@ -31,7 +34,14 @@ namespace Beef.Demo.Test
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/serialNo" } } } }
                 }, 400);
 
-            await csu.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "items");
+            await _csu.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "items");
+        }
+
+        [OneTimeTearDown]
+        public async Task OneTimeTearDown()
+        {
+            if (_config.GetValue<bool>("RemoveAfterUse"))
+                await _csu.DeleteDatabase();
         }
 
         #region Get

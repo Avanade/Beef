@@ -12,7 +12,7 @@ namespace Beef.Diagnostics
         private static bool _overriddenGlobalLogger = false;
         private static Logger _globalLogger = new Logger();
 
-        private Action<LoggerArgs> _binder;
+        private readonly Action<LoggerArgs> _binder;
 
         /// <summary>
         /// Gets or sets the enabled <see cref="LogMessageType"/> values (defaults to <see cref="LogMessageType.Default"/>) that apply to all logger instances.
