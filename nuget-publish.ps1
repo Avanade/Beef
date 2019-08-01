@@ -9,8 +9,7 @@ Write-Host "Enter API Key to continue:"
 $apiKey = Read-Host
 Write-Host ""
 
-if ($apiKey.Length -gt 0)
-{
+if ($apiKey.Length -gt 0) {
     # Create publish folder if it doesn't exist; otherwise, delete existing.
 	if (!(Test-Path -Path $publishFolder)) {
 		Write-Host "Publish folder doesn't exist - creating folder." -ForegroundColor Yellow 
@@ -47,7 +46,7 @@ if ($apiKey.Length -gt 0)
     # Publish packages to NuGet repository.
     Get-ChildItem -Path $publishFolder -Filter *.nupkg | ForEach-Object {
         $package = -join($publishFolder, "\", $_.Name)
-        $pushCommand = -join("nuget push -Source ", $nugetServer, " -ApiKey ", $apiKey, " ", $package)
+        $pushCommand = -join("dotnet nuget push --source ", $nugetServer, " --api-key ", $apiKey, " ", $package)
 
         Write-Host ""
         Write-Host $pushCommand -ForegroundColor Yellow
@@ -55,7 +54,6 @@ if ($apiKey.Length -gt 0)
         Invoke-Expression $pushCommand
     }
 }
-else
-{
+else {
     Write-Host "Operation aborted." -ForegroundColor Red
 }
