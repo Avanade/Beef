@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Beef (https://github.com/avanade/beef)",
+  "classifications": [ "Beef", "Common", "Library", "Web", "WebAPI", "Console", "Test", "NUnit", "Solution" ],
+  "identity": "Beef.Solution",
+  "groupIdentity": "Beef",
+  "name": "Beef (Business Entity Execution Framework) solution",
+  "shortName": "beef",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Company.AppName",
+  "preferNameDirectory": true,
+  "symbols": {
+    "company": {
+      "type": "parameter",
+      "replaces": "Company",
+      "fileRename": "Company",
+      "isRequired": true,
+      "description": "The company name 'Company' used to define the namespace etc; e.g. 'Company.AppName'."
+    },
+    "appname": {
+      "type": "parameter",
+      "replaces": "AppName",
+      "fileRename": "AppName",
+      "isRequired": true,
+      "description": "The application (domain) name 'AppName' used to define the namespace etc; e.g. 'Company.AppName'."
+    }
+  }
+}

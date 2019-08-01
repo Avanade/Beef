@@ -332,7 +332,7 @@
           <xs:documentation>The schema name to identify the reference data tables.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="ConnectionString" type="xs:string" use="required">
+      <xs:attribute name="ConnectionString" type="xs:string" use="optional">
         <xs:annotation>
           <xs:documentation>The connection string used to connect to the database to query the underlying table definitions.</xs:documentation>
         </xs:annotation>

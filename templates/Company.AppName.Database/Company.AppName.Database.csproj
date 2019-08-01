@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Beef.Database.Core" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\**\*" />
+    <EmbeddedResource Include="Migrations\**\*" />
+    <EmbeddedResource Include="Data\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Migrations\20190101-000000-create-ref-schema.sql" />
+    <None Remove="Migrations\20190101-000001-create-AppName-schema.sql" />
+    <None Remove="Migrations\20190101-000002-create-ref-gender.sql" />
+    <None Remove="Migrations\20190101-000003-create-AppName-Person.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Schema\" />
+    <Folder Include="Data\" />
+  </ItemGroup>
+
+</Project>

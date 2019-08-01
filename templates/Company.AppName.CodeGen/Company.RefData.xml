@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" MapperDefaultRefDataConverter="ReferenceDataCodeConverter">
+  <!-- The following is an example read-only reference data Entity accessing a SQL Database. -->
+  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="Database" DatabaseSchema="Ref" />
+</CodeGeneration>

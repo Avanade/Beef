@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" RefDatabaseSchema="Ref">
+  <!-- Reference data stored procedures -->
+  <Table Name="Gender" Schema="Ref" GetAll="true" />
+
+  <!-- Master data stored procedures. -->
+  <Table Name="Person" Schema="AppName" Get="true" Create="true" Update="true" Delete="true" />
+</CodeGeneration>
