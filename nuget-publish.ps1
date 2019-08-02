@@ -1,13 +1,16 @@
 $nugetServer = "https://api.nuget.org/v3/index.json"
 $publishFolder = "nuget-publish"
+$apiKey = $args[0]
 
-Write-Host "WARNING!" -ForegroundColor Yellow -BackgroundColor Red
-Write-Host "All existing NuGet packages in publish folder will be deleted."
-Write-Host ""
-Write-Host "Enter API Key to continue:"
+if ($apiKey.Length -eq 0) {
+	Write-Host "WARNING!" -ForegroundColor Yellow -BackgroundColor Red
+	Write-Host "All existing NuGet packages in publish folder will be deleted."
+	Write-Host ""
+	Write-Host "Enter API Key to continue:"
 
-$apiKey = Read-Host
-Write-Host ""
+	$apiKey = Read-Host
+	Write-Host ""
+}
 
 if ($apiKey.Length -gt 0) {
     # Create publish folder if it doesn't exist; otherwise, delete existing.
@@ -31,7 +34,8 @@ if ($apiKey.Length -gt 0) {
 	    "src\Beef.Data.Cosmos",
 	    "tools\Beef.CodeGen.Core",
         "tools\Beef.Database.Core",
-        "tools\Beef.Test.NUnit")
+        "tools\Beef.Test.NUnit",
+		"templates\Beef.Template.Solution")
 
     # Generate NuGet packages using dotnet pack.
     foreach ($project in $projectsToPublish) {

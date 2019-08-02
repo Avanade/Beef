@@ -108,6 +108,7 @@ Assembly | Description | NuGet | Changes
 [`Beef.CodeGen.Core`](./tools/Beef.CodeGen.Core) | Code generation console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.CodeGen.Core.svg)](https://badge.fury.io/nu/Beef.CodeGen.Core) | [Log](./tools/Beef.CodeGen.Core/CHANGELOG.md)
 [`Beef.Database.Core`](./tools/Beef.Database.Core) | Database and data management console tool. | [![NuGet version](https://badge.fury.io/nu/Beef.Database.Core.svg)](https://badge.fury.io/nu/Beef.Database.Core) | [Log](./tools/Beef.Database.Core/CHANGELOG.md)
 [`Beef.Test.NUnit`](./tools/Beef.Test.NUnit) | Unit and intra-domain integration testing framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Test.NUnit.svg)](https://badge.fury.io/nu/Beef.Test.NUnit) | [Log](./tools/Beef.Test.NUnit/CHANGELOG.md)
+[`Beef.Template.Solution`](./templates/Beef.Template.Solution) | Solution and projects template. | [![NuGet version](https://badge.fury.io/nu/Beef.Template.Solution.svg)](https://badge.fury.io/nu/Beef.Template.Solution) | [Log](./templates/Beef.Template.Solution/CHANGELOG.md)
 
 The following samples are provided to guide usage:
 
@@ -122,6 +123,12 @@ Sample | Description
 _Beef_ is open source under the [MIT license](./LICENSE) and is free for commercial use.
 
 <br>
+
+## Getting started
+
+To start using _Beef_ you do not need to clone; you just need to create a solution and the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md) and referencing the appropriate NuGet packages. To accelerate this a .NET Core [template capbility](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
+
+<br/>
 
 ## Contributing
 One of the easiest ways to contribute is to participate in discussions on GitHub issues. You can also contribute by submitting pull requests (PR) with code changes.

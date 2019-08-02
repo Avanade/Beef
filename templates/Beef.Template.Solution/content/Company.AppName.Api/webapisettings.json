@@ -1,0 +1,36 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "Database": "Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True"
+  },
+  "BeefIncludeExceptionInInternalServerError": true,
+  "BeefDefaultPageSize": 25,
+  "BeefCaching": {
+    "Policies": [
+      {
+        "Name": "30min sliding with 2hr max (default)",
+        "IsDefault": true,
+        "Policy": "Beef.Caching.Policy.SlidingCachePolicy, Beef.Core",
+        "Properties": [
+          {
+            "Name": "Duration",
+            "Value": "00:30:00"
+          },
+          {
+            "Name": "MaxDuration",
+            "Value": "02:00:00"
+          },
+          {
+            "Name": "RandomizerOffset",
+            "Value": "05:00:00"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+Demo:
+  - Person:
+    - { PersonId: 1, FirstName: Wendy, LastName: Jones, GenderCode: F, Birthday: 1985-03-18 }
+    - { PersonId: 2, FirstName: Brian, LastName: Smith, GenderCode: M, Birthday: 1994-11-07 }
+    - { PersonId: 3, FirstName: Rachael, LastName: Browne, GenderCode: F, Birthday: 1972-06-28 }
+    - { PersonId: 4, FirstName: Waylon, LastName: Smithers, GenderCode: M, Birthday: 1952-02-21 }

@@ -3,7 +3,7 @@
 The _Beef_ code-generation framework is somewhat opinionated around the naming of the .NET projects, their underlying .NET namespaces, and the names of the generated files themselves.
 
 There are two key attributes within the [code-generation](../tools/Beef.CodeGen.Core/README.md) that drive the naming:
-- **Company** - the company name.
+- **Company** - the company and product name.
 - **AppName** - the application / domain name.
 
 The project names and underlying namespaces must be named `Company.AppName.Yyy` where `Yyy` is the name of the layer / component. Files within typically follow a specific convention where `Xxx` is the key entity (or equivalent) name.
@@ -37,7 +37,7 @@ The underlying solution project structure will be as follows:
   └── Company.AppName.Common      # Common / shared components
   └── Tools
     └── Company.AppName.CodeGen   # Entity and Reference Data code generation console
-    └── Company.AppName.Database  # Custom service agents (XxxServiceAgent.cs)
+    └── Company.AppName.Database  # Database and data management console
   └── Testing
     └── Company.AppName.Test      # Unit and intra-integration tests
 ```
