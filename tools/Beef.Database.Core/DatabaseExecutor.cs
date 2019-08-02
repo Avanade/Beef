@@ -464,7 +464,7 @@ namespace Beef.Database.Core
             var fi = string.IsNullOrEmpty(action)
                 ? new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{DateTime.Now.ToString("yyyyMMdd-HHmmss")}-comment-text.sql"))
                 : new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, 
-                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss")}-{action.ToLowerInvariant()}-{(_codeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema.ToLowerInvariant() : "schema")}-{(_codeGenArgs.Parameters.TryGetValue("Table", out var table) ? table.ToLowerInvariant() : "table")}.sql"));
+                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss")}-{action.ToLowerInvariant()}-{(_codeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema : "schema")}-{(_codeGenArgs.Parameters.TryGetValue("Table", out var table) ? table : "table")}.sql"));
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
@@ -483,11 +483,6 @@ namespace Beef.Database.Core
 
             Logger.Default.Info($"Script file created: {fi.FullName}");
             return true;
-        }
-
-        private void Cg_CodeGenerated(object sender, CodeGeneratorEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

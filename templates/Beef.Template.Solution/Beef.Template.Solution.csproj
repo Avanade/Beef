@@ -10,9 +10,11 @@
     <Description>Business Entity Execution Framework (Beef) template solution for use with 'dotnet new'.</Description>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/Avanade/Beef/blob/master/docs/images/Logo64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>beef dotnet template solution</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
