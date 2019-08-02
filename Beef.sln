@@ -59,7 +59,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beef.Demo.Test", "samples\D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{72030FB2-0855-48FD-B903-FEB6B47B3372}"
 	ProjectSection(SolutionItems) = preProject
-		templates\Beef.Solution\beef-solution-template.nuspec = templates\Beef.Solution\beef-solution-template.nuspec
 		nuget-publish.ps1 = nuget-publish.ps1
 	EndProjectSection
 EndProject

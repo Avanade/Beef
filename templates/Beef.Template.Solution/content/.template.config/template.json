@@ -10,7 +10,7 @@
     "language": "C#",
     "type": "project"
   },
-  "sourceName": "Company.AppName",
+  "sourceName": "XCompanyX.XAppNameX", // Not acutally used; template uses the below parameters exclusively.
   "preferNameDirectory": true,
   "symbols": {
     "company": {

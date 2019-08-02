@@ -168,6 +168,5 @@ To run the console application, simply specify the required command; e.g:
 dotnet run dropandall
 dotnet run all
 dotnet run database -cs "Data Source=.;Initial atalog=Beef.Test;Integrated Security=True"
-
 dotnet run scriptnew -create Ref.Eyecolor
 ```
