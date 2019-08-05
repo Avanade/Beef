@@ -275,20 +275,6 @@ namespace Beef.Data.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Gets the keys from the EF model.
-        /// </summary>
-        private object[] GetKeys<T, TModel>(EfDbArgs<T, TModel> args, TModel value, Mapper.OperationTypes operationType) where T : class, new() where TModel : class, new()
-        {
-            var dkeys = new object[args.Mapper.UniqueKey.Length];
-            for (int i = 0; i < args.Mapper.UniqueKey.Length; i++)
-            {
-                dkeys[i] = args.Mapper.UniqueKey[i].GetDestValue(value, operationType);
-            }
-
-            return dkeys;
-        }
-
-        /// <summary>
         /// Manages the <see cref="DbContext"/> lifecycle.
         /// </summary>
         internal class EfDbContextManager : IDisposable

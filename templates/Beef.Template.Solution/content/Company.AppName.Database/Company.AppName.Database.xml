@@ -1,8 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" RefDatabaseSchema="Ref">
+  <!--#if (implement_database) -->
   <!-- Reference data stored procedures -->
   <Table Name="Gender" Schema="Ref" GetAll="true" />
 
   <!-- Master data stored procedures. -->
   <Table Name="Person" Schema="AppName" Get="true" Create="true" Update="true" Delete="true" />
+  <!--#endif -->
+  <!--#if (implement_entityframework) -->
+  <!-- Reference data tables/models. -->
+  <Table Name="Gender" Schema="Ref" EfModel="true" />
+
+  <!-- Master data tables/models. -->
+  <Table Name="Person" Schema="AppName" EfModel="true" />
+  <!--#endif -->
 </CodeGeneration>

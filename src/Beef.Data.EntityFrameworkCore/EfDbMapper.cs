@@ -74,9 +74,25 @@ namespace Beef.Data.EntityFrameworkCore
         }
 
         /// <summary>
+        /// Adds (or gets) a <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.
+        /// </summary>
+        /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
+        /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
+        /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
+        /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
+        /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        public new EfDbMapper<T, TModel> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<T, TSrceProperty>> srcePropertyExpression, Expression<Func<TModel, TDestProperty>> destPropertyExpression, Action<PropertyMapper<T, TSrceProperty, TModel, TDestProperty>> property = null)
+        {
+            base.HasProperty(srcePropertyExpression, destPropertyExpression, property);
+            return this;
+        }
+
+        /// <summary>
         /// Adds the standard properties for <see cref="IETag"/> and <see cref="IChangeLog"/>.
         /// </summary>
-        public void AddStandardProperties()
+        /// <returns>The <see cref="EfDbMapper{T, TModel}"/>.</returns>
+        public EfDbMapper<T, TModel> AddStandardProperties()
         {
             if (typeof(IETag).IsAssignableFrom(typeof(T)) && GetBySrcePropertyName(nameof(IETag.ETag)) == null)
             {
@@ -108,6 +124,8 @@ namespace Beef.Data.EntityFrameworkCore
 
                 pmap.SetMapper(new ChangeLogMapper<TModel>());
             }
+
+            return this;
         }
     }
 

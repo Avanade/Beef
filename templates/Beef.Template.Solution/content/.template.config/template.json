@@ -18,6 +18,7 @@
       "replaces": "Company",
       "fileRename": "Company",
       "isRequired": true,
+      "datatype": "text",
       "description": "The company name 'Company' used to define the namespace etc; e.g. 'Company.AppName'."
     },
     "appname": {
@@ -25,7 +26,70 @@
       "replaces": "AppName",
       "fileRename": "AppName",
       "isRequired": true,
+      "datatype": "text",
       "description": "The application (domain) name 'AppName' used to define the namespace etc; e.g. 'Company.AppName'."
+    },
+    "datasource": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "Cosmos",
+          "description": "Indicates that the data source is Cosmos DB."
+        },
+        {
+          "choice": "Database",
+          "description": "Indicates that the data source is a SQL Database accessed via Stored Procedures."
+        },
+        {
+          "choice": "EntityFramework",
+          "description": "Indicates that the data source is a SQL Database accessed via Entity Framework Core."
+        },
+        {
+          "choice": "None",
+          "description": "Indicates that no data source is to be implemented."
+        }
+      ],
+      "defaultValue": "Database",
+      "description": "The data source implementation option."
+    },
+    "implement_cosmos": {
+      "type": "computed",
+      "value": "(datasource == \"Cosmos\")"
+    },
+    "implement_database": {
+      "type": "computed",
+      "value": "(datasource == \"Database\")"
+    },
+    "implement_entityframework": {
+      "type": "computed",
+      "value": "(datasource == \"EntityFramework\")"
+    },
+    "implement_none": {
+      "type": "computed",
+      "value": "(datasource == \"None\")"
     }
-  }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(implement_cosmos || implement_none)",
+          "exclude": [ "Company.AppName.Database/**/*" ]
+        },
+        {
+          "condition": "(!implement_entityframework)",
+          "exclude": [ "Company.AppName.Business/Data/EfDb.cs", "Company.AppName.Business/Data/EfDbContext.cs", "Company.AppName.Business/Data/EfModel/**/*" ]
+        },
+        {
+          "condition": "(!implement_cosmos)",
+          "exclude": [ "Company.AppName.Business/Data/Cosmos.cs" ]
+        },
+        {
+          "condition": "(!implement_database && !implement_entityframework)",
+          "exclude": [ "Company.AppName.Business/Data/Database.cs" ]
+        }
+      ]
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Beef.Demo.Business.Data.EfModel
+namespace Company.AppName.Business.Data.EfModel
 {
     /// <summary>
     /// Represents the Entity Framework <see cref="ModelBuilder"/>.
@@ -13,7 +13,7 @@ namespace Beef.Demo.Business.Data.EfModel
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
         public static void Configure(ModelBuilder modelBuilder)
         {
-            EyeColor.AddToModel(modelBuilder);
+            Gender.AddToModel(modelBuilder);
             Person.AddToModel(modelBuilder);
         }
     }

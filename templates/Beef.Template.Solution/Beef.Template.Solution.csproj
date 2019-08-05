@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <NoBuild>true</NoBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) template solution for use with 'dotnet new'.</Description>
@@ -18,10 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="content\**" />
-    <EmbeddedResource Remove="content\**" />
-    <ExcludeFromBuild Remove="content\**" />
-    <None Remove="content\**" />
+    <Compile Remove="content\**\*" />
+    <EmbeddedResource Remove="content\**\*" />
+    <None Include="content\**\*" />
     <Content Include="content\**">
       <Pack>true</Pack>
       <PackagePath>contentFiles\any\any\Schema\</PackagePath>

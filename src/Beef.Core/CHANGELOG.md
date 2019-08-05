@@ -2,14 +2,15 @@
 
 Represents the **NuGet** versions.
 
-## v2.1.8
+## v2.1.9
+- *Fixed:* `PropertyMapper<>` was not correctly identifying/selecting the property where being overridden.
 
+## v2.1.8
 - *Enhancement:* `IIdentifier` added to give base capabilites to `IIntIdentifier` and `IGuidIdentifer`. 
 - *New:* `IStringIdentifier` added to enable support for a `string`-based identifier.
 - *New:* Added `ExecutionContext.PartitionKey` support.
 
 ## v2.1.7
-
 - *Enhancement:* Support overridding of HttpClient creation through the WebApiServiceAgentManager - enables the likes of HttpClientFactory to be used where required.
 - *Enhancement:* Renamed WebApiInvoker to WebApiServiceAgentInvoker to make its intended purpose more explicit.
 

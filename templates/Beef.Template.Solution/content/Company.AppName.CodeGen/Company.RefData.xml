@@ -1,5 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" MapperDefaultRefDataConverter="ReferenceDataCodeConverter">
-  <!-- The following is an example read-only reference data Entity accessing a SQL Database. -->
+  <!--#if (implement_database) -->
+  <!-- The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="Database" DatabaseSchema="Ref" />
+  <!--#endif -->
+  <!--#if (implement_entityframework) -->
+  <!-- The following is an example read-only reference data Entity accessing a SQL Database using EntityFramework. -->
+  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="EntityFramework" DatabaseSchema="Ref" EntityFrameworkEntity="EfModel.Gender" />
+  <!--#endif -->
+  <!--#if (implement_cosmos) -->
+  <!-- The following is an example read-only reference data Entity accessing Cosmos DB. -->
+  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="Cosmos" CosmosContainerId="RefData" />
+  <!--#endif -->
 </CodeGeneration>

@@ -4,6 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Beef.Data.Database" Version="2.1.5" />
+    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="2.1.4" />
+    <PackageReference Include="Beef.Data.Cosmos" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Common\Company.AppName.Common.csproj" />

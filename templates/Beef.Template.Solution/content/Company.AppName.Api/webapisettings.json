@@ -5,9 +5,19 @@
     }
   },
   "AllowedHosts": "*",
+//#if (implement_database || implement_entityframework)
   "ConnectionStrings": {
     "Database": "Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True"
   },
+//#endif
+//#if (implement_cosmos)
+  // Set using environment variables: 'AppName_DocumentDb__EndPoint' and 'AppName_DocumentDb__AuthKey' (keeps values out of config file).
+  "CosmosDb": {
+    "EndPoint": "https://yourcosmosname.documents.azure.com:443/",
+    "AuthKey": "top-secret-auth-key-from-azure-get-your-own-and-put-here",
+    "Database": "Company.AppName"
+  },
+//#endif
   "BeefIncludeExceptionInInternalServerError": true,
   "BeefDefaultPageSize": 25,
   "BeefCaching": {

@@ -2,6 +2,7 @@
 using Beef.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -119,8 +120,8 @@ namespace Beef.Mapper
             SrcePropertyExpression = srcePropertyExpression;
             DestPropertyExpression = destPropertyExpression;
 
-            SrcePropertyInfo = typeof(TSrce).GetProperty(SrcePropertyName);
-            DestPropertyInfo = typeof(TDest).GetProperty(DestPropertyName);
+            SrcePropertyInfo = typeof(TSrce).GetProperties().First(x => x.Name == SrcePropertyName && x.PropertyType == typeof(TSrceProperty));
+            DestPropertyInfo = typeof(TDest).GetProperties().First(x => x.Name == DestPropertyName && x.PropertyType == typeof(TDestProperty));
 
             if (SrcePropertyInfo.PropertyType.IsClass && SrcePropertyInfo.PropertyType != typeof(string))
             {

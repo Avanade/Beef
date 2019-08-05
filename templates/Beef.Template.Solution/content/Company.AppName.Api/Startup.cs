@@ -42,9 +42,20 @@ namespace Company.AppName.Api
             // Register the ReferenceData provider.
             Beef.RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
 
+#if (implement_database || implement_entityframework)
             // Register the database.
             Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "Database")));
 
+#endif
+#if (implement_cosmos)
+            // Register the DocumentDb/CosmosDb client.
+            CosmosDb.Register(() =>
+            {
+                var cs = config.GetSection("CosmosDb");
+                return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+            });
+
+#endif
             // Default the page size.
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
         }
