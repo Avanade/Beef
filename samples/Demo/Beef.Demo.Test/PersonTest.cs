@@ -38,7 +38,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A120_Validation_Empty()
+        public void A110_Validation_Empty()
         {
             TestSetUp.CreateMock<IPersonData>();
             ExpectValidationException.Run(

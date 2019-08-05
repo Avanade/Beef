@@ -71,7 +71,7 @@ namespace Beef.AspNetCore.WebApi
             if (ex == null)
                 return null;
 
-            IActionResult result = null;
+            IActionResult result;
             var messages = IncludeExecutionContextMessagesForAnIBusinessException && ExecutionContext.HasCurrent ? ExecutionContext.Current.Messages : new MessageItemCollection();
 
             // Where it is known then update the response accordingly.

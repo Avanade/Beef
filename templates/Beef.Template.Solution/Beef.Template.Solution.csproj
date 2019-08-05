@@ -26,4 +26,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="content\Company.AppName.Business\Validation\PersonValidator.cs" />
+    <None Remove="content\Company.AppName.Test\PersonTest.cs" />
+  </ItemGroup>
+
 </Project>

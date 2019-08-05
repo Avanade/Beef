@@ -3,14 +3,21 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <!--#if (implement_database || implement_entityframework) -->
     <PackageReference Include="Beef.Data.Database" Version="2.1.5" />
+    <!--#endif -->
+    <!--#if (implement_entityframework) -->
     <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="2.1.4" />
+    <!--#endif -->
+    <!--#if (implement_cosmos) -->
     <PackageReference Include="Beef.Data.Cosmos" Version="2.1.1" />
+    <!--#endif -->
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Company.AppName.Common\Company.AppName.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Data\" />
     <Folder Include="DataSvc\" />
     <Folder Include="Validation\" />
   </ItemGroup>

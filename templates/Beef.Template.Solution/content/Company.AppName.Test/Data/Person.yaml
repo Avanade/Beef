@@ -1,4 +1,4 @@
-Demo:
+AppName:
   - Person:
     - { PersonId: 1, FirstName: Wendy, LastName: Jones, GenderCode: F, Birthday: 1985-03-18 }
     - { PersonId: 2, FirstName: Brian, LastName: Smith, GenderCode: M, Birthday: 1994-11-07 }
