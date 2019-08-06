@@ -7,8 +7,8 @@ namespace Beef.Entities
 {
     /// <summary>
     /// Represents either position-based paging being (<see cref="Page"/> and <see cref="Size"/>), or <see cref="Skip"/> and <see cref="Take"/>. The <see cref="DefaultTake"/> 
-    /// and <see cref="MaxTake"/> are system-wide settings to encourage page-size consistency, as well as limit the maximum value possible. Selection of <see cref="IncludeFields"/>
-    /// and <see cref="ExcludeFields"/> is also supported to limit the data payload where serializing.
+    /// and <see cref="MaxTake"/> (and <see cref="DefaultIsGetCount"/>) are system-wide settings to encourage page-size consistency, as well as limit the maximum value possible. 
+    /// Selection of <see cref="IncludeFields"/> and <see cref="ExcludeFields"/> is also supported to limit the data payload where serializing.
     /// </summary>
     public class PagingArgs
     {
@@ -44,19 +44,24 @@ namespace Beef.Entities
         }
 
         /// <summary>
+        /// Gets or sets the default <see cref="IsGetCount"/> (defaults to <c>false</c>).
+        /// </summary>
+        public static bool DefaultIsGetCount { get; set; }
+
+        /// <summary>
         /// Creates a <see cref="PagingArgs"/> for a specified page number and size.
         /// </summary>
         /// <param name="page">The <see cref="Page"/> number.</param>
         /// <param name="size">The page <see cref="Size"/> (defaults to <see cref="DefaultTake"/>).</param>
-        /// <param name="isGetCount">Indicates whether to get the total count (see <see cref="PagingResult.TotalCount"/>) when performing the underlying query (defaults to <c>false</c>).</param>
+        /// <param name="isGetCount">Indicates whether to get the total count (see <see cref="PagingResult.TotalCount"/>) when performing the underlying query (defaults to <see cref="DefaultIsGetCount"/> where <c>null</c>).</param>
         /// <returns>The <see cref="PagingArgs"/>.</returns>
-        public static PagingArgs CreatePageAndSize(long page, long? size = null, bool isGetCount = false)
+        public static PagingArgs CreatePageAndSize(long page, long? size = null, bool? isGetCount = null)
         {
             var pa = new PagingArgs
             {
                 Page = page < 0 ? 1 : page,
                 Take = !size.HasValue || size.Value < 1 ? DefaultTake : (size.Value > MaxTake ? MaxTake : size.Value),
-                IsGetCount = isGetCount
+                IsGetCount = isGetCount == null ? DefaultIsGetCount : isGetCount.Value
             };
 
             pa.Skip = (pa.Page.Value - 1) * pa.Size;
@@ -68,15 +73,15 @@ namespace Beef.Entities
         /// </summary>
         /// <param name="skip">The <see cref="Skip"/> value.</param>
         /// <param name="take">The <see cref="Take"/> value (defaults to <see cref="DefaultTake"/>).</param>
-        /// <param name="isGetCount">Indicates whether to get the total count (see <see cref="PagingResult.TotalCount"/>) when performing the underlying query (defaults to <c>false</c>).</param>
+        /// <param name="isGetCount">Indicates whether to get the total count (see <see cref="PagingResult.TotalCount"/>) when performing the underlying query (defaults to <see cref="DefaultIsGetCount"/> where <c>null</c>).</param>
         /// <returns>The <see cref="PagingArgs"/>.</returns>
-        public static PagingArgs CreateSkipAndTake(long skip, long? take = null, bool isGetCount = false)
+        public static PagingArgs CreateSkipAndTake(long skip, long? take = null, bool? isGetCount = null)
         {
             return new PagingArgs
             {
                 Skip = skip < 0 ? 0 : skip,
                 Take = !take.HasValue || take.Value < 1 ? DefaultTake : (take.Value > MaxTake ? MaxTake : take.Value),
-                IsGetCount = isGetCount
+                IsGetCount = isGetCount == null ? DefaultIsGetCount : isGetCount.Value
             };
         }
 
@@ -87,6 +92,7 @@ namespace Beef.Entities
         {
             Skip = 0;
             Take = DefaultTake;
+            IsGetCount = DefaultIsGetCount;
         }
 
         /// <summary>
@@ -107,12 +113,12 @@ namespace Beef.Entities
         }
         
         /// <summary>
-        /// Gets page number for the elements in a sequence to select (see <see cref="CreatePageAndSize(long, long?, bool)"/>).
+        /// Gets page number for the elements in a sequence to select (see <see cref="CreatePageAndSize(long, long?, bool?)"/>).
         /// </summary>
         public long? Page { get; internal protected set; }
 
         /// <summary>
-        /// Indicates whether the paging was created with a <see cref="Skip"/> and <see cref="Take"/> (see <see cref="CreateSkipAndTake(long, long?, bool)"/>); versus <see cref="Page"/> and <see cref="Size"/> (see <see cref="CreatePageAndSize(long, long?, bool)"/>).
+        /// Indicates whether the paging was created with a <see cref="Skip"/> and <see cref="Take"/> (see <see cref="CreateSkipAndTake(long, long?, bool?)"/>); versus <see cref="Page"/> and <see cref="Size"/> (see <see cref="CreatePageAndSize(long, long?, bool?)"/>).
         /// </summary>
         public bool IsSkipTake => Page == null;
 

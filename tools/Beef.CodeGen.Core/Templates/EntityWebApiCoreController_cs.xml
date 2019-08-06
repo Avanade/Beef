@@ -682,7 +682,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             <Else><![CDATA[() => Factory.Create<I{{Entity.Name}}Manager>().{{Operation.Name}}Async(]]></Else>
           </If>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-            <![CDATA[value]]>
+            <![CDATA[WebApiActionBase.Value(value)]]>
           </If>
           <If Condition="Operation.OperationType == 'Patch'">
             <![CDATA[__value]]>

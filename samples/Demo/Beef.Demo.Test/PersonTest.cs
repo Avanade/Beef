@@ -532,6 +532,12 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => a.Agent.GetAsync(1.ToGuid())).Value;
 
+            // Try with an invalid If-Match value.
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .ExpectErrorType(ErrorType.ConcurrencyError)
+                .Run((a) => a.Agent.UpdateAsync(p, 1.ToGuid(), new WebApiRequestOptions { ETag = AgentTester.ConcurrencyErrorETag }));
+
             // Try updating the person with an invalid eTag.
             p.ETag = AgentTester.ConcurrencyErrorETag;
 

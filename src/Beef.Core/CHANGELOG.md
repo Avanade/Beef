@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.10
+- *Enhancement:* `PagingArgs.DefaultIsGetCount` added to enable default to be set globally.
+
 ## v2.1.9
 - *Fixed:* `PropertyMapper<>` was not correctly identifying/selecting the property where being overridden.
 

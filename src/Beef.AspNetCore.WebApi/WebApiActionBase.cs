@@ -26,7 +26,12 @@ namespace Beef.AspNetCore.WebApi
     /// </summary>
     public abstract class WebApiActionBase : IActionResult
     {
-        private const string AsciiArtRobot = "d[ o_0 ]b ";
+        private const string AsciiArtRobot = " d[ o_0 ]b ";
+
+        /// <summary>
+        /// Gets the <see cref="ExecutionContext.Properties"/> key for storing <c>this</c> request within the <see cref="ExecutionContext"/>.
+        /// </summary>
+        public const string ExecutionContextPropertyKey = "Beef.AspNetCore.WebApi.WebApiActionBase";
 
         /// <summary>
         /// Indicates whether the <see cref="ExecutionContext"/> <see cref="ExecutionContext.Messages"/> headers should be included for an <see cref="IBusinessException"/>
@@ -108,6 +113,25 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
+        /// Checks the value and applies any updates based on the HTTP request context.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns>The value.</returns>
+        public static T Value<T>(T value)
+        {
+            // Get the WebApiActionBase instance from the ExecutionContext.
+            if (value != default && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ExecutionContextPropertyKey, out var val) && val is WebApiActionBase api)
+            {
+                // Where the value implements IETag and If-Match is specified, then this should be used as the preference.
+                if (api.IfMatchETags != null && api.IfMatchETags.Count > 0 && value is IETag etag && etag != null)
+                    etag.ETag = api.IfMatchETags[0];
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="WebApiActionBase"/> class.
         /// </summary>
         /// <param name="controller">The initiating <see cref="ControllerBase"/>.</param>
@@ -157,6 +181,9 @@ namespace Beef.AspNetCore.WebApi
                 if (l.Count > 0)
                     IfMatchETags = l;
             }
+
+            // Add to the ExecutionContext in case we need access to the originating request as any stage.
+            ExecutionContext.Current.Properties.Add(ExecutionContextPropertyKey, this);
         }
 
         /// <summary>
@@ -376,7 +403,8 @@ namespace Beef.AspNetCore.WebApi
                 {
                     if (item is IETag cetag && cetag.ETag != null)
                     {
-                        sb.Append($"{cetag.ETag} {AsciiArtRobot} "); // Ascii art robot
+                        sb.Append(cetag.ETag);
+                        sb.Append(AsciiArtRobot); // Ascii art robot
                         continue;
                     }
 
@@ -388,10 +416,12 @@ namespace Beef.AspNetCore.WebApi
                     sb = null;
             }
 
-            var md5 = System.Security.Cryptography.MD5.Create();
-            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())} {AsciiArtRobot} {context.HttpContext.Request.QueryString.Value}");
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
-            return (json, Convert.ToBase64String(hash));
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context.HttpContext.Request.QueryString.Value}");
+                var hash = md5.ComputeHash(buf, 0, buf.Length);
+                return (json, Convert.ToBase64String(hash));
+            }
         }
 
         /// <summary>
@@ -978,7 +1008,7 @@ namespace Beef.AspNetCore.WebApi
         {
             if (context.HttpContext.Request.ContentType.Equals("application/json-patch+json", StringComparison.InvariantCultureIgnoreCase))
             {
-                JsonPatchDocument<T> patch = null;
+                JsonPatchDocument<T> patch;
                 try
                 {
                     patch = _value.ToObject<JsonPatchDocument<T>>();

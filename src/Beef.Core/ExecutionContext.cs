@@ -19,7 +19,7 @@ namespace Beef
     {
         private static readonly object _masterLock = new object();
         private static Func<ExecutionContext> _create = () => new ExecutionContext();
-        private static AsyncLocal<ExecutionContext> _asyncLocal = new AsyncLocal<ExecutionContext>();
+        private static readonly AsyncLocal<ExecutionContext> _asyncLocal = new AsyncLocal<ExecutionContext>();
         private static Func<ExecutionContext> _get = () => _asyncLocal.Value;
         private static Action<ExecutionContext> _set = (ec) => _asyncLocal.Value = ec;
         private string _username;
@@ -291,7 +291,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the entity tag (where value does not support <see cref="IETag"/>).
+        /// Gets or sets the <b>result</b> entity tag (where value does not support <see cref="IETag"/>).
         /// </summary>
         public string ETag { get; set; }
 

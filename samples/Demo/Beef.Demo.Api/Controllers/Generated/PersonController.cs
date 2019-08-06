@@ -33,7 +33,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Person value)
         {
-            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateAsync(value),
+            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -76,7 +76,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Person value, Guid id)
         {
-            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateAsync(value, id),
+            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -212,7 +212,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult UpdateDetail([FromBody] PersonDetail value, Guid id)
         {
-            return new WebApiPut<PersonDetail>(this, () => Factory.Create<IPersonManager>().UpdateDetailAsync(value, id),
+            return new WebApiPut<PersonDetail>(this, () => Factory.Create<IPersonManager>().UpdateDetailAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -287,7 +287,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult CreateWithEf([FromBody] Person value)
         {
-            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateWithEfAsync(value),
+            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateWithEfAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -302,7 +302,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult UpdateWithEf([FromBody] Person value, Guid id)
         {
-            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateWithEfAsync(value, id),
+            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateWithEfAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 

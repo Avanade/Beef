@@ -48,7 +48,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Robot value)
         {
-            return new WebApiPost<Robot>(this, () => Factory.Create<IRobotManager>().CreateAsync(value),
+            return new WebApiPost<Robot>(this, () => Factory.Create<IRobotManager>().CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -63,7 +63,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Robot value, Guid id)
         {
-            return new WebApiPut<Robot>(this, () => Factory.Create<IRobotManager>().UpdateAsync(value, id),
+            return new WebApiPut<Robot>(this, () => Factory.Create<IRobotManager>().UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 

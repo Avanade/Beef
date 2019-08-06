@@ -67,7 +67,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(CustomerGroup), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] CustomerGroup value, string company)
         {
-            return new WebApiPost<CustomerGroup>(this, () => Factory.Create<ICustomerGroupManager>().CreateAsync(value, company),
+            return new WebApiPost<CustomerGroup>(this, () => Factory.Create<ICustomerGroupManager>().CreateAsync(WebApiActionBase.Value(value), company),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -83,7 +83,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(CustomerGroup), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] CustomerGroup value, string id, string company)
         {
-            return new WebApiPut<CustomerGroup>(this, () => Factory.Create<ICustomerGroupManager>().UpdateAsync(value, id, company),
+            return new WebApiPut<CustomerGroup>(this, () => Factory.Create<ICustomerGroupManager>().UpdateAsync(WebApiActionBase.Value(value), id, company),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
