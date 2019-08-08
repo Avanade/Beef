@@ -100,6 +100,53 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
+        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <param name="messages">The expected <see cref="MessageType.Error">error</see> message texts.</param>
+        /// <returns>The corresponding <see cref="Task"/>.</returns>
+        public static Task RunAsync(Func<Task> func, params string[] messages)
+        {
+            var mic = new MessageItemCollection();
+            foreach (var text in messages)
+            {
+                mic.AddError(text);
+            }
+
+            return RunAsync(func, mic);
+        }
+
+        /// <summary>
+        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
+        /// <returns>The corresponding <see cref="Task"/>.</returns>
+        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
+        public static async Task RunAsync(Func<Task> func, MessageItemCollection messages)
+        {
+            Check.NotNull(func, nameof(func));
+            Check.NotNull(messages, nameof(messages));
+
+            try
+            {
+                await func();
+                Assert.Fail("A ValidationException is expected.");
+            }
+            catch (AggregateException aex)
+            {
+                if (aex.InnerException is ValidationException vex)
+                    CompareExpectedVsActual(messages, vex.Messages);
+                else
+                    throw;
+            }
+            catch (ValidationException vex)
+            {
+                CompareExpectedVsActual(messages, vex);
+            }
+        }
+
+        /// <summary>
         /// Compares the expected vs. actual messages and reports the differences.
         /// </summary>
         /// <param name="expectedMessages">The expected messages.</param>

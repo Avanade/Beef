@@ -126,7 +126,7 @@ _Beef_ is open source under the [MIT license](./LICENSE) and is free for commerc
 
 ## Getting started
 
-To start using _Beef_ you do not need to clone; you just need to create a solution and the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md) and referencing the appropriate NuGet packages. To accelerate this a .NET Core [template capbility](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
+To start using _Beef_ you do not need to clone; you just need to create a solution with the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md), including referencing the appropriate NuGet packages. To accelerate this a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
 
 <br/>
 

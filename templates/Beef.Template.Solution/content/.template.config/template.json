@@ -83,7 +83,7 @@
         },
         {
           "condition": "(!implement_cosmos)",
-          "exclude": [ "Company.AppName.Business/Data/Cosmos.cs" ]
+          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs" ]
         },
         {
           "condition": "(!implement_database && !implement_entityframework)",

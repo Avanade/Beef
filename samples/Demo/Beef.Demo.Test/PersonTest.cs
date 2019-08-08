@@ -10,6 +10,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Beef.Demo.Test
 {
@@ -38,17 +39,17 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void A110_Validation_Empty()
+        public async Task A110_Validation_Empty()
         {
             TestSetUp.CreateMock<IPersonData>();
-            ExpectValidationException.Run(
+            await ExpectValidationException.RunAsync(
                 () => (new PersonManager()).CreateAsync(new Person()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.");
 
-            ExpectValidationException.Run(
+            await ExpectValidationException.RunAsync(
                 () => (new PersonManager()).UpdateAsync(new Person(), 1.ToGuid()),
                 "First Name is required.",
                 "Last Name is required.",
@@ -61,7 +62,7 @@ namespace Beef.Demo.Test
         {
             TestSetUp.CreateMock<IPersonData>();
             ExpectValidationException.Run(
-                () => (new PersonManager()).CreateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
+                () => (new PersonManager()).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
                 "Last Name must not exceed 50 characters in length.",
                 "Gender is invalid.",
@@ -81,7 +82,7 @@ namespace Beef.Demo.Test
                     "Gender is invalid.",
                     "Eye Color is invalid.",
                     "Birthday must be less than or equal to Today.")
-                .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = TestSetUp.Text(), LastName = TestSetUp.Text(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
+                .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
         }
 
         [Test, TestSetUp]

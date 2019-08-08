@@ -358,7 +358,7 @@ namespace Beef
         public bool CacheRemove<T>(UniqueKey key)
         {
             if (_caching.IsValueCreated)
-                return _caching.Value.TryRemove(new Tuple<Type, UniqueKey>(typeof(T), key), out object val);
+                return _caching.Value.TryRemove(new Tuple<Type, UniqueKey>(typeof(T), key), out object _);
             else
                 return false;
         }

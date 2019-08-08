@@ -1,4 +1,5 @@
-﻿using Beef.Test.NUnit;
+﻿using Beef;
+using Beef.Test.NUnit;
 using Beef.WebApi;
 using Company.AppName.Business.Validation;
 using Company.AppName.Common.Agents;
@@ -28,6 +29,17 @@ namespace Company.AppName.Test
                 "Birthday is required.");
         }
 
+        [Test, TestSetUp]
+        public void A120_Validation_Invalid()
+        {
+            ExpectValidationException.Run(
+                () => PersonValidator.Default.Validate(new Person { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Gender = "X", Birthday = DateTime.Now.AddDays(1) }).ThrowOnError(),
+                "First Name must not exceed 100 characters in length.",
+                "Last Name must not exceed 100 characters in length.",
+                "Gender is invalid.",
+                "Birthday must be less than or equal to Today.");
+        }
+
         #endregion
 
         #region Get
@@ -48,7 +60,7 @@ namespace Company.AppName.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new PersonTest
+                .ExpectValue((t) => new Person
                 {
                     Id = 1.ToGuid(),
                     FirstName = "Wendy",
@@ -116,7 +128,7 @@ namespace Company.AppName.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => a.Agent.GetAsync(2.ToGuid())).Value;
 
-            // Update with an invalid identifier.
+            // Try updating with an invalid identifier.
             AgentTester.Create<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(ErrorType.NotFoundError)
@@ -153,10 +165,11 @@ namespace Company.AppName.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => a.Agent.GetAsync(2.ToGuid())).Value;
 
-            // Update the value with an address.
-            v.FirstName = v.FirstName + "X";
-            v.LastName = v.LastName + "Y";
+            // Make some changes to the data.
+            v.FirstName += "X";
+            v.LastName += "Y";
 
+            // Update the value.
             v = AgentTester.Create<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
@@ -195,7 +208,7 @@ namespace Company.AppName.Test
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run((a) => a.Agent.GetAsync(4.ToGuid()));
 
-            // Delete again. 
+            // Delete again (should still be successful). 
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run((a) => a.Agent.DeleteAsync(4.ToGuid()));

@@ -37,10 +37,16 @@ dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/ind
 
 ## Create Solution
 
-To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname` attributes as discussed above; it is important that these are entered in your desired casing as they will be used as-is. The `dotnet new` command is used to create:
+To create the _Solution_ you must first be in the directory that you intend to create the artefacts within. The _beef_ template requires the `company` and `appname` attributes as discussed above; it is important that these are entered in your desired casing as they will be used as-is. 
+
+Additionally, there is a futher optional `datasource` attribute to drive the desired output. This parameter supports the following values: `Database` (default), `EntityFramework`, `Cosmos` and `None`.
+
+The `dotnet new` command is used to create, e.g.:
 
 ```
 dotnet new beef --company My.Company --appname Sales
+
+dotnet new beef --company My.Company --appname Sales --datasource Cosmos
 ```
 
  The following will be created:

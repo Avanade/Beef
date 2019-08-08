@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Beef.AspNetCore.WebApi" Version="2.1.4" />
+    <PackageReference Include="Beef.AspNetCore.WebApi" Version="2.1.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>

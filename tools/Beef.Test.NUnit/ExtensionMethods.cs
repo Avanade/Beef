@@ -14,10 +14,21 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="value">The <see cref="int"/> value.</param>
         /// <returns>The corresponding <see cref="Guid"/>.</returns>
-        /// <remarks>Sets the first argument with the <paramref name="value"/> and the remainder with zeroes using <see cref="Guid(int, short, short, byte[])"/></remarks>
+        /// <remarks>Sets the first argument with the <paramref name="value"/> and the remainder with zeroes using <see cref="Guid(int, short, short, byte[])"/>.</remarks>
         public static Guid ToGuid(this int value)
         {
             return new Guid(value, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+
+        /// <summary>
+        /// Creates a long string by repeating the character for the specified count (defaults to 250).
+        /// </summary>
+        /// <param name="value">The character value.</param>
+        /// <param name="count">The repeating count.</param>
+        /// <returns>The resulting string.</returns>
+        public static string ToLongString(this char value, int count = 250)
+        {
+            return new string(value, count);
         }
     }
 }

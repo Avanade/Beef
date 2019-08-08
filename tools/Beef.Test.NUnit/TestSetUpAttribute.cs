@@ -17,16 +17,32 @@ namespace Beef.Test.NUnit
     {
         private readonly string _username;
         private readonly bool _needsSetUp;
+        private readonly object _args;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a named <paramref name="username"/>.
+        /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a <paramref name="username"/>.
         /// </summary>
-        /// <param name="username">The username (<c>null</c> indicates to use <see cref=" AgentTester.DefaultUsername"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="AgentTester.DefaultUsername"/>).</param>
+        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext"/> function).</param>
         /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
-        public TestSetUpAttribute(string username = null, bool needsSetUp = true) : base(username ?? AgentTester.DefaultUsername)
+        public TestSetUpAttribute(string username = null, object args = null, bool needsSetUp = true) : base(username ?? AgentTester.DefaultUsername)
         {
             _username = username ?? AgentTester.DefaultUsername;
             _needsSetUp = needsSetUp;
+            _args = args;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a <paramref name="userIdentifier"/>.
+        /// </summary>
+        /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext"/> function).</param>
+        /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
+        public TestSetUpAttribute(object userIdentifier, object args = null, bool needsSetUp = true) : base(AgentTester.UsernameConverter(userIdentifier) ?? AgentTester.DefaultUsername)
+        {
+            _username = AgentTester.UsernameConverter(userIdentifier) ?? AgentTester.DefaultUsername;
+            _needsSetUp = needsSetUp;
+            _args = args;
         }
 
         /// <summary>
@@ -37,7 +53,7 @@ namespace Beef.Test.NUnit
         public TestCommand Wrap(TestCommand command)
         {
             TestSetUp.ShouldContinueRunningTestsAssert();
-            return new TestSetUpAttribute.ExecutionContextCommand(command, _username, _needsSetUp);
+            return new ExecutionContextCommand(command, _username, _needsSetUp, _args);
         }
 
         /// <summary>
@@ -46,20 +62,9 @@ namespace Beef.Test.NUnit
         [DebuggerStepThrough()]
         public class ExecutionContextCommand : DelegatingTestCommand
         {
-            private static Action<ExecutionContext, object> _onBeforeAction;
-
             private readonly string _username;
             private readonly bool _needsSetUp;
-            private readonly object _data;
-
-            /// <summary>
-            /// Register an <i>on before</i> <see cref="Execute(TestExecutionContext)"/> action to perform any confguration etc. before executing.
-            /// </summary>
-            /// <param name="onBeforeAction">The action that accepts the <see cref="ExecutionContext"/> and optional <b>data</b> passed through the constructor.</param>
-            public void RegisterOnBefore(Action<ExecutionContext, object> onBeforeAction)
-            {
-                _onBeforeAction = onBeforeAction;
-            }
+            private readonly object _args;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ExecutionContextCommand"/> class.
@@ -67,12 +72,12 @@ namespace Beef.Test.NUnit
             /// <param name="innerCommand">The inner <see cref="TestCommand"/>.</param>
             /// <param name="username">The username.</param>
             /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked.</param>
-            /// <param name="data">Optional data.</param>
-            public ExecutionContextCommand(TestCommand innerCommand, string username = null, bool needsSetUp = true, object data = null) : base(innerCommand)
+            /// <param name="args">Optional args.</param>
+            public ExecutionContextCommand(TestCommand innerCommand, string username = null, bool needsSetUp = true, object args = null) : base(innerCommand)
             {
                 _username = username;
                 _needsSetUp = needsSetUp;
-                _data = data;
+                _args = args;
             }
 
             /// <summary>
@@ -87,11 +92,9 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    ExecutionContext.Reset(true);
-                    ExecutionContext.Current.Username = _username;
+                    ExecutionContext.Reset(false);
+                    ExecutionContext.SetCurrent(AgentTester.CreateExecutionContext(_username, _args));
                     ExecutionContext.Current.Properties["InvokeRegisteredSetUp"] = _needsSetUp;
-
-                    _onBeforeAction?.Invoke(ExecutionContext.Current, _data);
 
                     context.CurrentResult = this.innerCommand.Execute(context);
                 }

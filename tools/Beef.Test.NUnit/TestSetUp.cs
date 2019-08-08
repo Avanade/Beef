@@ -28,16 +28,6 @@ namespace Beef.Test.NUnit
             Reset();
         }
 
-        /// <summary>
-        /// Creates a string of 'X' for the specified length (defaults to 2048).
-        /// </summary>
-        /// <param name="length">The string length.</param>
-        /// <returns>The string of 'X's.</returns>
-        public static string Text(int length = 2048)
-        {
-            return new string('X', length < 1 ? 2048 : length);
-        }
-
         #region Logging
 
         /// <summary>

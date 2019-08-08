@@ -213,11 +213,11 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
-        public static AgentTester<TAgent> Create<TAgent>(string username = null) where TAgent : class
+        public static AgentTester<TAgent> Create<TAgent>(string username = null, object args = null) where TAgent : class
         {
-            TestSetUp.InvokeRegisteredSetUp();
-            return new AgentTester<TAgent>(username);
+            return new AgentTester<TAgent>(username, args);
         }
 
         /// <summary>
@@ -226,34 +226,80 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
-        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string username = null) where TAgent : class
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string username = null, object args = null) where TAgent : class
         {
-            TestSetUp.InvokeRegisteredSetUp();
-            return new AgentTester<TAgent, TValue>(username);
+            return new AgentTester<TAgent, TValue>(username, args);
         }
+
+        /// <summary>
+        /// Create a new <see cref="AgentTester{TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="UsernameConverter"/>).
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
+        public static AgentTester<TAgent> Create<TAgent>(object userIdentifier, object args = null) where TAgent : class
+        {
+            return new AgentTester<TAgent>(UsernameConverter?.Invoke(userIdentifier), args);
+        }
+
+        /// <summary>
+        /// Create a new <see cref="AgentTester{TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="UsernameConverter"/>).
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
+        /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(object userIdentifier, object args = null) where TAgent : class
+        {
+            return new AgentTester<TAgent, TValue>(UsernameConverter?.Invoke(userIdentifier), args);
+        }
+
+        /// <summary>
+        /// Gets or sets the username converter function for when a non-string identifier is specified.
+        /// </summary>
+        /// <remarks>The <c>object</c> value is the user identifier.</remarks>
+        public static Func<object, string> UsernameConverter { get; set; } = (x) => x?.ToString();
+
+        /// <summary>
+        /// Gets or sets the function for creating the <see cref="ExecutionContext"/> where there is no current instance.
+        /// </summary>
+        /// <remarks>The <c>string</c> is the <see cref="Username"/> and the <c>object</c> is the optional <see cref="Args"/>.</remarks>
+        public static Func<string, object, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username };
 
         #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTester"/> class using the specified details.
         /// </summary>
-        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
-        protected AgentTester(string username = null)
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>; otherwise, create using <see cref="CreateExecutionContext"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        protected AgentTester(string username = null, object args = null)
         {
-            if (ExecutionContext.HasCurrent)
-                Username = username ?? ExecutionContext.Current.Username;
-            else
+            TestSetUp.InvokeRegisteredSetUp();
+
+            if (username != null || !ExecutionContext.HasCurrent)
             {
-                ExecutionContext.Reset(true);
-                ExecutionContext.Current.Username = Username = username ?? DefaultUsername;
+                ExecutionContext.Reset(false);
+                ExecutionContext.SetCurrent(CreateExecutionContext.Invoke(username ?? DefaultUsername, args));
             }
+
+            Args = args;
+            Username = ExecutionContext.Current.Username;
         }
 
         /// <summary>
         /// Gets the username.
         /// </summary>
         public string Username { get; internal set; }
+
+        /// <summary>
+        /// Gets the optional argument.
+        /// </summary>
+        public object Args { get; private set; }
 
         /// <summary>
         /// Expect a response with the specified <see cref="HttpStatusCode"/>.
@@ -431,15 +477,11 @@ namespace Beef.Test.NUnit
         private Action<AgentTester<TAgent>, WebApiAgentResult> _afterAction;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AgentTester"/> class.
-        /// </summary>
-        internal AgentTester() : base() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AgentTester{TAgent}"/> class with a username.
         /// </summary>
         /// <param name="username">The username.</param>
-        internal AgentTester(string username) : base(username) { }
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        public AgentTester(string username = null, object args = null) : base(username, args) { }
 
         /// <summary>
         /// An action to perform <b>before</b> the <see cref="Run(Func{AgentTesterRunArgs{TAgent}, Task{WebApiAgentResult}})"/> or <see cref="RunAsync(Func{AgentTesterRunArgs{TAgent}, Task{WebApiAgentResult}})"/>.
@@ -568,15 +610,11 @@ namespace Beef.Test.NUnit
         private bool _isExpectedUniqueKey;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AgentTester{TValue}"/> class.
-        /// </summary>
-        internal AgentTester() : base() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AgentTester{TValue}"/> class with a username.
         /// </summary>
         /// <param name="username">The username.</param>
-        internal AgentTester(string username) : base(username) { }
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        public AgentTester(string username = null, object args = null) : base(username, args) { }
 
         /// <summary>
         /// An action to perform <b>before</b> the <see cref="Run(Func{AgentTesterRunArgs{TAgent, TValue}, Task{WebApiAgentResult{TValue}}})"/> or <see cref="RunAsync(Func{AgentTesterRunArgs{TAgent, TValue}, Task{WebApiAgentResult{TValue}}})"/>.

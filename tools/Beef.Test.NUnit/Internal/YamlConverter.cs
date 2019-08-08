@@ -1,4 +1,6 @@
-﻿using Beef.Entities;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Entities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using System.IO;
 using System.Linq;
 using YamlDotNet.Serialization;
 
-namespace Beef.Test.NUnit
+namespace Beef.Test.NUnit.Internal
 {
     /// <summary>
     /// Provides the capabilitity to convert <b>YAML</b> (or <b>JSON</b>) into a typed collection.

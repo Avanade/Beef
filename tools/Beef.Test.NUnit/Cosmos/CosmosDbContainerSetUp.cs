@@ -1,4 +1,5 @@
 ﻿using Beef.Diagnostics;
+using Beef.Test.NUnit.Internal;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
@@ -127,7 +128,7 @@ namespace Beef.Test.NUnit.Cosmos
             if (rn == null || rn.Count() > 1)
                 throw new ArgumentException($"A single Resource with name ending in 'Cosmos.{yamlResourceName}' not found in Assembly '{ass.FullName}'.", nameof(yamlResourceName));
 
-            var yc = YamlConverter.ReadYaml(ass.GetManifestResourceStream(rn.First()));
+            var yc = Internal.YamlConverter.ReadYaml(ass.GetManifestResourceStream(rn.First()));
 
             await ImportBatchAsync(yc.Convert<T>(Check.NotEmpty(name, nameof(name))), partitionKey, itemRequestOptions);
         }
