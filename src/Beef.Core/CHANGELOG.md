@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.11
+- *Fixed:* Constraint removed from `ExecutionContext.SetCurrent` so it can be called even where `HasBeenRegistered` is `true`.
+
 ## v2.1.10
 - *Enhancement:* `PagingArgs.DefaultIsGetCount` added to enable default to be set globally.
 

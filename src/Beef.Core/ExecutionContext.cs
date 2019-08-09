@@ -79,7 +79,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Sets the <see cref="Current"/> instance (only allowed where there is no <b>Current</b> instance and no <see cref="Register(Func{ExecutionContext})"/> has been configured).
+        /// Sets the <see cref="Current"/> instance (only allowed where <see cref="HasCurrent"/> is <c>false</c>).
         /// </summary>
         /// <param name="executionContext">The <see cref="ExecutionContext"/> instance.</param>
         public static void SetCurrent(ExecutionContext executionContext)
@@ -87,9 +87,6 @@ namespace Beef
             Check.NotNull(executionContext, nameof(executionContext));
             if (HasCurrent)
                 throw new InvalidOperationException("The SetCurrent method can only be used where there is no Current instance.");
-
-            if (HasBeenRegistered)
-                throw new InvalidOperationException("The SetCurrent method can only be used where there is on Register function configured.");
 
             _set(executionContext);
         }
