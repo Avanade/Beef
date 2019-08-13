@@ -105,7 +105,7 @@ namespace Beef.Data.Cosmos
         public static T GetResponseValue<T>(Response<T> resp)
         {
             if (resp == null)
-                return default(T);
+                return default;
 
             return GetResponseValue(resp.Resource);
         }
@@ -123,6 +123,9 @@ namespace Beef.Data.Cosmos
 
             if (resp is IETag etag && etag.ETag != null)
                 etag.ETag = (etag.ETag.StartsWith("\"") && etag.ETag.EndsWith("\"")) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
+
+            if (resp is CosmosDbValue cdv)
+                cdv.PrepareAfter();
 
             return resp;
         }
@@ -317,7 +320,48 @@ namespace Beef.Data.Cosmos
                         throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
                 }
 
-                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).CreateItemAsync<T>(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
+                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).CreateItemAsync(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
+            }, this);
+        }
+
+        /// <summary>
+        /// Creates the <b>DocumentDb/CosmosDb</b> <see cref="CosmosDbValue{T}"/> entity asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="value">The value to create.</param>
+        /// <returns>The value (re-queried where specified).</returns>
+        public async Task<CosmosDbValue<T>> CreateAsync<T>(CosmosDbArgs saveArgs, CosmosDbValue<T> value) where T : class, IIdentifier, new()
+        {
+            Check.NotNull(saveArgs, nameof(saveArgs));
+            Check.NotNull(value, nameof(value));
+            Check.NotNull(value.Value, nameof(value.Value));
+
+            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            {
+                if (value.Value is IChangeLog cl)
+                {
+                    if (cl.ChangeLog == null)
+                        cl.ChangeLog = new ChangeLog();
+
+                    cl.ChangeLog.CreatedBy = ExecutionContext.Current.Username;
+                    cl.ChangeLog.CreatedDate = ExecutionContext.Current.Timestamp;
+                    cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
+                }
+
+                if (saveArgs.SetIdentifierOnCreate)
+                {
+                    if (value is IGuidIdentifier gid)
+                        gid.Id = Guid.NewGuid();
+                    else if (value is IStringIdentifier sid)
+                        sid.Id = Guid.NewGuid().ToString();
+                    else
+                        throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
+                }
+
+                value.PrepareBefore();
+
+                return GetResponseValue<CosmosDbValue<T>>(await GetContainer(saveArgs.ContainerId).CreateItemAsync(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
             }, this);
         }
 
@@ -370,6 +414,57 @@ namespace Beef.Data.Cosmos
 
                 // Replace/Update the value.
                 return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync<T>(value, key, saveArgs.PartitionKey, ro));
+            }, this);
+        }
+
+        /// <summary>
+        /// Updates the <b>DocumentDb/CosmosDb</b> <see cref="CosmosDbValue{T}"/> entity asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="value">The value to create.</param>
+        /// <returns>The value (re-queried where specified).</returns>
+        public async Task<CosmosDbValue<T>> UpdateAsync<T>(CosmosDbArgs saveArgs, CosmosDbValue<T> value) where T : class, IIdentifier, new()
+        {
+            Check.NotNull(saveArgs, nameof(saveArgs));
+            Check.NotNull(value, nameof(value));
+            Check.NotNull(value.Value, nameof(value.Value));
+
+            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            {
+                // Where supporting etag then use IfMatch for concurreny.
+                var ro = GetItemRequestOptions(saveArgs);
+                if (ro.IfMatchEtag == null && value is IETag etag)
+                    ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
+
+                string key = null;
+                if (value is IGuidIdentifier gid)
+                    key = gid.Id.ToString();
+                if (value is IIntIdentifier iid)
+                    key = iid.Id.ToString();
+                else if (value is IStringIdentifier sid)
+                    key = sid.Id;
+
+                // Need to read the record to get access to the ChangeLog readonly fields.
+                if (value.Value is IChangeLog cl)
+                {
+                    if (cl.ChangeLog == null)
+                        cl.ChangeLog = new ChangeLog();
+
+                    var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
+                    var orig = (IChangeLog)GetResponseValue<T>(resp);
+                    cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
+                    cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
+                    cl.ChangeLog.UpdatedBy = ExecutionContext.Current.Username;
+                    cl.ChangeLog.UpdatedDate = ExecutionContext.Current.Timestamp;
+
+                    ro.SessionToken = resp.Headers?.Session;
+                }
+
+                value.PrepareBefore();
+
+                // Replace/Update the value.
+                return GetResponseValue<CosmosDbValue<T>>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync(value, key, saveArgs.PartitionKey, ro));
             }, this);
         }
 
