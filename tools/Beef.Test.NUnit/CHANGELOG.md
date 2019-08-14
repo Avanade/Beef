@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.6
+- *Fixed:* `AgentTester.StartupTestServer` optional method overload changed from `TestServer` to `IWebHostBuilder`.
+
 ## v2.1.5
 - *Enhancement:* Package `Beef.Core` v2.1.11 change as `ExecutionContext.SetCurrent` constraint removal required.
 
