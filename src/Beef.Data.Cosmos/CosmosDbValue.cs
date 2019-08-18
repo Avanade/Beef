@@ -7,52 +7,68 @@ using System;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Provides the base <b>DocumentDb/CosmosDb</b> value capabilities.
+    /// Provides the base <b>CosmosDb/DocumentDb</b> <see cref="Type"/> and <b>Value</b> capabilities.
     /// </summary>
-    public abstract class CosmosDbValue : IStringIdentifier, IETag
+    public abstract class CosmosDbTypeValue : IStringIdentifier, IETag
     {
         /// <summary>
-        /// Gets or sets the <see cref="IStringIdentifier"/>.
+        /// Gets or sets the <see cref="IStringIdentifier"/> (automatically set/synchronized before sending to Cosmos).
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Type"/> name.
+        /// Gets or sets the <see cref="Type"/> name (automatically set/synchronized before sending to Cosmos).
         /// </summary>
         [JsonProperty("type")]
         public string Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="IETag"/>.
+        /// Gets or sets the <see cref="IETag"/> (automatically set/synchronized before sending to Cosmos).
         /// </summary>
         [JsonProperty("_etag")]
         public string ETag { get; set; }
 
         /// <summary>
-        /// Prepares the object before a persistence operation.
+        /// Gets the value.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public abstract object GetValue();
+
+        /// <summary>
+        /// Prepares the object before sending to Cosmos.
         /// </summary>
         internal protected abstract void PrepareBefore();
 
         /// <summary>
-        /// Prepares the object after a persistence operation.
+        /// Prepares the object after getting from Cosmos.
         /// </summary>
         internal protected abstract void PrepareAfter();
     }
 
     /// <summary>
-    /// Represents a <b>DocumentDb/CosmosDb</b> <see cref="Value"/> that is wrapped, including <see cref="Type"/> name, for persistence.
+    /// Represents a <b>CosmosDb/DocumentDb</b> <see cref="Value"/> that is wrapped, including <see cref="Type"/> name, for persistence.
     /// </summary>
-    public class CosmosDbValue<T> : CosmosDbValue where T : IIdentifier
+    /// <remarks>The <see cref="CosmosDbTypeValue.Id"/>, <see cref="CosmosDbTypeValue.Type"/> and <see cref="CosmosDbTypeValue.ETag"/> are updated when the <see cref="Value"/> is set, and before
+    /// sending to <b>CosmosDB/DocumentDb</b>.</remarks>
+    public class CosmosDbTypeValue<T> : CosmosDbTypeValue where T : class, IIdentifier
     {
+        private T _value;
+
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         [JsonProperty("value")]
-        public T Value { get; set; }
+        public T Value { get => _value; set => _value = Check.NotNull(value, nameof(Value)); }
 
         /// <summary>
-        /// Prepares the object before a persistence operation.
+        /// Gets the <see cref="Value"/>.
+        /// </summary>
+        /// <returns>The <see cref="Value"/>.</returns>
+        public override object GetValue() => Value;
+
+        /// <summary>
+        /// Prepares the object before sending to Cosmos.
         /// </summary>
         internal protected override void PrepareBefore()
         {
@@ -75,7 +91,7 @@ namespace Beef.Data.Cosmos
                         break;
 
                     default:
-                        throw new InvalidOperationException("Value is an unknown IIdentifier.");
+                        throw new InvalidOperationException("An Identifier cannot be inferred for this Type.");
                 }
 
                 if (Value is IETag etag)
@@ -86,7 +102,7 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Prepares the object after a persistence operation.
+        /// Prepares the object after getting from Cosmos.
         /// </summary>
         internal protected override void PrepareAfter()
         {

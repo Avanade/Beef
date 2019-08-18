@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using Microsoft.Azure.Cosmos;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Extends <see cref="CosmosDbBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities for <b>DocumentDb/CosmosDb</b>.
+    /// Extends <see cref="CosmosDbBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities for <b>CosmosDb/DocumentDb</b>.
     /// </summary>
     /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
     public abstract class CosmosDb<TDefault> : CosmosDbBase where TDefault : CosmosDb<TDefault>
@@ -68,7 +67,7 @@ namespace Beef.Data.Cosmos
     }
 
     /// <summary>
-    /// Represents the base class for <b>DocumentDb/CosmosDb</b> access; being a lightweight direct <b>DocumentDb/CosmosDb</b> access layer.
+    /// Represents the base class for <b>CosmosDb/DocumentDb</b> access; being a lightweight direct <b>CosmosDb/DocumentDb</b> access layer.
     /// </summary>
     public abstract class CosmosDbBase
     {
@@ -107,27 +106,27 @@ namespace Beef.Data.Cosmos
             if (resp == null)
                 return default;
 
-            return GetResponseValue(resp.Resource);
+            return GetAndFormatValue(resp.Resource);
         }
 
         /// <summary>
-        /// Gets the <b>value</b> updating any special properties as required.
+        /// Gets the <b>value</b> formatting/updating any special properties as required.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="resp">The response.</param>
+        /// <param name="value">The value.</param>
         /// <returns>The response value.</returns>
-        public static T GetResponseValue<T>(T resp)
+        public static T GetAndFormatValue<T>(T value)
         {
-            if (resp == null)
-                return resp;
+            if (value == null)
+                return value;
 
-            if (resp is IETag etag && etag.ETag != null)
+            if (value is IETag etag && etag.ETag != null)
                 etag.ETag = (etag.ETag.StartsWith("\"") && etag.ETag.EndsWith("\"")) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
 
-            if (resp is CosmosDbValue cdv)
+            if (value is CosmosDbTypeValue cdv)
                 cdv.PrepareAfter();
 
-            return resp;
+            return value;
         }
 
         #endregion
@@ -244,7 +243,7 @@ namespace Beef.Data.Cosmos
         /// <param name="queryArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T}"/>.</returns>
-        public CosmosDbQuery<T> Query<T>(CosmosDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
+        public CosmosDbQuery<T> Query<T>(CosmosDbArgs queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
         {
             return new CosmosDbQuery<T>(this, queryArgs, query);
         }
@@ -254,7 +253,7 @@ namespace Beef.Data.Cosmos
         #region Get
 
         /// <summary>
-        /// Gets the <b>DocumentDb/CosmosDb</b> entity for the specified <paramref name="keys"/> converting to <typeparamref name="T"/> asynchronously.
+        /// Gets the <b>CosmosDb/DocumentDb</b> entity for the specified <paramref name="keys"/> converting to <typeparamref name="T"/> asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="getArgs">The <see cref="CosmosDbArgs"/>.</param>
@@ -270,7 +269,13 @@ namespace Beef.Data.Cosmos
             {
                 try
                 {
-                    return GetResponseValue<T>(await GetContainer(getArgs.ContainerId).ReadItemAsync<T>(keys[0].ToString(), getArgs.PartitionKey, GetItemRequestOptions(getArgs)));
+                    var val = await GetContainer(getArgs.ContainerId).ReadItemAsync<T>(keys[0].ToString(), getArgs.PartitionKey, GetItemRequestOptions(getArgs));
+
+                    // Check if T Type is CosmosDbValue<> and where Type is different it should be assumed that it does not exist.
+                    if (val.Resource is CosmosDbTypeValue cdv && cdv.Type != typeof(T).GenericTypeArguments[0].Name)
+                        return null;
+
+                    return GetResponseValue<T>(val);
                 }
                 catch (CosmosException dcex)
                 {
@@ -287,7 +292,7 @@ namespace Beef.Data.Cosmos
         #region Create
 
         /// <summary>
-        /// Creates the <b>DocumentDb/CosmosDb</b> entity asynchronously.
+        /// Creates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
@@ -300,69 +305,42 @@ namespace Beef.Data.Cosmos
 
             return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
             {
-                if (value is IChangeLog cl)
+                if (value is CosmosDbTypeValue cdv)
                 {
-                    if (cl.ChangeLog == null)
-                        cl.ChangeLog = new ChangeLog();
-
-                    cl.ChangeLog.CreatedBy = ExecutionContext.Current.Username;
-                    cl.ChangeLog.CreatedDate = ExecutionContext.Current.Timestamp;
-                    cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
+                    PrepareEntityForCreate(saveArgs, cdv.GetValue());
+                    cdv.PrepareBefore();
                 }
-
-                if (saveArgs.SetIdentifierOnCreate)
-                {
-                    if (value is IGuidIdentifier gid)
-                        gid.Id = Guid.NewGuid();
-                    else if (value is IStringIdentifier sid)
-                        sid.Id = Guid.NewGuid().ToString();
-                    else
-                        throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
-                }
+                else
+                    PrepareEntityForCreate(saveArgs, value);
 
                 return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).CreateItemAsync(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
             }, this);
         }
 
         /// <summary>
-        /// Creates the <b>DocumentDb/CosmosDb</b> <see cref="CosmosDbValue{T}"/> entity asynchronously.
+        /// Prepares the entity value for a Create by setting the IChangeLog and IIdentifer.
         /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
-        /// <param name="value">The value to create.</param>
-        /// <returns>The value (re-queried where specified).</returns>
-        public async Task<CosmosDbValue<T>> CreateAsync<T>(CosmosDbArgs saveArgs, CosmosDbValue<T> value) where T : class, IIdentifier, new()
+        private void PrepareEntityForCreate(CosmosDbArgs saveArgs, object value)
         {
-            Check.NotNull(saveArgs, nameof(saveArgs));
-            Check.NotNull(value, nameof(value));
-            Check.NotNull(value.Value, nameof(value.Value));
-
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            if (value is IChangeLog cl)
             {
-                if (value.Value is IChangeLog cl)
-                {
-                    if (cl.ChangeLog == null)
-                        cl.ChangeLog = new ChangeLog();
+                if (cl.ChangeLog == null)
+                    cl.ChangeLog = new ChangeLog();
 
-                    cl.ChangeLog.CreatedBy = ExecutionContext.Current.Username;
-                    cl.ChangeLog.CreatedDate = ExecutionContext.Current.Timestamp;
-                    cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
-                }
+                cl.ChangeLog.CreatedBy = ExecutionContext.Current.Username;
+                cl.ChangeLog.CreatedDate = ExecutionContext.Current.Timestamp;
+                cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
+            }
 
-                if (saveArgs.SetIdentifierOnCreate)
-                {
-                    if (value is IGuidIdentifier gid)
-                        gid.Id = Guid.NewGuid();
-                    else if (value is IStringIdentifier sid)
-                        sid.Id = Guid.NewGuid().ToString();
-                    else
-                        throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
-                }
-
-                value.PrepareBefore();
-
-                return GetResponseValue<CosmosDbValue<T>>(await GetContainer(saveArgs.ContainerId).CreateItemAsync(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
-            }, this);
+            if (saveArgs.SetIdentifierOnCreate)
+            {
+                if (value is IGuidIdentifier gid)
+                    gid.Id = Guid.NewGuid();
+                else if (value is IStringIdentifier sid)
+                    sid.Id = Guid.NewGuid().ToString();
+                else
+                    throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
+            }
         }
 
         #endregion
@@ -370,7 +348,7 @@ namespace Beef.Data.Cosmos
         #region Update
 
         /// <summary>
-        /// Updates the <b>DocumentDb/CosmosDb</b> entity asynchronously.
+        /// Updates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
@@ -388,28 +366,35 @@ namespace Beef.Data.Cosmos
                 if (ro.IfMatchEtag == null && value is IETag etag)
                     ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
 
-                string key = null;
-                if (value is IGuidIdentifier gid)
-                    key = gid.Id.ToString();
-                if (value is IIntIdentifier iid)
-                    key = iid.Id.ToString();
-                else if (value is IStringIdentifier sid)
-                    key = sid.Id;
-
-                // Need to read the record to get access to the ChangeLog readonly fields.
-                if (value is IChangeLog cl)
+                string key;
+                if (value is CosmosDbTypeValue cdv)
                 {
-                    if (cl.ChangeLog == null)
-                        cl.ChangeLog = new ChangeLog();
+                    cdv.PrepareBefore();
+                    var val = cdv.GetValue();
+                    key = GetKeyFromValue(val);
 
+                    // Must read existing and make sure we are updating for the correct Type; don't just trust the key.
                     var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
-                    var orig = (IChangeLog)GetResponseValue<T>(resp);
-                    cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
-                    cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
-                    cl.ChangeLog.UpdatedBy = ExecutionContext.Current.Username;
-                    cl.ChangeLog.UpdatedDate = ExecutionContext.Current.Timestamp;
-
+                    var orig = resp.Resource as CosmosDbTypeValue;
                     ro.SessionToken = resp.Headers?.Session;
+
+                    if (orig.Type != typeof(T).GenericTypeArguments[0].Name)
+                        throw new NotFoundException();
+
+                    if (val is IChangeLog cl)
+                        ChangeLogUpdate(cl, (IChangeLog)orig.GetValue());
+                }
+                else
+                {
+                    key = GetKeyFromValue(value);
+
+                    if (value is IChangeLog cl)
+                    {
+                        // Must read existing where updating IChangeLog to get the Created* values.
+                        var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
+                        ChangeLogUpdate(cl, (IChangeLog)resp.Resource);
+                        ro.SessionToken = resp.Headers?.Session;
+                    }
                 }
 
                 // Replace/Update the value.
@@ -418,54 +403,31 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Updates the <b>DocumentDb/CosmosDb</b> <see cref="CosmosDbValue{T}"/> entity asynchronously.
+        /// Get the key from the value.
         /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
-        /// <param name="value">The value to create.</param>
-        /// <returns>The value (re-queried where specified).</returns>
-        public async Task<CosmosDbValue<T>> UpdateAsync<T>(CosmosDbArgs saveArgs, CosmosDbValue<T> value) where T : class, IIdentifier, new()
+        private string GetKeyFromValue(object value)
         {
-            Check.NotNull(saveArgs, nameof(saveArgs));
-            Check.NotNull(value, nameof(value));
-            Check.NotNull(value.Value, nameof(value.Value));
-
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            switch (value)
             {
-                // Where supporting etag then use IfMatch for concurreny.
-                var ro = GetItemRequestOptions(saveArgs);
-                if (ro.IfMatchEtag == null && value is IETag etag)
-                    ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
+                case IGuidIdentifier gid: return gid.Id.ToString();
+                case IStringIdentifier isi: return isi.Id;
+                case IIntIdentifier iid: return iid.Id.ToString();
+                default: throw new InvalidOperationException("An Identifier cannot be inferred for this Type.");
+            }
+        }
 
-                string key = null;
-                if (value is IGuidIdentifier gid)
-                    key = gid.Id.ToString();
-                if (value is IIntIdentifier iid)
-                    key = iid.Id.ToString();
-                else if (value is IStringIdentifier sid)
-                    key = sid.Id;
+        /// <summary>
+        /// Update the change log; reset Created* to original.
+        /// </summary>
+        private void ChangeLogUpdate(IChangeLog cl, IChangeLog orig)
+        {
+            if (cl.ChangeLog == null)
+                cl.ChangeLog = new ChangeLog();
 
-                // Need to read the record to get access to the ChangeLog readonly fields.
-                if (value.Value is IChangeLog cl)
-                {
-                    if (cl.ChangeLog == null)
-                        cl.ChangeLog = new ChangeLog();
-
-                    var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
-                    var orig = (IChangeLog)GetResponseValue<T>(resp);
-                    cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
-                    cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
-                    cl.ChangeLog.UpdatedBy = ExecutionContext.Current.Username;
-                    cl.ChangeLog.UpdatedDate = ExecutionContext.Current.Timestamp;
-
-                    ro.SessionToken = resp.Headers?.Session;
-                }
-
-                value.PrepareBefore();
-
-                // Replace/Update the value.
-                return GetResponseValue<CosmosDbValue<T>>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync(value, key, saveArgs.PartitionKey, ro));
-            }, this);
+            cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
+            cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
+            cl.ChangeLog.UpdatedBy = ExecutionContext.Current.Username;
+            cl.ChangeLog.UpdatedDate = ExecutionContext.Current.Timestamp;
         }
 
         #endregion
@@ -473,17 +435,21 @@ namespace Beef.Data.Cosmos
         #region Delete
 
         /// <summary>
-        /// Deletes the <b>DocumentDb/CosmosDb</b> entity asynchronously.
+        /// Deletes the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync<T>(CosmosDbArgs saveArgs, params IComparable[] keys) where T : class, IIdentifier
+        public async Task DeleteAsync<T>(CosmosDbArgs saveArgs, params IComparable[] keys) where T : class, IIdentifier, new()
         {
             Check.NotNull(saveArgs, nameof(saveArgs));
             if (keys.Length != 1)
                 throw new NotSupportedException("Only a single key value is currently supported.");
+
+            // Where the T Type is CosmosDbValue<> do a get; which will confirm existence before proceeding - the GetAsync will check the Type property.
+            if (typeof(T) == typeof(CosmosDbTypeValue<>) && await GetAsync<T>(saveArgs, keys) == null)
+                return;
 
             await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
             {

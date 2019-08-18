@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -10,7 +11,7 @@ namespace Beef.RefData
     /// </summary>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, IsActive={IsActive}, IsValid={IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class ReferenceDataBaseInt : ReferenceDataBase
+    public abstract class ReferenceDataBaseInt : ReferenceDataBase, IIntIdentifier
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataBaseGuid"/> class.

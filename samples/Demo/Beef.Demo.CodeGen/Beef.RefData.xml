@@ -2,9 +2,8 @@
 <CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter">
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref" />
-
   <Entity Name="EyeColor" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/eyeColors" AutoImplement="EntityFramework" DatabaseSchema="Ref" EntityFrameworkEntity="EfModel.EyeColor" />
-  
+  <Entity Name="PowerSource" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/powerSources" AutoImplement="Cosmos" CosmosContainerId="RefData" />
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">
     <Property Name="ExternalCode" Type="string" RefDataMapping="true" Immutable="true" />
   </Entity>

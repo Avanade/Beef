@@ -8,7 +8,7 @@ using System.Linq;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Provides common <b>DocumentDb/CosmosDb</b> query capabilities.
+    /// Provides common <b>CosmosDb/DocumentDb</b> query capabilities.
     /// </summary>
     public abstract class CosmosDbQueryBase
     {
@@ -18,24 +18,24 @@ namespace Beef.Data.Cosmos
         protected CosmosDbQueryBase() { }
 
         /// <summary>
-        /// Gets a <see cref="PagingArgs"/> with a top/take of 1.
+        /// Gets a <see cref="PagingArgs"/> with a skip of 0 and top/take of 1.
         /// </summary>
         internal static PagingArgs PagingTop1 { get; } = PagingArgs.CreateSkipAndTake(0, 1);
 
         /// <summary>
-        /// Gets a <see cref="PagingArgs"/> with a top/take of 2.
+        /// Gets a <see cref="PagingArgs"/> with a skip of 0 and top/take of 2.
         /// </summary>
         internal static PagingArgs PagingTop2 { get; } = PagingArgs.CreateSkipAndTake(0, 2);
     }
 
     /// <summary>
-    /// Encapsulates a <b>DocumentDb/CosmosDb</b> query enabling all select-like capabilities.
+    /// Encapsulates a <b>CosmosDb/DocumentDb</b> query enabling all select-like capabilities.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
     public class CosmosDbQuery<T> : CosmosDbQueryBase where T : class, new()
     {
         private readonly CosmosDbBase _db;
-        private readonly Func<IOrderedQueryable<T>, IQueryable<T>> _query;
+        private readonly Func<IQueryable<T>, IQueryable<T>> _query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbQuery{T}"/> class.
@@ -43,7 +43,7 @@ namespace Beef.Data.Cosmos
         /// <param name="db">The <see cref="CosmosDbBase"/>.</param>
         /// <param name="queryArgs">The <see cref="CosmosDbArgs"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{T}"/>.</param>
-        internal CosmosDbQuery(CosmosDbBase db, CosmosDbArgs queryArgs, Func<IOrderedQueryable<T>, IQueryable<T>> query = null)
+        internal CosmosDbQuery(CosmosDbBase db, CosmosDbArgs queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null)
         {
             _db = Check.NotNull(db, nameof(db));
             QueryArgs = Check.NotNull(queryArgs, nameof(queryArgs));
@@ -56,33 +56,33 @@ namespace Beef.Data.Cosmos
         public CosmosDbArgs QueryArgs { get; private set; }
 
         /// <summary>
-        /// Manages the DbContext and underlying query construction and lifetime.
+        /// Manages the underlying query construction and lifetime.
         /// </summary>
-        private void ExecuteQuery(Action<IQueryable<T>> execute)
+        internal void ExecuteQuery(Action<IQueryable<T>> execute)
         {
             CosmosDbInvoker.Default.Invoke(this, () =>
             {
                 var q = _db.GetContainer(QueryArgs.ContainerId).GetItemLinqQueryable<T>(allowSynchronousQueryExecution: true, requestOptions: _db.GetQueryRequestOptions(QueryArgs));
-                execute(_query(q));
+                execute(_query == null ? Internal.CosmosDbHelper.AddTypeWhereClause<T>(q) : _query(Internal.CosmosDbHelper.AddTypeWhereClause<T>(q)));
             }, _db);
         }
 
         /// <summary>
-        /// Manages the DbContext and underlying query construction and lifetime.
+        /// Manages the underlying query construction and lifetime.
         /// </summary>
-        private T ExecuteQuery(Func<IQueryable<T>, T> execute)
+        internal T ExecuteQuery(Func<IQueryable<T>, T> execute)
         {
             return CosmosDbInvoker.Default.Invoke(this, () =>
             {
                 var q = _db.GetContainer(QueryArgs.ContainerId).GetItemLinqQueryable<T>(allowSynchronousQueryExecution: true, requestOptions: _db.GetQueryRequestOptions(QueryArgs));
-                return execute(_query(q));
+                return execute(_query == null ? Internal.CosmosDbHelper.AddTypeWhereClause<T>(q) : _query(Internal.CosmosDbHelper.AddTypeWhereClause<T>(q)));
             }, _db);
         }
 
         /// <summary>
         /// Sets the paging from the <see cref="PagingArgs"/>.
         /// </summary>
-        private IQueryable<T> SetPaging(IQueryable<T> query, PagingArgs paging)
+        internal IQueryable<T> SetPaging(IQueryable<T> query, PagingArgs paging)
         {
             var q = query;
             if (paging != null && paging.Skip > 0)
@@ -102,7 +102,7 @@ namespace Beef.Data.Cosmos
             return ExecuteQuery(q =>
             {
                 q = SetPaging(q, PagingTop2);
-                return q.AsEnumerable().Single();
+                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().Single());
             });
         }
 
@@ -115,7 +115,7 @@ namespace Beef.Data.Cosmos
             return ExecuteQuery(q =>
             {
                 q = SetPaging(q, PagingTop2);
-                return q.AsEnumerable().SingleOrDefault();
+                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().SingleOrDefault());
             });
         }
 
@@ -128,7 +128,7 @@ namespace Beef.Data.Cosmos
             return ExecuteQuery(q =>
             {
                 q = SetPaging(q, PagingTop1);
-                return q.AsEnumerable().First();
+                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().First());
             });
         }
 
@@ -141,7 +141,7 @@ namespace Beef.Data.Cosmos
             return ExecuteQuery(q =>
             {
                 q = SetPaging(q, PagingTop1);
-                return q.AsEnumerable().FirstOrDefault();
+                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().FirstOrDefault());
             });
         }
 
@@ -162,7 +162,7 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Executes a query adding to the passed collection.
+        /// Executes the query adding to the passed collection.
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
@@ -172,7 +172,7 @@ namespace Beef.Data.Cosmos
             {
                 foreach (var item in SetPaging(query, QueryArgs.Paging).AsEnumerable())
                 {
-                    coll.Add(CosmosDbBase.GetResponseValue<T>(item));
+                    coll.Add(CosmosDbBase.GetAndFormatValue(item));
                 }
 
                 if (QueryArgs.Paging != null && QueryArgs.Paging.IsGetCount)
