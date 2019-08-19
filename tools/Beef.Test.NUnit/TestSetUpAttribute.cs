@@ -92,7 +92,7 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    Factory.ResetLocal();
+                    //Factory.ResetLocal();
                     ExecutionContext.Reset(false);
                     ExecutionContext.SetCurrent(AgentTester.CreateExecutionContext(_username, _args));
                     ExecutionContext.Current.Properties["InvokeRegisteredSetUp"] = _needsSetUp;

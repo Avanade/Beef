@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.9
+- *Fixed:* Given the `AsyncLocal` nature of the _Factory Local_ implementation there should be no need to perform a `Factory.ResetLocal` - the invocations have been removed.
+
 ## v2.1.8
 - *Fixed:* `Factory.ResetLocal` was incorrectly being called for each `AgentTester` tester invocation; accidently resetting previously set mock objects for the test.
 

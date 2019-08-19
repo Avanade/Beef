@@ -97,7 +97,6 @@ namespace Beef.Test.NUnit
                     ShouldContinueRunningTests = true;
                     CachePolicyManager.ForceFlush();
                     DependencyGroupAttribute.Refresh();
-                    Factory.ResetLocal();
                     _registeredSetUpData = data;
                     _registeredSetUpInvoked = false;
                 }
@@ -138,8 +137,6 @@ namespace Beef.Test.NUnit
                     {
                         if (_registeredSetUp != null)
                         {
-                            Factory.ResetLocal();
-
                             Logger.Default.Info(null);
                             Logger.Default.Info("Invocation of registered set up action.");
                             Logger.Default.Info(new string('=', 80));
