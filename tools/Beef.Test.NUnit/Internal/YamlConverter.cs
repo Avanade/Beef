@@ -86,11 +86,12 @@ namespace Beef.Test.NUnit.Internal
         /// <param name="setCreatedChangeLog">Indicates whether to set the <see cref="ChangeLog.CreatedBy"/> and <see cref="ChangeLog.CreatedDate"/> where <typeparamref name="T"/> implements <see cref="IChangeLog"/>.</param>
         /// <param name="itemAction">An action to allow further updating to each item.</param>
         /// <returns>The corresponding collection.</returns>
-        public IEnumerable<T> Convert<T>(string name = "items", bool replaceAllShorthandGuids = true, bool setCreatedChangeLog = true, Action<T> itemAction = null) where T : class, new()
+        public IEnumerable<T> Convert<T>(string name, bool replaceAllShorthandGuids = true, bool setCreatedChangeLog = true, Action<T> itemAction = null) where T : class, new()
         {
-            var json = _json[Check.NotEmpty(name, nameof(name))];
-            if (json == null || json.Type != JTokenType.Array)
-                throw new ArgumentException("Specified name either does not exist or is not an array.");
+            Check.NotEmpty(name, nameof(name));
+            var json = _json?.Descendants().OfType<JProperty>().Where(x => x.Name == name).FirstOrDefault()?.Value;
+            if (json == null || json.Ancestors().Count() != 4 || json.Type != JTokenType.Array)
+                return default;
 
             if (replaceAllShorthandGuids)
                 ReplaceAllShorthandGuids(json);

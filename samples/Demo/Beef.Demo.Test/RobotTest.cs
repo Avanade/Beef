@@ -34,7 +34,7 @@ namespace Beef.Demo.Test
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/serialNo" } } } }
                 }, 400);
 
-            await _csu.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "items");
+            await _csu.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "Robot");
         }
 
         [OneTimeTearDown]

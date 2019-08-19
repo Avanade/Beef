@@ -1,4 +1,5 @@
 ﻿using Beef.Diagnostics;
+using Beef.RefData;
 using Beef.Test.NUnit.Internal;
 using Microsoft.Azure.Cosmos;
 using System;
@@ -32,7 +33,7 @@ namespace Beef.Test.NUnit.Cosmos
         }
 
         /// <summary>
-        /// Replaces (deletes and creates) the <b>Cosmos</b> container (and optionally created the database if it does not exist).
+        /// Replaces (deletes and creates) the <b>Cosmos</b> container (and optionally creates the database if it does not exist).
         /// </summary>
         /// <param name="client">The <see cref="CosmosClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
@@ -113,14 +114,15 @@ namespace Beef.Test.NUnit.Cosmos
         /// </summary>
         /// <typeparam name="TResource">The <see cref="Type"/> to infer the <see cref="Assembly"/> to find manifest resources (see <see cref="Assembly.GetManifestResourceStream(string)"/>).</typeparam>
         /// <typeparam name="T">The item <see cref="Type"/>.</typeparam>
-        /// <param name="yamlResourceName">The YAML resource name (must reside in <c>Cosmos</c> folder within <see cref="Assembly.GetCallingAssembly"/>).</param>
+        /// <param name="yamlResourceName">The YAML resource name (must reside in <c>Cosmos</c> folder within the <typeparamref name="TResource"/> <see cref="Assembly"/>).</param>
         /// <param name="name">The YAML node name to load.</param>
         /// <param name="partitionKey">The optional partition key; where not specified <see cref="PartitionKey.None"/> is used.</param>
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional.</remarks>
-        public async Task ImportBatchAsync<TResource, T>(string yamlResourceName, string name = "items", PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where T : class, new()
+        public async Task ImportBatchAsync<TResource, T>(string yamlResourceName, string name, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where T : class, new()
         {
+            Check.NotEmpty(yamlResourceName, nameof(yamlResourceName));
             Logger.Default.Info($"COSMOS > Database '{Database.Id}' Container '{Container.Id}' data import from resource '{yamlResourceName}' with node name '{name}'.");
 
             var ass = typeof(TResource).Assembly;
@@ -131,6 +133,26 @@ namespace Beef.Test.NUnit.Cosmos
             var yc = Internal.YamlConverter.ReadYaml(ass.GetManifestResourceStream(rn.First()));
 
             await ImportBatchAsync(yc.Convert<T>(Check.NotEmpty(name, nameof(name))), partitionKey, itemRequestOptions);
+        }
+
+        /// <summary>
+        /// Imports a batch (creates) of <b>reference data</b> items specified within a <b>YAML</b> resource (see <see cref="YamlConverter"/>) into the <see cref="Container"/>.
+        /// </summary>
+        /// <typeparam name="TResource">The <see cref="Type"/> to infer the <see cref="Assembly"/> to find manifest resources (see <see cref="Assembly.GetManifestResourceStream(string)"/>).</typeparam>
+        /// <param name="refData">The <see cref="ReferenceDataManager"/> to infer the underlying reference data types.</param>
+        /// <param name="yamlResourceName">The YAML resource name (must reside in <c>Cosmos</c> folder within the <typeparamref name="TResource"/> <see cref="Assembly"/>).</param>
+        /// <param name="partitionKey">The optional partition key; where not specified <see cref="PartitionKey.None"/> is used.</param>
+        /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        /// <remarks>Each item is added individually and is not transactional.</remarks>
+        public async Task ImportRefDataBatch<TResource>(ReferenceDataManager refData, string yamlResourceName, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null)
+        {
+            Check.NotNull(refData, nameof(refData));
+            Check.NotEmpty(yamlResourceName, nameof(yamlResourceName));
+
+
+
+            await Task.CompletedTask;
         }
 
         /// <summary>
