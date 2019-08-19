@@ -97,7 +97,6 @@ namespace Beef.Test.NUnit
                     ShouldContinueRunningTests = true;
                     CachePolicyManager.ForceFlush();
                     DependencyGroupAttribute.Refresh();
-                    Factory.ResetLocal();
                     _registeredSetUpData = data;
                     _registeredSetUpInvoked = false;
                 }
@@ -127,8 +126,6 @@ namespace Beef.Test.NUnit
         {
             lock (_lock)
             {
-                Factory.ResetLocal();
-
                 ShouldContinueRunningTestsAssert();
 
                 if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object needsSetUp) && !(bool)needsSetUp)

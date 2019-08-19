@@ -62,8 +62,8 @@ namespace Beef.Test.NUnit
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
         /// <param name="environmentVariablesPrefix">Override the environment variables prexfix.</param>
-        /// <param name="testServerConfig">An optional <see cref="Action{TestServer}"/> to further configure the underlying <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string environmentVariablesPrefix = null, Action<TestServer> testServerConfig = null) where TStartup : class
+        /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
+        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string environmentVariablesPrefix = null, Action<IWebHostBuilder> webHostBuilderAction = null) where TStartup : class
         {
             var cb = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -75,7 +75,7 @@ namespace Beef.Test.NUnit
             if (addEnvironmentVariables)
                 cb.AddEnvironmentVariables(environmentVariablesPrefix);
 
-            StartupTestServer<TStartup>(cb.Build(), environment, testServerConfig);
+            StartupTestServer<TStartup>(cb.Build(), environment, webHostBuilderAction);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
         /// <param name = "config" > The <see cref="IConfiguration"/>.</param> 
         /// <param name="environment">The environment to be used by the underlying web host.</param>
-        /// <param name="testServerConfig">An optional <see cref="Action{TestServer}"/> to further configure the underlying <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<TestServer> testServerConfig = null) where TStartup : class
+        /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
+        public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<IWebHostBuilder> webHostBuilderAction = null) where TStartup : class
         {
             lock (_lock)
             {
@@ -94,14 +94,13 @@ namespace Beef.Test.NUnit
 
                 var whb = new WebHostBuilder()
                     .UseEnvironment(environment)
-                    .UseConfiguration(config)
-                    .UseStartup<TStartup>();
+                    .UseConfiguration(config);
 
-                var testServer = new TestServer(whb);
-                testServerConfig?.Invoke(testServer);
+                webHostBuilderAction?.Invoke(whb);
+                whb.UseStartup<TStartup>();
 
                 _configuration = config;
-                _testServer = testServer;
+                _testServer = new TestServer(whb);
             }
         }
 
