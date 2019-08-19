@@ -29,11 +29,11 @@ namespace Beef.Demo.Test
         public void A110_Validation_Null()
         {
             TestSetUp.CreateMock<IPersonData>();
-            ExpectValidationException.Run(
+            ExpectValidationException.Throws(
                 () => (new PersonManager()).CreateAsync(null),
                 "Value is required.");
 
-            ExpectValidationException.Run(
+            ExpectValidationException.Throws(
                 () => (new PersonManager()).UpdateAsync(null, 1.ToGuid()),
                 "Value is required.");
         }
@@ -42,14 +42,14 @@ namespace Beef.Demo.Test
         public async Task A110_Validation_Empty()
         {
             TestSetUp.CreateMock<IPersonData>();
-            await ExpectValidationException.RunAsync(
+            await ExpectValidationException.ThrowsAsync(
                 () => (new PersonManager()).CreateAsync(new Person()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.");
 
-            await ExpectValidationException.RunAsync(
+            await ExpectValidationException.ThrowsAsync(
                 () => (new PersonManager()).UpdateAsync(new Person(), 1.ToGuid()),
                 "First Name is required.",
                 "Last Name is required.",
@@ -61,7 +61,7 @@ namespace Beef.Demo.Test
         public void A130_Validation_Invalid()
         {
             TestSetUp.CreateMock<IPersonData>();
-            ExpectValidationException.Run(
+            ExpectValidationException.Throws(
                 () => (new PersonManager()).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
                 "Last Name must not exceed 50 characters in length.",

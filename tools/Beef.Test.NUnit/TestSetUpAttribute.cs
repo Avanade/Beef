@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Sets up the <see cref="ExecutionContext"/> for an <see cref="AgentTester"/> test execution. 
+    /// Sets up the <see cref="ExecutionContext"/> for the likes of an <see cref="AgentTester"/> test execution. 
     /// </summary>
     [DebuggerStepThrough()]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper

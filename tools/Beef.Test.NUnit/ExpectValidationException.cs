@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Enables expected <see cref="ValidationException"/> execution.
+    /// Expects and asserts a <see cref="ValidationException"/> and its corresponding messages.
     /// </summary>
     public static class ExpectValidationException
     {
         /// <summary>
-        /// Runs the <paramref name="action"/> synchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the <paramref name="action"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
         /// </summary>
         /// <param name="action">The action to execute.</param>
         /// <param name="messages">The expected <see cref="MessageType.Error">error</see> message texts.</param>
-        public static void Run(Action action, params string[] messages)
+        public static void Throws(Action action, params string[] messages)
         {
             var mic = new MessageItemCollection();
             foreach (var text in messages)
@@ -27,16 +27,16 @@ namespace Beef.Test.NUnit
                 mic.AddError(text);
             }
 
-            Run(action, mic);
+            Throws(action, mic);
         }
 
         /// <summary>
-        /// Runs the <paramref name="action"/> synchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the <paramref name="action"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
         /// </summary>
         /// <param name="action">The action to execute.</param>
         /// <param name="messages">The expected <see cref="MessageItemCollection"/> collection.</param>
         /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
-        public static void Run(Action action, MessageItemCollection messages)
+        public static void Throws(Action action, MessageItemCollection messages)
         {
             Check.NotNull(action, nameof(action));
             Check.NotNull(messages, nameof(messages));
@@ -53,12 +53,12 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the asynchonrous <paramref name="func"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <param name="messages">The expected <see cref="MessageType.Error">error</see> message texts.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
-        public static void Run(Func<Task> func, params string[] messages)
+        public static void Throws(Func<Task> func, params string[] messages)
         {
             var mic = new MessageItemCollection();
             foreach (var text in messages)
@@ -66,17 +66,17 @@ namespace Beef.Test.NUnit
                 mic.AddError(text);
             }
 
-            Run(func, mic);
+            Throws(func, mic);
         }
 
         /// <summary>
-        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the asynchonrous <paramref name="func"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
         /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
-        public static void Run(Func<Task> func, MessageItemCollection messages)
+        public static void Throws(Func<Task> func, MessageItemCollection messages)
         {
             Check.NotNull(func, nameof(func));
             Check.NotNull(messages, nameof(messages));
@@ -100,12 +100,12 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the <paramref name="func"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/> (asynchronous).
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <param name="messages">The expected <see cref="MessageType.Error">error</see> message texts.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
-        public static Task RunAsync(Func<Task> func, params string[] messages)
+        public static Task ThrowsAsync(Func<Task> func, params string[] messages)
         {
             var mic = new MessageItemCollection();
             foreach (var text in messages)
@@ -113,17 +113,17 @@ namespace Beef.Test.NUnit
                 mic.AddError(text);
             }
 
-            return RunAsync(func, mic);
+            return ThrowsAsync(func, mic);
         }
 
         /// <summary>
-        /// Runs the <paramref name="func"/> asynchonously expecting it to fail with a <see cref="ValidationException"/> containing the passed <paramref name="messages"/>.
+        /// Verifies the <paramref name="func"/> throws a <see cref="ValidationException"/> containing the passed <paramref name="messages"/> (asynchronous).
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
         /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
-        public static async Task RunAsync(Func<Task> func, MessageItemCollection messages)
+        public static async Task ThrowsAsync(Func<Task> func, MessageItemCollection messages)
         {
             Check.NotNull(func, nameof(func));
             Check.NotNull(messages, nameof(messages));
@@ -151,7 +151,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="expectedMessages">The expected messages.</param>
         /// <param name="vex">The validation exception.</param>
-        static internal void CompareExpectedVsActual(MessageItemCollection expectedMessages, ValidationException vex)
+        static public void CompareExpectedVsActual(MessageItemCollection expectedMessages, ValidationException vex)
         {
             Check.NotNull(vex, nameof(vex));
             CompareExpectedVsActual(expectedMessages, vex.Messages);
@@ -162,7 +162,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="expectedMessages">The expected messages.</param>
         /// <param name="actualMessages">The actual messages.</param>
-        static internal void CompareExpectedVsActual(MessageItemCollection expectedMessages, MessageItemCollection actualMessages)
+        static public void CompareExpectedVsActual(MessageItemCollection expectedMessages, MessageItemCollection actualMessages)
         {
             var exp = (from e in expectedMessages ?? new MessageItemCollection()
                        where !actualMessages.Any(a => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))

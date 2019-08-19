@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+- *Fixed:* Renamed the `Run` methods to `Throws` within the `ExpectValidationException` to be consistent with `ExpectException`. As this is a rename, will result in a breaking compilation error that will need to be resolved.
+
 ## v2.1.6
 - *Fixed:* `AgentTester.StartupTestServer` optional method overload changed from `TestServer` to `IWebHostBuilder`.
 
