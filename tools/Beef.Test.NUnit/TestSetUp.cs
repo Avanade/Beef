@@ -127,8 +127,6 @@ namespace Beef.Test.NUnit
         {
             lock (_lock)
             {
-                Factory.ResetLocal();
-
                 ShouldContinueRunningTestsAssert();
 
                 if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object needsSetUp) && !(bool)needsSetUp)
@@ -140,6 +138,8 @@ namespace Beef.Test.NUnit
                     {
                         if (_registeredSetUp != null)
                         {
+                            Factory.ResetLocal();
+
                             Logger.Default.Info(null);
                             Logger.Default.Info("Invocation of registered set up action.");
                             Logger.Default.Info(new string('=', 80));

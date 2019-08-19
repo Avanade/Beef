@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Sets up the <see cref="ExecutionContext"/> for the likes of an <see cref="AgentTester"/> test execution. 
+    /// Sets up the <see cref="ExecutionContext"/> for the likes of an <see cref="AgentTester"/> test execution, as well as performing a <see cref="Factory.ResetLocal"/>.
     /// </summary>
     [DebuggerStepThrough()]
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
@@ -92,6 +92,7 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
+                    Factory.ResetLocal();
                     ExecutionContext.Reset(false);
                     ExecutionContext.SetCurrent(AgentTester.CreateExecutionContext(_username, _args));
                     ExecutionContext.Current.Properties["InvokeRegisteredSetUp"] = _needsSetUp;

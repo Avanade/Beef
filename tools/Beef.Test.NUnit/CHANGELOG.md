@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.8
+- *Fixed:* `Factory.ResetLocal` was incorrectly being called for each `AgentTester` tester invocation; accidently resetting previously set mock objects for the test.
+
 ## v2.1.7
 - *Fixed:* Renamed the `Run` methods to `Throws` within the `ExpectValidationException` to be consistent with `ExpectException`. As this is a rename, will result in a breaking compilation error that will need to be resolved.
 
