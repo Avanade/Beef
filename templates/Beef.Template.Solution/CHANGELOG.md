@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.4
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v2.1.3
 - *Enhancement:* Added `PersonValidator` and `PersonTest` for end-to-end example.
 

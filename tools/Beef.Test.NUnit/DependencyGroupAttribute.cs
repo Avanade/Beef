@@ -14,7 +14,7 @@ namespace Beef.Test.NUnit
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class DependencyGroupAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
-        private static KeyOnlyDictionary<string> _badGroups = new KeyOnlyDictionary<string>();
+        private static readonly KeyOnlyDictionary<string> _badGroups = new KeyOnlyDictionary<string>();
 
         private readonly string _group;
 

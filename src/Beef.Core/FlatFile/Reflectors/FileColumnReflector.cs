@@ -15,7 +15,7 @@ namespace Beef.FlatFile.Reflectors
     public sealed class FileColumnReflector
     {
         private string _text;
-        private ITextValueConverter _valueConverter;
+        private readonly ITextValueConverter _valueConverter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileColumnReflector"/> class.
@@ -366,7 +366,7 @@ namespace Beef.FlatFile.Reflectors
                 if (PropertyTypeCode == TypeCode.Int32)
                     val = (int)record.LineNumber;
                 else
-                    val = (long)record.LineNumber;
+                    val = record.LineNumber;
             }
             else
                 val = PropertyInfo.GetValue(record.Value);

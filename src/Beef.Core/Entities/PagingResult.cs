@@ -33,7 +33,7 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="PagingResult"/> class from a <see cref="PagingResult"/> (copies values).
         /// </summary>
         /// <param name="pagingResult"></param>
-        public PagingResult(PagingResult pagingResult) : this((PagingArgs)pagingResult, pagingResult.TotalCount) { }
+        public PagingResult(PagingResult pagingResult) : this(pagingResult, pagingResult.TotalCount) { }
 
         /// <summary>
         /// Gets or sets the total count of the elements in the sequence (a <c>null</c> value indicates that the total count is unknown).

@@ -427,7 +427,7 @@ namespace Beef.WebApi
                     var result = new WebApiAgentResult(await Client.SendAsync(CreateRequestMessage(HttpMethod.Post, uri, CreateJsonContentFromValue(value), requestOptions)).ConfigureAwait(false));
                     result.Content = await result.Response.Content.ReadAsStringAsync();
                     return VerifyResult(result);
-                },  null, memberName, filePath, lineNumber);
+                }, null, memberName, filePath, lineNumber);
             }
         }
 
@@ -670,7 +670,7 @@ namespace Beef.WebApi
         {
             if (value == null)
                 return null;
-            
+
             var content = new StringContent(JsonConvert.SerializeObject(value));
             content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
             return content;

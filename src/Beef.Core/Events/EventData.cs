@@ -168,7 +168,7 @@ namespace Beef.Events
         /// Gets or sets the entity tag.
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string ETag { get; set; } 
+        public string ETag { get; set; }
 
         /// <summary>
         /// Resets the value to the default.

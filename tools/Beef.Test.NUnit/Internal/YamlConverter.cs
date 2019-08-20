@@ -16,7 +16,7 @@ namespace Beef.Test.NUnit.Internal
     public class YamlConverter
     {
         private readonly JObject _json;
-        
+
         /// <summary>
         /// Gets or sets the default <see cref="ChangeLog.CreatedDate"/> value.
         /// </summary>

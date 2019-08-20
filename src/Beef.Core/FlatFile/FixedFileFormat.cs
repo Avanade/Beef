@@ -15,8 +15,8 @@ namespace Beef.FlatFile
     /// <typeparam name="TContent">The primary content <see cref="Type"/>.</typeparam>
     public class FixedFileFormat<TContent> : FileFormat<TContent> where TContent : class, new()
     {
-        private static object _lock = new object();
-        private static Dictionary<Type, int> _recordLengths = new Dictionary<Type, int>();
+        private static readonly object _lock = new object();
+        private static readonly Dictionary<Type, int> _recordLengths = new Dictionary<Type, int>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FixedFileFormat{TContent}"/> class with no hierarchy.
@@ -32,7 +32,7 @@ namespace Beef.FlatFile
         /// <param name="columnPosition">The <see cref="HierarchyColumnPosition"/>.</param>
         /// <param name="columnLength">The <see cref="HierarchyColumnLength"/>.</param>
         /// <param name="contentValidator">The content <see cref="ValidatorBase{TEntity}">validator</see>.</param>
-        public FixedFileFormat(string contentRecordIdentifier, int columnPosition, int columnLength, ValidatorBase<TContent> contentValidator = null) 
+        public FixedFileFormat(string contentRecordIdentifier, int columnPosition, int columnLength, ValidatorBase<TContent> contentValidator = null)
             : base(contentRecordIdentifier, contentValidator)
         {
             if (string.IsNullOrEmpty(contentRecordIdentifier))
@@ -110,10 +110,10 @@ namespace Beef.FlatFile
                 if (fcr.FileColumn.Width <= 0)
                     throw new InvalidOperationException(string.Format("Type '{0}' has column '{1}' with no width specified; this is required for a fixed file format.", type.Name, fcr.PropertyInfo.Name));
 
-                col = pos + fcr.FileColumn.Width > record.LineData.Length ? record.LineData.Substring(pos) : record.LineData.Substring(pos, (int)fcr.FileColumn.Width);
+                col = pos + fcr.FileColumn.Width > record.LineData.Length ? record.LineData.Substring(pos) : record.LineData.Substring(pos, fcr.FileColumn.Width);
                 cols.Add(col);
                 fcr.SetValue(record, CleanString(col, fcr.FileColumn), val);
-                pos += (int)fcr.FileColumn.Width;
+                pos += fcr.FileColumn.Width;
             }
 
             // Where more data than expected add remainder as an extra column.

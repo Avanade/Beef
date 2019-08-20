@@ -111,7 +111,7 @@ namespace Beef.Entities
             IncludeFields = pagingArgs.IncludeFields;
             ExcludeFields = pagingArgs.ExcludeFields;
         }
-        
+
         /// <summary>
         /// Gets page number for the elements in a sequence to select (see <see cref="CreatePageAndSize(long, long?, bool?)"/>).
         /// </summary>

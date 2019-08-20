@@ -12,13 +12,13 @@ namespace Beef.Entities
     [DebuggerDisplay("Type = {Type}, Text = {Text}, Property = {Property}")]
     [JsonObject(MemberSerialization.OptIn)]
     public class MessageItem : EntityBase
-	{
-		private MessageType _type;
-		private string _text;
-		private string _property;
+    {
+        private MessageType _type;
+        private string _text;
+        private string _property;
         private object _tag;
 
-		#region Static
+        #region Static
 
         /// <summary>
         /// Creates a new <see cref="MessageItem"/> with a specified <see cref="MessageType"/> and text.
@@ -123,34 +123,34 @@ namespace Beef.Entities
 
         #region Properties
 
-		/// <summary>
-		/// Gets the message severity validatorType.
-		/// </summary>
+        /// <summary>
+        /// Gets the message severity validatorType.
+        /// </summary>
         [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
         public MessageType Type
-		{
-			get { return _type; }
+        {
+            get { return _type; }
             set { SetValue<MessageType>(ref _type, value, false, false, TypeProperty); }
-		}
+        }
 
-		/// <summary>
-		/// Gets or sets the message text.
-		/// </summary>
+        /// <summary>
+        /// Gets or sets the message text.
+        /// </summary>
         [JsonProperty("text")]
         public string Text
-		{
-			get { return _text; }
-			set { SetValue<string>(ref _text, value, false, false, TextProperty); }
-		}
+        {
+            get { return _text; }
+            set { SetValue<string>(ref _text, value, false, false, TextProperty); }
+        }
 
-		/// <summary>
-		/// Gets or sets the name of the property that the message relates to.
-		/// </summary>
+        /// <summary>
+        /// Gets or sets the name of the property that the message relates to.
+        /// </summary>
         [JsonProperty("property", NullValueHandling = NullValueHandling.Ignore)]
         public string Property
-		{
-			get { return _property; }
-			set { SetValue<string>(ref _property, value, false, false, PropertyProperty); }
+        {
+            get { return _property; }
+            set { SetValue<string>(ref _property, value, false, false, PropertyProperty); }
         }
 
         /// <summary>
@@ -215,8 +215,8 @@ namespace Beef.Entities
         /// </summary>
         /// <returns>The message <see cref="Text"/>.</returns>
         public override string ToString()
-		{
-			return Text;
+        {
+            return Text;
         }
 
         /// <summary>

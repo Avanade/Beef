@@ -83,7 +83,7 @@ namespace Beef.Json
         /// </summary>
         private class UniqueKeyConfig
         {
-            private object _lock = new object();
+            private readonly object _lock = new object();
             private IPropertyReflector[] propertyReflectors = null;
 
             /// <summary>
@@ -389,8 +389,8 @@ namespace Beef.Json
 
                 // Get existing by unique key.
                 var uniqueKey = new UniqueKey(uk);
-                var item = current == null ? null : ukc.IsEntityBaseCollection 
-                    ? ((IEntityBaseCollection)current).GetByUniqueKey(uniqueKey) 
+                var item = current == null ? null : ukc.IsEntityBaseCollection
+                    ? ((IEntityBaseCollection)current).GetByUniqueKey(uniqueKey)
                     : current.OfType<EntityBase>().FirstOrDefault(x => uniqueKey.Equals(x.UniqueKey));
 
                 // Create new if not found.

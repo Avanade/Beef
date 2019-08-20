@@ -1,12 +1,12 @@
 // Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Collections.Specialized;
-using Beef.Entities;
+using System.Linq;
 
 namespace Beef.RefData
 {
@@ -19,10 +19,10 @@ namespace Beef.RefData
     /// <para>This collection only supports the <see cref="Add"/> of items; no other updates are supported.</para></remarks>
     public abstract class ReferenceDataCollectionBase<TItem> : IEnumerable<TItem>, ICollection<TItem>, IReferenceDataCollection, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
     {
-        private object _lock = new object();
-        private ReferenceDataIdCollection _rdcId;
-        private ReferenceDataCodeCollection _rdcCode;
-        private Dictionary<MappingsKey, string> _mappingsDict;
+        private readonly object _lock = new object();
+        private readonly ReferenceDataIdCollection _rdcId;
+        private readonly ReferenceDataCodeCollection _rdcCode;
+        private readonly Dictionary<MappingsKey, string> _mappingsDict;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataCollectionBase{TItem}"/> class with a default <see cref="ReferenceDataSortOrder.SortOrder"/>.
@@ -70,7 +70,7 @@ namespace Beef.RefData
         /// </summary>
         private class ReferenceDataIdCollection : KeyedCollection<object, TItem>
         {
-            private ReferenceDataCollectionBase<TItem> _owner;
+            private readonly ReferenceDataCollectionBase<TItem> _owner;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ReferenceDataIdCollection"/> class.
@@ -100,7 +100,7 @@ namespace Beef.RefData
         /// </summary>
         private class ReferenceDataCodeCollection : KeyedCollection<string, TItem>
         {
-            private ReferenceDataCollectionBase<TItem> _owner;
+            private readonly ReferenceDataCollectionBase<TItem> _owner;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ReferenceDataCodeCollection"/> class.
@@ -341,7 +341,7 @@ namespace Beef.RefData
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
         ReferenceDataBase IReferenceDataCollection.GetByCode(string code)
         {
-            return (ReferenceDataBase)GetByCode(code);
+            return GetByCode(code);
         }
 
         /// <summary>

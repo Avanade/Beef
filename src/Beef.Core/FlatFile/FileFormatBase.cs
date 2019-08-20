@@ -40,8 +40,8 @@ namespace Beef.FlatFile
         /// </summary>
         public const char NoCharacter = char.MinValue;
 
-        private object _lock = new object();
-        private Dictionary<Type, FileRecordReflector> _cache = new Dictionary<Type, FileRecordReflector>();
+        private readonly object _lock = new object();
+        private readonly Dictionary<Type, FileRecordReflector> _cache = new Dictionary<Type, FileRecordReflector>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileFormat{TContent}"/> class.

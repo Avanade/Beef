@@ -56,7 +56,7 @@ namespace Beef
         /// <returns>The <see cref="LText"/> string value.</returns>
         public override string ToString()
         {
-            return (string)this;
+            return this;
         }
 
         /// <summary>

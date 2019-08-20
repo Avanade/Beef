@@ -92,7 +92,7 @@ namespace Beef.WebApi
         /// </summary>
         public class RegisteredData
         {
-            private static Dictionary<Uri, HttpClient> _clientCache = new Dictionary<Uri, HttpClient>();
+            private static readonly Dictionary<Uri, HttpClient> _clientCache = new Dictionary<Uri, HttpClient>();
 
             private HttpClient _client;
             private Uri _baseAddress;

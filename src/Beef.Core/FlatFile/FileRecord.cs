@@ -78,7 +78,7 @@ namespace Beef.FlatFile
         /// Gets or sets the level within the hierarchy (less than zero indicates that it <see cref="IsOrphaned"/>.
         /// </summary>
         public int Level { get; internal set; } = -1;
-        
+
         /// <summary>
         /// Indicates whether it is the root record (<see cref="Level"/> is equal to zero).
         /// </summary>

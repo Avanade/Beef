@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using System.Linq;
-using System.Diagnostics;
 using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Beef.FlatFile
 {
@@ -50,7 +50,7 @@ namespace Beef.FlatFile
         /// of the <see cref="Records"/>);
         /// </summary>
         public bool HasErrors { get; private set; }
-        
+
         /// <summary>
         /// Gets the line number for the first record (see <see cref="Records"/>).
         /// </summary>
@@ -89,6 +89,6 @@ namespace Beef.FlatFile
         /// <summary>
         /// Gets the typed value (see <see cref="FileOperationResult.Value"/>.
         /// </summary>
-        public new T Value => (T)base.Value; 
+        public new T Value => (T)base.Value;
     }
 }

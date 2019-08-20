@@ -24,7 +24,7 @@ namespace Beef.Executors
         private readonly Func<Executor> _createExecutor;
         private ManualResetEvent _waiter;
         private readonly object _lock = new object();
-        private Dictionary<Guid, Executor> _executors = new Dictionary<Guid, Executor>();
+        private readonly Dictionary<Guid, Executor> _executors = new Dictionary<Guid, Executor>();
         private Stopwatch _stopwatch;
         private Exception _ctorException;
 

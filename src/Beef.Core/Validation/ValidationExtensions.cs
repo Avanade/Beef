@@ -328,7 +328,7 @@ namespace Beef.Validation
         /// <param name="compareToText">The compare to text <see cref="LText"/> to be passed for the error message (default is to use <paramref name="compareToValue"/>).</param>
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> CompareValue<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, CompareOperator compareOperator, TProperty compareToValue, LText compareToText = null, LText errorText = null) 
+        public static PropertyRuleBase<TEntity, TProperty> CompareValue<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, CompareOperator compareOperator, TProperty compareToValue, LText compareToText = null, LText errorText = null)
             where TEntity : class
         {
             return rule.AddRule(new CompareValueRule<TEntity, TProperty>(compareOperator, compareToValue, compareToText) { ErrorText = errorText });
@@ -595,9 +595,12 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, Decimal}"/>.</returns>
         public static PropertyRuleBase<TEntity, decimal> Currency<TEntity>(this PropertyRuleBase<TEntity, decimal> rule, bool allowNegatives = false, int? maxDigits = null, NumberFormatInfo currencyFormatInfo = null, LText errorText = null) where TEntity : class
         {
-            return rule.AddRule(new DecimalRule<TEntity, decimal> { AllowNegatives = allowNegatives, MaxDigits = maxDigits,
-                                                                    DecimalPlaces = currencyFormatInfo == null ? NumberFormatInfo.CurrentInfo.CurrencyDecimalDigits : currencyFormatInfo.CurrencyDecimalDigits,
-                                                                    ErrorText = errorText
+            return rule.AddRule(new DecimalRule<TEntity, decimal>
+            {
+                AllowNegatives = allowNegatives,
+                MaxDigits = maxDigits,
+                DecimalPlaces = currencyFormatInfo == null ? NumberFormatInfo.CurrentInfo.CurrencyDecimalDigits : currencyFormatInfo.CurrencyDecimalDigits,
+                ErrorText = errorText
             });
         }
 
@@ -614,9 +617,12 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, Decimal}"/>.</returns>
         public static PropertyRuleBase<TEntity, decimal?> Currency<TEntity>(this PropertyRuleBase<TEntity, decimal?> rule, bool allowNegatives = false, int? maxDigits = null, NumberFormatInfo currencyFormatInfo = null, LText errorText = null) where TEntity : class
         {
-            return rule.AddRule(new DecimalRule<TEntity, decimal?> { AllowNegatives = allowNegatives, MaxDigits = maxDigits,
-                                                                     DecimalPlaces = currencyFormatInfo == null ? NumberFormatInfo.CurrentInfo.CurrencyDecimalDigits : currencyFormatInfo.CurrencyDecimalDigits,
-                                                                     ErrorText = errorText
+            return rule.AddRule(new DecimalRule<TEntity, decimal?>
+            {
+                AllowNegatives = allowNegatives,
+                MaxDigits = maxDigits,
+                DecimalPlaces = currencyFormatInfo == null ? NumberFormatInfo.CurrentInfo.CurrencyDecimalDigits : currencyFormatInfo.CurrencyDecimalDigits,
+                ErrorText = errorText
             });
         }
 
@@ -632,8 +638,8 @@ namespace Beef.Validation
         /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
         /// <param name="errorText">The error message format text <see cref="LText"/> (overrides the default).</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> IsValid<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, LText errorText = null) 
-            where TEntity : class 
+        public static PropertyRuleBase<TEntity, TProperty> IsValid<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule, LText errorText = null)
+            where TEntity : class
             where TProperty : ReferenceDataBase
         {
             return rule.AddRule(new ReferenceDataRule<TEntity, TProperty> { ErrorText = errorText });
@@ -692,7 +698,7 @@ namespace Beef.Validation
         /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
         /// <param name="validator">The validator.</param>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public static PropertyRuleBase<TEntity, TProperty> Entity<TEntity, TProperty, TValidator>(this PropertyRuleBase<TEntity, TProperty> rule, TValidator validator) 
+        public static PropertyRuleBase<TEntity, TProperty> Entity<TEntity, TProperty, TValidator>(this PropertyRuleBase<TEntity, TProperty> rule, TValidator validator)
             where TEntity : class
             where TProperty : class
             where TValidator : Validator<TProperty>

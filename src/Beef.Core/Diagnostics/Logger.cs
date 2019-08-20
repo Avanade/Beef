@@ -103,7 +103,7 @@ namespace Beef.Diagnostics
         private void Write(Exception exception, object data, LogMessageType type, string format, params object[] values)
         {
             if (exception == null)
-                throw new ArgumentNullException(nameof(exception)); 
+                throw new ArgumentNullException(nameof(exception));
 
             if (string.IsNullOrEmpty(format))
                 throw new ArgumentNullException(nameof(format));

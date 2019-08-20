@@ -30,8 +30,8 @@ namespace Beef.Validation
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public abstract class PropertyRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private List<IValueRule<TEntity, TProperty>> _rules = new List<IValueRule<TEntity, TProperty>>();
-        private List<IPropertyRuleClause<TEntity>> _clauses = new List<IPropertyRuleClause<TEntity>>();
+        private readonly List<IValueRule<TEntity, TProperty>> _rules = new List<IValueRule<TEntity, TProperty>>();
+        private readonly List<IPropertyRuleClause<TEntity>> _clauses = new List<IPropertyRuleClause<TEntity>>();
 
         /// <summary>
         /// Gets the property name.
@@ -214,7 +214,7 @@ namespace Beef.Validation
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class PropertyRule<TEntity, TProperty> : PropertyRuleBase<TEntity, TProperty>, IPropertyRule<TEntity>, IValueRule<TEntity, TProperty> where TEntity : class
     {
-        private PropertyExpression<TEntity, TProperty> _property;
+        private readonly PropertyExpression<TEntity, TProperty> _property;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyRule{TEntity, TProperty}"/> class.
@@ -250,7 +250,7 @@ namespace Beef.Validation
 
             // Get the property value and create the property context.
             var value = _property.GetValue(context.Value);
-            var ctx = new PropertyContext<TEntity,TProperty>(context, value, this.Name, this.JsonName, this.Text);
+            var ctx = new PropertyContext<TEntity, TProperty>(context, value, this.Name, this.JsonName, this.Text);
 
             // Run the rules.
             Invoke(ctx);

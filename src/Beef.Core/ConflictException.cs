@@ -38,7 +38,7 @@ namespace Beef
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.ConflictError"/>).
         /// </summary>
-        public ErrorType ErrorType 
+        public ErrorType ErrorType
         {
             get { return ErrorType.ConflictError; }
         }

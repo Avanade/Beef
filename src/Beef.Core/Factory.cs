@@ -87,7 +87,7 @@ namespace Beef
         /// where there is no leading "I" the interface name will be used as-is.</remarks>
         public const string DefaultNameSubstitutionPattern = "(?(^[I][A-Z])^[I])";
 
-        private static Regex SubstitutionRegex = new Regex(DefaultNameSubstitutionPattern);
+        private static readonly Regex SubstitutionRegex = new Regex(DefaultNameSubstitutionPattern);
         private static readonly object _lock = new object();
         private static readonly Dictionary<string, string> _typeProviders = new Dictionary<string, string>();
         private static readonly List<Substitution> _substitutions = new List<Substitution>();

@@ -11,9 +11,9 @@ namespace Beef.Validation.Clauses
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class WhenClause<TEntity, TProperty> : IPropertyRuleClause<TEntity, TProperty> where TEntity : class
     {
-        private Predicate<TEntity> _entityPredicate;
-        private Predicate<TProperty> _propertyPredicate;
-        private Func<bool> _when;
+        private readonly Predicate<TEntity> _entityPredicate;
+        private readonly Predicate<TProperty> _propertyPredicate;
+        private readonly Func<bool> _when;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WhenClause{TEntity, TProperty}"/> class with a <paramref name="predicate"/> being passed the <typeparamref name="TEntity"/>.

@@ -10,7 +10,7 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValidator">The property validator <see cref="Type"/>.</typeparam>
-    public class EntityRule<TEntity, TProperty, TValidator> : ValueRuleBase<TEntity, TProperty> 
+    public class EntityRule<TEntity, TProperty, TValidator> : ValueRuleBase<TEntity, TProperty>
         where TEntity : class
         where TProperty : class
         where TValidator : Validator<TProperty>

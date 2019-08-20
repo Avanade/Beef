@@ -465,5 +465,5 @@ namespace Beef
         }
 
         #endregion
-    }   
+    }
 }

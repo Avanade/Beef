@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using System;
 using System.Collections.Generic;
-using Beef.Entities;
 
 namespace Beef.RefData
 {
@@ -15,7 +15,7 @@ namespace Beef.RefData
     public class ReferenceDataContext
     {
         private DateTime? _date;
-        private Dictionary<Type, DateTime?> _coll = new Dictionary<Type, DateTime?>();
+        private readonly Dictionary<Type, DateTime?> _coll = new Dictionary<Type, DateTime?>();
 
         /// <summary>
         /// Initializes a new instances of the <see cref="ReferenceDataContext"/>.

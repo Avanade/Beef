@@ -9,7 +9,7 @@ namespace Beef.Entities
     /// </summary>
     public class BeforePropertyChangedEventArgs : PropertyChangedEventArgs
     {
-        private object _newValue;
+        private readonly object _newValue;
         private bool _cancel;
 
         /// <summary>

@@ -56,7 +56,7 @@ namespace Beef.Entities
 
             return false;
         }
-        
+
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
@@ -282,7 +282,7 @@ namespace Beef.Entities
                 return true;
             }
         }
-       
+
         /// <summary>
         /// Sets a <see cref="DateTime"/> property value and raises the <see cref="PropertyChanged"/> event where applicable.
         /// </summary>

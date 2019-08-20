@@ -11,11 +11,11 @@ namespace Beef
     /// </summary>
     public class DataContextScope : IDisposable
     {
-        private static Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
+        private static readonly Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
 
-        private DataContextScope _parent;
-        private DataContextScopeOption _option;
-        private Dictionary<Type, object> _dataContexts = null;
+        private readonly DataContextScope _parent;
+        private readonly DataContextScopeOption _option;
+        private readonly Dictionary<Type, object> _dataContexts = null;
 
         /// <summary>
         /// Register a <b>context</b> and its creation function.

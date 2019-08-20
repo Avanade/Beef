@@ -111,7 +111,7 @@ namespace Beef.Entities
         /// <remarks>This is provided to enable the likes of <b>LINQ</b> based queries over the collection.</remarks>
         public new IEnumerable<TEntity> Items
         {
-            get { return (IEnumerable<TEntity>)base.Items; }
+            get { return base.Items; }
         }
 
         /// <summary>

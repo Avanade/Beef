@@ -25,7 +25,7 @@ namespace Beef.FlatFile
         /// <param name="delimiter">The <see cref="Delimiter"/>.</param>
         /// <param name="textQualifier">The <see cref="TextQualifier"/>.</param>
         /// <param name="contentValidator">The content <see cref="ValidatorBase{TEntity}">validator</see>.</param>
-        public DelimitedFileFormat(char delimiter = CommaCharater, char textQualifier = DoubleQuoteCharacter, ValidatorBase<TContent> contentValidator = null) 
+        public DelimitedFileFormat(char delimiter = CommaCharater, char textQualifier = DoubleQuoteCharacter, ValidatorBase<TContent> contentValidator = null)
             : base(null, contentValidator)
         {
             SetDelimiters(delimiter, textQualifier);

@@ -14,8 +14,8 @@ namespace Beef.FlatFile
     /// <typeparam name="TContent">The primary content <see cref="Type"/>.</typeparam>
     public sealed class FileWriter<TContent> : FileWriterBase where TContent : class, new()
     {
-        private TextWriter _textWriter;
-        private FileFormat<TContent> _fileFormat;
+        private readonly TextWriter _textWriter;
+        private readonly FileFormat<TContent> _fileFormat;
         private bool _isEndOfFile;
         private bool _writtenHeader = false;
         private bool _writtenContent = false;

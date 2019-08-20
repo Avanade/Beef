@@ -6,12 +6,12 @@ namespace Beef.Entities
     /// Represents the type of <see cref="MessageItem"/>.
     /// </summary>
     public enum MessageType
-	{
-		/// <summary>Indicates an informational message.</summary>
-		Info = 0,
-		/// <summary>Indicates a warning message.</summary>
-		Warning = 1,
-		/// <summary>Indicates an error message.</summary>
-		Error = 2,
-	}
+    {
+        /// <summary>Indicates an informational message.</summary>
+        Info = 0,
+        /// <summary>Indicates a warning message.</summary>
+        Warning = 1,
+        /// <summary>Indicates an error message.</summary>
+        Error = 2,
+    }
 }

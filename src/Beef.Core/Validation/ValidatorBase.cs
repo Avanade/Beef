@@ -30,7 +30,7 @@ namespace Beef.Validation
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     public abstract class ValidatorBase<TEntity> : IValidator
-        where TEntity : class 
+        where TEntity : class
     {
         /// <summary>
         /// Gets the underlying rules collection.

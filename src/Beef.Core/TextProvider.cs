@@ -66,7 +66,7 @@ namespace Beef
     /// </summary>
     public class DefaultTextProvider : TextProvider
     {
-        private static ResourceManager _resourceManager = new ResourceManager("Beef.Strings.Resources", typeof(DefaultTextProvider).GetTypeInfo().Assembly);
+        private static readonly ResourceManager _resourceManager = new ResourceManager("Beef.Strings.Resources", typeof(DefaultTextProvider).GetTypeInfo().Assembly);
 
         /// <summary>
         /// Gets the text for the passed <see cref="LText"/>.

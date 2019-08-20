@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using System;
 using Newtonsoft.Json;
+using System;
 
 namespace Beef.Entities
 {
@@ -156,8 +156,8 @@ namespace Beef.Entities
             get
             {
                 return Cleaner.IsInitial(CreatedDate)
-                    && Cleaner.IsInitial(CreatedBy) 
-                    && Cleaner.IsInitial(UpdatedDate) 
+                    && Cleaner.IsInitial(CreatedBy)
+                    && Cleaner.IsInitial(UpdatedDate)
                     && Cleaner.IsInitial(UpdatedBy);
             }
         }

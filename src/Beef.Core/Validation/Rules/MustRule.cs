@@ -11,8 +11,8 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class MustRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private Predicate<TEntity> _predicate;
-        private Func<bool> _must;
+        private readonly Predicate<TEntity> _predicate;
+        private readonly Func<bool> _must;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MustRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.

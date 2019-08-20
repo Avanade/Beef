@@ -18,7 +18,7 @@ namespace Beef.Net.Http
     {
         private static readonly MultiPartReadState[] DataOrEmptyStates = new MultiPartReadState[] { MultiPartReadState.Data, MultiPartReadState.Empty };
 
-        private TextReader _reader;
+        private readonly TextReader _reader;
         private bool _isClosed = false;
         private string _line = null;
         private MultiPartReadState _state;

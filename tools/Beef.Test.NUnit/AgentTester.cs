@@ -25,7 +25,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Provides the base <b>Agent</b> testing capabilities.
     /// </summary>
-    [DebuggerStepThrough()] 
+    [DebuggerStepThrough()]
     public abstract class AgentTester
     {
         private static readonly object _lock = new object();

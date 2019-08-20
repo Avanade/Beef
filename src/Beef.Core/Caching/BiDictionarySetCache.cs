@@ -55,7 +55,7 @@ namespace Beef.Caching
         /// <summary>
         /// Gets the count of items in the cache (both expired and non-expired may co-exist until flushed).
         /// </summary>
-        public override long Count =>_dict1 == null ? 0 : _dict1.Count;
+        public override long Count => _dict1 == null ? 0 : _dict1.Count;
 
         /// <summary>
         /// Gets the cache.

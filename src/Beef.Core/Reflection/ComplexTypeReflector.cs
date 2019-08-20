@@ -139,7 +139,7 @@ namespace Beef.Reflection
                 return type;
 
             if (type.IsArray)
-               return type.GetElementType();
+                return type.GetElementType();
 
             var t = GetCollectionType(type);
             if (t != null)
