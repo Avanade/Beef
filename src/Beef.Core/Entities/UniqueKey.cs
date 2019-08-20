@@ -36,7 +36,7 @@ namespace Beef.Entities
                 if (_args == null)
                     _args = new object[] { };
 
-                return _args; 
+                return _args;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Beef.Entities
         {
             return (new UniqueKeyComparer()).GetHashCode(this);
         }
-   }
+    }
 
     /// <summary>
     /// Represents a comparer of equality for a <see cref="UniqueKey"/>.

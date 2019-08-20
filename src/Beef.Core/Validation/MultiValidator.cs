@@ -11,7 +11,7 @@ namespace Beef.Validation
     /// </summary>
     public class MultiValidatorResult
     {
-        private MessageItemCollection _messages = new MessageItemCollection();
+        private readonly MessageItemCollection _messages = new MessageItemCollection();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiValidatorResult"/> class.
@@ -74,7 +74,7 @@ namespace Beef.Validation
     /// </summary>
     public class MultiValidator
     {
-        private List<Func<MessageItemCollection>> _validators = new List<Func<MessageItemCollection>>();
+        private readonly List<Func<MessageItemCollection>> _validators = new List<Func<MessageItemCollection>>();
 
         /// <summary>
         /// Creates a new <see cref="MultiValidator"/> instance.

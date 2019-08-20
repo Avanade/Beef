@@ -16,8 +16,8 @@ namespace Beef.Caching.Policy
     {
         private static ICachePolicy _defaultPolicy = new NoExpiryCachePolicy();
         private static readonly object _lock = new object();
-        private static ConcurrentDictionary<string, ICachePolicy> _policies = new ConcurrentDictionary<string, ICachePolicy>();
-        private static ConcurrentDictionary<string, ICacheCore> _registered = new ConcurrentDictionary<string, ICacheCore>();
+        private static readonly ConcurrentDictionary<string, ICachePolicy> _policies = new ConcurrentDictionary<string, ICachePolicy>();
+        private static readonly ConcurrentDictionary<string, ICacheCore> _registered = new ConcurrentDictionary<string, ICacheCore>();
         private static Timer _timer;
         private static readonly Random _random = new Random();
 

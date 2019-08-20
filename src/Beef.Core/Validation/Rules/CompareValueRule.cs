@@ -13,7 +13,7 @@ namespace Beef.Validation.Rules
         where TEntity : class
     {
         private readonly TProperty _compareToValue;
-        private Func<TEntity, TProperty> _compareToValueFunction;
+        private readonly Func<TEntity, TProperty> _compareToValueFunction;
         private readonly LText _compareToText;
         private readonly Func<TEntity, LText> _compareToTextFunction;
 

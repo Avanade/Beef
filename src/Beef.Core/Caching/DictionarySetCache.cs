@@ -145,7 +145,7 @@ namespace Beef.Caching
             var cache = GetCache();
             if (!cache.ContainsKey(key))
             {
-                value = default(TValue);
+                value = default;
                 return false;
             }
 
@@ -170,7 +170,7 @@ namespace Beef.Caching
         protected override void OnFlushCache(bool ignoreExpiry)
         {
             if (_dict != null)
-                _dict.Clear();
+                _dict = null;
         }
     }
 }

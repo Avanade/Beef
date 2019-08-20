@@ -92,7 +92,6 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    //Factory.ResetLocal();
                     ExecutionContext.Reset(false);
                     ExecutionContext.SetCurrent(AgentTester.CreateExecutionContext(_username, _args));
                     ExecutionContext.Current.Properties["InvokeRegisteredSetUp"] = _needsSetUp;
@@ -116,6 +115,7 @@ namespace Beef.Test.NUnit
                 finally
                 {
                     ExecutionContext.Reset(false);
+                    Factory.ResetLocal();
                 }
 
                 // Remove any extraneous assertion results as this clutters/confuses the output.

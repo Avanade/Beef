@@ -59,7 +59,7 @@ namespace Beef.Mapper.Converters
         public TSrceProperty ConvertToSrce(int? value)
         {
             if (!value.HasValue)
-                return null; 
+                return null;
 
             return (TSrceProperty)ReferenceDataManager.Current[typeof(TSrceProperty)].GetById(value.Value);
         }

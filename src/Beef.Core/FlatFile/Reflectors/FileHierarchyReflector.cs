@@ -15,7 +15,7 @@ namespace Beef.FlatFile.Reflectors
     public sealed class FileHierarchyReflector
     {
         private string _text;
-        private ComplexTypeReflector _collTypeReflector;
+        private readonly ComplexTypeReflector _collTypeReflector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileHierarchyReflector"/> class.

@@ -22,6 +22,7 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets the number of cache hits (number of times <see cref="HasExpired"/> has been accessed).
         /// </summary>
+        /// <remarks>Where a cache hit results in a refresh the value is reset to zero; as a result this initial load is not accounted for within the hits.</remarks>
         long Hits { get; }
 
         /// <summary>

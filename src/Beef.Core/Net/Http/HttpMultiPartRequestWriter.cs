@@ -12,12 +12,12 @@ namespace Beef.Net.Http
     /// </summary>
     public class HttpMultiPartRequestWriter : IDisposable
     {
-        private TextWriter _writer;
+        private readonly TextWriter _writer;
         private Guid _batchId;
         private Guid _changeSetId;
         private int _changeSetCount = 1;
         private bool _isClosed = false;
-        private bool _isChangeSet = false;
+        private readonly bool _isChangeSet = false;
         private bool _isHeaderOutput = false;
 
         /// <summary>

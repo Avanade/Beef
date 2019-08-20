@@ -12,7 +12,7 @@ namespace Beef.Validation
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class ValueValidatorResult<TEntity, TProperty> where TEntity : class
     {
-        private PropertyContext<TEntity, TProperty> _context;
+        private readonly PropertyContext<TEntity, TProperty> _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueValidatorResult{TEntity, TProperty}"/> class.

@@ -540,7 +540,7 @@ namespace Beef.Mapper
             if (sourcePropertyValue == null)
                 return default(TDestProperty);
 
-            if ((!IsSrceComplexType && !IsDestComplexType) 
+            if ((!IsSrceComplexType && !IsDestComplexType)
                 || ((IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection)))
             {
                 if (Mapper != null)

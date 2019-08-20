@@ -114,7 +114,7 @@ namespace Beef.Reflection
         /// Gets the <see cref="Dictionary{TKey, TValue}"/> for storing additional data.
         /// </summary>
         Dictionary<string, object> Data { get; }
-        
+
         /// <summary>
         /// Gets the <see cref="IPropertyReflector"/> for the specified property name.
         /// </summary>
@@ -136,9 +136,9 @@ namespace Beef.Reflection
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     public class EntityReflector<TEntity> : IEntityReflector where TEntity : class, new()
     {
-        private Dictionary<string, IPropertyReflector<TEntity>> _properties;
-        private Dictionary<string, IPropertyReflector<TEntity>> _jsonProperties;
-        private Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Dictionary<string, IPropertyReflector<TEntity>> _properties;
+        private readonly Dictionary<string, IPropertyReflector<TEntity>> _jsonProperties;
+        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityReflector{TEntity}"/> class.
@@ -411,7 +411,7 @@ namespace Beef.Reflection
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class PropertyReflector<TEntity, TProperty> : IPropertyReflector<TEntity> where TEntity : class, new()
     {
-        private Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
+        private readonly Lazy<Dictionary<string, object>> _data = new Lazy<Dictionary<string, object>>(true);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyReflector{TEntity, TProperty}"/> class.

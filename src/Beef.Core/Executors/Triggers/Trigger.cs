@@ -40,7 +40,7 @@ namespace Beef.Executors.Triggers
         /// <summary>
         /// Gets the current <see cref="TriggerState"/>.
         /// </summary>
-        public TriggerState State { get; private set;  } = TriggerState.NotStarted;
+        public TriggerState State { get; private set; } = TriggerState.NotStarted;
 
         /// <summary>
         /// Gets the <see cref="TriggerResult"/>.

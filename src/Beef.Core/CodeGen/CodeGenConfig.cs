@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -146,7 +146,7 @@ namespace Beef.CodeGen
                 else if (typeof(T) == typeof(int))
                     return (T)(object)XmlConvert.ToInt32(val);
                 else if (typeof(T) == typeof(Enum))
-                    return (T)(object)Enum.Parse(typeof(T), val);
+                    return (T)Enum.Parse(typeof(T), val);
                 else
                     throw new CodeGenException(string.Format("Attribute '{0} value can not be converted to Type {1}.", name, typeof(T).Name));
             }

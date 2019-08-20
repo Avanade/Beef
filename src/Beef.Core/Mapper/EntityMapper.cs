@@ -17,7 +17,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the destination <see cref="Type"/>.
         /// </summary>
-        Type DestType { get ; }
+        Type DestType { get; }
 
         /// <summary>
         /// Maps the source to the destination.
@@ -49,7 +49,7 @@ namespace Beef.Mapper
     /// </summary>
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDest">The destination entity <see cref="Type"/>.</typeparam>
-    public interface IEntityMapper<TSrce, TDest> : IEntityMapper 
+    public interface IEntityMapper<TSrce, TDest> : IEntityMapper
     {
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property name.
@@ -109,9 +109,9 @@ namespace Beef.Mapper
         where TSrce : class, new()
         where TDest : class, new()
     {
-        private List<IPropertyMapper<TSrce, TDest>> _mappings = new List<IPropertyMapper<TSrce, TDest>>();
-        private Dictionary<string, IPropertyMapper<TSrce, TDest>> _srceMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
-        private Dictionary<string, IPropertyMapper<TSrce, TDest>> _destMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
+        private readonly List<IPropertyMapper<TSrce, TDest>> _mappings = new List<IPropertyMapper<TSrce, TDest>>();
+        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _srceMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
+        private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _destMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
         private IPropertyMapper<TSrce, TDest>[] _uniqueKey;
 
         /// <summary>

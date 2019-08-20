@@ -19,8 +19,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.IsTrue(dsc.ContainsKey(2));
             Assert.IsFalse(dsc.ContainsKey(3));
 
-            string val = null;
-            Assert.IsTrue(dsc.TryGetByKey(1, out val));
+            Assert.IsTrue(dsc.TryGetByKey(1, out string val));
             Assert.AreEqual("1", val);
 
             Assert.IsTrue(dsc.TryGetByKey(2, out val));
@@ -61,6 +60,28 @@ namespace Beef.Core.UnitTest.Caching
             Assert.IsTrue(dsc.ContainsKey(2));
             Assert.IsFalse(dsc.ContainsKey(3));
             Assert.AreEqual(2, dsc.Count);
+        }
+
+        [Test]
+        public void Flush()
+        {
+            CachePolicyManager.Reset();
+
+            using (var dsc = new DictionarySetCache<int, string>((data) => new KeyValuePair<int, string>[] { new KeyValuePair<int, string>(1, "1"), new KeyValuePair<int, string>(2, "2") }))
+            {
+                var policy = new DailyCachePolicy();
+                CachePolicyManager.Set(dsc.PolicyKey, policy);
+
+                Assert.IsTrue(dsc.ContainsKey(1));
+                Assert.IsTrue(dsc.ContainsKey(2));
+                Assert.AreEqual(1, dsc.GetPolicy().Hits);
+
+                dsc.Flush(true);
+
+                Assert.IsTrue(dsc.ContainsKey(1));
+                Assert.IsTrue(dsc.ContainsKey(2));
+                Assert.AreEqual(1, dsc.GetPolicy().Hits);
+            }
         }
     }
 }

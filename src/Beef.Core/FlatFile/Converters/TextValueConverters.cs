@@ -16,7 +16,7 @@ namespace Beef.FlatFile.Converters
             public object Converter { get; set; }
         }
 
-        private Dictionary<string, TextValueConverter> _dict = new Dictionary<string, TextValueConverter>();
+        private readonly Dictionary<string, TextValueConverter> _dict = new Dictionary<string, TextValueConverter>();
 
         /// <summary>
         /// Adds a default <see cref="ITextValueConverter{T}"/> for the <see cref="Type"/>.

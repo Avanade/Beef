@@ -15,11 +15,11 @@ namespace Beef.Caching
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
     public class KeyValueCache<TKey, TValue> : CacheCoreBase
     {
-        private ConcurrentDictionary<TKey, CacheValue<TValue>> _dict = new ConcurrentDictionary<TKey, CacheValue<TValue>>();
+        private readonly ConcurrentDictionary<TKey, CacheValue<TValue>> _dict = new ConcurrentDictionary<TKey, CacheValue<TValue>>();
         private readonly Func<TKey, TValue> _get;
         private readonly Func<TKey, Task<TValue>> _getAsync;
         private readonly bool _cacheDefaultValues;
-        private KeyedLock<TKey> _keyLock = new KeyedLock<TKey>();
+        private readonly KeyedLock<TKey> _keyLock = new KeyedLock<TKey>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValueCache{TKey, TValue}"/> class that automatically <see cref="CachePolicyManager.Register">registers</see> for centralised <see cref="CachePolicyManager.Flush"/> management.
@@ -136,7 +136,8 @@ namespace Beef.Caching
                 if (v == default)
                 {
                     value = default;
-                    return false;
+                    if (!_cacheDefaultValues)
+                        return false;
                 }
 
                 var policy = (ICachePolicy)GetPolicy().Clone();

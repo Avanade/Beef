@@ -13,7 +13,7 @@ namespace Beef.FlatFile.Reflectors
     /// </summary>
     public sealed class FileRecordReflector
     {
-        private Dictionary<string, int> _childrenIndexes = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _childrenIndexes = new Dictionary<string, int>();
         private object _validator;
         private MethodInfo _validateMI;
         private ValidationArgs _validationArgs;

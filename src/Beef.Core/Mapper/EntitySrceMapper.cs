@@ -8,7 +8,7 @@ namespace Beef.Mapper
     /// Enables the base source entity <see cref="Type"/> mapping capabilities. 
     /// </summary>
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
-    public interface IEntitySrceMapper<TSrce> : IEntityMapperBase 
+    public interface IEntitySrceMapper<TSrce> : IEntityMapperBase
     {
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property name.
@@ -31,9 +31,9 @@ namespace Beef.Mapper
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     public abstract class EntitySrceMapper<TSrce> : IEntitySrceMapper<TSrce> where TSrce : class
     {
-        private List<IPropertySrceMapper<TSrce>> _mappings = new List<IPropertySrceMapper<TSrce>>();
-        private Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
-        private Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
+        private readonly List<IPropertySrceMapper<TSrce>> _mappings = new List<IPropertySrceMapper<TSrce>>();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
+        private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
         private IPropertyMapperBase[] _uniqueKey;
 
         /// <summary>

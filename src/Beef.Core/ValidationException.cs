@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using Beef.Entities;
 
 namespace Beef
 {

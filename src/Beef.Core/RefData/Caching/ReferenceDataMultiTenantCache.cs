@@ -16,13 +16,13 @@ namespace Beef.RefData.Caching
     /// <typeparam name="TColl">The <see cref="ReferenceDataCollectionBase{TItem}"/> <see cref="Type"/> of the the collection.</typeparam>
     /// <typeparam name="TItem">The <see cref="ReferenceDataBase"/> <see cref="Type"/> for the collection.</typeparam>
     public class ReferenceDataMultiTenantCache<TColl, TItem> : CacheCoreBase, IReferenceDataCache<TColl, TItem>
-	    where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
-	    where TItem : ReferenceDataBase, new()
-	{
+        where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
+        where TItem : ReferenceDataBase, new()
+    {
         private readonly Func<Task<TColl>> _loadCollection;
-        private ConcurrentDictionary<Guid, CacheValue<TColl>> _dict = new ConcurrentDictionary<Guid, CacheValue<TColl>>();
-        private ReferenceDataCacheLoader _loader = ReferenceDataCacheLoader.Create();
-        private KeyedLock<Guid> _keyLock = new KeyedLock<Guid>();
+        private readonly ConcurrentDictionary<Guid, CacheValue<TColl>> _dict = new ConcurrentDictionary<Guid, CacheValue<TColl>>();
+        private readonly ReferenceDataCacheLoader _loader = ReferenceDataCacheLoader.Create();
+        private readonly KeyedLock<Guid> _keyLock = new KeyedLock<Guid>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataMultiTenantCache{TColl, TItem}"/> class.
@@ -55,10 +55,10 @@ namespace Beef.RefData.Caching
         /// </summary>
         /// <returns>The resultant <see cref="ReferenceDataCollectionBase{TItem}"/>.</returns>
         public TColl GetCollection()
-		{
+        {
             var tenantId = GetTenantId();
             return GetByTenantId(tenantId);
-		}
+        }
 
         /// <summary>
         /// Gets the tenant identifier from the Execution Context.
@@ -101,7 +101,7 @@ namespace Beef.RefData.Caching
         /// Gets/fills the collection whilst also making the cached data read only.
         /// </summary>
 		private TColl GetCollectionInternal()
-		{
+        {
             TColl coll = null;
             if (_loadCollection == null)
                 coll = new TColl();
@@ -144,7 +144,7 @@ namespace Beef.RefData.Caching
         /// <remarks>This provides a means to override the loading of the collection on as needed basis. Also, resets
         /// the cache expiry (<see cref="ICachePolicy.Reset"/>).</remarks>
         public void SetCollection(IEnumerable<TItem> items)
-		{
+        {
             var tenantId = GetTenantId();
 
             using (_keyLock.Lock(tenantId))
@@ -155,13 +155,13 @@ namespace Beef.RefData.Caching
                 foreach (var item in items)
                 {
                     item.MakeReadOnly();
-                    coll.Add((TItem)item);
+                    coll.Add(item);
                 }
 
                 coll.GenerateETag();
                 GetPolicyForTenant(tenantId).Reset();
             }
-		}
+        }
 
         /// <summary>
         /// Determines whether the cache contains the tenant.

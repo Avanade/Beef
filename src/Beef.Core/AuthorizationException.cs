@@ -37,7 +37,7 @@ namespace Beef
         /// <summary>
         /// Gets the <see cref="ErrorType"/> (see <see cref="ErrorType.AuthorizationError"/>).
         /// </summary>
-        public ErrorType ErrorType 
+        public ErrorType ErrorType
         {
             get { return ErrorType.AuthorizationError; }
         }

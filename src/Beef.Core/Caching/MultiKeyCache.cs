@@ -14,8 +14,8 @@ namespace Beef.Caching
         where TCache : ICacheCore
     {
         private readonly Func<TKey, ICachePolicy, TCache> _createCache;
-        private ConcurrentDictionary<TKey, TCache> _dict = new ConcurrentDictionary<TKey, TCache>();
-        private KeyedLock<TKey> _keyLock = new KeyedLock<TKey>();
+        private readonly ConcurrentDictionary<TKey, TCache> _dict = new ConcurrentDictionary<TKey, TCache>();
+        private readonly KeyedLock<TKey> _keyLock = new KeyedLock<TKey>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiKeyCache{TKey, TCache}"/> class.

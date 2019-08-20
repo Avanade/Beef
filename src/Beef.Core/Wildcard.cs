@@ -276,7 +276,7 @@ namespace Beef
         /// <summary>
         /// Gets the originating <see cref="Beef.Wildcard"/> configuration.
         /// </summary>
-        internal Wildcard Wildcard { get; set; } 
+        internal Wildcard Wildcard { get; set; }
 
         /// <summary>
         /// Gets the resulting <see cref="WildcardSelection"/>.

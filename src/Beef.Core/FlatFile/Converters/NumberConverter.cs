@@ -12,7 +12,7 @@ namespace Beef.FlatFile.Converters
     /// <typeparam name="T">The <see cref="Type"/> to convert; must be numeric.</typeparam>
     public class NumberConverter<T> : ITextValueConverter<T> where T : IFormattable
     {
-        private TypeCode _typeCode;
+        private readonly TypeCode _typeCode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NumberConverter{T}"/> class.

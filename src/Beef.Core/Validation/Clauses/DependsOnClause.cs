@@ -13,7 +13,7 @@ namespace Beef.Validation.Clauses
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class DependsOnClause<TEntity, TProperty> : IPropertyRuleClause<TEntity, TProperty> where TEntity : class
     {
-        private PropertyExpression<TEntity, TProperty> _dependsOn;
+        private readonly PropertyExpression<TEntity, TProperty> _dependsOn;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DependsOnClause{TEntity, TProperty}"/> class.

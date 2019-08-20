@@ -11,7 +11,7 @@ namespace Beef.Mapper.Converters
     /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
-    public abstract class ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> : IPropertyMapperConverter<TSrceProperty, TDestProperty> 
+    public abstract class ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty> : IPropertyMapperConverter<TSrceProperty, TDestProperty>
         where TDefault : ReferenceDataMappingConverter<TDefault, TSrceProperty, TDestProperty>, new()
         where TSrceProperty : ReferenceDataBase
         where TDestProperty : IComparable
@@ -29,7 +29,7 @@ namespace Beef.Mapper.Converters
         /// <param name="name">The <see cref="ReferenceDataBase"/> mapping name.</param>
         protected ReferenceDataMappingConverter(string name)
         {
-            Name = !string.IsNullOrEmpty(name) ? name :  throw new ArgumentNullException(nameof(name));
+            Name = !string.IsNullOrEmpty(name) ? name : throw new ArgumentNullException(nameof(name));
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace Beef.FlatFile.Internal
     /// </summary>
     internal class FileRecordHierarchyLinker
     {
-        private Dictionary<string, List<FileRecordHierarchyLinker>> _children = new Dictionary<string, List<FileRecordHierarchyLinker>>();
+        private readonly Dictionary<string, List<FileRecordHierarchyLinker>> _children = new Dictionary<string, List<FileRecordHierarchyLinker>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileRecordHierarchyLinker"/> class.

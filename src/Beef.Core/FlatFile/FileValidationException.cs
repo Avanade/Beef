@@ -30,5 +30,5 @@ namespace Beef.FlatFile
         /// Gets the corresponding <see cref="FileRecord"/>.
         /// </summary>
         public FileRecord Record { get; private set; }
-    } 
+    }
 }

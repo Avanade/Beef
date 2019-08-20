@@ -61,7 +61,7 @@ namespace Beef.Executors.Triggers
             {
                 TimerTriggerResult tr = null;
                 lock (_lock)
-                { 
+                {
                     _timer.Change(Timeout.Infinite, Timeout.Infinite);
                     tr = OnTrigger() ?? throw new InvalidOperationException("OnTrigger override must return a TimerTriggerResult instance.");
                     Trace(() => Logger.Default.Trace($"Trigger '{InstanceId}' timer has fired; Executor run enabled: {tr.IsExecutorRunEnabled}."));

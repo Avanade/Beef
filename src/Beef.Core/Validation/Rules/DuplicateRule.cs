@@ -11,8 +11,8 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class DuplicateRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private Predicate<TEntity> _predicate;
-        private Func<bool> _duplicate;
+        private readonly Predicate<TEntity> _predicate;
+        private readonly Func<bool> _duplicate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DuplicateRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.

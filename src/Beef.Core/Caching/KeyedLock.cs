@@ -20,7 +20,7 @@ namespace Beef.Caching
         public class KeyedLockManager : IDisposable
         {
             private readonly object _lock;
-            private bool _gotLock = false;
+            private readonly bool _gotLock = false;
 
             /// <summary>
             /// Private constructor.
@@ -95,7 +95,7 @@ namespace Beef.Caching
         /// <param name="key">The key value.</param>
         public void Remove(TKey key)
         {
-            _lockDict.TryRemove(key, out object o);
+            _lockDict.TryRemove(key, out _);
         }
 
         /// <summary>

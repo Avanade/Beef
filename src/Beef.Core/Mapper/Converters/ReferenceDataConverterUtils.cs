@@ -18,8 +18,8 @@ namespace Beef.Mapper.Converters
         /// <returns>The <paramref name="refData"/>.</returns>
         public static ReferenceDataBase CheckIsValid(Type refType, ReferenceDataBase refData)
         {
-            return !(refData != null && !refData.IsValid) 
-                ? refData 
+            return !(refData != null && !refData.IsValid)
+                ? refData
                 : throw new InvalidOperationException($"The '{refType.Name}' ReferenceData instance is not valid and is unable to be converted.");
         }
 

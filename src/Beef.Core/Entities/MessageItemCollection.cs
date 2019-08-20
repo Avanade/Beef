@@ -6,7 +6,7 @@ namespace Beef.Entities
     /// Represents a <see cref="MessageItem"/> collection.
     /// </summary>
 	public class MessageItemCollection : EntityBaseCollection<MessageItem>
-	{
+    {
         /// <summary>
         /// Adds a new <see cref="MessageItem"/> for a specified <see cref="MessageType"/> and text.
         /// </summary>
@@ -201,17 +201,17 @@ namespace Beef.Entities
         /// <param name="type">Message validatorType.</param>
         /// <returns>A new <see cref="MessageItemCollection"/>.</returns>
         public MessageItemCollection GetMessagesForType(MessageType type)
-		{
-			MessageItemCollection msgs = new MessageItemCollection();
+        {
+            MessageItemCollection msgs = new MessageItemCollection();
 
-			foreach (MessageItem item in this)
-			{
-				if (item.Type == type)
-					msgs.Add(item);
-			}
+            foreach (MessageItem item in this)
+            {
+                if (item.Type == type)
+                    msgs.Add(item);
+            }
 
-			return msgs;
-		}
+            return msgs;
+        }
 
         /// <summary>
         /// Gets a new <see cref="MessageItemCollection"/> for a selected <see cref="MessageType"/> and <see cref="MessageItem.Property"/>.
@@ -266,15 +266,15 @@ namespace Beef.Entities
         /// <param name="type">The <see cref="MessageType"/>.</param>
 		/// <returns><c>true</c> if a message exists; otherwise, <c>false</c>.</returns>
 		public bool ContainsType(MessageType type)
-		{
-			foreach (MessageItem item in this)
-			{
-				if (item.Type == type)
-					return true;
-			}
+        {
+            foreach (MessageItem item in this)
+            {
+                if (item.Type == type)
+                    return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
         /// <summary>
         /// Determines whether a message exists for a selected <see cref="MessageType"/> and <see cref="MessageItem.Property"/>.
@@ -321,5 +321,5 @@ namespace Beef.Entities
 
             return clone;
         }
-	}
+    }
 }

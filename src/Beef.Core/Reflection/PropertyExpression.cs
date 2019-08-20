@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 
 namespace Beef.Reflection
 {
@@ -63,7 +63,7 @@ namespace Beef.Reflection
             public bool ProbeForJsonRefDataSidProperties;
         }
 
-        private static Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
+        private static readonly Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
         private static readonly object _lock = new object();
 
         private Func<TEntity, TProperty> _func;

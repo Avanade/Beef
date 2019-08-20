@@ -9,11 +9,11 @@ namespace Beef.Validation
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TInclude">The entity base <see cref="Type"/>.</typeparam>
-    public class IncludeBaseRule<TEntity, TInclude> : ValidatorBase<TEntity>, IPropertyRule<TEntity> 
+    public class IncludeBaseRule<TEntity, TInclude> : ValidatorBase<TEntity>, IPropertyRule<TEntity>
         where TEntity : class
-        where TInclude : class 
+        where TInclude : class
     {
-        private ValidatorBase<TInclude> _include;
+        private readonly ValidatorBase<TInclude> _include;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IncludeBaseRule{TEntity, TInclude}"/> class.

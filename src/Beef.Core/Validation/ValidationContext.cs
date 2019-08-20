@@ -64,7 +64,7 @@ namespace Beef.Validation
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     public class ValidationContext<TEntity> : IValidationContext where TEntity : class
     {
-        private Dictionary<string, MessageItem> _propertyErrors = new Dictionary<string, MessageItem>();
+        private readonly Dictionary<string, MessageItem> _propertyErrors = new Dictionary<string, MessageItem>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationContext{TEntity}"/> class.
@@ -501,7 +501,7 @@ namespace Beef.Validation
         /// <summary>
         /// Creates the fully qualified name using the property and json property names.
         /// </summary>
-        private string CreateFullyQualifiedName(string propertyName, string jsonPropertyName) 
+        private string CreateFullyQualifiedName(string propertyName, string jsonPropertyName)
             => UseJsonNames ? CreateFullyQualifiedJsonPropertyName(jsonPropertyName) : CreateFullyQualifiedPropertyName(propertyName);
 
         /// <summary>

@@ -21,8 +21,8 @@ namespace Beef.FlatFile
     /// <para>The <see cref="FileReaderBase.StopOnError"/> will cause the enumerator to stop when an error is encountered.</para></remarks>
     public sealed class FileReader<TContent> : FileReaderBase, IEnumerable<FileOperationResult<TContent>> where TContent : class, new()
     {
-        private TextReader _textReader;
-        private FileFormat<TContent> _fileFormat;
+        private readonly TextReader _textReader;
+        private readonly FileFormat<TContent> _fileFormat;
         private FileRecordReflector _contentReflector;
         private Dictionary<string, FileRecordHierarchyItem> _hierarchy;
         private bool _hasHierarchy;
@@ -61,7 +61,7 @@ namespace Beef.FlatFile
         /// Internal read logic.
         /// </summary>
         private FileOperationResult ReadInternal()
-        { 
+        {
             // Check and see if we are already at the end of the file.
             if (IsEndOfFile)
                 throw new InvalidOperationException("Attempt made to read past the end of the file.");
@@ -459,8 +459,8 @@ namespace Beef.FlatFile
         private bool CheckCurrentIsLast()
         {
             return
-                _nextRecord == null 
-                || _nextRecord.RecordIdentifier == _fileFormat.ContentRecordIdentifier 
+                _nextRecord == null
+                || _nextRecord.RecordIdentifier == _fileFormat.ContentRecordIdentifier
                 || (_fileFormat.HeaderRecordIdentifier != null && _nextRecord.RecordIdentifier == _fileFormat.HeaderRecordIdentifier)
                 || (_fileFormat.TrailerRecordIdentifier != null && _nextRecord.RecordIdentifier == _fileFormat.TrailerRecordIdentifier);
         }

@@ -1,11 +1,11 @@
 // Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using Beef.Entities;
-using Newtonsoft.Json;
 using System.Reflection;
 
 namespace Beef.RefData
@@ -47,7 +47,7 @@ namespace Beef.RefData
         #endregion
 
         private static readonly object _lock = new object();
-        private static Dictionary<Type, ReferenceDataIdTypeCode> _typeCodeDict = new Dictionary<Type, ReferenceDataIdTypeCode>();
+        private static readonly Dictionary<Type, ReferenceDataIdTypeCode> _typeCodeDict = new Dictionary<Type, ReferenceDataIdTypeCode>();
 
         private RefDataKey _key = new RefDataKey(null, null);
         private bool _hasIdBeenUpdated = false;
@@ -325,7 +325,7 @@ namespace Beef.RefData
         protected internal void SetMapping<T>(string name, T value) where T : IComparable
         {
             if (Comparer<T>.Default.Compare(value, default(T)) == 0)
-                return; 
+                return;
 
             if (Mappings.ContainsKey(name))
                 throw new InvalidOperationException(ValueIsImmutableMessage);
@@ -470,7 +470,7 @@ namespace Beef.RefData
         public override bool Equals(object obj)
         {
             // A null is not equal.
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             // Ensure the two types are the same.

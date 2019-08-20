@@ -15,7 +15,7 @@ namespace Beef.Executors
     {
         private ExecutionManager _executionManager;
         private readonly object _lock = new object();
-        private Stack<object> _stack = new Stack<object>();
+        private readonly Stack<object> _stack = new Stack<object>();
         private Action _triggerCallback;
         private Stopwatch _stopwatch;
 

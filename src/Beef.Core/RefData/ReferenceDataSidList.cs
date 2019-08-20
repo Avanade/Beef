@@ -44,7 +44,7 @@ namespace Beef.RefData
     public class ReferenceDataSidList<TItem, TSid> : ReferenceDataSidListBase, IList<TItem>, IEnumerable<TItem>, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
     {
         private static readonly SidType _sidType = SidType.Unknown;
-        private List<TSid> _sids;
+        private readonly List<TSid> _sids;
 
         /// <summary>
         /// Static initializer.
@@ -204,7 +204,7 @@ namespace Beef.RefData
 
                     case SidType.Int32:
                     case SidType.Guid:
-                        return (TSid)(object)item.Id;
+                        return (TSid)item.Id;
                 }
             }
 
@@ -239,7 +239,7 @@ namespace Beef.RefData
         {
             foreach (TSid sid in _sids)
             {
-                yield return (TItem)GetItem(sid);
+                yield return GetItem(sid);
             }
         }
 
