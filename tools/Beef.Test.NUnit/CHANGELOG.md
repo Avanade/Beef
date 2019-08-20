@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.10
+- *Fixed:* `Factory.ResetLocal` added to the internal finally (try-catch) for a `TestSetUpAttribute`. This will ensure configuration does not cross invocations; appears to be an edgecase for parallel testing.
+
 ## v2.1.9
 - *Fixed:* Given the `AsyncLocal` nature of the _Factory Local_ implementation there should be no need to perform a `Factory.ResetLocal` - the invocations have been removed.
 

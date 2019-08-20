@@ -161,7 +161,7 @@ namespace Beef.Caching
             var cache = GetCache1();
             if (!cache.ContainsKey(key1))
             {
-                value = default(TValue);
+                value = default;
                 return false;
             }
 
@@ -204,7 +204,7 @@ namespace Beef.Caching
             var cache = GetCache2();
             if (!cache.ContainsKey(key2))
             {
-                value = default(TValue);
+                value = default;
                 return false;
             }
 
@@ -229,10 +229,10 @@ namespace Beef.Caching
         protected override void OnFlushCache(bool ignoreExpiry)
         {
             if (_dict1 != null)
-                _dict1.Clear();
+                _dict1 = null;
 
             if (_dict1 != null)
-                _dict2.Clear();
+                _dict2 = null;
         }
     }
 }

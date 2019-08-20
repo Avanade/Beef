@@ -145,7 +145,7 @@ namespace Beef.Caching
             var cache = GetCache1();
             if (!cache.ContainsKey(key1))
             {
-                key2 = default(TKey2);
+                key2 = default;
                 return false;
             }
 
@@ -188,7 +188,7 @@ namespace Beef.Caching
             var cache = GetCache2();
             if (!cache.ContainsKey(key2))
             {
-                key1 = default(TKey1);
+                key1 = default;
                 return false;
             }
 
@@ -212,8 +212,8 @@ namespace Beef.Caching
         /// <param name="ignoreExpiry"><c>true</c> indicates to flush immediately; otherwise, <c>false</c> to only flush when the <see cref="ICachePolicy"/> is <see cref="ICachePolicy.IsExpired"/> (default).</param>
         protected override void OnFlushCache(bool ignoreExpiry)
         {
-            _dict1.Clear();
-            _dict2.Clear();
+            _dict1 = null;
+            _dict2 = null;
         }
     }
 }

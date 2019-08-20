@@ -17,10 +17,10 @@ namespace Beef.Caching
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
     public class TwoKeyValueCache<TKey1, TKey2, TValue> : CacheCoreBase
     {
-        private ConcurrentDictionary<TKey1, CacheValue> _dict1 = new ConcurrentDictionary<TKey1, CacheValue>();
-        private ConcurrentDictionary<TKey2, CacheValue> _dict2 = new ConcurrentDictionary<TKey2, CacheValue>();
-        private KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>();
-        private KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>();
+        private readonly ConcurrentDictionary<TKey1, CacheValue> _dict1 = new ConcurrentDictionary<TKey1, CacheValue>();
+        private readonly ConcurrentDictionary<TKey2, CacheValue> _dict2 = new ConcurrentDictionary<TKey2, CacheValue>();
+        private readonly KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>();
+        private readonly KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>();
 
         private readonly Func<TKey1, (bool hasValue, TKey2 key2, TValue value)> _get1;
         private readonly Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>> _getAsync1;
