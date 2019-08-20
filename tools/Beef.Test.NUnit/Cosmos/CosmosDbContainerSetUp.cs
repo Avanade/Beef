@@ -150,7 +150,17 @@ namespace Beef.Test.NUnit.Cosmos
             Check.NotNull(refData, nameof(refData));
             Check.NotEmpty(yamlResourceName, nameof(yamlResourceName));
 
+            var ass = typeof(TResource).Assembly;
+            var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($"Cosmos.{Check.NotNull(yamlResourceName, nameof(yamlResourceName))}"));
+            if (rn == null || rn.Count() > 1)
+                throw new ArgumentException($"A single Resource with name ending in 'Cosmos.{yamlResourceName}' not found in Assembly '{ass.FullName}'.", nameof(yamlResourceName));
 
+            var yc = Internal.YamlConverter.ReadYaml(ass.GetManifestResourceStream(rn.First()));
+
+            foreach (var rdt in refData.GetAllTypes())
+            {
+//                rdt.Name
+            }
 
             await Task.CompletedTask;
         }
