@@ -93,7 +93,7 @@ namespace Beef
         private static readonly List<Substitution> _substitutions = new List<Substitution>();
         private static readonly Dictionary<string, object> _providerValues = new Dictionary<string, object>();
         private static readonly Dictionary<Type, Type> _typeCache = new Dictionary<Type, Type>();
-        private static AsyncLocal<Dictionary<string, object>> _localProviderValues = new AsyncLocal<Dictionary<string, object>>();
+        private static readonly AsyncLocal<Dictionary<string, object>> _localProviderValues = new AsyncLocal<Dictionary<string, object>>();
 
         /// <summary>
         /// Sets the interface and type relationship.
@@ -205,7 +205,8 @@ namespace Beef
         /// </summary>
         public static void ResetLocal()
         {
-            _localProviderValues = new AsyncLocal<Dictionary<string, object>>();
+            if (_localProviderValues.Value != null)
+                _localProviderValues.Value.Clear();
         }
 
         /// <summary>
@@ -230,8 +231,8 @@ namespace Beef
             Type typeKey = typeof(T);
             Type typeVal = null;
 
-            if (_localProviderValues.Value != null && _localProviderValues.Value.ContainsKey(typeKey.AssemblyQualifiedName))
-                return (T)_localProviderValues.Value[typeKey.AssemblyQualifiedName];
+            if (_localProviderValues.Value != null && _localProviderValues.Value.TryGetValue(typeKey.AssemblyQualifiedName, out var lval))
+                return (T)lval;
 
             if (_providerValues.ContainsKey(typeKey.AssemblyQualifiedName))
                 return (T)_providerValues[typeKey.AssemblyQualifiedName];

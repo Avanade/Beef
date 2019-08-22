@@ -49,6 +49,17 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.PowerSource"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
+        public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.PowerSourceCollection();
+            await Task.CompletedTask; // DataInvoker.Default.InvokeAsync(this, async () => await this.PowerSourceGetAll_OnImplementation(__coll), BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            return __coll;
+        }
+
+        /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>

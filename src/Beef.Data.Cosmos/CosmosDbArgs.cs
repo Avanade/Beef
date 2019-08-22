@@ -7,7 +7,7 @@ using System.Net;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Enables the <b>DocumentDb/CosmosDb</b> arguments capabilities.
+    /// Enables the <b>CosmosDb/DocumentDb</b> arguments capabilities.
     /// </summary>
     public interface ICosmosDbArgs
     {
@@ -48,24 +48,24 @@ namespace Beef.Data.Cosmos
     }
 
     /// <summary>
-    /// Provides the base <b>DocumentDb/CosmosDb</b> arguments capabilities.
+    /// Provides the base <b>CosmosDb/DocumentDb</b> arguments capabilities.
     /// </summary>
     public class CosmosDbArgs : ICosmosDbArgs
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/> and <paramref name="requestOptions"/>.
+        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/> and <paramref name="requestOptions"/>.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
+        /// <param name="partitionKey">The optional <see cref="PartitionKey"/> (defaults to <see cref="PartitionKey.None"/>).</param>
         /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="CosmosDbArgs"/>.</returns>
-        public static CosmosDbArgs Create(string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
+        public static CosmosDbArgs Create(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions requestOptions = null)
         {
-            return new CosmosDbArgs(containerId, partitionKey, requestOptions);
+            return new CosmosDbArgs(containerId, partitionKey == null ? PartitionKey.None : partitionKey.Value, requestOptions);
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <see cref="PagingArgs"/> and <paramref name="requestOptions"/>.
+        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/>, <see cref="PagingArgs"/> and <paramref name="requestOptions"/>.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
@@ -78,7 +78,19 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <see cref="PagingResult"/> and <paramref name="requestOptions"/>.
+        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <see cref="PartitionKey.None"/>, <see cref="PagingArgs"/> and <paramref name="requestOptions"/>.
+        /// </summary>
+        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
+        /// <returns>The <see cref="CosmosDbArgs"/>.</returns>
+        public static CosmosDbArgs Create(string containerId, PagingArgs paging, QueryRequestOptions requestOptions = null)
+        {
+            return new CosmosDbArgs(containerId, PartitionKey.None, paging, requestOptions);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/>, <see cref="PagingResult"/> and <paramref name="requestOptions"/>.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
@@ -91,10 +103,22 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="CosmosDbArgs"/> class with the <paramref name="containerId"/>, <see cref="PartitionKey.None"/>, <see cref="PagingResult"/> and <paramref name="requestOptions"/>.
+        /// </summary>
+        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
+        /// <param name="paging">The <see cref="PagingResult"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
+        /// <returns>The <see cref="CosmosDbArgs"/>.</returns>
+        public static CosmosDbArgs Create(string containerId, PagingResult paging, QueryRequestOptions requestOptions = null)
+        {
+            return new CosmosDbArgs(containerId, PartitionKey.None, paging, requestOptions);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbArgs"/> class.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
+        /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
         public CosmosDbArgs(string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
         {
@@ -107,7 +131,7 @@ namespace Beef.Data.Cosmos
         /// Initializes a new instance of the <see cref="CosmosDbArgs"/> class.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
+        /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         public CosmosDbArgs(string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions requestOptions = null) 
@@ -117,7 +141,7 @@ namespace Beef.Data.Cosmos
         /// Initializes a new instance of the <see cref="CosmosDbArgs"/> class.
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
+        /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         public CosmosDbArgs(string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions requestOptions = null)

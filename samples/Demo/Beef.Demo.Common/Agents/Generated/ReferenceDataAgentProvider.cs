@@ -46,6 +46,10 @@ namespace Beef.Demo.Common.Agents
             _typeDict.Add(typeof(RefDataNamespace.EyeColor), ReferenceData.Property_EyeColor);
             _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value)));
 
+            _nameDict.Add(ReferenceData.Property_PowerSource, typeof(RefDataNamespace.PowerSource));
+            _typeDict.Add(typeof(RefDataNamespace.PowerSource), ReferenceData.Property_PowerSource);
+            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value)));
+
             _nameDict.Add(ReferenceData.Property_Company, typeof(RefDataNamespace.Company));
             _typeDict.Add(typeof(RefDataNamespace.Company), ReferenceData.Property_Company);
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value)));
@@ -76,6 +80,18 @@ namespace Beef.Demo.Common.Agents
             get 
             {
                 return (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
+            }
+        }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
+        public override RefDataNamespace.PowerSourceCollection PowerSource
+        {
+            get 
+            {
+                return (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
             }
         }
 
@@ -155,6 +171,7 @@ namespace Beef.Demo.Common.Agents
                 {
                     case ReferenceData.Property_Gender: GetCache(_nameDict[ReferenceData.Property_Gender]).SetCollection(JsonConvert.DeserializeObject<Gender[]>(rdj["items"].ToString())); break;
                     case ReferenceData.Property_EyeColor: GetCache(_nameDict[ReferenceData.Property_EyeColor]).SetCollection(JsonConvert.DeserializeObject<EyeColor[]>(rdj["items"].ToString())); break;
+                    case ReferenceData.Property_PowerSource: GetCache(_nameDict[ReferenceData.Property_PowerSource]).SetCollection(JsonConvert.DeserializeObject<PowerSource[]>(rdj["items"].ToString())); break;
                     case ReferenceData.Property_Company: GetCache(_nameDict[ReferenceData.Property_Company]).SetCollection(JsonConvert.DeserializeObject<Company[]>(rdj["items"].ToString())); break;
                 }
             }

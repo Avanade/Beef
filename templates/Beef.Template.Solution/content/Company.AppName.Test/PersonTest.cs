@@ -21,7 +21,7 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A110_Validation_Empty()
         {
-            ExpectValidationException.Run(
+            ExpectValidationException.Throws(
                 () => PersonValidator.Default.Validate(new Person()).ThrowOnError(),
                 "First Name is required.",
                 "Last Name is required.",
@@ -32,7 +32,7 @@ namespace Company.AppName.Test
         [Test, TestSetUp]
         public void A120_Validation_Invalid()
         {
-            ExpectValidationException.Run(
+            ExpectValidationException.Throws(
                 () => PersonValidator.Default.Validate(new Person { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Gender = "X", Birthday = DateTime.Now.AddDays(1) }).ThrowOnError(),
                 "First Name must not exceed 100 characters in length.",
                 "Last Name must not exceed 100 characters in length.",

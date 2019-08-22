@@ -5,13 +5,13 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>2.1.3</Version>
+    <Version>2.1.4</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
-    <AssemblyVersion>2.1.3</AssemblyVersion>
-    <FileVersion>2.1.3</FileVersion>
+    <AssemblyVersion>2.1.4</AssemblyVersion>
+    <FileVersion>2.1.4</FileVersion>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
@@ -80,7 +80,6 @@
   <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="4.2.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
-    <PackageReference Include="YamlDotNet" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

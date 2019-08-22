@@ -16,7 +16,7 @@ namespace Beef.RefData
     /// <remarks>For equality and comparision checking the <see cref="Id"/> and <see cref="Code"/> combination is used.</remarks>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, Active = {IsActive}, IsValid = {IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IETag, IChangeLog
+    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IETag, IChangeLog, IIdentifier
     {
         #region RefDataKey
 

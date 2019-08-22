@@ -60,6 +60,15 @@ namespace Beef.Demo.Common.Agents
         }
 
         /// <summary>
+        /// Gets all of the <see cref="PowerSource"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync()
+        {
+            return _serviceAgent.PowerSourceGetAllAsync();      
+        }
+
+        /// <summary>
         /// Gets all of the <see cref="Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>

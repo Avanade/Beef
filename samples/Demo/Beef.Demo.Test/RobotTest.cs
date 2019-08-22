@@ -1,32 +1,35 @@
-﻿using Beef.Demo.Common.Agents;
+﻿using Beef.Demo.Business.Data;
+using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
 using Beef.Test.NUnit;
-using Beef.Test.NUnit.Cosmos;
 using Cosmos = Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Beef.Data.Cosmos;
 
 namespace Beef.Demo.Test
 {
     [TestFixture, NonParallelizable]
     public class RobotTest
     {
-        private IConfigurationSection _config;
-        private CosmosDbContainerSetUp _csu;
+        private bool _removeAfterUse;
+        private CosmosDb _cosmosDb;
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
             TestSetUp.Reset(false);
 
-            _config = AgentTester.Configuration.GetSection("CosmosDb");
-            var cc = new Cosmos.CosmosClient(_config.GetValue<string>("EndPoint"), _config.GetValue<string>("AuthKey"));
+            var config = AgentTester.Configuration.GetSection("CosmosDb");
+            _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
+            _cosmosDb = new CosmosDb(new Cosmos.CosmosClient(config.GetValue<string>("EndPoint"), config.GetValue<string>("AuthKey")),
+                config.GetValue<string>("Database"), createDatabaseIfNotExists: true);
 
-            _csu = await CosmosDbContainerSetUp.ReplaceAndOpenAsync(cc, _config.GetValue<string>("Database"),
+            var rc = await _cosmosDb.ReplaceOrCreateContainerAsync(
                 new Cosmos.ContainerProperties
                 {
                     Id = "Items",
@@ -34,14 +37,24 @@ namespace Beef.Demo.Test
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/serialNo" } } } }
                 }, 400);
 
-            await _csu.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "items");
+            await rc.ImportBatchAsync<RobotTest, Robot>("Data.yaml", "Robot");
+
+            var rdc = await _cosmosDb.ReplaceOrCreateContainerAsync(
+                new Cosmos.ContainerProperties
+                {
+                    Id = "RefData",
+                    PartitionKeyPath = "/_partitionKey",
+                    UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
+                }, 400);
+
+            await rdc.ImportRefDataBatchAsync<RobotTest>(ReferenceData.Current, "RefData.yaml");
         }
 
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            if (_config.GetValue<bool>("RemoveAfterUse"))
-                await _csu.DeleteDatabase();
+            if (_removeAfterUse)
+                await _cosmosDb.Database.DeleteAsync();
         }
 
         #region Get
