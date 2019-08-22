@@ -60,12 +60,38 @@ namespace Beef.Core.UnitTest.Json
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class KeyDataCollection : EntityBaseCollection<KeyData>
+        {
+            public override object Clone() => throw new NotImplementedException();
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class NonKeyData : EntityBase
+        {
+            [JsonProperty("code")]
+            public string Code { get; set; }
+
+            [JsonProperty("text")]
+            public string Text { get; set; }
+
+            public override bool IsInitial => throw new NotImplementedException();
+
+            public override object Clone() => throw new NotImplementedException();
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+        public class NonKeyDataCollection : EntityBaseCollection<NonKeyData>
+        {
+            public override object Clone() => throw new NotImplementedException();
+        }
+
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public class ReferKeyData : EntityBase
         {
             [JsonProperty("code")]
             public string CodeSid { get; set; }
 
-            public ReferData Code { get => CodeSid; set => CodeSid = value.Code; } 
+            public ReferData Code { get => CodeSid; set => CodeSid = value.Code; }
 
             [JsonProperty("text")]
             public string Text { get; set; }
@@ -85,7 +111,7 @@ namespace Beef.Core.UnitTest.Json
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public class TestData
+        public class TestData : EntityBase
         {
             [JsonProperty("id")]
             public Guid Id { get; set; }
@@ -108,9 +134,17 @@ namespace Beef.Core.UnitTest.Json
             public List<SubData> NoKeys { get; set; }
             [JsonProperty("keys")]
             public List<KeyData> Keys { get; set; }
+            [JsonProperty("keyscoll")]
+            public KeyDataCollection KeysColl { get; set; }
             [JsonProperty("refers")]
             public List<ReferKeyData> Refers { get; set; }
+            [JsonProperty("nonkeys")]
+            public NonKeyDataCollection NonKeys { get; set; }
+
+            public override object Clone() => throw new NotImplementedException();
+            public override bool IsInitial => throw new NotImplementedException();
         }
+
 
         [Test]
         public void Merge_Nulls()
@@ -518,13 +552,97 @@ namespace Beef.Core.UnitTest.Json
         }
 
         [Test]
-        public void Merge_LoadTest_1000()
+        public void Merge_Property_KeysColl_Null()
+        {
+            MessageItem mi = null;
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.Error,
+                JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ null ] }"),
+                td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("keyscoll[0]", mi.Property);
+            Assert.AreEqual("The JSON token must be an object where Unique Key value(s) are required.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_KeysColl_Empty()
+        {
+            MessageItem mi = null;
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.Error,
+                JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ { } ] }"),
+                td, new JsonEntityMergeArgs { LogAction = (m) => mi = m }));
+
+            Assert.IsNotNull(mi);
+            Assert.AreEqual(MessageType.Error, mi.Type);
+            Assert.AreEqual("keyscoll[0]", mi.Property);
+            Assert.AreEqual("The JSON object must specify the 'code' token as required for the unique key.", mi.Text);
+        }
+
+        [Test]
+        public void Merge_Property_KeysColl_ListItemNoChanges1()
+        {
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def", Other = "123" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ { \"code\": \"abc\", \"text\": \"def\" } ] }"), td));
+            Assert.IsNotNull(td.KeysColl);
+            Assert.AreEqual(1, td.KeysColl.Count);
+
+            Assert.IsNotNull(td.KeysColl[0]);
+            Assert.AreEqual("abc", td.KeysColl[0].Code);
+            Assert.AreEqual("def", td.KeysColl[0].Text);
+            Assert.AreEqual("123", td.KeysColl[0].Other);
+        }
+
+        [Test]
+        public void Merge_Property_KeysColl_ListItemNoChanges2()
+        {
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def", Other = "123" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessNoChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ { \"code\": \"abc\" } ] }"), td));
+            Assert.IsNotNull(td.KeysColl);
+            Assert.AreEqual(1, td.KeysColl.Count);
+
+            Assert.IsNotNull(td.KeysColl[0]);
+            Assert.AreEqual("abc", td.KeysColl[0].Code);
+            Assert.AreEqual("def", td.KeysColl[0].Text);
+            Assert.AreEqual("123", td.KeysColl[0].Other);
+        }
+
+        [Test]
+        public void Merge_Property_KeysColl_ListItemWithChangesToExisting()
+        {
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ { \"code\": \"abc\", \"text\": \"xyz\" } ] }"), td));
+            Assert.IsNotNull(td.KeysColl);
+            Assert.AreEqual(1, td.KeysColl.Count);
+
+            Assert.IsNotNull(td.KeysColl[0]);
+            Assert.AreEqual("abc", td.KeysColl[0].Code);
+            Assert.AreEqual("xyz", td.KeysColl[0].Text);
+        }
+
+        [Test]
+        public void Merge_Property_KeysColl_ListItemChangedNew()
+        {
+            var td = new TestData { KeysColl = new KeyDataCollection { new KeyData { Code = "abc", Text = "def" } } };
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"keyscoll\": [ { \"code\": \"def\", \"text\": \"ghi\" } ] }"), td));
+            Assert.IsNotNull(td.KeysColl);
+            Assert.AreEqual(1, td.KeysColl.Count);
+
+            Assert.IsNotNull(td.KeysColl[0]);
+            Assert.AreEqual("def", td.KeysColl[0].Code);
+            Assert.AreEqual("ghi", td.KeysColl[0].Text);
+        }
+
+        [Test]
+        public void Merge_XtremeLoadTest_1000()
         {
             for (int i = 0; i < 1000; i++)
             {
                 var td = new TestData { Values = new int[] { 1, 2, 3 }, Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
                 JsonEntityMerge.Merge<TestData>(JObject.Parse(
-                    "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, " 
+                    "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, "
                     + "\"values\": [ 1, 2, 4], \"sub\": { \"code\": \"abc\", \"text\": \"xyz\" }, \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, null, { } ], "
                     + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }"),
                     td);
@@ -542,6 +660,47 @@ namespace Beef.Core.UnitTest.Json
             Assert.IsNotNull(td.Refers[0]);
             Assert.AreEqual("abc", td.Refers[0].CodeSid);
             Assert.AreEqual("xyz", td.Refers[0].Text);
+        }
+
+        [Test]
+        public void Merge_Property_NonKeyData()
+        {
+            var td = new TestData();
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nonkeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { \"code\": \"abc\", \"text\": \"uvw\"  } ] }"), td));
+            Assert.IsNotNull(td.NonKeys);
+            Assert.AreEqual(2, td.NonKeys.Count);
+
+            Assert.IsNotNull(td.NonKeys[0]);
+            Assert.AreEqual("abc", td.NonKeys[0].Code);
+            Assert.AreEqual("xyz", td.NonKeys[0].Text);
+
+            Assert.IsNotNull(td.NonKeys[1]);
+            Assert.AreEqual("abc", td.NonKeys[1].Code);
+            Assert.AreEqual("uvw", td.NonKeys[1].Text);
+        }
+
+        [Test]
+        public void Merge_Property_NonKeyData_WithPrior()
+        {
+            var td = new TestData
+            {
+                NonKeys = new NonKeyDataCollection
+                {
+                    new NonKeyData { Code = "def", Text = "hij" }
+                }
+            };
+
+            Assert.AreEqual(JsonEntityMergeResult.SuccessWithChanges, JsonEntityMerge.Merge<TestData>(JObject.Parse("{ \"nonkeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { \"code\": \"abc\", \"text\": \"uvw\"  } ] }"), td));
+            Assert.IsNotNull(td.NonKeys);
+            Assert.AreEqual(2, td.NonKeys.Count);
+
+            Assert.IsNotNull(td.NonKeys[0]);
+            Assert.AreEqual("abc", td.NonKeys[0].Code);
+            Assert.AreEqual("xyz", td.NonKeys[0].Text);
+
+            Assert.IsNotNull(td.NonKeys[1]);
+            Assert.AreEqual("abc", td.NonKeys[1].Code);
+            Assert.AreEqual("uvw", td.NonKeys[1].Text);
         }
     }
 }

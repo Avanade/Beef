@@ -150,11 +150,15 @@ namespace Beef.Json
                 // Where the underlying type is an EntityBase determine whether it has a unique key and what it is, and whether collection is IEntityBaseCollection.
                 if (pr.IsComplexType && pr.ComplexTypeReflector.IsCollection && pr.ComplexTypeReflector.ItemType.IsSubclassOf(typeof(EntityBase)))
                 {
-                    pr.Tag = new UniqueKeyConfig
+                    var ival = (EntityBase)pr.ComplexTypeReflector.CreateItemValue();
+                    if (ival.HasUniqueKey)
                     {
-                        IsEntityBaseCollection = pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)),
-                        Properties = ((EntityBase)pr.ComplexTypeReflector.CreateItemValue()).UniqueKeyProperties
-                    };
+                        pr.Tag = new UniqueKeyConfig
+                        {
+                            IsEntityBaseCollection = pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)),
+                            Properties = ival.UniqueKeyProperties
+                        };
+                    }
                 }
 
                 return true;
