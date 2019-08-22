@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Beef</RootNamespace>
-    <AssemblyVersion>2.1.12</AssemblyVersion>
-    <FileVersion>2.1.12</FileVersion>
-    <Version>2.1.12</Version>
+    <AssemblyVersion>2.1.13</AssemblyVersion>
+    <FileVersion>2.1.13</FileVersion>
+    <Version>2.1.13</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -37,6 +37,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="YamlDotNet" Version="6.1.2" />
   </ItemGroup>
   
 </Project>

@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Beef.Entities;
@@ -63,7 +64,10 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="client">The <see cref="CosmosClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
-        protected CosmosDb(CosmosClient client, string databaseId) : base(client, databaseId) { }
+        /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
+        /// <param name="throughput">The throughput (RU/S).</param>
+        protected CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400) 
+            : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
     }
 
     /// <summary>
@@ -136,10 +140,14 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="client">The <see cref="DocumentClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
-        protected CosmosDbBase(CosmosClient client, string databaseId)
+        /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
+        /// <param name="throughput">The throughput (RU/S).</param>
+        protected CosmosDbBase(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400)
         {
             Client = Check.NotNull(client, nameof(client));
-            Database = Client.GetDatabase(Check.NotEmpty(databaseId, nameof(databaseId)));
+            Database = createDatabaseIfNotExists ?
+                Client.CreateDatabaseIfNotExistsAsync(databaseId, throughput).Result.Database :
+                Client.GetDatabase(Check.NotEmpty(databaseId, nameof(databaseId)));
         }
 
         /// <summary>
@@ -163,6 +171,31 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <returns>The selected <see cref="Container"/>.</returns>
         public Container GetContainer(string containerId) => Database.GetContainer(containerId);
+
+        /// <summary>
+        /// Replace or create the <see cref="Container"/> asynchronously.
+        /// </summary>
+        /// <param name="containerProperties">The <see cref="ContainerProperties"/> used for the create.</param>
+        /// <param name="throughput">The throughput (RU/S).</param>
+        /// <returns>The replaced/created <see cref="Container"/>.</returns>
+        public async Task<Container> ReplaceOrCreateContainerAsync(ContainerProperties containerProperties, int? throughput = 400)
+        {
+            var container = GetContainer(containerProperties.Id);
+
+            // Remove existing container if it already exists.
+            try
+            {
+                await container.DeleteContainerAsync();
+            }
+            catch (CosmosException cex)
+            {
+                if (cex.StatusCode != HttpStatusCode.NotFound)
+                    throw;
+            }
+
+            // Create the container as specified.
+            return await Database.CreateContainerIfNotExistsAsync(containerProperties, throughput);
+        }
 
         #region RequestOptions
 

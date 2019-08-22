@@ -48,7 +48,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Gender value)
         {
-            return new WebApiPost<Gender>(this, () => Factory.Create<IGenderManager>().CreateAsync(value),
+            return new WebApiPost<Gender>(this, () => Factory.Create<IGenderManager>().CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -63,7 +63,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Gender value, Guid id)
         {
-            return new WebApiPut<Gender>(this, () => Factory.Create<IGenderManager>().UpdateAsync(value, id),
+            return new WebApiPut<Gender>(this, () => Factory.Create<IGenderManager>().UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
     }

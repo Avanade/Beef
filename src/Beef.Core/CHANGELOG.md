@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.13
+- *New:* Promoted `YamlConverter` into `Beef.Core` from `Beef.Test.NUnit` as it has an application beyond just testing.
+- *Fixed:* `Factory.ResetLocal` to clear only for the running thread; not all. This resulted in wonky tests where mocking was not reliably functioning.
+
 ## v2.1.12
 - *Fixed:* `DictionarySetCache`, `BiDictionarySetCache` and `TwoKeySetCache` were not resetting the cache correctly on a flush ensuring data was reloaded on next hit.
 - *Enhancement:* Applied Visual Studio Code Cleanup.

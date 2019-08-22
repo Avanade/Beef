@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) CosmosDB / DocumentDB Core extensions.</Description>

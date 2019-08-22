@@ -1,6 +1,14 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.WebApi;
+using Moq;
+using Moq.Language;
+using Moq.Language.Flow;
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Formatting;
+using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
@@ -29,6 +37,33 @@ namespace Beef.Test.NUnit
         public static string ToLongString(this char value, int count = 250)
         {
             return new string(value, count);
+        }
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="WebApiAgentResult{TEntity}"/> with no result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TEntity">The resultant entity <see cref="Type"/>.</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <returns>The <see cref="WebApiAgentResult{TEntity}"/> with no result.</returns>
+        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, HttpStatusCode statusCode = HttpStatusCode.NoContent) where TMock : class
+        {
+            return mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage() { StatusCode = statusCode }));
+        }
+
+        /// <summary>
+        /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="WebApiAgentResult{TEntity}"/> with an entity result.
+        /// </summary>
+        /// <typeparam name="TMock">The mock object <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TEntity">The resultant entity <see cref="Type"/>.</typeparam>
+        /// <param name="mock">The mock object.</param>
+        /// <param name="entity">The entity value.</param>
+        /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
+        /// <returns>The <see cref="WebApiAgentResult{TEntity}"/> with an entity result.</returns>
+        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, TEntity entity, HttpStatusCode statusCode = HttpStatusCode.OK) where TMock : class
+        {
+            return mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage(statusCode), entity));
         }
     }
 }

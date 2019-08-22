@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.11
+- *Fixed:* Removed any explicit Cosmos logic/dependencies into either `Beef.Core` (YAML) or `Beef.Data.Cosmos`. These should be referenced as required.
+- *Added:* `ReturnsWebApiAgentResultAsync` extensions methods (for mocking via MOQ) added to support `XxxServiceAgent` mocking scenarios.
+
 ## v2.1.10
 - *Fixed:* `Factory.ResetLocal` added to the internal finally (try-catch) for a `TestSetUpAttribute`. This will ensure configuration does not cross invocations; appears to be an edgecase for parallel testing.
 

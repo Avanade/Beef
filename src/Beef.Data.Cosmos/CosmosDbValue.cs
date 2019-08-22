@@ -49,11 +49,23 @@ namespace Beef.Data.Cosmos
     /// <summary>
     /// Represents a <b>CosmosDb/DocumentDb</b> <see cref="Value"/> that is wrapped, including <see cref="Type"/> name, for persistence.
     /// </summary>
+    /// <typeparam name="T">The <see cref="Value"/> <see cref="Type"/>.</typeparam>
     /// <remarks>The <see cref="CosmosDbTypeValue.Id"/>, <see cref="CosmosDbTypeValue.Type"/> and <see cref="CosmosDbTypeValue.ETag"/> are updated when the <see cref="Value"/> is set, and before
     /// sending to <b>CosmosDB/DocumentDb</b>.</remarks>
     public class CosmosDbTypeValue<T> : CosmosDbTypeValue where T : class, IIdentifier
     {
         private T _value;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CosmosDbTypeValue"/> class.
+        /// </summary>
+        public CosmosDbTypeValue() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CosmosDbTypeValue"/> class with a <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public CosmosDbTypeValue(T value) => Value = value;
 
         /// <summary>
         /// Gets or sets the value.

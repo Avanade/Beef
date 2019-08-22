@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.10</Version>
-    <AssemblyVersion>2.1.10</AssemblyVersion>
-    <FileVersion>2.1.10</FileVersion>
+    <Version>2.1.11</Version>
+    <AssemblyVersion>2.1.11</AssemblyVersion>
+    <FileVersion>2.1.11</FileVersion>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -36,11 +36,9 @@
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.58.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="NUnit" Version="3.11.0" />
-    <PackageReference Include="YamlDotNet" Version="6.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +48,9 @@
   <ItemGroup>
     <Reference Include="Microsoft.Extensions.FileProviders.Embedded">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.embedded\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnet.webapi.client\5.2.6\lib\netstandard2.0\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
   </ItemGroup>
 

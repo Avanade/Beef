@@ -54,6 +54,19 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data entities.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/powerSources")]
+        [ProducesResponseType(typeof(RefDataNamespace.PowerSourceCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult PowerSourceGetAll()
+        {
+            return new WebApiGet<RefDataNamespace.PowerSourceCollection>(this, () => Task.FromResult(ReferenceData.Current.PowerSource), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data entities.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
@@ -89,6 +102,7 @@ namespace Beef.Demo.Api.Controllers
                     {
                         ReferenceData.Property_Gender,
                         ReferenceData.Property_EyeColor,
+                        ReferenceData.Property_PowerSource,
                         ReferenceData.Property_Company,
                     };
                 }
@@ -100,6 +114,7 @@ namespace Beef.Demo.Api.Controllers
                     {
                         case ReferenceData.Property_Gender: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current[typeof(RefDataNamespace.Gender)] }); break;
                         case ReferenceData.Property_EyeColor: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current[typeof(RefDataNamespace.EyeColor)] }); break;
+                        case ReferenceData.Property_PowerSource: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceData.Current[typeof(RefDataNamespace.PowerSource)] }); break;
                         case ReferenceData.Property_Company: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current[typeof(RefDataNamespace.Company)] }); break;
                     }
                 }

@@ -31,6 +31,11 @@ namespace Beef.Demo.Common.Entities
         public const string Property_EyeColor = "EyeColor";
 
         /// <summary>
+        /// Represents the <see cref="PowerSource"/> property name.
+        /// </summary>
+        public const string Property_PowerSource = "PowerSource";
+
+        /// <summary>
         /// Represents the <see cref="Company"/> property name.
         /// </summary>
         public const string Property_Company = "Company";
@@ -43,6 +48,7 @@ namespace Beef.Demo.Common.Entities
             {
                 typeof(Gender),
                 typeof(EyeColor),
+                typeof(PowerSource),
                 typeof(Company)
             };
         
@@ -67,6 +73,11 @@ namespace Beef.Demo.Common.Entities
         /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
         /// </summary>
         public abstract RefDataNamespace.EyeColorCollection EyeColor { get; }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.PowerSourceCollection PowerSource { get; }
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
