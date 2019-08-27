@@ -1,0 +1,19 @@
+﻿Data:
+  - Person1:
+    - { id: ^1, name: "Rebecca", birthday: 1990-08-07, salary: 150000 }
+    - { id: ^2, name: "Gary", birthday: 1986-11-04, salary: 95000 }
+    - { id: ^3, name: "Greg", birthday: 1970-07-06, salary: 101000 }
+    - { id: ^4, name: "Sally", birthday: 1999-02-28, salary: 50000 }
+    - { id: ^5, name: "Mike", birthday: 1967-09-13, salary: 135000 }
+  - Person2:
+    - { id: ^1, name: "Rebecca", birthday: 1990-08-07, salary: 150000 }
+    - { id: ^2, name: "Gary", birthday: 1986-11-04, salary: 95000 }
+    - { id: ^3, name: "Greg", birthday: 1970-07-06, salary: 101000 }
+    - { id: ^4, name: "Sally", birthday: 1999-02-28, salary: 50000 }
+    - { id: ^5, name: "Mike", birthday: 1967-09-13, salary: 135000 }
+  - Person3:
+    - { id: ^1, type: Person3, value: { name: "Rebecca", birthday: 1990-08-07, salary: 150000 } } 
+    - { id: ^2, type: Person3, value: { name: "Gary", birthday: 1986-11-04, salary: 95000 } }
+    - { id: ^3, type: Person3, value: { name: "Greg", birthday: 1970-07-06, salary: 101000 } }
+    - { id: ^4, type: Person3, value: { name: "Sally", birthday: 1999-02-28, salary: 50000 } }
+    - { id: ^5, type: Person3, value: { name: "Mike", birthday: 1967-09-13, salary: 135000 } }

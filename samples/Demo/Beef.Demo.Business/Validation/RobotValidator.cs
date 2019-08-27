@@ -16,6 +16,7 @@ namespace Beef.Demo.Business.Validation
             Property(x => x.ModelNo).Mandatory().Common(CommonValidators.Text);
             Property(x => x.SerialNo).Mandatory().Common(CommonValidators.Text);
             Property(x => x.EyeColor).IsValid();
+            Property(x => x.PowerSource).IsValid();
         }
     }
 }

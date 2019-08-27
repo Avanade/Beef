@@ -38,7 +38,8 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Prepares the object before sending to Cosmos.
         /// </summary>
-        internal protected abstract void PrepareBefore();
+        /// <param name="typeName">The <see cref="Type"/> name.</param>
+        internal protected abstract void PrepareBefore(string typeName);
 
         /// <summary>
         /// Prepares the object after getting from Cosmos.
@@ -82,7 +83,8 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Prepares the object before sending to Cosmos.
         /// </summary>
-        internal protected override void PrepareBefore()
+        /// <param name="typeName">The <see cref="Type"/> name.</param>
+        internal protected override void PrepareBefore(string typeName)
         {
             if (Value == default)
                 Id = Guid.NewGuid().ToString();
@@ -110,7 +112,7 @@ namespace Beef.Data.Cosmos
                     ETag = etag.ETag;
             }
 
-            Type = typeof(T).Name;
+            Type = typeName;
         }
 
         /// <summary>

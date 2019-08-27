@@ -11,6 +11,7 @@ using Beef.Mapper.Converters;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
+using Beef.Data.Cosmos;
 
 namespace Beef.Demo.Business.Data
 {
@@ -55,7 +56,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await Task.CompletedTask; // DataInvoker.Default.InvokeAsync(this, async () => await this.PowerSourceGetAll_OnImplementation(__coll), BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.Query(CosmosDbArgs<CosmosDbTypeValue<RefDataNamespace.PowerSource>>.Create("RefData")).SelectValueQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
             return __coll;
         }
 

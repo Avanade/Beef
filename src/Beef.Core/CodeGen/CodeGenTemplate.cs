@@ -111,6 +111,10 @@ namespace Beef.CodeGen
                                 ExecuteForEachListList(xmlE, config);
                                 break;
 
+                            case "Switch":
+                                ExecuteSwitch(xmlE, config);
+                                break;
+
                             case "Config":
                                 throw new CodeGenException(string.Format("Unexpected XML Element '{0}' encountered.", xmlE.Name.LocalName));
 
@@ -410,12 +414,10 @@ namespace Beef.CodeGen
                     return (res <= 0);
 
                 case "contains":
-                    string slVal = lVal as string;
-                    if (slVal == null)
+                    if (!(lVal is string slVal))
                         throw new CodeGenException("LVal is not string; required for a 'contains' condition.");
 
-                    string srVal = rVal as string;
-                    if (srVal == null)
+                    if (!(rVal is string srVal))
                         throw new CodeGenException("RVal is not string; required for a 'contains' condition.");
 
                     return slVal.Contains(srVal);
@@ -461,13 +463,48 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
+        /// Invoke the switch-case command.
+        /// </summary>
+        private void ExecuteSwitch(XElement xml, CodeGenConfig config)
+        {
+            var lval = xml.Attribute("Value")?.Value;
+            if (string.IsNullOrEmpty(lval))
+                throw new CodeGenException("Switch element has no 'Value' attribute specified.", xml.ToString());
+
+            if (!ExecuteIfCondition(xml, config))
+                return;
+
+            foreach (var cXml in xml.Elements("Case"))
+            {
+                string rval = cXml.Attribute("Value")?.Value;
+                if (string.IsNullOrEmpty(rval))
+                    throw new CodeGenException("Case element has no 'Value' attribute specified.", xml.ToString());
+
+                var stmt = new List<string> { lval, "==", rval };
+                var stmtResult = ExecuteIfConditionStmt(stmt, config);
+                if (stmtResult == null)
+                    throw new CodeGenException(string.Format("Switch-case conditional statement is invalid: {0}.", string.Join(" ", stmt)), xml.ToString());
+
+                if (!stmtResult.Value)
+                    continue;
+
+                ExecuteXml(cXml, config);
+                return;
+            }
+
+            var dXml = xml.Elements("Default").FirstOrDefault();
+            if (dXml != null)
+                ExecuteXml(dXml, config);
+        }
+
+        /// <summary>
         /// Invoke the set command.
         /// </summary>
         private void ExecuteSet(XElement xml, CodeGenConfig config)
         {
             string name = xml.Attribute("Name")?.Value;
             if (string.IsNullOrEmpty(name))
-                throw new CodeGenException("Set element has no 'Name' property specified.", xml.ToString());
+                throw new CodeGenException("Set element has no 'Name' attribute specified.", xml.ToString());
 
             if (ExecuteIfCondition(xml, config))
                 SetConfigValue(name, config, xml.Attribute("Value")?.Value);
@@ -480,7 +517,7 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Trasforms the value.
+        /// Transforms the value.
         /// </summary>
         private string Transform(string transform, string value)
         {
@@ -552,7 +589,7 @@ namespace Beef.CodeGen
         {
             string name = xml.Attribute("Name")?.Value;
             if (string.IsNullOrEmpty(name))
-                throw new CodeGenException("ForEachList element has no 'Name' property specified.", xml.ToString());
+                throw new CodeGenException("ForEachList element has no 'Name' attribute specified.", xml.ToString());
 
             object val = GetValue(name, config);
             if (val == null)
@@ -605,8 +642,8 @@ namespace Beef.CodeGen
         private string TemplateReplace(string value, CodeGenConfig config)
         {
             string temp = value;
-            int start = -1;
-            int end = -1;
+            int start;
+            int end;
 
             if (temp == null)
                 return temp;

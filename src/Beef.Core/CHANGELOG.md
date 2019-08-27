@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.15
+- *Fixed:* An `ExecutionContext.Username` get will return `Environment.UserName` as a default where not overridden to ensure a valid value is returned.
+- *Fixed:* The `IEnumerable` extensions `WhereWildcard` will correctly construct the internal lambda expression to correctly construct the underlying where statement.
+- *Added:* The `CodeGenTemplate` now supports Switch-Case-Default XML-based statements.
+
 ## v2.1.14
 - *Fixed:* `JsonEntityMerge` was not correctly merging an array where the item inherited from `EntityBase` and the underlying `HasUniqueKey` was `false`.
 

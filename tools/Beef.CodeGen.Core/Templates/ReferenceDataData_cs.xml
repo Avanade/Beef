@@ -3,9 +3,11 @@
 <Template OutputGenDirName="Generated" OutputFileName="ReferenceDataData.cs">
   <Set Name="System.UsesDatabase" Value="false" />
   <Set Name="System.UsesEntityFramework" Value="false" />
+  <Set Name="System.UsesCosmos" Value="false" />
   <Entity>
     <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" />
     <Set Name="System.UsesEntityFramework" Condition="Entity.AutoImplement == 'EntityFramework'" Value="true" />
+    <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" />
   </Entity>
   <Header>
     <![CDATA[/*
@@ -39,7 +41,15 @@ using Beef.Mapper.Converters;
       <![CDATA[using Beef.Data.EntityFrameworkCore;
 ]]>
       <If Condition="Config.EntityFrameworkUsingNamespace != null">
-        <![CDATA[using {{Config.ODataUsingNamespace}};
+        <![CDATA[using {{Config.EntityFrameworkUsingNamespace}};
+]]>
+      </If>
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <![CDATA[using Beef.Data.Cosmos;
+]]>
+      <If Condition="Config.CosmosUsingNamespace != null">
+        <![CDATA[using {{Config.CosmosUsingNamespace}};
 ]]>
       </If>
     </If>
@@ -74,8 +84,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             var __coll = new {{Entity.EntityCollectionName}}();
             await DataInvoker.Default.InvokeAsync(this, async () => ]]>
       <Set Name="Config.NewLine" Value="false" />
-      <If Condition="Entity.AutoImplement == 'Database'">
-        <Then>
+      <Switch Value="Entity.AutoImplement">
+        <Case Value="'Database'">
           <![CDATA[
             {
                 ]]>
@@ -153,18 +163,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                 await Task.Delay(0);
             }]]>
           <Set Name="Config.NewLine" Value="true" />
-        </Then>
-        <Else>
-          <If Condition="Entity.AutoImplement == 'EntityFramework'">
-            <Then>
-              <![CDATA[{ EfDb.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }]]>
-            </Then>
-            <Else>
-              <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll)]]>
-            </Else>
+        </Case>
+        <Case Value="'EntityFramework'">
+          <![CDATA[{ ]]>
+          <If Condition="Entity.EntityFrameworkName == null">
+            <Then><![CDATA[EfDb]]></Then>
+            <Else><![CDATA[{{Entity.EntityFrameworkName}}]]></Else>
           </If>
-        </Else>
-      </If>
+          <![CDATA[.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }]]>
+        </Case>
+        <Case Value="'Cosmos'">
+          <![CDATA[{ ]]>
+          <If Condition="Entity.CosmosName == null">
+            <Then><![CDATA[CosmosDb]]></Then>
+            <Else><![CDATA[{{Entity.CosmosName}}]]></Else>
+          </If>
+          <![CDATA[.Default.Query(CosmosDbArgs<CosmosDbTypeValue<{{Entity.EntityName}}>>.Create("{{Entity.CosmosContainerId}}")).SelectValueQuery(__coll); await Task.CompletedTask; }]]>
+        </Case>
+        <Default>
+          <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll)]]>
+        </Default>
+      </Switch>
       <![CDATA[, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
 ]]>
       <If Condition="Config.NewLine == true">

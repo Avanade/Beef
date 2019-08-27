@@ -170,7 +170,8 @@ namespace Beef.Demo.Test
             {
                 ModelNo = "T500",
                 SerialNo = "321987",
-                EyeColor = "BLUE"
+                EyeColor = "BLUE",
+                PowerSource = "N"
             };
 
             // Create a robot.
@@ -196,7 +197,8 @@ namespace Beef.Demo.Test
             {
                 ModelNo = "T500",
                 SerialNo = "123456",
-                EyeColor = "BLUE"
+                EyeColor = "BLUE",
+                PowerSource = "N"
             };
 
             // Try to create a robot which will result in a duplicate.

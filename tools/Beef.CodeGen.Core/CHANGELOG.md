@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.9
+- *Enhancment:* Additional code-generation enhancements to support the auto-implements of Cosmos DB data access.
+
 ## v2.1.8
 - *Enhancement:* An invocation with an `If-Match` will override the value where it implements `IEtag` as this should take precedence over the value inside of the value itself via `WebApiActionBase.Value`. Code-gen has updated to take advantage of this; next gen will introduce usage within `XxxApiController` classes.
 

@@ -133,6 +133,34 @@ namespace Beef.Data.Cosmos
             return value;
         }
 
+        /// <summary>
+        /// Prepares the entity value for a Create by setting the IChangeLog and IIdentifer.
+        /// </summary>
+        /// <param name="value">The entity value.</param>
+        /// <param name="setIdentifier">Indicates whether to override the <c>Id</c> where entity implements <see cref="IIdentifier"/>.</param>
+        /// <returns>The entity value.</returns>
+        internal static void PrepareEntityForCreate(object value, bool setIdentifier)
+        {
+            if (value is IChangeLog cl)
+            {
+                cl.ChangeLog = new ChangeLog
+                {
+                    CreatedBy = ExecutionContext.Current.Username,
+                    CreatedDate = ExecutionContext.Current.Timestamp
+                };
+            }
+
+            if (setIdentifier)
+            {
+                if (value is IGuidIdentifier gid)
+                    gid.Id = Guid.NewGuid();
+                else if (value is IStringIdentifier sid)
+                    sid.Id = Guid.NewGuid().ToString();
+                else
+                    throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -223,7 +251,9 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets or instantiates the <see cref="ItemRequestOptions"/>.
         /// </summary>
-        protected ItemRequestOptions GetItemRequestOptions(CosmosDbArgs dbArgs = null)
+        /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
+        internal protected ItemRequestOptions GetItemRequestOptions<T>(CosmosDbArgs<T> dbArgs = null) where T : class, new()
         {
             var iro = dbArgs != null && dbArgs.ItemRequestOptions != null ? dbArgs.ItemRequestOptions : new ItemRequestOptions();
             UpdateRequestOptions(iro);
@@ -258,7 +288,9 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets or instantiates the <see cref="QueryRequestOptions"/>.
         /// </summary>
-        internal protected QueryRequestOptions GetQueryRequestOptions(CosmosDbArgs dbArgs = null)
+        /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
+        internal protected QueryRequestOptions GetQueryRequestOptions<T>(CosmosDbArgs<T> dbArgs = null) where T : class, new()
         {
             var ro = dbArgs != null && dbArgs.QueryRequestOptions != null ? dbArgs.QueryRequestOptions : new QueryRequestOptions() { MaxConcurrency = 2 };
             UpdateQueryRequestOptions(ro);
@@ -273,233 +305,62 @@ namespace Beef.Data.Cosmos
         /// Creates a <see cref="CosmosDbQuery{T}"/> to enable LINQ-style queries.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="queryArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T}"/>.</returns>
-        public CosmosDbQuery<T> Query<T>(CosmosDbArgs queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
+        public CosmosDbQuery<T> Query<T>(CosmosDbArgs<T> queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
         {
             return new CosmosDbQuery<T>(this, queryArgs, query);
         }
 
         #endregion
 
-        #region Get
-
         /// <summary>
         /// Gets the <b>CosmosDb/DocumentDb</b> entity for the specified <paramref name="keys"/> converting to <typeparamref name="T"/> asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="getArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T> GetAsync<T>(CosmosDbArgs getArgs, params IComparable[] keys) where T : class, IIdentifier, new()
+        /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="ICosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
+        public Task<T> GetAsync<T>(CosmosDbArgs<T> getArgs, params IComparable[] keys) where T : class, IIdentifier, new()
         {
-            Check.NotNull(getArgs, nameof(getArgs));
-            if (keys.Length != 1)
-                throw new NotSupportedException("Only a single key value is currently supported.");
-
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
-            {
-                try
-                {
-                    var val = await GetContainer(getArgs.ContainerId).ReadItemAsync<T>(keys[0].ToString(), getArgs.PartitionKey, GetItemRequestOptions(getArgs));
-
-                    // Check if T Type is CosmosDbValue<> and where Type is different it should be assumed that it does not exist.
-                    if (val.Resource is CosmosDbTypeValue cdv && cdv.Type != typeof(T).GenericTypeArguments[0].Name)
-                        return null;
-
-                    return GetResponseValue<T>(val);
-                }
-                catch (CosmosException dcex)
-                {
-                    if (dcex.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return null;
-
-                    throw;
-                }
-            }, this);
+            return new CosmosDbContainer<T>(this, Check.NotNull(getArgs, nameof(getArgs))).GetAsync(keys);
         }
-
-        #endregion
-
-        #region Create
 
         /// <summary>
         /// Creates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The value (re-queried where specified).</returns>
-        public async Task<T> CreateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, IIdentifier, new()
+        public Task<T> CreateAsync<T>(CosmosDbArgs<T> saveArgs, T value) where T : class, IIdentifier, new()
         {
-            Check.NotNull(saveArgs, nameof(saveArgs));
-            Check.NotNull(value, nameof(value));
-
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
-            {
-                if (value is CosmosDbTypeValue cdv)
-                {
-                    PrepareEntityForCreate(saveArgs, cdv.GetValue());
-                    cdv.PrepareBefore();
-                }
-                else
-                    PrepareEntityForCreate(saveArgs, value);
-
-                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).CreateItemAsync(value, saveArgs.PartitionKey, GetItemRequestOptions(saveArgs)));
-            }, this);
+            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).CreateAsync(value);
         }
-
-        /// <summary>
-        /// Prepares the entity value for a Create by setting the IChangeLog and IIdentifer.
-        /// </summary>
-        private void PrepareEntityForCreate(CosmosDbArgs saveArgs, object value)
-        {
-            if (value is IChangeLog cl)
-            {
-                if (cl.ChangeLog == null)
-                    cl.ChangeLog = new ChangeLog();
-
-                cl.ChangeLog.CreatedBy = ExecutionContext.Current.Username;
-                cl.ChangeLog.CreatedDate = ExecutionContext.Current.Timestamp;
-                cl.ChangeLog.UpdatedBy = cl.ChangeLog.UpdatedBy = null;
-            }
-
-            if (saveArgs.SetIdentifierOnCreate)
-            {
-                if (value is IGuidIdentifier gid)
-                    gid.Id = Guid.NewGuid();
-                else if (value is IStringIdentifier sid)
-                    sid.Id = Guid.NewGuid().ToString();
-                else
-                    throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
-            }
-        }
-
-        #endregion
-
-        #region Update
 
         /// <summary>
         /// Updates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
         /// <param name="value">The value to create.</param>
         /// <returns>The value (re-queried where specified).</returns>
-        public async Task<T> UpdateAsync<T>(CosmosDbArgs saveArgs, T value) where T : class, IIdentifier, new()
+        public Task<T> UpdateAsync<T>(CosmosDbArgs<T> saveArgs, T value) where T : class, IIdentifier, new()
         {
-            Check.NotNull(saveArgs, nameof(saveArgs));
-            Check.NotNull(value, nameof(value));
-
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
-            {
-                // Where supporting etag then use IfMatch for concurreny.
-                var ro = GetItemRequestOptions(saveArgs);
-                if (ro.IfMatchEtag == null && value is IETag etag)
-                    ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
-
-                string key;
-                if (value is CosmosDbTypeValue cdv)
-                {
-                    cdv.PrepareBefore();
-                    var val = cdv.GetValue();
-                    key = GetKeyFromValue(val);
-
-                    // Must read existing and make sure we are updating for the correct Type; don't just trust the key.
-                    var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
-                    var orig = resp.Resource as CosmosDbTypeValue;
-                    ro.SessionToken = resp.Headers?.Session;
-
-                    if (orig.Type != typeof(T).GenericTypeArguments[0].Name)
-                        throw new NotFoundException();
-
-                    if (val is IChangeLog cl)
-                        ChangeLogUpdate(cl, (IChangeLog)orig.GetValue());
-                }
-                else
-                {
-                    key = GetKeyFromValue(value);
-
-                    if (value is IChangeLog cl)
-                    {
-                        // Must read existing where updating IChangeLog to get the Created* values.
-                        var resp = await GetContainer(saveArgs.ContainerId).ReadItemAsync<T>(key, saveArgs.PartitionKey, ro);
-                        ChangeLogUpdate(cl, (IChangeLog)resp.Resource);
-                        ro.SessionToken = resp.Headers?.Session;
-                    }
-                }
-
-                // Replace/Update the value.
-                return GetResponseValue<T>(await GetContainer(saveArgs.ContainerId).ReplaceItemAsync<T>(value, key, saveArgs.PartitionKey, ro));
-            }, this);
+            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).UpdateAsync(value);
         }
-
-        /// <summary>
-        /// Get the key from the value.
-        /// </summary>
-        private string GetKeyFromValue(object value)
-        {
-            switch (value)
-            {
-                case IGuidIdentifier gid: return gid.Id.ToString();
-                case IStringIdentifier isi: return isi.Id;
-                case IIntIdentifier iid: return iid.Id.ToString();
-                default: throw new InvalidOperationException("An Identifier cannot be inferred for this Type.");
-            }
-        }
-
-        /// <summary>
-        /// Update the change log; reset Created* to original.
-        /// </summary>
-        private void ChangeLogUpdate(IChangeLog cl, IChangeLog orig)
-        {
-            if (cl.ChangeLog == null)
-                cl.ChangeLog = new ChangeLog();
-
-            cl.ChangeLog.CreatedBy = orig.ChangeLog?.CreatedBy;
-            cl.ChangeLog.CreatedDate = orig.ChangeLog?.CreatedDate;
-            cl.ChangeLog.UpdatedBy = ExecutionContext.Current.Username;
-            cl.ChangeLog.UpdatedDate = ExecutionContext.Current.Timestamp;
-        }
-
-        #endregion
-
-        #region Delete
 
         /// <summary>
         /// Deletes the <b>CosmosDb/DocumentDb</b> entity asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs"/>.</param>
+        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync<T>(CosmosDbArgs saveArgs, params IComparable[] keys) where T : class, IIdentifier, new()
+        public Task DeleteAsync<T>(CosmosDbArgs<T> saveArgs, params IComparable[] keys) where T : class, IIdentifier, new()
         {
-            Check.NotNull(saveArgs, nameof(saveArgs));
-            if (keys.Length != 1)
-                throw new NotSupportedException("Only a single key value is currently supported.");
-
-            // Where the T Type is CosmosDbValue<> do a get; which will confirm existence before proceeding - the GetAsync will check the Type property.
-            if (typeof(T) == typeof(CosmosDbTypeValue<>) && await GetAsync<T>(saveArgs, keys) == null)
-                return;
-
-            await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
-            {
-                try
-                {
-                    await GetContainer(saveArgs.ContainerId).DeleteItemAsync<T>(keys[0].ToString(), saveArgs.PartitionKey, GetItemRequestOptions(saveArgs));
-                }
-                catch (CosmosException cex)
-                {
-                    if (cex.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return;
-
-                    throw;
-                }
-            }, this);
+            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).DeleteAsync(keys);
         }
-
-        #endregion
     }
 }

@@ -24,14 +24,15 @@ XML elements, and their hierarchy drive the code-generation; some elements are r
 ### Reserved elements
 
 The following XML elements represent the language statements used by the code generator; these are further [detailed](#Language-constructs-detailed):
-- `If` - enables if/then/else conditional statements.
+- `If`, `Then`, `Else` - enables if/then/else conditional statements.
 - `Set` - sets a named variable with a value.
 - `Increment` - increments a named variable up or down.
 - `Exception`- throws an expection to terminate generation.
 - `ForEachList` - iterates a list (being a string separated by a specified character).
+- `Switch`, `Case`, `Default` - enables switch/case/default statements.
 
 The following XML elements support specific data elements:
-- `Config` - accesses the root element for the XML data source; includiny any name/value pairs passed via the command line; contains reserved attribute:
+- `Config` - accesses the root element for the XML data source; including any name/value pairs passed via the command line; contains reserved attribute:
 	- `Config.OutputGenDirName` - being an additional directory name used for all artefact outputs.
 - `System` - accesses a system-wide XML data source; contains reserved attribute:
   - `System.Index` - being the zero-based index where looping an entity.
@@ -154,7 +155,7 @@ The **Not** attribute is optional, and reverses the conditional true/false outco
 The **Then** and **Else** child elements are optional; where neither are specified then **true** is assumed for the specified child statement.
 
 Following are some examples:
-```xml
+``` xml
 <If Condition="Entity.Abstract == true">
   <![CDATA[xyz]]>
 </If>
@@ -170,6 +171,35 @@ Following are some examples:
 ```
 
 <br>
+
+### `Switch` element
+
+Enables if/then/else condition statements.
+
+```xml
+<Switch Value="var-value" Condition="condition" Not="true|false">
+  <Case Value="var-value"><Case/>
+  <Case Value="var-value"><Case/>
+  <Default></Default>
+</Switch>
+```
+
+The used attributes are:
+- `Value` - *var-value* to be used for the switch-case comparison.
+- `Condition` - compare two values being `lval operator rval` and invokes the switch when true (optional).
+- `Not` - reverses the conditional true/false outcome (optional).
+
+This works similar to the C# switch-case, where the `Switch.Value` equals the `Case.Value` then that `Case` is invoked; otherwise the `Default`. Only the first `Case` or `Default` that matches will be invoked.
+
+Following is an example:
+``` xml
+<Switch Value="Entity.AutoImplement">
+  <Case Value="'Database'"><![CDATA[using Beef.Data.Database]]></Case>
+  <Case Value="'Cosmos'"><![CDATA[using Beef.Data.Cosmos]]></Case>
+</Switch>
+```
+
+<br/>
 
 ### `Set` element
 

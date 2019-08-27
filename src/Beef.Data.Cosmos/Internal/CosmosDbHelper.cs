@@ -11,14 +11,12 @@ namespace Beef.Data.Cosmos.Internal
         /// <summary>
         /// Adds a <b>where</b> clause for `type` where T is CosmosDbValue.
         /// </summary>
-        internal static IQueryable<T> AddTypeWhereClause<T>(IQueryable<T> q)
+        /// <typeparam name="T">The entity <see cref="System.Type"/>.</typeparam>
+        /// <param name="q">The <see cref="IQueryable{T}"/>.</param>
+        /// <param name="type">The type name.</param>
+        internal static IQueryable<T> AddTypeWhereClause<T>(IQueryable<T> q, string type)
         {
-            var type = typeof(T);
-            if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(CosmosDbTypeValue<>))
-                return q;
-
-            q = q.Where("type = @0", type.GenericTypeArguments[0].Name);
-            return q;
+            return q.Where("type = @0", type);
         }
     }
 }
