@@ -43,6 +43,11 @@ namespace Beef.Demo.Common.Entities
         public const string Property_EyeColor = nameof(EyeColor);
 
         /// <summary>
+        /// Represents the <see cref="PowerSource"/> property name.
+        /// </summary>
+        public const string Property_PowerSource = nameof(PowerSource);
+
+        /// <summary>
         /// Represents the <see cref="ETag"/> property name.
         /// </summary>
         public const string Property_ETag = nameof(ETag);
@@ -60,6 +65,7 @@ namespace Beef.Demo.Common.Entities
         private string _modelNo;
         private string _serialNo;
         private string _eyeColorSid;
+        private string _powerSourceSid;
         private string _eTag;
         private ChangeLog _changeLog;
 
@@ -132,6 +138,28 @@ namespace Beef.Demo.Common.Entities
         {
             get { return this._eyeColorSid; }
             set { SetValue<string>(ref this._eyeColorSid, value, false, false, Property_EyeColor); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="PowerSource"/> using the underlying Serialization Identifier (SID).
+        /// </summary>
+        [JsonProperty("powerSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Power Source")]
+        public string PowerSourceSid
+        {
+            get { return this._powerSourceSid; }
+            set { SetValue(ref this._powerSourceSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_PowerSource); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Display(Name="Power Source")]
+        public RefDataNamespace.PowerSource PowerSource
+        {
+            get { return this._powerSourceSid; }
+            set { SetValue<string>(ref this._powerSourceSid, value, false, false, Property_PowerSource); }
         }
 
         /// <summary>
@@ -219,6 +247,7 @@ namespace Beef.Demo.Common.Entities
             this.ModelNo = from.ModelNo;
             this.SerialNo = from.SerialNo;
             this.EyeColor = from.EyeColor;
+            this.PowerSource = from.PowerSource;
             this.ETag = from.ETag;
             this.ChangeLog = from.ChangeLog;
 
@@ -254,6 +283,7 @@ namespace Beef.Demo.Common.Entities
             this.ModelNo = Cleaner.Clean(this.ModelNo, StringTrim.End, StringTransform.EmptyToNull);
             this.SerialNo = Cleaner.Clean(this.SerialNo, StringTrim.End, StringTransform.EmptyToNull);
             this.EyeColor = Cleaner.Clean<RefDataNamespace.EyeColor>(this.EyeColor);
+            this.PowerSource = Cleaner.Clean<RefDataNamespace.PowerSource>(this.PowerSource);
             this.ETag = Cleaner.Clean(this.ETag, StringTrim.End, StringTransform.EmptyToNull);
             this.ChangeLog = Cleaner.Clean<ChangeLog>(this.ChangeLog);
 
@@ -272,6 +302,7 @@ namespace Beef.Demo.Common.Entities
                     && Cleaner.IsInitial(this.ModelNo)
                     && Cleaner.IsInitial(this.SerialNo)
                     && Cleaner.IsInitial(this.EyeColor)
+                    && Cleaner.IsInitial(this.PowerSource)
                     && Cleaner.IsInitial(this.ETag)
                     && Cleaner.IsInitial(this.ChangeLog);
             }

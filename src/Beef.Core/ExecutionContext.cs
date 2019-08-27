@@ -177,9 +177,10 @@ namespace Beef
         /// <summary>
         /// Gets or sets the username for the request. This value is immutable.
         /// </summary>
+        /// <remarks>Where not overridden the <i>get</i> will default to <see cref="Environment.UserName"/> to ensure a value is always returned.</remarks>
         public string Username
         {
-            get { return _username; }
+            get { return _username ?? Environment.UserName; }
 
             set
             {

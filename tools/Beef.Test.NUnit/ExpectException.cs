@@ -2,6 +2,7 @@
 
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
@@ -14,8 +15,9 @@ namespace Beef.Test.NUnit
         /// Verifies that a delegate throws a particular exception with the specified <paramref name="exceptionMessage"/> when called.
         /// </summary>
         /// <typeparam name="TException">The <see cref="Exception"/> <see cref="Type"/>.</typeparam>
-        /// <param name="exceptionMessage">The expected exception message.</param>
+        /// <param name="exceptionMessage">The expected exception message; "*" indicates any.</param>
         /// <param name="action">The action to execute.</param>
+        [System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException>(string exceptionMessage, Action action) where TException : Exception
         {
             Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
@@ -36,7 +38,53 @@ namespace Beef.Test.NUnit
                             return;
                     }
 
-                    if (ex.Message == exceptionMessage)
+                    if (exceptionMessage == "*" || ex.Message == exceptionMessage)
+                        return;
+                }
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Verifies that a delegate throws a particular exception with the specified <paramref name="exceptionMessage"/> when called.
+        /// </summary>
+        /// <typeparam name="TException">The <see cref="Exception"/> <see cref="Type"/>.</typeparam>
+        /// <param name="exceptionMessage">The expected exception message; "*" indicates any.</param>
+        /// <param name="funcAsync">The asynchronous function to execute.</param>
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void Throws<TException>(string exceptionMessage, Func<Task> funcAsync)
+        {
+            Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
+            Check.NotNull(funcAsync, nameof(funcAsync));
+
+            try
+            {
+                funcAsync.Invoke().Wait();
+                Assert.Fail($"{typeof(TException).Name} expected: {exceptionMessage}");
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() == typeof(TException))
+                {
+                    if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
+                    {
+                        if (!exceptionMessage.Contains("\r\n") && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                            return;
+                    }
+
+                    if (exceptionMessage == "*" || ex.Message == exceptionMessage)
+                        return;
+                }
+                else if (ex is AggregateException aex && aex.InnerException.GetType() == typeof(TException))
+                {
+                    if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
+                    {
+                        if (!exceptionMessage.Contains("\r\n") && aex.InnerException.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                            return;
+                    }
+
+                    if (exceptionMessage == "*" || aex.InnerException.Message == exceptionMessage)
                         return;
                 }
 
@@ -49,8 +97,9 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <typeparam name="TException">The <see cref="Exception"/> <see cref="Type"/>.</typeparam>
         /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
-        /// <param name="exceptionMessage">The expected exception message.</param>
+        /// <param name="exceptionMessage">The expected exception message; "*" indicates any.</param>
         /// <param name="func">The function to execute.</param>
+        [System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException, TResult>(string exceptionMessage, Func<TResult> func) where TException : Exception
         {
             Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
@@ -63,8 +112,17 @@ namespace Beef.Test.NUnit
             }
             catch (Exception ex)
             {
-                if (ex.GetType() == typeof(TException) && ex.Message == exceptionMessage)
-                    return;
+                if (ex.GetType() == typeof(TException))
+                {
+                    if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
+                    {
+                        if (!exceptionMessage.Contains("\r\n") && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                            return;
+                    }
+
+                    if (exceptionMessage == "*" || ex.Message == exceptionMessage)
+                        return;
+                }
 
                 throw;
             }

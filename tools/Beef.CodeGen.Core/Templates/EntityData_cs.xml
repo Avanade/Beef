@@ -524,7 +524,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
               <Then>
-                <![CDATA[                var __dataArgs = CosmosDbArgs.Create("{{Entity.CosmosContainerId}}"]]>
+                <![CDATA[                var __dataArgs = CosmosDbArgs<{{Entity.EntityName}}>.Create("{{Entity.CosmosContainerId}}"]]>
                 <If Condition="Entity.CosmosPartitionKey == null">
                   <Then><![CDATA[, PartitionKey.None]]></Then>
                   <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>

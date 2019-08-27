@@ -123,9 +123,7 @@ namespace Beef
             if (!(property.Body is MemberExpression me))
                 throw new ArgumentException("Property expression must be of Type MemberExpression.", nameof(property));
 
-            var pe = (ParameterExpression)me.Expression;
             Expression exp = me;
-
             var wc = Wildcard.MultiBasic;
             var wr = wc.Parse(text).ThrowOnError();
 
@@ -158,8 +156,7 @@ namespace Beef
                 exp = Expression.AndAlso(ee, exp);
             }
 
-            var le = Expression.Lambda<Func<TElement, bool>>(exp, pe);
-
+            var le = Expression.Lambda<Func<TElement, bool>>(exp, property.Parameters);
             return query.Where(le);
         }
     }

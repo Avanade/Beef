@@ -59,7 +59,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
+                var __dataArgs = CosmosDbArgs<Robot>.Create("Items", PartitionKey.None);
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs);
                 __result = await CosmosDb.Default.GetAsync<Robot>(__dataArgs, id);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
@@ -80,7 +80,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
+                var __dataArgs = CosmosDbArgs<Robot>.Create("Items", PartitionKey.None);
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs);
                 __result = await CosmosDb.Default.CreateAsync(__dataArgs, value);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
@@ -101,7 +101,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 Robot __result = null;
-                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
+                var __dataArgs = CosmosDbArgs<Robot>.Create("Items", PartitionKey.None);
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs);
                 __result = await CosmosDb.Default.UpdateAsync(__dataArgs, value);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
@@ -117,7 +117,7 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None);
+                var __dataArgs = CosmosDbArgs<Robot>.Create("Items", PartitionKey.None);
                 if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs);
                 await CosmosDb.Default.DeleteAsync<Robot>(__dataArgs, id);
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id);
@@ -135,7 +135,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 RobotCollectionResult __result = new RobotCollectionResult(paging);
-                var __dataArgs = CosmosDbArgs.Create("Items", PartitionKey.None, __result.Paging);
+                var __dataArgs = CosmosDbArgs<Robot>.Create("Items", PartitionKey.None, __result.Paging);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
                 __result.Result = CosmosDb.Default.Query<Robot>(__dataArgs, q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<RobotCollection>();
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args);

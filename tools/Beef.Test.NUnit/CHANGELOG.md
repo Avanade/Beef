@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.12
+- *Added:* `ExpectException.Throws` has had a new overload added that supports an async method (i.e. returns `Task`).
+- *Enhancement:* `ExpectException.Throws` message argument where set to '*' will accept any message text; i.e. just validates the `Type` of `Exception`. 
+
 ## v2.1.11
 - *Fixed:* Removed any explicit Cosmos logic/dependencies into either `Beef.Core` (YAML) or `Beef.Data.Cosmos`. These should be referenced as required.
 - *Added:* `ReturnsWebApiAgentResultAsync` extensions methods (for mocking via MOQ) added to support `XxxServiceAgent` mocking scenarios.

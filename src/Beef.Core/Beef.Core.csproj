@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Beef</RootNamespace>
-    <AssemblyVersion>2.1.14</AssemblyVersion>
-    <FileVersion>2.1.14</FileVersion>
-    <Version>2.1.14</Version>
+    <AssemblyVersion>2.1.15</AssemblyVersion>
+    <FileVersion>2.1.15</FileVersion>
+    <Version>2.1.15</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
