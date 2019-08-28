@@ -1,6 +1,47 @@
 # Beef.Data.Cosmos
 
+[![NuGet version](https://badge.fury.io/nu/Beef.Data.Cosmos.svg)](https://badge.fury.io/nu/Beef.Data.Cosmos)
+
 Adds additional capabilities extending	[`Microsoft.Azure.Cosmos`](https://github.com/Azure/azure-cosmos-dotnet-v3) that standardise and simply usage of the Cosmos [`Database`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.database) for _Beef_.
+
+<br/>
+
+## Database
+
+To encapsulate the Cosmos database access the [CosmosDb](./CosmosDbBase.cs) or [CosmosDbBase](./CosmosDbBase.cs) is inherited to enable.
+
+The following demonstrates the usage:
+
+``` csharp
+public class MyCosmosDb : CosmosDb<MyCosmosDb>
+{
+    public MyCosmosDb() : base(new Microsoft.Azure.Cosmos("https://localhost:8081", "C2=="), "Beef.UnitTest", true)
+    { }
+}
+```
+
+</br>
+
+## Operation arguments
+
+The [`CosmosDbArgs`](./CosmosDbArgs.cs) provides the required [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) operation arguments:
+
+Property | Description
+-|-
+`ContainerId` | The Cosmos `Container` identifier.
+`PartitionKey` | The [PartitionKey](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.partitionkey) (defaults to `PartitionKey.None`).
+`Paging` | The [paging](../Beef.Core/Entities/PagingResult.cs) configuration (used by **query** operation only).
+`ItemRequestOptions` | The [`ItemRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.itemrequestoptions) used for `Get`, `Create`, `Update` and `Delete`.
+`QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
+`NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
+`SetIdentifierOnCreate` | Indicates whether to the set (override) the identifier on `Create` where the entity implements [`IIdentifer`](../Beef.Core/Entities/IIdentifier.cs).
+
+The following demonstrates the usage:
+
+``` csharp
+var args1 = CosmosDbArgs<Person>.Create("Persons");
+var args2 = CosmosDbArgs<Person>.Create("Persons", paging);
+```
 
 <br/>
 
@@ -28,7 +69,8 @@ More advanced query operations are enabled via by the `CosmosDbBase.Query` which
 
 Operation | Description
 -|-
-`AsQueryable` | Gets a prepared `IQueryable` with any `CosmosDbTypeValue` filtering as applicable. <br/> **Note**: for this reason this is the recommended approach for all ad-hoc queries. <br/> **Note**: [`CosmosDbArgs.Paging`](./CosmosDbArgs.cs) is not supported and must be applied using the provided `IQueryable.Paging`.`SelectFirst` | Selects the first item.**<sup>*</sup>** 
+`AsQueryable` | Gets a prepared `IQueryable` with any `CosmosDbTypeValue` filtering as applicable. <br/> **Note**: for this reason this is the recommended approach for all ad-hoc queries. <br/> **Note**: [`CosmosDbArgs.Paging`](./CosmosDbArgs.cs) is not supported and must be applied using the provided `IQueryable.Paging`.
+`SelectFirst` | Selects the first item.**<sup>*</sup>** 
 `SelectFirstOrDefault` | Selects the first item or default.**<sup>*</sup>**
 `SelectSingle` | Selects a single item.**<sup>*</sup>**
 `SelectSingleOrDefault` | Selects a single item or default.**<sup>*</sup>**
@@ -48,7 +90,7 @@ Examples as follows:
 ``` csharp
 public class CosmosDb : CosmosDbBase
 {
-    public CosmosDb() : base(new AzCosmos.CosmosClient("https://localhost:8081", "C2=="), "Beef.UnitTest", true)
+    public CosmosDb() : base(new Microsoft.Azure.Cosmos("https://localhost:8081", "C2=="), "Beef.UnitTest", true)
     {
         Persons = new CosmosDbContainer<Person>(this, CosmosDbArgs<Person>.Create("Persons"));
     }

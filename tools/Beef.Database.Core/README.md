@@ -112,26 +112,35 @@ See the sample [`Beef.Demo.Database`](../../samples/Demo/Beef.Demo.Database) as 
 ### Commands
 
 The following [commands](DatabaseExecutorCommand.cs) are automatically enabled for the console application:
-- `Drop` - drop the existing database (where it alredy exists).
-- `Create` - create the database (where it does not already exist).
-- `Migrate` - migrate the database using the **Migrations** scripts (those that have not already been executed).
-- `CodeGen` - generates database **Schema** objects via code generation.
-- `Schema` - drops and creates the known database **Schema** objects.
-- `Reset` - resets the database by deleting all existing data and reseting all identities (IDENT) to 0.
-- `Data` - inserts or merges **Data** from embedded YAML files.
+
+Command | Description
+-|-
+`Drop` | Drop the existing database (where it alredy exists).
+`Create` | Create the database (where it does not already exist).
+`Migrate` | Migrate the database using the **Migrations** scripts (those that have not already been executed).
+`CodeGen` | Generates database **Schema** objects via code generation.
+`Schema` | Drops and creates the known database **Schema** objects.
+`Reset` | Resets the database by deleting all existing data and reseting all identities (IDENT) to 0.
+`Data` | Inserts or merges **Data** from embedded YAML files.
 
 The remainder are common combinations of the above:
-- `All` - performs **all** commands as follows; `Create`, `Migrate`, `CodeGen`, `Schema` and `Data`.
-- `DropAndAll` - performs `Drop` and `All`.
-- `ResetAndAll` - performs `Reset` and `All`.
-- `Database` - performs only the **database** commands as follows: `Create`, `Migrate`, `Schema` and `Data`.
-- `DropAndDatabase` - performs `Drop` and `Database`.
-- `ResetAndDatabase` - performs `Reset` and `Database`.
+
+Command | Description
+-|-
+`All` | Performs **all** commands as follows; `Create`, `Migrate`, `CodeGen`, `Schema` and `Data`.
+`DropAndAll` | Performs `Drop` and `All`.
+`ResetAndAll` | Performs `Reset` and `All`.
+`Database` | Performs only the **database** commands as follows: `Create`, `Migrate`, `Schema` and `Data`.
+`DropAndDatabase` | Performs `Drop` and `Database`.
+`ResetAndDatabase` | Performs `Reset` and `Database`.
 
 There are multiple scripting options (create new script file in the `Migrate` folder:
-- `ScriptNew` - creates a new (skeleton) script file using the defined naming convention.
-- `ScriptNew -create Schema.Table` - creates a new table create script file for the named schema and table.
-- `ScriptNew -alter Schema.Table` - creates a new table create script file for the named schema and table.
+
+Command | Description
+-|-
+`ScriptNew` | Creates a new (skeleton) script file using the defined naming convention.
+`ScriptNew -create Schema.Table` | Creates a new table create script file for the named schema and table.
+`ScriptNew -alter Schema.Table` | Creates a new table create script file for the named schema and table.
 
 <br/>
 
