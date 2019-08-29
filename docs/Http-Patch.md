@@ -1,6 +1,6 @@
 # HTTP PATCH
 
-In addition to HTTP GET/POST/PUT/DELETE there is support for HTTP PATCH. This allows an update to an entity value where only the properties that have changed are passed to the API. This has the added benefit of being less brittle with respect to versioning as not all properties are required as per a POST/PUT.
+In addition to HTTP `GET/POST/PUT/DELETE` there is support for HTTP `PATCH`. This allows an update to an entity value where only the properties that have changed are passed to the API. This has the added benefit of being less brittle with respect to versioning as not all properties are required as per a `POST/PUT`.
 
 <br/>
 
@@ -14,7 +14,7 @@ There are two approaches that are supported:
 
 ## JSON Merge Patch
 
-This is likely to be the most common approach that will be leveraged. Which is simply the passing of properties that are to be updated within the JSON payload. To nullify a property then it must be explicitly set to null.
+This is likely to be the most common approach that will be leveraged. Which is simply the passing of properties that are to be updated within the JSON payload. To nullify a property then it must be explicitly set to null. To support, the [`JsonEntityMerge`](../src/Beef.Core/Json/JsonEntityMerge.cs) is provided to enable.
 
 ``` json
 {
@@ -27,9 +27,13 @@ This is likely to be the most common approach that will be leveraged. Which is s
 }
 ```
 
+<br/>
+
+### Arrays
+
 However, the _gotcha_ is with arrays, in that all items must be passed as this is a replacement operation only. Within the specification there is no means to reference a specific item for change; however, a **JSON Patch** enables through array indexing.
 
-We have extended our own support to enable an indexing of sorts through the use of the [`IUniqueKey`](../src/Beef.Core/Entities/IUniqueKey.cs) which all generated entities can support. By enabling one or more properties as forming the `UniqueKey` this is used to match within the existing collection. All items still need to be passed so that the add, change and delete can be determined; however, then only the properties to change for each item need to be provided.
+_Beef_ has extended support to enable an indexing of sorts through the use of the [`IUniqueKey`](../src/Beef.Core/Entities/IUniqueKey.cs) which all generated entities can support. By enabling one or more properties as forming the `UniqueKey` this is used to match within the existing collection. All items still need to be passed so that the add, change and delete can be determined; however, then only the properties to change for each item need to be provided.
 
 <br/>
 
@@ -52,7 +56,7 @@ This is unlikely to be used but is supported if needed.
 
 ## Code-generation
 
-The [code generation](../tools/Beef.CodeGen.Core/README.md) supports `Patch` operations.
+The [code generation](../tools/Beef.CodeGen.Core/README.md) supports `PATCH` operations.
 
 This is a special case operation in that only `XxxAgent`, `XxxServiceAgent` and `XxxController` classes are ever generated. Under the covers the `XxxController` uses the corresponding `Get` operation to validate existence, and validate `etag` for concurrency. The JSON patching then occurs on this entity value. Assuming changes are made, and are valid, the corresponding `Update` operation is used to perform the actual update; as such, all existing validation and updating logic is reused.
 

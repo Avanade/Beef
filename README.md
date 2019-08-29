@@ -66,13 +66,13 @@ The following represents the prescribed tiering and layering of the architecture
 
 Given this architecture, the .NET Solution you create using _Beef_ should adhere to the prescribed [solution structure](./docs/Solution-Structure.md).
 
-Each of the key layers / components above are further detailed: 
-- [Service interface](./docs/Layer-ServiceInterface.md)
-- [Domain logic](./docs/Layer-Manager.md)
-- [Service orchestration](./docs/Layer-DataSvc.md)
-- [Data access](./docs/Layer-Data.md)
-- [Entity (DTO)](./docs/Layer-Entity.md)
-- [Service agent](./docs/Layer-ServiceAgent.md)
+Each of the key layers / components above are further detailed (`Xxx` denotes the entity name): 
+- [Entity (DTO)](./docs/Layer-Entity.md) - `Xxx`
+- [Service agent](./docs/Layer-ServiceAgent.md) - `XxxAgent` and `XxxServiceAgent`
+- [Service interface](./docs/Layer-ServiceInterface.md) - `XxxController`
+- [Domain logic](./docs/Layer-Manager.md) - `XxxManager`
+- [Service orchestration](./docs/Layer-DataSvc.md) - `XxxDataSvc`
+- [Data access](./docs/Layer-Data.md) - `XxxData`
 
 <br>
 
@@ -98,10 +98,10 @@ Assembly | Description | NuGet | Changes
 [`Beef.AspNetCore.WebApi`](./src/Beef.AspNetCore.WebApi) | ASP.NET Core Web API framework. | [![NuGet version](https://badge.fury.io/nu/Beef.AspNetCore.WebApi.svg)](https://badge.fury.io/nu/Beef.AspNetCore.WebApi) | [Log](./src/Beef.AspNetCore.WebApi/CHANGELOG.md)
 [`Beef.Data.Database`](./src/Beef.Data.Database) | ADO.NET database framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.svg)](https://badge.fury.io/nu/Beef.Data.Database) | [Log](./src/Beef.Data.Database/CHANGELOG.md)
 [`Beef.Data.EntityFrameworkCore`](./src/Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore.svg)](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore) | [Log](./src/Beef.Data.EntityFrameworkCore/CHANGELOG.md)
-[`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData) | [Log](./src/Beef.Data.OData/CHANGELOG.md)
 [`Beef.Data.Cosmos`](./src/Beef.Data.Cosmos) | Cosmos DB execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Cosmos.svg)](https://badge.fury.io/nu/Beef.Data.Cosmos) | [Log](./src/Beef.Data.Cosmos/CHANGELOG.md)
+[`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData) | [Log](./src/Beef.Data.OData/CHANGELOG.md)
 
-The tooling / supporting capabilities for _Beef_ are enabled by the following  assemblies:
+The tooling / supporting capabilities for _Beef_ are enabled by the following assemblies:
 
 Assembly | Description | NuGet | Changes
 -|-|-|-
