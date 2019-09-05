@@ -13,6 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>beef dotnet template solution</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,11 @@
       <PackagePath>contentFiles\any\any\Schema\</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="content\Company.AppName.Business\Data\PersonData.cs" />
+    <None Remove="content\Company.AppName.Business\Validation\PersonArgsValidator.cs" />
   </ItemGroup>
 
 </Project>

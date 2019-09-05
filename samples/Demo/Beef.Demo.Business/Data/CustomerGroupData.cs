@@ -15,8 +15,8 @@ namespace Beef.Demo.Business.Data
 
         private IQueryable<CustomerGroup> GetByArgsOnQuery(IQueryable<CustomerGroup> q, CustomerGroupArgs args, IODataArgs odataArgs)
         {
-            return q.WhereWhen(a => a.Company == args.Company, args?.Company != null)
-                    .WhereWhen(a => a.Description == args.Description, args?.Description != null);
+            return q.WhereWith(args?.Company, a => a.Company == args.Company)
+                    .WhereWith(args?.Description, a => a.Description == args.Description);
         }
 
         private async Task UpdateBatchOnImplementationAsync(CustomerGroupCollection values)

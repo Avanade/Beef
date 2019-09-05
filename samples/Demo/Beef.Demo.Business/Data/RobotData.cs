@@ -15,6 +15,7 @@ namespace Beef.Demo.Business.Data
         {
             q = q.WhereWildcard(x => x.ModelNo, args?.ModelNo);
             q = q.WhereWildcard(x => x.SerialNo, args?.SerialNo);
+            q = q.WhereWith(args?.PowerSources, x => args.PowerSources.ToCodeList().Contains(x.PowerSourceSid));
             return q.OrderBy(x => x.SerialNo);
         }
     }

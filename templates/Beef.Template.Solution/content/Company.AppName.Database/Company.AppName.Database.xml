@@ -1,11 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" RefDatabaseSchema="Ref">
+<CodeGeneration RefDatabaseSchema="Ref" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!--#if (implement_database) -->
   <!-- Reference data stored procedures -->
   <Table Name="Gender" Schema="Ref" GetAll="true" />
 
   <!-- Master data stored procedures. -->
-  <Table Name="Person" Schema="AppName" Get="true" Create="true" Update="true" Delete="true" />
+  <Table Name="Person" Schema="AppName" Get="true" Create="true" Update="true" Delete="true">
+    <StoredProcedure Name="GetByArgs" Paging="true">
+      <Parameter Name="FirstName" IsNullable="true" Operator="LIKE" />
+      <Parameter Name="LastName" IsNullable="true" Operator="LIKE" />
+      <Parameter Name="GenderCode" IsNullable="true" IsCollection="true" />
+      <OrderBy Name="LastName" />
+      <OrderBy Name="FirstName" />
+    </StoredProcedure>
+  </Table>
   <!--#endif -->
   <!--#if (implement_entityframework) -->
   <!-- Reference data tables/models. -->

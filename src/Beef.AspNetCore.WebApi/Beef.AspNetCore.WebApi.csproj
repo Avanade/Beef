@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Beef.AspNetCore.WebApi</RootNamespace>
-    <AssemblyVersion>2.1.5</AssemblyVersion>
-    <FileVersion>2.1.5</FileVersion>
-    <Version>2.1.5</Version>
+    <AssemblyVersion>2.1.6</AssemblyVersion>
+    <FileVersion>2.1.6</FileVersion>
+    <Version>2.1.6</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -33,6 +33,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

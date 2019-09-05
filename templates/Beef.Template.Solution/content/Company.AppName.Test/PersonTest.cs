@@ -6,6 +6,8 @@ using Company.AppName.Common.Agents;
 using Company.AppName.Common.Entities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace Company.AppName.Test
@@ -83,6 +85,74 @@ namespace Company.AppName.Test
             AgentTester.Create<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run((a) => a.Agent.GetAsync(1.ToGuid(), new WebApiRequestOptions { ETag = v.ETag }));
+        }
+
+        #endregion
+
+        #region GetByArgs
+
+        [Test, TestSetUp]
+        public void B210_GetByArgs_All()
+        {
+            var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(null)).Value;
+
+            Assert.IsNotNull(v);
+            Assert.IsNotNull(v.Result);
+            Assert.AreEqual(4, v.Result.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, v.Result.Select(x => x.LastName).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void B220_GetByArgs_FirstName()
+        {
+            var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new PersonArgs { FirstName = "*a*" })).Value;
+
+            Assert.IsNotNull(v);
+            Assert.IsNotNull(v.Result);
+            Assert.AreEqual(3, v.Result.Count);
+            Assert.AreEqual(new string[] { "Browne", "Smith", "Smithers" }, v.Result.Select(x => x.LastName).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void B230_GetByArgs_LastName()
+        {
+            var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new PersonArgs { LastName = "s*" })).Value;
+
+            Assert.IsNotNull(v);
+            Assert.IsNotNull(v.Result);
+            Assert.AreEqual(2, v.Result.Count);
+            Assert.AreEqual(new string[] { "Smith", "Smithers" }, v.Result.Select(x => x.LastName).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void B240_GetByArgs_Gender()
+        {
+            var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new PersonArgs { GendersSids = new List<string> { "F" } })).Value;
+
+            Assert.IsNotNull(v);
+            Assert.IsNotNull(v.Result);
+            Assert.AreEqual(2, v.Result.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones" }, v.Result.Select(x => x.LastName).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void B250_GetByArgs_Empty()
+        {
+            var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new PersonArgs { LastName = "s*", FirstName = "b*", GendersSids = new List<string> { "F" } })).Value;
+
+            Assert.IsNotNull(v);
+            Assert.IsNotNull(v.Result);
+            Assert.AreEqual(0, v.Result.Count);
         }
 
         #endregion

@@ -74,6 +74,10 @@
     {
       "modifiers": [
         {
+          "condition": "(implement_none)",
+          "exclude": [ "Company.AppName.Business/Validation/**/*", "Company.AppName.Business/Data/PersonData.cs" ]
+        },
+        {
           "condition": "(implement_cosmos || implement_none)",
           "exclude": [ "Company.AppName.Database/**/*" ]
         },

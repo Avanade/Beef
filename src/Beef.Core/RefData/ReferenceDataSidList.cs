@@ -159,6 +159,22 @@ namespace Beef.RefData
         }
 
         /// <summary>
+        /// Creates a <see cref="string"/> list containing the <see cref="ReferenceDataBase"/> <see cref="ReferenceDataBase.Code"/> for each item (where <see cref="ReferenceDataBase.IsValid"/>).
+        /// </summary>
+        /// <returns>A <see cref="List{Int32}"/>.</returns>
+        public List<string> ToCodeList()
+        {
+            var codes = new List<string>();
+            foreach (var item in this)
+            {
+                if (item.IsValid)
+                    codes.Add(item.Code);
+            }
+
+            return codes;
+        }
+
+        /// <summary>
         /// Gets the underlying <see cref="ReferenceDataBase"/> list.
         /// </summary>
         /// <returns>The underlying <see cref="ReferenceDataBase"/> list.</returns>
@@ -173,7 +189,7 @@ namespace Beef.RefData
         private TItem GetItem(object sid)
         {
             if (sid == null)
-                return default(TItem);
+                return default;
 
             switch (_sidType)
             {
@@ -187,7 +203,7 @@ namespace Beef.RefData
                     return ReferenceDataBase.ConvertFromId<TItem>((Guid)sid);
             }
 
-            return default(TItem);
+            return default;
         }
 
         /// <summary>
@@ -208,7 +224,7 @@ namespace Beef.RefData
                 }
             }
 
-            return default(TSid);
+            return default;
         }
 
         /// <summary>

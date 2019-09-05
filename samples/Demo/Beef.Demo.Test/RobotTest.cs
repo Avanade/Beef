@@ -75,7 +75,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456" })
+                .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456", PowerSource = "F" })
                 .Run((a) => a.Agent.GetAsync(1.ToGuid()));
         }
 
@@ -157,6 +157,29 @@ namespace Beef.Demo.Test
             // Check only 2 are returned in the sorted order.
             Assert.AreEqual(2, rcr?.Value?.Result?.Count);
             Assert.AreEqual(new string[] { "A45768", "B45768" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void C140_GetByArgs_PowerSources_NoPaging()
+        {
+            var rcr = AgentTester.Create<RobotAgent, RobotCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new RobotArgs { PowerSources = new RefData.ReferenceDataSidList<PowerSource, string> { "F", "N" } }));
+
+            // Check only 2 are returned in the sorted order.
+            Assert.AreEqual(2, rcr?.Value?.Result?.Count);
+            Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
+        }
+
+        [Test, TestSetUp]
+        public void C150_GetByArgs_All_NoResult()
+        {
+            var rcr = AgentTester.Create<RobotAgent, RobotCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new RobotArgs { ModelNo = "ABC", SerialNo = "K*", PowerSources = new RefData.ReferenceDataSidList<PowerSource, string> { "F", "N" } }));
+
+            // Check nothing is returned..
+            Assert.AreEqual(0, rcr?.Value?.Result?.Count);
         }
 
         #endregion

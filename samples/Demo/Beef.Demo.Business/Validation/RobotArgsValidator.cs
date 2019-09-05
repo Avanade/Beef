@@ -15,6 +15,7 @@ namespace Beef.Demo.Business.Validation
         {
             Property(x => x.ModelNo).Common(CommonValidators.Text).Wildcard(Wildcard.MultiBasic);
             Property(x => x.SerialNo).Common(CommonValidators.Text).Wildcard(Wildcard.MultiBasic);
+            Property(x => x.PowerSources).AreValid();
         }
     }
 }

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.16
+- *Added:* The `ReferenceDataSidList` has had a new method `ToCodeList` to get the list of codes added.
+- *Added:* A new extenstion method `IQueryable.WhereWith` added to simply the specification of a where clause when the `with` value is not the `default`.
+
 ## v2.1.15
 - *Fixed:* An `ExecutionContext.Username` get will return `Environment.UserName` as a default where not overridden to ensure a valid value is returned.
 - *Fixed:* The `IEnumerable` extensions `WhereWildcard` will correctly construct the internal lambda expression to correctly construct the underlying where statement.
