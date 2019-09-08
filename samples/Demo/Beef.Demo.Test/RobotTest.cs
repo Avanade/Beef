@@ -47,7 +47,7 @@ namespace Beef.Demo.Test
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                 }, 400);
 
-            await rdc.ImportRefDataBatchAsync<RobotTest>(ReferenceData.Current, "RefData.yaml");
+            await rdc.ImportValueRefDataBatchAsync<RobotTest>(ReferenceData.Current, "RefData.yaml");
         }
 
         [OneTimeTearDown]

@@ -25,7 +25,7 @@ namespace Beef.Mapper
         public PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string destPropertyName, OperationTypes operationTypes = OperationTypes.Any)
         {
             SrcePropertyExpression = PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression)));
-            SrcePropertyInfo = typeof(TSrce).GetProperties().Where(x => x.Name == SrcePropertyName).First();
+            SrcePropertyInfo = TypeReflector.GetPropertyInfo(typeof(TSrce), SrcePropertyName);
             DestPropertyName = string.IsNullOrEmpty(destPropertyName) ? SrcePropertyExpression.Name : destPropertyName;
             OperationTypes = operationTypes;
 

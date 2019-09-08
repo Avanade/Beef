@@ -398,7 +398,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default(TSrceProperty);
+                return default;
         }
 
         /// <summary>
@@ -509,6 +509,17 @@ namespace Beef.Mapper
                 return;
 
             TSrceProperty val = GetSrceValue(sourceEntity, operationType);
+
+            if (Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection))
+            {
+                TDestProperty dval = GetDestValue(destinationEntity, operationType);
+                if (dval != null)
+                {
+                    ((IEntityMapper)Mapper).MapToDest(val, dval, operationType);
+                    return;
+                }
+            }
+
             SetDestValue(destinationEntity, ConvertToDestValue(val, operationType), operationType);
         }
 
@@ -532,13 +543,13 @@ namespace Beef.Mapper
         public TDestProperty ConvertToDestValue(TSrceProperty sourcePropertyValue, OperationTypes operationType)
         {
             if (!OperationTypes.HasFlag(operationType))
-                return default(TDestProperty);
+                return default;
 
             if (Converter != null)
                 return Converter.ConvertToDest(sourcePropertyValue);
 
             if (sourcePropertyValue == null)
-                return default(TDestProperty);
+                return default;
 
             if ((!IsSrceComplexType && !IsDestComplexType)
                 || ((IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection)))
@@ -634,13 +645,13 @@ namespace Beef.Mapper
         public TSrceProperty ConvertToSrceValue(TDestProperty destinationPropertyValue, OperationTypes operationType)
         {
             if (!OperationTypes.HasFlag(operationType))
-                return default(TSrceProperty);
+                return default;
 
             if (Converter != null)
                 return Converter.ConvertToSrce(destinationPropertyValue);
 
             if (destinationPropertyValue == null)
-                return default(TSrceProperty);
+                return default;
 
             if ((!IsSrceComplexType && !IsDestComplexType)
                 || ((IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection)))
@@ -651,7 +662,7 @@ namespace Beef.Mapper
                 return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType);
             }
 
-            if (SrceComplexTypeReflector.IsCollection)
+            if (IsSrceComplexType && SrceComplexTypeReflector.IsCollection)
             {
                 var c = new List<object>();
                 foreach (var item in (System.Collections.IEnumerable)destinationPropertyValue)

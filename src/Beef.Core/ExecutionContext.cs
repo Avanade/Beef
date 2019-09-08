@@ -143,6 +143,12 @@ namespace Beef
         }
 
         /// <summary>
+        /// Gets the username from the <see cref="Environment"/> settings.
+        /// </summary>
+        /// <returns>The fully qualified username.</returns>
+        public static string EnvironmentUsername => Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
+
+        /// <summary>
         /// Gets or sets the current <see cref="Beef.DataContextScope"/>.
         /// </summary>
         internal DataContextScope DataContextScope { get; set; }
@@ -177,10 +183,10 @@ namespace Beef
         /// <summary>
         /// Gets or sets the username for the request. This value is immutable.
         /// </summary>
-        /// <remarks>Where not overridden the <i>get</i> will default to <see cref="Environment.UserName"/> to ensure a value is always returned.</remarks>
+        /// <remarks>Where not overridden the <i>get</i> will default to <see cref="EnvironmentUsername"/> to ensure a value is always returned.</remarks>
         public string Username
         {
-            get { return _username ?? Environment.UserName; }
+            get { return _username ?? EnvironmentUsername; }
 
             set
             {

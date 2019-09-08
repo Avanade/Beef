@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.10
+- *Enhancment:* Cosmos code-generation enhancements to support changes to `CosmosDb` implementation.
+
 ## v2.1.9
 - *Enhancment:* Additional code-generation enhancements to support the auto-implements of Cosmos DB data access.
 

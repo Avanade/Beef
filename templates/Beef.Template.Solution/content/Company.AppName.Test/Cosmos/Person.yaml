@@ -1,0 +1,6 @@
+AppName:
+  - Person:
+    - { id: ^1, firstName: Wendy, lastName: Jones, gender: F, birthday: 1985-03-18 }
+    - { id: ^2, firstName: Brian, lastName: Smith, gender: M, birthday: 1994-11-07 }
+    - { id: ^3, firstName: Rachael, lastName: Browne, gender: F, birthday: 1972-06-28 }
+    - { id: ^4, firstName: Waylon, lastName: Smithers, gender: M, birthday: 1952-02-21 }

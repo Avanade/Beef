@@ -100,41 +100,18 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the <b>value</b> from the response updating any special properties as required.
+        /// Reformats the <see cref="IETag.ETag"/> for the value.
         /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="resp">The response.</param>
-        /// <returns>The response value.</returns>
-        public static T GetResponseValue<T>(Response<T> resp)
-        {
-            if (resp == null)
-                return default;
-
-            return GetAndFormatValue(resp.Resource);
-        }
-
-        /// <summary>
-        /// Gets the <b>value</b> formatting/updating any special properties as required.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
-        /// <returns>The response value.</returns>
-        public static T GetAndFormatValue<T>(T value)
+        /// <remarks>The CosmosDB ETag value is formatted with a leading and trailing double-quote which are removed to enable consistency of handling within the <i>Beef</i> pipeline.</remarks>
+        public static void ReformatValueETag(object value)
         {
-            if (value == null)
-                return value;
-
             if (value is IETag etag && etag.ETag != null)
                 etag.ETag = (etag.ETag.StartsWith("\"") && etag.ETag.EndsWith("\"")) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
-
-            if (value is CosmosDbTypeValue cdv)
-                cdv.PrepareAfter();
-
-            return value;
         }
 
         /// <summary>
-        /// Prepares the entity value for a Create by setting the IChangeLog and IIdentifer.
+        /// Prepares the entity value for a 'Create' by setting the IChangeLog and IIdentifer.
         /// </summary>
         /// <param name="value">The entity value.</param>
         /// <param name="setIdentifier">Indicates whether to override the <c>Id</c> where entity implements <see cref="IIdentifier"/>.</param>
@@ -143,11 +120,11 @@ namespace Beef.Data.Cosmos
         {
             if (value is IChangeLog cl)
             {
-                cl.ChangeLog = new ChangeLog
-                {
-                    CreatedBy = ExecutionContext.Current.Username,
-                    CreatedDate = ExecutionContext.Current.Timestamp
-                };
+                if (cl.ChangeLog == null)
+                    cl.ChangeLog = new ChangeLog();
+
+                cl.ChangeLog.CreatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
+                cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
 
             if (setIdentifier)
@@ -158,6 +135,22 @@ namespace Beef.Data.Cosmos
                     sid.Id = Guid.NewGuid().ToString();
                 else
                     throw new InvalidOperationException("An identifier cannot be automatically generated for this Type.");
+            }
+        }
+
+        /// <summary>
+        /// Prepares the entity value for a 'Update' by setting the IChangeLog.
+        /// </summary>
+        /// <param name="value">The entity value.</param>
+        internal static void PrepareEntityForUpdate(object value)
+        {
+            if (value is IChangeLog cl)
+            {
+                if (cl.ChangeLog == null)
+                    cl.ChangeLog = new ChangeLog();
+
+                cl.ChangeLog.UpdatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
+                cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
         }
 
@@ -174,7 +167,7 @@ namespace Beef.Data.Cosmos
         {
             Client = Check.NotNull(client, nameof(client));
             Database = createDatabaseIfNotExists ?
-                Client.CreateDatabaseIfNotExistsAsync(databaseId, throughput).Result.Database :
+                Client.CreateDatabaseIfNotExistsAsync(databaseId, throughput ?? 400).Result.Database :
                 Client.GetDatabase(Check.NotEmpty(databaseId, nameof(databaseId)));
         }
 
@@ -198,7 +191,27 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <returns>The selected <see cref="Container"/>.</returns>
-        public Container GetContainer(string containerId) => Database.GetContainer(containerId);
+        public Container CosmosContainer(string containerId) => Database.GetContainer(containerId);
+
+        /// <summary>
+        /// Gets (creates) the <see cref="CosmosDbContainer{T, TModel}"/> using the specified <paramref name="dbArgs"/>.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <returns>The <see cref="CosmosDbContainer{T, TModel}"/>.</returns>
+        public CosmosDbContainer<T, TModel> Container<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
+            => new CosmosDbContainer<T, TModel>(this, dbArgs);
+
+        /// <summary>
+        /// Gets (creates) the <see cref="CosmosDbValueContainer{T, TModel}"/> using the specified <paramref name="dbArgs"/>.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <returns>The <see cref="CosmosDbValueContainer{T, TModel}"/>.</returns>
+        public CosmosDbValueContainer<T, TModel> ValueContainer<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
+            => new CosmosDbValueContainer<T, TModel>(this, dbArgs);
 
         /// <summary>
         /// Replace or create the <see cref="Container"/> asynchronously.
@@ -208,7 +221,7 @@ namespace Beef.Data.Cosmos
         /// <returns>The replaced/created <see cref="Container"/>.</returns>
         public async Task<Container> ReplaceOrCreateContainerAsync(ContainerProperties containerProperties, int? throughput = 400)
         {
-            var container = GetContainer(containerProperties.Id);
+            var container = CosmosContainer(containerProperties.Id);
 
             // Remove existing container if it already exists.
             try
@@ -252,8 +265,9 @@ namespace Beef.Data.Cosmos
         /// Gets or instantiates the <see cref="ItemRequestOptions"/>.
         /// </summary>
         /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        internal protected ItemRequestOptions GetItemRequestOptions<T>(CosmosDbArgs<T> dbArgs = null) where T : class, new()
+        /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        internal protected ItemRequestOptions GetItemRequestOptions<T, TModel>(CosmosDbArgs<T, TModel> dbArgs = null) where T : class, new() where TModel : class, new()
         {
             var iro = dbArgs != null && dbArgs.ItemRequestOptions != null ? dbArgs.ItemRequestOptions : new ItemRequestOptions();
             UpdateRequestOptions(iro);
@@ -289,8 +303,9 @@ namespace Beef.Data.Cosmos
         /// Gets or instantiates the <see cref="QueryRequestOptions"/>.
         /// </summary>
         /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
-        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        internal protected QueryRequestOptions GetQueryRequestOptions<T>(CosmosDbArgs<T> dbArgs = null) where T : class, new()
+        /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        internal protected QueryRequestOptions GetQueryRequestOptions<T, TModel>(CosmosDbArgs<T, TModel> dbArgs = null) where T : class, new() where TModel : class, new()
         {
             var ro = dbArgs != null && dbArgs.QueryRequestOptions != null ? dbArgs.QueryRequestOptions : new QueryRequestOptions() { MaxConcurrency = 2 };
             UpdateQueryRequestOptions(ro);
@@ -302,65 +317,23 @@ namespace Beef.Data.Cosmos
         #region Query
 
         /// <summary>
-        /// Creates a <see cref="CosmosDbQuery{T}"/> to enable LINQ-style queries.
+        /// Gets (creates) a <see cref="CosmosDbQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="queryArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         /// <param name="query">The function to perform additional query execution.</param>
-        /// <returns>The <see cref="CosmosDbQuery{T}"/>.</returns>
-        public CosmosDbQuery<T> Query<T>(CosmosDbArgs<T> queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null) where T : class, IIdentifier, new()
-        {
-            return new CosmosDbQuery<T>(this, queryArgs, query);
-        }
+        /// <returns>The <see cref="CosmosDbQuery{T, TModel}"/>.</returns>
+        public CosmosDbQuery<T, TModel> Query<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<TModel>, IQueryable<TModel>> query = null) where T : class, new() where TModel : class, new() =>
+            Container(dbArgs).Query(query);
+
+        /// <summary>
+        /// Gets (creates) a <see cref="CosmosDbValueQuery{T, TModel}"/> to enable LINQ-style queries.
+        /// </summary>
+        /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <param name="query">The function to perform additional query execution.</param>
+        /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
+        public CosmosDbValueQuery<T, TModel> ValueQuery<T, TModel>(CosmosDbArgs<T, TModel> dbArgs, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> query = null) where T : class, new() where TModel : class, new() =>
+            ValueContainer(dbArgs).Query(query);
 
         #endregion
-
-        /// <summary>
-        /// Gets the <b>CosmosDb/DocumentDb</b> entity for the specified <paramref name="keys"/> converting to <typeparamref name="T"/> asynchronously.
-        /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="ICosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
-        public Task<T> GetAsync<T>(CosmosDbArgs<T> getArgs, params IComparable[] keys) where T : class, IIdentifier, new()
-        {
-            return new CosmosDbContainer<T>(this, Check.NotNull(getArgs, nameof(getArgs))).GetAsync(keys);
-        }
-
-        /// <summary>
-        /// Creates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
-        /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        /// <param name="value">The value to create.</param>
-        /// <returns>The value (re-queried where specified).</returns>
-        public Task<T> CreateAsync<T>(CosmosDbArgs<T> saveArgs, T value) where T : class, IIdentifier, new()
-        {
-            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).CreateAsync(value);
-        }
-
-        /// <summary>
-        /// Updates the <b>CosmosDb/DocumentDb</b> entity asynchronously.
-        /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        /// <param name="value">The value to create.</param>
-        /// <returns>The value (re-queried where specified).</returns>
-        public Task<T> UpdateAsync<T>(CosmosDbArgs<T> saveArgs, T value) where T : class, IIdentifier, new()
-        {
-            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).UpdateAsync(value);
-        }
-
-        /// <summary>
-        /// Deletes the <b>CosmosDb/DocumentDb</b> entity asynchronously.
-        /// </summary>
-        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
-        /// <param name="keys">The key values.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public Task DeleteAsync<T>(CosmosDbArgs<T> saveArgs, params IComparable[] keys) where T : class, IIdentifier, new()
-        {
-            return new CosmosDbContainer<T>(this, Check.NotNull(saveArgs, nameof(saveArgs))).DeleteAsync(keys);
-        }
     }
 }

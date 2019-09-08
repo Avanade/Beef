@@ -8,42 +8,21 @@ using System.Linq;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Provides common <b>CosmosDb/DocumentDb</b> query capabilities.
-    /// </summary>
-    public abstract class CosmosDbQueryBase
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbQueryBase"/> class.
-        /// </summary>
-        protected CosmosDbQueryBase() { }
-
-        /// <summary>
-        /// Gets a <see cref="PagingArgs"/> with a skip of 0 and top/take of 1.
-        /// </summary>
-        internal static PagingArgs PagingTop1 { get; } = PagingArgs.CreateSkipAndTake(0, 1);
-
-        /// <summary>
-        /// Gets a <see cref="PagingArgs"/> with a skip of 0 and top/take of 2.
-        /// </summary>
-        internal static PagingArgs PagingTop2 { get; } = PagingArgs.CreateSkipAndTake(0, 2);
-    }
-
-    /// <summary>
-    /// Encapsulates a <b>CosmosDb/DocumentDb</b> query enabling all select-like capabilities.
+    /// Encapsulates a <b>CosmosDb/DocumentDb</b> <see cref="CosmosDbValue{T}"/> query enabling all select-like capabilities.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
     /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-    public class CosmosDbQuery<T, TModel> : CosmosDbQueryBase where T : class, new() where TModel : class, new()
+    public class CosmosDbValueQuery<T, TModel> : CosmosDbQueryBase where T : class, new() where TModel : class, new()
     {
-        private readonly CosmosDbContainer<T, TModel> _container;
-        private readonly Func<IQueryable<TModel>, IQueryable<TModel>> _query;
+        private readonly CosmosDbValueContainer<T, TModel> _container;
+        private readonly Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> _query;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbQuery{T, TModel}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbValueQuery{T, TModel}"/> class.
         /// </summary>
-        /// <param name="container">The <see cref="CosmosDbContainer{T, TModel}"/>.</param>
-        /// <param name="query">A function to modify the underlying <see cref="IQueryable{T}"/>.</param>
-        internal CosmosDbQuery(CosmosDbContainer<T, TModel> container, Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        /// <param name="container">The <see cref="CosmosDbValueContainer{T, TModel}"/>.</param>
+        /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
+        internal CosmosDbValueQuery(CosmosDbValueContainer<T, TModel> container, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> query = null)
         {
             _container = Check.NotNull(container, nameof(container));
             _query = query;
@@ -57,7 +36,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal void ExecuteQuery(Action<IQueryable<TModel>> execute)
+        internal void ExecuteQuery(Action<IQueryable<CosmosDbValue<TModel>>> execute)
         {
             CosmosDbInvoker.Default.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
         }
@@ -65,10 +44,14 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
         /// </summary>
-        private IQueryable<TModel> ExecuteQueryInternal(Action<IQueryable<TModel>> execute)
+        private IQueryable<CosmosDbValue<TModel>> ExecuteQueryInternal(Action<IQueryable<CosmosDbValue<TModel>>> execute)
         {
-            IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
-            q = _query == null ? q : _query(q);
+            IQueryable<CosmosDbValue<TModel>> q =
+                _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
+
+            q = _query == null ?
+                Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name) :
+                _query(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name));
 
             execute?.Invoke(q);
             return q;
@@ -77,7 +60,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal TModel ExecuteQuery(Func<IQueryable<TModel>, TModel> execute)
+        internal CosmosDbValue<TModel> ExecuteQuery(Func<IQueryable<CosmosDbValue<TModel>>, CosmosDbValue<TModel>> execute)
         {
             return CosmosDbInvoker.Default.Invoke(this, () =>
             {
@@ -89,7 +72,7 @@ namespace Beef.Data.Cosmos
         /// Gets a prepared <see cref="IQueryable{TModel}"/> with any <see cref="CosmosDbValue{TModel}"/> filtering as applicable.
         /// </summary>
         /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
-        public IQueryable<TModel> AsQueryable()
+        public IQueryable<CosmosDbValue<TModel>> AsQueryable()
         {
             return AsQueryable(true);
         }
@@ -97,7 +80,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Initiate the IQueryable.
         /// </summary>
-        private IQueryable<TModel> AsQueryable(bool checkPaging)
+        private IQueryable<CosmosDbValue<TModel>> AsQueryable(bool checkPaging)
         {
             if (checkPaging && QueryArgs.Paging != null)
                 throw new NotSupportedException("The QueryArgs.Paging must be null for an AsQueryable(); this is a limitation of the Microsoft.Azure.Cosmos SDK in that the paging must be applied last, as such use the IQueryable.Paging provided to perform where appropriate.");

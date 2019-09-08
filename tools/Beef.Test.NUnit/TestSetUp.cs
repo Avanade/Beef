@@ -5,6 +5,7 @@ using Beef.Diagnostics;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
@@ -15,6 +16,7 @@ namespace Beef.Test.NUnit
     {
         private static readonly object _lock = new object();
         private static Func<int, object, bool> _registeredSetUp;
+        private static Func<int, object, Task<bool>> _registeredSetUpAsync;
         private static object _registeredSetUpData;
         private static bool _registeredSetUpInvoked;
         private static int _registeredSetUpCount;
@@ -116,6 +118,24 @@ namespace Beef.Test.NUnit
                     throw new InvalidOperationException("The RegisterSetUp can only be invoked once.");
 
                 _registeredSetUp = setUpFunc;
+                _registeredSetUpAsync = null;
+            }
+        }
+
+        /// <summary>
+        /// Registers the <paramref name="setUpFuncAsync"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
+        /// </summary>
+        /// <param name="setUpFuncAsync">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
+        /// <see cref="ShouldContinueRunningTests"/>.</param>
+        public static void RegisterSetUp(Func<int, object, Task<bool>> setUpFuncAsync)
+        {
+            lock (_lock)
+            {
+                if (_registeredSetUp != null)
+                    throw new InvalidOperationException("The RegisterSetUp can only be invoked once.");
+
+                _registeredSetUpAsync = setUpFuncAsync;
+                _registeredSetUp = null;
             }
         }
 
@@ -142,6 +162,20 @@ namespace Beef.Test.NUnit
                             Logger.Default.Info(new string('=', 80));
 
                             ShouldContinueRunningTests = _registeredSetUp.Invoke(_registeredSetUpCount++, _registeredSetUpData);
+                            if (!ShouldContinueRunningTests)
+                                Assert.Fail("This RegisterSetUp function failed to execute successfully.");
+                        }
+
+                        if (_registeredSetUpAsync != null)
+                        {
+                            Logger.Default.Info(null);
+                            Logger.Default.Info("Invocation of registered set up action.");
+                            Logger.Default.Info(new string('=', 80));
+
+                            var task = Task.Run(() => _registeredSetUpAsync.Invoke(_registeredSetUpCount++, _registeredSetUpData));
+                            task.Wait();
+
+                            ShouldContinueRunningTests = task.Result;
                             if (!ShouldContinueRunningTests)
                                 Assert.Fail("This RegisterSetUp function failed to execute successfully.");
                         }

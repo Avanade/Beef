@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.4
+- *Enhancement:* A number of refactorings, including the introduction of `CosmosDbMapper`, and `CosmosDbValueContainer` option for a `CosmosDbValue`. 
+
 ## v2.1.3
 - *Enhancement:* A number of refactorings, including the introduction of `CosmosDbContainer` to formalize the Entity _to_ Container relationship. 
 

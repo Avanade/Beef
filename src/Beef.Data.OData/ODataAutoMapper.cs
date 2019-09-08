@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Linq.Expressions;
 using Beef.Mapper.Converters;
 using System.Collections.Generic;
+using Beef.Reflection;
 
 namespace Beef.Data.OData
 {
@@ -106,7 +107,7 @@ namespace Beef.Data.OData
 
                 MapperPropertyAttribute mpa = null;
 
-                foreach (var p in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance))
+                foreach (var p in TypeReflector.GetProperties(type))
                 {
                     // Do not auto-map where the Ignore attribute has been specified.
                     if (p.GetCustomAttributes(typeof(MapperIgnoreAttribute), true).OfType<MapperIgnoreAttribute>().FirstOrDefault() != null)

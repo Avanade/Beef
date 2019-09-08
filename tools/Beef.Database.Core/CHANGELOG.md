@@ -1,6 +1,8 @@
 ﻿# Change log
 
 Represents the **NuGet** versions.
+## v2.1.5
+- *Enhancement:* All usernames will be set to `ExecutionContext.EnvironmentUsername` (this results in the same outcome).
 
 ## v2.1.4
 - *Fixed:* Internal *Beef* dependencies changed as a result of other changes.

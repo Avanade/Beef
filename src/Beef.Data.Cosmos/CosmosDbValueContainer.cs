@@ -1,52 +1,28 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Data.Cosmos.Internal;
 using Beef.Entities;
-using Beef.RefData;
 using Microsoft.Azure.Cosmos;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Provides all of the common <see cref="Container"/> operations.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TModel"></typeparam>
-    public interface ICosmosDbContainer<T, TModel> where T : class, new() where TModel : class, new()
-    {
-        /// <summary>
-        /// Gets the owning <see cref="CosmosDbBase"/>.
-        /// </summary>
-        CosmosDbBase CosmosDb { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="CosmosDbArgs{T, TModel}"/> (used for all operations).
-        /// </summary>
-        CosmosDbArgs<T, TModel> DbArgs { get; }
-
-        /// <summary>
-        /// Gets the <see cref="Microsoft.Azure.Cosmos.Container"/>.
-        /// </summary>
-        Container Container { get; }
-    }
-
-    /// <summary>
-    /// Enables all of the common <see cref="Container"/> operations for a specified <see cref="CosmosDb"/> and <see cref="DbArgs"/>.
+    /// Enables all of the common <see cref="Container"/> <see cref="CosmosDbValue{T}"/> operations for a specified <see cref="CosmosDb"/> and <see cref="DbArgs"/>.
     /// </summary>
     /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
-    public class CosmosDbContainer<T, TModel> : ICosmosDbContainer<T, TModel> where T : class, new() where TModel : class, new()
+    public class CosmosDbValueContainer<T, TModel> : ICosmosDbContainer<T, TModel> where T : class, new() where TModel : class, new()
     {
+        private readonly string _typeName = typeof(TModel).Name;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbContainer{T, TModel}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbValueContainer{T, TModel}"/> class.
         /// </summary>
         /// <param name="cosmosDb">The <see cref="CosmosDb"/>.</param>
         /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
-        public CosmosDbContainer(CosmosDbBase cosmosDb, CosmosDbArgs<T, TModel> dbArgs)
+        public CosmosDbValueContainer(CosmosDbBase cosmosDb, CosmosDbArgs<T, TModel> dbArgs)
         {
             CosmosDb = Check.NotNull(cosmosDb, nameof(cosmosDb));
             DbArgs = Check.NotNull(dbArgs, nameof(dbArgs));
@@ -73,7 +49,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="resp">The response value.</param>
         /// <returns>The entity value.</returns>
-        internal T GetResponseValue(Response<TModel> resp)
+        internal T GetResponseValue(Response<CosmosDbValue<TModel>> resp)
         {
             if (resp?.Resource == null)
                 return default;
@@ -86,22 +62,23 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param>The model value.</param>
         /// <returns>The entity value.</returns>
-        internal T GetValue(TModel model)
+        internal T GetValue(CosmosDbValue<TModel> model)
         {
             CosmosDbBase.ReformatValueETag(model);
-            return DbArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
+            ((ICosmosDbValue)model).PrepareAfter();
+            return DbArgs.Mapper.MapToSrce(model.Value, Mapper.OperationTypes.Get);
         }
 
         #region Query
 
         /// <summary>
-        /// Gets (creates) a <see cref="CosmosDbQuery{T, TModel}"/> to enable LINQ-style queries.
+        /// Gets (creates) a <see cref="CosmosDbValueQuery{T, TModel}"/> to enable LINQ-style queries.
         /// </summary>
         /// <param name="query">The function to perform additional query execution.</param>
-        /// <returns>The <see cref="CosmosDbQuery{T, TModel}"/>.</returns>
-        public CosmosDbQuery<T, TModel> Query(Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
+        public CosmosDbValueQuery<T, TModel> Query(Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> query = null)
         {
-            return new CosmosDbQuery<T, TModel>(this, query);
+            return new CosmosDbValueQuery<T, TModel>(this, query);
         }
 
         /// <summary>
@@ -109,9 +86,9 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <returns>An <see cref="IQueryable{T}"/>.</returns>
         /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
-        public IQueryable<TModel> AsQueryable()
+        public IQueryable<CosmosDbValue<TModel>> AsQueryable()
         {
-            return new CosmosDbQuery<T, TModel>(this).AsQueryable();
+            return new CosmosDbValueQuery<T, TModel>(this).AsQueryable();
         }
 
         #endregion
@@ -131,7 +108,17 @@ namespace Beef.Data.Cosmos
             {
                 try
                 {
-                    var val = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                    var val = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+
+                    // Check that the TypeName is the same.
+                    if (val?.Resource == null || val.Resource.Type != _typeName)
+                    {
+                        if (DbArgs.NullOnNotFoundResponse)
+                            return null;
+                        else
+                            throw new NotFoundException();
+                    }
+
                     return GetResponseValue(val);
                 }
                 catch (CosmosException dcex)
@@ -161,8 +148,10 @@ namespace Beef.Data.Cosmos
             {
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
+                var cvm = new CosmosDbValue<TModel>(model);
+                ((ICosmosDbValue)cvm).PrepareBefore();
 
-                var resp = await Container.CreateItemAsync(model, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                var resp = await Container.CreateItemAsync(cvm, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
                 return GetResponseValue(resp);
             }, CosmosDb);
         }
@@ -189,14 +178,19 @@ namespace Beef.Data.Cosmos
 
                 string key = DbArgs.GetCosmosKey(value);
                 CosmosDbBase.PrepareEntityForUpdate(value);
-                    
-                // Must read existing to update.
-                var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, ro);
+
+                // Must read existing to update and to make sure we are updating for the correct Type; don't just trust the key.
+                var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro);
+                if (resp?.Resource == null || resp.Resource.Type != _typeName)
+                    throw new NotFoundException();
 
                 ro.SessionToken = resp.Headers?.Session;
-                DbArgs.Mapper.MapToDest(value, resp.Resource, Mapper.OperationTypes.Update);
+                DbArgs.Mapper.MapToDest(value, resp.Resource.Value, Mapper.OperationTypes.Update);
+                ((ICosmosDbValue)resp.Resource).PrepareBefore();
+
                 resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro);
                 return GetResponseValue(resp);
+
             }, CosmosDb);
         }
 
@@ -217,7 +211,15 @@ namespace Beef.Data.Cosmos
             {
                 try
                 {
-                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                    // Must read existing to delete and to make sure we are deleting for the correct Type; don't just trust the key.
+                    var ro = CosmosDb.GetItemRequestOptions(DbArgs);
+                    var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro);
+                    if (resp?.Resource == null || resp.Resource.Type != _typeName)
+                        return;
+
+                    ro.SessionToken = resp.Headers?.Session;
+
+                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, ro);
                 }
                 catch (CosmosException cex)
                 {

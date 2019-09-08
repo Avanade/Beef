@@ -8,41 +8,44 @@ using System.Linq;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Adds additional extension methods to the <see cref="CosmosDbQuery{T}"/>.
+    /// Adds additional extension methods to the <see cref="CosmosDbQuery{T, TModel}"/>.
     /// </summary>
     public static class CosmosDbQueryExtensions
     {
-        /// <summary>
-        /// Executes the query creating a resultant collection for the underlying <see cref="CosmosDbTypeValue{T}.Value"/>.
-        /// </summary>
-        /// <typeparam name="T">The <see cref="CosmosDbTypeValue{T}.Value"/> <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TColl">THe collection <see cref="Type"/>.</typeparam>
-        /// <param name="query">The query.</param>
-        /// <returns>A resultant collection.</returns>
-        public static TColl SelectValueQuery<T, TColl>(this CosmosDbQuery<CosmosDbTypeValue<T>> query) where T : class, IIdentifier where TColl : ICollection<T>, new()
-        {
-            var coll = new TColl();
-            SelectValueQuery(query, coll);
-            return coll;
-        }
+        // TODO: COME BACK HERE!
+        ///// <summary>
+        ///// Executes the query creating a resultant collection for the underlying <see cref="CosmosDbValue{T}.Value"/>.
+        ///// </summary>
+        ///// <typeparam name="T">The <see cref="CosmosDbValue{T}.Value"/> <see cref="Type"/>.</typeparam>
+        ///// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+        ///// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        ///// <param name="query">The query.</param>
+        ///// <returns>A resultant collection.</returns>
+        //public static TColl SelectValueQuery<T, TColl, TModel>(this CosmosDbQuery<CosmosDbValue<T>, TModel> query) where T : class, IIdentifier where TColl : ICollection<T>, new() where TModel : class, new()
+        //{
+        //    var coll = new TColl();
+        //    SelectValueQuery(query, coll);
+        //    return coll;
+        //}
 
-        /// <summary>
-        /// Executes the query adding to the passed collection for the underlying <see cref="CosmosDbTypeValue{T}.Value"/>.
-        /// </summary>
-        /// <typeparam name="T">The <see cref="CosmosDbTypeValue{T}.Value"/> <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TColl">THe collection <see cref="Type"/>.</typeparam>
-        /// <param name="query">The query.</param>
-        /// <param name="coll">The collection to add items to.</param>
-        public static void SelectValueQuery<T, TColl>(this CosmosDbQuery<CosmosDbTypeValue<T>> query, TColl coll) where T : class, IIdentifier where TColl : ICollection<T>
-        {
-            query.ExecuteQuery(q =>
-            {
-                foreach (var item in q.Paging(query.QueryArgs.Paging).AsEnumerable())
-                {
-                    coll.Add(CosmosDbBase.GetAndFormatValue(item).Value);
-                }
-            });
-        }
+        ///// <summary>
+        ///// Executes the query adding to the passed collection for the underlying <see cref="CosmosDbValue{T}.Value"/>.
+        ///// </summary>
+        ///// <typeparam name="T">The <see cref="CosmosDbValue{T}.Value"/> <see cref="Type"/>.</typeparam>
+        ///// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+        ///// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+        ///// <param name="query">The query.</param>
+        ///// <param name="coll">The collection to add items to.</param>
+        //public static void SelectValueQuery<T, TColl, TModel>(this CosmosDbQuery<CosmosDbValue<T>, TModel> query, TColl coll) where T : class, IIdentifier where TColl : ICollection<T> where TModel : class, new()
+        //{
+        //    query.ExecuteQuery(q =>
+        //    {
+        //        foreach (var item in q.Paging(query.QueryArgs.Paging).AsEnumerable())
+        //        {
+        //            coll.Add(CosmosDbBase.GetAndFormatValue(query.QueryArgs, item).Value);
+        //        }
+        //    });
+        //}
 
         /// <summary>
         /// Adds paging to the query.
