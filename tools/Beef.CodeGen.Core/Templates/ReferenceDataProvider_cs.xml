@@ -34,8 +34,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.ExcludeManager == false and Entity.ExcludeAll == false">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <![CDATA[        /// <summary> 
         /// Gets the {{Entity.EntityCollectionName:ToSeeComments}}.
         /// </summary>

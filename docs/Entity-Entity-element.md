@@ -103,7 +103,7 @@ The following represents the corresponding **database** attributes:
 
 Attribute | Description
 ---|---
-`DatabaseName` | Specifies the .NET database wrapper instance name. Defaults to `Database` where `AutoImplement` is `Database`. 
+`DatabaseName` | Specifies the .NET database wrapper instance name where `AutoImplement` is `Database`. Defaults to `CodeGeneration.DatabaseName` (`Database`). 
 `DatabaseSchema` | Specifies the database schema name where `AutoImplement` is `Database`. Defaults to `dbo`.
 `DataDatabaseMapperInheritsFrom` | Specifies the mapper that the generated Database mapper inherits from.
 `DataDatabaseCustomMapper` | Indicates that a custom Database `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
@@ -112,7 +112,7 @@ The following represents the corresponding **entity framework** attributes:
 
 Attribute | Description
 ---|---
-`EntityFrameworkName` | Specifies the entity framework instance name where `AutoImplement` is `EntityFramework`. Defaults to `EfDb`.
+`EntityFrameworkName` | Specifies the entity framework instance name where `AutoImplement` is `EntityFramework`. Defaults to `CodeGenerationEntityFrameworkName.` (`EfDb`).
 `EntityFrameworkEntity` | Specifies the corresponding Entity Framework entity model name (required where `AutoImplement` is `EntityFramework`).
 `DataEntityFrameworkMapperInheritsFrom` | Specifies the mapper that the generated Entity Framework mapper inherits from.
 `DataEntityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
@@ -121,7 +121,7 @@ The following represents the corresponding **OData** attributes:
 
 Attribute | Description
 ---|---
-`ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `OData`.
+`ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `CodeGeneration.ODataName` (`OData`).
 `ODataEntity` | Specifies the corresponding OData entity name. Required where `AutoImplement` is `OData`.
 `DataODataMapperInheritsFrom` | Specifies the mapper that the generated OData mapper inherits from.
 `DataODataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
@@ -130,7 +130,7 @@ The following represents the corresponding **Cosmos** attributes:
 
 Attribute | Description
 ---|---
-`CosmosName` | Specifies the .NET Cosmos DB wrapper instance name where `AutoImplement` is `Cosmos`. Defaults to `CosmosDb`.
+`CosmosName` | Specifies the .NET Cosmos DB wrapper instance name where `AutoImplement` is `Cosmos`. Defaults to `CodeGeneration.CosmosName` (`CosmosDb`).
 `CosmosEntity` | Specifies the corresponding Cosmos entity/model name. Defaults to `Name` (i.e. the same type).
 `CosmosContainerId` | Specifies the Cosmos ContainerId name where `AutoImplement` is `Cosmos`.
 `CosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'.

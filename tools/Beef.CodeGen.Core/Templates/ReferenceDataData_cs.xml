@@ -68,8 +68,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
   </Header>
   <Entity>
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <If Condition="Entity.RefDataType != null and Entity.ExcludeData == false and Entity.ExcludeAll == false">
       <If Condition="System.Index > 0">
         <![CDATA[
@@ -196,8 +196,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
     </If>
   </Entity>
   <Entity Condition="Entity.AutoImplement == 'EntityFramework' and Entity.DataEntityFrameworkCustomMapper == false">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <![CDATA[
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Entity Framework {{Entity.EntityFrameworkEntity:ToSeeComments}} property mapping.
@@ -273,9 +273,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
   </Entity>
   <Entity Condition="Entity.AutoImplement == 'Cosmos' and Entity.DataCosmosCustomMapper == false">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
-    <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="^{{Entity.EntityName}}" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="${{Entity.EntityName}}" />
     <![CDATA[
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Cosmos {{Entity.CosmosEntity:ToSeeComments}} property mapping.

@@ -672,7 +672,7 @@ namespace Beef.CodeGen
         /// </summary>
         private string GetConfigValue(string name, CodeGenConfig config)
         {
-            if (name.StartsWith("^"))
+            if (name.StartsWith("$"))
                 return TemplateReplace(name.Substring(1), config);
 
             CodeGenConfig val = GetConfig(name, config, out string propertyName);

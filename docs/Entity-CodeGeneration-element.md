@@ -28,7 +28,21 @@ Attribute | Description
 
 <br>
 
+### Data attributes
+
+The following represents the **Data** attributes:
+
+Attribute | Description
+-|-
+DatabaseName | Provides the default database instance name (where `AutoImplement` is `'Database'`); defaults to `'Database'`.
+EntityFrameworkName | Provides the default Entity Framework instance name (where `AutoImplement` is `'EntityFramework'`); defaults to `'EfDb'`.
+CosmosName | Provides the default Cosmos instance name (where `AutoImplement` is `'Cosmos'`); defaults to `'CosmosDb'`.
+ODataName | Provides the default OData instance name (where `AutoImplement` is `'OData'`); defaults to `'OData'`.
+
+<br/>
+
 ### Reference data attributes
+
 The following represents the attributes when specifically generating **reference data** entities:
 
 Attribute | Description

@@ -328,11 +328,11 @@ namespace Beef.CodeGen
         public T GetAttributeValue<T>(string name)
         {
             if (!Attributes.ContainsKey(name))
-                return default(T);
+                return default;
 
             string val = Attributes[name];
             if (string.IsNullOrEmpty(val))
-                return default(T);
+                return default;
 
             return (T)Convert.ChangeType(val, typeof(T));
         }
