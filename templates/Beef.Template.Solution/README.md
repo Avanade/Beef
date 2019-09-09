@@ -89,6 +89,8 @@ dotnet run all
 
 For more information see: [code-generation](../../tools/Beef.CodeGen.Core/README.md).
 
+</br/>
+
 ### Database table-driven code-gen
 
 The `Company.AppName.Database` project contains the following:

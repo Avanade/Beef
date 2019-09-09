@@ -47,7 +47,6 @@ namespace Beef
             return coll;
         }
 
-
         /// <summary>
         /// Add to a collection from a <see cref="IEnumerable{TItem}"/>.
         /// </summary>

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Database.Core" Version="2.1.4" />
+    <PackageReference Include="Beef.Database.Core" Version="2.1.5" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,6 +15,6 @@ namespace Beef.Demo.Business.Data
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
         /// <param name="throughput">The throughput (RU/S).</param>
-        public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400) : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
+        public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
     }
 }

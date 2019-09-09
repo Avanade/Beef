@@ -94,6 +94,8 @@ Attribute | Description
 `DataEntityFrameworkIgnore` | Indicates whether the property should be ignored (excluded) from the entity framework `Mapper` generated output.
 `DataODataMapper` | Specifies the OData `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to convert a data source value to/from a .NET complex type (i.e. class with one or more properties).
 `DataODataIgnore` | Indicates whether the property should be ignored (excluded) from the OData `Mapper` generated output.
+`DataCosmosMapper` | Specifies the Cosmos `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to convert a data source value to/from a .NET complex type (i.e. class with one or more properties).
+`DataCosmosIgnore` | Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
 
 <br>
 

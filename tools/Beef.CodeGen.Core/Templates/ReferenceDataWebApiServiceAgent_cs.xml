@@ -32,8 +32,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <![CDATA[        /// <summary>
         /// Gets all of the {{Entity.EntityName:ToSeeComments}} objects.
         /// </summary>

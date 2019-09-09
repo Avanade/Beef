@@ -108,9 +108,9 @@ namespace Beef.Database.Core.Sql
             {
                 var row = Rows[i];
                 AddColumnWhereNotSpecified(row, hasCreatedDate, DatabaseColumns.CreatedDateName, SqlDataUpdater.DateTimeNow);
-                AddColumnWhereNotSpecified(row, hasCreatedBy, DatabaseColumns.CreatedByName, SqlDataUpdater.EnvironmentUsername);
+                AddColumnWhereNotSpecified(row, hasCreatedBy, DatabaseColumns.CreatedByName, ExecutionContext.EnvironmentUsername);
                 AddColumnWhereNotSpecified(row, hasUpdatedDate, DatabaseColumns.UpdatedDateName, SqlDataUpdater.DateTimeNow);
-                AddColumnWhereNotSpecified(row, hasUpdatedBy, DatabaseColumns.UpdatedByName, SqlDataUpdater.EnvironmentUsername);
+                AddColumnWhereNotSpecified(row, hasUpdatedBy, DatabaseColumns.UpdatedByName, ExecutionContext.EnvironmentUsername);
                 AddColumnWhereNotSpecified(row, hasIsActive, DatabaseRefDataColumns.IsActiveColumnName, true);
                 AddColumnWhereNotSpecified(row, hasSortOrder, DatabaseRefDataColumns.SortOrderColumnName, i + 1);
             }

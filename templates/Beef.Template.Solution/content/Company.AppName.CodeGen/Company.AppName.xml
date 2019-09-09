@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" RefDataNamespace="Company.AppName.Common.Entities" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" EventPublish="true">
+<CodeGeneration RefDataNamespace="Company.AppName.Common.Entities" ValidatorLayer="Business" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!--#if (implement_database) -->
   <!-- The following is an example Entity with CRUD operations defined accessing a SQL Database using Stored Procedures. -->
   <Entity Name="Person" Text="Person" Implements="IGuidIdentifier, IETag, IChangeLog" Collection="true" CollectionResult="true" Validator="PersonValidator" WebApiRoutePrefix="api/v1/persons" Get="true" Create="true" Update="true" Delete="true" AutoImplement="Database" DatabaseSchema="AppName">
@@ -9,8 +9,7 @@
     <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" DataName="GenderCode" IsDataConverterGeneric="true" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
     <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />    
-  </Entity>
+    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   <!--#endif -->
   <!--#if (implement_entityframework) -->
   <!-- The following is an example Entity with CRUD operations defined accessing a SQL Database using EntityFramework. -->
@@ -22,7 +21,6 @@
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
     <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
-  </Entity>
   <!--#endif -->
   <!--#if (implement_cosmos) -->
   <!-- The following is an example Entity with CRUD operations defined accessing Cosmos DB. -->
@@ -34,6 +32,18 @@
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
     <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
+  <!--#endif -->
+  <!--#if (implement_database || implement_entityframework || implement_cosmos) -->
+
+    <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="" >
+      <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />
+    </Operation>
+  </Entity>
+  
+  <Entity Name="PersonArgs" Text="{{Person}} arguments" ExcludeAll="true" >
+    <Property Name="FirstName" Type="string" />
+    <Property Name="LastName" Type="string" />
+    <Property Name="Genders" Type="Gender" RefDataType="string" RefDataList="true" />
   </Entity>
   <!--#endif -->
 </CodeGeneration>

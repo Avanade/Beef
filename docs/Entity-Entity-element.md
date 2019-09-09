@@ -67,7 +67,7 @@ Attribute | Description
 The following represents the corresponding **entity collection class** attributes:
 
 Attribute | Description
----|---
+-|-
 **`Collection`** | Indicates whether a corresponding entity collection class should be created.
 `CollectionKeyed` | Indicates whether the entity collection is keyed using the properties defined as forming part of the unique key. 
 `CollectionInherits` | Defines the base class that a standard entity collection inherits from. Defaults to `EntityBaseCollection` or `EntityBaseKeyedCollection` depending on `CollectionKeyed`. For Reference Data it will default to `ReferenceDataCollectionBase`.
@@ -81,7 +81,7 @@ Attribute | Description
 The following represents the corresponding **Operation** attributes. These primarily provide a shorthand to create the standard Get, Create, Update and Delete operations (versus having to specify directly):
 
 Attribute | Description
----|---
+-|-
 **`Validator`** | The name of the Type that will perform the value validation; only used for a 'Create' and 'Update' operation types (used where not specified for the [`Operation`](Entity-Operation-element.md)).
 `Get` | Indicates that a **Get** operation will be automatically generated where not otherwise specified.
 `Create` | Indicates that a **Create** operation will be automatically generated where not otherwise specified.
@@ -95,24 +95,48 @@ Attribute | Description
 The following represents the corresponding **data** attributes:
 
 Attribute | Description
----|---
+-|-
 **`AutoImplement`** | Indicates that the implementation for the underlying [`Operations`](Entity-Operation-element.md) can be auto-implemented using the selected data source; options are `Database`, `EntityFramework`, `Cosmos` or `OData`. When selected some of the folllowing related attributes are also required (as documented). Additionally, the `AutoImplement` indicator must be selected for each **`Operation`** that is to be auto-implemented.
-`DatabaseName` | Specifies the .NET database wrapper instance name. Defaults to `Database` where `AutoImplement` is `Database`. 
+`MapperAddStandardProperties` | Indicates that the AddStandardProperties method call is to be included for the `Mapper`. Defaults to `true`.
+
+The following represents the corresponding **database** attributes:
+
+Attribute | Description
+---|---
+`DatabaseName` | Specifies the .NET database wrapper instance name where `AutoImplement` is `Database`. Defaults to `CodeGeneration.DatabaseName` (`Database`). 
 `DatabaseSchema` | Specifies the database schema name where `AutoImplement` is `Database`. Defaults to `dbo`.
-`EntityFrameworkName` | Specifies the entity framework instance name where `AutoImplement` is `EntityFramework`. Defaults to `EfDb`.
+`DataDatabaseMapperInheritsFrom` | Specifies the mapper that the generated Database mapper inherits from.
+`DataDatabaseCustomMapper` | Indicates that a custom Database `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
+
+The following represents the corresponding **entity framework** attributes:
+
+Attribute | Description
+---|---
+`EntityFrameworkName` | Specifies the entity framework instance name where `AutoImplement` is `EntityFramework`. Defaults to `CodeGenerationEntityFrameworkName.` (`EfDb`).
 `EntityFrameworkEntity` | Specifies the corresponding Entity Framework entity model name (required where `AutoImplement` is `EntityFramework`).
-`ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `OData`.
+`DataEntityFrameworkMapperInheritsFrom` | Specifies the mapper that the generated Entity Framework mapper inherits from.
+`DataEntityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
+
+The following represents the corresponding **OData** attributes:
+
+Attribute | Description
+---|---
+`ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `CodeGeneration.ODataName` (`OData`).
 `ODataEntity` | Specifies the corresponding OData entity name. Required where `AutoImplement` is `OData`.
-`CosmosName` | Specifies the .NET Cosmos DB wrapper instance name where `AutoImplement` is `Cosmos`. Defaults to `CosmosDb`.
+`DataODataMapperInheritsFrom` | Specifies the mapper that the generated OData mapper inherits from.
+`DataODataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
+
+The following represents the corresponding **Cosmos** attributes:
+
+Attribute | Description
+---|---
+`CosmosName` | Specifies the .NET Cosmos DB wrapper instance name where `AutoImplement` is `Cosmos`. Defaults to `CodeGeneration.CosmosName` (`CosmosDb`).
+`CosmosEntity` | Specifies the corresponding Cosmos entity/model name. Defaults to `Name` (i.e. the same type).
 `CosmosContainerId` | Specifies the Cosmos ContainerId name where `AutoImplement` is `Cosmos`.
 `CosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'.
-`DataDatabaseMapperInheritsFrom` | Specifies the mapper that the generated Database mapper inherits from.
-`DataODataMapperInheritsFrom` | Specifies the mapper that the generated OData mapper inherits from.
-`DataEntityFrameworkMapperInheritsFrom` | Specifies the mapper that the generated Entity Framework mapper inherits from.
-`DataDatabaseCustomMapper` | Indicates that a custom Database `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
-`DataODataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
-`DataEntityFrameworkCustomMapper` | Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
-`MapperAddStandardProperties` | Indicates that the AddStandardProperties method call is to be included for the `Mapper`. Defaults to `true`.
+`DataCosmosValueContainer` | Indicates that the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer` (default).
+`DataCosmosMapperInheritsFrom` | Specifies the mapper that the generated Cosmos mapper inherits from.
+`DataCosmosCustomMapper` | Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
 
 <br>
 

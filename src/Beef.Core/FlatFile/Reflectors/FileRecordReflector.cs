@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Reflection;
 using Beef.Validation;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace Beef.FlatFile.Reflectors
             var columns = new List<FileColumnReflector>();
             var children = new List<FileHierarchyReflector>();
 
-            foreach (var pi in Type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var pi in TypeReflector.GetProperties(Type))
             {
                 i++;
                 var fca = pi.GetCustomAttribute<FileColumnAttribute>();

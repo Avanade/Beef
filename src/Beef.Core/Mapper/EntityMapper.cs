@@ -155,9 +155,7 @@ namespace Beef.Mapper
         /// </summary>
         private void AutomagicallyMap(string[] ignoreSrceProperties)
         {
-            MapperPropertyAttribute mpa = null;
-
-            foreach (var sp in SrceType.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance))
+            foreach (var sp in TypeReflector.GetProperties(SrceType))
             {
                 // Do not auto-map where ignore has been specified.
                 if (ignoreSrceProperties.Contains(sp.Name))
@@ -167,29 +165,34 @@ namespace Beef.Mapper
                     continue;
 
                 // Find corresponding property.
-                mpa = sp.GetCustomAttributes(typeof(MapperPropertyAttribute), true).OfType<MapperPropertyAttribute>().FirstOrDefault();
+                MapperPropertyAttribute mpa = sp.GetCustomAttributes(typeof(MapperPropertyAttribute), true).OfType<MapperPropertyAttribute>().FirstOrDefault();
                 var dname = mpa == null || string.IsNullOrEmpty(mpa.Name) ? sp.Name : mpa.Name;
-                var dp = DestType.GetProperty(dname, BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance);
-                if (dp == null)
+                var dp = TypeReflector.GetPropertyInfo(DestType, dname);
+                if (dp == null || !dp.CanRead || !dp.CanWrite)
                 {
                     if (mpa != null)
-                        throw new InvalidOperationException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with Name set to '{dname}' which does not exist for destination Type '{DestType.Name}'.");
+                        throw new InvalidOperationException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with Name set to '{dname}' which does not exist (or is not a get/set) for destination Type '{DestType.Name}'.");
 
                     continue;
                 }
 
                 // Create the lambda expressions for the property and add to the mapper.
                 var spe = Expression.Parameter(SrceType, "x");
-                var sex = Expression.Lambda(Expression.Property(spe, sp.Name), spe);
+                var sex = Expression.Lambda(Expression.Property(spe, sp), spe);
                 var dpe = Expression.Parameter(DestType, "x");
-                var dex = Expression.Lambda(Expression.Property(dpe, dname), dpe);
+                var dex = Expression.Lambda(Expression.Property(dpe, dp), dpe);
                 var pmap = (IPropertyMapper<TSrce, TDest>)typeof(EntityMapper<TSrce, TDest>)
                     .GetMethod("PropertySrceAndDest", BindingFlags.NonPublic | BindingFlags.Instance)
                     .MakeGenericMethod(new Type[] { sp.PropertyType, dp.PropertyType })
                     .Invoke(this, new object[] { sex, dex });
 
                 if (mpa == null)
+                {
+                    if (pmap.IsSrceComplexType && sp.PropertyType == typeof(ChangeLog) && dp.PropertyType == typeof(ChangeLog))
+                        pmap.SetMapper(ChangeLogMapper.Default);
+
                     continue;
+                }
 
                 // Apply auto-map Property attribute IsUnique configuration.
                 if (mpa.IsUniqueKey)
@@ -236,6 +239,11 @@ namespace Beef.Mapper
                         }
                         else
                             em = (IEntityMapperBase)mdef.GetValue(null);
+                    }
+                    else
+                    {
+                        if (sp.PropertyType == typeof(ChangeLog) && dp.PropertyType == typeof(ChangeLog))
+                            em = ChangeLogMapper.Default;
                     }
 
                     if (em != null)
@@ -315,7 +323,7 @@ namespace Beef.Mapper
             if (px != null && (px.DestPropertyName != dpe.Name))
                 throw new ArgumentException($"Source property '{srcePropertyExpression.Name}' mapping already exists with a different destination property name");
 
-            PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> p = null;
+            PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> p;
             if (px == null)
             {
                 p = new PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>(spe, dpe);
@@ -364,7 +372,7 @@ namespace Beef.Mapper
             if (px != null && (px.DestPropertyName != null))
                 throw new ArgumentException($"Source property '{srcePropertyExpression.Name}' mapping already exists with a different destination property name");
 
-            PropertySrceMapper<TSrce, TSrceProperty, TDest> p = null;
+            PropertySrceMapper<TSrce, TSrceProperty, TDest> p;
             if (px == null)
             {
                 p = new PropertySrceMapper<TSrce, TSrceProperty, TDest>(spe);
@@ -442,18 +450,18 @@ namespace Beef.Mapper
         }
 
         /// <summary>
-        /// Maps the source to the destination.
+        /// Maps the source to the destination (creating).
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination value.</returns>
         object IEntityMapper.MapToDest(object sourceEntity, OperationTypes operationType)
         {
-            return MapToDest((TSrce)sourceEntity);
+            return MapToDest((TSrce)sourceEntity, operationType);
         }
 
         /// <summary>
-        /// Maps the source to the destination.
+        /// Maps the source to the destination (creating).
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
@@ -475,18 +483,18 @@ namespace Beef.Mapper
         }
 
         /// <summary>
-        /// Maps the source to the destination updating an existing object.
+        /// Maps the source to the destination (updating an existing object).
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         void IEntityMapper.MapToDest(object sourceEntity, object destinationEntity, OperationTypes operationType)
         {
-            MapToDest((TSrce)sourceEntity, (TDest)destinationEntity);
+            MapToDest((TSrce)sourceEntity, (TDest)destinationEntity, operationType);
         }
 
         /// <summary>
-        /// Maps the source to the destination updating an existing object.
+        /// Maps the source to the destination (updating an existing object).
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="destinationEntity">The destination entity.</param>
@@ -498,7 +506,7 @@ namespace Beef.Mapper
                 map.MapToDest(sourceEntity, destinationEntity, operationType);
             }
 
-            destinationEntity = OnMapToDest(sourceEntity, destinationEntity, operationType);
+            OnMapToDest(sourceEntity, destinationEntity, operationType);
         }
 
         /// <summary>
@@ -521,7 +529,7 @@ namespace Beef.Mapper
         /// <returns>The source value.</returns>
         object IEntityMapper.MapToSrce(object destinationEntity, OperationTypes operationType)
         {
-            return MapToSrce((TDest)destinationEntity);
+            return MapToSrce((TDest)destinationEntity, operationType);
         }
 
         /// <summary>

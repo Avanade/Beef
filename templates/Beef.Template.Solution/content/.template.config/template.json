@@ -74,6 +74,10 @@
     {
       "modifiers": [
         {
+          "condition": "(implement_none)",
+          "exclude": [ "Company.AppName.Business/Validation/**/*", "Company.AppName.Business/Data/PersonData.cs" ]
+        },
+        {
           "condition": "(implement_cosmos || implement_none)",
           "exclude": [ "Company.AppName.Database/**/*" ]
         },
@@ -83,11 +87,11 @@
         },
         {
           "condition": "(!implement_cosmos)",
-          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs" ]
+          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs", "Company.AppName.Test/Cosmos/**/*" ]
         },
         {
           "condition": "(!implement_database && !implement_entityframework)",
-          "exclude": [ "Company.AppName.Business/Data/Database.cs" ]
+          "exclude": [ "Company.AppName.Business/Data/Database.cs", "Company.AppName.Test/Data/**/*" ]
         }
       ]
     }

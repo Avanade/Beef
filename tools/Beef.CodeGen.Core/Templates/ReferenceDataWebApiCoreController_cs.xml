@@ -41,8 +41,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
 
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <Set Name="System.WebApiAuthorize" Value="null" />
     <If Condition="Config.WebApiAuthorize == 'Authorize'"><Set Name="System.WebApiAuthorize" Value="'Authorize'" /></If>
     <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'"><Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" /></If>

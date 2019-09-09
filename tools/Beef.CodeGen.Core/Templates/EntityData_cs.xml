@@ -14,9 +14,9 @@
     </If>
 
     <Entity Condition="System.EntityExclude == false and Entity.Name == System.EntityName" OutputFileName="{{Entity.Name}}Data.cs">
-      <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="^{{Entity.Name}}&lt;T&gt;" />
-      <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="^{{Entity.Name}}Collection" Otherwise="^{{Entity.Name}}Collection&lt;T&gt;" />
-      <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="^{{Entity.Name}}CollectionResult" Otherwise="^{{Entity.Name}}CollectionResult&lt;T&gt;" />
+      <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="${{Entity.Name}}&lt;T&gt;" />
+      <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
+      <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}CollectionResult" Otherwise="${{Entity.Name}}CollectionResult&lt;T&gt;" />
       <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" Otherwise="false" />
       <Set Name="System.UsesOData" Condition="Entity.AutoImplement == 'OData'" Value="true" Otherwise="false" />
       <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" Otherwise="false" />
@@ -270,6 +270,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <If Condition="System.AutoImplement == 'EntityFramework'">
             <Set Name="System.DataEntityMapper" Value="'EfMapper'" />
           </If>
+          <If Condition="System.AutoImplement == 'Cosmos'">
+            <Set Name="System.DataEntityMapper" Value="'CosmosMapper'" />
+          </If>
         </If>
 
         <!-- Comments + Method Definition -->
@@ -522,18 +525,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
             </If>
-            <If Condition="System.AutoImplement == 'Cosmos'">
-              <Then>
-                <![CDATA[                var __dataArgs = CosmosDbArgs<{{Entity.EntityName}}>.Create("{{Entity.CosmosContainerId}}"]]>
-                <If Condition="Entity.CosmosPartitionKey == null">
-                  <Then><![CDATA[, PartitionKey.None]]></Then>
-                  <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>
-                </If>
-              </Then>
-              <Else>
-                <![CDATA[                var __dataArgs = {{System.DataEntityMapper}}.Default.CreateArgs(]]>
-              </Else>
-            </If>
+            <![CDATA[                var __dataArgs = {{System.DataEntityMapper}}.Default.CreateArgs(]]>
             <If Condition="System.AutoImplement == 'Database'">
               <![CDATA["[]]>
               <If Condition="Entity.DatabaseSchema == null">
@@ -558,8 +550,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[);]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
+              <![CDATA["{{Entity.CosmosContainerId}}"]]>
               <If Condition="Operation.PagingArgs == true">
                 <![CDATA[, __result.Paging]]>
+              </If>
+              <If Condition="Entity.CosmosPartitionKey == null">
+                <Then><![CDATA[, PartitionKey.None]]></Then>
+                <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>
               </If>
               <![CDATA[);]]>
             </If>
@@ -581,12 +578,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                 ]]>
 
             <If Condition="System.AutoImplement == 'Database'">
+              <Set Name="System.DatabaseName" Condition="Entity.DatabaseName != null" Value="Entity.DatabaseName" Otherwise="Config.DatabaseName" />
+              <Set Name="System.DatabaseName" Condition="System.DatabaseName == null" Value="'Database'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <If Condition="Entity.DatabaseName == null">
-                  <Then><![CDATA[__result = Database]]></Then>
-                  <Else><![CDATA[__result = {{Entity.DatabaseName}}]]></Else>
-                </If>
-                <![CDATA[.Default.Get(__dataArgs]]>
+                <![CDATA[__result = {{System.DatabaseName}}.Default.Get(__dataArgs]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="Parameter.DataConverter == null">
                     <Then><![CDATA[, {{Parameter.ArgumentName}}]]></Then>
@@ -603,12 +598,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result.Result = ]]>
-                <If Condition="Entity.DatabaseName == null">
-                  <Then><![CDATA[Database]]></Then>
-                  <Else><![CDATA[{{Entity.DatabaseName}}]]></Else>
-                </If>
-                <![CDATA[.Default.Query(__dataArgs, p => {{Operation.PrivateName}}OnQuery?.Invoke(p]]>
+                <![CDATA[__result.Result = {{System.DatabaseName}}.Default.Query(__dataArgs, p => {{Operation.PrivateName}}OnQuery?.Invoke(p]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
@@ -621,19 +611,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <If Condition="Entity.DatabaseName == null">
-                  <Then><![CDATA[__result = Database]]></Then>
-                  <Else><![CDATA[__result = {{Entity.DatabaseName}}]]></Else>
-                </If>
-                <![CDATA[.Default.{{Operation.OperationType}}(__dataArgs, value);
+                <![CDATA[__result = {{System.DatabaseName}}.Default.{{Operation.OperationType}}(__dataArgs, value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <If Condition="Entity.DatabaseName == null">
-                  <Then><![CDATA[Database]]></Then>
-                  <Else><![CDATA[{{Entity.DatabaseName}}]]></Else>
-                </If>
-                <![CDATA[.Default.Delete(__dataArgs]]>
+                <![CDATA[{{System.DatabaseName}}.Default.Delete(__dataArgs]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="Parameter.DataConverter == null">
                     <Then><![CDATA[, {{Parameter.ArgumentName}}]]></Then>
@@ -651,12 +633,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'OData'">
+              <Set Name="System.ODataName" Condition="Entity.ODataName != null" Value="Entity.ODataName" Otherwise="Config.ODataName" />
+              <Set Name="System.ODataName" Condition="System.ODataName == null" Value="'OData'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <If Condition="Entity.ODataName == null">
-                  <Then><![CDATA[__result = await OData]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.ODataName}}]]></Else>
-                </If>
-                <![CDATA[.Default.GetAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <![CDATA[__result = await {{System.ODataName}}.Default.GetAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -681,12 +661,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                   <![CDATA[paging]]>
                 </If>
                 <![CDATA[);
-                __result.Result = await ]]>
-                <If Condition="Entity.ODataName == null">
-                  <Then><![CDATA[OData]]></Then>
-                  <Else><![CDATA[{{Entity.ODataName}}]]></Else>
-                </If>
-                <![CDATA[.Default.SelectQueryAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__dataArgs,
+                __result.Result = await {{System.ODataName}}.Default.SelectQueryAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__dataArgs,
                     q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
@@ -696,20 +671,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <If Condition="Entity.ODataName == null">
-                  <Then><![CDATA[__result = await OData]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.ODataName}}]]></Else>
-                </If>
-                <![CDATA[.Default.{{Operation.OperationType}}Async<{{Entity.EntityName}}>(__dataArgs, value);
+                <![CDATA[__result = await {{System.ODataName}}.Default.{{Operation.OperationType}}Async<{{Entity.EntityName}}>(__dataArgs, value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <![CDATA[await ]]>
-                <If Condition="Entity.ODataName == null">
-                  <Then><![CDATA[OData]]></Then>
-                  <Else><![CDATA[{{Entity.ODataName}}]]></Else>
-                </If>
-                <![CDATA[.Default.DeleteAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <![CDATA[await {{System.ODataName}}.Default.DeleteAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -730,12 +696,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
+              <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
+              <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <If Condition="Entity.CosmosName == null">
-                  <Then><![CDATA[__result = await CosmosDb]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.CosmosName}}]]></Else>
-                </If>
-                <![CDATA[.Default.GetAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
+                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <![CDATA[Container(__dataArgs).GetAsync(]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -755,12 +721,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result.Result = ]]>
-                <If Condition="Entity.CosmosName == null">
-                  <Then><![CDATA[CosmosDb]]></Then>
-                  <Else><![CDATA[{{Entity.CosmosName}}]]></Else>
-                </If>
-                <![CDATA[.Default.Query<{{Entity.EntityName}}>(__dataArgs, q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
+                <![CDATA[__result.Result = {{System.CosmosName}}.Default.]]>
+                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <![CDATA[Container(__dataArgs).Query(q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
@@ -768,20 +731,15 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <If Condition="Entity.CosmosName == null">
-                  <Then><![CDATA[__result = await CosmosDb]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.CosmosName}}]]></Else>
-                </If>
-                <![CDATA[.Default.{{Operation.OperationType}}Async(__dataArgs, value);
+                <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
+                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <![CDATA[Container(__dataArgs).{{Operation.OperationType}}Async(value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <![CDATA[await ]]>
-                <If Condition="Entity.CosmosName == null">
-                  <Then><![CDATA[CosmosDb]]></Then>
-                  <Else><![CDATA[{{Entity.CosmosName}}]]></Else>
-                </If>
-                <![CDATA[.Default.DeleteAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <![CDATA[await {{System.CosmosName}}.Default.]]>
+                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <![CDATA[Container(__dataArgs).DeleteAsync(]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -802,12 +760,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
+              <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName != null" Value="Entity.EntityFrameworkName" Otherwise="Config.EntityFrameworkName" />
+              <Set Name="System.EntityFrameworkName" Condition="System.EntityFrameworkName == null" Value="'EfDb'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <If Condition="Entity.EntityFrameworkName == null">
-                  <Then><![CDATA[__result = await EfDb]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.EntityFrameworkName}}]]></Else>
-                </If>
-                <![CDATA[.Default.GetAsync(__dataArgs, ]]>
+                <![CDATA[__result = await {{System.EntityFrameworkName}}.Default.GetAsync(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -827,12 +783,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result.Result = ]]>
-                <If Condition="Entity.EntityFrameworkName == null">
-                  <Then><![CDATA[EfDb]]></Then>
-                  <Else><![CDATA[{{Entity.EntityFrameworkName}}]]></Else>
-                </If>
-                <![CDATA[.Default.Query(__dataArgs, q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
+                <![CDATA[__result.Result = {{System.EntityFrameworkName}}.Default.Query(__dataArgs, q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
@@ -840,20 +791,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <If Condition="Entity.EntityFrameworkName == null">
-                  <Then><![CDATA[__result = await EfDb]]></Then>
-                  <Else><![CDATA[__result = await {{Entity.EntityFrameworkName}}]]></Else>
-                </If>
-                <![CDATA[.Default.{{Operation.OperationType}}Async(__dataArgs, value);
+                <![CDATA[__result = await {{System.EntityFrameworkName}}.Default.{{Operation.OperationType}}Async(__dataArgs, value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <![CDATA[await ]]>
-                <If Condition="Entity.EntityFrameworkName == null">
-                  <Then><![CDATA[EfDb]]></Then>
-                  <Else><![CDATA[{{Entity.EntityFrameworkName}}]]></Else>
-                </If>
-                <![CDATA[.Default.DeleteAsync(__dataArgs, ]]>
+                <![CDATA[await {{System.EntityFrameworkName}}.Default.DeleteAsync(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -1171,6 +1113,106 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             /// Enables the <see cref="EfMapper"/> constructor to be extended.
             /// </summary>
             partial void EfMapperCtor();
+        }
+]]>
+      </If>
+      <If Condition="System.UsesCosmos == true and Entity.DataCosmosCustomMapper == false">
+        <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="${{Entity.EntityName}}" />
+        <![CDATA[
+        /// <summary>
+        /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Cosmos {{Entity.CosmosEntity:ToSeeComments}} property mapping.
+        /// </summary>
+        public partial class CosmosMapper : CosmosDbMapper<{{Entity.EntityName}}, {{Entity.CosmosEntity}}, CosmosMapper>
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
+            /// </summary>
+            public CosmosMapper()
+            {
+]]>
+        <If Condition="Entity.DataCosmosMapperInheritsFrom != null">
+          <![CDATA[                InheritPropertiesFrom({{Entity.DataDatabaseMapperInheritsFrom}}.Default);
+]]>
+        </If>
+        <Property Condition="Property.DataCosmosIgnore == false and Property.Name != 'ETag' and Property.Name != 'ChangeLog'">
+          <Set Name="System.RefDataSidCodeMapping" Value="false" />
+          <If Condition="Property.RefDataType == 'string'">
+            <If Condition="Property.DataConverter == null and Config.MapperDefaultRefDataConverter == 'ReferenceDataCodeConverter'">
+              <Then>
+                <Set Name="System.RefDataSidCodeMapping" Value="true" />
+              </Then>
+              <Else>
+                <If Condition="Property.DataConverter == 'ReferenceDataCodeConverter'">
+                  <Set Name="System.RefDataSidCodeMapping" Value="true" />
+                </If>
+              </Else>
+            </If>
+          </If>
+          <If Condition="System.RefDataSidCodeMapping == true">
+            <Then>
+              <![CDATA[                Property(s => s.{{Property.Name}}Sid, d => d.]]>
+            </Then>
+            <Else>
+              <![CDATA[                Property(s => s.{{Property.Name}}, d => d.]]>
+            </Else>
+          </If>
+          <If Condition="Property.DataName == null">
+            <Then>
+              <![CDATA[{{Property.Name}}]]>
+              <If Condition="System.RefDataSidCodeMapping == true and Entity.EntityName == Entity.CosmosEntity">
+                <![CDATA[Sid]]>
+              </If>
+            </Then>
+            <Else>
+              <![CDATA[{{Property.DataName}}]]>
+            </Else>
+          </If>
+          <If Condition="Property.DataOperationTypes != null">
+            <![CDATA[, operationTypes: OperationTypes.{{Property.DataOperationTypes}}]]>
+          </If>
+          <![CDATA[)]]>
+          <If Condition="Property.UniqueKey == true">
+            <If Condition="Property.DataAutoGenerated == true or Property.DataAutoGenerated == null">
+              <Then><![CDATA[.SetUniqueKey(true)]]></Then>
+              <Else><![CDATA[.SetUniqueKey(false)]]></Else>
+            </If>
+          </If>
+          <If Condition="System.RefDataSidCodeMapping == false">
+            <If Condition="Property.DataConverter == null">
+              <Then>
+                <If Condition="Property.RefDataType != null">
+                  <If Condition="Config.MapperDefaultRefDataConverter != null">
+                    <Then><![CDATA[.SetConverter({{Config.MapperDefaultRefDataConverter}}<{{Property.Type}}>.Default)]]></Then>
+                    <Else><![CDATA[.SetConverter(ReferenceDataCodeConverter<{{Property.Type}}>.Default)]]></Else>
+                  </If>
+                </If>
+              </Then>
+              <Else>
+                <![CDATA[.SetConverter({{Property.DataConverter}}]]>
+                <If Condition="Property.IsDataConverterGeneric == true">
+                  <![CDATA[<{{Property.Type}}>]]>
+                </If>
+                <![CDATA[.Default)]]>
+              </Else>
+            </If>
+          </If>
+          <If Condition="Property.DataCosmosMapper != null">
+            <![CDATA[.SetMapper({{Property.DataCosmosMapper}}.Default)]]>
+          </If>
+          <![CDATA[;
+]]>
+        </Property>
+        <If Condition="Entity.MapperAddStandardProperties == null or Entity.MapperAddStandardProperties == true">
+          <![CDATA[                AddStandardProperties();
+]]>
+        </If>
+        <![CDATA[                CosmosMapperCtor();
+            }
+            
+            /// <summary>
+            /// Enables the <see cref="CosmosMapper"/> constructor to be extended.
+            /// </summary>
+            partial void CosmosMapperCtor();
         }
 ]]>
       </If>

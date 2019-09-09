@@ -78,7 +78,7 @@ There are two main means to obtain a var-value (variable value):
 
 To reference any XML element attribue value for a data source element, including `Config` or `System`, a dot-based notation is used; i.e: `Element.Attribute`. For example, if an *element* is named `Entity` and the *attribute* is named `Name`, then the dot-based notation would be `Entity.Name`.
 
-A *var-value* can also produce *output-text* by prefixing the value with a `^` symbol; e.g. `^The Entity Name is {{Entity.Name}}.` would result in the `{{Entity.Name}}` being replaced with the actual `Entity.Name` *var-value*.
+A *var-value* can also produce *output-text* by prefixing the value with a `$` symbol; e.g. `$The Entity Name is {{Entity.Name}}.` would result in the `{{Entity.Name}}` being replaced with the actual `Entity.Name` *var-value*.
 
 The *var-value* types supported are: `string`, `bool` (true/false) and `float` (number) generally inferred from its underlying usage; at a minium all values are treated as a `string`.
 

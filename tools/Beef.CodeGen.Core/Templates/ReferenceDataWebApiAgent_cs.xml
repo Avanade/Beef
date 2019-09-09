@@ -49,8 +49,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
         public IReferenceDataServiceAgent ServiceAgent => _serviceAgent;
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <Set Name="Entity.EntityName" Value="^{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Value="^{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Value="${{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Value="${{Entity.Name}}Collection" />
     <![CDATA[
         /// <summary>
         /// Gets all of the <see cref="{{Entity.Name}}"/> objects.

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.5</Version>
+    <Version>2.1.6</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) template solution for use with 'dotnet new'.</Description>
@@ -13,6 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>beef dotnet template solution</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,13 @@
       <PackagePath>contentFiles\any\any\Schema\</PackagePath>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="content\Company.AppName.Business\Data\PersonData.cs" />
+    <None Remove="content\Company.AppName.Business\Validation\PersonArgsValidator.cs" />
+    <None Remove="content\Company.AppName.Test\Cosmos\Person.yaml" />
+    <None Remove="content\Company.AppName.Test\Cosmos\RefData.yaml" />
   </ItemGroup>
 
 </Project>

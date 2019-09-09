@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Beef.Mapper;
 using Microsoft.Azure.Cosmos;
+using System;
 using System.Linq;
 using System.Net;
 
@@ -12,6 +14,11 @@ namespace Beef.Data.Cosmos
     /// </summary>
     public interface ICosmosDbArgs
     {
+        /// <summary>
+        /// Gets the <see cref="IEntityMapper"/>.
+        /// </summary>
+        IEntityMapper Mapper { get; }
+
         /// <summary>
         /// Gets the <see cref="Container"/> identifier.
         /// </summary>
@@ -46,138 +53,67 @@ namespace Beef.Data.Cosmos
         /// Gets the <see cref="T:QueryRequestOptions"/>.
         /// </summary>
         QueryRequestOptions QueryRequestOptions { get; }
-
-        /// <summary>
-        /// Indicates whether the entity <see cref="System.Type"/> inherits from <see cref="CosmosDbTypeValue"/>.
-        /// </summary>
-        bool IsTypeValue { get; }
-
-        /// <summary>
-        /// Gets the <see cref="CosmosDbTypeValue"/> <see cref="System.Type"/> (see <see cref="ICosmosDbArgs.IsTypeValue"/>). Where the <b>Type</b> is explicitly constructed from the generic
-        /// <see cref="CosmosDbTypeValue{T}"/> at runtime then the <see cref="CosmosDbTypeValue{T}.Value"/> <b>Type</b> is used; otherwise, the primary object <b>Type</b> itself is used.
-        /// </summary>
-        string TypeValueType { get; }
     }
 
     /// <summary>
     /// Provides the base <b>CosmosDb/DocumentDb Container</b> arguments capabilities.
     /// </summary>
-    public class CosmosDbArgs<T> : ICosmosDbArgs where T : class, new()
+    /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TModel">The cosmos model.</typeparam>
+    public class CosmosDbArgs<T, TModel> : ICosmosDbArgs where T : class, new() where TModel : class, new()
     {
-        private readonly bool _isTypeValue;
-        private readonly string _typeValueType;
-
         /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs{T}"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/> and <paramref name="requestOptions"/>.
+        /// Initializes a new instance of the <see cref="CosmosDbArgs{T, TModel}"/> class.
         /// </summary>
-        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/> (defaults to <see cref="PartitionKey.None"/>).</param>
-        /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
-        /// <returns>The <see cref="CosmosDbArgs{T}"/>.</returns>
-        public static CosmosDbArgs<T> Create(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions requestOptions = null)
-        {
-            return new CosmosDbArgs<T>(containerId, partitionKey == null ? PartitionKey.None : partitionKey.Value, requestOptions);
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs{T}"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/>, <see cref="PagingArgs"/> and <paramref name="requestOptions"/>.
-        /// </summary>
-        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
-        /// <returns>The <see cref="CosmosDbArgs{T}"/>.</returns>
-        public static CosmosDbArgs<T> Create(string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions requestOptions = null)
-        {
-            return new CosmosDbArgs<T>(containerId, partitionKey, paging, requestOptions);
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs{T}"/> class with the <paramref name="containerId"/>, <see cref="PartitionKey.None"/>, <see cref="PagingArgs"/> and <paramref name="requestOptions"/>.
-        /// </summary>
-        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
-        /// <returns>The <see cref="CosmosDbArgs{T}"/>.</returns>
-        public static CosmosDbArgs<T> Create(string containerId, PagingArgs paging, QueryRequestOptions requestOptions = null)
-        {
-            return new CosmosDbArgs<T>(containerId, PartitionKey.None, paging, requestOptions);
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs{T}"/> class with the <paramref name="containerId"/>, <paramref name="partitionKey"/>, <see cref="PagingResult"/> and <paramref name="requestOptions"/>.
-        /// </summary>
-        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        /// <param name="partitionKey">The optional <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
-        /// <returns>The <see cref="CosmosDbArgs{T}"/>.</returns>
-        public static CosmosDbArgs<T> Create(string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions requestOptions = null)
-        {
-            return new CosmosDbArgs<T>(containerId, partitionKey, paging, requestOptions);
-        }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="CosmosDbArgs{T}"/> class with the <paramref name="containerId"/>, <see cref="PartitionKey.None"/>, <see cref="PagingResult"/> and <paramref name="requestOptions"/>.
-        /// </summary>
-        /// <param name="containerId">The <see cref="Container"/> identifier.</param>
-        /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="QueryRequestOptions"/>.</param>
-        /// <returns>The <see cref="CosmosDbArgs{T}"/>.</returns>
-        public static CosmosDbArgs<T> Create(string containerId, PagingResult paging, QueryRequestOptions requestOptions = null)
-        {
-            return new CosmosDbArgs<T>(containerId, PartitionKey.None, paging, requestOptions);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbArgs{T}"/> class.
-        /// </summary>
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
-        public CosmosDbArgs(string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
         {
+            Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
             PartitionKey = partitionKey;
             ItemRequestOptions = requestOptions;
-
-            var t = typeof(T);
-            _isTypeValue = typeof(CosmosDbTypeValue).IsAssignableFrom(t);
-            _typeValueType = _isTypeValue ?
-                t.IsGenericType && t.BaseType == typeof(CosmosDbTypeValue) ? t.GetGenericArguments().First().Name : t.Name 
-                : null;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbArgs{T}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbArgs{T, TModel}"/> class.
         /// </summary>
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
-        public CosmosDbArgs(string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions requestOptions = null) 
-            : this(containerId, partitionKey, new PagingResult(Check.NotNull(paging, (nameof(paging)))), requestOptions) { }
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions requestOptions = null) 
+            : this(mapper, containerId, partitionKey, new PagingResult(Check.NotNull(paging, (nameof(paging)))), requestOptions) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbArgs{T}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbArgs{T, TModel}"/> class.
         /// </summary>
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
-        public CosmosDbArgs(string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions requestOptions = null)
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions requestOptions = null)
         {
+            Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
             PartitionKey = partitionKey;
             Paging = Check.NotNull(paging, nameof(paging));
             QueryRequestOptions = requestOptions;
-
-            var t = typeof(T);
-            _isTypeValue = typeof(CosmosDbTypeValue).IsAssignableFrom(t);
-            _typeValueType = _isTypeValue ?
-                t.IsGenericType && t.BaseType == typeof(CosmosDbTypeValue) ? t.GetGenericArguments().First().Name : t.Name
-                : null;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IEntityMapper"/>.
+        /// </summary>
+        IEntityMapper ICosmosDbArgs.Mapper => Mapper;
+
+        /// <summary>
+        /// Gets the <see cref="IEntityMapper{T, TModel}"/>.
+        /// </summary>
+        public IEntityMapper<T, TModel> Mapper { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Container"/> identifier.
@@ -216,14 +152,36 @@ namespace Beef.Data.Cosmos
         public bool SetIdentifierOnCreate { get; set; } = true;
 
         /// <summary>
-        /// Indicates whether the entity <see cref="System.Type"/> inherits from <see cref="CosmosDbTypeValue"/>.
+        /// Gets the <b>CosmosDb/DocumentDb</b> key from the specified keys.
         /// </summary>
-        bool ICosmosDbArgs.IsTypeValue => _isTypeValue;
+        /// <param name="keys">The key values.</param>
+        /// <returns>The cosmos key.</returns>
+        internal string GetCosmosKey(IComparable[] keys)
+        {
+            if (keys == null || keys.Length == 0)
+                throw new ArgumentNullException(nameof(keys));
+
+            if (keys.Length != 1)
+                throw new NotSupportedException("Only a single key value is currently supported.");
+
+            if (keys.Length != Mapper.UniqueKey.Length)
+                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Length}'.", nameof(keys));
+
+            return Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified).ToString();
+        }
 
         /// <summary>
-        /// Gets the <see cref="CosmosDbTypeValue"/> <see cref="System.Type"/> (see <see cref="ICosmosDbArgs.IsTypeValue"/>). Where the <b>Type</b> is explicitly constructed from the generic
-        /// <see cref="CosmosDbTypeValue{T}"/> at runtime then the <see cref="CosmosDbTypeValue{T}.Value"/> <b>Type</b> is used; otherwise, the primary object <b>Type</b> itself is used.
+        /// Gets the <b>CosmosDb/DocumentDb</b> key from the entity value.
         /// </summary>
-        string ICosmosDbArgs.TypeValueType => _typeValueType;
+        /// <param name="value">The entity value.</param>
+        /// <returns>The cosmos key.</returns>
+        internal string GetCosmosKey(T value)
+        {
+            if (Mapper.UniqueKey.Length != 1)
+                throw new NotSupportedException("Only a single key value is currently supported.");
+
+            var v = Mapper.UniqueKey[0].GetSrceValue(value, OperationTypes.Unspecified);
+            return Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified).ToString();
+        }
     }
 }

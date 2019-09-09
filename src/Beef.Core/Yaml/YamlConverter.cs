@@ -26,7 +26,7 @@ namespace Beef.Yaml
         /// <summary>
         /// Gets or sets the default <see cref="ChangeLog.CreatedBy"/> value.
         /// </summary>
-        public static string DefaultCreatedBy { get; set; } = Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
+        public static string DefaultCreatedBy { get; set; } = ExecutionContext.EnvironmentUsername;
 
         /// <summary>
         /// Reads and parses the YAML <see cref="string"/>.

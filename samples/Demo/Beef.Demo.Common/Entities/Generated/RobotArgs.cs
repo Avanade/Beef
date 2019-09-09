@@ -32,12 +32,18 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         public const string Property_SerialNo = nameof(SerialNo);
 
+        /// <summary>
+        /// Represents the <see cref="PowerSources"/> property name.
+        /// </summary>
+        public const string Property_PowerSources = nameof(PowerSources);
+
         #endregion
 
         #region Privates
 
         private string _modelNo;
         private string _serialNo;
+        private List<string> _powerSourcesSids;
 
         #endregion
 
@@ -77,6 +83,28 @@ namespace Beef.Demo.Common.Entities
             set { SetValue(ref this._serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_SerialNo); }
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="PowerSources"/> list using the underlying Serialization Identifier (SID).
+        /// </summary>
+        [JsonProperty("powerSources", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Power Sources")]
+        public List<string> PowerSourcesSids
+        {
+            get { return this._powerSourcesSids; }
+            set { SetValue<List<string>>(ref this._powerSourcesSids, value, false, false, Property_PowerSources); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Display(Name="Power Sources")]
+        public ReferenceDataSidList<RefDataNamespace.PowerSource, string> PowerSources
+        {
+            get { return new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref this._powerSourcesSids); }
+            set { SetValue<List<string>>(ref this._powerSourcesSids, value?.ToSidList() ?? null, false, false, Property_PowerSources); }
+        }
+
         #endregion
 
         #region ICopyFrom
@@ -100,6 +128,7 @@ namespace Beef.Demo.Common.Entities
             CopyFrom((EntityBase)from);
             this.ModelNo = from.ModelNo;
             this.SerialNo = from.SerialNo;
+            this.PowerSources = from.PowerSources;
 
             this.OnAfterCopyFrom(from);
         }
@@ -131,6 +160,7 @@ namespace Beef.Demo.Common.Entities
             base.CleanUp();
             this.ModelNo = Cleaner.Clean(this.ModelNo, StringTrim.End, StringTransform.EmptyToNull);
             this.SerialNo = Cleaner.Clean(this.SerialNo, StringTrim.End, StringTransform.EmptyToNull);
+            this.PowerSources = Cleaner.Clean<ReferenceDataSidList<RefDataNamespace.PowerSource, string>>(this.PowerSources);
 
             this.OnAfterCleanUp();
         }
@@ -144,7 +174,8 @@ namespace Beef.Demo.Common.Entities
             get
             {
                 return Cleaner.IsInitial(this.ModelNo)
-                    && Cleaner.IsInitial(this.SerialNo);
+                    && Cleaner.IsInitial(this.SerialNo)
+                    && Cleaner.IsInitial(this.PowerSources);
             }
         }
 

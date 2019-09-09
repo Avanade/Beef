@@ -100,14 +100,15 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="modelNo">The Model number.</param>
         /// <param name="serialNo">The Unique serial number.</param>
+        /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         /// <returns>A <see cref="RobotCollection"/>.</returns>
         [HttpGet()]
         [Route("")]
         [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs(string modelNo = default(string), string serialNo = default(string))
+        public IActionResult GetByArgs(string modelNo = default(string), string serialNo = default(string), List<string> powerSources = default(List<string>))
         {
-            var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo };
+            var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo, PowerSourcesSids = powerSources };
             return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => Factory.Create<IRobotManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }

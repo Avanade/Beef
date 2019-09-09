@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -155,7 +156,7 @@ namespace Beef.Reflection
 
             var pe = Expression.Parameter(typeof(TEntity), "x");
 
-            foreach (var p in typeof(TEntity).GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance))
+            foreach (var p in TypeReflector.GetProperties(typeof(TEntity)))
             {
                 var lex = Expression.Lambda(Expression.Property(pe, p.Name), pe);
                 var pr = (IPropertyReflector<TEntity>)Activator.CreateInstance(typeof(PropertyReflector<,>).MakeGenericType(typeof(TEntity), p.PropertyType), Args, lex);

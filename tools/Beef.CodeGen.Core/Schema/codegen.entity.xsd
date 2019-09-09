@@ -879,7 +879,7 @@
             </xs:attribute>
             <xs:attribute name="DatabaseName" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the database instance name (where AutoImplement is 'Database'); defaults to 'Database'.</xs:documentation>
+                <xs:documentation>Specifies the database instance name (where AutoImplement is 'Database'); defaults to CodeGeneration.DatabaseName ('Database').</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DatabaseSchema" type="xs:string" use="optional">
@@ -919,7 +919,7 @@
             </xs:attribute>
             <xs:attribute name="EntityFrameworkName" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the EntityFramework instance name (where AutoImplement is 'EntityFramework'); defaults to 'EfDb'.</xs:documentation>
+                <xs:documentation>Specifies the EntityFramework instance name (where AutoImplement is 'EntityFramework'); defaults to CodeGeneration.EntityFrameworkName ('EfDb').</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="EntityFrameworkEntity" type="xs:string" use="optional">
@@ -929,7 +929,7 @@
             </xs:attribute>
             <xs:attribute name="ODataName" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the OData instance name (where AutoImplement is 'OData'); defaults to 'OData'.</xs:documentation>
+                <xs:documentation>Specifies the OData instance name (where AutoImplement is 'OData'); defaults to CodeGeneration.ODataName ('OData').</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ODataEntity" type="xs:string" use="optional">
@@ -939,7 +939,12 @@
             </xs:attribute>
             <xs:attribute name="CosmosName" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the Cosmos instance name (where AutoImplement is 'Cosmos'); defaults to 'CosmosDb'.</xs:documentation>
+                <xs:documentation>Specifies the Cosmos instance name (where AutoImplement is 'Cosmos'); defaults to CodeGeneration.CosmosName ('CosmosDb').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CosmosEntity" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the corresponding Cosmos entity/model name (defaults to 'Name').</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="CosmosContainerId" type="xs:string" use="optional">
@@ -950,6 +955,21 @@
             <xs:attribute name="CosmosPartitionKey" type="xs:string" use="optional">
               <xs:annotation>
                 <xs:documentation>Specifies the C# code to be used for setting the Cosmos PartitionKey (optional where AutoImplement is 'Cosmos').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataCosmosValueContainer" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that the 'CosmosDbValueContainer' is to be used; otherwise, 'CosmosDbContainer' (default).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataCosmosCustomMapper" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that a custom Cosmos Mapper will be created (not generated); otherwise, will be automatically generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataCosmosInheritsFrom" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the mapper that the generated Cosmos mapper inherits from.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="MapperAddStandardProperties" type="xs:boolean" use="optional">
@@ -997,11 +1017,11 @@
                 <xs:documentation>Indicates that a 'Delete' operation will be automatically generated where not otherwise specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-             <xs:attribute name="Validator" type="xs:string" use="optional">
+            <xs:attribute name="Validator" type="xs:string" use="optional">
               <xs:annotation>
                 <xs:documentation>The name of the Type that will perform the value validation; only used for a 'Create' and 'Update' operation types (used where not specified for the Operation).</xs:documentation>
               </xs:annotation>
-            </xs:attribute>         
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -1124,6 +1144,26 @@
             <xs:enumeration value="ReferenceDataNullableGuidIdConverter"/>
           </xs:restriction>
         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DatabaseName" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Provides the default database instance name (where AutoImplement is 'Database'); defaults to 'Database'.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ODataName" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Provides the default OData instance name (where AutoImplement is 'OData'); defaults to 'OData'.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+          <xs:attribute name="CosmosName" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Provides the default Cosmos instance name (where AutoImplement is 'Cosmos'); defaults to 'CosmosDb'.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+          <xs:attribute name="EntityFrameworkName" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Provides the default Entity Framework instance name (where AutoImplement is 'EntityFramework'); defaults to 'EfDb'.</xs:documentation>
+        </xs:annotation>
       </xs:attribute>
     </xs:complexType>
   </xs:element>

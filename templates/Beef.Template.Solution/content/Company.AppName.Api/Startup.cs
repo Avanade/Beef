@@ -9,7 +9,6 @@ using Beef.Entities;
 using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,23 +23,27 @@ namespace Company.AppName.Api
     /// </summary>
     public class Startup
     {
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        public Startup(IConfiguration config)
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        public Startup(IConfiguration config, ILoggerFactory loggerFactory)
         {
-            // Use JSON property names in validation.
+            // Use JSON property names in validation; default the page size and determine whether unhandled exception details are to be included in the response.
             ValidationArgs.DefaultUseJsonNames = true;
+            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
 
-            // Load the cache policies.
+            // Configure the logger.
+            _logger = loggerFactory.CreateLogger("Logging");
+            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
+
+            // Configure the cache policies.
             CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
             CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-
-            // Register the ReferenceData provider.
-            Beef.RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
 
 #if (implement_database || implement_entityframework)
             // Register the database.
@@ -52,12 +55,12 @@ namespace Company.AppName.Api
             CosmosDb.Register(() =>
             {
                 var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+                return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
             });
 
 #endif
-            // Default the page size.
-            PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
+            // Register the ReferenceData provider.
+            Beef.RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
         }
 
         /// <summary>
@@ -67,6 +70,8 @@ namespace Company.AppName.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddHealthChecks();
+            services.AddHttpClient();
 
             services.AddSwaggerGen(c =>
             {
@@ -77,25 +82,16 @@ namespace Company.AppName.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
-
-            services.AddHttpClient();
         }
 
         /// <summary>
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="env">The <see cref="IHostingEnvironment"/>.</param>
-        /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         /// <param name="clientFactory">The <see cref="IHttpClientFactory"/>.</param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
+        public void Configure(IApplicationBuilder app, IHttpClientFactory clientFactory)
         {
-            // Configure the logger.
-            _logger = loggerFactory.CreateLogger("Logging");
-            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
-
-            // Register the HttpClientCreate so it uses the factory.
+            // Register the ServiceAgent HttpClientCreate (for cross-domain calls) so it uses the factory.
             WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
             {
                 var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
@@ -103,26 +99,20 @@ namespace Company.AppName.Api
                 return hc;
             });
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            // Add exception handling to the pipeline.
+            app.UseWebApiExceptionHandler();
+
+            // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName"));
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName");
-            });
+            // Add health checks page to the pipeline.
+            app.UseHealthChecks("/health");
 
-            // Override the exception handling.
-            var includeExceptionInInternalServerError = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
-            app.UseExceptionHandler(c => WebApiStartup.ExceptionHandler(c, includeExceptionInInternalServerError));
+            // Add execution context set up to the pipeline.
+            app.UseExecutionContext();
 
-            // Configure the ExecutionContext for the request.
-            app.UseExecutionContext((context, ec) =>
-            {
-                ec.Username = context.User.Identity.Name ?? "Anonymous";
-                ec.Timestamp = DateTime.Now;
-            });
-
+            // Add mvc to the pipeline to support the api's themselves.
             app.UseMvc();
         }
     }

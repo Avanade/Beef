@@ -56,7 +56,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.Query(CosmosDbArgs<CosmosDbTypeValue<RefDataNamespace.PowerSource>>.Create("RefData")).SelectValueQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
             return __coll;
         }
 
@@ -77,6 +77,13 @@ namespace Beef.Demo.Business.Data
         public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper = EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor>
             .CreateAuto()
             .HasProperty(s => s.Id, d => d.EyeColorId)
+            .AddStandardProperties();
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.PowerSource"/> entity and Cosmos <see cref="RefDataNamespace.PowerSource"/> property mapping.
+        /// </summary>
+        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper = CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>
+            .CreateAuto()
             .AddStandardProperties();
     }
 }

@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
     /// <summary>
     /// Fully parallelizable test; seeing how it performs (perf/stability) under load.
     /// </summary>
-    [TestFixture, Parallelizable]
+    [TestFixture, Parallelizable(ParallelScope.Children)]
     public class XParallelPersonTest
     {
         [OneTimeSetUp]

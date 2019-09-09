@@ -7,7 +7,7 @@ namespace Beef.Mapper
     /// Represents a <see cref="ChangeLog"/> to <typeparamref name="TDestEntity"/> mapper.
     /// </summary>
     /// <typeparam name="TDestEntity">The destination entity <see cref="Type"/>.</typeparam>
-    public class ChangeLogMapper<TDestEntity> : EntityMapper<ChangeLog, TDestEntity> where TDestEntity : class, new()
+    public class ChangeLogMapper<TDestEntity> : EntityMapper<ChangeLog, TDestEntity, ChangeLogMapper<TDestEntity>> where TDestEntity : class, new()
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ChangeLogMapper{TDestEntity}"/> class.
@@ -41,6 +41,23 @@ namespace Beef.Mapper
         protected override ChangeLog OnMapToSrce(TDestEntity destinationEntity, ChangeLog sourceEntity, OperationTypes operationType)
         {
             return sourceEntity.IsInitial ? null : sourceEntity;
+        }
+    }
+
+    /// <summary>
+    /// Represents a <see cref="ChangeLog"/> mapper.
+    /// </summary>
+    public class ChangeLogMapper : EntityMapper<ChangeLog, ChangeLog, ChangeLogMapper>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ChangeLogMapper"/> class.
+        /// </summary>
+        public ChangeLogMapper()
+        {
+            Property(s => s.CreatedBy, d => d.CreatedBy).SetOperationTypes(OperationTypes.AnyExceptUpdate);
+            Property(s => s.CreatedDate, d => d.CreatedDate).SetOperationTypes(OperationTypes.AnyExceptUpdate);
+            Property(s => s.UpdatedBy, d => d.UpdatedBy).SetOperationTypes(OperationTypes.AnyExceptCreate);
+            Property(s => s.UpdatedDate, d => d.UpdatedDate).SetOperationTypes(OperationTypes.AnyExceptCreate);
         }
     }
 }

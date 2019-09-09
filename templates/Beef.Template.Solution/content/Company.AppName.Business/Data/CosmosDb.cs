@@ -13,6 +13,8 @@ namespace Company.AppName.Business.Data
         /// </summary>
         /// <param name="client">The <see cref="CosmosClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
-        public CosmosDb(CosmosClient client, string databaseId) : base(client, databaseId) { }
+        /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
+        /// <param name="throughput">The throughput (RU/S).</param>
+        public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
     }
 }

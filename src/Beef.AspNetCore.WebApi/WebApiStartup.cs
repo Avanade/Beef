@@ -1,15 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Net;
 
 namespace Beef.AspNetCore.WebApi
 {
@@ -55,43 +49,6 @@ namespace Beef.AspNetCore.WebApi
                     logger.LogTrace(args.ToString());
                     break;
             }
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="HttpStatusCode"/> used by the <see cref="ExceptionHandler(IApplicationBuilder, bool)"/> for an unhandled <see cref="Exception"/>.
-        /// </summary>
-        public static HttpStatusCode UnhandledExceptionStatusCode { get; set; } = HttpStatusCode.InternalServerError;
-
-        /// <summary>
-        /// Gets or sets the message used by the <see cref="ExceptionHandler(IApplicationBuilder, bool)"/> for an unhandled <see cref="Exception"/>.
-        /// </summary>
-        public static string UnhandledExceptionMessage { get; set; } = "An unexpected internal server error has occurred.";
-
-        /// <summary>
-        /// Provides a standardised approach to handle an unhandled <see cref="Exception"/>.
-        /// </summary>
-        /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="includeExceptionInError">Indicates whether to include the <see cref="Exception"/> details in the resulting error.</param>
-        public static void ExceptionHandler(IApplicationBuilder builder, bool includeExceptionInError = false)
-        {
-            Check.NotNull(builder, nameof(builder));
-
-            builder.Run(async context =>
-            {
-                var ex = context.Features.Get<IExceptionHandlerFeature>();
-                if (ex != null)
-                {
-                    var ac = new ActionContext(context, new RouteData(), new ActionDescriptor());
-                    var ar = WebApiActionBase.CreateResultFromException(ac, ex.Error);
-                    if (ar == null)
-                    {
-                        ar = new ObjectResult(includeExceptionInError ? ex.Error.ToString() : UnhandledExceptionMessage) { StatusCode = (int)UnhandledExceptionStatusCode };
-                        Logger.Default.Exception(ex.Error, UnhandledExceptionMessage);
-                    }
-
-                    await ar.ExecuteResultAsync(ac);
-                }
-            });
         }
 
         /// <summary>

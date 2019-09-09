@@ -22,9 +22,41 @@ public class MyCosmosDb : CosmosDb<MyCosmosDb>
 
 </br>
 
+## Mapping
+
+A key feature is the mapping of a .NET entity to/from a cosmos-oriented .NET model (these can be the same). The [`CosmosDbMapper`](./CosmosDbMapper.cs) will enable:
+- Property to/from mapping, including naming differences.
+- Property to/from data type conversions.
+- Entity to/from one or more property mappings.
+
+Also, specific mappings can be configured to only be performed when performing a specific [operation type](../Beef.Core/Mapper/OperationTypes.cs); e.g. Create or Update, etc.
+
+The following demonstrates the usage:
+
+``` csharp
+public partial class CosmosMapper : CosmosDbMapper<Robot, Robot, CosmosMapper>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
+    /// </summary>
+    public CosmosMapper()
+    {
+        Property(s => s.Id, d => d.Id).SetUniqueKey(true);
+        Property(s => s.ModelNo, d => d.ModelNo);
+        Property(s => s.SerialNo, d => d.SerialNo);
+        Property(s => s.EyeColorSid, d => d.EyeColorSid);
+        Property(s => s.PowerSourceSid, d => d.PowerSourceSid);
+        AddStandardProperties();
+        CosmosMapperCtor();
+    }
+}
+``` 
+
+</br>
+
 ## Operation arguments
 
-The [`CosmosDbArgs`](./CosmosDbArgs.cs) provides the required [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) operation arguments:
+The [`CosmosDbArgs`](./CosmosDbArgs.cs) provides the required [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) operation arguments. As a general rule the `CosmosDbArgs` is created from the `CosmosDbMapper`:
 
 Property | Description
 -|-
@@ -39,37 +71,61 @@ Property | Description
 The following demonstrates the usage:
 
 ``` csharp
-var args1 = CosmosDbArgs<Person>.Create("Persons");
-var args2 = CosmosDbArgs<Person>.Create("Persons", paging);
+var args1 = CosmosMapper.Default.CreateArgs("Persons");
+var args1 = CosmosMapper.Default.CreateArgs("Persons", paging);
+```
+
+<br/>
+
+## Container-based
+
+A [`CosmosDbContainer`](./CosmosDbContainer.cs) (and [`CosmosDbValueContainer`](./CosmosDbValueContainer.cs) for [`CosmosDbValue`](./CosmosDbValue.cs)) enables all of the _CRUD_ and _Query_ access for a configured Cosmos [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container); versus, having to specify the container identifier per operation.
+
+Examples as follows:
+
+``` csharp
+public class CosmosDb : CosmosDbBase
+{
+    public CosmosDb() : base(new Microsoft.Azure.Cosmos("https://localhost:8081", "C2=="), "Beef.UnitTest", true)
+    {
+        Persons = new CosmosDbContainer<Person, Person>(this, CosmosMapper.Default.CreateArgs("Persons"));
+    }
+
+    public CosmosDbContainer<Person, Person> Persons { get; private set; }
+}
+
+...
+
+var db = new CosmosDb();
+var v = await db.Persons.GetAsync(Guid.NewGuid());
 ```
 
 <br/>
 
 ## CRUD
 
-The primary data persistence activities are CRUD (Create, Read, Update and Delete) related; the [`CosmosDbBase`](./CosmosDbBase.cs) enables the following capabilities for a specified Cosmos [`Container`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container):
+The primary data persistence activities are CRUD (Create, Read, Update and Delete) related; [`CosmosDbContainer`](./CosmosDbContainer.cs) (and [`CosmosDbValueContainer`](./CosmosDbValueContainer.cs) for [`CosmosDbValue`](./CosmosDbValue.cs)) enable:
 
 Operation | Description
 -|-
 `GetAsync` | Gets the entity for the specified key where found; otherwise, `null` (default) or [`NotFoundException`](../Beef.Core/NotFoundException.cs) depending on the corresponding [`CosmosDbArgs.NullOnNotFoundResponse`](./CosmosDbArgs.cs).
-`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented. Where the entity implements either [`IGuidIdentifier`](../Beef.Core/Entities/IIdentifier.cs) or [`IStringIdentifier`](../Beef.Core/Entities/IIdentifier.cs) and the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the value will be set to `Guid.NewGuid` (overridding any prior value).
+`CreateAsync` | Creates the entity. Automatically updates the `Created*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented. Where the  the corresponding [`CosmosDbArgs.SetIdentifierOnCreate`](./CosmosDbArgs.cs) is `true` (default), then the Cosmos `Id` will be set to `Guid.NewGuid` (overridding any prior value).
 `UpdateAsync` | Updates the entity. Automatically updates the `Updated*` fields of [`IChangeLog`](../Beef.Core/Entities/IChangeLog.cs) where implemented; also ensuring that the existing `Created*` fields are not changed.
 `DeleteAsync` | Deletes the entity. Given a delete is idempotent it will be successful even where the entity does not exist.
 
 Additional information:
-- Each of the operations must be provided a [`CosmosDbArgs`](./CosmosDbArgs.cs) that provides additional context for the operation. At a minimum the `ContainerId` must be provided.
-- Each of the operations support the entity being of type [`CosmosDbTypeValue`](./CosmosDbTypeValue.cs); this will persist both the .NET [`Type.Name`](https://docs.microsoft.com/en-us/dotnet/api/system.type.name) and underlying `Value`. This enables values with multiple types to be persisted in a single containger; for example, reference data.
-- Where the entity implements [`IETag`](../Beef.Core/Entities/IEtag.cs) then the `UpdateAsync` will be performed with an `If-Match` header; and a corresponding [`ConcurrencyException`](../Beef.Core/ConcurrencyException.cs) will be thrown where it does not match. **Note**: for the `ETag` to function correctly the JSON name on the entity must be `_etag`.
+- Where the entity implements [`IETag`](../Beef.Core/Entities/IEtag.cs) then the `UpdateAsync` will be performed with an `If-Match` header; and a corresponding [`ConcurrencyException`](../Beef.Core/ConcurrencyException.cs) will be thrown where it does not match. **Note**: for the `ETag` to function correctly the JSON name on the model must be `_etag`.
 - Where uniqueness has been defined for the `Container` and a create or update results in a duplicate a [`DuplicateException`](../Beef.Core/DuplicateException.cs) will be thrown.
+
 <br/>
 
 ## Query
 
-More advanced query operations are enabled via by the `CosmosDbBase.Query` which will return a [`CosmosDbQuery`](./CosmosDbQuery.cs) which further extends on the LINQ capabilities provided by the `Container`. This supports an overload where a query `Func` can be added to simplify the likes of filtering, etc. where needed:
+More advanced query operations are enabled via by the [`CosmosDbQuery`](./CosmosDbQuery.cs) (and [`CosmosDbValueQuery`](./CosmosDbValueQuery.cs) for [`CosmosDbValue`](./CosmosDbValue.cs)) which further extends on the LINQ capabilities provided by the `Container`. This supports an overload where a query `Func` can be added to simplify the likes of filtering, etc. where needed:
 
 Operation | Description
 -|-
-`AsQueryable` | Gets a prepared `IQueryable` with any `CosmosDbTypeValue` filtering as applicable. <br/> **Note**: for this reason this is the recommended approach for all ad-hoc queries. <br/> **Note**: [`CosmosDbArgs.Paging`](./CosmosDbArgs.cs) is not supported and must be applied using the provided `IQueryable.Paging`.
+`AsQueryable` | Gets a prepared `IQueryable` (with any `CosmosDbValue.Type` filtering as applicable). <br/> **Note**: for this reason this is the recommended approach for all ad-hoc queries. <br/> **Note**: [`CosmosDbArgs.Paging`](./CosmosDbArgs.cs) is not supported and must be applied using the provided `IQueryable.Paging`.
 `SelectFirst` | Selects the first item.**<sup>*</sup>** 
 `SelectFirstOrDefault` | Selects the first item or default.**<sup>*</sup>**
 `SelectSingle` | Selects a single item.**<sup>*</sup>**
@@ -81,28 +137,11 @@ Operation | Description
 
 <br/>
 
-## Container-based
+## Cosmos specific model
 
-A [`CosmosDbContainer`](./CosmosDbContainer.cs) enables all of the previously decribed _CRUD_ and _Query_ access for a configured container; versus, having to specify the container identifier per operation.
-
-Examples as follows:
-
-``` csharp
-public class CosmosDb : CosmosDbBase
-{
-    public CosmosDb() : base(new Microsoft.Azure.Cosmos("https://localhost:8081", "C2=="), "Beef.UnitTest", true)
-    {
-        Persons = new CosmosDbContainer<Person>(this, CosmosDbArgs<Person>.Create("Persons"));
-    }
-
-    public CosmosDbContainer<Person> Persons { get; private set; }
-}
-
-...
-
-var db = new CosmosDb();
-var v = await db.Persons.GetAsync(Guid.NewGuid());
-```
+Where the _Entity_ does not naturally map to a Cosmos _Model_ a couple of options are provided:
+- Inherit _Model_ from [`CosmosDbModelBase`](./CosmosDbModelBase.cs); this provides the basic `Id`, `_etag` and [`ttl`](https://docs.microsoft.com/en-us/azure/cosmos-db/time-to-live).
+- Use the `CosmosDbValueContainer` that in turn leverages the [`CosmosDbValue`](./CosmosDbValue.cs) for persisting the _Model_ `Value`. This inherits from `CosmosDbModelBase`, and extends by adding a `Type` (enables values with multiple types to be persisted in a single containger; for example, reference data), and the `Value` itself.
 
 <br/>
 

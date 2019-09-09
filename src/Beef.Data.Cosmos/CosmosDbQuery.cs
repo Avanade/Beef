@@ -32,51 +32,43 @@ namespace Beef.Data.Cosmos
     /// Encapsulates a <b>CosmosDb/DocumentDb</b> query enabling all select-like capabilities.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
-    public class CosmosDbQuery<T> : CosmosDbQueryBase where T : class, new()
+    /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
+    public class CosmosDbQuery<T, TModel> : CosmosDbQueryBase where T : class, new() where TModel : class, new()
     {
-        private readonly CosmosDbBase _db;
-        private readonly Func<IQueryable<T>, IQueryable<T>> _query;
+        private readonly CosmosDbContainer<T, TModel> _container;
+        private readonly Func<IQueryable<TModel>, IQueryable<TModel>> _query;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbQuery{T}"/> class.
+        /// Initializes a new instance of the <see cref="CosmosDbQuery{T, TModel}"/> class.
         /// </summary>
-        /// <param name="db">The <see cref="CosmosDbBase"/>.</param>
-        /// <param name="queryArgs">The <see cref="CosmosDbArgs{T}"/>.</param>
+        /// <param name="container">The <see cref="CosmosDbContainer{T, TModel}"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{T}"/>.</param>
-        internal CosmosDbQuery(CosmosDbBase db, CosmosDbArgs<T> queryArgs, Func<IQueryable<T>, IQueryable<T>> query = null)
+        internal CosmosDbQuery(CosmosDbContainer<T, TModel> container, Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
         {
-            _db = Check.NotNull(db, nameof(db));
-            QueryArgs = Check.NotNull(queryArgs, nameof(queryArgs));
+            _container = Check.NotNull(container, nameof(container));
             _query = query;
         }
 
         /// <summary>
-        /// Gets the <see cref="CosmosDbArgs{T}"/>.
+        /// Gets the <see cref="CosmosDbArgs{T, TModel}"/>.
         /// </summary>
-        public CosmosDbArgs<T> QueryArgs { get; private set; }
+        public CosmosDbArgs<T, TModel> QueryArgs => _container.DbArgs;
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal void ExecuteQuery(Action<IQueryable<T>> execute)
+        internal void ExecuteQuery(Action<IQueryable<TModel>> execute)
         {
-            CosmosDbInvoker.Default.Invoke(this, () => ExecuteQueryInternal(execute), _db);
+            CosmosDbInvoker.Default.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
         }
 
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
         /// </summary>
-        private IQueryable<T> ExecuteQueryInternal(Action<IQueryable<T>> execute)
+        private IQueryable<TModel> ExecuteQueryInternal(Action<IQueryable<TModel>> execute)
         {
-            IQueryable<T> q = _db.GetContainer(QueryArgs.ContainerId).GetItemLinqQueryable<T>(allowSynchronousQueryExecution: true, requestOptions: _db.GetQueryRequestOptions(QueryArgs));
-            if (QueryArgs is ICosmosDbArgs qa && qa.IsTypeValue)
-            {
-                q = _query == null ?
-                    Internal.CosmosDbHelper.AddTypeWhereClause<T>(q, qa.TypeValueType) :
-                    _query(Internal.CosmosDbHelper.AddTypeWhereClause<T>(q, qa.TypeValueType));
-            }
-            else
-                q = _query == null ? q : _query(q);
+            IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
+            q = _query == null ? q : _query(q);
 
             execute?.Invoke(q);
             return q;
@@ -85,19 +77,19 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Manages the underlying query construction and lifetime.
         /// </summary>
-        internal T ExecuteQuery(Func<IQueryable<T>, T> execute)
+        internal TModel ExecuteQuery(Func<IQueryable<TModel>, TModel> execute)
         {
             return CosmosDbInvoker.Default.Invoke(this, () =>
             {
                 return execute(AsQueryable(false));
-            }, _db);
+            }, _container.CosmosDb);
         }
 
         /// <summary>
-        /// Gets a prepared <see cref="IQueryable{T}"/> with any <see cref="CosmosDbTypeValue{T}"/> filtering as applicable.
+        /// Gets a prepared <see cref="IQueryable{TModel}"/> with any <see cref="CosmosDbValue{TModel}"/> filtering as applicable.
         /// </summary>
         /// <remarks>The <see cref="ICosmosDbArgs.Paging"/> is not supported.</remarks>
-        public IQueryable<T> AsQueryable()
+        public IQueryable<TModel> AsQueryable()
         {
             return AsQueryable(true);
         }
@@ -105,7 +97,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Initiate the IQueryable.
         /// </summary>
-        private IQueryable<T> AsQueryable(bool checkPaging)
+        private IQueryable<TModel> AsQueryable(bool checkPaging)
         {
             if (checkPaging && QueryArgs.Paging != null)
                 throw new NotSupportedException("The QueryArgs.Paging must be null for an AsQueryable(); this is a limitation of the Microsoft.Azure.Cosmos SDK in that the paging must be applied last, as such use the IQueryable.Paging provided to perform where appropriate.");
@@ -121,11 +113,11 @@ namespace Beef.Data.Cosmos
         /// <returns>The single item.</returns>
         public T SelectSingle()
         {
-            return ExecuteQuery(q =>
+            return _container.GetValue(ExecuteQuery(q =>
             {
                 q = q.Paging(0, 2);
-                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().Single());
-            });
+                return q.AsEnumerable().Single();
+            }));
         }
 
         /// <summary>
@@ -134,11 +126,11 @@ namespace Beef.Data.Cosmos
         /// <returns>The single item or default.</returns>
         public T SelectSingleOrDefault()
         {
-            return ExecuteQuery(q =>
+            return _container.GetValue(ExecuteQuery(q =>
             {
                 q = q.Paging(0, 2);
-                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().SingleOrDefault());
-            });
+                return q.AsEnumerable().SingleOrDefault();
+            }));
         }
 
         /// <summary>
@@ -147,11 +139,11 @@ namespace Beef.Data.Cosmos
         /// <returns>The first item.</returns>
         public T SelectFirst()
         {
-            return ExecuteQuery(q =>
+            return _container.GetValue(ExecuteQuery(q =>
             {
                 q = q.Paging(0, 1);
-                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().First());
-            });
+                return q.AsEnumerable().First();
+            }));
         }
 
         /// <summary>
@@ -160,11 +152,11 @@ namespace Beef.Data.Cosmos
         /// <returns>The single item or default.</returns>
         public T SelectFirstOrDefault()
         {
-            return ExecuteQuery(q =>
+            return _container.GetValue(ExecuteQuery(q =>
             {
                 q = q.Paging(0, 1);
-                return CosmosDbBase.GetAndFormatValue(q.AsEnumerable().FirstOrDefault());
-            });
+                return q.AsEnumerable().FirstOrDefault();
+            }));
         }
 
         #endregion
@@ -196,7 +188,7 @@ namespace Beef.Data.Cosmos
             {
                 foreach (var item in query.Paging(QueryArgs.Paging).AsEnumerable())
                 {
-                    coll.Add(CosmosDbBase.GetAndFormatValue(item));
+                    coll.Add(_container.GetValue(item));
                 }
 
                 if (QueryArgs.Paging != null && QueryArgs.Paging.IsGetCount)

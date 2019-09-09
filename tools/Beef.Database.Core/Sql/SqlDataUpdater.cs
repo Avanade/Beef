@@ -20,7 +20,6 @@ namespace Beef.Database.Core.Sql
     {
         internal static readonly DateTime DateTimeNow = DateTime.Now;
         internal static readonly string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
-        internal static readonly string EnvironmentUsername = Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
 
         private readonly JObject _json;
 

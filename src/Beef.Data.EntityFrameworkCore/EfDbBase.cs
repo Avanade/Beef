@@ -130,7 +130,7 @@ namespace Beef.Data.EntityFrameworkCore
                 if (cl.ChangeLog == null)
                     cl.ChangeLog = new ChangeLog();
 
-                cl.ChangeLog.CreatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : null;
+                cl.ChangeLog.CreatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
 
@@ -169,7 +169,7 @@ namespace Beef.Data.EntityFrameworkCore
                 if (cl.ChangeLog == null)
                     cl.ChangeLog = new ChangeLog();
 
-                cl.ChangeLog.UpdatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : null;
+                cl.ChangeLog.UpdatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
                 cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
             

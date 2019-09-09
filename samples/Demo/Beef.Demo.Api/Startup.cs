@@ -61,6 +61,8 @@ namespace Beef.Demo.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddHealthChecks();
+            services.AddHttpClient();
 
             services.AddSwaggerGen(c =>
             {
@@ -71,8 +73,6 @@ namespace Beef.Demo.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
-
-            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -90,26 +90,25 @@ namespace Beef.Demo.Api
                 return hc;
             });
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BEEF Demo");
-            });
-
             // Override the exception handling.
-            var includeExceptionInInternalServerError = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
-            app.UseExceptionHandler(c => WebApiStartup.ExceptionHandler(c, includeExceptionInInternalServerError));
+            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
+            app.UseWebApiExceptionHandler();
+
+            // Set up the health checks.
+            app.UseHealthChecks("/health");
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint and serve the swagger-ui.
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BEEF Demo"));
 
             // Configure the ExecutionContext for the request.
             app.UseExecutionContext((context, ec) =>
             {
-                ec.Username = context.User.Identity.Name ?? "Anonymous";
+                ec.Username = context.User.Identity.Name ?? WebApiExecutionContextMiddleware.DefaultUsername;
                 ec.Timestamp = DateTime.Now;
             });
 
+            // Use mvc.
             app.UseMvc();
         }
     }

@@ -1,6 +1,6 @@
 ﻿Data:
   - Robot:
-    - { id: ^1, modelNo: T1000, serialNo: 123456 }
-    - { id: ^2, modelNo: T100, serialNo: A45768 }
-    - { id: ^3, modelNo: T1000, serialNo: 223456 }
-    - { id: ^4, modelNo: T100, serialNo: B45768 }
+    - { id: ^1, modelNo: T1000, serialNo: 123456, powerSource: "F" }
+    - { id: ^2, modelNo: T100, serialNo: A45768, powerSource: "E" }
+    - { id: ^3, modelNo: T1000, serialNo: 223456, powerSource: "N" }
+    - { id: ^4, modelNo: T100, serialNo: B45768, powerSource: "E" }

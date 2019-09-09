@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Beef.Demo.Test
 {
-    [TestFixture, Parallelizable]
+    [TestFixture, Parallelizable(ParallelScope.Children)]
     public class ProductTest
     {
         [OneTimeSetUp]

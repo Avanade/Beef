@@ -92,14 +92,37 @@ namespace Beef
         /// </summary>
         /// <typeparam name="TElement">The element <see cref="Type"/>.</typeparam>
         /// <param name="query">The query.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
         /// <param name="when">Indicates to perform an underlying <see cref="Queryable.Where{TElement}(IQueryable{TElement}, Expression{Func{TElement, bool}})"/> only when <c>true</c>;
-        /// otherwise no <b>Where</b> is invoked.</param>
-        /// <returns></returns>
-        public static IQueryable<TElement> WhereWhen<TElement>(this IQueryable<TElement> query, Expression<Func<TElement, bool>> predicate, bool when)
+        /// otherwise, no <b>Where</b> is invoked.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>The resulting query.</returns>
+        public static IQueryable<TElement> WhereWhen<TElement>(this IQueryable<TElement> query, bool when, Expression<Func<TElement, bool>> predicate)
         {
             if (when)
                 return query.Where(predicate);
+            else
+                return query;
+        }
+
+        /// <summary>
+        /// Filters a sequence of values based on a <paramref name="predicate"/> only when the <paramref name="with"/> is not the default value for the <see cref="Type"/>.
+        /// </summary>
+        /// <typeparam name="TElement">The element <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The with value <see cref="Type"/>.</typeparam>
+        /// <param name="query">The query.</param>
+        /// <param name="with">Indicates to perform an underlying <see cref="Queryable.Where{TElement}(IQueryable{TElement}, Expression{Func{TElement, bool}})"/> only when the with is not the default
+        /// value; otherwise, no <b>Where</b> is invoked.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>The resulting query.</returns>
+        public static IQueryable<TElement> WhereWith<TElement, T>(this IQueryable<TElement> query, T with, Expression<Func<TElement, bool>> predicate)
+        {
+            if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
+            {
+                if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
+                    return query;
+
+                return query.Where(predicate);
+            }
             else
                 return query;
         }

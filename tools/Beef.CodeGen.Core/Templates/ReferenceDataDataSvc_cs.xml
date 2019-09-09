@@ -42,8 +42,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
   </Header>
   <Entity Condition="Entity.RefDataType != null and Entity.ExcludeDataSvc == false and Entity.ExcludeAll == false">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}" Otherwise="^RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="^{{Entity.Name}}Collection" Otherwise="^RefDataNamespace.{{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <![CDATA[            cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
     <If Condition="Config.RefDataCache == null">
       <Then><![CDATA[ReferenceDataCache]]></Then>

@@ -1,18 +1,14 @@
-# ServiceAgent
+# Service Agent
 
 The *Service Agent* is the proxy layer that encapsulates the invocation of the corresponding [Service Interface layer](./Layer-ServiceInterface.md). 
 
-This layer is code-generated and responsible for performing the HTTP request / response handling, it generates the following artefacts :
-
-- `XxxAgent` - a proxy class that invokes the `XxxServiceAgent` class that is instantiated by the [`Factory`](../src/Beef.Core/Factory.cs) (enables a test mocking opportunity). This is the component that should be invoked directly by the developer.
-- `XxxServiceAgent` - inherits from [WebApiServiceAgentBase](../src/Beef.Core/WebApi/WebApiServiceAgentBase.cs) and implements the logic to invoke the HTTP endpoint.
-- `IXxxSericeAgent` - the interface to enable the test mocking.
+This layer is code-generated and responsible for performing the HTTP request / response handling. it generates the following artefacts :
 
 <br>
 
 ## Capabilities
 
-The [`WebApiServiceAgentBase`](../src/Beef.Core/WebApi/WebApiServiceAgentBase.cs) provides the base functionality for invoking an API endpoint:
+The [`WebApiServiceAgentBase`](../src/Beef.Core/WebApi/WebApiServiceAgentBase.cs) provides the core Service Agent functionality for invoking an API endpoint:
 
 - `GetAsync` - Sends an HTTP **`GET`**.
 - `PutAsync` - Sends an HTTP **`PUT`**.
@@ -37,5 +33,7 @@ Step | Description
 ## Usage
 
 The [`Operation`](./Entity-Operation-element.md) element within the `entity.xml` configuration primarily drives the output. There are generated classes per [`Entity`](./Entity-Entity-element.md) named `{Entity}Agent` and `{EntityServiceAgent}`.
+
+The `{Entity}Agent` is simply a proxy class that invokes the `{Entity}ServiceAgent` class that is instantiated by the [`Factory`](../src/Beef.Core/Factory.cs) (enables a test mocking opportunity). The `{Entity}Agent` is the component that should be invoked directly by the developer.
 
 There are currently **no** opportunities for a developer to extend on the generated code; beyond amending the underlying code generation templates. This is by design to limit the introduction of business or data logic into this layer.

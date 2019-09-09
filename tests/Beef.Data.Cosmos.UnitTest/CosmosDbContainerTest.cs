@@ -20,10 +20,10 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Get1Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons1.GetAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons1.GetAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons1.GetAsync(1, 2));
 
-            Assert.IsNull(await _db.Persons1.GetAsync(404));
+            Assert.IsNull(await _db.Persons1.GetAsync(404.ToGuid()));
 
             var v = await _db.Persons1.GetAsync(1.ToGuid());
             Assert.IsNotNull(v);
@@ -33,10 +33,10 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Get2Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons2.GetAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons2.GetAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons2.GetAsync(1, 2));
 
-            Assert.IsNull(await _db.Persons2.GetAsync(404));
+            Assert.IsNull(await _db.Persons2.GetAsync(404.ToGuid()));
 
             var v = await _db.Persons2.GetAsync(1.ToGuid());
             Assert.IsNotNull(v);
@@ -46,19 +46,18 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Get3Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons3.GetAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons3.GetAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons3.GetAsync(1, 2));
 
-            Assert.IsNull(await _db.Persons3.GetAsync(404));
+            Assert.IsNull(await _db.Persons3.GetAsync(404.ToGuid()));
 
             var v = await _db.Persons3.GetAsync(1.ToGuid());
             Assert.IsNotNull(v);
-            Assert.AreEqual("Person3", v.Type);
-            Assert.AreEqual(1.ToGuid(), v.Value.Id);
-            Assert.AreEqual("Rebecca", v.Value.Name);
+            Assert.AreEqual(1.ToGuid(), v.Id);
+            Assert.AreEqual("Rebecca", v.Name);
 
             // Different type.
-            Assert.IsNull(await _db.Persons3.GetAsync(100));
+            Assert.IsNull(await _db.Persons3.GetAsync(100.ToGuid()));
         }
 
         [Test]
@@ -104,22 +103,22 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Create3Async()
         {
-            //ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons3.CreateAsync(null));
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons3.CreateAsync(null));
 
             var id = Guid.NewGuid();
-            var v = new Person3 { Value = new Person2 { Id = id, Name = "Michelle", Birthday = new DateTime(1979, 08, 12), Salary = 181000m } };
+            var v = new Person3 { Id = id, Name = "Michelle", Birthday = new DateTime(1979, 08, 12), Salary = 181000m };
             v = await _db.Persons3.CreateAsync(v);
 
             Assert.IsNotNull(v);
             Assert.AreNotEqual(id, v.Id);
-            Assert.AreEqual("Michelle", v.Value.Name);
-            Assert.AreEqual(new DateTime(1979, 08, 12), v.Value.Birthday);
-            Assert.AreEqual(181000m, v.Value.Salary);
-            Assert.IsNotNull(v.Value.ChangeLog);
-            Assert.IsNotNull(v.Value.ChangeLog.CreatedBy);
-            Assert.IsNotNull(v.Value.ChangeLog.CreatedDate);
-            Assert.IsNull(v.Value.ChangeLog.UpdatedBy);
-            Assert.IsNull(v.Value.ChangeLog.UpdatedDate);
+            Assert.AreEqual("Michelle", v.Name);
+            Assert.AreEqual(new DateTime(1979, 08, 12), v.Birthday);
+            Assert.AreEqual(181000m, v.Salary);
+            Assert.IsNotNull(v.ChangeLog);
+            Assert.IsNotNull(v.ChangeLog.CreatedBy);
+            Assert.IsNotNull(v.ChangeLog.CreatedDate);
+            Assert.IsNull(v.ChangeLog.UpdatedBy);
+            Assert.IsNull(v.ChangeLog.UpdatedDate);
 
             Assert.IsNotNull(await _db.Persons3.GetAsync(v.Id));
         }
@@ -160,6 +159,7 @@ namespace Beef.Data.Cosmos.UnitTest
 
             v.Id = 5.ToGuid();
             v.Name += "X";
+            v.ChangeLog = null;
             v = await _db.Persons2.UpdateAsync(v);
             Assert.NotNull(v);
             Assert.AreEqual(5.ToGuid(), v.Id);
@@ -181,27 +181,27 @@ namespace Beef.Data.Cosmos.UnitTest
             Assert.NotNull(v);
 
             // Update testing.
-            v.Value.Id = 404.ToGuid();
+            v.Id = 404.ToGuid();
             ExpectException.Throws<NotFoundException>("*", () => _db.Persons3.UpdateAsync(v));
 
-            v.Value.Id = 5.ToGuid();
-            v.Value.Name += "X";
+            v.Id = 5.ToGuid();
+            v.Name += "X";
+            v.ChangeLog = null;
             v = await _db.Persons3.UpdateAsync(v);
             Assert.NotNull(v);
-            Assert.AreEqual(5.ToGuid().ToString(), v.Id);
-            Assert.AreEqual(5.ToGuid(), v.Value.Id);
-            Assert.AreEqual("MikeX", v.Value.Name);
-            Assert.IsNotNull(v.Value.ChangeLog);
-            Assert.IsNotNull(v.Value.ChangeLog.CreatedBy);
-            Assert.IsNotNull(v.Value.ChangeLog.CreatedDate);
-            Assert.IsNotNull(v.Value.ChangeLog.UpdatedBy);
-            Assert.IsNotNull(v.Value.ChangeLog.UpdatedDate);
+            Assert.AreEqual(5.ToGuid(), v.Id);
+            Assert.AreEqual("MikeX", v.Name);
+            Assert.IsNotNull(v.ChangeLog);
+            Assert.IsNotNull(v.ChangeLog.CreatedBy);
+            Assert.IsNotNull(v.ChangeLog.CreatedDate);
+            Assert.IsNotNull(v.ChangeLog.UpdatedBy);
+            Assert.IsNotNull(v.ChangeLog.UpdatedDate);
         }
 
         [Test]
         public async Task Delete1Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons1.DeleteAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons1.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons1.DeleteAsync(1, 2));
 
             await _db.Persons1.DeleteAsync(404.ToGuid());
@@ -218,7 +218,7 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Delete2Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons2.DeleteAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons2.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons2.DeleteAsync(1, 2));
 
             await _db.Persons2.DeleteAsync(404.ToGuid());
@@ -235,7 +235,7 @@ namespace Beef.Data.Cosmos.UnitTest
         [Test]
         public async Task Delete3Async()
         {
-            ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons3.DeleteAsync());
+            ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons3.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons3.DeleteAsync(1, 2));
 
             await _db.Persons3.DeleteAsync(404.ToGuid());
