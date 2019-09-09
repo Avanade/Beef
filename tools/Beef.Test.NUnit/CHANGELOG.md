@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.13
+- *Added:* `TestSetUp.RegisterSetUp` has had a new overload that supports an asynchronous function.
+
 ## v2.1.12
 - *Added:* `ExpectException.Throws` has had a new overload added that supports an async method (i.e. returns `Task`).
 - *Enhancement:* `ExpectException.Throws` message argument where set to '*' will accept any message text; i.e. just validates the `Type` of `Exception`. 

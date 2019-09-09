@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Beef.Test.NUnit" Version="2.1.12" />
+    <PackageReference Include="Beef.Test.NUnit" Version="2.1.13" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
