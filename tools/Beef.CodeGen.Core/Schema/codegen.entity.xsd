@@ -1022,6 +1022,11 @@
                 <xs:documentation>The name of the Type that will perform the value validation; only used for a 'Create' and 'Update' operation types (used where not specified for the Operation).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="OmitEntityBase" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates that the Entity does not inherit from 'EntityBase' and therefore related capabilites are not supported (omitted from generation).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

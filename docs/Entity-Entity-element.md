@@ -59,6 +59,7 @@ Attribute | Description
 `Abstract` | Indicates whether the class should be defined as `abstract`.
 `GenericWithT` | Indicates whether the class should be defined as a generic with a single parameter `T`.
 `Namespace` | Name of the entity namespace appended to end of the standard `[company].[appname].Common.Entities.Namespace`.
+`OmitEntityBase` | Indicates that the entity does not inherit from `EntityBase` and therefore related capabilites are not supported (omitted from generation). As such, some features will no longer be supported. The intention for this is more for the generation of internal entities.
 
 <br>
 

@@ -139,4 +139,13 @@
     <Property Name="Company" Type="RefDataNamespace.Company" RefDataType="string" />
     <Property Name="Description" Type="string" />
   </Entity>
+  
+  <!-- Non EntityBase entity -->
+  <Entity Name="PersonOther" Text="other {{Person}} without {{EntityBase}} capabilities" OmitEntityBase="true" Implements="IGuidIdentifier, IChangeLog, IETag" Collection="true" ExcludeAll="true">
+    <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />
+    <Property Name="FirstName" Type="string" />
+    <Property Name="LastName" Type="string" />
+    <Property Name="ETag" ArgumentName="etag" Type="string" />
+    <Property Name="ChangeLog" Type="ChangeLog" />
+  </Entity> 
  </CodeGeneration>

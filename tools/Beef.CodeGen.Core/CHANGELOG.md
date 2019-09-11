@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.11
+- *Fixed:* The `Entity.DatabaseName`, `Entity.EntityFrameworkName`, `Entity.CosmosName` are now being honoured when generating for reference data.
+- *Enhancement:* A new `Entity.OmitEntityBase` attribute is now supported in the code-generation to omit the output of the `EntityBase` inherited capabilities.
+
 ## v2.1.10
 - *Enhancment:* Cosmos code-generation enhancements to support changes to `CosmosDb` implementation.
 

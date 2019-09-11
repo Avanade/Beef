@@ -86,14 +86,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
       <Set Name="Config.NewLine" Value="false" />
       <Switch Value="Entity.AutoImplement">
         <Case Value="'Database'">
+          <Set Name="System.DatabaseName" Condition="Entity.DatabaseName != null" Value="Entity.DatabaseName" Otherwise="Config.DatabaseName" />
+          <Set Name="System.DatabaseName" Condition="System.DatabaseName == null" Value="'Database'" />
           <![CDATA[
             {
-                ]]>
-          <If Condition="Entity.DatabaseName == null">
-            <Then><![CDATA[Database]]></Then>
-            <Else><![CDATA[{{Entity.DatabaseName}}]]></Else>
-          </If>
-          <![CDATA[.Default.GetRefData<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__coll, "[]]>
+                {{System.DatabaseName}}.Default.GetRefData<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__coll, "[]]>
           <If Condition="Entity.DatabaseSchema == null">
             <Then><![CDATA[dbo]]></Then>
             <Else><![CDATA[{{Entity.DatabaseSchema}}]]></Else>
@@ -165,20 +162,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <Set Name="Config.NewLine" Value="true" />
         </Case>
         <Case Value="'EntityFramework'">
-          <![CDATA[{ ]]>
-          <If Condition="Entity.EntityFrameworkName == null">
-            <Then><![CDATA[EfDb]]></Then>
-            <Else><![CDATA[{{Entity.EntityFrameworkName}}]]></Else>
-          </If>
-          <![CDATA[.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }]]>
+          <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName != null" Value="Entity.EntityFrameworkName" Otherwise="Config.EntityFrameworkName" />
+          <Set Name="System.EntityFrameworkName" Condition="System.EntityFrameworkName == null" Value="'EfDb'" />
+          <![CDATA[{ {{System.EntityFrameworkName}}.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }]]>
         </Case>
         <Case Value="'Cosmos'">
-          <![CDATA[{ ]]>
-          <If Condition="Entity.CosmosName == null">
-            <Then><![CDATA[CosmosDb]]></Then>
-            <Else><![CDATA[{{Entity.CosmosName}}]]></Else>
-          </If>
-          <![CDATA[.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask; }]]>
+          <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
+          <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
+          <![CDATA[{ {{System.CosmosName}}.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask; }]]>
         </Case>
         <Default>
           <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll)]]>
