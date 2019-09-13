@@ -1,8 +1,8 @@
-<br>
+<br/>
 
 ![Logo](./docs/images/LogoPill.png "Beef")
 
-<br>
+<br/>
 
 ## Introduction
 
@@ -16,13 +16,13 @@ The key industralisation goals are:
 5. **Consistency** – improve overall quality and maintainability
 6. **Flexibility** – enable innovation and evolution easily over time
 
-<br>
+<br/>
 
 ## Architecture
 
 _Beef_ has been developed to encourage the standardisation and industrialisation of the tiering and layering within the backend services (APIs) of an Application Architecture.
 
-<br>
+<br/>
 
 ### API-enabled domain-based channel-agnostic architecture 
 
@@ -39,7 +39,7 @@ The key concepts are as follows:
   - Outcome of a [Domain-Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design); divides capapabilities into different [Bounded Contexts](https://www.martinfowler.com/bliki/BoundedContext.html).
   - Encourages micro vs monolithic services.
 
-<br>
+<br/>
 
 ### Microservices
 
@@ -54,7 +54,7 @@ An architectural pattern for creating domain-based APIs:
 
 > “Micro” doesn’t imply number of lines of code; but a bounded concept / business capability within your Domain. - [http://herdingcode.com](http://herdingcode.com/herding-code-210-ian-cooper-on-microservices-and-the-brighter-library/)
 
-<br>
+<br/>
 
 ### Tiering and layering
 
@@ -74,7 +74,15 @@ Each of the key layers / components above are further detailed (`Xxx` denotes th
 - [Service orchestration](./docs/Layer-DataSvc.md) - `XxxDataSvc`
 - [Data access](./docs/Layer-Data.md) - `XxxData`
 
-<br>
+<br/>
+
+### Event-driven
+
+To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) _Beef_ enables the basic capabilities. Primarily is the integrated support for the **publishing** of events as part of the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure, and must be implemented by the developer.
+
+An event receiver is able to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a receiving domain).
+
+<br/>
 
 ## Framework 
 
@@ -114,15 +122,15 @@ The following samples are provided to guide usage:
 
 Sample | Description
 -|-
-[`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing.
+[`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is also used to further test the key end-to-end capabilities enabled by _Beef_.
 
-<br>
+<br/>
 
 ## License
 
 _Beef_ is open source under the [MIT license](./LICENSE) and is free for commercial use.
 
-<br>
+<br/>
 
 ## Getting started
 
@@ -133,7 +141,7 @@ To start using _Beef_ you do not need to clone; you just need to create a soluti
 ## Contributing
 One of the easiest ways to contribute is to participate in discussions on GitHub issues. You can also contribute by submitting pull requests (PR) with code changes.
 
-<br>
+<br/>
 
 ### Coding guidelines
 
@@ -148,7 +156,7 @@ The most general guideline is that we use all the VS default settings in terms o
 
 For further guidance see ASP.NET Core [Engineering guidelines](https://github.com/aspnet/AspNetCore/wiki/Engineering-guidelines).
 
-<br>
+<br/>
 
 ### Tests
 
@@ -161,7 +169,7 @@ We use [`NUnit`](https://github.com/nunit/nunit) for all unit testing.
 
 We understand there is more work to be performed in generating a higher level of code coverage; this technical debt is on the backlog.
 
-<br>
+<br/>
 
 ### Code reviews and checkins
 To help ensure that only the highest quality code makes its way into the project, please submit all your code changes to GitHub as PRs. This includes runtime code changes, unit test updates, and updates to the end-to-end demo.
