@@ -2,6 +2,7 @@
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Template OutputGenDirName="Generated">
   <Entity Condition="Entity.ExcludeEntity == false and Entity.EntityScope == Config.EntityScope" OutputFileName="{{Entity.FileName}}.cs" OutputDirName="{{Entity.Namespace}}">
+    <Set Name="Entity.Namespace" Condition="Config.IsDataModel == true" Value="null" />
     <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="${{Entity.Name}}&lt;T&gt;" />
     <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
     <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}CollectionResult" Otherwise="${{Entity.Name}}CollectionResult&lt;T&gt;" />
@@ -23,7 +24,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 ]]>
-    <If Condition="Entity.OmitEntityBase == false">
+    <If Condition="Config.IsDataModel == false and Entity.OmitEntityBase == false">
       <![CDATA[using Beef.RefData;
 ]]>
     </If>
@@ -41,30 +42,42 @@ using Beef.Entities;
       <![CDATA[using {{Config.UsingNamespace3}};
 ]]>
     </If>
-    <If Condition="Config.EntityUsing == null or Config.EntityUsing == 'Common' or Config.EntityUsing == 'All'">
-      <If Condition="Entity.EntityScope == 'Business'">
-        <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Common;
+    <If Condition="Config.IsDataModel == false">
+      <Then>
+        <If Condition="Config.EntityUsing == null or Config.EntityUsing == 'Common' or Config.EntityUsing == 'All'">
+          <If Condition="Entity.EntityScope == 'Business'">
+            <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Common;
 ]]>
-      </If>
+          </If>
+        </If>
+        <If Condition="Config.EntityUsing == 'Business' or Config.EntityUsing == 'All'">
+          <If Condition="Entity.EntityScope == 'Common'">
+            <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Business;
+]]>
+          </If>
+        </If>
+        <If Condition="Entity.OmitEntityBase == false">
+          <If Condition="Config.RefDataNamespace != null">
+            <![CDATA[using RefDataNamespace = {{Config.RefDataNamespace}};
+]]>
+          </If>
+          <If Condition="Config.RefDataBusNamespace != null">
+            <![CDATA[using RefDataBusNamespace = {{Config.RefDataBusNamespace}};
+]]>
+          </If>
+        </If>
+      </Then>
     </If>
-    <If Condition="Config.EntityUsing == 'Business' or Config.EntityUsing == 'All'">
-      <If Condition="Entity.EntityScope == 'Common'">
-        <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Business;
-]]>
-      </If>
-    </If>
-    <If Condition="Entity.OmitEntityBase == false">
-      <If Condition="Config.RefDataNamespace != null">
-        <![CDATA[using RefDataNamespace = {{Config.RefDataNamespace}};
-]]>
-      </If>
-      <If Condition="Config.RefDataBusNamespace != null">
-        <![CDATA[using RefDataBusNamespace = {{Config.RefDataBusNamespace}};
-]]>
-      </If>
-    </If>
-    <![CDATA[
+    <If Condition="Config.IsDataModel == true">
+      <Then>
+        <![CDATA[
+namespace {{Config.Company}}.{{Config.AppName}}.Business.Data.Model]]>
+      </Then>
+      <Else>
+        <![CDATA[
 namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]]>
+      </Else>
+    </If>
     <If Condition="Entity.Namespace != null">
       <![CDATA[.{{Entity.Namespace}}]]>
     </If>

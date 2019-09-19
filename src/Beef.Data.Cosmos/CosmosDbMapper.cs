@@ -125,7 +125,7 @@ namespace Beef.Data.Cosmos
                 var spe = Expression.Parameter(SrceType, "x");
                 var sex = Expression.Lambda(Expression.Property(spe, nameof(IChangeLog.ChangeLog)), spe);
                 var dpe = Expression.Parameter(DestType, "x");
-                var dex = Expression.Lambda(Expression.Property(spe, nameof(IChangeLog.ChangeLog)), dpe);
+                var dex = Expression.Lambda(Expression.Property(dpe, nameof(IChangeLog.ChangeLog)), dpe);
                 var pmap = (IPropertyMapper<T, TModel>)typeof(EntityMapper<T, TModel>)
                     .GetMethod("PropertySrceAndDest", BindingFlags.NonPublic | BindingFlags.Instance)
                     .MakeGenericMethod(new Type[] { typeof(ChangeLog), typeof(ChangeLog) })

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.12
+- *Added:* New `DataModel` code generation support has been added to enable the specification and generation of back-end only data model entities.
+
 ## v2.1.11
 - *Fixed:* The `Entity.DatabaseName`, `Entity.EntityFrameworkName`, `Entity.CosmosName` are now being honoured when generating for reference data.
 - *Enhancement:* A new `Entity.OmitEntityBase` attribute is now supported in the code-generation to omit the output of the `EntityBase` inherited capabilities.

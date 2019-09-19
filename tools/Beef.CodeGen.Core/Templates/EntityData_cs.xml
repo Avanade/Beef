@@ -140,7 +140,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[        private Func<IQueryable<{{Entity.EntityName}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
-              <![CDATA[        private Func<IQueryable<{{Entity.EntityName}}>]]>
+              <![CDATA[        private Func<IQueryable<{{Entity.CosmosEntity}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[        private Func<IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
@@ -158,7 +158,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[, IODataArgs, IQueryable<{{Entity.EntityName}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
-              <![CDATA[, ICosmosDbArgs, IQueryable<{{Entity.EntityName}}>]]>
+              <![CDATA[, ICosmosDbArgs, IQueryable<{{Entity.CosmosEntity}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[, IEfDbArgs, IQueryable<{{Entity.EntityFrameworkEntity}}>]]>

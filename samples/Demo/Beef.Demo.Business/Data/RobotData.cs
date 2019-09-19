@@ -11,11 +11,11 @@ namespace Beef.Demo.Business.Data
             _getByArgsOnQuery = GetByArgsOnQuery;
         }
 
-        private IQueryable<Robot> GetByArgsOnQuery(IQueryable<Robot> q, RobotArgs args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Robot> GetByArgsOnQuery(IQueryable<Model.Robot> q, RobotArgs args, ICosmosDbArgs dbArgs)
         {
             q = q.WhereWildcard(x => x.ModelNo, args?.ModelNo);
             q = q.WhereWildcard(x => x.SerialNo, args?.SerialNo);
-            q = q.WhereWith(args?.PowerSources, x => args.PowerSources.ToCodeList().Contains(x.PowerSourceSid));
+            q = q.WhereWith(args?.PowerSources, x => args.PowerSources.ToCodeList().Contains(x.PowerSource));
             return q.OrderBy(x => x.SerialNo);
         }
     }

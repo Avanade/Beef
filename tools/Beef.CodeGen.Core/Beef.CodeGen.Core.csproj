@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>2.1.11</Version>
+    <Version>2.1.12</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -14,8 +14,8 @@
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <AssemblyVersion>2.1.11</AssemblyVersion>
-    <FileVersion>2.1.11</FileVersion>
+    <AssemblyVersion>2.1.12</AssemblyVersion>
+    <FileVersion>2.1.12</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
@@ -34,6 +34,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\DataModelOnly.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Resources\SelectTableAlwaysGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableAndColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableForeignKeys.sql" />
@@ -42,6 +46,7 @@
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
     <EmbeddedResource Include="Scripts\Database.xml" />
     <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
+    <EmbeddedResource Include="Scripts\DataModelOnly.xml" />
     <EmbeddedResource Include="Scripts\EntityOnly.xml" />
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
