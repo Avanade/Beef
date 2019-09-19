@@ -165,7 +165,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
-        [JsonProperty("_etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="ETag")]
         public string ETag
         {

@@ -16,7 +16,8 @@ namespace Beef.CodeGen
             Entity = 1,
             Database = 2,
             RefData = 4,
-            All = Entity | Database | RefData
+            DataModel = 8,
+            All = Entity | Database | RefData | DataModel
         }
 
         /// <summary>
@@ -25,14 +26,19 @@ namespace Beef.CodeGen
         public static string EntityFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.xml";
 
         /// <summary>
-        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
+        /// Gets or sets the <see cref="CommandType.Database"/> filename template.
         /// </summary>
         public static string DatabaseFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.Database.xml";
 
         /// <summary>
-        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
+        /// Gets or sets the <see cref="CommandType.RefData"/> filename template.
         /// </summary>
         public static string RefDataFileNameTemplate { get; set; } = "{{Company}}.RefData.xml";
+
+        /// <summary>
+        /// Gets or sets the <see cref="CommandType.DataModel"/> filename template.
+        /// </summary>
+        public static string DataModelFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.DataModel.xml";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
@@ -51,6 +57,12 @@ namespace Beef.CodeGen
         /// </summary>
         public static string RefDataCommandLineTemplate { get; set; }
             = "-s RefDataCoreCrud.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+
+        /// <summary>
+        /// Gets or sets the <see cref="CommandType.DataModel"/> command line template.
+        /// </summary>
+        public static string DataModelCommandLineTemplate { get; set; }
+            = "-s DataModelOnly.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="Assembly"/> portion command line template.
@@ -132,7 +144,7 @@ namespace Beef.CodeGen
         public bool IsEntitySupported { get; set; } = true;
 
         /// <summary>
-        /// Indicates whether <see cref="CommandType.Database"/> is supported (defaults to <c>true</c>).
+        /// Indicates whether <see cref="CommandType.Database"/> is supported (defaults to <c>false</c>).
         /// </summary>
         public bool IsDatabaseSupported { get; set; } = false;
 
@@ -142,17 +154,24 @@ namespace Beef.CodeGen
         public bool IsRefDataSupported { get; set; } = false;
 
         /// <summary>
+        /// Indicates whether <see cref="CommandType.DataModel"/> is supported (defaults to <c>false</c>).
+        /// </summary>
+        public bool IsDataModelSupported { get; set; } = false;
+
+        /// <summary>
         /// Sets the <see cref="IsEntitySupported"/>, <see cref="IsDatabaseSupported"/> and <see cref="IsRefDataSupported"/> options.
         /// </summary>
-        /// <param name="entity">Indicates where the entity code generation should take place.</param>
-        /// <param name="database">Indicates where the database generation should take place.</param>
-        /// <param name="refData">Indicates where the reference data generation should take place.</param>
+        /// <param name="entity">Indicates whether the entity code generation should take place.</param>
+        /// <param name="database">Indicates whether the database generation should take place.</param>
+        /// <param name="refData">Indicates whether the reference data generation should take place.</param>
+        /// <param name="dataModel">Indicates whether the data model generation should take place.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> to support method chaining/fluent style.</returns>
-        public CodeGenConsoleWrapper Supports(bool entity = true, bool database = false, bool refData = false)
+        public CodeGenConsoleWrapper Supports(bool entity = true, bool database = false, bool refData = false, bool dataModel = false)
         {
             IsEntitySupported = entity;
             IsDatabaseSupported = database;
             IsRefDataSupported = refData;
+            IsDataModelSupported = dataModel;
             return this;
         }
 
@@ -176,6 +195,7 @@ namespace Beef.CodeGen
             var entityFileName = EntityFileNameTemplate;
             var databaseFileName = DatabaseFileNameTemplate;
             var refDataFileName = RefDataFileNameTemplate;
+            var dataModelFileName = DataModelFileNameTemplate;
 
             app.OnExecute(() =>
             {
@@ -185,7 +205,7 @@ namespace Beef.CodeGen
                     if (ct == CommandType.All)
                         throw new CommandParsingException(app, "Command 'All' is not compatible with --xml; the command must be more specific when using a configuration XML file.");
 
-                    entityFileName = databaseFileName = refDataFileName = cx.Value();
+                    entityFileName = databaseFileName = refDataFileName = dataModelFileName = cx.Value();
                 }
 
                 var rc = 0;
@@ -197,6 +217,9 @@ namespace Beef.CodeGen
 
                 if (IsEntitySupported && ct.HasFlag(CommandType.Entity))
                     rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(entityFileName + " " + EntityCommandLineTemplate)));
+
+                if (IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
+                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(dataModelFileName + " " + DataModelCommandLineTemplate)));
             });
 
             try
@@ -229,7 +252,7 @@ namespace Beef.CodeGen
             if (Assemblies == null)
                 return text;
 
-            Assemblies.ForEach(a => text = text + CommandLineAssemblyTemplate.Replace("{{Assembly}}", a.FullName, StringComparison.OrdinalIgnoreCase));
+            Assemblies.ForEach(a => text += CommandLineAssemblyTemplate.Replace("{{Assembly}}", a.FullName, StringComparison.OrdinalIgnoreCase));
             return text;
         }
     }

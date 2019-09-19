@@ -234,7 +234,7 @@ namespace Beef.CodeGen
                 ScriptFile = new FileInfo(_scriptOpt.Value()),
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
-                Assemblies = _assemblies,
+                Assemblies = _assembliesOpt.HasValue() ? ((AssemblyValidator)_assembliesOpt.Validators.First()).Assemblies : _assemblies,
                 Parameters = CreateParamDict(_paramsOpt)
             };
 

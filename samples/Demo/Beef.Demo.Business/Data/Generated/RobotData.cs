@@ -42,7 +42,7 @@ namespace Beef.Demo.Business.Data
         private Func<Guid, Task> _deleteOnAfterAsync = null;
         private Action<Exception> _deleteOnException = null;
 
-        private Func<IQueryable<Robot>, RobotArgs, ICosmosDbArgs, IQueryable<Robot>> _getByArgsOnQuery = null;
+        private Func<IQueryable<Model.Robot>, RobotArgs, ICosmosDbArgs, IQueryable<Model.Robot>> _getByArgsOnQuery = null;
         private Func<RobotArgs, ICosmosDbArgs, Task> _getByArgsOnBeforeAsync = null;
         private Func<RobotCollectionResult, RobotArgs, Task> _getByArgsOnAfterAsync = null;
         private Action<Exception> _getByArgsOnException = null;
@@ -144,9 +144,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Robot"/> entity and Cosmos <see cref="Robot"/> property mapping.
+        /// Provides the <see cref="Robot"/> entity and Cosmos <see cref="Model.Robot"/> property mapping.
         /// </summary>
-        public partial class CosmosMapper : CosmosDbMapper<Robot, Robot, CosmosMapper>
+        public partial class CosmosMapper : CosmosDbMapper<Robot, Model.Robot, CosmosMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
@@ -156,8 +156,8 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Id, d => d.Id).SetUniqueKey(true);
                 Property(s => s.ModelNo, d => d.ModelNo);
                 Property(s => s.SerialNo, d => d.SerialNo);
-                Property(s => s.EyeColorSid, d => d.EyeColorSid);
-                Property(s => s.PowerSourceSid, d => d.PowerSourceSid);
+                Property(s => s.EyeColorSid, d => d.EyeColor);
+                Property(s => s.PowerSourceSid, d => d.PowerSource);
                 AddStandardProperties();
                 CosmosMapperCtor();
             }
