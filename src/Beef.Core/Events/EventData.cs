@@ -89,6 +89,10 @@ namespace Beef.Events
                     ed.Key = gi;
                     break;
 
+                case IStringIdentifier si:
+                    ed.Key = si;
+                    break;
+
                 case IUniqueKey uk:
                     if (uk.HasUniqueKey)
                         ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
@@ -202,6 +206,7 @@ namespace Beef.Events
         public T Value
         {
             get => _value;
+
             set
             {
                 _value = value;
