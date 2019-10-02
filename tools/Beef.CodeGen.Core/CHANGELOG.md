@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.13
+- *Fixed:* Code-gen of `Entity.cs` outputs incorrect `using` statement when `EntityScope="Business"` is used.
+
 ## v2.1.12
 - *Added:* New `DataModel` code generation support has been added to enable the specification and generation of back-end only data model entities.
 

@@ -46,13 +46,7 @@ using Beef.Entities;
       <Then>
         <If Condition="Config.EntityUsing == null or Config.EntityUsing == 'Common' or Config.EntityUsing == 'All'">
           <If Condition="Entity.EntityScope == 'Business'">
-            <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Common;
-]]>
-          </If>
-        </If>
-        <If Condition="Config.EntityUsing == 'Business' or Config.EntityUsing == 'All'">
-          <If Condition="Entity.EntityScope == 'Common'">
-            <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Business;
+            <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Common.Entities;
 ]]>
           </If>
         </If>
