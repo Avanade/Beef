@@ -3,7 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v2.1.17
-- *Added:* 
+- *Added:* New `Beef.Event.Subscribe` namespace added to enable the base capabilities for the subscription of events.
 
 ## v2.1.16
 - *Added:* The `ReferenceDataSidList` has had a new method `ToCodeList` to get the list of codes added.
@@ -12,7 +12,6 @@ Represents the **NuGet** versions.
 - *Fixed:* `TypeReflector.GetProperty` fixed to ensure only single named get/set property returned.
 - *Added:* `ChangeLogMapper` added to ensure consistency mapping `ChangeLog` entity; specifically, the `Created*` and `Updated*` properties for the corresponding mapping operation type.
 - *Fixed:* `EntityMapper` had a number of fixes made.
-
 
 ## v2.1.15
 - *Fixed:* An `ExecutionContext.Username` get will return `Environment.UserName` as a default where not overridden to ensure a valid value is returned.

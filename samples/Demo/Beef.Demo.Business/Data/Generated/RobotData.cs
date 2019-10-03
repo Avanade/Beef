@@ -26,26 +26,26 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private Func<Guid, ICosmosDbArgs, Task> _getOnBeforeAsync = null;
-        private Func<Robot, Guid, Task> _getOnAfterAsync = null;
-        private Action<Exception> _getOnException = null;
+        private readonly Func<Guid, ICosmosDbArgs, Task> _getOnBeforeAsync = null;
+        private readonly Func<Robot, Guid, Task> _getOnAfterAsync = null;
+        private readonly Action<Exception> _getOnException = null;
 
-        private Func<Robot, ICosmosDbArgs, Task> _createOnBeforeAsync = null;
-        private Func<Robot, Task> _createOnAfterAsync = null;
-        private Action<Exception> _createOnException = null;
+        private readonly Func<Robot, ICosmosDbArgs, Task> _createOnBeforeAsync = null;
+        private readonly Func<Robot, Task> _createOnAfterAsync = null;
+        private readonly Action<Exception> _createOnException = null;
 
-        private Func<Robot, ICosmosDbArgs, Task> _updateOnBeforeAsync = null;
-        private Func<Robot, Task> _updateOnAfterAsync = null;
-        private Action<Exception> _updateOnException = null;
+        private readonly Func<Robot, ICosmosDbArgs, Task> _updateOnBeforeAsync = null;
+        private readonly Func<Robot, Task> _updateOnAfterAsync = null;
+        private readonly Action<Exception> _updateOnException = null;
 
-        private Func<Guid, ICosmosDbArgs, Task> _deleteOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteOnAfterAsync = null;
-        private Action<Exception> _deleteOnException = null;
+        private readonly Func<Guid, ICosmosDbArgs, Task> _deleteOnBeforeAsync = null;
+        private readonly Func<Guid, Task> _deleteOnAfterAsync = null;
+        private readonly Action<Exception> _deleteOnException = null;
 
-        private Func<IQueryable<Model.Robot>, RobotArgs, ICosmosDbArgs, IQueryable<Model.Robot>> _getByArgsOnQuery = null;
-        private Func<RobotArgs, ICosmosDbArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<RobotCollectionResult, RobotArgs, Task> _getByArgsOnAfterAsync = null;
-        private Action<Exception> _getByArgsOnException = null;
+        private readonly Func<IQueryable<Model.Robot>, RobotArgs, ICosmosDbArgs, IQueryable<Model.Robot>> _getByArgsOnQuery = null;
+        private readonly Func<RobotArgs, ICosmosDbArgs, Task> _getByArgsOnBeforeAsync = null;
+        private readonly Func<RobotCollectionResult, RobotArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Action<Exception> _getByArgsOnException = null;
 
         #endregion
 

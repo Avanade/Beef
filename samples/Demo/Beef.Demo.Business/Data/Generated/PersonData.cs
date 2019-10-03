@@ -26,67 +26,67 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private Func<Person, IDatabaseArgs, Task> _createOnBeforeAsync = null;
-        private Func<Person, Task> _createOnAfterAsync = null;
-        private Action<Exception> _createOnException = null;
+        private readonly Func<Person, IDatabaseArgs, Task> _createOnBeforeAsync = null;
+        private readonly Func<Person, Task> _createOnAfterAsync = null;
+        private readonly Action<Exception> _createOnException = null;
 
-        private Func<Guid, IDatabaseArgs, Task> _deleteOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteOnAfterAsync = null;
-        private Action<Exception> _deleteOnException = null;
+        private readonly Func<Guid, IDatabaseArgs, Task> _deleteOnBeforeAsync = null;
+        private readonly Func<Guid, Task> _deleteOnAfterAsync = null;
+        private readonly Action<Exception> _deleteOnException = null;
 
-        private Func<Guid, IDatabaseArgs, Task> _getOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _getOnAfterAsync = null;
-        private Action<Exception> _getOnException = null;
+        private readonly Func<Guid, IDatabaseArgs, Task> _getOnBeforeAsync = null;
+        private readonly Func<Person, Guid, Task> _getOnAfterAsync = null;
+        private readonly Action<Exception> _getOnException = null;
 
-        private Func<Person, IDatabaseArgs, Task> _updateOnBeforeAsync = null;
-        private Func<Person, Task> _updateOnAfterAsync = null;
-        private Action<Exception> _updateOnException = null;
+        private readonly Func<Person, IDatabaseArgs, Task> _updateOnBeforeAsync = null;
+        private readonly Func<Person, Task> _updateOnAfterAsync = null;
+        private readonly Action<Exception> _updateOnException = null;
 
-        private Action<DatabaseParameters, IDatabaseArgs> _getAllOnQuery = null;
-        private Func<IDatabaseArgs, Task> _getAllOnBeforeAsync = null;
-        private Func<PersonCollectionResult, Task> _getAllOnAfterAsync = null;
-        private Action<Exception> _getAllOnException = null;
+        private readonly Action<DatabaseParameters, IDatabaseArgs> _getAllOnQuery = null;
+        private readonly Func<IDatabaseArgs, Task> _getAllOnBeforeAsync = null;
+        private readonly Func<PersonCollectionResult, Task> _getAllOnAfterAsync = null;
+        private readonly Action<Exception> _getAllOnException = null;
 
-        private Action<DatabaseParameters, IDatabaseArgs> _getAll2OnQuery = null;
-        private Func<IDatabaseArgs, Task> _getAll2OnBeforeAsync = null;
-        private Func<PersonCollectionResult, Task> _getAll2OnAfterAsync = null;
-        private Action<Exception> _getAll2OnException = null;
+        private readonly Action<DatabaseParameters, IDatabaseArgs> _getAll2OnQuery = null;
+        private readonly Func<IDatabaseArgs, Task> _getAll2OnBeforeAsync = null;
+        private readonly Func<PersonCollectionResult, Task> _getAll2OnAfterAsync = null;
+        private readonly Action<Exception> _getAll2OnException = null;
 
-        private Action<DatabaseParameters, PersonArgs, IDatabaseArgs> _getByArgsOnQuery = null;
-        private Func<PersonArgs, IDatabaseArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<PersonCollectionResult, PersonArgs, Task> _getByArgsOnAfterAsync = null;
-        private Action<Exception> _getByArgsOnException = null;
+        private readonly Action<DatabaseParameters, PersonArgs, IDatabaseArgs> _getByArgsOnQuery = null;
+        private readonly Func<PersonArgs, IDatabaseArgs, Task> _getByArgsOnBeforeAsync = null;
+        private readonly Func<PersonCollectionResult, PersonArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Action<Exception> _getByArgsOnException = null;
 
-        private Action<Exception> _getDetailByArgsOnException = null;
+        private readonly Action<Exception> _getDetailByArgsOnException = null;
 
-        private Action<Exception> _mergeOnException = null;
+        private readonly Action<Exception> _mergeOnException = null;
 
-        private Action<Exception> _markOnException = null;
+        private readonly Action<Exception> _markOnException = null;
 
-        private Action<Exception> _getDetailOnException = null;
+        private readonly Action<Exception> _getDetailOnException = null;
 
-        private Action<Exception> _updateDetailOnException = null;
+        private readonly Action<Exception> _updateDetailOnException = null;
 
-        private Func<IQueryable<EfModel.Person>, PersonArgs, IEfDbArgs, IQueryable<EfModel.Person>> _getByArgsWithEfOnQuery = null;
-        private Func<PersonArgs, IEfDbArgs, Task> _getByArgsWithEfOnBeforeAsync = null;
-        private Func<PersonCollectionResult, PersonArgs, Task> _getByArgsWithEfOnAfterAsync = null;
-        private Action<Exception> _getByArgsWithEfOnException = null;
+        private readonly Func<IQueryable<EfModel.Person>, PersonArgs, IEfDbArgs, IQueryable<EfModel.Person>> _getByArgsWithEfOnQuery = null;
+        private readonly Func<PersonArgs, IEfDbArgs, Task> _getByArgsWithEfOnBeforeAsync = null;
+        private readonly Func<PersonCollectionResult, PersonArgs, Task> _getByArgsWithEfOnAfterAsync = null;
+        private readonly Action<Exception> _getByArgsWithEfOnException = null;
 
-        private Func<Guid, IEfDbArgs, Task> _getWithEfOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _getWithEfOnAfterAsync = null;
-        private Action<Exception> _getWithEfOnException = null;
+        private readonly Func<Guid, IEfDbArgs, Task> _getWithEfOnBeforeAsync = null;
+        private readonly Func<Person, Guid, Task> _getWithEfOnAfterAsync = null;
+        private readonly Action<Exception> _getWithEfOnException = null;
 
-        private Func<Person, IEfDbArgs, Task> _createWithEfOnBeforeAsync = null;
-        private Func<Person, Task> _createWithEfOnAfterAsync = null;
-        private Action<Exception> _createWithEfOnException = null;
+        private readonly Func<Person, IEfDbArgs, Task> _createWithEfOnBeforeAsync = null;
+        private readonly Func<Person, Task> _createWithEfOnAfterAsync = null;
+        private readonly Action<Exception> _createWithEfOnException = null;
 
-        private Func<Person, IEfDbArgs, Task> _updateWithEfOnBeforeAsync = null;
-        private Func<Person, Task> _updateWithEfOnAfterAsync = null;
-        private Action<Exception> _updateWithEfOnException = null;
+        private readonly Func<Person, IEfDbArgs, Task> _updateWithEfOnBeforeAsync = null;
+        private readonly Func<Person, Task> _updateWithEfOnAfterAsync = null;
+        private readonly Action<Exception> _updateWithEfOnException = null;
 
-        private Func<Guid, IEfDbArgs, Task> _deleteWithEfOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteWithEfOnAfterAsync = null;
-        private Action<Exception> _deleteWithEfOnException = null;
+        private readonly Func<Guid, IEfDbArgs, Task> _deleteWithEfOnBeforeAsync = null;
+        private readonly Func<Guid, Task> _deleteWithEfOnAfterAsync = null;
+        private readonly Action<Exception> _deleteWithEfOnException = null;
 
         #endregion
 
