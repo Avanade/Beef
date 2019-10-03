@@ -731,7 +731,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
                 <![CDATA[__result.Result = {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="System.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).Query(q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
@@ -741,13 +741,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                 <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="System.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).{{Operation.OperationType}}Async(value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
                 <![CDATA[await {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="System.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).DeleteAsync(]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
