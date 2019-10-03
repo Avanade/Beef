@@ -14,11 +14,11 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventSubscriberBase"/> class.
         /// </summary>
         /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="action">The <see cref="EventData.Action"/>; where <b>null</b> this indicates all.</param>
-        protected EventSubscriberBase(string subjectTemplate, string action = null)
+        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
+        protected EventSubscriberBase(string subjectTemplate, params string[] actions)
         {
             SubjectTemplate = Check.NotEmpty(subjectTemplate, nameof(subjectTemplate));
-            Action = action;
+            Actions = actions;
         }
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace Beef.Events.Subscribe
         public string SubjectTemplate { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="EventData.Action"/>; where <b>null</b> this indicates all.
+        /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
         /// </summary>
-        public string Action { get; private set; }
+        public string[] Actions { get; private set; }
 
         /// <summary>
         /// Determines the <see cref="Subscribe.RunAsUser"/>; defaults to <see cref="RunAsUser.Originating"/>.
@@ -63,8 +63,8 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventSubscriber"/> class.
         /// </summary>
         /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="action">The <see cref="EventData.Action"/>; where <b>null</b> this indicates all.</param>
-        public EventSubscriber(string subjectTemplate, string action = null) : base(subjectTemplate, action) { }
+        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
+        public EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
 
         /// <summary>
         /// Gets the value <see cref="Type"/>; always <c>null</c> as there will not be one.
@@ -89,8 +89,8 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventSubscriber"/> class.
         /// </summary>
         /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="action">The <see cref="EventData.Action"/>; where <b>null</b> this indicates all.</param>
-        public EventSubscriber(string subjectTemplate, string action = null) : base(subjectTemplate, action) { }
+        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
+        public EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
 
         /// <summary>
         /// Gets the value <see cref="Type"/>.

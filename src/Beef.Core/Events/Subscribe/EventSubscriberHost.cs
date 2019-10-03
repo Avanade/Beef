@@ -42,9 +42,11 @@ namespace Beef.Events.Subscribe
         /// <returns>The <see cref="Task"/>.</returns>
         protected async Task ReceiveAsync(string subject, string action, Func<EventData> getEventData)
         {
-            // Match a subscriber to the subject + template.
-            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (action == null || StringComparer.InvariantCultureIgnoreCase.Compare(r.Action, action) == 0)).ToArray();
-            var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject `{subject}` and Action '{action}'; there can be no more than 1 subscriber.");
+            Check.NotEmpty(subject, nameof(subject));
+
+            // Match a subscriber to the subject + template supplied.
+            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Length == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
+            var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
             if (subscriber == null)
                 return;
 

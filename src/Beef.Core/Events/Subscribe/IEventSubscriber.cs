@@ -16,9 +16,9 @@ namespace Beef.Events.Subscribe
         string SubjectTemplate { get; }
 
         /// <summary>
-        /// Gets the <see cref="Beef.Events.EventData.Action"/>; where <b>null</b> this indicates all.
+        /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
         /// </summary>
-        string Action { get; }
+        string[] Actions { get; }
 
         /// <summary>
         /// Gets the <see cref="RunAsUser"/> option.

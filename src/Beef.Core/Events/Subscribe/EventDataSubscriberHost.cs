@@ -10,10 +10,17 @@ namespace Beef.Events.Subscribe
     public class EventDataSubscriberHost : EventSubscriberHost
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventSubscriberHost"/>.
+        /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="args"/>.
         /// </summary>
         /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
-        public EventDataSubscriberHost(EventSubscriberHostArgs args = null) : base(args) { }
+        /// <returns>The <see cref="EventDataSubscriberHost"/>.</returns>
+        public static EventDataSubscriberHost Create(EventSubscriberHostArgs args = null) => new EventDataSubscriberHost(args);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
+        /// </summary>
+        /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
+        private EventDataSubscriberHost(EventSubscriberHostArgs args = null) : base(args) { }
 
         /// <summary>
         /// Indicates that multiple messages (<see cref="EventData"/>) can be processed.
@@ -35,7 +42,7 @@ namespace Beef.Events.Subscribe
                 return;
 
             if (events.Length != 1 && !AreMultipleMessagesSupported)
-                throw new EventSubscriberException($"The {nameof(EventDataSubscriberHost)} does not AllowMultipleMessages; the collection contains '{events.Length}' events.");
+                throw new EventSubscriberException($"The {nameof(EventDataSubscriberHost)} does not AllowMultipleMessages; there were {events.Length} event messages.");
 
             foreach (var @event in events)
             {
