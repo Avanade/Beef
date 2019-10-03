@@ -101,7 +101,7 @@
     <Property Name="ETag" ArgumentName="etag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" />
 
-    <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="" >
+    <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
       <Parameter Name="Args" Type="RobotArgs" Validator="RobotArgsValidator" />
     </Operation>
   </Entity>

@@ -134,16 +134,20 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           </If>
           <If Condition="Operation.OperationType == 'GetColl'">
             <If Condition="System.AutoImplement == 'Database'">
-              <![CDATA[        private Action<DatabaseParameters]]>
+              <![CDATA[        private readonly Action<DatabaseParameters]]>
             </If>
             <If Condition="System.AutoImplement == 'OData'">
-              <![CDATA[        private Func<IQueryable<{{Entity.EntityName}}>]]>
+              <![CDATA[        private readonly Func<IQueryable<{{Entity.EntityName}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
-              <![CDATA[        private Func<IQueryable<{{Entity.CosmosEntity}}>]]>
+              <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
+              <If Condition="System.DataCosmosValueContainer == true">
+                <Then><![CDATA[        private readonly Func<IQueryable<CosmosDbValue<{{Entity.CosmosEntity}}>>]]></Then>
+                <Else><![CDATA[        private readonly Func<IQueryable<{{Entity.CosmosEntity}}>]]></Else>
+              </If>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
-              <![CDATA[        private Func<IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
+              <![CDATA[        private readonly Func<IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
             </If>
             <Parameter Condition="Parameter.LayerPassing == 'All'">
               <![CDATA[, {{Parameter.Type}}]]>
@@ -158,7 +162,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[, IODataArgs, IQueryable<{{Entity.EntityName}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
-              <![CDATA[, ICosmosDbArgs, IQueryable<{{Entity.CosmosEntity}}>]]>
+              <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
+              <If Condition="System.DataCosmosValueContainer == true">
+                <Then><![CDATA[, ICosmosDbArgs, IQueryable<CosmosDbValue<{{Entity.CosmosEntity}}>>]]></Then>
+                <Else><![CDATA[, ICosmosDbArgs, IQueryable<{{Entity.CosmosEntity}}>]]></Else>
+              </If>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[, IEfDbArgs, IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
@@ -166,7 +174,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <![CDATA[> {{Operation.PrivateName}}OnQuery = null;
 ]]>
           </If>
-          <![CDATA[        private Func<]]>
+          <![CDATA[        private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -200,7 +208,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <![CDATA[IEfDbArgs, ]]>
           </If>
           <![CDATA[Task> {{Operation.PrivateName}}OnBeforeAsync = null;
-        private Func<]]>
+        private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -244,7 +252,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[
 ]]>
         </If>
-        <![CDATA[        private Action<Exception> {{Operation.PrivateName}}OnException = null;
+        <![CDATA[        private readonly Action<Exception> {{Operation.PrivateName}}OnException = null;
 ]]>
       </Operation>
       <If Condition="System.EndRegion == true">
@@ -698,9 +706,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <If Condition="System.AutoImplement == 'Cosmos'">
               <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
               <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
+              <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
               <If Condition="Operation.OperationType == 'Get'">
                 <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="System.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).GetAsync(]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
@@ -722,7 +731,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
                 <![CDATA[__result.Result = {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).Query(q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
@@ -732,13 +741,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                 <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).{{Operation.OperationType}}Async(value);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
                 <![CDATA[await {{System.CosmosName}}.Default.]]>
-                <If Condition="Operation.CosmosValueContainer == true"><![CDATA[Value]]></If>
+                <If Condition="Operation.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
                 <![CDATA[Container(__dataArgs).DeleteAsync(]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
