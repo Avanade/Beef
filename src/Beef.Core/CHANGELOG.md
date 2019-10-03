@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.17
+- *Added:* 
+
 ## v2.1.16
 - *Added:* The `ReferenceDataSidList` has had a new method `ToCodeList` to get the list of codes added.
 - *Added:* A new extenstion method `IQueryable.WhereWith` added to simply the specification of a where clause when the `with` value is not the `default`.

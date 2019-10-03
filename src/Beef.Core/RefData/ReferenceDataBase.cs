@@ -16,7 +16,7 @@ namespace Beef.RefData
     /// <remarks>For equality and comparision checking the <see cref="Id"/> and <see cref="Code"/> combination is used.</remarks>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, Active = {IsActive}, IsValid = {IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
-    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IETag, IChangeLog, IIdentifier
+    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IETag, IChangeLog, IIdentifier
     {
         #region RefDataKey
 
@@ -700,6 +700,135 @@ namespace Beef.RefData
         {
             return string.Format(stringFormat, Id, Code, Text);
         }
+
+        #endregion
+
+        #region IConvertible
+
+        /// <summary>
+        /// Gets the <see cref="TypeCode"/> being <see cref="TypeCode.Object"/>.
+        /// </summary>
+        /// <returns>The <see cref="TypeCode.Object"/> value.</returns>
+        TypeCode IConvertible.GetTypeCode() => TypeCode.Object;
+
+        /// <summary>
+        /// Converts the value to a <see cref="bool"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        bool IConvertible.ToBoolean(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="byte"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        byte IConvertible.ToByte(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="char"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        char IConvertible.ToChar(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="DateTime"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        DateTime IConvertible.ToDateTime(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="decimal"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        decimal IConvertible.ToDecimal(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="double"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        double IConvertible.ToDouble(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="short"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        short IConvertible.ToInt16(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="int"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        int IConvertible.ToInt32(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="long"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        long IConvertible.ToInt64(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="sbyte"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        sbyte IConvertible.ToSByte(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="float"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        float IConvertible.ToSingle(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="string"/>; returns the <see cref="Code"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>The <see cref="Code"/>.</returns>
+        string IConvertible.ToString(IFormatProvider provider) => Code;
+
+        /// <summary>
+        /// Converts the value to an <see cref="object"/> of the specified <see cref="Type"/> that has an equivalent value.
+        /// </summary>
+        /// <param name="conversionType">The <see cref="Type"/> to which the value of this instance is converted.</param>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>The converted value.</returns>
+        object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+        {
+            if (conversionType == typeof(string))
+                return Code;
+
+            throw new InvalidCastException();
+        }
+
+        /// <summary>
+        /// Converts the value to a <see cref="ushort"/>; throws a <see crefconvert="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        ushort IConvertible.ToUInt16(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="uint"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        uint IConvertible.ToUInt32(IFormatProvider provider) => throw new InvalidCastException();
+
+        /// <summary>
+        /// Converts the value to a <see cref="ulong"/>; throws a <see cref="InvalidCastException"/>.
+        /// </summary>
+        /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
+        /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
+        ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException();
 
         #endregion
 
