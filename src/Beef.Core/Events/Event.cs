@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Beef.Events
 {
     /// <summary>
-    /// Provides the standardised <b>Event</b> processing.
+    /// Provides the standardised <b>Event</b> processing/publishing.
     /// </summary>
     public static class Event
     {
@@ -25,7 +25,8 @@ namespace Beef.Events
         public const string TemplateWildcard = "*";
 
         /// <summary>
-        /// Creates a subject from the <paramref name="template"/> replacing any '{key}' (where {key} enclosed by curly brackets is the corresponding value from the <b>KeyValuePair</b>) placeholders with the corresponding value found within the <paramref name="keyValuePairs"/>.
+        /// Creates a subject from the <paramref name="template"/> replacing any '{key}' placeholders with the corresponding value found within the <paramref name="keyValuePairs"/>;
+        /// where {key} enclosed by curly brackets is the corresponding value from the <paramref name="keyValuePairs"/>.
         /// </summary>
         /// <param name="template">The subject template.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>

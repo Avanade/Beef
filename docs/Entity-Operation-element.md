@@ -53,6 +53,7 @@ Attribute | Description
 `AutoImplement` | Indicates whether the data logic for the operation is to be auto-implemented. The corresponding `Entity.AutoImplement` must be defined for this to enacted. Auto-implementation is applicable for all `OperationType` values with the exception of `Custom`.
 `DatabaseStoredProc` | Specifies the database stored procedure. Used where the	`Entity.AutoImplement` is `Database` and `Operation.AutoImplement` is `true`. Defaults to `sp + Entity.Name + Operation.Name`; e.g. `spPersonCreate`.
 `DataEntityMapper` | Overrides the data mapper class name.
+`DataCosmosValueContainer` | Indicates that the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer` (default). Overrides the `Entity.CosmosValueContainer` value.
 
 <br>
 
