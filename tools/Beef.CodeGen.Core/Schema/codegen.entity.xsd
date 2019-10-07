@@ -972,7 +972,7 @@
                 <xs:documentation>Indicates that a custom Cosmos Mapper will be created (not generated); otherwise, will be automatically generated.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="DataCosmosInheritsFrom" type="xs:string" use="optional">
+            <xs:attribute name="DataCosmosMapperInheritsFrom" type="xs:string" use="optional">
               <xs:annotation>
                 <xs:documentation>Specifies the mapper that the generated Cosmos mapper inherits from.</xs:documentation>
               </xs:annotation>

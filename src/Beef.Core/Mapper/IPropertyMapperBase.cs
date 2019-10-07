@@ -25,6 +25,11 @@ namespace Beef.Mapper
         string DestPropertyName { get; }
 
         /// <summary>
+        /// Gets the destination property <see cref="Type"/>.
+        /// </summary>
+        Type DestPropertyType { get; }
+
+        /// <summary>
         /// Indicates whether the property forms part of the unique (primary) key. 
         /// </summary>
         bool IsUniqueKey { get; }

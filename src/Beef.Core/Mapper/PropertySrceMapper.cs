@@ -78,6 +78,11 @@ namespace Beef.Mapper
         public Type SrcePropertyType => typeof(TSrceProperty);
 
         /// <summary>
+        /// Gets the destination property <see cref="Type"/>.
+        /// </summary>
+        Type IPropertyMapperBase.DestPropertyType => null;
+
+        /// <summary>
         /// Gets the destination property name.
         /// </summary>
         string IPropertyMapperBase.DestPropertyName => null;

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.15
+- *Fixed:* Code-gen `Entity.DataCosmosMapperInheritsFrom` not generating correctly.
+
 ## v2.1.14
 - *Fixed:* Code-gen `Entity.DataCosmosValueContainer` not generating correctly. Added support for `Operation.DataCosmosValueContainer` to override.
 - *Fixed:* Code-gen for the private `Data` variables are now `readonly` as they are only intended for update within the constructor. Will remove corresponding compiler warnings.

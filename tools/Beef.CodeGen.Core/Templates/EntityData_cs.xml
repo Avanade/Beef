@@ -1140,7 +1140,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             {
 ]]>
         <If Condition="Entity.DataCosmosMapperInheritsFrom != null">
-          <![CDATA[                InheritPropertiesFrom({{Entity.DataDatabaseMapperInheritsFrom}}.Default);
+          <![CDATA[                InheritPropertiesFrom({{Entity.DataCosmosMapperInheritsFrom}}.Default);
 ]]>
         </If>
         <Property Condition="Property.DataCosmosIgnore == false and Property.Name != 'ETag' and Property.Name != 'ChangeLog'">

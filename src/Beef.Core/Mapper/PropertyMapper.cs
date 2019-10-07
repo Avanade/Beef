@@ -194,6 +194,11 @@ namespace Beef.Mapper
         public Type SrcePropertyType => typeof(TSrceProperty);
 
         /// <summary>
+        /// Gets the destination property <see cref="Type"/>.
+        /// </summary>
+        public Type DestPropertyType => typeof(TDestProperty);
+
+        /// <summary>
         /// Gets the underlying source property <see cref="Type"/> allowing for nullables.
         /// </summary>
         protected Type SrceUnderlyingPropertyType { get; } = Nullable.GetUnderlyingType(typeof(TSrceProperty)) ?? typeof(TSrceProperty);
@@ -574,7 +579,14 @@ namespace Beef.Mapper
                 return (TDestProperty)DestComplexTypeReflector.CreateValue(c);
             }
 
-            throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; consider using a Converter or Mapper.");
+            try
+            {
+                return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Property mapping between types '{SrcePropertyInfo.Name}' and '{DestPropertyInfo.Name}' cannot be performed; consider using a Converter or Mapper.", ex);
+            }
         }
 
         /// <summary>
@@ -676,7 +688,14 @@ namespace Beef.Mapper
                 return (TSrceProperty)SrceComplexTypeReflector.CreateValue(c);
             }
 
-            throw new InvalidOperationException($"Property mapping between types '{DestPropertyInfo.Name}' and '{SrcePropertyInfo.Name}' cannot be performed; consider using a Converter or Mapper.");
+            try
+            {
+                return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidCastException($"Property mapping between types '{DestPropertyInfo.Name}' and '{SrcePropertyInfo.Name}' cannot be performed; consider using a Converter or Mapper.", ex);
+            }
         }
 
         /// <summary>
