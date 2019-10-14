@@ -3,7 +3,7 @@
 namespace Beef.Events.Subscribe
 {
     /// <summary>
-    /// Provides the run as user options.
+    /// Provides the run as user options as either <see cref="Originating"/> or <see cref="System"/>.
     /// </summary>
     public enum RunAsUser
     {

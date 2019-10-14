@@ -17,9 +17,10 @@ namespace Beef.Events.Publish
         private readonly EventHubs.EventHubClient _client;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubPublisher"/> using the specified <see cref="EventHubs.EventHubClient"/>.
+        /// Initializes a new instance of the <see cref="EventHubPublisher"/> using the specified <see cref="EventHubs.EventHubClient"/> (consider setting the underlying
+        /// <see cref="EventHubs.ClientEntity.RetryPolicy"/>) to allow for transient errors).
         /// </summary>
-        /// <param name="client">The <see cref="EventHubs.EventHubClient"/> (consider setting the underlying <see cref="EventHubs.ClientEntity.RetryPolicy"/>.</param>
+        /// <param name="client">The <see cref="EventHubs.EventHubClient"/>.</param>
         public EventHubPublisher(EventHubs.EventHubClient client) => _client = Check.NotNull(client, nameof(client));
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Beef.Events.Publish
         }
 
         /// <summary>
-        /// Gets the partition key (will use <see cref="ExecutionContext.TenantId"/> by default where set; otherwise, will use the JSON-serialized <see cref="EventData.Key"/> of the first event).
+        /// Gets the partition key (will use <see cref="ExecutionContext.TenantId"/> by default where set; otherwise, will use the JSON-serialized <see cref="EventData.Key"/> from the first event).
         /// </summary>
         /// <param name="events">The events that will be published.</param>
         /// <returns>The partition key where determined; otherwise, <c>null</c> for round-robin allocation.</returns>

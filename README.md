@@ -6,7 +6,9 @@
 
 ## Introduction
 
-The _Beef_ framework, and the underlying code generation, has been primarily created to support the **industralisation** of API development - to have software developers focus directly on the **accelerated** delivery of **business value**; with consistently **higher quality** outcomes at an overall **lower cost**.
+The _Beef_ framework, and the underlying code generation, has been primarily created to support the **industralisation** of API development.
+
+> A means to have software developers focus directly on the **accelerated** delivery of **business value**; with consistently **higher quality** outcomes at an overall **lower cost**.
 
 The key industralisation goals are:
 1. **Value** - focus on business value, not on boilerplate
@@ -20,7 +22,7 @@ The key industralisation goals are:
 
 ## Architecture
 
-_Beef_ has been developed to encourage the standardisation and industrialisation of the tiering and layering within the backend services (APIs) of an Application Architecture.
+_Beef_ has been developed to encourage the standardisation and industrialisation of the tiering and layering within the microservices (APIs) of an Application Architecture.
 
 <br/>
 
@@ -78,9 +80,15 @@ Each of the key layers / components above are further detailed (`Xxx` denotes th
 
 ### Event-driven
 
-To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) _Beef_ enables the basic capabilities. Primarily is the integrated support for the **publishing** of events as part of the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure, and must be implemented by the developer.
+To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) _Beef_ enables the key capabilities; the publishing and subscribing of events (messages) to and from an event-stream (or equivalent).
 
-An event receiver is able to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a receiving domain).
+![Layers](./docs/images/EventDrivenArchitecture.png "Event-Driven Architecture")
+
+- **Publish** - the publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer.
+
+- **Subscribe** - a event subscriber is then implemented to listen to events from the underlying event/messaging infrastructure (event-stream) and perform the related action. The event subscriber is encouraged to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a subscribing domain).
+
+The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events) assembly.
 
 <br/>
 
@@ -108,6 +116,7 @@ Assembly | Description | NuGet | Changes
 [`Beef.Data.EntityFrameworkCore`](./src/Beef.Data.EntityFrameworkCore) | Entity Framework (EF) Core framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore.svg)](https://badge.fury.io/nu/Beef.Data.EntityFrameworkCore) | [Log](./src/Beef.Data.EntityFrameworkCore/CHANGELOG.md)
 [`Beef.Data.Cosmos`](./src/Beef.Data.Cosmos) | Cosmos DB execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.Cosmos.svg)](https://badge.fury.io/nu/Beef.Data.Cosmos) | [Log](./src/Beef.Data.Cosmos/CHANGELOG.md)
 [`Beef.Data.OData`](./src/Beef.Data.OData) | OData execution framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Data.OData.svg)](https://badge.fury.io/nu/Beef.Data.OData) | [Log](./src/Beef.Data.OData/CHANGELOG.md)
+[`Beef.Events`](./src/Beef.Events) | Supporting Event-driven framework. | [![NuGet version](https://badge.fury.io/nu/Beef.Events.svg)](https://badge.fury.io/nu/Beef.Events) | [Log](./src/Beef.Events/CHANGELOG.md)
 
 The tooling / supporting capabilities for _Beef_ are enabled by the following assemblies:
 

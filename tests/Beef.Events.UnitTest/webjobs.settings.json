@@ -1,0 +1,8 @@
+{
+  "AzureTableStorage": "UseDevelopmentStorage=true",
+  "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+  //"EventHubName": "tenant-event",
+  //"ConsumerGroup": "inttest-processor-common",
+  //"APPSETTINGS_WEBSITE_SITE_NAME": "inttest-function",
+  "EventHubPoisonMessageTable": "unittestpoisonmessage"
+}

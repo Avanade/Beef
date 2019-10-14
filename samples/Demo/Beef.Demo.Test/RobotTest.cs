@@ -203,6 +203,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogCreated()
                 .ExpectETag()
                 .ExpectUniqueKey()
+                .ExpectEvent("Demo.Robot.*", "Create")
                 .ExpectValue((t) => r)
                 .Run((a) => a.Agent.CreateAsync(r)).Value;
 
@@ -228,6 +229,7 @@ namespace Beef.Demo.Test
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.CreateAsync(r));
         }
 
@@ -247,6 +249,7 @@ namespace Beef.Demo.Test
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(ErrorType.NotFoundError)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.UpdateAsync(v, 404.ToGuid()));
         }
 
@@ -264,6 +267,7 @@ namespace Beef.Demo.Test
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid()));
         }
 
@@ -281,6 +285,7 @@ namespace Beef.Demo.Test
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid()));
         }
 
@@ -290,6 +295,7 @@ namespace Beef.Demo.Test
             // Get an existing Robot.
             var v = AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.GetAsync(1.ToGuid())).Value;
 
             // Update the Robot with an address.
@@ -301,12 +307,14 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
+                .ExpectEvent("Demo.Robot.*", "Update")
                 .ExpectValue((t) => v)
                 .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid())).Value;
 
             // Check the Robot was updated properly.
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
                 .ExpectValue((t) => v)
                 .Run((a) => a.Agent.GetAsync(v.Id));
         }
@@ -330,17 +338,20 @@ namespace Beef.Demo.Test
             // Check Robot exists.
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.GetAsync(1.ToGuid()));
 
             // Delete a Robot.
             AgentTester.Create<RobotAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
+                .ExpectEvent("Demo.Robot.*", "Delete")
                 .Run((a) => a.Agent.DeleteAsync(1.ToGuid()));
 
             // Check Robot no longer exists.
             AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
+                .ExpectNoEvents()
                 .Run((a) => a.Agent.GetAsync(1.ToGuid()));
         }
 

@@ -1,7 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Diagnostics;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,8 +21,8 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHost"/>.
         /// </summary>
-        /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
-        public EventSubscriberHost(EventSubscriberHostArgs args = null) => Args = args ?? new EventSubscriberHostArgs(Assembly.GetCallingAssembly());
+        /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
+        protected EventSubscriberHost(EventSubscriberHostArgs args = null) => Args = Check.NotNull(args, nameof(args));
 
         /// <summary>
         /// Gets the <see cref="EventSubscriberHostArgs"/>.
@@ -38,9 +39,9 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
-        /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> / <see cref="EventData{T}"/> where subscribed for processing.</param>
+        /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        protected async Task ReceiveAsync(string subject, string action, Func<EventData> getEventData)
+        protected async Task ReceiveAsync(string subject, string action, Func<IEventSubscriber, EventData> getEventData)
         {
             Check.NotEmpty(subject, nameof(subject));
 
@@ -51,20 +52,22 @@ namespace Beef.Events.Subscribe
                 return;
 
             // Where matched get the EventData and execute the subscriber receive.
-            var @event = getEventData() ?? throw new EventSubscriberException($"An EventData instance must not be null (Subject `{subject}` and Action '{action}').");
+            var @event = getEventData(subscriber) ?? throw new EventSubscriberException($"An EventData instance must not be null (Subject `{subject}` and Action '{action}').");
 
             try
             {
                 ExecutionContext.Reset(false);
-                ExecutionContext.SetCurrent(CreateExecutionContext(subscriber, @event));
-
+                ExecutionContext.SetCurrent(BindLogger(CreateExecutionContext(subscriber, @event)));
                 await subscriber.ReceiveAsync(@event);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Handle the exception as per the subscriber configuration.
                 if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
+                {
+                    Logger.Default.Warning($"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.ToString()}");
                     return;
+                }
 
                 throw;
             }
@@ -84,6 +87,57 @@ namespace Beef.Events.Subscribe
                 ec.Username = @event.Username;
 
             return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username : SystemUsername, TenantId = @event.TenantId };
+        }
+
+        /// <summary>
+        /// Bind the logger to the execution context.
+        /// </summary>
+        private ExecutionContext BindLogger(ExecutionContext ec)
+        {
+            if (ec == null)
+                throw new EventSubscriberException("An ExecutionContext instance must be returned from CreateExecutionContext.");
+
+            ec.RegisterLogger((largs) => BindLogger(Args.Logger, largs));
+            return ec;
+        }
+
+        /// <summary>
+        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.
+        /// </summary>
+        /// <param name="logger">The ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.</param>
+        /// <param name="args">The Beef <see cref="LoggerArgs"/>.</param>
+        /// <remarks>Redirects (binds) the Beef logger to the ASP.NET logger.</remarks>
+        private static void BindLogger(ILogger logger, LoggerArgs args)
+        {
+            Check.NotNull(logger, nameof(logger));
+            Check.NotNull(args, nameof(args));
+
+            switch (args.Type)
+            {
+                case LogMessageType.Critical:
+                    logger.LogCritical(args.ToString());
+                    break;
+
+                case LogMessageType.Info:
+                    logger.LogInformation(args.ToString());
+                    break;
+
+                case LogMessageType.Warning:
+                    logger.LogWarning(args.ToString());
+                    break;
+
+                case LogMessageType.Error:
+                    logger.LogError(args.ToString());
+                    break;
+
+                case LogMessageType.Debug:
+                    logger.LogDebug(args.ToString());
+                    break;
+
+                case LogMessageType.Trace:
+                    logger.LogTrace(args.ToString());
+                    break;
+            }
         }
     }
 }

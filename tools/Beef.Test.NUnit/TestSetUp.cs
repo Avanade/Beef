@@ -2,6 +2,8 @@
 
 using Beef.Caching.Policy;
 using Beef.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Orchestrates the set up for testing.
+    /// Orchestrates the set up for testing whilst also providing reusable utility methods.
     /// </summary>
     public sealed class TestSetUp
     {
@@ -33,11 +35,11 @@ namespace Beef.Test.NUnit
         #region Logging
 
         /// <summary>
-        /// Execute the <see cref="Logger.RegisterGlobal(Action{LoggerArgs})"/> and bind output to the console.
+        /// Execute the <see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/> and bind output to the console.
         /// </summary>
         public static void RegisterGlobalLogger()
         {
-            Logger.RegisterGlobal((largs) =>
+            Beef.Diagnostics.Logger.RegisterGlobal((largs) =>
             {
                 switch (largs.Type)
                 {
@@ -241,6 +243,18 @@ namespace Beef.Test.NUnit
             var mock = new Mock<T>();
             Factory.SetLocal<T>(mock.Object);
             return mock;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="ILogger"/> instance that logs to the <see cref="System.Console"/>.
+        /// </summary>
+        /// <returns>The <see cref="ILogger"/> instance.</returns>
+        public static ILogger CreateLogger()
+        {
+            var services = new ServiceCollection();
+            services.AddLogging(configure => configure.AddConsole());
+            var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
+            return logger;
         }
     }
 }

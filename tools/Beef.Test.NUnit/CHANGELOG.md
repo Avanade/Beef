@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.15
+- *Added:* `ExpectEvent`, `ExpectNoEvent` and `ExpectNoEvents` added to `AgentTester`. This is enabled via the new `ExpectEvent` supporting class.
+
+## v2.1.14
+- *Added:* `TestSetUp.CreateLogger` enables creation of an `ILogger` that writes directly to the console.
+
 ## v2.1.13
 - *Added:* `TestSetUp.RegisterSetUp` has had a new overload that supports an asynchronous function.
 

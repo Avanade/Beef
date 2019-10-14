@@ -2,6 +2,7 @@
 
 using Beef.Diagnostics;
 using Beef.Entities;
+using Beef.Events;
 using Beef.RefData;
 using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -37,6 +39,9 @@ namespace Beef.Test.NUnit
         private ErrorType? _expectedErrorType;
         private string _expectedErrorMessage;
         private MessageItemCollection _expectedMessages;
+        private readonly List<(string template, string action)> _expectedPublished = new List<(string template, string action)>();
+        private readonly List<(string template, string action)> _expectedNotPublished = new List<(string template, string action)>();
+        private bool _expectedNonePublished;
 
         /// <summary>
         /// Defines the default environment as 'Development'.
@@ -279,6 +284,7 @@ namespace Beef.Test.NUnit
         protected AgentTester(string username = null, object args = null)
         {
             TestSetUp.InvokeRegisteredSetUp();
+            ExpectEvent.SetUp();
 
             if (username != null || !ExecutionContext.HasCurrent)
             {
@@ -349,6 +355,34 @@ namespace Beef.Test.NUnit
                 _expectedMessages = new MessageItemCollection();
 
             _expectedMessages.AddRange(messages);
+        }
+
+        /// <summary>
+        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        protected void SetExpectEvent(string template, string action = null)
+        {
+            _expectedPublished.Add((Check.NotEmpty(template, nameof(template)), action));
+        }
+
+        /// <summary>
+        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        protected void SetExpectNoEvent(string template, string action = null)
+        {
+            _expectedNotPublished.Add((Check.NotEmpty(template, nameof(template)), action));
+        }
+
+        /// <summary>
+        /// Verifies that no events were published.
+        /// </summary>
+        protected void SetExpectNoEvents()
+        {
+            _expectedNonePublished = true;
         }
 
         /// <summary>
@@ -447,6 +481,19 @@ namespace Beef.Test.NUnit
             else
                 Logger.Default.Info($"{(string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}");
 
+            Logger.Default.Info("");
+            Logger.Default.Info($"EVENTS PUBLISHED >");
+            var events = ExpectEvent.GetEvents();
+            if (events.Length == 0)
+                Logger.Default.Info("  None.");
+            else
+            {
+                foreach (var e in events)
+                {
+                    Logger.Default.Info($"  Subject: {e.Subject}, Action: {e.Action}");
+                }
+            }
+
             Logger.Default.Info(null);
             Logger.Default.Info(new string('=', 80));
             Logger.Default.Info(null);
@@ -463,6 +510,19 @@ namespace Beef.Test.NUnit
 
             if (_expectedMessages != null)
                 ExpectValidationException.CompareExpectedVsActual(_expectedMessages, result.Messages);
+
+            foreach (var (t, a) in _expectedPublished)
+            {
+                ExpectEvent.IsPublished(t, a);
+            }
+
+            foreach (var (t, a) in _expectedNotPublished)
+            {
+                ExpectEvent.IsNotPublished(t, a);
+            }
+
+            if (_expectedNonePublished)
+                ExpectEvent.NonePublished();
         }
     }
 
@@ -547,6 +607,37 @@ namespace Beef.Test.NUnit
         public AgentTester<TAgent> ExpectMessages(MessageItemCollection messages)
         {
             SetExpectMessages(messages);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        public AgentTester<TAgent> ExpectEvent(string template, string action = null)
+        {
+            SetExpectEvent(template, action);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        public AgentTester<TAgent> ExpectNoEvent(string template, string action = null)
+        {
+            SetExpectNoEvent(template, action);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that no events were published.
+        /// </summary>
+        public AgentTester<TAgent> ExpectNoEvents()
+        {
+            SetExpectNoEvents();
             return this;
         }
 
@@ -789,6 +880,37 @@ namespace Beef.Test.NUnit
             Check.IsTrue(typeof(TValue).GetInterface(typeof(IUniqueKey).Name) != null, "TValue must implement the interface IUniqueKey.");
 
             _isExpectedUniqueKey = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        public AgentTester<TAgent, TValue> ExpectEvent(string template, string action = null)
+        {
+            SetExpectEvent(template, action);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// </summary>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        public AgentTester<TAgent, TValue> ExpectNoEvent(string template, string action = null)
+        {
+            SetExpectNoEvent(template, action);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that no events were published.
+        /// </summary>
+        public AgentTester<TAgent, TValue> ExpectNoEvents()
+        {
+            SetExpectNoEvents();
             return this;
         }
 
