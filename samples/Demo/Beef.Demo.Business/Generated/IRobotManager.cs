@@ -53,5 +53,12 @@ namespace Beef.Demo.Business
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
         Task<RobotCollectionResult> GetByArgsAsync(RobotArgs args, PagingArgs paging);
+
+        /// <summary>
+        /// Raises a <see cref="Robot.PowerSource"/> change event.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource powerSource);
     }
 }

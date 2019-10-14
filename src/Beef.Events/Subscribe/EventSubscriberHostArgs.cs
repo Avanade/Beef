@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,14 +19,17 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> using the <see cref="Assembly.GetCallingAssembly"/> to find the <see cref="IEventSubscriber"/> types.
         /// </summary>
-        public EventSubscriberHostArgs() : this(Assembly.GetCallingAssembly()) { }
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public EventSubscriberHostArgs(ILogger logger) : this(logger, Assembly.GetCallingAssembly()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="subscribersAssembly"/>.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
         /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
-        public EventSubscriberHostArgs(Assembly subscribersAssembly)
+        public EventSubscriberHostArgs(ILogger logger, Assembly subscribersAssembly)
         {
+            Logger = Check.NotNull(logger, nameof(logger));
             Check.NotNull(subscribersAssembly, nameof(subscribersAssembly));
 
             EventSubscribers = _subscribers.GetOrAdd(subscribersAssembly, (assembly) =>
@@ -47,13 +51,20 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="eventSubscribers"/>.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
         /// <param name="eventSubscribers">One or more <see cref="IEventSubscriber"/> instances.</param>
-        public EventSubscriberHostArgs(params IEventSubscriber[] eventSubscribers)
+        public EventSubscriberHostArgs(ILogger logger, params IEventSubscriber[] eventSubscribers)
         {
+            Logger = Check.NotNull(logger, nameof(logger));
             Check.NotNull(eventSubscribers, nameof(eventSubscribers));
             Check.IsTrue(eventSubscribers.Any(), nameof(eventSubscribers), $"At least one {nameof(IEventSubscriber)} instance must be specified to enable execution.");
             EventSubscribers = eventSubscribers;
         }
+
+        /// <summary>
+        /// Gets the <see cref="ILogger"/>.
+        /// </summary>
+        public ILogger Logger { get; private set; }
 
         /// <summary>
         /// Gets the list of specific <see cref="IEventSubscriber"/> instances.

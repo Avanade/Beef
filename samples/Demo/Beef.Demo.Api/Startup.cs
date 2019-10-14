@@ -17,6 +17,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
+using Beef.Events;
+using Beef.Events.Publish;
+using Microsoft.Azure.EventHubs;
 
 namespace Beef.Demo.Api
 {
@@ -55,6 +58,15 @@ namespace Beef.Demo.Api
             // Configure the Service Agents from the configuration and register.
             var sac = config.GetSection("BeefServiceAgents").Get<WebApiServiceAgentConfig>();
             sac?.RegisterAll();
+
+            // Set up the event publishing to event hubs.
+            if (config.GetValue<bool>("EventHubPublishing"))
+            {
+                var ehc = EventHubClient.CreateFromConnectionString(config.GetValue<string>("EventHubConnectionString"));
+                ehc.RetryPolicy = RetryPolicy.Default;
+                var ehp = new EventHubPublisher(ehc);
+                Event.Register((events) => ehp.Publish(events));
+            }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

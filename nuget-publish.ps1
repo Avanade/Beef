@@ -31,6 +31,7 @@ $projectsToPublish = @(
 	"src\Beef.Data.EntityFrameworkCore",
 	"src\Beef.Data.OData",
 	"src\Beef.Data.Cosmos",
+	"src\Beef.Events",
 	"tools\Beef.CodeGen.Core",
     "tools\Beef.Database.Core",
     "tools\Beef.Test.NUnit",

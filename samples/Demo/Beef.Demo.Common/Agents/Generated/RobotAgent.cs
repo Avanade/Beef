@@ -110,5 +110,17 @@ namespace Beef.Demo.Common.Agents
         {
             return RobotServiceAgent.GetByArgsAsync(args, paging, requestOptions);
         }
+
+        /// <summary>
+        /// Raises a <see cref="Robot.PowerSource"/> change event.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource powerSource, WebApiRequestOptions requestOptions = null)
+        {
+            return RobotServiceAgent.RaisePowerSourceChangeAsync(id, powerSource, requestOptions);
+        }
     }
 }

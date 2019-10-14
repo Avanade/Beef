@@ -5,7 +5,7 @@ using System;
 namespace Beef.Events.Subscribe
 {
     /// <summary>
-    /// Provides the unhandled <see cref="Exception"/> options.
+    /// Provides the unhandled <see cref="Exception"/> options of either <see cref="Stop"/> or <see cref="Continue"/>.
     /// </summary>
     public enum UnhandledExceptionHandling
     {

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.19
+- *Added:* Moved `Events.Subscribe` capability to new `Beef.Events` assembly.
+- *Added:* `Cleaner.Clean` extended to perform a `EntityBasicBase.AcceptChanges` where appropriate.
+
 ## v2.1.18
 - *Added:* Support for `IConvertible` added to `ReferenceDataBase` to enable usage of `Convert.ChangeType`.
 - *Added:* `PropertyMapper` updated to use `Convert.ChangeType` as last resort property value mapping.

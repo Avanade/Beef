@@ -180,5 +180,19 @@ namespace Beef.Demo.Business
                 return __result;
             });
         }
+
+        /// <summary>
+        /// Raises a <see cref="Robot.PowerSource"/> change event.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource powerSource)
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                await RaisePowerSourceChangeOnImplementationAsync(id, powerSource);
+            });
+        }
     }
 }

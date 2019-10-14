@@ -112,5 +112,19 @@ namespace Beef.Demo.Api.Controllers
             return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => Factory.Create<IRobotManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
+
+        /// <summary>
+        /// Raises a <see cref="Robot.PowerSource"/> change event.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
+        [HttpPost]
+        [Route("{id}/powerSource/{powerSource}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult RaisePowerSourceChange(Guid id, string powerSource)
+        {
+            return new WebApiPost(this, () => Factory.Create<IRobotManager>().RaisePowerSourceChangeAsync(id, powerSource),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        }
     }
 }

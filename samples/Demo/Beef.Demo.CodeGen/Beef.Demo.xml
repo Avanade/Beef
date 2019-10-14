@@ -104,6 +104,10 @@
     <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
       <Parameter Name="Args" Type="RobotArgs" Validator="RobotArgsValidator" />
     </Operation>
+
+    <Operation Name="RaisePowerSourceChange" Text="Raises a {{Robot.PowerSource}} change event" OperationType="Custom" WebApiRoute="{id}/powerSource/{powerSource}" WebApiStatus="Accepted" UniqueKey="true" ManagerCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeDataSvc="true">
+      <Parameter Name="PowerSource" Type="RefDataNamespace.PowerSource" RefDataType="string" />
+    </Operation>
   </Entity>
 
   <Entity Name="RobotArgs" Text="{{Robot}} arguments" ExcludeAll="true">

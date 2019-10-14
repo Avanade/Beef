@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.1.1</Version>
+    <Authors>Beef Developers</Authors>
+    <Company>Avanade</Company>
+    <Description>Business Entity Execution Framework (Beef) Events framework.</Description>
+    <Copyright>Avanade (c)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>beef framework event event-based webjobs azure functions trigger resilient</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>.\bin\debug\Beef.Events.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.0" />
+    <PackageReference Include="Polly" Version="7.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Triggers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.FileProviders.Embedded">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.embedded\2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Embedded.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
