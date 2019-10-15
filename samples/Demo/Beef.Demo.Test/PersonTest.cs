@@ -615,6 +615,32 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void F150_UpdateDetail()
+        {
+            // Get an existing person detail.
+            var p = AgentTester.Create<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetDetailAsync(2.ToGuid())).Value;
+
+            // Update the work history.
+            p.History[0].StartDate = p.History[0].StartDate.AddDays(1);
+
+            p = AgentTester.Create<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectChangeLogUpdated()
+                .ExpectETag(p.ETag)
+                .ExpectUniqueKey()
+                .ExpectValue((t) => p)
+                .Run((a) => a.Agent.UpdateDetailAsync(p, 2.ToGuid())).Value;
+
+            // Check the person detail was updated properly.
+            p = AgentTester.Create<PersonAgent, PersonDetail>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue((t) => p)
+                .Run((a) => a.Agent.GetDetailAsync(p.Id)).Value;
+        }
+
+        [Test, TestSetUp]
         public void F210_UpdateWithEF_NotFound()
         {
             // Get an existing person.

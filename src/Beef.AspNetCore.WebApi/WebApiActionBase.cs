@@ -29,7 +29,7 @@ namespace Beef.AspNetCore.WebApi
         private const string AsciiArtRobot = " d[ o_0 ]b ";
 
         /// <summary>
-        /// Gets the <see cref="ExecutionContext.Properties"/> key for storing <c>this</c> request within the <see cref="ExecutionContext"/>.
+        /// Gets the <see cref="ExecutionContext.Properties"/> key for storing <c>this</c> (<see cref="WebApiActionBase"/>) request within the <see cref="ExecutionContext"/>.
         /// </summary>
         public const string ExecutionContextPropertyKey = "Beef.AspNetCore.WebApi.WebApiActionBase";
 
@@ -126,6 +126,8 @@ namespace Beef.AspNetCore.WebApi
                 // Where the value implements IETag and If-Match is specified, then this should be used as the preference.
                 if (api.IfMatchETags != null && api.IfMatchETags.Count > 0 && value is IETag etag && etag != null)
                     etag.ETag = api.IfMatchETags[0];
+
+                api.BodyValue = value;
             }
 
             return value;
@@ -182,29 +184,33 @@ namespace Beef.AspNetCore.WebApi
                     IfMatchETags = l;
             }
 
-            // Add to the ExecutionContext in case we need access to the originating request as any stage.
+            // Get the paging arguments.
+            PagingArgs = WebApiQueryString.CreatePagingArgs(Controller);
+            ExecutionContext.Current.PagingArgs = PagingArgs;
+
+            // Add to the ExecutionContext in case we need access to the originating request at any stage.
             ExecutionContext.Current.Properties.Add(ExecutionContextPropertyKey, this);
         }
 
         /// <summary>
         /// Gets the <see cref="ControllerBase"/>.
         /// </summary>
-        protected ControllerBase Controller { get; private set; }
+        public ControllerBase Controller { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="T:OperationType"/>.
         /// </summary>
-        protected OperationType OperationType { get; private set; }
+        public OperationType OperationType { get; private set; }
 
         /// <summary>
         /// Gets the primary <see cref="HttpStatusCode"/>.
         /// </summary>
-        protected HttpStatusCode StatusCode { get; private set; }
+        public HttpStatusCode StatusCode { get; private set; }
 
         /// <summary>
         /// Gets the alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <c>null</c>).
         /// </summary>
-        protected HttpStatusCode? AlternateStatusCode { get; private set; }
+        public HttpStatusCode? AlternateStatusCode { get; private set; }
 
         /// <summary>
         /// Gets the method or property name of the caller.
@@ -224,21 +230,22 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the <see cref="IETag.ETag"/> values where the <c>If-None-Match</c> header is supplied.
         /// </summary>
-        protected List<string> IfNoneMatchETags { get; private set; }
+        public List<string> IfNoneMatchETags { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IETag.ETag"/> values where the <c>If-Match</c> header is supplied.
         /// </summary>
-        protected List<string> IfMatchETags { get; private set; }
+        public List<string> IfMatchETags { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="PagingArgs"/> for the request.
+        /// Gets the <see cref="Entities.PagingArgs"/> for the request.
         /// </summary>
-        /// <returns>The <see cref="PagingArgs"/>.</returns>
-        protected PagingArgs GetPagingArgs()
-        {
-            return WebApiQueryString.CreatePagingArgs(Controller, true, true);
-        }
+        public PagingArgs PagingArgs { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="FromBodyAttribute"/> value.
+        /// </summary>
+        public object BodyValue { get; internal set; }
 
         /// <summary>
         /// Executes the result operation of the action method asynchronously.
@@ -384,8 +391,7 @@ namespace Beef.AspNetCore.WebApi
             if (result == null)
                 return (null, null);
 
-            var pa = GetPagingArgs();
-            var json = JsonPropertyFilter.Apply(result, pa.IncludeFields, pa.ExcludeFields);
+            var json = JsonPropertyFilter.Apply(result, PagingArgs.IncludeFields, PagingArgs.ExcludeFields);
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
                 return (json, ExecutionContext.Current.ETag);
@@ -827,7 +833,7 @@ namespace Beef.AspNetCore.WebApi
             [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
-            _value = value;
+            BodyValue = _value = value;
             _getFunc = getFunc ?? throw new ArgumentNullException(nameof(getFunc));
             _updateFuncWithResult = updateFuncWithResult ?? throw new ArgumentNullException(nameof(updateFuncWithResult));
         }

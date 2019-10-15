@@ -120,11 +120,11 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         [HttpPost]
         [Route("{id}/powerSource/{powerSource}")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult RaisePowerSourceChange(Guid id, string powerSource)
         {
             return new WebApiPost(this, () => Factory.Create<IRobotManager>().RaisePowerSourceChangeAsync(id, powerSource),
-                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Accepted);
         }
     }
 }

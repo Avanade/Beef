@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+- *Fixed:* `ExecutionContext.PagingArgs` always updated regardless of whether paging parameter explicitly defined.
+- *Added:* `WebApiActionBase` has new `BodyValue` property that will be updated when `FromBodyAttribute` specified. A number of other properties have been made `public` (from `protected`) - the `WebApiActionBase` is accessible from `ExecutionContext.Properties[WebApiActionBase.ExecutionContextPropertyKey]`.
+
 ## v2.1.6
 - *Added:* New `WebApiExecutionContextMiddleware` and `WebApiExceptionHandlerMiddleware` added, including `Use*` extension methods to properly integrate into the pipeline as per https://docs.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write.
 

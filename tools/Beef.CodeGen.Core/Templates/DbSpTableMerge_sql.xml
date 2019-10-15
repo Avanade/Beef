@@ -280,7 +280,24 @@ BEGIN
         <Set Name="System.AndNeeded" Value="true" />
       </Where>
       <![CDATA[)
-      WHEN MATCHED
+      WHEN MATCHED AND EXISTS
+          (SELECT ]]>
+      <Column Condition="Column.SkipAsInternal == false and Column.ParameterName == null and Column.Type != 'timestamp' and Column.IsIdentity == false and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.Name != 'UpdatedDate' and Column.Name != 'UpdatedBy' and Column.IsComputed == false">
+        <If Condition="System.Index > 0">
+          <![CDATA[, ]]>
+        </If>
+        <![CDATA[[s].[{{Column.Name}}]]]>
+      </Column>
+      <![CDATA[
+           EXCEPT
+           SELECT ]]>
+      <Column Condition="Column.SkipAsInternal == false and Column.ParameterName == null and Column.Type != 'timestamp' and Column.IsIdentity == false and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.Name != 'UpdatedDate' and Column.Name != 'UpdatedBy' and Column.IsComputed == false">
+        <If Condition="System.Index > 0">
+          <![CDATA[, ]]>
+        </If>
+        <![CDATA[[t].[{{Column.Name}}]]]>
+      </Column>
+      <![CDATA[)
         THEN UPDATE SET
            ]]>
       <Column Condition="Column.SkipAsInternal == false and Column.ParameterName == null and Column.Type != 'timestamp' and Column.IsIdentity == false and Column.Name != 'CreatedDate' and Column.Name != 'CreatedBy' and Column.IsComputed == false">

@@ -75,7 +75,20 @@ MERGE INTO [{{Table.Schema}}].[{{Table.Name}}] WITH (HOLDLOCK) as [t]
           </Else>
         </If>
         <![CDATA[)
-  WHEN MATCHED
+  WHEN MATCHED AND EXISTS
+      (SELECT ]]>
+        <Column Condition="Column.Name == 'CreatedBy' or Column.Name == 'CreatedDate' or Column.Name == 'UpdatedBy' or Column.Name == 'UpdatedDate' or Column.IsPrimaryKey == true" Not="true">
+          <If Condition="System.Index > 0"><![CDATA[, ]]></If>
+          <![CDATA[[s].[{{Column.Name}}]]]>
+        </Column>
+        <![CDATA[
+       EXCEPT
+       SELECT ]]>
+        <Column Condition="Column.Name == 'CreatedBy' or Column.Name == 'CreatedDate' or Column.Name == 'UpdatedBy' or Column.Name == 'UpdatedDate' or Column.IsPrimaryKey == true" Not="true">
+          <If Condition="System.Index > 0"><![CDATA[, ]]></If>
+          <![CDATA[[t].[{{Column.Name}}]]]>
+        </Column>
+        <![CDATA[)
     THEN UPDATE SET]]>
         <Column Condition="Column.Name == 'CreatedBy' or Column.Name == 'CreatedDate'" Not="true">
           <If Condition="System.Index > 0"><![CDATA[, ]]></If>

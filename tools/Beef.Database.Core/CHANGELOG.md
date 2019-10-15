@@ -1,6 +1,10 @@
 ﻿# Change log
 
 Represents the **NuGet** versions.
+
+## v2.1.6
+- *Fixed:* Database merge statements updated to include `AND EXISTS (...)` for a `WHEN MATCHED` to avoid updates where column data has not changed.
+
 ## v2.1.5
 - *Enhancement:* All usernames will be set to `ExecutionContext.EnvironmentUsername` (this results in the same outcome).
 

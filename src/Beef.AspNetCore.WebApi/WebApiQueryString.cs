@@ -46,16 +46,16 @@ namespace Beef.AspNetCore.WebApi
         /// Creates the <see cref="PagingArgs"/> from the query string.
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
-        /// <param name="useExectionContext">Indicates whether to use the <see cref="ExecutionContext"/> value where there is already a current value (see <see cref="ExecutionContext.PagingArgs"/>).</param>
-        /// <param name="overrideExecutionContext">Indicates whether to update the <see cref="ExecutionContext"/> value where there is no current value.</param>
         /// <returns>The <see cref="PagingArgs"/>.</returns>
-        public static PagingArgs CreatePagingArgs(this ControllerBase controller, bool useExectionContext = false, bool overrideExecutionContext = true)
+        /// <remarks>Will return the <see cref="ExecutionContext"/> <see cref="ExecutionContext.PagingArgs"/> where already set; otherwise, will update it once value inferred.</remarks>
+        public static PagingArgs CreatePagingArgs(this ControllerBase controller)
         {
-            if (useExectionContext && ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs != null)
+            if (ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs != null)
                 return ExecutionContext.Current.PagingArgs;
 
-            PagingArgs pa = null;
             var q = controller.HttpContext.Request.Query;
+            PagingArgs pa;
+
             if (q == null || q.Count == 0)
                 pa = new PagingArgs();
             else
@@ -80,7 +80,7 @@ namespace Beef.AspNetCore.WebApi
                     pa.ExcludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
             }
 
-            if (overrideExecutionContext && ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs == null)
+            if (ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs == null)
                 ExecutionContext.Current.PagingArgs = pa;
 
             return pa;

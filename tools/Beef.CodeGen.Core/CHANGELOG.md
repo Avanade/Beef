@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.16
+- *Fixed:* Database merge statements updated to include `AND EXISTS (...)` for a `WHEN MATCHED` to avoid updates where column data has not changed.
+
 ## v2.1.15
 - *Fixed:* Code-gen `Entity.DataCosmosMapperInheritsFrom` not generating correctly.
 

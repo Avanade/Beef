@@ -18,7 +18,10 @@ BEGIN
       USING @List as [s]
         ON ([t].[Name] = [s].[Name]
         AND [t].[PersonId] = @PersonId)
-      WHEN MATCHED
+      WHEN MATCHED AND EXISTS
+          (SELECT [s].[Name], [s].[StartDate], [s].[EndDate]
+           EXCEPT
+           SELECT [t].[Name], [t].[StartDate], [t].[EndDate])
         THEN UPDATE SET
            [t].[Name] = [s].[Name]
           ,[t].[StartDate] = [s].[StartDate]
