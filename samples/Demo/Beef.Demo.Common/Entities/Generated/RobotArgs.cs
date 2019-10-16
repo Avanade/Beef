@@ -47,18 +47,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RobotArgs"/> class.
-        /// </summary>
-        public RobotArgs()
-        {
-            this.RobotArgsConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -68,8 +56,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Model No")]
         public string ModelNo
         {
-            get { return this._modelNo; }
-            set { SetValue(ref this._modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ModelNo); }
+            get { return _modelNo; }
+            set { SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ModelNo); }
         }
 
         /// <summary>
@@ -79,8 +67,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Serial No")]
         public string SerialNo
         {
-            get { return this._serialNo; }
-            set { SetValue(ref this._serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_SerialNo); }
+            get { return _serialNo; }
+            set { SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_SerialNo); }
         }
 
         /// <summary>
@@ -90,8 +78,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Power Sources")]
         public List<string> PowerSourcesSids
         {
-            get { return this._powerSourcesSids; }
-            set { SetValue<List<string>>(ref this._powerSourcesSids, value, false, false, Property_PowerSources); }
+            get { return _powerSourcesSids; }
+            set { SetValue<List<string>>(ref _powerSourcesSids, value, false, false, Property_PowerSources); }
         }
 
         /// <summary>
@@ -101,8 +89,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Power Sources")]
         public ReferenceDataSidList<RefDataNamespace.PowerSource, string> PowerSources
         {
-            get { return new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref this._powerSourcesSids); }
-            set { SetValue<List<string>>(ref this._powerSourcesSids, value?.ToSidList() ?? null, false, false, Property_PowerSources); }
+            get { return new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref _powerSourcesSids); }
+            set { SetValue<List<string>>(ref _powerSourcesSids, value?.ToSidList() ?? null, false, false, Property_PowerSources); }
         }
 
         #endregion
@@ -126,11 +114,11 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(RobotArgs from)
         {
             CopyFrom((EntityBase)from);
-            this.ModelNo = from.ModelNo;
-            this.SerialNo = from.SerialNo;
-            this.PowerSources = from.PowerSources;
+            ModelNo = from.ModelNo;
+            SerialNo = from.SerialNo;
+            PowerSourcesSids = from.PowerSourcesSids;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -158,11 +146,11 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.ModelNo = Cleaner.Clean(this.ModelNo, StringTrim.End, StringTransform.EmptyToNull);
-            this.SerialNo = Cleaner.Clean(this.SerialNo, StringTrim.End, StringTransform.EmptyToNull);
-            this.PowerSources = Cleaner.Clean<ReferenceDataSidList<RefDataNamespace.PowerSource, string>>(this.PowerSources);
+            ModelNo = Cleaner.Clean(ModelNo, StringTrim.End, StringTransform.EmptyToNull);
+            SerialNo = Cleaner.Clean(SerialNo, StringTrim.End, StringTransform.EmptyToNull);
+            PowerSourcesSids = Cleaner.Clean(PowerSourcesSids);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -173,9 +161,9 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.ModelNo)
-                    && Cleaner.IsInitial(this.SerialNo)
-                    && Cleaner.IsInitial(this.PowerSources);
+                return Cleaner.IsInitial(ModelNo)
+                    && Cleaner.IsInitial(SerialNo)
+                    && Cleaner.IsInitial(PowerSourcesSids);
             }
         }
 

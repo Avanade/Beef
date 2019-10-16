@@ -25,14 +25,14 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private readonly Func<int, IODataArgs, Task> _getOnBeforeAsync = null;
-        private readonly Func<Product, int, Task> _getOnAfterAsync = null;
-        private readonly Action<Exception> _getOnException = null;
+        private readonly Func<int, IODataArgs, Task> _getOnBeforeAsync;
+        private readonly Func<Product, int, Task> _getOnAfterAsync;
+        private readonly Action<Exception> _getOnException;
 
-        private readonly Func<IQueryable<Product>, ProductArgs, IODataArgs, IQueryable<Product>> _getByArgsOnQuery = null;
-        private readonly Func<ProductArgs, IODataArgs, Task> _getByArgsOnBeforeAsync = null;
-        private readonly Func<ProductCollectionResult, ProductArgs, Task> _getByArgsOnAfterAsync = null;
-        private readonly Action<Exception> _getByArgsOnException = null;
+        private readonly Func<IQueryable<Product>, ProductArgs, IODataArgs, IQueryable<Product>> _getByArgsOnQuery;
+        private readonly Func<ProductArgs, IODataArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<ProductCollectionResult, ProductArgs, Task> _getByArgsOnAfterAsync;
+        private readonly Action<Exception> _getByArgsOnException;
 
         #endregion
 

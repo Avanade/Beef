@@ -20,18 +20,6 @@ namespace Beef.Demo.Common.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Gender : ReferenceDataBaseGuid
     {
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Gender"/> class.
-        /// </summary>
-        public Gender()
-        {
-            this.GenderConstructor();
-        }
-        
-        #endregion
-
         #region Operator
 
         /// <summary>
@@ -76,7 +64,7 @@ namespace Beef.Demo.Common.Entities
         {
             CopyFrom((ReferenceDataBaseGuid)from);
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -105,7 +93,7 @@ namespace Beef.Demo.Common.Entities
         {
             base.CleanUp();
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>

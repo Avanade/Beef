@@ -47,18 +47,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonArgs"/> class.
-        /// </summary>
-        public PersonArgs()
-        {
-            this.PersonArgsConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -68,8 +56,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="First Name")]
         public string FirstName
         {
-            get { return this._firstName; }
-            set { SetValue(ref this._firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_FirstName); }
+            get { return _firstName; }
+            set { SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_FirstName); }
         }
 
         /// <summary>
@@ -79,8 +67,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Last Name")]
         public string LastName
         {
-            get { return this._lastName; }
-            set { SetValue(ref this._lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_LastName); }
+            get { return _lastName; }
+            set { SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_LastName); }
         }
 
         /// <summary>
@@ -90,8 +78,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Genders")]
         public List<string> GendersSids
         {
-            get { return this._gendersSids; }
-            set { SetValue<List<string>>(ref this._gendersSids, value, false, false, Property_Genders); }
+            get { return _gendersSids; }
+            set { SetValue<List<string>>(ref _gendersSids, value, false, false, Property_Genders); }
         }
 
         /// <summary>
@@ -101,8 +89,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Genders")]
         public ReferenceDataSidList<Gender, string> Genders
         {
-            get { return new ReferenceDataSidList<Gender, string>(ref this._gendersSids); }
-            set { SetValue<List<string>>(ref this._gendersSids, value?.ToSidList() ?? null, false, false, Property_Genders); }
+            get { return new ReferenceDataSidList<Gender, string>(ref _gendersSids); }
+            set { SetValue<List<string>>(ref _gendersSids, value?.ToSidList() ?? null, false, false, Property_Genders); }
         }
 
         #endregion
@@ -126,11 +114,11 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(PersonArgs from)
         {
             CopyFrom((EntityBase)from);
-            this.FirstName = from.FirstName;
-            this.LastName = from.LastName;
-            this.Genders = from.Genders;
+            FirstName = from.FirstName;
+            LastName = from.LastName;
+            GendersSids = from.GendersSids;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -158,11 +146,11 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.FirstName = Cleaner.Clean(this.FirstName, StringTrim.End, StringTransform.EmptyToNull);
-            this.LastName = Cleaner.Clean(this.LastName, StringTrim.End, StringTransform.EmptyToNull);
-            this.Genders = Cleaner.Clean<ReferenceDataSidList<Gender, string>>(this.Genders);
+            FirstName = Cleaner.Clean(FirstName, StringTrim.End, StringTransform.EmptyToNull);
+            LastName = Cleaner.Clean(LastName, StringTrim.End, StringTransform.EmptyToNull);
+            GendersSids = Cleaner.Clean(GendersSids);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -173,9 +161,9 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.FirstName)
-                    && Cleaner.IsInitial(this.LastName)
-                    && Cleaner.IsInitial(this.Genders);
+                return Cleaner.IsInitial(FirstName)
+                    && Cleaner.IsInitial(LastName)
+                    && Cleaner.IsInitial(GendersSids);
             }
         }
 

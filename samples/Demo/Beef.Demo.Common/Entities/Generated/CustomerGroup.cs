@@ -59,18 +59,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CustomerGroup"/> class.
-        /// </summary>
-        public CustomerGroup()
-        {
-            this.CustomerGroupConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -80,8 +68,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Identifier")]
         public string Id
         {
-            get { return this._id; }
-            set { SetValue(ref this._id, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_Id); }
+            get { return _id; }
+            set { SetValue(ref _id, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_Id); }
         }
 
         /// <summary>
@@ -91,8 +79,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public string CompanySid
         {
-            get { return this._companySid; }
-            set { SetValue(ref this._companySid, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_Company); }
+            get { return _companySid; }
+            set { SetValue(ref _companySid, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_Company); }
         }
 
         /// <summary>
@@ -102,8 +90,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public RefDataNamespace.Company Company
         {
-            get { return this._companySid; }
-            set { SetValue<string>(ref this._companySid, value, true, false, Property_Company); }
+            get { return _companySid; }
+            set { SetValue<string>(ref _companySid, value, true, false, Property_Company); }
         }
 
         /// <summary>
@@ -113,8 +101,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string Description
         {
-            get { return this._description; }
-            set { SetValue(ref this._description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
+            get { return _description; }
+            set { SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
         }
 
         /// <summary>
@@ -124,8 +112,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Is Sales Tax Included In Price")]
         public bool IsSalesTaxIncludedInPrice
         {
-            get { return this._isSalesTaxIncludedInPrice; }
-            set { SetValue<bool>(ref this._isSalesTaxIncludedInPrice, value, false, false, Property_IsSalesTaxIncludedInPrice); }
+            get { return _isSalesTaxIncludedInPrice; }
+            set { SetValue<bool>(ref _isSalesTaxIncludedInPrice, value, false, false, Property_IsSalesTaxIncludedInPrice); }
         }
 
         /// <summary>
@@ -135,8 +123,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Tax Group")]
         public string TaxGroup
         {
-            get { return this._taxGroup; }
-            set { SetValue(ref this._taxGroup, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_TaxGroup); }
+            get { return _taxGroup; }
+            set { SetValue(ref _taxGroup, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_TaxGroup); }
         }
 
         #endregion
@@ -175,7 +163,7 @@ namespace Beef.Demo.Common.Entities
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.Id, this.CompanySid); }
+            get { return new UniqueKey(Id, CompanySid); }
         }
 
         #endregion
@@ -199,13 +187,13 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(CustomerGroup from)
         {
             CopyFrom((EntityBase)from);
-            this.Id = from.Id;
-            this.Company = from.Company;
-            this.Description = from.Description;
-            this.IsSalesTaxIncludedInPrice = from.IsSalesTaxIncludedInPrice;
-            this.TaxGroup = from.TaxGroup;
+            Id = from.Id;
+            CompanySid = from.CompanySid;
+            Description = from.Description;
+            IsSalesTaxIncludedInPrice = from.IsSalesTaxIncludedInPrice;
+            TaxGroup = from.TaxGroup;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -233,11 +221,11 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Description = Cleaner.Clean(this.Description, StringTrim.End, StringTransform.EmptyToNull);
-            this.IsSalesTaxIncludedInPrice = Cleaner.Clean<bool>(this.IsSalesTaxIncludedInPrice);
-            this.TaxGroup = Cleaner.Clean(this.TaxGroup, StringTrim.End, StringTransform.EmptyToNull);
+            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
+            IsSalesTaxIncludedInPrice = Cleaner.Clean(IsSalesTaxIncludedInPrice);
+            TaxGroup = Cleaner.Clean(TaxGroup, StringTrim.End, StringTransform.EmptyToNull);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -248,9 +236,9 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Description)
-                    && Cleaner.IsInitial(this.IsSalesTaxIncludedInPrice)
-                    && Cleaner.IsInitial(this.TaxGroup);
+                return Cleaner.IsInitial(Description)
+                    && Cleaner.IsInitial(IsSalesTaxIncludedInPrice)
+                    && Cleaner.IsInitial(TaxGroup);
             }
         }
 
@@ -351,7 +339,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public CustomerGroupCollectionResult(IEnumerable<CustomerGroup> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

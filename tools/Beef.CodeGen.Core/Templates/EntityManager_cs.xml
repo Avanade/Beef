@@ -91,7 +91,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         <![CDATA[
 ]]>
         <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.ParameterCount > 0">
-          <![CDATA[        private Func<]]>
+          <![CDATA[        private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -120,8 +120,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
             </Else>
           </If>
-          <![CDATA[Task> {{Operation.PrivateName}}OnPreValidateAsync = null;
-        private Action<MultiValidator]]>
+          <![CDATA[Task> {{Operation.PrivateName}}OnPreValidateAsync;
+        private readonly Action<MultiValidator]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[, {{Entity.EntityName}}]]></Then>
@@ -137,10 +137,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
           <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
             <![CDATA[, PagingArgs]]>
           </If>
-          <![CDATA[> {{Operation.PrivateName}}OnValidate = null;
+          <![CDATA[> {{Operation.PrivateName}}OnValidate;
 ]]>
         </If>
-        <![CDATA[        private Func<]]>
+        <![CDATA[        private readonly Func<]]>
         <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
           <If Condition="Operation.ReturnType == 'void'">
             <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -169,8 +169,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             </If>
           </Else>
         </If>
-        <![CDATA[Task> {{Operation.PrivateName}}OnBeforeAsync = null;
-        private Func<]]>
+        <![CDATA[Task> {{Operation.PrivateName}}OnBeforeAsync;
+        private readonly Func<]]>
         <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
           <If Condition="Operation.ReturnType == 'void'">
             <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -218,7 +218,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             </If>
           </Else>
         </If>
-        <![CDATA[Task> {{Operation.PrivateName}}OnAfterAsync = null;
+        <![CDATA[Task> {{Operation.PrivateName}}OnAfterAsync;
 ]]>
       </Operation>
       <If Condition="System.EndRegion == true">

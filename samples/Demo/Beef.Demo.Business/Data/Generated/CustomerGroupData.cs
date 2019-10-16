@@ -25,28 +25,28 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private readonly Func<string, RefDataNamespace.Company, IODataArgs, Task> _getOnBeforeAsync = null;
-        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync = null;
-        private readonly Action<Exception> _getOnException = null;
+        private readonly Func<string, RefDataNamespace.Company, IODataArgs, Task> _getOnBeforeAsync;
+        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync;
+        private readonly Action<Exception> _getOnException;
 
-        private readonly Func<IQueryable<CustomerGroup>, CustomerGroupArgs, IODataArgs, IQueryable<CustomerGroup>> _getByArgsOnQuery = null;
-        private readonly Func<CustomerGroupArgs, IODataArgs, Task> _getByArgsOnBeforeAsync = null;
-        private readonly Func<CustomerGroupCollectionResult, CustomerGroupArgs, Task> _getByArgsOnAfterAsync = null;
-        private readonly Action<Exception> _getByArgsOnException = null;
+        private readonly Func<IQueryable<CustomerGroup>, CustomerGroupArgs, IODataArgs, IQueryable<CustomerGroup>> _getByArgsOnQuery;
+        private readonly Func<CustomerGroupArgs, IODataArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<CustomerGroupCollectionResult, CustomerGroupArgs, Task> _getByArgsOnAfterAsync;
+        private readonly Action<Exception> _getByArgsOnException;
 
-        private readonly Func<CustomerGroup, IODataArgs, Task> _createOnBeforeAsync = null;
-        private readonly Func<CustomerGroup, Task> _createOnAfterAsync = null;
-        private readonly Action<Exception> _createOnException = null;
+        private readonly Func<CustomerGroup, IODataArgs, Task> _createOnBeforeAsync;
+        private readonly Func<CustomerGroup, Task> _createOnAfterAsync;
+        private readonly Action<Exception> _createOnException;
 
-        private readonly Func<CustomerGroup, IODataArgs, Task> _updateOnBeforeAsync = null;
-        private readonly Func<CustomerGroup, Task> _updateOnAfterAsync = null;
-        private readonly Action<Exception> _updateOnException = null;
+        private readonly Func<CustomerGroup, IODataArgs, Task> _updateOnBeforeAsync;
+        private readonly Func<CustomerGroup, Task> _updateOnAfterAsync;
+        private readonly Action<Exception> _updateOnException;
 
-        private readonly Action<Exception> _updateBatchOnException = null;
+        private readonly Action<Exception> _updateBatchOnException;
 
-        private readonly Func<string, RefDataNamespace.Company, IODataArgs, Task> _deleteOnBeforeAsync = null;
-        private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync = null;
-        private readonly Action<Exception> _deleteOnException = null;
+        private readonly Func<string, RefDataNamespace.Company, IODataArgs, Task> _deleteOnBeforeAsync;
+        private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync;
+        private readonly Action<Exception> _deleteOnException;
 
         #endregion
 

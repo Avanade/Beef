@@ -24,30 +24,30 @@ namespace Beef.Demo.Business
     {
         #region Private
 
-        private Func<Guid, Task> _getOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _getOnValidate = null;
-        private Func<Guid, Task> _getOnBeforeAsync = null;
-        private Func<Robot, Guid, Task> _getOnAfterAsync = null;
+        private readonly Func<Guid, Task> _getOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _getOnValidate;
+        private readonly Func<Guid, Task> _getOnBeforeAsync;
+        private readonly Func<Robot, Guid, Task> _getOnAfterAsync;
 
-        private Func<Robot, Task> _createOnPreValidateAsync = null;
-        private Action<MultiValidator, Robot> _createOnValidate = null;
-        private Func<Robot, Task> _createOnBeforeAsync = null;
-        private Func<Robot, Task> _createOnAfterAsync = null;
+        private readonly Func<Robot, Task> _createOnPreValidateAsync;
+        private readonly Action<MultiValidator, Robot> _createOnValidate;
+        private readonly Func<Robot, Task> _createOnBeforeAsync;
+        private readonly Func<Robot, Task> _createOnAfterAsync;
 
-        private Func<Robot, Guid, Task> _updateOnPreValidateAsync = null;
-        private Action<MultiValidator, Robot, Guid> _updateOnValidate = null;
-        private Func<Robot, Guid, Task> _updateOnBeforeAsync = null;
-        private Func<Robot, Guid, Task> _updateOnAfterAsync = null;
+        private readonly Func<Robot, Guid, Task> _updateOnPreValidateAsync;
+        private readonly Action<MultiValidator, Robot, Guid> _updateOnValidate;
+        private readonly Func<Robot, Guid, Task> _updateOnBeforeAsync;
+        private readonly Func<Robot, Guid, Task> _updateOnAfterAsync;
 
-        private Func<Guid, Task> _deleteOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _deleteOnValidate = null;
-        private Func<Guid, Task> _deleteOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteOnAfterAsync = null;
+        private readonly Func<Guid, Task> _deleteOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _deleteOnValidate;
+        private readonly Func<Guid, Task> _deleteOnBeforeAsync;
+        private readonly Func<Guid, Task> _deleteOnAfterAsync;
 
-        private Func<RobotArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync = null;
-        private Action<MultiValidator, RobotArgs, PagingArgs> _getByArgsOnValidate = null;
-        private Func<RobotArgs, PagingArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<RobotCollectionResult, RobotArgs, PagingArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Func<RobotArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync;
+        private readonly Action<MultiValidator, RobotArgs, PagingArgs> _getByArgsOnValidate;
+        private readonly Func<RobotArgs, PagingArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<RobotCollectionResult, RobotArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
 
         #endregion
 

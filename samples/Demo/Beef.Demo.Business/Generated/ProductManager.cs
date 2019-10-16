@@ -24,15 +24,15 @@ namespace Beef.Demo.Business
     {
         #region Private
 
-        private Func<int, Task> _getOnPreValidateAsync = null;
-        private Action<MultiValidator, int> _getOnValidate = null;
-        private Func<int, Task> _getOnBeforeAsync = null;
-        private Func<Product, int, Task> _getOnAfterAsync = null;
+        private readonly Func<int, Task> _getOnPreValidateAsync;
+        private readonly Action<MultiValidator, int> _getOnValidate;
+        private readonly Func<int, Task> _getOnBeforeAsync;
+        private readonly Func<Product, int, Task> _getOnAfterAsync;
 
-        private Func<ProductArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync = null;
-        private Action<MultiValidator, ProductArgs, PagingArgs> _getByArgsOnValidate = null;
-        private Func<ProductArgs, PagingArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<ProductCollectionResult, ProductArgs, PagingArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Func<ProductArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync;
+        private readonly Action<MultiValidator, ProductArgs, PagingArgs> _getByArgsOnValidate;
+        private readonly Func<ProductArgs, PagingArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<ProductCollectionResult, ProductArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
 
         #endregion
 

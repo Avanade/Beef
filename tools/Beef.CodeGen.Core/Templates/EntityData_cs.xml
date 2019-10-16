@@ -171,7 +171,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <![CDATA[, IEfDbArgs, IQueryable<{{Entity.EntityFrameworkEntity}}>]]>
             </If>
-            <![CDATA[> {{Operation.PrivateName}}OnQuery = null;
+            <![CDATA[> {{Operation.PrivateName}}OnQuery;
 ]]>
           </If>
           <![CDATA[        private readonly Func<]]>
@@ -207,7 +207,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <If Condition="System.AutoImplement == 'EntityFramework'">
             <![CDATA[IEfDbArgs, ]]>
           </If>
-          <![CDATA[Task> {{Operation.PrivateName}}OnBeforeAsync = null;
+          <![CDATA[Task> {{Operation.PrivateName}}OnBeforeAsync;
         private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
@@ -240,7 +240,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <![CDATA[        #region Private
 ]]>
           </If>
-          <![CDATA[, Task> {{Operation.PrivateName}}OnAfterAsync = null;
+          <![CDATA[, Task> {{Operation.PrivateName}}OnAfterAsync;
 ]]>
         </If>
         <If Condition="Operation.OperationType == 'Custom' or Operation.AutoImplement == 'None'">
@@ -252,7 +252,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[
 ]]>
         </If>
-        <![CDATA[        private readonly Action<Exception> {{Operation.PrivateName}}OnException = null;
+        <![CDATA[        private readonly Action<Exception> {{Operation.PrivateName}}OnException;
 ]]>
       </Operation>
       <If Condition="System.EndRegion == true">

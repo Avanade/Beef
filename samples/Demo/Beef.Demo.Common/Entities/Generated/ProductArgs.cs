@@ -41,18 +41,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProductArgs"/> class.
-        /// </summary>
-        public ProductArgs()
-        {
-            this.ProductArgsConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -62,8 +50,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Name")]
         public string Name
         {
-            get { return this._name; }
-            set { SetValue(ref this._name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
+            get { return _name; }
+            set { SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
         }
 
         /// <summary>
@@ -73,8 +61,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string Description
         {
-            get { return this._description; }
-            set { SetValue(ref this._description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
+            get { return _description; }
+            set { SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
         }
 
         #endregion
@@ -98,10 +86,10 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(ProductArgs from)
         {
             CopyFrom((EntityBase)from);
-            this.Name = from.Name;
-            this.Description = from.Description;
+            Name = from.Name;
+            Description = from.Description;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -129,10 +117,10 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Name = Cleaner.Clean(this.Name, StringTrim.End, StringTransform.EmptyToNull);
-            this.Description = Cleaner.Clean(this.Description, StringTrim.End, StringTransform.EmptyToNull);
+            Name = Cleaner.Clean(Name, StringTrim.End, StringTransform.EmptyToNull);
+            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -143,8 +131,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Name)
-                    && Cleaner.IsInitial(this.Description);
+                return Cleaner.IsInitial(Name)
+                    && Cleaner.IsInitial(Description);
             }
         }
 

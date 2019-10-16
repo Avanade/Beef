@@ -71,18 +71,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Robot"/> class.
-        /// </summary>
-        public Robot()
-        {
-            this.RobotConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -92,8 +80,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Identifier")]
         public Guid Id
         {
-            get { return this._id; }
-            set { SetValue<Guid>(ref this._id, value, false, false, Property_Id); }
+            get { return _id; }
+            set { SetValue<Guid>(ref _id, value, false, false, Property_Id); }
         }
 
         /// <summary>
@@ -103,8 +91,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Model No")]
         public string ModelNo
         {
-            get { return this._modelNo; }
-            set { SetValue(ref this._modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ModelNo); }
+            get { return _modelNo; }
+            set { SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ModelNo); }
         }
 
         /// <summary>
@@ -114,8 +102,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Serial No")]
         public string SerialNo
         {
-            get { return this._serialNo; }
-            set { SetValue(ref this._serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_SerialNo); }
+            get { return _serialNo; }
+            set { SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_SerialNo); }
         }
 
         /// <summary>
@@ -125,8 +113,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public string EyeColorSid
         {
-            get { return this._eyeColorSid; }
-            set { SetValue(ref this._eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
+            get { return _eyeColorSid; }
+            set { SetValue(ref _eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
         }
 
         /// <summary>
@@ -136,8 +124,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public RefDataNamespace.EyeColor EyeColor
         {
-            get { return this._eyeColorSid; }
-            set { SetValue<string>(ref this._eyeColorSid, value, false, false, Property_EyeColor); }
+            get { return _eyeColorSid; }
+            set { SetValue<string>(ref _eyeColorSid, value, false, false, Property_EyeColor); }
         }
 
         /// <summary>
@@ -147,8 +135,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Power Source")]
         public string PowerSourceSid
         {
-            get { return this._powerSourceSid; }
-            set { SetValue(ref this._powerSourceSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_PowerSource); }
+            get { return _powerSourceSid; }
+            set { SetValue(ref _powerSourceSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_PowerSource); }
         }
 
         /// <summary>
@@ -158,8 +146,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Power Source")]
         public RefDataNamespace.PowerSource PowerSource
         {
-            get { return this._powerSourceSid; }
-            set { SetValue<string>(ref this._powerSourceSid, value, false, false, Property_PowerSource); }
+            get { return _powerSourceSid; }
+            set { SetValue<string>(ref _powerSourceSid, value, false, false, Property_PowerSource); }
         }
 
         /// <summary>
@@ -169,8 +157,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="ETag")]
         public string ETag
         {
-            get { return this._eTag; }
-            set { SetValue(ref this._eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ETag); }
+            get { return _eTag; }
+            set { SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ETag); }
         }
 
         /// <summary>
@@ -180,8 +168,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Change Log")]
         public ChangeLog ChangeLog
         {
-            get { return this._changeLog; }
-            set { SetValue<ChangeLog>(ref this._changeLog, value, false, false, Property_ChangeLog); }
+            get { return _changeLog; }
+            set { SetValue<ChangeLog>(ref _changeLog, value, false, false, Property_ChangeLog); }
         }
 
         #endregion
@@ -219,7 +207,7 @@ namespace Beef.Demo.Common.Entities
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.Id); }
+            get { return new UniqueKey(Id); }
         }
 
         #endregion
@@ -243,15 +231,15 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Robot from)
         {
             CopyFrom((EntityBase)from);
-            this.Id = from.Id;
-            this.ModelNo = from.ModelNo;
-            this.SerialNo = from.SerialNo;
-            this.EyeColor = from.EyeColor;
-            this.PowerSource = from.PowerSource;
-            this.ETag = from.ETag;
-            this.ChangeLog = from.ChangeLog;
+            Id = from.Id;
+            ModelNo = from.ModelNo;
+            SerialNo = from.SerialNo;
+            EyeColorSid = from.EyeColorSid;
+            PowerSourceSid = from.PowerSourceSid;
+            ETag = from.ETag;
+            ChangeLog = from.ChangeLog;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -279,15 +267,15 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Id = Cleaner.Clean<Guid>(this.Id);
-            this.ModelNo = Cleaner.Clean(this.ModelNo, StringTrim.End, StringTransform.EmptyToNull);
-            this.SerialNo = Cleaner.Clean(this.SerialNo, StringTrim.End, StringTransform.EmptyToNull);
-            this.EyeColor = Cleaner.Clean<RefDataNamespace.EyeColor>(this.EyeColor);
-            this.PowerSource = Cleaner.Clean<RefDataNamespace.PowerSource>(this.PowerSource);
-            this.ETag = Cleaner.Clean(this.ETag, StringTrim.End, StringTransform.EmptyToNull);
-            this.ChangeLog = Cleaner.Clean<ChangeLog>(this.ChangeLog);
+            Id = Cleaner.Clean(Id);
+            ModelNo = Cleaner.Clean(ModelNo, StringTrim.End, StringTransform.EmptyToNull);
+            SerialNo = Cleaner.Clean(SerialNo, StringTrim.End, StringTransform.EmptyToNull);
+            EyeColorSid = Cleaner.Clean(EyeColorSid);
+            PowerSourceSid = Cleaner.Clean(PowerSourceSid);
+            ETag = Cleaner.Clean(ETag, StringTrim.End, StringTransform.EmptyToNull);
+            ChangeLog = Cleaner.Clean(ChangeLog);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -298,13 +286,13 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Id)
-                    && Cleaner.IsInitial(this.ModelNo)
-                    && Cleaner.IsInitial(this.SerialNo)
-                    && Cleaner.IsInitial(this.EyeColor)
-                    && Cleaner.IsInitial(this.PowerSource)
-                    && Cleaner.IsInitial(this.ETag)
-                    && Cleaner.IsInitial(this.ChangeLog);
+                return Cleaner.IsInitial(Id)
+                    && Cleaner.IsInitial(ModelNo)
+                    && Cleaner.IsInitial(SerialNo)
+                    && Cleaner.IsInitial(EyeColorSid)
+                    && Cleaner.IsInitial(PowerSourceSid)
+                    && Cleaner.IsInitial(ETag)
+                    && Cleaner.IsInitial(ChangeLog);
             }
         }
 
@@ -405,7 +393,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public RobotCollectionResult(IEnumerable<Robot> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

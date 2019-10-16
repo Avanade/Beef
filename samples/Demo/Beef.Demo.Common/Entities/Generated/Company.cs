@@ -29,18 +29,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Company"/> class.
-        /// </summary>
-        public Company()
-        {
-            this.CompanyConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -99,9 +87,9 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Company from)
         {
             CopyFrom((ReferenceDataBaseGuid)from);
-            this.ExternalCode = from.ExternalCode;
+            ExternalCode = from.ExternalCode;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -130,7 +118,7 @@ namespace Beef.Demo.Common.Entities
         {
             base.CleanUp();
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>

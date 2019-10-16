@@ -89,18 +89,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Person"/> class.
-        /// </summary>
-        public Person()
-        {
-            this.PersonConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -110,8 +98,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Identifier")]
         public Guid Id
         {
-            get { return this._id; }
-            set { SetValue<Guid>(ref this._id, value, false, false, Property_Id); }
+            get { return _id; }
+            set { SetValue<Guid>(ref _id, value, false, false, Property_Id); }
         }
 
         /// <summary>
@@ -121,8 +109,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="First Name")]
         public string FirstName
         {
-            get { return this._firstName; }
-            set { SetValue(ref this._firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_FirstName); }
+            get { return _firstName; }
+            set { SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_FirstName); }
         }
 
         /// <summary>
@@ -132,8 +120,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Last Name")]
         public string LastName
         {
-            get { return this._lastName; }
-            set { SetValue(ref this._lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_LastName); }
+            get { return _lastName; }
+            set { SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_LastName); }
         }
 
         /// <summary>
@@ -143,8 +131,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Unique Code")]
         public string UniqueCode
         {
-            get { return this._uniqueCode; }
-            set { SetValue(ref this._uniqueCode, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_UniqueCode); }
+            get { return _uniqueCode; }
+            set { SetValue(ref _uniqueCode, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_UniqueCode); }
         }
 
         /// <summary>
@@ -154,8 +142,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Gender")]
         public string GenderSid
         {
-            get { return this._genderSid; }
-            set { SetValue(ref this._genderSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Gender); }
+            get { return _genderSid; }
+            set { SetValue(ref _genderSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Gender); }
         }
 
         /// <summary>
@@ -165,8 +153,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Gender")]
         public RefDataNamespace.Gender Gender
         {
-            get { return this._genderSid; }
-            set { SetValue<string>(ref this._genderSid, value, false, false, Property_Gender); }
+            get { return _genderSid; }
+            set { SetValue<string>(ref _genderSid, value, false, false, Property_Gender); }
         }
 
         /// <summary>
@@ -176,8 +164,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public string EyeColorSid
         {
-            get { return this._eyeColorSid; }
-            set { SetValue(ref this._eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
+            get { return _eyeColorSid; }
+            set { SetValue(ref _eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
         }
 
         /// <summary>
@@ -187,8 +175,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public RefDataNamespace.EyeColor EyeColor
         {
-            get { return this._eyeColorSid; }
-            set { SetValue<string>(ref this._eyeColorSid, value, false, false, Property_EyeColor); }
+            get { return _eyeColorSid; }
+            set { SetValue<string>(ref _eyeColorSid, value, false, false, Property_EyeColor); }
         }
 
         /// <summary>
@@ -199,8 +187,8 @@ namespace Beef.Demo.Common.Entities
         [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime Birthday
         {
-            get { return this._birthday; }
-            set { SetValue(ref this._birthday, value, false, DateTimeTransform.DateOnly, Property_Birthday); }
+            get { return _birthday; }
+            set { SetValue(ref _birthday, value, false, DateTimeTransform.DateOnly, Property_Birthday); }
         }
 
         /// <summary>
@@ -210,8 +198,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Address")]
         public Address Address
         {
-            get { return this._address; }
-            set { SetValue<Address>(ref this._address, value, false, false, Property_Address); }
+            get { return _address; }
+            set { SetValue<Address>(ref _address, value, false, false, Property_Address); }
         }
 
         /// <summary>
@@ -221,8 +209,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="ETag")]
         public string ETag
         {
-            get { return this._eTag; }
-            set { SetValue(ref this._eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ETag); }
+            get { return _eTag; }
+            set { SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ETag); }
         }
 
         /// <summary>
@@ -232,8 +220,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Change Log")]
         public ChangeLog ChangeLog
         {
-            get { return this._changeLog; }
-            set { SetValue<ChangeLog>(ref this._changeLog, value, false, false, Property_ChangeLog); }
+            get { return _changeLog; }
+            set { SetValue<ChangeLog>(ref _changeLog, value, false, false, Property_ChangeLog); }
         }
 
         #endregion
@@ -271,7 +259,7 @@ namespace Beef.Demo.Common.Entities
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.Id); }
+            get { return new UniqueKey(Id); }
         }
 
         #endregion
@@ -295,18 +283,18 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Person from)
         {
             CopyFrom((EntityBase)from);
-            this.Id = from.Id;
-            this.FirstName = from.FirstName;
-            this.LastName = from.LastName;
-            this.UniqueCode = from.UniqueCode;
-            this.Gender = from.Gender;
-            this.EyeColor = from.EyeColor;
-            this.Birthday = from.Birthday;
-            this.Address = (from.Address == null) ? null : (Address)from.Address.Clone();
-            this.ETag = from.ETag;
-            this.ChangeLog = from.ChangeLog;
+            Id = from.Id;
+            FirstName = from.FirstName;
+            LastName = from.LastName;
+            UniqueCode = from.UniqueCode;
+            GenderSid = from.GenderSid;
+            EyeColorSid = from.EyeColorSid;
+            Birthday = from.Birthday;
+            Address = (from.Address == null) ? null : (Address)from.Address.Clone();
+            ETag = from.ETag;
+            ChangeLog = from.ChangeLog;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -334,18 +322,18 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Id = Cleaner.Clean<Guid>(this.Id);
-            this.FirstName = Cleaner.Clean(this.FirstName, StringTrim.End, StringTransform.EmptyToNull);
-            this.LastName = Cleaner.Clean(this.LastName, StringTrim.End, StringTransform.EmptyToNull);
-            this.UniqueCode = Cleaner.Clean(this.UniqueCode, StringTrim.End, StringTransform.EmptyToNull);
-            this.Gender = Cleaner.Clean<RefDataNamespace.Gender>(this.Gender);
-            this.EyeColor = Cleaner.Clean<RefDataNamespace.EyeColor>(this.EyeColor);
-            this.Birthday = Cleaner.Clean(this.Birthday, DateTimeTransform.DateOnly);
-            this.Address = Cleaner.Clean<Address>(this.Address);
-            this.ETag = Cleaner.Clean(this.ETag, StringTrim.End, StringTransform.EmptyToNull);
-            this.ChangeLog = Cleaner.Clean<ChangeLog>(this.ChangeLog);
+            Id = Cleaner.Clean(Id);
+            FirstName = Cleaner.Clean(FirstName, StringTrim.End, StringTransform.EmptyToNull);
+            LastName = Cleaner.Clean(LastName, StringTrim.End, StringTransform.EmptyToNull);
+            UniqueCode = Cleaner.Clean(UniqueCode, StringTrim.End, StringTransform.EmptyToNull);
+            GenderSid = Cleaner.Clean(GenderSid);
+            EyeColorSid = Cleaner.Clean(EyeColorSid);
+            Birthday = Cleaner.Clean(Birthday, DateTimeTransform.DateOnly);
+            Address = Cleaner.Clean(Address);
+            ETag = Cleaner.Clean(ETag, StringTrim.End, StringTransform.EmptyToNull);
+            ChangeLog = Cleaner.Clean(ChangeLog);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -356,16 +344,16 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Id)
-                    && Cleaner.IsInitial(this.FirstName)
-                    && Cleaner.IsInitial(this.LastName)
-                    && Cleaner.IsInitial(this.UniqueCode)
-                    && Cleaner.IsInitial(this.Gender)
-                    && Cleaner.IsInitial(this.EyeColor)
-                    && Cleaner.IsInitial(this.Birthday)
-                    && Cleaner.IsInitial(this.Address)
-                    && Cleaner.IsInitial(this.ETag)
-                    && Cleaner.IsInitial(this.ChangeLog);
+                return Cleaner.IsInitial(Id)
+                    && Cleaner.IsInitial(FirstName)
+                    && Cleaner.IsInitial(LastName)
+                    && Cleaner.IsInitial(UniqueCode)
+                    && Cleaner.IsInitial(GenderSid)
+                    && Cleaner.IsInitial(EyeColorSid)
+                    && Cleaner.IsInitial(Birthday)
+                    && Cleaner.IsInitial(Address)
+                    && Cleaner.IsInitial(ETag)
+                    && Cleaner.IsInitial(ChangeLog);
             }
         }
 
@@ -466,7 +454,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public PersonCollectionResult(IEnumerable<Person> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

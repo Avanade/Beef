@@ -24,35 +24,35 @@ namespace Beef.Demo.Business
     {
         #region Private
 
-        private Func<string, RefDataNamespace.Company, Task> _getOnPreValidateAsync = null;
-        private Action<MultiValidator, string, RefDataNamespace.Company> _getOnValidate = null;
-        private Func<string, RefDataNamespace.Company, Task> _getOnBeforeAsync = null;
-        private Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync = null;
+        private readonly Func<string, RefDataNamespace.Company, Task> _getOnPreValidateAsync;
+        private readonly Action<MultiValidator, string, RefDataNamespace.Company> _getOnValidate;
+        private readonly Func<string, RefDataNamespace.Company, Task> _getOnBeforeAsync;
+        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync;
 
-        private Func<CustomerGroupArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync = null;
-        private Action<MultiValidator, CustomerGroupArgs, PagingArgs> _getByArgsOnValidate = null;
-        private Func<CustomerGroupArgs, PagingArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<CustomerGroupCollectionResult, CustomerGroupArgs, PagingArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Func<CustomerGroupArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync;
+        private readonly Action<MultiValidator, CustomerGroupArgs, PagingArgs> _getByArgsOnValidate;
+        private readonly Func<CustomerGroupArgs, PagingArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<CustomerGroupCollectionResult, CustomerGroupArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
 
-        private Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnPreValidateAsync = null;
-        private Action<MultiValidator, CustomerGroup, RefDataNamespace.Company> _createOnValidate = null;
-        private Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnBeforeAsync = null;
-        private Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnAfterAsync = null;
+        private readonly Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnPreValidateAsync;
+        private readonly Action<MultiValidator, CustomerGroup, RefDataNamespace.Company> _createOnValidate;
+        private readonly Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnBeforeAsync;
+        private readonly Func<CustomerGroup, RefDataNamespace.Company, Task> _createOnAfterAsync;
 
-        private Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnPreValidateAsync = null;
-        private Action<MultiValidator, CustomerGroup, string, RefDataNamespace.Company> _updateOnValidate = null;
-        private Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnBeforeAsync = null;
-        private Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnAfterAsync = null;
+        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnPreValidateAsync;
+        private readonly Action<MultiValidator, CustomerGroup, string, RefDataNamespace.Company> _updateOnValidate;
+        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnBeforeAsync;
+        private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _updateOnAfterAsync;
 
-        private Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnPreValidateAsync = null;
-        private Action<MultiValidator, CustomerGroupCollection, RefDataNamespace.Company> _updateBatchOnValidate = null;
-        private Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnBeforeAsync = null;
-        private Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnAfterAsync = null;
+        private readonly Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnPreValidateAsync;
+        private readonly Action<MultiValidator, CustomerGroupCollection, RefDataNamespace.Company> _updateBatchOnValidate;
+        private readonly Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnBeforeAsync;
+        private readonly Func<CustomerGroupCollection, RefDataNamespace.Company, Task> _updateBatchOnAfterAsync;
 
-        private Func<string, RefDataNamespace.Company, Task> _deleteOnPreValidateAsync = null;
-        private Action<MultiValidator, string, RefDataNamespace.Company> _deleteOnValidate = null;
-        private Func<string, RefDataNamespace.Company, Task> _deleteOnBeforeAsync = null;
-        private Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync = null;
+        private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnPreValidateAsync;
+        private readonly Action<MultiValidator, string, RefDataNamespace.Company> _deleteOnValidate;
+        private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnBeforeAsync;
+        private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync;
 
         #endregion
 

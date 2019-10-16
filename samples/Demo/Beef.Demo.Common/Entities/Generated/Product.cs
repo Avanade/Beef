@@ -47,18 +47,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Product"/> class.
-        /// </summary>
-        public Product()
-        {
-            this.ProductConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -68,8 +56,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Identifier")]
         public int Id
         {
-            get { return this._id; }
-            set { SetValue<int>(ref this._id, value, true, false, Property_Id); }
+            get { return _id; }
+            set { SetValue<int>(ref _id, value, true, false, Property_Id); }
         }
 
         /// <summary>
@@ -79,8 +67,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Name")]
         public string Name
         {
-            get { return this._name; }
-            set { SetValue(ref this._name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
+            get { return _name; }
+            set { SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
         }
 
         /// <summary>
@@ -90,8 +78,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string Description
         {
-            get { return this._description; }
-            set { SetValue(ref this._description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
+            get { return _description; }
+            set { SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
         }
 
         #endregion
@@ -129,7 +117,7 @@ namespace Beef.Demo.Common.Entities
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.Id); }
+            get { return new UniqueKey(Id); }
         }
 
         #endregion
@@ -153,11 +141,11 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Product from)
         {
             CopyFrom((EntityBase)from);
-            this.Id = from.Id;
-            this.Name = from.Name;
-            this.Description = from.Description;
+            Id = from.Id;
+            Name = from.Name;
+            Description = from.Description;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -185,10 +173,10 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Name = Cleaner.Clean(this.Name, StringTrim.End, StringTransform.EmptyToNull);
-            this.Description = Cleaner.Clean(this.Description, StringTrim.End, StringTransform.EmptyToNull);
+            Name = Cleaner.Clean(Name, StringTrim.End, StringTransform.EmptyToNull);
+            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -199,8 +187,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Name)
-                    && Cleaner.IsInitial(this.Description);
+                return Cleaner.IsInitial(Name)
+                    && Cleaner.IsInitial(Description);
             }
         }
 
@@ -301,7 +289,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public ProductCollectionResult(IEnumerable<Product> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

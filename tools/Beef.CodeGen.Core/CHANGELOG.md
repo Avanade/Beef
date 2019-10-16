@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.17
+- *Fixed:* Optimisations made to the entity code generation for reference data so that internal operations use the property serialization identifier (SID); otherwise, was resulting in unecessary reference data loads.
+
 ## v2.1.16
 - *Fixed:* Database merge statements updated to include `AND EXISTS (...)` for a `WHEN MATCHED` to avoid updates where column data has not changed.
 

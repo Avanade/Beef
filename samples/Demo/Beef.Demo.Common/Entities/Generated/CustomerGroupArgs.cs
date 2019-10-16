@@ -41,18 +41,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CustomerGroupArgs"/> class.
-        /// </summary>
-        public CustomerGroupArgs()
-        {
-            this.CustomerGroupArgsConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -62,8 +50,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public string CompanySid
         {
-            get { return this._companySid; }
-            set { SetValue(ref this._companySid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Company); }
+            get { return _companySid; }
+            set { SetValue(ref _companySid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Company); }
         }
 
         /// <summary>
@@ -73,8 +61,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public RefDataNamespace.Company Company
         {
-            get { return this._companySid; }
-            set { SetValue<string>(ref this._companySid, value, false, false, Property_Company); }
+            get { return _companySid; }
+            set { SetValue<string>(ref _companySid, value, false, false, Property_Company); }
         }
 
         /// <summary>
@@ -84,8 +72,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string Description
         {
-            get { return this._description; }
-            set { SetValue(ref this._description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
+            get { return _description; }
+            set { SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
         }
 
         #endregion
@@ -109,10 +97,10 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(CustomerGroupArgs from)
         {
             CopyFrom((EntityBase)from);
-            this.Company = from.Company;
-            this.Description = from.Description;
+            CompanySid = from.CompanySid;
+            Description = from.Description;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -140,10 +128,10 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Company = Cleaner.Clean<RefDataNamespace.Company>(this.Company);
-            this.Description = Cleaner.Clean(this.Description, StringTrim.End, StringTransform.EmptyToNull);
+            CompanySid = Cleaner.Clean(CompanySid);
+            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -154,8 +142,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Company)
-                    && Cleaner.IsInitial(this.Description);
+                return Cleaner.IsInitial(CompanySid)
+                    && Cleaner.IsInitial(Description);
             }
         }
 

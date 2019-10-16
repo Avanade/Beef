@@ -35,18 +35,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetail"/> class.
-        /// </summary>
-        public PersonDetail()
-        {
-            this.PersonDetailConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -56,8 +44,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="History")]
         public WorkHistoryCollection History
         {
-            get { return this._history; }
-            set { SetValue<WorkHistoryCollection>(ref this._history, value, false, false, Property_History); }
+            get { return _history; }
+            set { SetValue<WorkHistoryCollection>(ref _history, value, false, false, Property_History); }
         }
 
         #endregion
@@ -81,9 +69,9 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(PersonDetail from)
         {
             CopyFrom((Person)from);
-            this.History = from.History;
+            History = from.History;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -111,9 +99,9 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.History = Cleaner.Clean<WorkHistoryCollection>(this.History);
+            History = Cleaner.Clean(History);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -127,7 +115,7 @@ namespace Beef.Demo.Common.Entities
                 if (!base.IsInitial)
                     return false;
 
-                return Cleaner.IsInitial(this.History);
+                return Cleaner.IsInitial(History);
             }
         }
 
@@ -228,7 +216,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public PersonDetailCollectionResult(IEnumerable<PersonDetail> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

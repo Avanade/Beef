@@ -25,17 +25,17 @@ namespace Beef.Demo.Business.Data
     {
         #region Private
 
-        private readonly Func<Guid, IDatabaseArgs, Task> _getOnBeforeAsync = null;
-        private readonly Func<Gender, Guid, Task> _getOnAfterAsync = null;
-        private readonly Action<Exception> _getOnException = null;
+        private readonly Func<Guid, IDatabaseArgs, Task> _getOnBeforeAsync;
+        private readonly Func<Gender, Guid, Task> _getOnAfterAsync;
+        private readonly Action<Exception> _getOnException;
 
-        private readonly Func<Gender, IDatabaseArgs, Task> _createOnBeforeAsync = null;
-        private readonly Func<Gender, Task> _createOnAfterAsync = null;
-        private readonly Action<Exception> _createOnException = null;
+        private readonly Func<Gender, IDatabaseArgs, Task> _createOnBeforeAsync;
+        private readonly Func<Gender, Task> _createOnAfterAsync;
+        private readonly Action<Exception> _createOnException;
 
-        private readonly Func<Gender, IDatabaseArgs, Task> _updateOnBeforeAsync = null;
-        private readonly Func<Gender, Task> _updateOnAfterAsync = null;
-        private readonly Action<Exception> _updateOnException = null;
+        private readonly Func<Gender, IDatabaseArgs, Task> _updateOnBeforeAsync;
+        private readonly Func<Gender, Task> _updateOnAfterAsync;
+        private readonly Action<Exception> _updateOnException;
 
         #endregion
 

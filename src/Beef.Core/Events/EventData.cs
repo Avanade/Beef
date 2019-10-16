@@ -139,7 +139,7 @@ namespace Beef.Events
         public Guid? TenantId { get; set; }
 
         /// <summary>
-        /// Gets or sets the event subject (the name should use the '/' character to denote paths).
+        /// Gets or sets the event subject (the name should use the '.' character to denote paths).
         /// </summary>
         [JsonProperty("subject", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Subject { get; set; }

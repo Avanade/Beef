@@ -53,18 +53,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WorkHistory"/> class.
-        /// </summary>
-        public WorkHistory()
-        {
-            this.WorkHistoryConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -73,8 +61,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Person")]
         public Guid PersonId
         {
-            get { return this._personId; }
-            set { SetValue<Guid>(ref this._personId, value, true, false, Property_PersonId); }
+            get { return _personId; }
+            set { SetValue<Guid>(ref _personId, value, true, false, Property_PersonId); }
         }
 
         /// <summary>
@@ -84,8 +72,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Name")]
         public string Name
         {
-            get { return this._name; }
-            set { SetValue(ref this._name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
+            get { return _name; }
+            set { SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Name); }
         }
 
         /// <summary>
@@ -96,8 +84,8 @@ namespace Beef.Demo.Common.Entities
         [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime StartDate
         {
-            get { return this._startDate; }
-            set { SetValue(ref this._startDate, value, false, DateTimeTransform.DateOnly, Property_StartDate); }
+            get { return _startDate; }
+            set { SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, Property_StartDate); }
         }
 
         /// <summary>
@@ -108,8 +96,8 @@ namespace Beef.Demo.Common.Entities
         [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime? EndDate
         {
-            get { return this._endDate; }
-            set { SetValue(ref this._endDate, value, false, DateTimeTransform.DateOnly, Property_EndDate); }
+            get { return _endDate; }
+            set { SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, Property_EndDate); }
         }
 
         #endregion
@@ -147,7 +135,7 @@ namespace Beef.Demo.Common.Entities
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.Name); }
+            get { return new UniqueKey(Name); }
         }
 
         #endregion
@@ -171,12 +159,12 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(WorkHistory from)
         {
             CopyFrom((EntityBase)from);
-            this.PersonId = from.PersonId;
-            this.Name = from.Name;
-            this.StartDate = from.StartDate;
-            this.EndDate = from.EndDate;
+            PersonId = from.PersonId;
+            Name = from.Name;
+            StartDate = from.StartDate;
+            EndDate = from.EndDate;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -204,11 +192,11 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Name = Cleaner.Clean(this.Name, StringTrim.End, StringTransform.EmptyToNull);
-            this.StartDate = Cleaner.Clean(this.StartDate, DateTimeTransform.DateOnly);
-            this.EndDate = Cleaner.Clean(this.EndDate, DateTimeTransform.DateOnly);
+            Name = Cleaner.Clean(Name, StringTrim.End, StringTransform.EmptyToNull);
+            StartDate = Cleaner.Clean(StartDate, DateTimeTransform.DateOnly);
+            EndDate = Cleaner.Clean(EndDate, DateTimeTransform.DateOnly);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -219,9 +207,9 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Name)
-                    && Cleaner.IsInitial(this.StartDate)
-                    && Cleaner.IsInitial(this.EndDate);
+                return Cleaner.IsInitial(Name)
+                    && Cleaner.IsInitial(StartDate)
+                    && Cleaner.IsInitial(EndDate);
             }
         }
 

@@ -214,21 +214,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
 
 ]]>
     </If>
-    <If Condition="Entity.OmitEntityBase == false">
-      <![CDATA[        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the {{Entity.EntityName:ToSeeComments}} class.
-        /// </summary>
-        public {{Entity.Name}}()
-        {
-            this.{{Entity.Name}}Constructor();
-        }
-        
-        #endregion
-
-]]>
-    </If>
     <Set Name="System.EndRegion" Value="false"/>
     <Property Condition="Property.Inherited == false">
       <If Condition="System.Index == 0 and Entity.OmitEntityBase == false">
@@ -277,13 +262,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
         <![CDATA[
         {
-            get { return this.{{Property.PrivateName}}Sid]]>
+            get { return {{Property.PrivateName}}Sid]]>
         <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
         <![CDATA[; }
             set { SetValue]]>
         <If Condition="Property.RefDataList == true">
           <Then>
-            <![CDATA[<List<{{Property.RefDataType}}>>(ref this.{{Property.PrivateName}}Sids, value, ]]>
+            <![CDATA[<List<{{Property.RefDataType}}>>(ref {{Property.PrivateName}}Sids, value, ]]>
             <If Condition="Property.Immutable == false">
               <Then><![CDATA[false]]></Then>
               <Else><![CDATA[true]]></Else>
@@ -296,7 +281,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
               <If Condition="Property.Nullable == true"><![CDATA[?]]></If>
               <![CDATA[>]]>
             </If>
-            <![CDATA[(ref this.{{Property.PrivateName}}Sid, value, ]]>
+            <![CDATA[(ref {{Property.PrivateName}}Sid, value, ]]>
             <If Condition="Property.Immutable == false">
               <Then><![CDATA[false]]></Then>
               <Else><![CDATA[true]]></Else>
@@ -417,8 +402,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         <Then>
           <![CDATA[        public ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}> {{Property.Name}}
         {
-            get { return new ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}>(ref this.{{Property.PrivateName}}Sids); }
-            set { SetValue<List<{{Property.RefDataType}}>>(ref this.{{Property.PrivateName}}Sids, value?.ToSidList() ?? null]]>
+            get { return new ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}>(ref {{Property.PrivateName}}Sids); }
+            set { SetValue<List<{{Property.RefDataType}}>>(ref {{Property.PrivateName}}Sids, value?.ToSidList() ?? null]]>
           <If Condition="Property.Immutable == false">
             <Then><![CDATA[, false]]></Then>
             <Else><![CDATA[, true]]></Else>
@@ -443,7 +428,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
                   <If Condition="Property.AutoCreate == true">
                     <![CDATA[GetAutoValue(ref ]]>
                   </If>
-                  <![CDATA[this.{{Property.PrivateName}}]]>
+                  <![CDATA[{{Property.PrivateName}}]]>
                   <If Condition="Property.RefDataType != null">
                     <![CDATA[Sid]]>
                   </If>
@@ -474,7 +459,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
               </If>
               <If Condition="Property.RefDataMapping == true">
                 <Then><![CDATA[(ref _{{Property.PrivateName}}]]></Then>
-                <Else><![CDATA[(ref this.{{Property.PrivateName}}]]></Else>
+                <Else><![CDATA[(ref {{Property.PrivateName}}]]></Else>
               </If>
               <If Condition="Property.RefDataType != null">
                 <![CDATA[Sid]]>
@@ -590,15 +575,17 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// </remarks>
         public override UniqueKey UniqueKey
         {
-            get { return new UniqueKey(this.{{Property.Name}}]]>
+            get { return new UniqueKey({{Property.Name}}]]>
             <If Condition="Property.RefDataType != null">
               <![CDATA[Sid]]>
+              <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
             </If>
           </Then>
           <Else>
-            <![CDATA[, this.{{Property.Name}}]]>
+            <![CDATA[, {{Property.Name}}]]>
             <If Condition="Property.RefDataType != null">
               <![CDATA[Sid]]>
+              <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
             </If>
           </Else>
         </If>
@@ -665,11 +652,29 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
       </If>
 
       <Property Condition="Property.Inherited == false">
-        <![CDATA[            this.{{Property.Name}} = ]]>
+        <If Condition="Property.RefDataType == null">
+          <Then><![CDATA[            {{Property.Name}} = ]]></Then>
+          <Else>
+            <![CDATA[            {{Property.Name}}Sid]]>
+            <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
+            <![CDATA[ = ]]>
+          </Else>
+        </If>
+
         <If Condition="Property.IsEntity == false">
           <Then>
-            <![CDATA[from.{{Property.Name}};
+            <If Condition="Property.RefDataType == null">
+              <Then>
+                <![CDATA[from.{{Property.Name}};
 ]]>
+              </Then>
+              <Else>
+                <![CDATA[from.{{Property.Name}}Sid]]>
+                <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
+                <![CDATA[;
+]]>
+              </Else>
+            </If>
           </Then>
           <Else>
             <![CDATA[(from.{{Property.Name}} == null) ? null : ({{Property.Type}})from.{{Property.Name}}.Clone();
@@ -679,7 +684,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
 
       </Property>
       <![CDATA[
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
 ]]>
       <![CDATA[        }
     
@@ -718,22 +723,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
             base.CleanUp();
 ]]>
       <Property Condition="Property.Inherited == false and Property.Immutable == false and Property.ExcludeCleanUp == false">
-        <![CDATA[            this.{{Property.Name}} = Cleaner.Clean]]>
-        <If Condition="Property.RefDataType != null and Property.RefDataList == true">
-          <Then>
-            <![CDATA[<ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}>>]]>
-          </Then>
-          <Else>
-            <If Condition="Property.Type != 'DateTime' and Property.Type != 'string'">
-              <![CDATA[<{{Property.Type}}]]>
-              <If Condition="Property.RefDataType == null and Property.Nullable == true">
-                <![CDATA[?]]>
-              </If>
-              <![CDATA[>]]>
-            </If>
-          </Else>
+        <![CDATA[            {{Property.Name}}]]>
+        <If Condition="Property.RefDataType != null">
+          <![CDATA[Sid]]>
+          <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
         </If>
-        <![CDATA[(this.{{Property.Name}}]]>
+        <![CDATA[ = Cleaner.Clean({{Property.Name}}]]>
+        <If Condition="Property.RefDataType != null">
+          <![CDATA[Sid]]>
+          <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
+        </If>
         <If Condition="Property.Type == 'DateTime'">
           <![CDATA[, DateTimeTransform.{{Property.DateTimeTransform}}]]>
         </If>
@@ -744,7 +743,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
 ]]>
       </Property>
       <![CDATA[
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
 ]]>
       <![CDATA[        }
     
@@ -774,7 +773,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
                     &&]]>
               </Else>
             </If>
-            <![CDATA[ Cleaner.IsInitial(this.{{Property.Name}})]]>
+            <![CDATA[ Cleaner.IsInitial({{Property.Name}}]]>
+            <If Condition="Property.RefDataType != null">
+              <![CDATA[Sid]]>
+              <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
+            </If>
+            <![CDATA[)]]>
             <Set Name="System.NeedsTermination" Value="true" />
           </Property>
           <If Condition="System.NeedsTermination == true">
@@ -998,7 +1002,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public {{Entity.Name}}CollectionResult(IEnumerable<{{Entity.EntityName}}> collection, PagingArgs paging = null) : base(paging)
         {
-            this.Result.AddRange(collection);
+            Result.AddRange(collection);
         }
         
         /// <summary>

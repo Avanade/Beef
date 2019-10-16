@@ -23,20 +23,20 @@ namespace Beef.Demo.Business
     {
         #region Private
 
-        private Func<Guid, Task> _getOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _getOnValidate = null;
-        private Func<Guid, Task> _getOnBeforeAsync = null;
-        private Func<Gender, Guid, Task> _getOnAfterAsync = null;
+        private readonly Func<Guid, Task> _getOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _getOnValidate;
+        private readonly Func<Guid, Task> _getOnBeforeAsync;
+        private readonly Func<Gender, Guid, Task> _getOnAfterAsync;
 
-        private Func<Gender, Task> _createOnPreValidateAsync = null;
-        private Action<MultiValidator, Gender> _createOnValidate = null;
-        private Func<Gender, Task> _createOnBeforeAsync = null;
-        private Func<Gender, Task> _createOnAfterAsync = null;
+        private readonly Func<Gender, Task> _createOnPreValidateAsync;
+        private readonly Action<MultiValidator, Gender> _createOnValidate;
+        private readonly Func<Gender, Task> _createOnBeforeAsync;
+        private readonly Func<Gender, Task> _createOnAfterAsync;
 
-        private Func<Gender, Guid, Task> _updateOnPreValidateAsync = null;
-        private Action<MultiValidator, Gender, Guid> _updateOnValidate = null;
-        private Func<Gender, Guid, Task> _updateOnBeforeAsync = null;
-        private Func<Gender, Guid, Task> _updateOnAfterAsync = null;
+        private readonly Func<Gender, Guid, Task> _updateOnPreValidateAsync;
+        private readonly Action<MultiValidator, Gender, Guid> _updateOnValidate;
+        private readonly Func<Gender, Guid, Task> _updateOnBeforeAsync;
+        private readonly Func<Gender, Guid, Task> _updateOnAfterAsync;
 
         #endregion
 

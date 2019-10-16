@@ -24,84 +24,84 @@ namespace Beef.Demo.Business
     {
         #region Private
 
-        private Func<Person, Task> _createOnPreValidateAsync = null;
-        private Action<MultiValidator, Person> _createOnValidate = null;
-        private Func<Person, Task> _createOnBeforeAsync = null;
-        private Func<Person, Task> _createOnAfterAsync = null;
+        private readonly Func<Person, Task> _createOnPreValidateAsync;
+        private readonly Action<MultiValidator, Person> _createOnValidate;
+        private readonly Func<Person, Task> _createOnBeforeAsync;
+        private readonly Func<Person, Task> _createOnAfterAsync;
 
-        private Func<Guid, Task> _deleteOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _deleteOnValidate = null;
-        private Func<Guid, Task> _deleteOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteOnAfterAsync = null;
+        private readonly Func<Guid, Task> _deleteOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _deleteOnValidate;
+        private readonly Func<Guid, Task> _deleteOnBeforeAsync;
+        private readonly Func<Guid, Task> _deleteOnAfterAsync;
 
-        private Func<Guid, Task> _getOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _getOnValidate = null;
-        private Func<Guid, Task> _getOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _getOnAfterAsync = null;
+        private readonly Func<Guid, Task> _getOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _getOnValidate;
+        private readonly Func<Guid, Task> _getOnBeforeAsync;
+        private readonly Func<Person, Guid, Task> _getOnAfterAsync;
 
-        private Func<Person, Guid, Task> _updateOnPreValidateAsync = null;
-        private Action<MultiValidator, Person, Guid> _updateOnValidate = null;
-        private Func<Person, Guid, Task> _updateOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _updateOnAfterAsync = null;
+        private readonly Func<Person, Guid, Task> _updateOnPreValidateAsync;
+        private readonly Action<MultiValidator, Person, Guid> _updateOnValidate;
+        private readonly Func<Person, Guid, Task> _updateOnBeforeAsync;
+        private readonly Func<Person, Guid, Task> _updateOnAfterAsync;
 
-        private Func<PagingArgs, Task> _getAllOnBeforeAsync = null;
-        private Func<PersonCollectionResult, PagingArgs, Task> _getAllOnAfterAsync = null;
+        private readonly Func<PagingArgs, Task> _getAllOnBeforeAsync;
+        private readonly Func<PersonCollectionResult, PagingArgs, Task> _getAllOnAfterAsync;
 
-        private Func<Task> _getAll2OnBeforeAsync = null;
-        private Func<PersonCollectionResult, Task> _getAll2OnAfterAsync = null;
+        private readonly Func<Task> _getAll2OnBeforeAsync;
+        private readonly Func<PersonCollectionResult, Task> _getAll2OnAfterAsync;
 
-        private Func<PersonArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync = null;
-        private Action<MultiValidator, PersonArgs, PagingArgs> _getByArgsOnValidate = null;
-        private Func<PersonArgs, PagingArgs, Task> _getByArgsOnBeforeAsync = null;
-        private Func<PersonCollectionResult, PersonArgs, PagingArgs, Task> _getByArgsOnAfterAsync = null;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsOnPreValidateAsync;
+        private readonly Action<MultiValidator, PersonArgs, PagingArgs> _getByArgsOnValidate;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsOnBeforeAsync;
+        private readonly Func<PersonCollectionResult, PersonArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
 
-        private Func<PersonArgs, PagingArgs, Task> _getDetailByArgsOnPreValidateAsync = null;
-        private Action<MultiValidator, PersonArgs, PagingArgs> _getDetailByArgsOnValidate = null;
-        private Func<PersonArgs, PagingArgs, Task> _getDetailByArgsOnBeforeAsync = null;
-        private Func<PersonDetailCollectionResult, PersonArgs, PagingArgs, Task> _getDetailByArgsOnAfterAsync = null;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getDetailByArgsOnPreValidateAsync;
+        private readonly Action<MultiValidator, PersonArgs, PagingArgs> _getDetailByArgsOnValidate;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getDetailByArgsOnBeforeAsync;
+        private readonly Func<PersonDetailCollectionResult, PersonArgs, PagingArgs, Task> _getDetailByArgsOnAfterAsync;
 
-        private Func<Guid, Guid, Task> _mergeOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid, Guid> _mergeOnValidate = null;
-        private Func<Guid, Guid, Task> _mergeOnBeforeAsync = null;
-        private Func<Person, Guid, Guid, Task> _mergeOnAfterAsync = null;
+        private readonly Func<Guid, Guid, Task> _mergeOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid, Guid> _mergeOnValidate;
+        private readonly Func<Guid, Guid, Task> _mergeOnBeforeAsync;
+        private readonly Func<Person, Guid, Guid, Task> _mergeOnAfterAsync;
 
-        private Func<Task> _markOnBeforeAsync = null;
-        private Func<Task> _markOnAfterAsync = null;
+        private readonly Func<Task> _markOnBeforeAsync;
+        private readonly Func<Task> _markOnAfterAsync;
 
-        private Func<Guid, Task> _getDetailOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _getDetailOnValidate = null;
-        private Func<Guid, Task> _getDetailOnBeforeAsync = null;
-        private Func<PersonDetail, Guid, Task> _getDetailOnAfterAsync = null;
+        private readonly Func<Guid, Task> _getDetailOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _getDetailOnValidate;
+        private readonly Func<Guid, Task> _getDetailOnBeforeAsync;
+        private readonly Func<PersonDetail, Guid, Task> _getDetailOnAfterAsync;
 
-        private Func<PersonDetail, Guid, Task> _updateDetailOnPreValidateAsync = null;
-        private Action<MultiValidator, PersonDetail, Guid> _updateDetailOnValidate = null;
-        private Func<PersonDetail, Guid, Task> _updateDetailOnBeforeAsync = null;
-        private Func<PersonDetail, Guid, Task> _updateDetailOnAfterAsync = null;
+        private readonly Func<PersonDetail, Guid, Task> _updateDetailOnPreValidateAsync;
+        private readonly Action<MultiValidator, PersonDetail, Guid> _updateDetailOnValidate;
+        private readonly Func<PersonDetail, Guid, Task> _updateDetailOnBeforeAsync;
+        private readonly Func<PersonDetail, Guid, Task> _updateDetailOnAfterAsync;
 
-        private Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnPreValidateAsync = null;
-        private Action<MultiValidator, PersonArgs, PagingArgs> _getByArgsWithEfOnValidate = null;
-        private Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnBeforeAsync = null;
-        private Func<PersonCollectionResult, PersonArgs, PagingArgs, Task> _getByArgsWithEfOnAfterAsync = null;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnPreValidateAsync;
+        private readonly Action<MultiValidator, PersonArgs, PagingArgs> _getByArgsWithEfOnValidate;
+        private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnBeforeAsync;
+        private readonly Func<PersonCollectionResult, PersonArgs, PagingArgs, Task> _getByArgsWithEfOnAfterAsync;
 
-        private Func<Guid, Task> _getWithEfOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _getWithEfOnValidate = null;
-        private Func<Guid, Task> _getWithEfOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _getWithEfOnAfterAsync = null;
+        private readonly Func<Guid, Task> _getWithEfOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _getWithEfOnValidate;
+        private readonly Func<Guid, Task> _getWithEfOnBeforeAsync;
+        private readonly Func<Person, Guid, Task> _getWithEfOnAfterAsync;
 
-        private Func<Person, Task> _createWithEfOnPreValidateAsync = null;
-        private Action<MultiValidator, Person> _createWithEfOnValidate = null;
-        private Func<Person, Task> _createWithEfOnBeforeAsync = null;
-        private Func<Person, Task> _createWithEfOnAfterAsync = null;
+        private readonly Func<Person, Task> _createWithEfOnPreValidateAsync;
+        private readonly Action<MultiValidator, Person> _createWithEfOnValidate;
+        private readonly Func<Person, Task> _createWithEfOnBeforeAsync;
+        private readonly Func<Person, Task> _createWithEfOnAfterAsync;
 
-        private Func<Person, Guid, Task> _updateWithEfOnPreValidateAsync = null;
-        private Action<MultiValidator, Person, Guid> _updateWithEfOnValidate = null;
-        private Func<Person, Guid, Task> _updateWithEfOnBeforeAsync = null;
-        private Func<Person, Guid, Task> _updateWithEfOnAfterAsync = null;
+        private readonly Func<Person, Guid, Task> _updateWithEfOnPreValidateAsync;
+        private readonly Action<MultiValidator, Person, Guid> _updateWithEfOnValidate;
+        private readonly Func<Person, Guid, Task> _updateWithEfOnBeforeAsync;
+        private readonly Func<Person, Guid, Task> _updateWithEfOnAfterAsync;
 
-        private Func<Guid, Task> _deleteWithEfOnPreValidateAsync = null;
-        private Action<MultiValidator, Guid> _deleteWithEfOnValidate = null;
-        private Func<Guid, Task> _deleteWithEfOnBeforeAsync = null;
-        private Func<Guid, Task> _deleteWithEfOnAfterAsync = null;
+        private readonly Func<Guid, Task> _deleteWithEfOnPreValidateAsync;
+        private readonly Action<MultiValidator, Guid> _deleteWithEfOnValidate;
+        private readonly Func<Guid, Task> _deleteWithEfOnBeforeAsync;
+        private readonly Func<Guid, Task> _deleteWithEfOnAfterAsync;
 
         #endregion
 

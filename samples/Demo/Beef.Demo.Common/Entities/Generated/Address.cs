@@ -41,18 +41,6 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region Constructor
-      
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Address"/> class.
-        /// </summary>
-        public Address()
-        {
-            this.AddressConstructor();
-        }
-        
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -62,8 +50,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Street")]
         public string Street
         {
-            get { return this._street; }
-            set { SetValue(ref this._street, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Street); }
+            get { return _street; }
+            set { SetValue(ref _street, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Street); }
         }
 
         /// <summary>
@@ -73,8 +61,8 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="City")]
         public string City
         {
-            get { return this._city; }
-            set { SetValue(ref this._city, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_City); }
+            get { return _city; }
+            set { SetValue(ref _city, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_City); }
         }
 
         #endregion
@@ -98,10 +86,10 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Address from)
         {
             CopyFrom((EntityBase)from);
-            this.Street = from.Street;
-            this.City = from.City;
+            Street = from.Street;
+            City = from.City;
 
-            this.OnAfterCopyFrom(from);
+            OnAfterCopyFrom(from);
         }
     
         #endregion
@@ -129,10 +117,10 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.Street = Cleaner.Clean(this.Street, StringTrim.End, StringTransform.EmptyToNull);
-            this.City = Cleaner.Clean(this.City, StringTrim.End, StringTransform.EmptyToNull);
+            Street = Cleaner.Clean(Street, StringTrim.End, StringTransform.EmptyToNull);
+            City = Cleaner.Clean(City, StringTrim.End, StringTransform.EmptyToNull);
 
-            this.OnAfterCleanUp();
+            OnAfterCleanUp();
         }
     
         /// <summary>
@@ -143,8 +131,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(this.Street)
-                    && Cleaner.IsInitial(this.City);
+                return Cleaner.IsInitial(Street)
+                    && Cleaner.IsInitial(City);
             }
         }
 
