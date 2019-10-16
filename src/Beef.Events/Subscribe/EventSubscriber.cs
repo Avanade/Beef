@@ -42,7 +42,7 @@ namespace Beef.Events.Subscribe
         public UnhandledExceptionHandling UnhandledExceptionHandling { get; protected set; } = UnhandledExceptionHandling.Stop;
 
         /// <summary>
-        /// Gets the value <see cref="Type"/>; always <c>null</c> as there will not be one.
+        /// Gets the value <see cref="Type"/>; <c>null</c> indicates no value.
         /// </summary>
         public abstract Type ValueType { get; }
 

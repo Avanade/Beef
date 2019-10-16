@@ -82,10 +82,6 @@ namespace Beef.Events.Subscribe
         /// <remarks>When overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.</remarks>
         protected virtual ExecutionContext CreateExecutionContext(IEventSubscriber subscriber, EventData @event)
         {
-            var ec = new ExecutionContext { TenantId = @event.TenantId };
-            if (subscriber.RunAsUser == RunAsUser.Originating)
-                ec.Username = @event.Username;
-
             return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username : SystemUsername, TenantId = @event.TenantId };
         }
 

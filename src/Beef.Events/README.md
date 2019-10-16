@@ -32,14 +32,15 @@ The code-generation of _Beef_ will automatically infer the `Subject` and `Action
 For example, an invoice creation event could result in the following:
 - `Subject:` `Billing.Invoice.7634626f-edee-e911-bd3b-bc8385e26041`
 - `Action:` `Create`
+- `Key:` `7634626f-edee-e911-bd3b-bc8385e26041`
 
 <br/>
 
 ## Publishing
 
-The [`Event`](../../src/Beef.Core/Events/Event.cs) provides the standardised event processing/publishing. The underlying `PublishAsync` set of methods provide the means to publish the event(s). By default, the events are not processed until a publisher has registered; the `Register` method will allow one or more publishers to be registered.
+The [`Event`](../../src/Beef.Core/Events/Event.cs) provides the standardised event processing/publishing. The underlying `PublishAsync` set of methods provide the means to publish the event(s). By default, the events are not processed until a publisher has been registered; the `Register` method will allow one or more publishers to be registered.
 
-> To publish to Azure Event Hubs the [`EventHubPublisher`](../../src/Beef.Events/Publish/EventHubPublisher.cs) should be used. 
+> To publish to Azure Event Hubs the [`EventHubPublisher`](../../src/Beef.Events/Publish/EventHubPublisher.cs) can be used. 
 
 The publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. All `Create`, `Update` and `Delete` operations raise events automatically; others will need to be issued by the developer.
 
@@ -56,7 +57,13 @@ Within the _Beef_ context each Domain would subscribe (listen) to events and pro
 
 ### Subscribers
 
-To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [EventSubscriber](../../src/Beef.Events/Subscribe/EventSubscriber.cs) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. See [example](../../samples/Demo/Beef.Demo.Functions/Subscribers/PowerSourceChangeSubscriber.cs) below:
+To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. 
+
+There are the following properties that can be set that will change the runtime logic:
+- [`UnhandledExceptionHandling`](../../src/Beef.Events/Subscribe/UnhandledExceptionHandling.cs) - provides the unhandled `Exception` option as either `Stop` (stops and bubbles up the `Exception` allowing the [host](#Host) process to determine the appropriate action) or `Continue` (skips and continues effectively swallowing the `Exception`).
+- [`RunAsUser`](../../src/Beef.Events/Subscribe/RunAsUser.cs) - provides the run as user option as either `Originating` (originating user being `EventData.Username`) or `System` (`EventSubscriberHost.SystemUsername`).
+
+See [example](../../samples/Demo/Beef.Demo.Functions/Subscribers/PowerSourceChangeSubscriber.cs) below:
 
 ``` csharp
 public class PowerSourceChangeSubscriber : EventSubscriber<string>
@@ -75,9 +82,38 @@ public class PowerSourceChangeSubscriber : EventSubscriber<string>
 
 <br/>
 
-### Host
+### Subscriber Host
 
-The [EventSubscriberHost](../../src/Beef.Events/Subscribe/EventSubscriberHost.cs) provides the base capabilities for the host. The host is responsible for receiving (`ReceiveAsync`) each event 
+The [`EventSubscriberHost`](../../src/Beef.Events/Subscribe/EventSubscriberHost.cs) provides the base capabilities for the host. The host is responsible for receiving (`ReceiveAsync`) each event and converting to an [`EventData`](../../src/Beef.Core/Events/EventData.cs) instance. The host checks whether there is a [subscriber](#subscribers) and will invoke where found; otherwise, the event will be skipped (ignored).
+
+The `EventSubscriberHost` infers the [subscribers](#subscribers) automatically by reflecting on the `Assembly` that instatiates the host. The subscribers can be specified by using the [`EventSubscriberHostArgs`](../../src/Beef.Events/Subscribe/EventSubscriberHostArgs.cs) 
+
+The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can be overridden by overridding the `CreateExecutionContext` method where neccessary.
+
+> To subscribe to Azure Event Hubs the [`EventHubSubscriberHost`](../../src/Beef.Events/Subscribe/EventHubSubscriberHost.cs) can be used. 
+
+<br/>
+
+### Azure Function
+
+The process host, for example an [Azure Function](https://docs.microsoft.com/en-us/azure/azure-functions/), will create/instantiate the [subscriber host](#Subscriber-Host).
+
+To set the likes of connection strings, etc. a [startup](../../samples/Demo/Beef.Demo.Functions/Startup.cs)-style component will be required.
+
+An [example](../../samples/Demo/Beef.Demo.Functions/EventSubscriber.cs) using a [Resilient Event Hub Trigger](#Resilient-Event-Hub-Trigger) is as follows:
+
+``` csharp
+public static class EventSubscriber
+{
+    [FunctionName("EventSubscriber")]
+    public static async Task Run([ResilientEventHubTrigger] EventHubs.EventData @event, ILogger log)
+    {
+        await EventHubSubscriberHost.Create(log).ReceiveAsync(@event);
+    }
+}
+```
+
+<br/>
 
 ## Resilient Event Hub Trigger
 
