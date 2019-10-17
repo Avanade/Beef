@@ -42,7 +42,7 @@ The [`Event`](../../src/Beef.Core/Events/Event.cs) provides the standardised eve
 
 > To publish to Azure Event Hubs the [`EventHubPublisher`](../../src/Beef.Events/Publish/EventHubPublisher.cs) can be used. 
 
-The publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. All `Create`, `Update` and `Delete` operations raise events automatically; others will need to be issued by the developer.
+The publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](../../docs/Layer-DataSvc.md) layer to ensure consistency of approach. All `Create`, `Update` and `Delete` operations raise events automatically; others will need to be issued by the developer.
 
 <br/>
 
@@ -60,8 +60,11 @@ Within the _Beef_ context each Domain would subscribe (listen) to events and pro
 To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. 
 
 There are the following properties that can be set that will change the runtime logic:
-- [`UnhandledExceptionHandling`](../../src/Beef.Events/Subscribe/UnhandledExceptionHandling.cs) - provides the unhandled `Exception` option as either `Stop` (stops and bubbles up the `Exception` allowing the [host](#Host) process to determine the appropriate action) or `Continue` (skips and continues effectively swallowing the `Exception`).
-- [`RunAsUser`](../../src/Beef.Events/Subscribe/RunAsUser.cs) - provides the run as user option as either `Originating` (originating user being `EventData.Username`) or `System` (`EventSubscriberHost.SystemUsername`).
+
+Property | Description
+-|-
+[`UnhandledExceptionHandling`](../../src/Beef.Events/Subscribe/UnhandledExceptionHandling.cs) | Provides the unhandled `Exception` option as either `Stop` (stops and bubbles up the `Exception` allowing the [host](#Host) process to determine the appropriate action) or `Continue` (skips and continues effectively swallowing the `Exception`). Defaults to `Stop`.
+[`RunAsUser`](../../src/Beef.Events/Subscribe/RunAsUser.cs) | Provides the run as user option as either `Originating` (originating user being `EventData.Username`) or `System` (`EventSubscriberHost.SystemUsername`). Defaults to `Originating`.
 
 See [example](../../samples/Demo/Beef.Demo.Functions/Subscribers/PowerSourceChangeSubscriber.cs) below:
 
@@ -86,7 +89,7 @@ public class PowerSourceChangeSubscriber : EventSubscriber<string>
 
 The [`EventSubscriberHost`](../../src/Beef.Events/Subscribe/EventSubscriberHost.cs) provides the base capabilities for the host. The host is responsible for receiving (`ReceiveAsync`) each event and converting to an [`EventData`](../../src/Beef.Core/Events/EventData.cs) instance. The host checks whether there is a [subscriber](#subscribers) and will invoke where found; otherwise, the event will be skipped (ignored).
 
-The `EventSubscriberHost` infers the [subscribers](#subscribers) automatically by reflecting on the `Assembly` that instatiates the host. The subscribers can be specified by using the [`EventSubscriberHostArgs`](../../src/Beef.Events/Subscribe/EventSubscriberHostArgs.cs) 
+The `EventSubscriberHost` infers the [subscribers](#subscribers) automatically by reflecting on the `Assembly` that instatiates the host. The subscribers can be specified by using the [`EventSubscriberHostArgs`](../../src/Beef.Events/Subscribe/EventSubscriberHostArgs.cs).
 
 The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can be overridden by overridding the `CreateExecutionContext` method where neccessary.
 
@@ -96,9 +99,7 @@ The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can b
 
 ### Azure Function
 
-The process host, for example an [Azure Function](https://docs.microsoft.com/en-us/azure/azure-functions/), will create/instantiate the [subscriber host](#Subscriber-Host).
-
-To set the likes of connection strings, etc. a [startup](../../samples/Demo/Beef.Demo.Functions/Startup.cs)-style component will be required.
+The process host, for example an [Azure Function](https://docs.microsoft.com/en-us/azure/azure-functions/), will create/instantiate the [subscriber host](#Subscriber-Host). To set up the likes of connection strings, etc. a [startup](../../samples/Demo/Beef.Demo.Functions/Startup.cs)-style component will be required.
 
 An [example](../../samples/Demo/Beef.Demo.Functions/EventSubscriber.cs) using a [Resilient Event Hub Trigger](#Resilient-Event-Hub-Trigger) is as follows:
 
@@ -132,13 +133,13 @@ For the Event-Driven approach between the likes of Domains and/or Applications i
 The underpinnings of the [`ResilientEventHubTrigger`](./Triggers/ResilientEventHubTriggerAttribute.cs) logic is:
 
 - All unhandled Function exceptions will be caught for a message; and then re-processed (retry) until successfully processed; or alternatively, skipped (explictly).
-- The retry logic leverages [Polly](https://github.com/App-vNext/Polly) and uses a base 2 [exponential back-off](https://github.com/App-vNext/Polly/wiki/Retry#exponential-backoff) strategy. Each retry timespan is calculated as 2^count^ to calculate the sleep seconds. For example the 3rd retry would be 2^3^, being 8 seconds. There is also a [jitter](https://github.com/App-vNext/Polly/wiki/Retry-with-jitter) added to add a random number of milliseconds to minimise bunching. A maximum timespan can also be specified, defaults to 15 minutes - so that it eventually falls back to a standard frequency upon which to retry.
-- At times the exception/failure could be transient, and as such, the message is not considered *Poison* until it has been retried a number of times. By default, the message will be logged as *Poison* after 6 attempts (2^6^, being 64 seconds). Initially, warnings will be logged; then they will be treated as errors.
+- The retry logic leverages [Polly](https://github.com/App-vNext/Polly) and uses a base 2 [exponential back-off](https://github.com/App-vNext/Polly/wiki/Retry#exponential-backoff) strategy. Each retry timespan is calculated as 2\^count to calculate the sleep seconds. For example the 3rd retry would be 2\^3, being 8 seconds. There is also a [jitter](https://github.com/App-vNext/Polly/wiki/Retry-with-jitter) to add a random number of milliseconds to minimise bunching. A maximum timespan can also be specified, defaults to 15 minutes - so that it eventually falls back to a standard frequency upon which to retry.
+- At times the exception/failure could be transient, and as such, the message is not considered *Poison* until it has been retried a number of times. By default, the message will be logged as *Poison* after 6 attempts (2\^6, being 64 seconds). Initially, warnings will be logged; then they will be treated as errors.
 - The *Poison* message will be written to an Azure Storage Table (`EventHubPoisonMessage`) for the Event Hub + Consumer Group + Partition Id, that includes the likes of: `Exception`, `EventData.Body` (as a string), Function Name, etc. There is a property `SkipMessage` that determines whether the message is to be skipped (defaults to `false`).
-- Whilst there is a *Poison* message with a `SkipMessage` of `false` it will continue to retry - even if the Function is restarted, the message will continue to be retried.
+- Whilst there is a *Poison* message with a `SkipMessage` of `false` it will continue to retry - even if the Function is restarted; i.e. the message will continue to be retried.
 - To skip the *Poison* message the `SkipMessage` must be set explicitly to `true`. Each time a *Poison* message is re-tried it looks for (re-reads) the `SkipMessage` value and acts accordingly. Once skipped the Poison messages is removed (deleted) from the storage table; a copy is written to a corresponding skipped Azure Storage Table (`EventHubPoisonMessageSkipped`) as an audit.
 
-The [`PoisonMessagePersistence`](./Triggers/PoisonMessages/PoisonMessagePersistence.cs) provides the *Poison* message Azure storage persistence functionality described. This can be overridden using the [`IPoisonMessagePersistence`](./Triggers/PoisonMessages/IPoisonMessagePersistence.cs) where required.
+The [`PoisonMessagePersistence`](./Triggers/PoisonMessages/PoisonMessagePersistence.cs) provides the *Poison* message Azure storage persistence functionality described. This behaviour can be overridden using the [`IPoisonMessagePersistence`](./Triggers/PoisonMessages/IPoisonMessagePersistence.cs) where required.
 
 <br/>
 
@@ -150,6 +151,8 @@ Option | Description
 -|-
 `MaxRetryMinutes` | The maximum retry `TimeSpan`. Defaults to 15 minutes. Maximum allowed value is 24 hours.
 `LogPoisonMessageAfterRetryCount` | Determines whether a possible Poison message has been encountered and should be logged (persisted) after the specified retry count (must be between 1 and 10, defaults to 6).
+
+<br/>
 
 ### Constraints
 
