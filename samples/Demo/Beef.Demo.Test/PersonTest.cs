@@ -853,10 +853,18 @@ namespace Beef.Demo.Test
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
             // Check the person was patched properly.
-            AgentTester.Create<PersonAgent, Person>()
+            p = AgentTester.Create<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
-                .Run((a) => a.Agent.GetAsync(3.ToGuid()));
+                .Run((a) => a.Agent.GetAsync(3.ToGuid())).Value;
+
+            // Try a re-patch with no changes.
+            p = AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => p)
+                .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch,
+                    JToken.Parse("{ \"firstName\": \"Barry\", \"address\": { \"street\": \"Simpsons Road\", \"city\": \"Bardon\" } }"),
+                    3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
         }
 
         [Test, TestSetUp]
