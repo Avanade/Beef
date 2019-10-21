@@ -22,12 +22,31 @@ namespace Beef.Demo.Common.Agents
     /// </summary>
     public class ReferenceDataAgentProvider : Beef.Demo.Common.Entities.ReferenceData
     {
-        private ReferenceDataAgent _agent;
-        private Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
-        private Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
-        private Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
+        private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
+        private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
+
+        private readonly ReferenceDataAgent _agent;
+        private readonly Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
 
         #region Ctor
+        
+        /// <summary>
+        /// Static constructor.
+        /// </summary>
+        static ReferenceDataAgentProvider()
+        {
+            _nameDict.Add(ReferenceData.Property_Gender, typeof(RefDataNamespace.Gender));
+            _typeDict.Add(typeof(RefDataNamespace.Gender), ReferenceData.Property_Gender);
+
+            _nameDict.Add(ReferenceData.Property_EyeColor, typeof(RefDataNamespace.EyeColor));
+            _typeDict.Add(typeof(RefDataNamespace.EyeColor), ReferenceData.Property_EyeColor);
+
+            _nameDict.Add(ReferenceData.Property_PowerSource, typeof(RefDataNamespace.PowerSource));
+            _typeDict.Add(typeof(RefDataNamespace.PowerSource), ReferenceData.Property_PowerSource);
+
+            _nameDict.Add(ReferenceData.Property_Company, typeof(RefDataNamespace.Company));
+            _typeDict.Add(typeof(RefDataNamespace.Company), ReferenceData.Property_Company);
+        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
@@ -38,20 +57,9 @@ namespace Beef.Demo.Common.Agents
         {
             _agent = new ReferenceDataAgent(httpClient, beforeRequest);
 
-            _nameDict.Add(ReferenceData.Property_Gender, typeof(RefDataNamespace.Gender));
-            _typeDict.Add(typeof(RefDataNamespace.Gender), ReferenceData.Property_Gender);
             _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value)));
-
-            _nameDict.Add(ReferenceData.Property_EyeColor, typeof(RefDataNamespace.EyeColor));
-            _typeDict.Add(typeof(RefDataNamespace.EyeColor), ReferenceData.Property_EyeColor);
             _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value)));
-
-            _nameDict.Add(ReferenceData.Property_PowerSource, typeof(RefDataNamespace.PowerSource));
-            _typeDict.Add(typeof(RefDataNamespace.PowerSource), ReferenceData.Property_PowerSource);
             _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value)));
-
-            _nameDict.Add(ReferenceData.Property_Company, typeof(RefDataNamespace.Company));
-            _typeDict.Add(typeof(RefDataNamespace.Company), ReferenceData.Property_Company);
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value)));
         }
 
@@ -169,10 +177,10 @@ namespace Beef.Demo.Common.Agents
             {
                 switch (rdj["name"].Value<string>())
                 {
-                    case ReferenceData.Property_Gender: GetCache(_nameDict[ReferenceData.Property_Gender]).SetCollection(JsonConvert.DeserializeObject<Gender[]>(rdj["items"].ToString())); break;
-                    case ReferenceData.Property_EyeColor: GetCache(_nameDict[ReferenceData.Property_EyeColor]).SetCollection(JsonConvert.DeserializeObject<EyeColor[]>(rdj["items"].ToString())); break;
-                    case ReferenceData.Property_PowerSource: GetCache(_nameDict[ReferenceData.Property_PowerSource]).SetCollection(JsonConvert.DeserializeObject<PowerSource[]>(rdj["items"].ToString())); break;
-                    case ReferenceData.Property_Company: GetCache(_nameDict[ReferenceData.Property_Company]).SetCollection(JsonConvert.DeserializeObject<Company[]>(rdj["items"].ToString())); break;
+                    case Property_Gender: GetCache(_nameDict[ReferenceData.Property_Gender]).SetCollection(JsonConvert.DeserializeObject<Gender[]>(rdj["items"].ToString())); break;
+                    case Property_EyeColor: GetCache(_nameDict[ReferenceData.Property_EyeColor]).SetCollection(JsonConvert.DeserializeObject<EyeColor[]>(rdj["items"].ToString())); break;
+                    case Property_PowerSource: GetCache(_nameDict[ReferenceData.Property_PowerSource]).SetCollection(JsonConvert.DeserializeObject<PowerSource[]>(rdj["items"].ToString())); break;
+                    case Property_Company: GetCache(_nameDict[ReferenceData.Property_Company]).SetCollection(JsonConvert.DeserializeObject<Company[]>(rdj["items"].ToString())); break;
                 }
             }
         }

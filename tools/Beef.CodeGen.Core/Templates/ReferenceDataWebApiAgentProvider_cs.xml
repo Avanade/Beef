@@ -33,12 +33,32 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     /// </summary>
     public class ReferenceDataAgentProvider : {{Config.RefDataNamespace}}.ReferenceData
     {
-        private ReferenceDataAgent _agent;
-        private Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
-        private Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
-        private Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
+        private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
+        private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
+
+        private readonly ReferenceDataAgent _agent;
+        private readonly Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
 
         #region Ctor
+        
+        /// <summary>
+        /// Static constructor.
+        /// </summary>
+        static ReferenceDataAgentProvider()
+        {
+]]>
+  <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
+    <If Condition="System.Index > 0">
+      <![CDATA[
+]]>
+    </If>
+    <![CDATA[            _nameDict.Add(ReferenceData.Property_{{Entity.Name}}, typeof({{Entity.EntityName}}));
+            _typeDict.Add(typeof({{Entity.EntityName}}), ReferenceData.Property_{{Entity.Name}});
+]]>
+  </Entity>
+  <![CDATA[        }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
@@ -51,20 +71,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
 
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
-    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
-    <If Condition="System.Index > 0">
-      <![CDATA[
-]]>
+    <![CDATA[            _cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
+    <If Condition="Config.RefDataCache == null">
+      <Then><![CDATA[ReferenceDataCache]]></Then>
+      <Else><![CDATA[{{Config.RefDataCache}}]]></Else>
     </If>
-    <![CDATA[            _nameDict.Add(ReferenceData.Property_{{Entity.Name}}, typeof({{Entity.EntityName}}));
-            _typeDict.Add(typeof({{Entity.EntityName}}), ReferenceData.Property_{{Entity.Name}});
-            _cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
-            <If Condition="Config.RefDataCache == null">
-              <Then><![CDATA[ReferenceDataCache]]></Then>
-              <Else><![CDATA[{{Config.RefDataCache}}]]></Else>
-            </If>
-            <![CDATA[<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(() => _agent.{{Entity.Name}}GetAllAsync().ContinueWith((t) => t.Result.Value)));
+    <![CDATA[<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(() => _agent.{{Entity.Name}}GetAllAsync().ContinueWith((t) => t.Result.Value)));
 ]]>
   </Entity>
   <![CDATA[        }
@@ -153,15 +165,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
                 {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
-    <![CDATA[                    case ReferenceData.Property_{{Entity.Name}}: GetCache(_nameDict[ReferenceData.Property_{{Entity.Name}}]).SetCollection(JsonConvert.DeserializeObject<{{Entity.Name}}[]>(rdj["items"].ToString())); break;
+    <![CDATA[                    case Property_{{Entity.Name}}: GetCache(_nameDict[ReferenceData.Property_{{Entity.Name}}]).SetCollection(JsonConvert.DeserializeObject<{{Entity.Name}}[]>(rdj["items"].ToString())); break;
 ]]>
   </Entity>
-                    <![CDATA[                }
+  <![CDATA[                }
             }
         }
         
         #endregion
     }
-}
-]]>
+}]]>
 </Template>

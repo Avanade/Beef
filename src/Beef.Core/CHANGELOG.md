@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.20
+- *Added:* Reference data updated to support multiple providers. A new `IReferenceDataProvider`
+
 ## v2.1.19
 - *Added:* Moved `Events.Subscribe` capability to new `Beef.Events` assembly.
 - *Added:* `Cleaner.Clean` extended to perform a `EntityBasicBase.AcceptChanges` where appropriate.
