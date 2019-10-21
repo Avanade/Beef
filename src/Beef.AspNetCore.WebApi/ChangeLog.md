@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.8
+- *Fixed:* A `PATCH` operation was incorrectly attempting to return a `null` value where no changes were made as a result of merging the JSON changes; the result of the `GET` will be returned to ensure a response (content) is returned.
+
 ## v2.1.7
 - *Fixed:* `ExecutionContext.PagingArgs` always updated regardless of whether paging parameter explicitly defined.
 - *Added:* `WebApiActionBase` has new `BodyValue` property that will be updated when `FromBodyAttribute` specified. A number of other properties have been made `public` (from `protected`) - the `WebApiActionBase` is accessible from `ExecutionContext.Properties[WebApiActionBase.ExecutionContextPropertyKey]`.

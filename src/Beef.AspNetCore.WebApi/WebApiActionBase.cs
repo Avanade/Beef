@@ -977,7 +977,7 @@ namespace Beef.AspNetCore.WebApi
                 }
 
                 // Now perform the update and return the result (ignore any etag value patch).
-                T result = default;
+                T result = value;
                 if (performUpdate)
                 {
                     if (currETag != null)
