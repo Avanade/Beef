@@ -39,7 +39,7 @@ $projectsToPublish = @(
 
 # Generate NuGet packages using dotnet pack.
 foreach ($project in $projectsToPublish) {
-    $packCommand = -join("dotnet pack ", $project, " -o ..\..\", $publishFolder) #, " -c Release --no-build")
+    $packCommand = -join("dotnet pack ", $project, " -o ", $publishFolder) #, " -c Release --no-build")
 
     Write-Host ""
     Write-Host $packCommand -ForegroundColor Yellow 
