@@ -140,8 +140,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void ProductArgsConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(ProductArgs from);

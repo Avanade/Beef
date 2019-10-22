@@ -51,10 +51,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     <Set Name="Entity.EntityCollectionName" Value="${{Entity.Name}}Collection" />
     <![CDATA[
         /// <summary>
-        /// Gets all of the <see cref="{{Entity.Name}}"/> objects.
+        /// Gets all of the <see cref="{{Entity.Name}}"/> objects that match the filter arguments.
         /// </summary>
+        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync() => ServiceAgent.{{Entity.Name}}GetAllAsync();      
+        public Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.{{Entity.Name}}GetAllAsync(args);      
 ]]>
   </Entity>
   <![CDATA[

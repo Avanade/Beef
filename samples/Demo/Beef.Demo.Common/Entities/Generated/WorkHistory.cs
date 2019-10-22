@@ -217,8 +217,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void WorkHistoryConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(WorkHistory from);

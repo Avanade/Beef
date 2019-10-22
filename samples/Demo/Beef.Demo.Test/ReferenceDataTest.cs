@@ -3,6 +3,7 @@ using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -92,6 +93,30 @@ namespace Beef.Demo.Test
                 {
                     x.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue(vals.First()));
                 }).GenderGetAllAsync());
+        }
+
+        [Test, Parallelizable]
+        public void A160_GetPowerSource_FilterByCodes()
+        {
+            var r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "E", "n" } }));
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Value);
+            Assert.AreEqual(2, r.Value.Count());
+        }
+
+        [Test, Parallelizable]
+        public void A170_GetPowerSource_FilterByText()
+        {
+            var r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Text = "el*" }));
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Value);
+            Assert.AreEqual(1, r.Value.Count());
         }
     }
 }

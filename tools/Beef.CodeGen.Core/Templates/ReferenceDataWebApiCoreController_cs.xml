@@ -53,8 +53,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
 ]]>
     </If>
     <![CDATA[        /// <summary> 
-        /// Gets all of the {{Entity.EntityName:ToSeeComments}} reference data entities.
+        /// Gets all of the {{Entity.EntityName:ToSeeComments}} reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A {{Entity.EntityCollectionName:ToSeeComments}}.</returns>
 ]]>
     <If Condition="System.WebApiAuthorize != null">
@@ -69,9 +71,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
     </If>
     <![CDATA[        [ProducesResponseType(typeof({{Entity.EntityCollectionName}}), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult {{Entity.Name}}GetAll()
+        public IActionResult {{Entity.Name}}GetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<{{Entity.EntityCollectionName}}>(this, () => Task.FromResult(ReferenceData.Current.{{Entity.Name}}), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<{{Entity.EntityCollectionName}}>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 ]]>
   </Entity>

@@ -171,8 +171,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void RobotArgsConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(RobotArgs from);

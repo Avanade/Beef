@@ -72,7 +72,7 @@ namespace Beef.RefData
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
-            ReferenceDataIdTypeCode typeCode = ReferenceDataIdTypeCode.Unknown;
+            ReferenceDataIdTypeCode typeCode;
             if (id is int)
                 typeCode = ReferenceDataIdTypeCode.Int32;
             else if (id is Guid)
@@ -297,10 +297,10 @@ namespace Beef.RefData
                 if (_isInvalid || !_isActive)
                     return false;
 
-                if (StartDate != null && ReferenceDataManager.Context[this.GetType()] < StartDate)
+                if (StartDate != null && ReferenceDataManager.Context[GetType()] < StartDate)
                     return false;
 
-                if (EndDate != null && ReferenceDataManager.Context[this.GetType()] > EndDate)
+                if (EndDate != null && ReferenceDataManager.Context[GetType()] > EndDate)
                     return false;
 
                 return true;
@@ -324,7 +324,7 @@ namespace Beef.RefData
         /// <remarks>A <paramref name="value"/> with the default value will not be set; assumed in this case that no mapping exists.</remarks>
         protected internal void SetMapping<T>(string name, T value) where T : IComparable
         {
-            if (Comparer<T>.Default.Compare(value, default(T)) == 0)
+            if (Comparer<T>.Default.Compare(value, default) == 0)
                 return;
 
             if (Mappings.ContainsKey(name))
@@ -342,7 +342,7 @@ namespace Beef.RefData
         public T GetMapping<T>(string name) where T : IComparable
         {
             if (!HasMappings || !Mappings.TryGetValue(name, out IComparable value))
-                return default(T);
+                return default;
 
             return (T)value;
         }
@@ -474,10 +474,10 @@ namespace Beef.RefData
                 return false;
 
             // Ensure the two types are the same.
-            if (this.GetType() != obj.GetType())
+            if (GetType() != obj.GetType())
                 return false;
 
-            return this._key.Equals(((ReferenceDataBase)obj)._key);
+            return _key.Equals(((ReferenceDataBase)obj)._key);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Beef.RefData
         /// <returns>A hash code for the <see cref="ReferenceDataBase"/>.</returns>
         public override int GetHashCode()
         {
-            return this._key.GetHashCode();
+            return _key.GetHashCode();
         }
 
         /// <summary>
@@ -502,7 +502,7 @@ namespace Beef.RefData
                 return true;
 
             // If one is null, but not both, return false.
-            if ((object)a == null || (object)b == null)
+            if (a is null || b is null)
                 return false;
 
             return a.Equals(b);
@@ -595,7 +595,7 @@ namespace Beef.RefData
         /// <returns>A value that indicates the relative order of the objects being compared (see <see cref="IComparable.CompareTo"/>).</returns>
         public int CompareTo(ReferenceDataBase other)
         {
-            if (other == null || this.GetType() != other.GetType())
+            if (other == null || GetType() != other.GetType())
                 return 1;
 
             return Comparer<RefDataKey>.Default.Compare(_key, other._key);

@@ -123,8 +123,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void PersonDetailConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(PersonDetail from);

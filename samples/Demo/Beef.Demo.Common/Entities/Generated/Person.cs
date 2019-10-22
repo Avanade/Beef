@@ -361,8 +361,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void PersonConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(Person from);

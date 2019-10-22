@@ -34,7 +34,7 @@ namespace Beef.RefData
             SortOrder = sortOrder;
             IsCodeCaseSensitive = isCodeCaseSensitive;
 
-            _rdcId = new ReferenceDataIdCollection(this);
+            _rdcId = new ReferenceDataIdCollection();
             _rdcCode = new ReferenceDataCodeCollection(this);
             _mappingsDict = new Dictionary<MappingsKey, string>();
         }
@@ -70,17 +70,6 @@ namespace Beef.RefData
         /// </summary>
         private class ReferenceDataIdCollection : KeyedCollection<object, TItem>
         {
-            private readonly ReferenceDataCollectionBase<TItem> _owner;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ReferenceDataIdCollection"/> class.
-            /// </summary>
-            /// <param name="owner">The owner collection.</param>
-            public ReferenceDataIdCollection(ReferenceDataCollectionBase<TItem> owner)
-            {
-                _owner = owner;
-            }
-
             /// <summary>
             /// Gets the key (<see cref="ReferenceDataBase.Id"/>) for the <see cref="ReferenceDataBase"/> item.
             /// </summary>
@@ -495,6 +484,7 @@ namespace Beef.RefData
                     list = list.OrderBy(x => x.Text);
                     break;
 
+                case ReferenceDataSortOrder.SortOrder:
                 default:
                     list = list.OrderBy(x => x.SortOrder);
                     break;
@@ -588,7 +578,7 @@ namespace Beef.RefData
         /// </summary>
         public void GenerateETag()
         {
-            var md5 = System.Security.Cryptography.MD5.Create();
+            using var md5 = System.Security.Cryptography.MD5.Create();
             var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(this));
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             ETag = Convert.ToBase64String(hash);

@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v2.1.20
 - *Added:* Reference data updated to support multiple run-time providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created (code-gen updated to enable).
+- *Added:* Reference data now supports a `ReferenceDataFilter` to filter by a list of codes and/or text wildcard. Leveraged by the code-gen `XxxController` to enable filtering against the in-memory cache.
 
 ## v2.1.19
 - *Added:* Moved `Events.Subscribe` capability to new `Beef.Events` assembly.

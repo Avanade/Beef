@@ -40,28 +40,32 @@ namespace Beef.Demo.Common.Agents
         public IReferenceDataServiceAgent ServiceAgent { get; private set; }
 
         /// <summary>
-        /// Gets all of the <see cref="Gender"/> objects.
+        /// Gets all of the <see cref="Gender"/> objects that match the filter arguments.
         /// </summary>
+        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<GenderCollection>> GenderGetAllAsync() => ServiceAgent.GenderGetAllAsync();      
+        public Task<WebApiAgentResult<GenderCollection>> GenderGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.GenderGetAllAsync(args);      
 
         /// <summary>
-        /// Gets all of the <see cref="EyeColor"/> objects.
+        /// Gets all of the <see cref="EyeColor"/> objects that match the filter arguments.
         /// </summary>
+        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync() => ServiceAgent.EyeColorGetAllAsync();      
+        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.EyeColorGetAllAsync(args);      
 
         /// <summary>
-        /// Gets all of the <see cref="PowerSource"/> objects.
+        /// Gets all of the <see cref="PowerSource"/> objects that match the filter arguments.
         /// </summary>
+        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync() => ServiceAgent.PowerSourceGetAllAsync();      
+        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.PowerSourceGetAllAsync(args);      
 
         /// <summary>
-        /// Gets all of the <see cref="Company"/> objects.
+        /// Gets all of the <see cref="Company"/> objects that match the filter arguments.
         /// </summary>
+        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<CompanyCollection>> CompanyGetAllAsync() => ServiceAgent.CompanyGetAllAsync();      
+        public Task<WebApiAgentResult<CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.CompanyGetAllAsync(args);      
 
         /// <summary>
         /// Gets the named reference data objects.
