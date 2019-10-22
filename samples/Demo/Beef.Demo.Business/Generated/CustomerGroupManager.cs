@@ -23,6 +23,7 @@ namespace Beef.Demo.Business
     public partial class CustomerGroupManager : ICustomerGroupManager
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<string, RefDataNamespace.Company, Task> _getOnPreValidateAsync;
         private readonly Action<MultiValidator, string, RefDataNamespace.Company> _getOnValidate;
@@ -54,6 +55,7 @@ namespace Beef.Demo.Business
         private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnBeforeAsync;
         private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

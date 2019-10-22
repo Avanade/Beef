@@ -49,7 +49,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
         Task<WebApiAgentResult> GetNamedAsync(string[] names);
-  }
+    }
 
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API service agent.
@@ -81,10 +81,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
         /// Gets all of the {{Entity.EntityName:ToSeeComments}} objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync()
-        {
-            return base.GetAsync<{{Entity.EntityCollectionName}}>("{{Entity.WebApiRoutePrefix}}", args: new WebApiArg[] { });      
-        }
+        public Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync() => base.GetAsync<{{Entity.EntityCollectionName}}>("{{Entity.WebApiRoutePrefix}}", args: new WebApiArg[] { });      
 ]]>
   </Entity>
   <![CDATA[
@@ -94,11 +91,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
         /// <param name="names">The list of reference data names.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<WebApiAgentResult> GetNamedAsync(string[] names)
-        {
-            return base.GetAsync("{{Config.RefDataWebApiRoute}}", args: new WebApiArg[] { new WebApiArg<string[]>("names", names) });
-        }
+        public Task<WebApiAgentResult> GetNamedAsync(string[] names) => base.GetAsync("{{Config.RefDataWebApiRoute}}", args: new WebApiArg[] { new WebApiArg<string[]>("names", names) });
     }
-}
-]]>
+}]]>
 </Template>

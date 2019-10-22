@@ -3,7 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v2.1.20
-- *Added:* Reference data updated to support multiple providers. A new `IReferenceDataProvider`
+- *Added:* Reference data updated to support multiple run-time providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created (code-gen updated to enable).
 
 ## v2.1.19
 - *Added:* Moved `Events.Subscribe` capability to new `Beef.Events` assembly.

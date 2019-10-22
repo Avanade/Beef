@@ -24,6 +24,7 @@ namespace Beef.Demo.Business.Data
     public partial class CustomerGroupData : ICustomerGroupData
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<string, RefDataNamespace.Company, IODataArgs, Task> _getOnBeforeAsync;
         private readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync;
@@ -48,6 +49,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync;
         private readonly Action<Exception> _deleteOnException;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>
@@ -82,7 +84,6 @@ namespace Beef.Demo.Business.Data
                 CustomerGroupCollectionResult __result = new CustomerGroupCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
-                __result = new CustomerGroupCollectionResult(paging);
                 __result.Result = await DynamicsAx.Default.SelectQueryAsync<CustomerGroupCollection, CustomerGroup>(__dataArgs,
                     q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs));
 

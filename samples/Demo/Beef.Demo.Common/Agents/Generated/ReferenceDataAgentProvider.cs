@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding Web API agent.
     /// </summary>
-    public class ReferenceDataAgentProvider : Beef.Demo.Common.Entities.ReferenceData
+    public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
     {
         private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
         private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
@@ -35,17 +35,17 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         static ReferenceDataAgentProvider()
         {
-            _nameDict.Add(ReferenceData.Property_Gender, typeof(RefDataNamespace.Gender));
-            _typeDict.Add(typeof(RefDataNamespace.Gender), ReferenceData.Property_Gender);
+            _nameDict.Add(Property_Gender, typeof(RefDataNamespace.Gender));
+            _typeDict.Add(typeof(RefDataNamespace.Gender), Property_Gender);
 
-            _nameDict.Add(ReferenceData.Property_EyeColor, typeof(RefDataNamespace.EyeColor));
-            _typeDict.Add(typeof(RefDataNamespace.EyeColor), ReferenceData.Property_EyeColor);
+            _nameDict.Add(Property_EyeColor, typeof(RefDataNamespace.EyeColor));
+            _typeDict.Add(typeof(RefDataNamespace.EyeColor), Property_EyeColor);
 
-            _nameDict.Add(ReferenceData.Property_PowerSource, typeof(RefDataNamespace.PowerSource));
-            _typeDict.Add(typeof(RefDataNamespace.PowerSource), ReferenceData.Property_PowerSource);
+            _nameDict.Add(Property_PowerSource, typeof(RefDataNamespace.PowerSource));
+            _typeDict.Add(typeof(RefDataNamespace.PowerSource), Property_PowerSource);
 
-            _nameDict.Add(ReferenceData.Property_Company, typeof(RefDataNamespace.Company));
-            _typeDict.Add(typeof(RefDataNamespace.Company), ReferenceData.Property_Company);
+            _nameDict.Add(Property_Company, typeof(RefDataNamespace.Company));
+            _typeDict.Add(typeof(RefDataNamespace.Company), Property_Company);
         }
         
         /// <summary>
@@ -71,49 +71,25 @@ namespace Beef.Demo.Common.Agents
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
-        public override RefDataNamespace.GenderCollection Gender
-        {
-            get 
-            {
-                return (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)];
-            }
-        }
+        public override RefDataNamespace.GenderCollection Gender => (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
-        public override RefDataNamespace.EyeColorCollection EyeColor
-        {
-            get 
-            {
-                return (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
-            }
-        }
+        public override RefDataNamespace.EyeColorCollection EyeColor => (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
-        public override RefDataNamespace.PowerSourceCollection PowerSource
-        {
-            get 
-            {
-                return (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
-            }
-        }
+        public override RefDataNamespace.PowerSourceCollection PowerSource => (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
-        public override RefDataNamespace.CompanyCollection Company
-        {
-            get 
-            {
-                return (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
-            }
-        }
+        public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
 
         #endregion
   
@@ -124,13 +100,7 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The <see cref="IReferenceDataCollection"/>.</returns>
-        public override IReferenceDataCollection this[Type type]
-        {
-            get
-            {
-                return GetCache(type).GetCollection();
-            }
-        }
+        public override IReferenceDataCollection this[Type type] => GetCache(type).GetCollection();
 
         /// <summary>
         /// Gets the <see cref="IReferenceDataCache"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
@@ -139,10 +109,7 @@ namespace Beef.Demo.Common.Agents
         /// <returns>The <see cref="IReferenceDataCache"/>.</returns>
         public IReferenceDataCache GetCache(Type type)
         {
-            if (type == null)
-                throw new NullReferenceException("type");
-
-            if (!_cacheDict.ContainsKey(type))
+            if (!_cacheDict.ContainsKey(Check.NotNull(type, nameof(type))))
                 throw new ArgumentException(string.Format("Type {0} does not exist within the ReferenceDataProvider cache.", type.Name));
 
             return (IReferenceDataCache)_cacheDict[type];

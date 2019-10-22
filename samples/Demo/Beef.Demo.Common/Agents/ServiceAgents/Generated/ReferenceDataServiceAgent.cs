@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
         Task<WebApiAgentResult> GetNamedAsync(string[] names);
-  }
+    }
 
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API service agent.
@@ -80,37 +80,25 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// Gets all of the <see cref="RefDataNamespace.Gender"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync()
-        {
-            return base.GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", args: new WebApiArg[] { });      
-        }
+        public Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync() => base.GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", args: new WebApiArg[] { });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync()
-        {
-            return base.GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", args: new WebApiArg[] { });      
-        }
+        public Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync() => base.GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", args: new WebApiArg[] { });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync()
-        {
-            return base.GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", args: new WebApiArg[] { });      
-        }
+        public Task<WebApiAgentResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync() => base.GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", args: new WebApiArg[] { });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.Company"/> objects.
         /// </summary>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync()
-        {
-            return base.GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", args: new WebApiArg[] { });      
-        }
+        public Task<WebApiAgentResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync() => base.GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", args: new WebApiArg[] { });      
 
         /// <summary>
         /// Gets the named reference data objects.
@@ -118,9 +106,6 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// <param name="names">The list of reference data names.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<WebApiAgentResult> GetNamedAsync(string[] names)
-        {
-            return base.GetAsync("api/v1/ref", args: new WebApiArg[] { new WebApiArg<string[]>("names", names) });
-        }
+        public Task<WebApiAgentResult> GetNamedAsync(string[] names) => base.GetAsync("api/v1/ref", args: new WebApiArg[] { new WebApiArg<string[]>("names", names) });
     }
 }

@@ -25,6 +25,7 @@ namespace Beef.Demo.Business.Data
     public partial class RobotData : IRobotData
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<Guid, ICosmosDbArgs, Task> _getOnBeforeAsync;
         private readonly Func<Robot, Guid, Task> _getOnAfterAsync;
@@ -47,6 +48,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<RobotCollectionResult, RobotArgs, Task> _getByArgsOnAfterAsync;
         private readonly Action<Exception> _getByArgsOnException;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

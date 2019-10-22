@@ -25,6 +25,7 @@ namespace Beef.Demo.Business.Data
     public partial class PersonData : IPersonData
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<Person, IDatabaseArgs, Task> _createOnBeforeAsync;
         private readonly Func<Person, Task> _createOnAfterAsync;
@@ -88,6 +89,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<Guid, Task> _deleteWithEfOnAfterAsync;
         private readonly Action<Exception> _deleteWithEfOnException;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

@@ -86,6 +86,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         <If Condition="System.Index == 0">
           <Set Name="System.EndRegion" Value="true"/>
           <![CDATA[        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 ]]>
         </If>
         <![CDATA[
@@ -223,6 +224,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
       </Operation>
       <If Condition="System.EndRegion == true">
         <![CDATA[
+        #pragma warning restore CS0649
         #endregion
 
 ]]>

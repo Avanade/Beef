@@ -23,6 +23,7 @@ namespace Beef.Demo.Business
     public partial class ProductManager : IProductManager
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<int, Task> _getOnPreValidateAsync;
         private readonly Action<MultiValidator, int> _getOnValidate;
@@ -34,6 +35,7 @@ namespace Beef.Demo.Business
         private readonly Func<ProductArgs, PagingArgs, Task> _getByArgsOnBeforeAsync;
         private readonly Func<ProductCollectionResult, ProductArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

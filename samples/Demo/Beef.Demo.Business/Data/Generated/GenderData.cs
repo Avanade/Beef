@@ -24,6 +24,7 @@ namespace Beef.Demo.Business.Data
     public partial class GenderData : IGenderData
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<Guid, IDatabaseArgs, Task> _getOnBeforeAsync;
         private readonly Func<Gender, Guid, Task> _getOnAfterAsync;
@@ -37,6 +38,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<Gender, Task> _updateOnAfterAsync;
         private readonly Action<Exception> _updateOnException;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

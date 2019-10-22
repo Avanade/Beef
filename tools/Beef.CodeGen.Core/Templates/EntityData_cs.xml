@@ -124,6 +124,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <If Condition="System.EndRegion == false">
             <Set Name="System.EndRegion" Value="true"/>
             <![CDATA[        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 ]]>
           </If>
           <![CDATA[
@@ -238,6 +239,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <If Condition="System.EndRegion == false">
             <Set Name="System.EndRegion" Value="true"/>
             <![CDATA[        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 ]]>
           </If>
           <![CDATA[, Task> {{Operation.PrivateName}}OnAfterAsync;
@@ -247,6 +249,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <If Condition="System.EndRegion == false">
             <Set Name="System.EndRegion" Value="true"/>
             <![CDATA[        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 ]]>
           </If>
           <![CDATA[
@@ -257,6 +260,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
       </Operation>
       <If Condition="System.EndRegion == true">
         <![CDATA[
+        #pragma warning restore CS0649
         #endregion
 
 ]]>
@@ -664,12 +668,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result = new {{Entity.EntityCollectionResultName}}(]]>
-                <If Condition="Operation.PagingArgs == true">
-                  <![CDATA[paging]]>
-                </If>
-                <![CDATA[);
-                __result.Result = await {{System.ODataName}}.Default.SelectQueryAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__dataArgs,
+                <![CDATA[__result.Result = await {{System.ODataName}}.Default.SelectQueryAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__dataArgs,
                     q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
@@ -824,8 +823,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
             </If>
-
-
             <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
             <If Condition="Operation.OperationType != 'Delete'">
               <![CDATA[__result]]>
@@ -1226,8 +1223,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
       </If>
       <![CDATA[    }
-}
-]]>
+}]]>
     </Entity>
   </Entity>
 </Template>

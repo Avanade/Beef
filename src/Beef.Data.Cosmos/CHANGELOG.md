@@ -2,8 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.6
+- *Added:* The `ImportValueRefDataBatchAsync` has been updated to use the new `IReferenceDataProvider`.
+
 ## v2.1.5
-  - *Fixed:* The `CosmosDbMapper` not correctly instantiates the `ChangeLog` mappings within `AddStandardProperties` where the underlying types are different.
+- *Fixed:* The `CosmosDbMapper` not correctly instantiates the `ChangeLog` mappings within `AddStandardProperties` where the underlying types are different.
 
 ## v2.1.4
 - *Enhancement:* A number of refactorings, including the introduction of `CosmosDbMapper`, and `CosmosDbValueContainer` option for a `CosmosDbValue`. 
