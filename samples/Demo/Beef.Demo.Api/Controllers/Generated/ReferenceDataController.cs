@@ -136,7 +136,7 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: api/v1/demo/ref/codes?entity=codeX,codeY&entity2=codeZ&entity3
+        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: api/v1/demo/ref/codes?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
