@@ -36,7 +36,7 @@ Property | Description
 `Text` | The textual `string` used for display within an application; e.g. within a drop-down. 
 `SortOrder` | Defines the sort order within the underlying reference data collection.
 `IsActive` | Indicates whether the value is active or not. It is up to the application what to do when a value is not considered valid.
-... | There are other properties on this base type that can also be used; see codebase for more information.
+... | There are other properties on this base type that can also be used; see [codebase](../src/Beef.Core/RefData/ReferenceDataBase.cs) for more information.
 
 <br/>
 
@@ -125,6 +125,14 @@ When the cache is empty, or expired, then a load will occur. There are two optio
 
 1. Using the `GetRefData` purpose-built capability built into the [`DatabaseBase`](../src/Beef.Data.Database/DatabaseBase.cs). This uses the [DatabaseRefDataColumns](../src/Beef.Data.Database/DatabaseRefDataColumns.cs) to map the database columns names to the .NET properties. This can be completely code generated to minimise the developer effort.
 2. Implement as required (i.e. custom logic).
+
+<br/>
+
+## Reference data providers
+
+The [IReferenceDataProvider](../src/Beef.Core/RefData/IReferenceDataProvider.cs) provides a means to manage and group one or more Reference Data entities for use by the centralised [ReferenceDataManager](../src/Beef.Core/RefData/ReferenceDataManager.cs). There can be one or more providers (perhaps from multiple domains) that are centrally managed. The code-generation will implement this automatically; see [example](../samples/Demo/Beef.Demo.Common/Entities/Generated/ReferenceData.cs).
+
+The [ReferenceDataManager](../src/Beef.Core/RefData/ReferenceDataManager.cs) provides a standard, centralised, mechanism for managing and accessing all the available/possible Reference Data entities via the `Current` property. There is a `Register` method that is used to register one or more providers for use; this is typically performed at start up.
 
 <br/>
 

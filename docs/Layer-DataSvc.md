@@ -43,6 +43,7 @@ Step | Description
 `Data` | The [`{Entity}Data`](./Layer-DataSvc.md) layer is invoked to orchestrate the data processing; this is instantiated by the [`Factory`](../src/Beef.Core/Factory.cs) (enables a test mocking opportunity).
 `EventPublish` | Constructs the `EventData` and invokes the `Event.Publish`.
 `Cache` | Performs a cache set or remove (as applicable).
+`OnAfter` | The `OnAfter` extension opportunity; where set this will be invoked. This enables logic to be invoked _after_ the primary `Operation` is performed.
 
 The following demonstrates the usage (a snippet from the sample [`PersonDataSvc`](../samples/Demo/Beef.Demo.Business/DataSvc/Generated/PersonDataSvc.cs)):
 
@@ -58,6 +59,7 @@ public static Task<Person> GetAsync(Guid id)
 
         var __result = await Factory.Create<IPersonData>().GetAsync(id);
         ExecutionContext.Current.CacheSet<Person>(__key, __result);
+        if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
         return __result;
     });
 } 
@@ -71,6 +73,7 @@ public static Task<Person> UpdateAsync(Person value)
         var __result = await Factory.Create<IPersonData>().UpdateAsync(value);
         await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
         ExecutionContext.Current.CacheSet<Person>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+        if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
         return __result;
     }, new BusinessInvokerArgs { IncludeTransactionScope = true });
 }
@@ -89,6 +92,7 @@ Step | Description
 `OnImplementation` | Invocation of a named `XxxxxOnImplementaionAsync` method that must be implemented in a non-generated partial class.
 `EventPublish` | Constructs the `EventData` and invokes the `Event.Publish`.
 `Cache` | Performs a cache set or remove (as applicable).
+`OnAfter` | The `OnAfter` extension opportunity; where set this will be invoked. This enables logic to be invoked _after_ the primary `Operation` is performed.
 
 The following demonstrates the usage:
 
@@ -100,6 +104,7 @@ public static Task<Person> UpdateAsync(Person value)
         var __result = await UpdateOnImplementationAsync(value);
         await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
         ExecutionContext.Current.CacheSet<Person>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+        if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
         return __result;
     }, new BusinessInvokerArgs { IncludeTransactionScope = true });
 }

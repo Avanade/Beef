@@ -135,6 +135,48 @@ Sample | Description
 
 <br/>
 
+## Additional documentation
+
+The following are references to additional documentation (these are all accessible via links within this and other documentation):
+
+### General
+
+- [Reference data](./docs/Reference-Data.md)
+- [Validation](./docs/Beef-Validation.md)
+- [HTTP PATCH](./docs/Http-Patch.md)
+
+### Solution
+
+- [Solution structure](./docs/Solution-Structure.md)
+- [Entity (DTO)](./docs/Layer-Entity.md)
+- [Service agent](./docs/Layer-ServiceAgent.md)
+- [Service interface](./docs/Layer-ServiceInterface.md)
+- [Domain logic](./docs/Layer-Manager.md)
+- [Service orchestration](./docs/Layer-DataSvc.md)
+- [Data access](./docs/Layer-Data.md)
+
+### Code-generation
+
+- [Code generation](./tools/Beef.CodeGen.Core/README.md)
+- [Template structure](./docs/Template-Structure.md)
+- Entity-based:
+  - [CodeGeneration element](./docs/Entity-CodeGeneration-element.md)
+  - [Entity element](./docs/Entity-Entity-element.md)
+  - [Property element](./docs/Entity-Property-element.md)
+  - [Operation element](./docs/Entity-Operation-element.md)
+  - [Parameter element](./docs/Entity-Parameter-element.md)
+  - [Const element](./docs/Entity-Const-element.md)
+- Table-based:
+  - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
+  - [Table element](./docs/Table-Table-element.md)
+  - [Stored procedure element](./docs/Table-StoredProcedure-element.md)
+  - [Parameter element](./docs/Table-Parameter-element.md)
+  - [Where element](./docs/Table-Where-element.md)
+  - [OrderBy element](./docs/Table-OrderBy-element.md)
+  - [Execute element](./docs/Table-Execute-element.md)
+
+<br/>
+
 ## License
 
 _Beef_ is open source under the [MIT license](./LICENSE) and is free for commercial use.
