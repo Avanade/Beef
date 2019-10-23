@@ -81,7 +81,7 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult> GetNamedAsync(string[] names, WebApiRequestOptions requestOptions = null) => ServiceAgent.GetNamedAsync(names, requestOptions);
         
         /// <summary>
-        /// Gets the reference data entities for the specified entities and codes from the <see cref="WebApiRequestOptions.UrlQueryString"/>; e.g: entity=codeX,codeY&entity2=codeZ&entity3
+        /// Gets the reference data entities for the specified entities and codes from the <see cref="WebApiRequestOptions.UrlQueryString"/>; e.g: entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
