@@ -28,64 +28,76 @@ namespace Beef.Demo.Api.Controllers
         public static bool IsGetNamedAllNamesSupported { get; set; } = false;
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data entities.
+        /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A <see cref="RefDataNamespace.GenderCollection"/>.</returns>
         [HttpGet()]
         [Route("api/v1/demo/ref/genders")]
         [ProducesResponseType(typeof(RefDataNamespace.GenderCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GenderGetAll()
+        public IActionResult GenderGetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<RefDataNamespace.GenderCollection>(this, () => Task.FromResult(ReferenceData.Current.Gender), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<RefDataNamespace.GenderCollection>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(ReferenceData.Current.Gender, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data entities.
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
         [HttpGet()]
         [Route("api/v1/demo/ref/eyeColors")]
         [ProducesResponseType(typeof(RefDataNamespace.EyeColorCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult EyeColorGetAll()
+        public IActionResult EyeColorGetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<RefDataNamespace.EyeColorCollection>(this, () => Task.FromResult(ReferenceData.Current.EyeColor), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<RefDataNamespace.EyeColorCollection>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(ReferenceData.Current.EyeColor, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data entities.
+        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
         [HttpGet()]
         [Route("api/v1/demo/ref/powerSources")]
         [ProducesResponseType(typeof(RefDataNamespace.PowerSourceCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult PowerSourceGetAll()
+        public IActionResult PowerSourceGetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<RefDataNamespace.PowerSourceCollection>(this, () => Task.FromResult(ReferenceData.Current.PowerSource), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<RefDataNamespace.PowerSourceCollection>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(ReferenceData.Current.PowerSource, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data entities.
+        /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
         [HttpGet()]
         [Route("api/v1/demo/ref/companies")]
         [ProducesResponseType(typeof(RefDataNamespace.CompanyCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult CompanyGetAll()
+        public IActionResult CompanyGetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<RefDataNamespace.CompanyCollection>(this, () => Task.FromResult(ReferenceData.Current.Company), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<RefDataNamespace.CompanyCollection>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(ReferenceData.Current.Company, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Gets the named reference data entities.
         /// </summary>
-        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="ReferenceDataAgent.GetNamedAllNames"/>.</param>
+        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="Common.Agents.ReferenceDataAgent.GetNamedAllNames"/>.</param>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
-        [Route("api/v1/ref")]
+        [Route("api/v1/demo/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetNamed(string[] names)
@@ -110,15 +122,43 @@ namespace Beef.Demo.Api.Controllers
                 var coll = new ReferenceDataMultiCollection();
                 foreach (string name in allNames == null ? names : allNames.ToArray())
                 {
-                    switch (name)
+                    switch (name.ToUpperInvariant())
                     {
-                        case ReferenceData.Property_Gender: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current[typeof(RefDataNamespace.Gender)] }); break;
-                        case ReferenceData.Property_EyeColor: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current[typeof(RefDataNamespace.EyeColor)] }); break;
-                        case ReferenceData.Property_PowerSource: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceData.Current[typeof(RefDataNamespace.PowerSource)] }); break;
-                        case ReferenceData.Property_Company: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current[typeof(RefDataNamespace.Company)] }); break;
+                        case var s when s == ReferenceData.Property_Gender.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current.Gender }); break;
+                        case var s when s == ReferenceData.Property_EyeColor.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current.EyeColor }); break;
+                        case var s when s == ReferenceData.Property_PowerSource.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceData.Current.PowerSource }); break;
+                        case var s when s == ReferenceData.Property_Company.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current.Company }); break;
                     }
                 }
 
+                return Task.FromResult(coll);
+            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: api/v1/demo/ref/codes?entity=codeX,codeY&entity2=codeZ&entity3
+        /// </summary>
+        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/codes")]
+        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult GetByCodes()
+        {
+            return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
+            {
+                var coll = new ReferenceDataMultiCollection();
+                foreach (var q in HttpContext.Request.Query)
+                {
+                    switch (q.Key.ToUpperInvariant())
+                    {
+                        case var s when s == ReferenceData.Property_Gender.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(ReferenceData.Current.Gender, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_EyeColor.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(ReferenceData.Current.EyeColor, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_PowerSource.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(ReferenceData.Current.PowerSource, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_Company.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(ReferenceData.Current.Company, q.Value) }); break;
+                    }
+                }
+                
                 return Task.FromResult(coll);
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }

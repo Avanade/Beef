@@ -59,7 +59,7 @@ namespace Beef.Entities
             }
 
             // Trim the string.
-            string tmp = null;
+            string tmp;
             switch (trim)
             {
                 case StringTrim.Both:
@@ -74,6 +74,7 @@ namespace Beef.Entities
                     tmp = value.TrimEnd();
                     break;
 
+                case StringTrim.None:
                 default:
                     tmp = value;
                     break;
@@ -88,6 +89,7 @@ namespace Beef.Entities
                 case StringTransform.NullToEmpty:
                     return tmp ?? string.Empty;
 
+                case StringTransform.None:
                 default:
                     return tmp;
             }
@@ -193,7 +195,7 @@ namespace Beef.Entities
         /// <returns><c>true</c> indicates that the value is initial; otherwise, <c>false</c>.</returns>
         public static bool IsInitial<T>(T value)
         {
-            if (value == null || Comparer<T>.Default.Compare(value, default(T)) == 0)
+            if (value == null || Comparer<T>.Default.Compare(value, default) == 0)
                 return true;
 
             if (value is ICleanUp ic)

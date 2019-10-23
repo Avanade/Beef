@@ -20,6 +20,19 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class CustomerGroupDataSvc
     {
+        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+
+        private static readonly Func<CustomerGroup, string, RefDataNamespace.Company, Task> _getOnAfterAsync;
+        private static readonly Func<CustomerGroupCollectionResult, CustomerGroupArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
+        private static readonly Func<CustomerGroup, Task> _createOnAfterAsync;
+        private static readonly Func<CustomerGroup, Task> _updateOnAfterAsync;
+        private static readonly Func<CustomerGroupCollection, Task> _updateBatchOnAfterAsync;
+        private static readonly Func<string, RefDataNamespace.Company, Task> _deleteOnAfterAsync;
+
+        #pragma warning restore CS0649
+        #endregion
+
         /// <summary>
         /// Gets the <see cref="CustomerGroup"/> object that matches the selection criteria.
         /// </summary>
@@ -36,6 +49,7 @@ namespace Beef.Demo.Business.DataSvc
 
                 var __result = await Factory.Create<ICustomerGroupData>().GetAsync(id, company);
                 ExecutionContext.Current.CacheSet<CustomerGroup>(__key, __result);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id, company);
                 return __result;
             });
         }      
@@ -51,6 +65,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 var __result = await Factory.Create<ICustomerGroupData>().GetByArgsAsync(args, paging);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging);
                 return __result;
             });
         }      
@@ -67,6 +82,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<ICustomerGroupData>().CreateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.CustomerGroup.{id},{company}", "Create", new KeyValuePair<string, object>("id", __result.Id), new KeyValuePair<string, object>("company", __result.Company));
                 ExecutionContext.Current.CacheSet<CustomerGroup>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
                 return __result;
             });
         }      
@@ -83,6 +99,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<ICustomerGroupData>().UpdateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.CustomerGroup.{id},{company}", "Update", new KeyValuePair<string, object>("id", __result.Id), new KeyValuePair<string, object>("company", __result.Company));
                 ExecutionContext.Current.CacheSet<CustomerGroup>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
                 return __result;
             });
         }      
@@ -96,6 +113,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(CustomerGroupDataSvc), async () => 
             {
                 await Factory.Create<ICustomerGroupData>().UpdateBatchAsync(value);
+                if (_updateBatchOnAfterAsync != null) await _updateBatchOnAfterAsync(value);
             });
         }      
 
@@ -111,6 +129,7 @@ namespace Beef.Demo.Business.DataSvc
                 await Factory.Create<ICustomerGroupData>().DeleteAsync(id, company);
                 await Beef.Events.Event.PublishAsync("Demo.CustomerGroup.{id},{company}", "Delete", new KeyValuePair<string, object>("id", id), new KeyValuePair<string, object>("company", company));
                 ExecutionContext.Current.CacheRemove<CustomerGroup>(new UniqueKey(id, company));
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id, company);
             });
         }      
     }

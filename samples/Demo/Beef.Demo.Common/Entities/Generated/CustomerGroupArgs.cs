@@ -151,8 +151,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void CustomerGroupArgsConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(CustomerGroupArgs from);

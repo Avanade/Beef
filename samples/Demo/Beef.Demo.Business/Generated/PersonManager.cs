@@ -23,6 +23,7 @@ namespace Beef.Demo.Business
     public partial class PersonManager : IPersonManager
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<Person, Task> _createOnPreValidateAsync;
         private readonly Action<MultiValidator, Person> _createOnValidate;
@@ -103,6 +104,7 @@ namespace Beef.Demo.Business
         private readonly Func<Guid, Task> _deleteWithEfOnBeforeAsync;
         private readonly Func<Guid, Task> _deleteWithEfOnAfterAsync;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>

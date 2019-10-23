@@ -112,7 +112,7 @@ BEGIN
         <Column Condition="Column.IsPrimaryKey == true or Column.Name == 'IsDeleted'">
           <If Condition="System.Index > 0"><![CDATA[ AND ]]></If>
           <If Condition="Column.Name == 'IsDeleted'">
-            <Then><![CDATA[x.[{{Column.Name}}] = 0]]></Then>
+            <Then><![CDATA[ISNULL(x.[{{Column.Name}}], 0) = 0]]></Then>
             <Else><![CDATA[x.[{{Column.Name}}] = @{{Column.Name}}]]></Else>
           </If>
         </Column>
@@ -158,7 +158,7 @@ BEGIN
         [IsDeleted] = 1
        ,[UpdatedDate] = @UpdatedDate
        ,[UpdatedBy] = @UpdatedBy
-      WHERE [IsDeleted] = 0
+      WHERE ISNULL([IsDeleted], 0) = 0
         AND ]]>
         </Else>
       </If>

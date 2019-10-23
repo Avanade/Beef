@@ -115,8 +115,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void EyeColorConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(EyeColor from);

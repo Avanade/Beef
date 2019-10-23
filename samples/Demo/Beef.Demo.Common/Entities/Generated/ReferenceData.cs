@@ -3,21 +3,19 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using Beef.Entities;
+using System.Threading.Tasks;
 using Beef.RefData;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Entities
 {
     /// <summary>
-    /// Provides a standard mechanism for accessing the <b>ReferenceData</b> via the <see cref="ReferenceData.Current"/> property. 
+    /// Provides a standard mechanism for accessing the <b>ReferenceData</b>. 
     /// </summary>
-    /// <remarks>See <see cref="ReferenceData"/> for more information.</remarks>
-    public abstract partial class ReferenceData : ReferenceDataManager
+    public abstract partial class ReferenceData : IReferenceDataProvider
     {
+        private static ReferenceData _current;
+
         #region PropertyNames
     
         /// <summary>
@@ -40,11 +38,24 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         public const string Property_Company = "Company";
 
+        #endregion
+
+        /// <summary>
+        /// Gets the current <see cref="ReferenceData"/> instance; uses the <see cref="ReferenceDataManager.Register(IReferenceDataProvider[])">registered</see> instance from the
+        /// <see cref="ReferenceDataManager.GetProvider(string)"/> using the defined <see cref="IReferenceDataProvider.ProviderName"/>.
+        /// </summary>
+        public static ReferenceData Current => _current ?? (_current = (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(ReferenceData).FullName));
+
+        /// <summary>
+        /// Gets the unique provider name.
+        /// </summary>
+        string IReferenceDataProvider.ProviderName => typeof(ReferenceData).FullName;
+
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
         /// </summary>
         /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        public override Type[] GetAllTypes() => new Type[] 
+        public Type[] GetAllTypes() => new Type[] 
             {
                 typeof(Gender),
                 typeof(EyeColor),
@@ -52,16 +63,21 @@ namespace Beef.Demo.Common.Entities
                 typeof(Company)
             };
         
-        #endregion
-        
         /// <summary>
-        /// Gets the current <see cref="ReferenceData"/> instance. 
+        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
-        public static new ReferenceData Current
-        {
-            get { return (ReferenceData)ReferenceDataManager.Current; }
-        }
-    
+        /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
+        /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
+        public abstract IReferenceDataCollection this[Type type] { get; }
+
+        /// <summary>
+        /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects.
+        /// </summary>
+        /// <param name="names">The list of <see cref="ReferenceDataBase"/> names.</param>
+        /// <remarks>Note for implementers; should only fetch where not already cached or expired. This is provided to improve performance for consuming applications to reduce the overhead of
+        /// making multiple individual invocations, i.e. reduces chattiness across a potentially high-latency connection.</remarks>
+        public abstract Task PrefetchAsync(params string[] names);
+        
         #region Collections
 
         /// <summary> 

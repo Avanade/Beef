@@ -140,8 +140,6 @@ namespace Beef.Demo.Common.Entities
 
         #region PartialMethods
       
-        partial void AddressConstructor();
-
         partial void OnAfterCleanUp();
 
         partial void OnAfterCopyFrom(Address from);

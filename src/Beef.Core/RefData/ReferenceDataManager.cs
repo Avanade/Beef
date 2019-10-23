@@ -1,60 +1,55 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.RefData
 {
     /// <summary>
-    /// Provides a standard mechanism for managing and accessing the <b>ReferenceData</b> via the <see cref="Current"/> property. 
+    /// Provides a standard mechanism for managing and accessing all the available/possible <b>ReferenceData</b> entities via the <see cref="Current"/> property. 
     /// </summary>
     /// <remarks>
-    /// This class provides the interface for the <b>ReferenceData</b> but not the implementation itself. This is required as <b>Entity</b> classes should
-    /// contain no implementation specific logic, such as database access, etc. This enables the interface to be seperated from the implementation
-    /// and ensures that the <b>ReferenceData</b> follows the same pattern of using <b>Components</b> and <b>Data Services</b> for the implementation logic.
-    /// <para>This also enables there to be multiple implementations; for example the loading and caching could be different on the User Interface versus
-    /// Application tiers.</para> 
-    /// <para><see cref="Register"/> must be invoked to set the providing implementation before accessing the <see cref="Current"/> instance.</para>
+    /// This is required as <b>Entity</b> classes should contain no implementation specific logic, such as database access, etc. This enables the <b>ReferenceData</b> access logic to be seperated from
+    /// the implementation. This ensures that the <b>ReferenceData</b> follows the same pattern of using <c>Manager</c>, <c>DataSvc</c> and <c>Data</c> layering for the implementation logic.
+    /// <para>This also enables there to be multiple implementations; for example the loading and caching could be different on the external consumer channel versus the internal application tier.</para> 
+    /// <para>The <see cref="Register"/> must be invoked to set the providing implementation(s) before accessing the <see cref="Current"/> instance.</para>
     /// </remarks>
-    public abstract partial class ReferenceDataManager
+    public sealed class ReferenceDataManager : IReferenceDataProvider
     {
-        private static ReferenceDataManager _current;
+        private static readonly ConcurrentDictionary<string, IReferenceDataProvider> _providers = new ConcurrentDictionary<string, IReferenceDataProvider>();
+        private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _itemProviders = new ConcurrentDictionary<Type, IReferenceDataProvider>();
 
         [ThreadStatic()]
         private static ReferenceDataContext _context;
 
-        #region Create/Default
-
         /// <summary>
-        /// Registers the <see cref="Current"/> <see cref="ReferenceDataManager"/> instance.
+        /// Registers one or more <see cref="IReferenceDataProvider"/> provider instances.
         /// </summary>
-        /// <param name="refData">The concrete <see cref="ReferenceDataManager"/> instance.</param>
-        public static void Register(ReferenceDataManager refData)
+        /// <param name="refDataProviders">The <see cref="IReferenceDataProvider"/> provider instances.</param>
+        public static void Register(params IReferenceDataProvider[] refDataProviders)
         {
-            if (_current != null)
-                throw new InvalidOperationException("The Register method can only be invoked once.");
+            if (refDataProviders == null || refDataProviders.Length == 0)
+                return;
 
-            _current = refData ?? throw new ArgumentNullException(nameof(refData));
+            foreach (var provider in refDataProviders.Where(p => p != null))
+            {
+                if (!_providers.TryAdd(provider.ProviderName, provider))
+                    throw new ArgumentException($"Provider with Name '{provider.ProviderName}' has already been registered.");
+
+                foreach (var type in provider.GetAllTypes())
+                {
+                    if (!_itemProviders.TryAdd(type, provider))
+                        throw new ArgumentException($"Item Type '{type.Name}' has already been registered.");
+                }
+            }
         }
-
-        /// <summary>
-        /// Indicates whether the <see cref="Current"/> has a value.
-        /// </summary>
-        public static bool HasCurrent { get => _current != null; }
 
         /// <summary>
         /// Gets the current <see cref="ReferenceDataManager"/> instance. 
         /// </summary>
-        public static ReferenceDataManager Current
-        {
-            get
-            {
-                if (_current == null)
-                    throw new InvalidOperationException("The Register method must be invoked before this property can be accessed.");
-
-                return _current;
-            }
-        }
+        public static ReferenceDataManager Current { get; } = new ReferenceDataManager();
 
         /// <summary>
         /// Gets the thread-based <see cref="ReferenceDataContext"/> (used for the setting of the contextual validation date).
@@ -71,28 +66,70 @@ namespace Beef.RefData
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataManager"/>.
+        /// </summary>
+        private ReferenceDataManager() { }
+
+        /// <summary>
+        /// Gets the unique provider name.
+        /// </summary>
+        string IReferenceDataProvider.ProviderName => typeof(ReferenceDataManager).FullName;
 
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        public abstract IReferenceDataCollection this[Type type] { get; }
+        public IReferenceDataCollection this[Type type]
+        {
+            get
+            {
+                Check.NotNull(type, nameof(type));
+
+                if (_itemProviders.TryGetValue(type, out var provider))
+                    return provider[type];
+
+                throw new ArgumentException(string.Format($"Type '{type.Name}' has not been configured within the registered providers."));
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Register(IReferenceDataProvider[])">registered</see> <see cref="IReferenceDataProvider"/> for the specified <paramref name="providerName"/>.
+        /// </summary>
+        /// <param name="providerName">The <see cref="IReferenceDataProvider.ProviderName"/>.</param>
+        /// <returns>The <see cref="IReferenceDataProvider"/> instance.</returns>
+        public IReferenceDataProvider GetProvider(string providerName)
+        {
+            Check.NotNull(providerName, nameof(providerName));
+            if (_providers.TryGetValue(providerName, out var provider))
+                return provider;
+
+            throw new ArgumentException(string.Format($"Provider with Name '{providerName}' has not been registered."));
+        }
 
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
         /// </summary>
         /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        public abstract Type[] GetAllTypes();
+        public Type[] GetAllTypes() => _itemProviders.Keys.ToArray();
 
         /// <summary>
-        /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. 
+        /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects.
         /// </summary>
         /// <param name="names">The list of <see cref="ReferenceDataBase"/> names.</param>
-        /// <remarks>Note for implementers; should only fetch where not already cached or expired. This is provided to improve performance
-        /// for consuming applications to reduce the overhead of making multiple individual invocations, i.e. reduces chattiness across a 
-        /// potentially high-latency connection.</remarks>
-        public abstract Task PrefetchAsync(params string[] names);
+        /// <remarks>Note for implementers; should only fetch where not already cached or expired. This is provided to improve performance for consuming applications to reduce the overhead of
+        /// making multiple individual invocations, i.e. reduces chattiness across a potentially high-latency connection.</remarks>
+        public async Task PrefetchAsync(params string[] names)
+        {
+            var tasks = new Task[_providers.Count];
+            var i = 0;
+            foreach (var provider in _providers.Values)
+            {
+                tasks[i++] = provider.PrefetchAsync(names);
+            }
+
+            await Task.WhenAll(tasks);
+        }
     }
 }

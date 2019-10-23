@@ -103,12 +103,14 @@ namespace Beef.Data.Cosmos.UnitTest
         public override object Clone() => throw new NotImplementedException();
     }
 
-    public class ReferenceDataProvider : ReferenceDataManager
+    public class ReferenceDataProvider : IReferenceDataProvider
     {
-        public override IReferenceDataCollection this[Type type] => throw new NotImplementedException();
+        public IReferenceDataCollection this[Type type] => throw new NotImplementedException();
 
-        public override Type[] GetAllTypes() => new Type[] { typeof(Gender) };
+        public string ProviderName => typeof(ReferenceDataProvider).FullName;
 
-        public override Task PrefetchAsync(params string[] names) => throw new NotImplementedException();
+        public Type[] GetAllTypes() => new Type[] { typeof(Gender) };
+
+        public Task PrefetchAsync(params string[] names) => throw new NotImplementedException();
     }
 }

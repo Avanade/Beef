@@ -164,7 +164,7 @@ namespace Beef
             var wr = new WildcardResult { Wildcard = this, Selection = WildcardSelection.Undetermined };
 
             if (CharactersNotAllowed != null && CharactersNotAllowed.Count() > 0 && text.IndexOfAny(CharactersNotAllowed) >= 0)
-                wr.Selection = wr.Selection | WildcardSelection.InvalidCharacter;
+                wr.Selection |= WildcardSelection.InvalidCharacter;
 
             var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter) >= 0;
             var hasTxt = false;

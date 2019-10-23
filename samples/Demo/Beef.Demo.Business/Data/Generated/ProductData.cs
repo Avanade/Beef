@@ -24,6 +24,7 @@ namespace Beef.Demo.Business.Data
     public partial class ProductData : IProductData
     {
         #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<int, IODataArgs, Task> _getOnBeforeAsync;
         private readonly Func<Product, int, Task> _getOnAfterAsync;
@@ -34,6 +35,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<ProductCollectionResult, ProductArgs, Task> _getByArgsOnAfterAsync;
         private readonly Action<Exception> _getByArgsOnException;
 
+        #pragma warning restore CS0649
         #endregion
 
         /// <summary>
@@ -67,7 +69,6 @@ namespace Beef.Demo.Business.Data
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
-                __result = new ProductCollectionResult(paging);
                 __result.Result = await TestOData.Default.SelectQueryAsync<ProductCollection, Product>(__dataArgs,
                     q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs));
 

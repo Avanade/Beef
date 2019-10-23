@@ -3,9 +3,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.Demo.Business.DataSvc;
@@ -24,34 +21,22 @@ namespace Beef.Demo.Business
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
         /// </summary>
-        public override RefDataNamespace.GenderCollection Gender
-        {
-            get { return (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)]; }
-        }
+        public override RefDataNamespace.GenderCollection Gender => (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
         /// </summary>
-        public override RefDataNamespace.EyeColorCollection EyeColor
-        {
-            get { return (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)]; }
-        }
+        public override RefDataNamespace.EyeColorCollection EyeColor => (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
         /// </summary>
-        public override RefDataNamespace.PowerSourceCollection PowerSource
-        {
-            get { return (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)]; }
-        }
+        public override RefDataNamespace.PowerSourceCollection PowerSource => (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
         /// </summary>
-        public override RefDataNamespace.CompanyCollection Company
-        {
-            get { return (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)]; }
-        }
+        public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
 
         #endregion
   
@@ -60,13 +45,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public override IReferenceDataCollection this[Type type]
-        {
-            get
-            {
-                return ReferenceDataDataSvc.GetCollection(type);
-            }
-        }
+        public override IReferenceDataCollection this[Type type] => ReferenceDataDataSvc.GetCollection(type);
         
         /// <summary>
         /// Prefetches all, or the list of <see cref="ReferenceDataBase"/> objects, where not already cached or expired.
@@ -92,10 +71,10 @@ namespace Beef.Demo.Business
                 {
                     switch (name)
                     {
-                        case ReferenceData.Property_Gender: temp = this[typeof(RefDataNamespace.Gender)]; break;
-                        case ReferenceData.Property_EyeColor: temp = this[typeof(RefDataNamespace.EyeColor)]; break;
-                        case ReferenceData.Property_PowerSource: temp = this[typeof(RefDataNamespace.PowerSource)]; break;
-                        case ReferenceData.Property_Company: temp = this[typeof(RefDataNamespace.Company)]; break;
+                        case Property_Gender: temp = this[typeof(RefDataNamespace.Gender)]; break;
+                        case Property_EyeColor: temp = this[typeof(RefDataNamespace.EyeColor)]; break;
+                        case Property_PowerSource: temp = this[typeof(RefDataNamespace.PowerSource)]; break;
+                        case Property_Company: temp = this[typeof(RefDataNamespace.Company)]; break;
                     }
                 }
             });

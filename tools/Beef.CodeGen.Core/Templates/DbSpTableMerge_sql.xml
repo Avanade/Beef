@@ -185,7 +185,7 @@ BEGIN
             <![CDATA[
         AND ]]>
           </If>
-          <![CDATA[[{{Table.Alias}}].[IsDeleted]= 0]]>
+          <![CDATA[ISNULL([{{Table.Alias}}].[IsDeleted], 0) = 0]]>
           <Set Name="System.AndNeeded" Value="true" />
         </If>
         <Where>

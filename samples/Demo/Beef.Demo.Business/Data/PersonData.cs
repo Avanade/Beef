@@ -53,7 +53,7 @@ namespace Beef.Demo.Business.Data
 
         private Task MarkOnImplementationAsync()
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         private void MarkOnException(Exception ex)

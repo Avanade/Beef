@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.16
+- *Added:* The `AgentTester` has been updated to reflect the `IReferenceDataProvider` changes.
+
 ## v2.1.15
 - *Added:* `ExpectEvent`, `ExpectNoEvent` and `ExpectNoEvents` added to `AgentTester`. This is enabled via the new `ExpectEvent` supporting class.
 

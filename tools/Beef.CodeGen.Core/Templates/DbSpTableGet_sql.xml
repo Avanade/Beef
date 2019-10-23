@@ -161,7 +161,7 @@ BEGIN
         </If>
         <If Condition="System.IsDeleted == true">
           <![CDATA[
-      AND [{{Table.Alias}}].[IsDeleted] = 0]]>
+      AND ISNULL([{{Table.Alias}}].[IsDeleted], 0) = 0]]>
         </If>
       </If>
       <Execute Condition="Execute.Location == null or Execute.Location == 'After'">

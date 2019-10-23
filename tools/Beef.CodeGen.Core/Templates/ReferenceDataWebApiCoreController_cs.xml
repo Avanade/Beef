@@ -44,17 +44,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
     <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
     <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <Set Name="System.WebApiAuthorize" Value="null" />
-    <If Condition="Config.WebApiAuthorize == 'Authorize'"><Set Name="System.WebApiAuthorize" Value="'Authorize'" /></If>
-    <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'"><Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" /></If>
-    <If Condition="Entity.WebApiAuthorize == 'Authorize'"><Set Name="System.WebApiAuthorize" Value="'Authorize'" /></If>
-    <If Condition="Entity.WebApiAuthorize == 'AllowAnonymous'"><Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" /></If>
+    <If Condition="Config.WebApiAuthorize == 'Authorize'">
+      <Set Name="System.WebApiAuthorize" Value="'Authorize'" />
+    </If>
+    <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'">
+      <Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" />
+    </If>
+    <If Condition="Entity.WebApiAuthorize == 'Authorize'">
+      <Set Name="System.WebApiAuthorize" Value="'Authorize'" />
+    </If>
+    <If Condition="Entity.WebApiAuthorize == 'AllowAnonymous'">
+      <Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" />
+    </If>
     <If Condition="System.Index > 0">
       <![CDATA[
 ]]>
     </If>
     <![CDATA[        /// <summary> 
-        /// Gets all of the {{Entity.EntityName:ToSeeComments}} reference data entities.
+        /// Gets all of the {{Entity.EntityName:ToSeeComments}} reference data entities that match the specified criteria.
         /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A {{Entity.EntityCollectionName:ToSeeComments}}.</returns>
 ]]>
     <If Condition="System.WebApiAuthorize != null">
@@ -69,9 +79,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
     </If>
     <![CDATA[        [ProducesResponseType(typeof({{Entity.EntityCollectionName}}), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult {{Entity.Name}}GetAll()
+        public IActionResult {{Entity.Name}}GetAll(List<string> codes = default, string text = default)
         {
-            return new WebApiGet<{{Entity.EntityCollectionName}}>(this, () => Task.FromResult(ReferenceData.Current.{{Entity.Name}}), operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+            return new WebApiGet<{{Entity.EntityCollectionName}}>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, codes, text)),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 ]]>
   </Entity>
@@ -79,12 +90,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
         /// <summary>
         /// Gets the named reference data entities.
         /// </summary>
-        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="ReferenceDataAgent.GetNamedAllNames"/>.</param>
+        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="Common.Agents.ReferenceDataAgent.GetNamedAllNames"/>.</param>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
 ]]>
   <Set Name="System.WebApiAuthorize" Value="null" />
-  <If Condition="Config.WebApiAuthorize == 'Authorize'"><Set Name="System.WebApiAuthorize" Value="'Authorize'" /></If>
-  <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'"><Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" /></If>
+  <If Condition="Config.WebApiAuthorize == 'Authorize'">
+    <Set Name="System.WebApiAuthorize" Value="'Authorize'" />
+  </If>
+  <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'">
+    <Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" />
+  </If>
   <If Condition="System.WebApiAuthorize != null">
     <![CDATA[        [{{System.WebApiAuthorize}}]
 ]]>
@@ -116,11 +131,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 var coll = new ReferenceDataMultiCollection();
                 foreach (string name in allNames == null ? names : allNames.ToArray())
                 {
-                    switch (name)
+                    switch (name.ToUpperInvariant())
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case ReferenceData.Property_{{Entity.Name}}: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceData.Current[typeof(RefDataNamespace.{{Entity.Name}})] }); break;
+    <![CDATA[                        case var s when s == ReferenceData.Property_{{Entity.Name}}.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceData.Current.{{Entity.Name}} }); break;
 ]]>
   </Entity>
   <![CDATA[                    }
@@ -129,7 +144,40 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 return Task.FromResult(coll);
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
-    }
-}
+
+        /// <summary>
+        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: {{Config.RefDataWebApiRoute}}/codes?entity=codeX,codeY&entity2=codeZ&entity3
+        /// </summary>
+        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
 ]]>
+  <If Condition="System.WebApiAuthorize != null">
+    <![CDATA[        [{{System.WebApiAuthorize}}]
+]]>
+  </If>
+  <![CDATA[        [HttpGet()]
+        [Route("{{Config.RefDataWebApiRoute}}/codes")]
+        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult GetByCodes()
+        {
+            return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
+            {
+                var coll = new ReferenceDataMultiCollection();
+                foreach (var q in HttpContext.Request.Query)
+                {
+                    switch (q.Key.ToUpperInvariant())
+                    {
+]]>
+  <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
+    <![CDATA[                        case var s when s == ReferenceData.Property_{{Entity.Name}}.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value) }); break;
+]]>
+  </Entity>
+  <![CDATA[                    }
+                }
+                
+                return Task.FromResult(coll);
+            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+    }
+}]]>
 </Template>

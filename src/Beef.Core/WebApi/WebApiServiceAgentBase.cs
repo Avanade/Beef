@@ -128,10 +128,12 @@ namespace Beef.WebApi
             if (requestOptions == null || string.IsNullOrEmpty(requestOptions.ETag))
                 return;
 
+            var etag = requestOptions.ETag.StartsWith("\"") && requestOptions.ETag.EndsWith("\"") ? requestOptions.ETag : "\"" + requestOptions.ETag + "\"";
+
             if (request.Method == HttpMethod.Get)
-                request.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + requestOptions.ETag + "\""));
+                request.Headers.IfNoneMatch.Add(new EntityTagHeaderValue(etag));
             else
-                request.Headers.IfMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + requestOptions.ETag + "\""));
+                request.Headers.IfMatch.Add(new EntityTagHeaderValue(etag));
         }
 
         #region Get/Put/Post/Delete Async
@@ -148,7 +150,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
         public async Task<WebApiAgentResult> GetAsync(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
@@ -174,7 +176,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
         public async Task<WebApiAgentResult<TResult>> GetAsync<TResult>(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
@@ -244,7 +246,7 @@ namespace Beef.WebApi
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
 
@@ -276,7 +278,7 @@ namespace Beef.WebApi
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
 
@@ -303,7 +305,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
         public async Task<WebApiAgentResult> PutAsync(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
@@ -329,7 +331,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
         public async Task<WebApiAgentResult<TResult>> PutAsync<TResult>(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
@@ -358,7 +360,7 @@ namespace Beef.WebApi
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
 
@@ -390,7 +392,7 @@ namespace Beef.WebApi
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody where a content value is used.", nameof(args));
 
@@ -417,7 +419,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult"/>.</returns>
         public async Task<WebApiAgentResult> PostAsync(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
@@ -444,7 +446,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult{TResult}"/>.</returns>
         public async Task<WebApiAgentResult<TResult>> PostAsync<TResult>(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
 
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
@@ -470,7 +472,7 @@ namespace Beef.WebApi
         /// <returns>The <see cref="WebApiAgentResult{T}"/>.</returns>
         public async Task<WebApiAgentResult> DeleteAsync(string url, WebApiRequestOptions requestOptions = null, WebApiArg[] args = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             using (var pt = new WebApiPerformanceTimer(uri.AbsoluteUri))
             {
                 return await WebApiServiceAgentInvoker.Default.InvokeAsync(this, async () =>
@@ -502,7 +504,7 @@ namespace Beef.WebApi
             if (patchOption == WebApiPatchOption.NotSpecified)
                 throw new ArgumentException("A valid patch option must be specified.", nameof(patchOption));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody for a PATCH.", nameof(args));
 
@@ -537,7 +539,7 @@ namespace Beef.WebApi
             if (json == null)
                 throw new ArgumentNullException(nameof(json));
 
-            var uri = CreateFullUri(url, args);
+            var uri = CreateFullUri(url, args, requestOptions);
             if (args != null && args.Count(x => x.ArgType == WebApiArgType.FromBody) > 0)
                 throw new ArgumentException("No arguments can be marked as IsFromBody for a PATCH.", nameof(args));
 
@@ -561,15 +563,16 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="url">The specific url suffix for the operation.</param>
         /// <param name="args">The operation arguments to be substituted within the <paramref name="url"/>.</param>
-        protected Uri CreateFullUri(string url = null, WebApiArg[] args = null)
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        protected Uri CreateFullUri(string url = null, WebApiArg[] args = null, WebApiRequestOptions requestOptions = null)
         {
             // Concatenate the base and specific url strings to form the full Url.
             string fullUrl = Client.BaseAddress.AbsoluteUri;
             if (fullUrl[fullUrl.Length - 1] != '/')
-                fullUrl = fullUrl + "/";
+                fullUrl += "/";
 
             if (!string.IsNullOrEmpty(url))
-                fullUrl = fullUrl + ((url[0] == '/') ? url.Substring(1) : url);
+                fullUrl += ((url[0] == '/') ? url.Substring(1) : url);
 
             // Replace known url tokens with passed argument values.
             if (args != null)
@@ -587,7 +590,7 @@ namespace Beef.WebApi
                     }
                 }
 
-                bool firstTime = !fullUrl.Contains("&");
+                bool firstTime = !fullUrl.Contains("?");
                 foreach (var arg in args.Where(x => !x.IsDefault && x.ArgType != WebApiArgType.FromBody && !x.IsUsed))
                 {
                     var argUrl = arg.ToUrlQueryString();
@@ -598,6 +601,10 @@ namespace Beef.WebApi
                     }
                 }
             }
+
+            // Where additional url query string is supplied then add.
+            if (!string.IsNullOrEmpty(requestOptions?.UrlQueryString))
+                fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?") ? requestOptions.UrlQueryString.Substring(1) : requestOptions.UrlQueryString);
 
             return new Uri(fullUrl.Replace(" ", "%20"));
         }

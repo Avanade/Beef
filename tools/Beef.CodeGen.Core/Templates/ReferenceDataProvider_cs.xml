@@ -6,9 +6,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using Beef.RefData;
 using {{Config.Company}}.{{Config.AppName}}.Business.DataSvc;
@@ -39,10 +36,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
     <![CDATA[        /// <summary> 
         /// Gets the {{Entity.EntityCollectionName:ToSeeComments}}.
         /// </summary>
-        public override {{Entity.EntityCollectionName}} {{Entity.Name}}
-        {
-            get { return ({{Entity.EntityCollectionName}})this[typeof({{Entity.EntityName}})]; }
-        }
+        public override {{Entity.EntityCollectionName}} {{Entity.Name}} => ({{Entity.EntityCollectionName}})this[typeof({{Entity.EntityName}})];
 
 ]]>
   </Entity>
@@ -53,13 +47,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public override IReferenceDataCollection this[Type type]
-        {
-            get
-            {
-                return ReferenceDataDataSvc.GetCollection(type);
-            }
-        }
+        public override IReferenceDataCollection this[Type type] => ReferenceDataDataSvc.GetCollection(type);
         
         /// <summary>
         /// Prefetches all, or the list of <see cref="ReferenceDataBase"/> objects, where not already cached or expired.
@@ -88,7 +76,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.ExcludeManager == false">
-    <![CDATA[                        case ReferenceData.Property_{{Entity.Name}}: temp = this[typeof({{Entity.EntityName}})]; break;
+    <![CDATA[                        case Property_{{Entity.Name}}: temp = this[typeof({{Entity.EntityName}})]; break;
 ]]>
   </Entity>
   <![CDATA[                    }
@@ -96,6 +84,5 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             });
         }
     }
-}
-]]>
+}]]>
 </Template>

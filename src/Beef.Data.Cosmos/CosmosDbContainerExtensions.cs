@@ -121,14 +121,14 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <typeparam name="TResource">The <see cref="Type"/> to infer the <see cref="Assembly"/> to find manifest resources (see <see cref="Assembly.GetManifestResourceStream(string)"/>).</typeparam>
         /// <param name="container">The <see cref="Container"/>.</param>
-        /// <param name="refData">The <see cref="ReferenceDataManager"/> to infer the underlying reference data types.</param>
+        /// <param name="refData">The <see cref="IReferenceDataProvider"/> to infer the underlying reference data types.</param>
         /// <param name="yamlResourceName">The YAML resource name (must reside in <c>Cosmos</c> folder within the <typeparamref name="TResource"/> <see cref="Assembly"/>).</param>
         /// <param name="partitionKey">The optional partition key; where not specified <see cref="PartitionKey.None"/> is used.</param>
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional. Also, the data is created using a <see cref="CosmosDbValue{ReferenceDataBase}"/> so that multiple reference data types
         /// can co-exist within the same collection.</remarks>
-        public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, ReferenceDataManager refData, string yamlResourceName, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null)
+        public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, IReferenceDataProvider refData, string yamlResourceName, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null)
         {
             Check.NotNull(refData, nameof(refData));
 
