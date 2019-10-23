@@ -94,10 +94,10 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Gets the named reference data entities.
         /// </summary>
-        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="ReferenceDataAgent.GetNamedAllNames"/>.</param>
+        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="Common.Agents.ReferenceDataAgent.GetNamedAllNames"/>.</param>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
         [HttpGet()]
-        [Route("api/v1/ref")]
+        [Route("api/v1/demo/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetNamed(string[] names)
@@ -122,15 +122,43 @@ namespace Beef.Demo.Api.Controllers
                 var coll = new ReferenceDataMultiCollection();
                 foreach (string name in allNames == null ? names : allNames.ToArray())
                 {
-                    switch (name)
+                    switch (name.ToUpperInvariant())
                     {
-                        case ReferenceData.Property_Gender: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current[typeof(RefDataNamespace.Gender)] }); break;
-                        case ReferenceData.Property_EyeColor: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current[typeof(RefDataNamespace.EyeColor)] }); break;
-                        case ReferenceData.Property_PowerSource: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceData.Current[typeof(RefDataNamespace.PowerSource)] }); break;
-                        case ReferenceData.Property_Company: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current[typeof(RefDataNamespace.Company)] }); break;
+                        case var s when s == ReferenceData.Property_Gender.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceData.Current.Gender }); break;
+                        case var s when s == ReferenceData.Property_EyeColor.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceData.Current.EyeColor }); break;
+                        case var s when s == ReferenceData.Property_PowerSource.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceData.Current.PowerSource }); break;
+                        case var s when s == ReferenceData.Property_Company.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceData.Current.Company }); break;
                     }
                 }
 
+                return Task.FromResult(coll);
+            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: api/v1/demo/ref/codes?entity=codeX,codeY&entity2=codeZ&entity3
+        /// </summary>
+        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/codes")]
+        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult GetByCodes()
+        {
+            return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
+            {
+                var coll = new ReferenceDataMultiCollection();
+                foreach (var q in HttpContext.Request.Query)
+                {
+                    switch (q.Key.ToUpperInvariant())
+                    {
+                        case var s when s == ReferenceData.Property_Gender.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Gender, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(ReferenceData.Current.Gender, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_EyeColor.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_EyeColor, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(ReferenceData.Current.EyeColor, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_PowerSource.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_PowerSource, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(ReferenceData.Current.PowerSource, q.Value) }); break;
+                        case var s when s == ReferenceData.Property_Company.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_Company, Items = ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(ReferenceData.Current.Company, q.Value) }); break;
+                    }
+                }
+                
                 return Task.FromResult(coll);
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }

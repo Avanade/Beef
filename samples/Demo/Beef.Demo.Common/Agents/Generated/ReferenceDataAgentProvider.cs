@@ -109,7 +109,7 @@ namespace Beef.Demo.Common.Agents
         /// <returns>The <see cref="IReferenceDataCache"/>.</returns>
         public IReferenceDataCache GetCache(Type type)
         {
-            if (!_cacheDict.ContainsKey(Check.NotNull(type, nameof(type))))
+            if (!_cacheDict.ContainsKey(Beef.Check.NotNull(type, nameof(type))))
                 throw new ArgumentException(string.Format("Type {0} does not exist within the ReferenceDataProvider cache.", type.Name));
 
             return (IReferenceDataCache)_cacheDict[type];

@@ -966,6 +966,15 @@ namespace Beef.Demo.Test
             Assert.AreEqual("{\"firstName\":\"Gary\"}", res.Request.Content.ReadAsStringAsync().Result);
         }
 
+        [Test, TestSetUp]
+        public void I120_Mark()
+        {
+            AgentTester.Create<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.Accepted)
+                .ExpectEvent("Demo.Mark")
+                .Run((a) => a.Agent.MarkAsync());
+        }
+
         #endregion
     }
 }

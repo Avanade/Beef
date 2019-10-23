@@ -42,37 +42,50 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets all of the <see cref="Gender"/> objects that match the filter arguments.
         /// </summary>
-        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<GenderCollection>> GenderGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.GenderGetAllAsync(args);      
+        public Task<WebApiAgentResult<GenderCollection>> GenderGetAllAsync(ReferenceDataFilter args = null, WebApiRequestOptions requestOptions = null) => ServiceAgent.GenderGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="EyeColor"/> objects that match the filter arguments.
         /// </summary>
-        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.EyeColorGetAllAsync(args);      
+        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter args = null, WebApiRequestOptions requestOptions = null) => ServiceAgent.EyeColorGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="PowerSource"/> objects that match the filter arguments.
         /// </summary>
-        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.PowerSourceGetAllAsync(args);      
+        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter args = null, WebApiRequestOptions requestOptions = null) => ServiceAgent.PowerSourceGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="Company"/> objects that match the filter arguments.
         /// </summary>
-        /// <param name="args">The <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter args = null) => ServiceAgent.CompanyGetAllAsync(args);      
+        public Task<WebApiAgentResult<CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter args = null, WebApiRequestOptions requestOptions = null) => ServiceAgent.CompanyGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets the named reference data objects.
         /// </summary>
         /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="ReferenceDataAgent.GetNamedAllNames"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<WebApiAgentResult> GetNamedAsync(string[] names) => ServiceAgent.GetNamedAsync(names);
+        public Task<WebApiAgentResult> GetNamedAsync(string[] names, WebApiRequestOptions requestOptions = null) => ServiceAgent.GetNamedAsync(names, requestOptions);
+        
+        /// <summary>
+        /// Gets the reference data entities for the specified entities and codes from the <see cref="WebApiRequestOptions.UrlQueryString"/>; e.g: entity=codeX,codeY&entity2=codeZ&entity3
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
+        public Task<WebApiAgentResult> GetByCodesAsync(WebApiRequestOptions requestOptions = null) => ServiceAgent.GetByCodesAsync(requestOptions);
     }
 }

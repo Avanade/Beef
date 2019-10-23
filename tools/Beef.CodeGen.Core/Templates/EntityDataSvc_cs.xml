@@ -55,7 +55,75 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
       <![CDATA[
     {
 ]]>
-      <!-- Comments + Method Definition -->
+      <Set Name="System.EndRegion" Value="false"/>
+      <Operation Condition="Operation.ExcludeDataSvc == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch' and Operation.DataSvcCustom == false">
+        <If Condition="System.EndRegion == false">
+          <Set Name="System.EndRegion" Value="true"/>
+          <![CDATA[        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+
+]]>
+        </If>
+        <![CDATA[        private static readonly Func<]]>
+        <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+          <If Condition="Operation.ReturnType == 'void'">
+            <Then><![CDATA[{{Entity.EntityName}}]]></Then>
+            <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+          </If>
+        </If>
+        <If Condition="Operation.OperationType == 'GetColl'">
+          <If Condition="Operation.ReturnType == 'void'">
+            <Then><![CDATA[{{Entity.EntityCollectionResultName}}]]></Then>
+            <Else><![CDATA[{{Operation.ReturnType}}CollectionResult]]></Else>
+          </If>
+        </If>
+        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+          <![CDATA[{{Operation.ReturnType}}]]>
+        </If>
+        <Parameter Condition="Parameter.LayerPassing == 'All'">
+          <If Condition="System.Index == 0">
+            <Then>
+              <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[, ]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[, ]]>
+              </If>
+            </Then>
+            <Else>
+              <![CDATA[, ]]>
+            </Else>
+          </If>
+          <![CDATA[{{Parameter.Type}}]]>
+          <If Condition="Parameter.Nullable == true">
+            <![CDATA[?]]>
+          </If>
+        </Parameter>
+        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+          <Then>
+            <![CDATA[, PagingArgs, ]]>
+          </Then>
+          <Else>
+            <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+              <Then><![CDATA[, ]]></Then>
+              <Else>
+                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                  <![CDATA[, ]]>
+                </If>
+              </Else>
+            </If>
+          </Else>
+        </If>
+        <![CDATA[Task> {{Operation.PrivateName}}OnAfterAsync;
+]]>
+      </Operation>
+      <If Condition="System.EndRegion == true">
+        <![CDATA[
+        #pragma warning restore CS0649
+        #endregion
+
+]]>
+      </If>
       <Operation Condition="Operation.ExcludeDataSvc == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch'">
         <If Condition="System.Index > 0">
           <![CDATA[
@@ -434,6 +502,47 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
           </If>
         </If>
+        <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
+        <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+          <![CDATA[__result]]>
+        </If>
+        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+          <![CDATA[__result]]>
+        </If>
+        <Parameter Condition="Parameter.LayerPassing == 'All'">
+          <If Condition="System.Index == 0">
+            <Then>
+              <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[, ]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[, ]]>
+              </If>
+            </Then>
+            <Else>
+              <![CDATA[, ]]>
+            </Else>
+          </If>
+          <![CDATA[{{Parameter.ArgumentName}}]]>
+        </Parameter>
+        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+          <If Condition="Operation.ParameterCount > 0">
+            <Then>
+              <![CDATA[, ]]>
+            </Then>
+            <Else>
+              <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
+                <![CDATA[, ]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[, ]]>
+              </If>
+            </Else>
+          </If>
+          <![CDATA[paging]]>
+        </If>
+        <![CDATA[);
+]]>
         <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'GetColl'">
           <![CDATA[                return __result;
 ]]>

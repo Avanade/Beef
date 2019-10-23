@@ -174,7 +174,7 @@ BEGIN
       AND ]]>
             </If>
             <Set Name="System.AndNeeded" Value="true" />
-            <![CDATA[[{{Table.Alias}}].[IsDeleted] = 0]]>
+            <![CDATA[ISNULL([{{Table.Alias}}].[IsDeleted], 0) = 0]]>
           </If>
         </If>
         <If Condition="Table.UserRole != null and System.OrgUnitId == false">
@@ -351,7 +351,7 @@ BEGIN
         AND ]]>
               </If>
               <Set Name="System.AndNeeded" Value="true" />
-              <![CDATA[[{{Table.Alias}}].[IsDeleted] = 0]]>
+              <![CDATA[ISNULL([{{Table.Alias}}].[IsDeleted], 0) = 0]]>
             </If>
           </If>
           <If Condition="Table.UserRole != null and System.OrgUnitId == false">

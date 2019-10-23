@@ -45,7 +45,7 @@ AS
           <![CDATA[
       AND ]]>
         </If>
-        <![CDATA[[{{Table.Alias}}].[IsDeleted] = 0]]>
+        <![CDATA[ISNULL([{{Table.Alias}}].[IsDeleted], 0) = 0]]>
       </If>
     </If>
     <If Condition="Table.UserRole != null and System.OrgUnitId == false">

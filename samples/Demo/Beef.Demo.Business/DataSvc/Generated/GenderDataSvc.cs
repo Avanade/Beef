@@ -20,6 +20,16 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class GenderDataSvc
     {
+        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+
+        private static readonly Func<Gender, Guid, Task> _getOnAfterAsync;
+        private static readonly Func<Gender, Task> _createOnAfterAsync;
+        private static readonly Func<Gender, Task> _updateOnAfterAsync;
+
+        #pragma warning restore CS0649
+        #endregion
+
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -35,6 +45,7 @@ namespace Beef.Demo.Business.DataSvc
 
                 var __result = await Factory.Create<IGenderData>().GetAsync(id);
                 ExecutionContext.Current.CacheSet<Gender>(__key, __result);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
                 return __result;
             });
         }      
@@ -51,6 +62,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IGenderData>().CreateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Gender.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id));
                 ExecutionContext.Current.CacheSet<Gender>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
                 return __result;
             });
         }      
@@ -67,6 +79,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IGenderData>().UpdateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Gender.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
                 ExecutionContext.Current.CacheSet<Gender>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
                 return __result;
             });
         }      

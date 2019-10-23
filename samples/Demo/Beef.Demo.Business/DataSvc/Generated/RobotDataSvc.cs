@@ -20,6 +20,18 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class RobotDataSvc
     {
+        #region Private
+        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+
+        private static readonly Func<Robot, Guid, Task> _getOnAfterAsync;
+        private static readonly Func<Robot, Task> _createOnAfterAsync;
+        private static readonly Func<Robot, Task> _updateOnAfterAsync;
+        private static readonly Func<Guid, Task> _deleteOnAfterAsync;
+        private static readonly Func<RobotCollectionResult, RobotArgs, PagingArgs, Task> _getByArgsOnAfterAsync;
+
+        #pragma warning restore CS0649
+        #endregion
+
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
         /// </summary>
@@ -35,6 +47,7 @@ namespace Beef.Demo.Business.DataSvc
 
                 var __result = await Factory.Create<IRobotData>().GetAsync(id);
                 ExecutionContext.Current.CacheSet<Robot>(__key, __result);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
                 return __result;
             });
         }      
@@ -51,6 +64,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IRobotData>().CreateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id));
                 ExecutionContext.Current.CacheSet<Robot>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
                 return __result;
             });
         }      
@@ -67,6 +81,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IRobotData>().UpdateAsync(value);
                 await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
                 ExecutionContext.Current.CacheSet<Robot>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
                 return __result;
             });
         }      
@@ -82,6 +97,7 @@ namespace Beef.Demo.Business.DataSvc
                 await Factory.Create<IRobotData>().DeleteAsync(id);
                 await Beef.Events.Event.PublishAsync("Demo.Robot.{id}", "Delete", new KeyValuePair<string, object>("id", id));
                 ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id);
             });
         }      
 
@@ -96,6 +112,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __result = await Factory.Create<IRobotData>().GetByArgsAsync(args, paging);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging);
                 return __result;
             });
         }      

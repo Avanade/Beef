@@ -93,6 +93,10 @@ namespace Beef.Demo.Test
                 {
                     x.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue(vals.First()));
                 }).GenderGetAllAsync());
+
+            AgentTester.Create<ReferenceDataAgent, GenderCollection>()
+                .ExpectStatusCode(HttpStatusCode.NotModified)
+                .Run((a) => a.Agent.GenderGetAllAsync(null, new WebApi.WebApiRequestOptions { ETag = vals.First() }));
         }
 
         [Test, Parallelizable]
@@ -117,6 +121,18 @@ namespace Beef.Demo.Test
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
             Assert.AreEqual(1, r.Value.Count());
+        }
+
+        [Test, Parallelizable]
+        public void A180_GetByCodes()
+        {
+            var r = AgentTester.Create<ReferenceDataAgent>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByCodesAsync(new WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Content);
+            Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.Content);
         }
     }
 }

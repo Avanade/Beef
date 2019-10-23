@@ -14,5 +14,10 @@ namespace Beef.WebApi
         /// Gets or sets the entity tag that will be passed as either a <c>If-None-Match</c> header where <see cref="HttpMethod.Get"/>; otherwise, an <c>If-Match</c> header.
         /// </summary>
         public string ETag { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value to append to the URL query string.
+        /// </summary>
+        public string UrlQueryString { get; set; }
     }
 }

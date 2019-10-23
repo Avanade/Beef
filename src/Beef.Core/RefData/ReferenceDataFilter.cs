@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Validation;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Beef.RefData
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ReferenceDataFilter : EntityBase
     {
-        private List<string> _codes;
+        private IEnumerable<string> _codes;
         private string _text;
 
         /// <summary>
@@ -32,9 +33,29 @@ namespace Beef.RefData
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>The filtered collection.</returns>
-        public static TColl ApplyFilter<TColl, TItem>(TColl coll, List<string> codes = null, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static TColl ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string> codes = null, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes, Text = text });
+        }
+
+        /// <summary>
+        /// Validates the <paramref name="codes"/> and <paramref name="text"/> then applies as a filter to the reference data <paramref name="coll"/>.
+        /// </summary>
+        /// <typeparam name="TColl">The collection <see cref="System.Type"/>.</typeparam>
+        /// <typeparam name="TItem">The item <see cref="System.Type"/>.</typeparam>
+        /// <param name="coll">The reference data collection.</param>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>The filtered collection.</returns>
+        public static TColl ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        {
+            var list = new List<string>();
+            foreach (var c in codes)
+            {
+                list.AddRange(c.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries));
+            }
+
+            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = list, Text = text });
         }
 
         /// <summary>
@@ -55,7 +76,7 @@ namespace Beef.RefData
 
             // Apply the filter.
             var result = new TColl();
-            result.AddRange(coll.WhereWhen(x => filter.Codes.Contains(x.Code, StringComparer.OrdinalIgnoreCase), filter.Codes != null && filter.Codes.Count > 0).WhereWildcard(x => x.Text, filter.Text));
+            result.AddRange(coll.WhereWhen(x => filter.Codes.Contains(x.Code, StringComparer.OrdinalIgnoreCase), filter.Codes != null && filter.Codes.FirstOrDefault() != null).WhereWildcard(x => x.Text, filter.Text));
             result.GenerateETag();
             return result;
         }
@@ -64,7 +85,7 @@ namespace Beef.RefData
         /// Gets or sets the list of codes.
         /// </summary>
         [JsonProperty("codes", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<string> Codes
+        public IEnumerable<string> Codes
         {
             get => _codes;
             set => SetValue(ref _codes, value, false, false, nameof(Codes));
