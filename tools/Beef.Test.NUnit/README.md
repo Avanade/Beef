@@ -81,6 +81,9 @@ Method | Description
 `IgnoreETag` | Ignores the [`IETag`](../../src/Beef.Core/Entities/IETag.cs) property.
 `ExpectETag` | Expects the [`IETag`](../../src/Beef.Core/Entities/IETag.cs) to be implemented for the response with a generated value different to the previous value.
 `ExpectUniqueKey` | Expects the [`IUniqueKey`](../../src/Beef.Core/Entities/IUniqueKey.cs) to be implemented for the response with a generated value.
+`ExpectEvent` | Expects an `Event` was published that matched the `Template` (which may contain wildcards) and optional `Action.`
+`ExpectNoEvent` | Expects that *no* `Event` was published that matched the `Template` (which may contain wildcards) and optional `Action.`
+`ExpectNoEvents` | Expects that *no* `Event` was published.
 
 An example usage is as follows (see [`PersonTest`](../../samples/Demo/Beef.Demo.Test/PersonTest.cs) for more complete usage):
 

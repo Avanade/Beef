@@ -159,14 +159,14 @@ The following are references to additional documentation (these are all accessib
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
 - [Template structure](./docs/Template-Structure.md)
-- Entity-based:
+- Entity-driven:
   - [CodeGeneration element](./docs/Entity-CodeGeneration-element.md)
   - [Entity element](./docs/Entity-Entity-element.md)
   - [Property element](./docs/Entity-Property-element.md)
   - [Operation element](./docs/Entity-Operation-element.md)
   - [Parameter element](./docs/Entity-Parameter-element.md)
   - [Const element](./docs/Entity-Const-element.md)
-- Table-based:
+- Table-driven ([database](./tools/Beef.Database.Core/README.md)):
   - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
   - [Table element](./docs/Table-Table-element.md)
   - [Stored procedure element](./docs/Table-StoredProcedure-element.md)
