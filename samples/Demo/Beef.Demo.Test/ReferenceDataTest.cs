@@ -104,7 +104,7 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "E", "n" } }));
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "E", null, "n" } }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
@@ -128,11 +128,19 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Create<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetByCodesAsync(new WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
+                .Run((a) => a.Agent.GetNamedAsync(new WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Content);
             Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.Content);
+        }
+
+        [Test, Parallelizable]
+        public void A190_Get_NoContent()
+        {
+            var r = AgentTester.Create<ReferenceDataAgent>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetNamedAsync(null));
         }
     }
 }

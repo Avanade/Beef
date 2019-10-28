@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.20
+- *Fixed:* Incorrect end-point generated for Reference Data Service Agent.
+
+## v2.1.19
+- *Fixed:* Consolidated the `/ref` and `/ref/codes` endpoints into `/ref`. Supports list of names as per previous, as well as the new specified entity+code, within the query string.
+
 ## v2.1.18
 - *Added:* Reference data updated to support multiple run-time providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created. The underlying code-gen templates have been updated to enable.
 - *Fixed:* Code-gen for the database where `IsDeleted` is used will perform `ISNULL(IsDeleted, 0) = 0` to check for null or zero as not-deleted.

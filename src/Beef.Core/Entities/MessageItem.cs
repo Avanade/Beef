@@ -1,6 +1,7 @@
 // Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Diagnostics;
 
@@ -127,6 +128,7 @@ namespace Beef.Entities
         /// Gets the message severity validatorType.
         /// </summary>
         [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonConverter(typeof(StringEnumConverter))]
         public MessageType Type
         {
             get { return _type; }
@@ -173,9 +175,7 @@ namespace Beef.Entities
         /// <param name="from">The <see cref="MessageItem"/> to copy from.</param>
         public void CopyFrom(MessageItem from)
         {
-            if (from == null)
-                throw new ArgumentNullException("from");
-
+            Check.NotNull(from, nameof(from));
             base.CopyFrom(from);
             Type = from.Type;
             Text = from.Text;

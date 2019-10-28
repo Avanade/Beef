@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.9
+- *Added:* `WebApiQueryString.GetReferenceDataSelection` added to parse the query string for the reference data selection/filter.
+
 ## v2.1.8
 - *Fixed:* A `PATCH` operation was incorrectly attempting to return a `null` value where no changes were made as a result of merging the JSON changes; the result of the `GET` will be returned to ensure a response (content) is returned.
 

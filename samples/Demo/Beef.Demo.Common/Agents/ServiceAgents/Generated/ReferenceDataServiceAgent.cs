@@ -52,21 +52,13 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         Task<WebApiAgentResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter args, WebApiRequestOptions requestOptions);
 
         /// <summary>
-        /// Gets the named reference data objects.
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
-        /// <param name="names">The list of reference data names.</param>
+        /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
         Task<WebApiAgentResult> GetNamedAsync(string[] names, WebApiRequestOptions requestOptions);
-        
-        /// <summary>
-        /// Gets the reference data entities for the specified entities and codes from the <see cref="WebApiRequestOptions.UrlQueryString"/>; e.g: entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        Task<WebApiAgentResult> GetByCodesAsync(WebApiRequestOptions requestOptions);
     }
 
     /// <summary>
@@ -130,20 +122,19 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
             base.GetAsync<RefDataNamespace.CompanyCollection>("api/v1/demo/ref/companies", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets the named reference data objects.
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="names">The list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<WebApiAgentResult> GetNamedAsync(string[] names, WebApiRequestOptions requestOptions = null) => base.GetAsync("api/v1/demo/ref", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<string[]>("names", names) });
-        
-        /// <summary>
-        /// Gets the reference data entities for the specified entities and codes from the <see cref="WebApiRequestOptions.UrlQueryString"/>; e.g: entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
-        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>
-        public Task<WebApiAgentResult> GetByCodesAsync(WebApiRequestOptions requestOptions = null) => base.GetAsync("api/v1/demo/ref/codes", requestOptions: requestOptions);
+        public Task<WebApiAgentResult> GetNamedAsync(string[] names, WebApiRequestOptions requestOptions = null)
+        {
+            var ro = requestOptions ?? new WebApiRequestOptions();
+            if (names != null)
+                ro.UrlQueryString += string.Join("&", names);
+                
+            return base.GetAsync("api/v1/demo/ref", requestOptions: ro);
+        }
     }
 }

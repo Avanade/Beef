@@ -35,7 +35,7 @@ namespace Beef.RefData
         /// <returns>The filtered collection.</returns>
         public static TColl ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string> codes = null, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
-            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes, Text = text });
+            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text });
         }
 
         /// <summary>

@@ -143,7 +143,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public WebApiActionBase(ControllerBase controller, OperationType operationType,
+        protected WebApiActionBase(ControllerBase controller, OperationType operationType,
             HttpStatusCode statusCode, HttpStatusCode? alternateStatusCode = null,
             [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
@@ -260,7 +260,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <returns>The <see cref="IActionResult"/>.</returns>
-        protected IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode)
+        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode)
         {
             if (statusCode == HttpStatusCode.NotFound)
             {
@@ -278,7 +278,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <param name="json">The return <see cref="JToken"/>.</param>
         /// <returns>The <see cref="IActionResult"/>.</returns>
-        protected IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken json)
+        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken json)
         {
             return new ObjectResult(json) { StatusCode = (int)statusCode };
         }
@@ -422,12 +422,10 @@ namespace Beef.AspNetCore.WebApi
                     sb = null;
             }
 
-            using (var md5 = System.Security.Cryptography.MD5.Create())
-            {
-                var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context.HttpContext.Request.QueryString.Value}");
-                var hash = md5.ComputeHash(buf, 0, buf.Length);
-                return (json, Convert.ToBase64String(hash));
-            }
+            using var md5 = System.Security.Cryptography.MD5.Create();
+            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context.HttpContext.Request.QueryString.Value}");
+            var hash = md5.ComputeHash(buf, 0, buf.Length);
+            return (json, Convert.ToBase64String(hash));
         }
 
         /// <summary>

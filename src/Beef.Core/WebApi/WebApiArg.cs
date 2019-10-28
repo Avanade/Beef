@@ -156,7 +156,8 @@ namespace Beef.WebApi
                 var sb = new StringBuilder();
                 foreach (var v in (IEnumerable)Value)
                 {
-                    UriAppend(sb, CreateNameValue(base.Name, v, false));
+                    if (v != null)
+                        UriAppend(sb, CreateNameValue(base.Name, v, false));
                 }
 
                 return sb.Length == 0 ? null : sb.ToString();
@@ -211,7 +212,8 @@ namespace Beef.WebApi
                     {
                         foreach (var item in ((IEnumerable)pVal))
                         {
-                            UriAppend(sb, CreateNameValue(pName, item, false));
+                            if (item != null)
+                                UriAppend(sb, CreateNameValue(pName, item, false));
                         }
 
                         continue;

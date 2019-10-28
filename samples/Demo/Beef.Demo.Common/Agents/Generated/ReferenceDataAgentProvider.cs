@@ -125,15 +125,10 @@ namespace Beef.Demo.Common.Agents
                 return;
 
             var getNames = new List<string>();
-            if (names.Length == 1 && names[0] == ReferenceDataAgent.GetNamedAllNames)
-                getNames.Add(ReferenceDataAgent.GetNamedAllNames);
-            else
+            foreach (string name in names.Distinct())
             {
-                foreach (string name in names.Distinct())
-                {
-                    if (_nameDict.ContainsKey(name) && GetCache(_nameDict[name]).IsExpired)
-                        getNames.Add(name);
-                }
+                if (_nameDict.ContainsKey(name) && GetCache(_nameDict[name]).IsExpired)
+                    getNames.Add(name);
             }
 
             if (getNames.Count == 0)

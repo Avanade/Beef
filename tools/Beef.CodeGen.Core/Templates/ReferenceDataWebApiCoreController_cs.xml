@@ -34,11 +34,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
   </If>
   <![CDATA[    public partial class ReferenceDataController : ControllerBase
     {
-        /// <summary>
-        /// Determines whether get named all names is supported.
-        /// </summary>
-        public static bool IsGetNamedAllNamesSupported { get; set; } = false;
-
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
     <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
@@ -88,18 +83,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
   </Entity>
   <![CDATA[
         /// <summary>
-        /// Gets the named reference data entities.
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Config.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
-        /// <param name="names">The list of reference data names; to retrieve all pass a single name of <see cref="Common.Agents.ReferenceDataAgent.GetNamedAllNames"/>.</param>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
 ]]>
-  <Set Name="System.WebApiAuthorize" Value="null" />
-  <If Condition="Config.WebApiAuthorize == 'Authorize'">
-    <Set Name="System.WebApiAuthorize" Value="'Authorize'" />
-  </If>
-  <If Condition="Config.WebApiAuthorize == 'AllowAnonymous'">
-    <Set Name="System.WebApiAuthorize" Value="'AllowAnonymous'" />
-  </If>
   <If Condition="System.WebApiAuthorize != null">
     <![CDATA[        [{{System.WebApiAuthorize}}]
 ]]>
@@ -108,68 +95,18 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
         [Route("{{Config.RefDataWebApiRoute}}")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetNamed(string[] names)
-        {
-            return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
-            {
-                if (names == null || names.Length == 0)
-                    return Task.FromResult<ReferenceDataMultiCollection>(null);
-                            
-                List<string> allNames = null;
-                if (IsGetNamedAllNamesSupported && names.Length == 1 && names[0] == Common.Agents.ReferenceDataAgent.GetNamedAllNames)
-                {
-                    allNames = new List<string>
-                    {
-]]>
-  <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        ReferenceData.Property_{{Entity.Name}},
-]]>
-  </Entity>
-  <![CDATA[                    };
-                }
-
-                var coll = new ReferenceDataMultiCollection();
-                foreach (string name in allNames == null ? names : allNames.ToArray())
-                {
-                    switch (name.ToUpperInvariant())
-                    {
-]]>
-  <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case var s when s == ReferenceData.Property_{{Entity.Name}}.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceData.Current.{{Entity.Name}} }); break;
-]]>
-  </Entity>
-  <![CDATA[                    }
-                }
-
-                return Task.FromResult(coll);
-            }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
-
-        /// <summary>
-        /// Gets the reference data entities for the specified entities and codes from the query string; e.g: {{Config.RefDataWebApiRoute}}/codes?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
-        /// </summary>
-        /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
-]]>
-  <If Condition="System.WebApiAuthorize != null">
-    <![CDATA[        [{{System.WebApiAuthorize}}]
-]]>
-  </If>
-  <![CDATA[        [HttpGet()]
-        [Route("{{Config.RefDataWebApiRoute}}/codes")]
-        [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByCodes()
+        public IActionResult GetNamed()
         {
             return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
             {
                 var coll = new ReferenceDataMultiCollection();
-                foreach (var q in HttpContext.Request.Query)
+                foreach (var q in WebApiQueryString.GetReferenceDataSelection(this))
                 {
-                    switch (q.Key.ToUpperInvariant())
+                    switch (q.Key)
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case var s when s == ReferenceData.Property_{{Entity.Name}}.ToUpperInvariant(): coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value) }); break;
+    <![CDATA[                        case var s when string.Compare(s, ReferenceData.Property_{{Entity.Name}}, true) == 0: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value) }); break;
 ]]>
   </Entity>
   <![CDATA[                    }

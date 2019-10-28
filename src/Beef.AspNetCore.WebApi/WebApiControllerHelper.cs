@@ -93,13 +93,12 @@ namespace Beef.AspNetCore.WebApi
         /// Sets the <see cref="HttpResponse.Headers"/> for the <see cref="ExecutionContext"/> (see <see cref="ExecutionContext.Messages"/> and <see cref="ExecutionContext.ETag"/>).
         /// </summary>
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
-        /// <param name="executionContext">The <see cref="ExecutionContext"/>; where <c>null</c> then the <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> will be used.</param>
-        public static void SetExecutionContext(HttpResponse response, ExecutionContext executionContext = null)
+        public static void SetExecutionContext(HttpResponse response)
         {
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
 
-            if (ExecutionContext.Current == null)
+            if (!ExecutionContext.HasCurrent)
                 return;
 
             if (ExecutionContext.Current.Messages != null && ExecutionContext.Current.Messages.Count > 0)

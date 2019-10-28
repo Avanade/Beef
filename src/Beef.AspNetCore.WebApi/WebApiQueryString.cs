@@ -2,7 +2,9 @@
 
 using Beef.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Beef.AspNetCore.WebApi
@@ -15,32 +17,32 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Page"/> query string names.
         /// </summary>
-        public static string[] PagingArgsPageQueryStringNames { get; set; } = new string[] { "$page", "$pageNumber" };
+        public static IEnumerable<string> PagingArgsPageQueryStringNames { get; set; } = new string[] { "$page", "$pageNumber" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Skip"/> query string names.
         /// </summary>
-        public static string[] PagingArgsSkipQueryStringNames { get; set; } = new string[] { "$skip" };
+        public static IEnumerable<string> PagingArgsSkipQueryStringNames { get; set; } = new string[] { "$skip" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static string[] PagingArgsTakeQueryStringNames { get; set; } = new string[] { "$take", "$top", "$size", "$pageSize" };
+        public static IEnumerable<string> PagingArgsTakeQueryStringNames { get; set; } = new string[] { "$take", "$top", "$size", "$pageSize" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static string[] PagingArgsCountQueryStringNames { get; set; } = new string[] { "$count", "$totalCount" };
+        public static IEnumerable<string> PagingArgsCountQueryStringNames { get; set; } = new string[] { "$count", "$totalCount" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.IncludeFields"/> query string names.
         /// </summary>
-        public static string[] IncludeFieldsStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
+        public static IEnumerable<string> IncludeFieldsStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.ExcludeFields"/> query string names.
         /// </summary>
-        public static string[] ExcludeFieldsStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
+        public static IEnumerable<string> ExcludeFieldsStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
 
         /// <summary>
         /// Creates the <see cref="PagingArgs"/> from the query string.
@@ -89,7 +91,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the value for the named query string.
         /// </summary>
-        private static string GetNamedQueryString(ControllerBase controller, string[] names)
+        private static string GetNamedQueryString(ControllerBase controller, IEnumerable<string> names)
         {
             var q = controller.HttpContext.Request.Query.Where(x => names.Contains(x.Key, StringComparer.InvariantCultureIgnoreCase)).ToArray();
             return (q.Length != 1 || q[0].Value.Count != 1) ? null : q[0].Value[0];
@@ -121,6 +123,43 @@ namespace Beef.AspNetCore.WebApi
                 return false;
 
             return val;
+        }
+
+        /// <summary>
+        /// Gets the reference data selection from the query string.
+        /// </summary>
+        /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
+        /// <returns>The resulting selection.</returns>
+        public static IEnumerable<KeyValuePair<string, StringValues>> GetReferenceDataSelection(this ControllerBase controller)
+        {
+            Check.NotNull(controller, nameof(controller));
+
+            var dict = new Dictionary<string, KeyValuePair<string, StringValues>>();
+            if (controller.HttpContext.Request.Query.Count() == 0)
+            {
+                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. api/v1/demo/ref?entity=codeX,codeY&entity2=codeZ&entity3");
+                return dict.Values;
+            }
+
+            foreach (var q in controller.HttpContext.Request.Query.Where(x => !string.IsNullOrEmpty(x.Key)))
+            {
+                if (string.Compare(q.Key, "names", true) == 0)
+                {
+                    foreach (var v in q.Value.Where(x => !string.IsNullOrEmpty(x)))
+                    {
+                        if (!dict.ContainsKey(v))
+                        {
+                            dict.Add(v, new KeyValuePair<string, StringValues>(v, new StringValues()));
+                        }
+                    }
+                }
+                else
+                {
+                    dict[q.Key] = new KeyValuePair<string, StringValues>(q.Key, q.Value);
+                }
+            }
+
+            return dict.Values;
         }
     }
 }
