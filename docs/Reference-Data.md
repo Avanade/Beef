@@ -149,7 +149,7 @@ By leveraging the code-generation reference data endpoint can be created. By def
 Each reference data entity should have an API endpoint generated; being `/ref/Xxx`. This can also be invoked passing additional URL query string parameters:
 
 Parameter | Description
-- | -
+-|-
 `code` | Zero or mode codes can be passed; e.g: `?code=m,f` or `?code=m&code=f` (case insensitive).
 `text` | A single text with wildcards can be passed; e.g: `?text=M*` (case insensitive).
 
