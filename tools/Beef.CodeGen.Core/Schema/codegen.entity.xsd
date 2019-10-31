@@ -121,6 +121,11 @@
                       <xs:documentation>Indicates that the RefData property is to be a serializable list (ReferenceDataSidList).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="RefDataText" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (automatically performed where url contains '$text=true').</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="RefDataMapping" type="xs:boolean" use="optional">
                     <xs:annotation>
                       <xs:documentation>Indicates whether the property should use the underlying ReferenceData mapping capabilities (only use for ReferenceData entities).</xs:documentation>
@@ -839,6 +844,11 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="RefDataText" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (automatically performed where url contains '$text=true').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="ConstType" use="optional">
               <xs:annotation>
                 <xs:documentation>The type to be used for the Const elements/values.</xs:documentation>
@@ -1065,6 +1075,11 @@
             <xs:enumeration value="ReferenceDataMultiTenantCache"/>
           </xs:restriction>
         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="RefDataText" type="xs:boolean" use="optional">
+        <xs:annotation>
+          <xs:documentation>Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the 'Controller' and the 'ExecutionContext.IsRefDataTextSerializationEnabled' is set to 'true' (automatically performed where url contains '$text=true').</xs:documentation>
+        </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">
         <xs:annotation>

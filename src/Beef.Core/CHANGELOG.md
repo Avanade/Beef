@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.22
+- *Added:* `ReferenceDataFilter.ApplyFilter` supports new parameter `isActiveOnly` (defaults to `true`) that indicates whether to include `ReferenceDataBase.IsActive` entries only; otherwise, `false` for all.
+- *Added:* `EntityBasicBase.GetRefDataText` added to enable the conditional runtime getting of reference data text during serialization. `ExecutionContext.IsRefDataTextSerializationEnabled` also added to enable.
+- *Enhanced:* `ReferenceDataMultiCollection` accepts `Items` as `IEnumerable<T>` versus `IReferenceDataCollection` to enable greater flexibility for the source of data; there is no serialization change.
+
 ## v2.1.21
 - *Fixed:* `ReferenceDataFilter.ApplyFilter` would throw a `NullReferenceException` where a code was null within the array; this is fixed.
 

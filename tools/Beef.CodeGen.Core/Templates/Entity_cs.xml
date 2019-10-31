@@ -206,6 +206,19 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         </If>
         <![CDATA[;
 ]]>
+        <If Condition="Property.RefDataType != null and Property.IgnoreSerialization == false">
+          <Set Name="System.RefDataText" Condition="Config.RefDataText == true" Value="true" Otherwise="false" />
+          <If Condition="Entity.RefDataText != null">
+            <Set Name="System.RefDataText" Value="Entity.RefDataText" />
+          </If>
+          <If Condition="Property.RefDataText != null">
+            <Set Name="System.RefDataText" Value="Entity.RefDataText" />
+          </If>
+          <If Condition="System.RefDataText == true">
+            <![CDATA[        private string {{Property.PrivateName}}Text;
+]]>
+          </If>
+        </If>
       </Property>
     </If>
     <If Condition="System.EndRegion == true">
@@ -295,6 +308,29 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         <![CDATA[, Property_{{Property.Name}}); }
         }
 ]]>
+        <If Condition="Property.IgnoreSerialization == false">
+          <Set Name="System.RefDataText" Condition="Config.RefDataText == true" Value="true" Otherwise="false" />
+          <If Condition="Entity.RefDataText != null">
+            <Set Name="System.RefDataText" Value="Entity.RefDataText" />
+          </If>
+          <If Condition="Property.RefDataText != null">
+            <Set Name="System.RefDataText" Value="Entity.RefDataText" />
+          </If>
+          <If Condition="System.RefDataText == true">
+            <![CDATA[
+        /// <summary>
+        /// Gets the corresponding {{Property.Name:ToSeeComments}} text (read-only where selected).
+        /// </summary>
+        [JsonProperty("]]>
+        <If Condition="Property.JsonName == null">
+          <Then><![CDATA[{{Property.ArgumentName}}]]></Then>
+          <Else><![CDATA[{{Property.JsonName}}]]></Else>
+        </If>
+        <![CDATA[Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string {{Property.Name}}Text { get => {{Property.PrivateName}}Text ?? GetRefDataText(() => {{Property.Name}}); set => {{Property.PrivateName}}Text = value; }
+]]>
+          </If>
+        </If>
       </If>
       <If Condition="System.Index == 0">
         <Then>

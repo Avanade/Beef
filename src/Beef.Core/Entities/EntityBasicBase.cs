@@ -19,6 +19,14 @@ namespace Beef.Entities
         private Dictionary<string, PropertyChangedEventHandler> _propertyEventHandlers;
 
         /// <summary>
+        /// Gets the corresponding <see cref="RefData.ReferenceDataBase"/> <see cref="RefData.ReferenceDataBase.Text"/> when <see cref="ExecutionContext.IsRefDataTextSerializationEnabled"/>.
+        /// </summary>
+        /// <param name="refData">The function to get the <see cref="RefData.ReferenceDataBase"/> instance.</param>
+        /// <returns>The corresponding <see cref="RefData.ReferenceDataBase.Text"/> where applicable; otherwise, <c>null</c>.</returns>
+        public static string GetRefDataText(Func<RefData.ReferenceDataBase> refData) 
+            => ExecutionContext.HasCurrent && ExecutionContext.Current.IsRefDataTextSerializationEnabled ? refData?.Invoke()?.Text : null;
+
+        /// <summary>
         /// Indicates whether the <see cref="INotifyPropertyChanged.PropertyChanged"/> event is raised when a property is set with a value that is the same as the existing; 
         /// unless overridden (see <see cref="NotifyChangesWhenSameValue"/>) for a specific instance. Defaults to <c>false</c> indicating to <b>not</b> notify changes for same.
         /// </summary>

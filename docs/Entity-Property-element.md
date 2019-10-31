@@ -60,6 +60,7 @@ Attribute | Description
 ---|---
 **`RefDataType`** | Identifies the `Type` as being a Reference Data type as well as specifying the underlying .NET Type used for the Reference Data identifier serialization (SID). Options are: `string`, `int` and `Guid`.
 `RefDataList` | Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`). This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.
+`RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 `RefDataMapping` | Indicates whether the property should use the underlying Reference Data mapping capabilities. Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.
 
 <br>

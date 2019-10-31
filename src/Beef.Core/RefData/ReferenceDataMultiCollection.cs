@@ -9,7 +9,6 @@ namespace Beef.RefData
     /// <summary>
     /// Represents a collection that supports multiple Reference Data collections.
     /// </summary>
-    /// <remarks>Enables the passing of </remarks>
     public class ReferenceDataMultiCollection : List<ReferenceDataMultiItem> { }
 
     /// <summary>
@@ -17,7 +16,17 @@ namespace Beef.RefData
     /// </summary>
     public class ReferenceDataMultiItem : IETag
     {
-        private IReferenceDataCollection _items;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataMultiItem"/> class for a <paramref name="name"/> and <paramref name="refDataResult"/>.
+        /// </summary>
+        /// <param name="name">The <see cref="Name"/>.</param>
+        /// <param name="refDataResult">The <see cref="IReferenceDataFilterResult"/>.</param>
+        public ReferenceDataMultiItem(string name, IReferenceDataFilterResult refDataResult)
+        {
+            Name = name;
+            Items = refDataResult.Collection;
+            ETag = refDataResult.ETag;
+        }
 
         /// <summary>
         /// Gets or sets the reference data name.
@@ -35,15 +44,6 @@ namespace Beef.RefData
         /// Gets or sets the reference data collection.
         /// </summary>
         [JsonProperty("items")]
-        public IReferenceDataCollection Items
-        {
-            get => _items;
-
-            set
-            {
-                _items = value;
-                ETag = _items?.ETag;
-            }
-        }
+        public IEnumerable<ReferenceDataBase> Items { get; set; }
     }
 }

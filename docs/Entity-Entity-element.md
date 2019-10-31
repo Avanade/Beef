@@ -44,6 +44,7 @@ The following represent the attibutes where specifically outputing a **Reference
 Attribute | Description
 ---|---
 **`RefDataType`** | Required to identify an entity as being Reference Data. Specifies the underlying .NET Type used for the Reference Data identifier. Options are `int` or `Guid`.
+`RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 `RefDataSortOrder` | Identifies the default sort order for the underlying Reference Data collection. Options are: `SortOrder` (default), `Id`, `Code` and `Text`.
 
 <br>

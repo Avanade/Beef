@@ -65,7 +65,9 @@ namespace Beef.Demo.Common.Entities
         private string _modelNo;
         private string _serialNo;
         private string _eyeColorSid;
+        private string _eyeColorText;
         private string _powerSourceSid;
+        private string _powerSourceText;
         private string _eTag;
         private ChangeLog _changeLog;
 
@@ -118,6 +120,12 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
+        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("eyeColorText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string EyeColorText { get => _eyeColorText ?? GetRefDataText(() => EyeColor); set => _eyeColorText = value; }
+
+        /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -138,6 +146,12 @@ namespace Beef.Demo.Common.Entities
             get { return _powerSourceSid; }
             set { SetValue(ref _powerSourceSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_PowerSource); }
         }
+
+        /// <summary>
+        /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("powerSourceText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string PowerSourceText { get => _powerSourceText ?? GetRefDataText(() => PowerSource); set => _powerSourceText = value; }
 
         /// <summary>
         /// Gets or sets the Power Source (see <see cref="RefDataNamespace.PowerSource"/>).

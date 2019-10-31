@@ -40,7 +40,7 @@ Property | Description
 
 <br/>
 
-Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer.
+Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer. The property will only be serialized when the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 
 The [`ReferenceDataCollectionBase`](../src/Beef.Core/RefData/ReferenceDataCollectionBase.cs) provides the base capabilities for a reference data collection. Including the adding, sorting and additional filtering (e.g. `ActiveList`).
 
@@ -50,13 +50,17 @@ The [`ReferenceDataCollectionBase`](../src/Beef.Core/RefData/ReferenceDataCollec
 
 When the code generation is used to create an entity, any properties that are marked up with the `RefDataType` attribute will have code generated to enable multiple options to access the reference data values.
 
-There will be a single field and two properties (where `Xxx` is the name of the reference data item) generated. The Serialization Identifier (SID) is the selected value used for actual serialization:
+There will be a single field and two properties (where `Xxx` is the name of the reference data item) generated. The Serialization Identifier (SID) is the selected value used for actual serialization.
+
+Additionally, if there is a need for the reference data `Text` to also be made available within the entity as a read-only property then the property can be marked up with the `RefDataText` attribute.
 
 Name | Description
 -|-
 `XxxSid` | This is the Serialization Identifier (SID) that is used where serializing the reference data value; this is generally the unique reference data `Code`. <br/> As you can see in the sample below this property has the `JsonPropertyAttribute` specified so that this property is marked for serialization.
 `_xxxSid` | This is the private Serialization Identifier (SID) field used internally to store the `XxxSid` above.
 `Xxx` | This is the reference data object (inherits from `ReferenceDataBase`) that provides the rich capabilities that a developer would typically interact with. This value is never serialized. <br/> This is casted from the `_xxxSid` when referenced; this will force the underlying reference data to be loaded (lazy) on first access. This will result in a small performance cost, although this data is generally cached so for most access this will not be an issue. 
+`XxxText` | The related reference data text (where optionally enabled). This can be either set directly (not encouraged), or will return the appropriate `Text` when selected to do so.
+`_xxxText` | This the private variable field used internally to store the `XxxText` above.
 
 <br/>
 
@@ -135,6 +139,25 @@ The [IReferenceDataProvider](../src/Beef.Core/RefData/IReferenceDataProvider.cs)
 The [ReferenceDataManager](../src/Beef.Core/RefData/ReferenceDataManager.cs) provides a standard, centralised, mechanism for managing and accessing all the available/possible Reference Data entities via the `Current` property. There is a `Register` method that is used to register one or more providers for use; this is typically performed at start up.
 
 <br/>
+
+## Reference data APIs
+
+By leveraging the code-generation reference data endpoint can be created. By default only the active (`ReferenceDataBase.IsActive`) entries will be returned. To get both the active and inactive the `$inactive=true` URL query string must be used.
+
+### Per referenece data endpoints:
+
+Each reference data entity should have an API endpoint generated; being `/ref/Xxx`. This can also be invoked passing additional URL query string parameters:
+
+Parameter | Description
+- | -
+`code` | Zero or mode codes can be passed; e.g: `?code=m,f` or `?code=m&code=f` (case insensitive).
+`text` | A single text with wildcards can be passed; e.g: `?text=M*` (case insensitive).
+
+### Root reference data endpoints:
+
+Additionally there is a root `/ref` that can be used to return multiple reference data values in a single request; designed to reduce chattiness from a consuming channel to the above endpoints. This must be passed at least a single URL query string parameter to function.
+
+The parameter is either a just the named reference data entity which will result in all corresponding entries being returned (e.g: `?gender` or `?gender&country`). Otherwise, specific codes can be specified (e.g" `?gender=m,f`, `?gender=m&gender=f`, `?gender=m,f&country=au,nz`). The options can be mixed and matched (e.g: `?gender&country=au,nz`).
 
 ## Sample
 

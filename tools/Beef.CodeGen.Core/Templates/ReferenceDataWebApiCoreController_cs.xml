@@ -60,7 +60,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A {{Entity.EntityCollectionName:ToSeeComments}}.</returns>
+        /// <returns>A {{Entity.EntityName:ToSeeComments}} collection.</returns>
 ]]>
     <If Condition="System.WebApiAuthorize != null">
       <![CDATA[        [{{System.WebApiAuthorize}}]
@@ -72,13 +72,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
       <![CDATA[        [Route("{{Entity.WebApiRoutePrefix}}")]
 ]]>
     </If>
-    <![CDATA[        [ProducesResponseType(typeof({{Entity.EntityCollectionName}}), (int)HttpStatusCode.OK)]
+    <![CDATA[        [ProducesResponseType(typeof(IEnumerable<{{Entity.EntityName}}>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult {{Entity.Name}}GetAll(List<string> codes = default, string text = default)
-        {
-            return new WebApiGet<{{Entity.EntityCollectionName}}>(this, () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, codes, text)),
-                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
-        }
+        public IActionResult {{Entity.Name}}GetAll(List<string> codes = default, string text = default) => new WebApiGet<ReferenceDataFilterResult<{{Entity.EntityName}}>>(this, 
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, codes, text, includeInactive: this.IncludeInactive())),
+            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 ]]>
   </Entity>
   <![CDATA[
@@ -100,13 +98,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             return new WebApiGet<ReferenceDataMultiCollection>(this, () =>
             {
                 var coll = new ReferenceDataMultiCollection();
-                foreach (var q in WebApiQueryString.GetReferenceDataSelection(this))
+                var inactive = this.IncludeInactive();
+                foreach (var q in this.ReferenceDataSelection())
                 {
                     switch (q.Key)
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case var s when string.Compare(s, ReferenceData.Property_{{Entity.Name}}, true) == 0: coll.Add(new ReferenceDataMultiItem { Name = ReferenceData.Property_{{Entity.Name}}, Items = ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value) }); break;
+    <![CDATA[                        case var s when string.Compare(s, ReferenceData.Property_{{Entity.Name}}, true) == 0: coll.Add(new ReferenceDataMultiItem(ReferenceData.Property_{{Entity.Name}}, ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value, includeInactive: inactive))); break;
 ]]>
   </Entity>
   <![CDATA[                    }

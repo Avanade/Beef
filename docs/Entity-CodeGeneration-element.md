@@ -49,6 +49,7 @@ Attribute | Description
 -|-
 **`RefDataWebApiRoute`** | The top level reference data Web API route required for named pre-fetching.
 `RefDataCache` | Defines the cache used for the ReferenceData providers. Options are: `ReferenceDataCache` (single-tenant cache), or `ReferenceDataMultiTenantCache` (multi-tenant cache). The default is `ReferenceDataCache`.
+`RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 
 <br>
 

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.21
+- *Added:* Code-gen attribute `RefDataText=true|false` has been added to `Config`, `Entity` and `Property` elements. Where set to true for a reference data value a corresponding property `xxxText` will be created. This will only be populated during serialization when `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true`.
+- *Fixed:* Optimised the reference data `Controller` code-gen including corresponding `ETag` value.
+
 ## v2.1.20
 - *Fixed:* Incorrect end-point generated for Reference Data Service Agent.
 

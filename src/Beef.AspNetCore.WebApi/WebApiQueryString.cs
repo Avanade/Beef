@@ -37,12 +37,22 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.IncludeFields"/> query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeFieldsStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
+        public static IEnumerable<string> IncludeFieldsQueryStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.ExcludeFields"/> query string names.
         /// </summary>
-        public static IEnumerable<string> ExcludeFieldsStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
+        public static IEnumerable<string> ExcludeFieldsQueryStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
+
+        /// <summary>
+        /// Gets or sets the list of possible "include inactive" query string names.
+        /// </summary>
+        public static IEnumerable<string> IncludeInactiveQueryStringNames { get; set; } = new string[] { "$inactive", "$includeInactive" };
+
+        /// <summary>
+        /// Gets or sets the list of possible reference data "include texts" query string names.
+        /// </summary>
+        public static IEnumerable<string> IncludeRefDataTextQueryStringNames { get; set; } = new string[] { "$text", "$includeText" };
 
         /// <summary>
         /// Creates the <see cref="PagingArgs"/> from the query string.
@@ -73,11 +83,11 @@ namespace Beef.AspNetCore.WebApi
 
                 pa.IsGetCount = ParseBoolValue(GetNamedQueryString(controller, PagingArgsCountQueryStringNames));
 
-                var fields = GetNamedQueryString(controller, IncludeFieldsStringNames);
+                var fields = GetNamedQueryString(controller, IncludeFieldsQueryStringNames);
                 if (!string.IsNullOrEmpty(fields))
                     pa.IncludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
 
-                fields = GetNamedQueryString(controller, ExcludeFieldsStringNames);
+                fields = GetNamedQueryString(controller, ExcludeFieldsQueryStringNames);
                 if (!string.IsNullOrEmpty(fields))
                     pa.ExcludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
             }
@@ -126,11 +136,33 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
+        /// Gets the <see cref="IncludeInactiveQueryStringNames"/> value.
+        /// </summary>
+        /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
+        /// <returns>The corresponding value.</returns>
+        public static bool IncludeInactive(this ControllerBase controller)
+        {
+            Check.NotNull(controller, nameof(controller));
+            return ParseBoolValue(GetNamedQueryString(controller, IncludeInactiveQueryStringNames));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IncludeRefDataTextQueryStringNames"/> value.
+        /// </summary>
+        /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
+        /// <returns>The corresponding value.</returns>
+        public static bool IncludeRefDataText(this ControllerBase controller)
+        {
+            Check.NotNull(controller, nameof(controller));
+            return ParseBoolValue(GetNamedQueryString(controller, IncludeRefDataTextQueryStringNames));
+        }
+
+        /// <summary>
         /// Gets the reference data selection from the query string.
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
         /// <returns>The resulting selection.</returns>
-        public static IEnumerable<KeyValuePair<string, StringValues>> GetReferenceDataSelection(this ControllerBase controller)
+        public static IEnumerable<KeyValuePair<string, StringValues>> ReferenceDataSelection(this ControllerBase controller)
         {
             Check.NotNull(controller, nameof(controller));
 

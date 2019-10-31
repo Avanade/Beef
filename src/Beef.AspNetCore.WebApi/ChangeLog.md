@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.10
+- *Added:* `WebApiQueryString.` added to parse the query string for `$Text=true`. Where set then the `ExecutionContext.IsRefDataTextSerializationEnabled` will be automatically set to `true` before serializing the result enabling conditional *reference data* text output. An additional `XxxText` property must be explicitly added to enable; `RefDataText` attribute to code-gen to support.
+
 ## v2.1.9
 - *Added:* `WebApiQueryString.GetReferenceDataSelection` added to parse the query string for the reference data selection/filter.
 

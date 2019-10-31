@@ -80,6 +80,17 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void B120_Get_Found_WithText()
+        {
+            AgentTester.Create<RobotAgent, Robot>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .IgnoreChangeLog()
+                .IgnoreETag()
+                .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456", PowerSource = "F", PowerSourceText = "Fusion" })
+                .Run((a) => a.Agent.GetAsync(1.ToGuid(), new WebApi.WebApiRequestOptions { UrlQueryString = "$text=true" }));
+        }
+
+        [Test, TestSetUp]
         public void B130_Get_NotModified()
         {
             var v = AgentTester.Create<RobotAgent, Robot>()

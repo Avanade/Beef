@@ -3,3 +3,4 @@
     - E: Electrical
     - F: Fusion
     - N: Nuclear
+    - { Code: O, Text: Oil, IsActive: false }

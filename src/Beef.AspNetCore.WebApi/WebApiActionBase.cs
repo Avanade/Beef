@@ -391,6 +391,9 @@ namespace Beef.AspNetCore.WebApi
             if (result == null)
                 return (null, null);
 
+            if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
+                ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
+
             var json = JsonPropertyFilter.Apply(result, PagingArgs.IncludeFields, PagingArgs.ExcludeFields);
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))

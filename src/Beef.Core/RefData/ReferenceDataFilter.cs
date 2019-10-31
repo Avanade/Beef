@@ -11,7 +11,61 @@ using System.Linq;
 namespace Beef.RefData
 {
     /// <summary>
-    /// Represents the filter for a reference data collection.
+    /// Provides the <see cref="Collection"/> and <see cref="IETag.ETag"/>.
+    /// </summary>
+    public interface IReferenceDataFilterResult : IETag
+    {
+        /// <summary>
+        /// Gets the underlying <see cref="ReferenceDataBase"/> collection.
+        /// </summary>
+        IEnumerable<ReferenceDataBase> Collection { get; }
+    }
+
+    /// <summary>
+    /// The underlying <see cref="ReferenceDataFilter"/> result/collection.
+    /// </summary>
+    /// <typeparam name="TItem">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</typeparam>
+    public class ReferenceDataFilterResult<TItem> : EntityBaseCollection<TItem>, IReferenceDataFilterResult where TItem : ReferenceDataBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataFilterResult{TItem}" /> class.
+        /// </summary>
+        public ReferenceDataFilterResult() : base() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataFilterResult{TItem}" /> class.
+        /// </summary>
+        /// <param name="collection">The entities.</param>
+        public ReferenceDataFilterResult(IEnumerable<TItem> collection) : base(collection) { }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IETag.ETag"/>.
+        /// </summary>
+        public string ETag { get; set; }
+
+        /// <summary>
+        /// Gets the underlying <see cref="ReferenceDataBase"/> collection.
+        /// </summary>
+        IEnumerable<ReferenceDataBase> IReferenceDataFilterResult.Collection => this;
+
+        /// <summary>
+        /// Creates a deep copy of the <see cref="ReferenceDataFilterResult{TItem}"/>.
+        /// </summary>
+        /// <returns>A deep copy of the <see cref="ReferenceDataFilterResult{TItem}"/>.</returns>
+        public override object Clone()
+        {
+            var clone = new ReferenceDataFilterResult<TItem> { ETag = ETag };
+            foreach (TItem item in this)
+            {
+                clone.Add((TItem)item.Clone());
+            }
+
+            return clone;
+        }
+    }
+     
+    /// <summary>
+    /// Represents a filter for a reference data collection.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ReferenceDataFilter : EntityBase
@@ -32,10 +86,11 @@ namespace Beef.RefData
         /// <param name="coll">The reference data collection.</param>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>The filtered collection.</returns>
-        public static TColl ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string> codes = null, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
+        /// <returns>The filtered collection and corresponding ETag.</returns>
+        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string> codes = null, string text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
-            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text });
+            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text }, includeInactive);
         }
 
         /// <summary>
@@ -46,8 +101,9 @@ namespace Beef.RefData
         /// <param name="coll">The reference data collection.</param>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>The filtered collection.</returns>
-        public static TColl ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string text = null) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
+        /// <returns>The filtered collection and corresponding ETag.</returns>
+        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             var list = new List<string>();
             foreach (var c in codes)
@@ -55,7 +111,7 @@ namespace Beef.RefData
                 list.AddRange(c.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries));
             }
 
-            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = list, Text = text });
+            return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = list, Text = text }, includeInactive);
         }
 
         /// <summary>
@@ -65,20 +121,35 @@ namespace Beef.RefData
         /// <typeparam name="TItem">The item <see cref="System.Type"/>.</typeparam>
         /// <param name="coll">The reference data collection.</param>
         /// <param name="filter">The <see cref="ReferenceDataFilter"/>.</param>
-        /// <returns>The filtered collection.</returns>
-        public static TColl ApplyFilter<TColl, TItem>(TColl coll, ReferenceDataFilter filter) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
+        /// <returns>The filtered collection and corresponding ETag.</returns>
+        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, ReferenceDataFilter filter, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
-            if (filter == null || filter.IsInitial)
-                return coll;
+            Check.NotNull(filter, nameof(filter));
+            if (!filter.Codes.Any() && string.IsNullOrEmpty(filter.Text) && !includeInactive)
+                return new ReferenceDataFilterResult<TItem>(coll.ActiveList) { ETag = coll.ETag };
 
             // Validate the arguments.
             Validator.Validate(filter).ThrowOnError();
 
             // Apply the filter.
-            var result = new TColl();
-            result.AddRange(coll.WhereWhen(x => filter.Codes.Contains(x.Code, StringComparer.OrdinalIgnoreCase), filter.Codes != null && filter.Codes.FirstOrDefault() != null).WhereWildcard(x => x.Text, filter.Text));
-            result.GenerateETag();
-            return result;
+            var items = includeInactive ? coll.AllList : coll.ActiveList; 
+            var list = items
+                .WhereWhen(x => filter.Codes.Contains(x.Code, StringComparer.OrdinalIgnoreCase), filter.Codes != null && filter.Codes.FirstOrDefault() != null)
+                .WhereWildcard(x => x.Text, filter.Text);
+
+            return new ReferenceDataFilterResult<TItem>(list) { ETag = GenerateETag(list) };
+        }
+
+        /// <summary>
+        /// Generates an ETag as an <see cref="System.Security.Cryptography.SHA1"/> hash of the collection contents.
+        /// </summary>
+        private static string GenerateETag(IEnumerable<ReferenceDataBase> items)
+        {
+            using var md5 = System.Security.Cryptography.MD5.Create();
+            var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(items));
+            var hash = md5.ComputeHash(buf, 0, buf.Length);
+            return Convert.ToBase64String(hash);
         }
 
         /// <summary>

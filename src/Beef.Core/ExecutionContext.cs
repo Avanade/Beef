@@ -309,6 +309,12 @@ namespace Beef
         /// </summary>
         public Dictionary<string, object> Properties { get => _properties.Value; }
 
+        /// <summary>
+        /// Indicates whether <see cref="RefData.ReferenceDataBase"/> <see cref="RefData.ReferenceDataBase.Text"/> serialization is enabled. The
+        /// <see cref="Entities.EntityBasicBase.GetRefDataText(Func{RefData.ReferenceDataBase})"/> checks this value to determine whether the <i>text</i> should be retrieved.
+        /// </summary>
+        public bool IsRefDataTextSerializationEnabled { get; set; }
+
         #region Cache
 
         /// <summary>

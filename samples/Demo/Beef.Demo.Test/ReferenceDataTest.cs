@@ -6,16 +6,28 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Beef.Demo.Test
 {
     [TestFixture, Parallelizable(ParallelScope.Children)]
     public class ReferenceDataTest
     {
+        private static RobotTest _robotTest;
+
         [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public async Task OneTimeSetUp()
         {
             TestSetUp.Reset(false);
+
+            _robotTest = new RobotTest();
+            await _robotTest.OneTimeSetUp();
+        }
+
+        [OneTimeTearDown]
+        public async Task OneTimeTearDown()
+        {
+            await _robotTest.OneTimeTearDown();
         }
 
         [Test, Parallelizable]
@@ -117,6 +129,26 @@ namespace Beef.Demo.Test
             var r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Text = "el*" }));
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Value);
+            Assert.AreEqual(1, r.Value.Count());
+        }
+
+        [Test, Parallelizable]
+        public void A175_GetPowerSource_FilterByCodes_Inactive()
+        {
+            var r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }));
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.Value);
+            Assert.AreEqual(0, r.Value.Count());
+
+            r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }, new WebApi.WebApiRequestOptions { UrlQueryString = "$inactive=true" }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
