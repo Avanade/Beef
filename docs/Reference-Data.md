@@ -34,13 +34,24 @@ Property | Description
 `Id` | The internal unique identifier as either an `int` ([`ReferenceDataBaseInt32`](../src/Beef.Core/RefData/ReferenceDataBaseInt.cs)) or a `Guid` ([`ReferenceDataBaseGuid`](../src/Beef.Core/RefData/ReferenceDataBaseGuid.cs)).
 `Code` | The unique (immutable) code as a `string`. This is primarily the value that would be used by external parties (applications) to consume. Additionally, it could be used to store the reference in the underlying data source if the above `Id` is not suitable.
 `Text` | The textual `string` used for display within an application; e.g. within a drop-down. 
-`SortOrder` | Defines the sort order within the underlying reference data collection.
+`SortOrder` | Defines the sort order (integer) within the underlying reference data collection.
 `IsActive` | Indicates whether the value is active or not. It is up to the application what to do when a value is not considered valid.
 ... | There are other properties on this base type that can also be used; see [codebase](../src/Beef.Core/RefData/ReferenceDataBase.cs) for more information.
 
+Additional, secondary properties, are:
+
+Property | Description
+-|-
+`StartDate` | The `IsValid` validity start date (`null` indicates not defined).
+`EndDate` | The `IsValid` validity end date (`null` indicates not defined).
+`ETag` | The entity tag (for optimistic concurrency and `IF-MATCH` checking).
+`ChangeLog` | The [`ChangeLog`](../src/Beef.Core/Entities/ChangeLog.cs) containing the created and updated user and time.
+
+Finally, there is a feature to enable multiple code mappings; i.e. where two (or more) systems have a different codes for the same value. The `SetMapping`, `GetMapping` and `TryGetMapping` enable.
+
 <br/>
 
-Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer. The property will only be serialized when the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
+Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer. 
 
 The [`ReferenceDataCollectionBase`](../src/Beef.Core/RefData/ReferenceDataCollectionBase.cs) provides the base capabilities for a reference data collection. Including the adding, sorting and additional filtering (e.g. `ActiveList`).
 
@@ -52,7 +63,7 @@ When the code generation is used to create an entity, any properties that are ma
 
 There will be a single field and two properties (where `Xxx` is the name of the reference data item) generated. The Serialization Identifier (SID) is the selected value used for actual serialization.
 
-Additionally, if there is a need for the reference data `Text` to also be made available within the entity as a read-only property then the property can be marked up with the `RefDataText` attribute.
+Additionally, if there is a need for the reference data `Text` to also be made available within the entity as a read-only property then the property can be marked up with the `RefDataText` attribute. The property will only be serialized when the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true'). The reason this is not the default behaviour is that it is believed that these should generally be retrieved and cached (minimises payload size) 
 
 Name | Description
 -|-
@@ -144,20 +155,26 @@ The [ReferenceDataManager](../src/Beef.Core/RefData/ReferenceDataManager.cs) pro
 
 By leveraging the code-generation reference data endpoint can be created. By default only the active (`ReferenceDataBase.IsActive`) entries will be returned. To get both the active and inactive the `$inactive=true` URL query string must be used.
 
-### Per referenece data endpoints:
+<br/>
 
-Each reference data entity should have an API endpoint generated; being `/ref/Xxx`. This can also be invoked passing additional URL query string parameters:
+### Per reference data endpoints
+
+Each reference data entity should have an API endpoint generated; being `/ref/Xxx`. This will by default return all of the active reference data entries. This can also be invoked passing additional URL query string parameters:
 
 Parameter | Description
 -|-
-`code` | Zero or mode codes can be passed; e.g: `?code=m,f` or `?code=m&code=f` (case insensitive).
+`code` | Zero or more codes can be passed; e.g: `?code=m,f` or `?code=m&code=f` (case insensitive).
 `text` | A single text with wildcards can be passed; e.g: `?text=M*` (case insensitive).
 
-### Root reference data endpoints:
+<br/>
+
+### Root reference data endpoint
 
 Additionally there is a root `/ref` that can be used to return multiple reference data values in a single request; designed to reduce chattiness from a consuming channel to the above endpoints. This must be passed at least a single URL query string parameter to function.
 
 The parameter is either a just the named reference data entity which will result in all corresponding entries being returned (e.g: `?gender` or `?gender&country`). Otherwise, specific codes can be specified (e.g" `?gender=m,f`, `?gender=m&gender=f`, `?gender=m,f&country=au,nz`). The options can be mixed and matched (e.g: `?gender&country=au,nz`).
+
+<br/>
 
 ## Sample
 
