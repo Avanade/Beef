@@ -36,7 +36,6 @@ Property | Description
 `Text` | The textual `string` used for display within an application; e.g. within a drop-down. 
 `SortOrder` | Defines the sort order (integer) within the underlying reference data collection.
 `IsActive` | Indicates whether the value is active or not. It is up to the application what to do when a value is not considered valid.
-... | There are other properties on this base type that can also be used; see [codebase](../src/Beef.Core/RefData/ReferenceDataBase.cs) for more information.
 
 Additional, secondary properties, are:
 
@@ -48,8 +47,6 @@ Property | Description
 `ChangeLog` | The [`ChangeLog`](../src/Beef.Core/Entities/ChangeLog.cs) containing the created and updated user and time.
 
 Finally, there is a feature to enable multiple code mappings; i.e. where two (or more) systems have a different codes for the same value. The `SetMapping`, `GetMapping` and `TryGetMapping` enable.
-
-<br/>
 
 Additional developer-defined properties can be, and should be, added where required extending on the base class. The Reference Data framework will then make these available within the application to enable simple usage/access by a developer. 
 
