@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.16</Version>
-    <AssemblyVersion>2.1.16</AssemblyVersion>
-    <FileVersion>2.1.16</FileVersion>
+    <Version>2.1.17</Version>
+    <AssemblyVersion>2.1.17</AssemblyVersion>
+    <FileVersion>2.1.17</FileVersion>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

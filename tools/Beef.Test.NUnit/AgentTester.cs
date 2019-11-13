@@ -39,8 +39,7 @@ namespace Beef.Test.NUnit
         private ErrorType? _expectedErrorType;
         private string _expectedErrorMessage;
         private MessageItemCollection _expectedMessages;
-        private readonly List<(string template, string action)> _expectedPublished = new List<(string template, string action)>();
-        private readonly List<(string template, string action)> _expectedNotPublished = new List<(string template, string action)>();
+        private readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
         private bool _expectedNonePublished;
 
         /// <summary>
@@ -184,6 +183,27 @@ namespace Beef.Test.NUnit
             var cr = cl.Compare(expected, actual);
             if (!cr.AreEqual)
                 Assert.Fail($"Expected vs Actual value mismatch: {cr.DifferencesString}");
+        }
+
+
+        /// <summary>
+        /// Infer additional members to ignore based on the <paramref name="valueType"/>.
+        /// </summary>
+        /// <param name="comparisonConfig">The <see cref="ComparisonConfig"/>.</param>
+        /// <param name="valueType">The value <see cref="Type"/>.</param>
+        internal static void InferAdditionalMembersToIgnore(ComparisonConfig comparisonConfig, Type valueType)
+        {
+            Check.NotNull(comparisonConfig, nameof(comparisonConfig));
+            Check.NotNull(valueType, nameof(valueType));
+
+            if (valueType.GetInterface(typeof(IUniqueKey).Name) != null)
+                comparisonConfig.MembersToIgnore.AddRange(new string[] { "UniqueKey", "HasUniqueKey", "UniqueKeyProperties" });
+
+            if (valueType.GetInterface(typeof(IChangeTrackingLogging).Name) != null)
+                comparisonConfig.MembersToIgnore.Add("ChangeTracking");
+
+            if (valueType.GetInterface(typeof(IEntityCollectionResult).Name) != null)
+                comparisonConfig.MembersToIgnore.AddRange(new string[] { "Paging", "ItemType" });
         }
 
         #endregion
@@ -358,23 +378,29 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        protected void SetExpectEvent(string template, string action = null)
+        protected void SetExpectEvent(string template, string action)
         {
-            _expectedPublished.Add((Check.NotEmpty(template, nameof(template)), action));
+            _expectedPublished.Add((new ExpectedEvent { EventData = new EventData { Subject = template, Action = action } }, false));
         }
 
         /// <summary>
-        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. The <paramref name="eventValue"/> will be compared against the <see cref="EventData{T}.Value"/>. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
+        /// <typeparam name="T">The event value <see cref="Type"/>.</typeparam>
+        /// <param name="useReturnedValue">Indicates whether to use the returned value.</param>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        protected void SetExpectNoEvent(string template, string action = null)
+        /// <param name="eventValue">The <see cref="EventData{T}"/> value.</param>
+        /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
+        protected void SetExpectEvent<T>(bool useReturnedValue, string template, string action, T eventValue, params string[] membersToIgnore)
         {
-            _expectedNotPublished.Add((Check.NotEmpty(template, nameof(template)), action));
+            _expectedPublished.Add((new ExpectedEvent { EventData = new EventData<T> { Subject = template, Action = action, Value = eventValue }, MembersToIgnore = membersToIgnore.ToList() }, useReturnedValue));
         }
 
         /// <summary>
@@ -429,7 +455,9 @@ namespace Beef.Test.NUnit
                 {
                     json = JToken.Parse(result.Request.Content.ReadAsStringAsync().Result);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception) { }
+#pragma warning restore CA1031
 
                 Logger.Default.Info($"Content [{result.Request.Content?.Headers?.ContentType?.MediaType}]:");
                 Logger.Default.Info(json == null ? result.Request.Content.ToString() : json.ToString());
@@ -469,7 +497,9 @@ namespace Beef.Test.NUnit
                 {
                     json = JToken.Parse(result.Content);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception) { /* This is being swallowed by design. */ }
+#pragma warning restore CA1031
             }
 
             TestContext.Out.Write($"Content: ");
@@ -510,15 +540,22 @@ namespace Beef.Test.NUnit
 
             if (_expectedMessages != null)
                 ExpectValidationException.CompareExpectedVsActual(_expectedMessages, result.Messages);
+        }
 
-            foreach (var (t, a) in _expectedPublished)
+        /// <summary>
+        /// Check the published events to make sure they are valid.
+        /// </summary>
+        /// <param name="eventNeedingValueUpdateAction">Action that will be called where the value needs to be updated.</param>
+        protected void PublishedEventsCheck(Action<ExpectedEvent> eventNeedingValueUpdateAction = null)
+        {
+            if (_expectedPublished.Count > 0)
             {
-                ExpectEvent.IsPublished(t, a);
-            }
+                foreach (var ee in _expectedPublished.Where((v) => v.useReturnedValue).Select((v) => v.expectedEvent))
+                {
+                    eventNeedingValueUpdateAction?.Invoke(ee);
+                }
 
-            foreach (var (t, a) in _expectedNotPublished)
-            {
-                ExpectEvent.IsNotPublished(t, a);
+                ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());
             }
 
             if (_expectedNonePublished)
@@ -599,36 +636,31 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Expect a response with the specified messages.
-        /// </summary>
-        /// <param name="messages">The <see cref="MessageItemCollection"/> collection.</param>
-        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
-        /// <remarks>Will only check the <see cref="MessageItem.Property"/> where specified (not <c>null</c>).</remarks>
-        public AgentTester<TAgent> ExpectMessages(MessageItemCollection messages)
-        {
-            SetExpectMessages(messages);
-            return this;
-        }
-
-        /// <summary>
-        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public AgentTester<TAgent> ExpectEvent(string template, string action = null)
+        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTester<TAgent> ExpectEvent(string template, string action)
         {
             SetExpectEvent(template, action);
             return this;
         }
 
         /// <summary>
-        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. The <paramref name="eventValue"/> will be compared against the <see cref="EventData{T}.Value"/>. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
+        /// <typeparam name="T">The event value <see cref="Type"/>.</typeparam>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public AgentTester<TAgent> ExpectNoEvent(string template, string action = null)
+        /// <param name="eventValue">The <see cref="EventData{T}"/> value.</param>
+        /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
+        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTester<TAgent> ExpectEvent<T>(string template, string action, T eventValue, params string[] membersToIgnore)
         {
-            SetExpectNoEvent(template, action);
+            SetExpectEvent<T>(false, template, action, eventValue, membersToIgnore);
             return this;
         }
 
@@ -665,6 +697,7 @@ namespace Beef.Test.NUnit
             WebApiAgentResult result = await func(GetRunArgs());
             sw.Stop();
             ResultCheck(result, sw);
+            PublishedEventsCheck();
             _afterAction?.Invoke(this, result);
             return result;
         }
@@ -884,24 +917,45 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public AgentTester<TAgent, TValue> ExpectEvent(string template, string action = null)
+        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTester<TAgent, TValue> ExpectEvent(string template, string action)
         {
             SetExpectEvent(template, action);
             return this;
         }
 
         /// <summary>
-        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. The <paramref name="eventValue"/> will be compared against the <see cref="EventData{T}.Value"/>. Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// </summary>
+        /// <typeparam name="T">The event value <see cref="Type"/>.</typeparam>
+        /// <param name="template">The expected subject template (or fully qualified subject).</param>
+        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
+        /// <param name="eventValue">The <see cref="EventData{T}"/> value.</param>
+        /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
+        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTester<TAgent, TValue> ExpectEvent<T>(string template, string action, T eventValue, params string[] membersToIgnore)
+        {
+            SetExpectEvent<T>(false, template, action, eventValue, membersToIgnore);
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
+        /// <see cref="EventData.Action"/>. The returned value (<typeparamref name="TValue"/>) will be compared against the <see cref="EventData{TValue}.Value"/>.
+        /// Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public AgentTester<TAgent, TValue> ExpectNoEvent(string template, string action = null)
+        /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public AgentTester<TAgent, TValue> ExpectEventWithValue(string template, string action)
         {
-            SetExpectNoEvent(template, action);
+            SetExpectEvent<TValue>(true, template, action, default);
             return this;
         }
 
@@ -1006,22 +1060,16 @@ namespace Beef.Test.NUnit
 
                 // Further configure the comparison configuration.
                 _comparisonConfig.TypesToIgnore.AddRange(ReferenceDataManager.Current.GetAllTypes());
+                InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
 
-                if (typeof(TValue).GetInterface(typeof(IUniqueKey).Name) != null)
-                    _comparisonConfig.MembersToIgnore.AddRange(new string[] { "UniqueKey", "HasUniqueKey", "UniqueKeyProperties" });
-
-                if (typeof(TValue).GetInterface(typeof(IChangeTrackingLogging).Name) != null)
-                    _comparisonConfig.MembersToIgnore.Add("ChangeTracking");
-
-                if (typeof(TValue).GetInterface(typeof(IEntityCollectionResult).Name) != null)
-                    _comparisonConfig.MembersToIgnore.AddRange(new string[] { "Paging", "ItemType" });
-
-                // Perform the actual configuration.
+                // Perform the actual comparison.
                 var cl = new CompareLogic(_comparisonConfig);
                 var cr = cl.Compare(exp, result.Value);
                 if (!cr.AreEqual)
                     Assert.Fail($"Expected vs Actual value mismatch: {cr.DifferencesString}");
             }
+
+            PublishedEventsCheck((ee) => ((EventData<TValue>)ee.EventData).Value = result.Value);
 
             // Execute the after action.
             _afterAction?.Invoke(this, result);

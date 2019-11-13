@@ -214,7 +214,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogCreated()
                 .ExpectETag()
                 .ExpectUniqueKey()
-                .ExpectEvent("Demo.Robot.*", "Create")
+                .ExpectEventWithValue("Demo.Robot.*", "Create")
                 .ExpectValue((t) => r)
                 .Run((a) => a.Agent.CreateAsync(r)).Value;
 
@@ -318,7 +318,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogUpdated()
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
-                .ExpectEvent("Demo.Robot.*", "Update")
+                .ExpectEventWithValue("Demo.Robot.*", "Update")
                 .ExpectValue((t) => v)
                 .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid())).Value;
 

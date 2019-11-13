@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.17
+- *Fixed:* The `AgentTester.ExpectEvent` will now validate the event value where specified. Also, all expected events will now need to be specified, in the order that they are raised.
+
 ## v2.1.16
 - *Added:* The `AgentTester` has been updated to reflect the `IReferenceDataProvider` changes.
 

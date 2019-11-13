@@ -971,7 +971,12 @@ namespace Beef.Demo.Test
         {
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.Accepted)
-                .ExpectEvent("Demo.Mark")
+                .ExpectEvent("Demo.Mark", "Marked")
+                .Run((a) => a.Agent.MarkAsync());
+
+            AgentTester.Create<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.Accepted)
+                .ExpectEvent("Demo.Mark", "Marked", "Wahlberg")
                 .Run((a) => a.Agent.MarkAsync());
         }
 

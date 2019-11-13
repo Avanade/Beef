@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Events;
+using Beef.RefData;
+using KellermanSoftware.CompareNetObjects;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -40,7 +42,7 @@ namespace Beef.Test.NUnit
         /// Gets the events for the <see cref="System.Threading.AsyncLocal{T}"/>.
         /// </summary>
         /// <returns>An <see cref="Beef.Events.EventData"/> array.</returns>
-        public static EventData[] GetEvents() => _localEvents.Value == null ? new EventData[0] : _localEvents.Value.ToArray();
+        public static EventData[] GetEvents() => _localEvents.Value == null ? Array.Empty<EventData>() : _localEvents.Value.ToArray();
 
         /// <summary>
         /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
@@ -71,6 +73,53 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
+        /// Verifies that the <paramref name="expectedEvents"/> are published (in order specified). The expected events can use wildcards for <see cref="EventData.Subject"/> and
+        /// optionally define <see cref="EventData.Action"/>. Use <see cref="EventData{T}"/> where <see cref="EventData{T}.Value"/> comparisons are required (otherwise no comparison will occur). 
+        /// Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// </summary>
+        /// <param name="expectedEvents">The <see cref="ExpectedEvent"/> list.</param>
+        public static void ArePublished(List<ExpectedEvent> expectedEvents)
+        {
+            Check.NotNull(expectedEvents, nameof(expectedEvents));
+
+            var actualEvents = GetEvents();
+            if (actualEvents.Length != expectedEvents.Count)
+                Assert.Fail($"Expected {expectedEvents.Count} Event(s) to be published; there were {actualEvents.Length} published.");
+
+            for (int i = 0; i < actualEvents.Length; i++)
+            {
+                // Assert subject and action.
+                var exp = expectedEvents[i].EventData;
+                var act = actualEvents[i];
+
+                if (!Event.Match(exp.Subject, act.Subject))
+                    Assert.Fail($"Expected published Event[{i}].Subject '{exp.Subject}' is not equal to actual '{act.Subject}'.");
+
+                if (!string.IsNullOrEmpty(exp.Action) && string.CompareOrdinal(exp.Action, act.Action) != 0)
+                    Assert.Fail($"Expected published Event[{i}].Action '{exp.Action}' is not equal to actual '{act.Action}'.");
+
+                // Where there is *no* expected value then skip value comparison.
+                if (!exp.HasValue)
+                    continue;
+
+                // Assert value.
+                var eVal = exp.GetValue();
+                var aVal = act.GetValue();
+
+                var comparisonConfig = AgentTester.GetDefaultComparisonConfig();
+                comparisonConfig.TypesToIgnore.AddRange(ReferenceDataManager.Current.GetAllTypes());
+                var type = eVal?.GetType() ?? aVal?.GetType();
+                if (type != null)
+                    AgentTester.InferAdditionalMembersToIgnore(comparisonConfig, type);
+
+                var cl = new CompareLogic(comparisonConfig);
+                var cr = cl.Compare(eVal, aVal);
+                if (!cr.AreEqual)
+                    Assert.Fail($"Expected published Event[{i}].Value is not equal to actual: {cr.DifferencesString}");
+            }
+        }
+
+        /// <summary>
         /// Verifies that no events were published.
         /// </summary>
         public static void NonePublished()
@@ -80,5 +129,21 @@ namespace Beef.Test.NUnit
 
             Assert.Fail($"Expected no events to be published, there were '{_localEvents.Value.Count}' published.");
         }
+    }
+
+    /// <summary>
+    /// Provides the configuration for the expected event (see <see cref="ExpectEvent.ArePublished(List{ExpectedEvent})"/>).
+    /// </summary>
+    public class ExpectedEvent
+    {
+        /// <summary>
+        /// Gets or sets the <see cref="Events.EventData"/>.
+        /// </summary>
+        public EventData EventData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the members to ignore for the <see cref="EventData.GetValue"/> comparison.
+        /// </summary>
+        public List<string> MembersToIgnore { get; set; }
     }
 }
