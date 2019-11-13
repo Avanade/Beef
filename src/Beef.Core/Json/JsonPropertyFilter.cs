@@ -60,12 +60,14 @@ namespace Beef.Json
         {
             Check.NotNull(json, nameof(json));
 
-            bool isInclude = include != null && include.Count() > 0;
-            if ((isInclude) || (exclude != null && exclude.Count() > 0))
+            bool isInclude = include != null && include.Any();
+            if (isInclude || (exclude != null && exclude.Any()))
             {
                 foreach (var jp in json.Children().ToArray())
                 {
+#pragma warning disable CA1062 // Validate arguments of public methods; is checked; false negative.
                     Filter(jp, isInclude, isInclude ? Expand(include) : exclude);
+#pragma warning restore CA1062
                 }
             }
         }

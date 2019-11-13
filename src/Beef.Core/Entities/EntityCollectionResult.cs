@@ -55,16 +55,18 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="EntityCollectionResult{TColl, TEntity}"/> class.
         /// </summary>
         /// <param name="paging">Defaults the <see cref="Paging"/> to the requesting <see cref="PagingArgs"/>.</param>
-        public EntityCollectionResult(PagingArgs paging = null)
+        protected EntityCollectionResult(PagingArgs paging = null)
         {
             if (paging != null)
                 _paging = new PagingResult(paging);
         }
 
+#pragma warning disable CA2227 // Collection properties should be read only; special purpose - by-design.
         /// <summary>
         /// Gets or sets the result.
         /// </summary>
         public TColl Result
+#pragma warning restore CA2227
         {
             get { return _result; }
             set { SetValue<TColl>(ref _result, value, false, false, ResultProperty); }
@@ -90,7 +92,9 @@ namespace Beef.Entities
         /// </summary>
         ICollection IEntityCollectionResult.Collection
         {
+#pragma warning disable CA1033 // Interface methods should be callable by child types; special purpose - by-design.
             get { return _result; }
+#pragma warning restore CA1033
         }
 
         /// <summary>
@@ -98,7 +102,9 @@ namespace Beef.Entities
         /// </summary>
         ICollection<TEntity> IEntityCollectionResult<TEntity>.Collection
         {
+#pragma warning disable CA1033 // Interface methods should be callable by child types; special purpose - by-design.
             get { return _result; }
+#pragma warning restore CA1033
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 
 namespace Beef.Diagnostics
 {
@@ -20,7 +21,7 @@ namespace Beef.Diagnostics
         public static LogMessageType EnabledLogMessageTypes { get; set; } = LogMessageType.Default;
 
         /// <summary>
-        /// Gets or sets the <see cref="LogMessageType"/> for an <see cref="T:Exception"/> (defaults to <see cref="LogMessageType.Critical"/>) that applies to all logger instances.
+        /// Gets or sets the <see cref="LogMessageType"/> for an <see cref="System.Exception"/> (defaults to <see cref="LogMessageType.Critical"/>) that applies to all logger instances.
         /// </summary>
         public static LogMessageType ExceptionLogMessageType { get; set; } = LogMessageType.Critical;
 
@@ -151,14 +152,14 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="System.Exception"/> log message.
         /// </summary>
         /// <param name="exception">The <see cref="System.Exception"/></param>
-        public void Exception(Exception exception) { Write(exception, null, ExceptionLogMessageType, exception.Message); }
+        public void Exception(Exception exception) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, exception?.Message); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message with a specified <paramref name="text"/>.
         /// </summary>
         /// <param name="exception">The <see cref="System.Exception"/></param>
         /// <param name="text">The message text.</param>
-        public void Exception(Exception exception, string text) { Write(exception, null, ExceptionLogMessageType, text); }
+        public void Exception(Exception exception, string text) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, text); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message using a composite format string.
@@ -173,7 +174,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="exception">The <see cref="System.Exception"/></param>
-        public void Exception2(object data, Exception exception) { Write(exception, data, ExceptionLogMessageType, exception.Message); }
+        public void Exception2(object data, Exception exception) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, exception?.Message); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message with a specified <paramref name="text"/>.
@@ -181,7 +182,7 @@ namespace Beef.Diagnostics
         /// <param name="data">Additional contextual data.</param>
         /// <param name="exception">The <see cref="System.Exception"/></param>
         /// <param name="text">The message text.</param>
-        public void Exception2(object data, Exception exception, string text) { Write(exception, data, ExceptionLogMessageType, text); }
+        public void Exception2(object data, Exception exception, string text) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, text); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message using a composite format string.
@@ -190,7 +191,7 @@ namespace Beef.Diagnostics
         /// <param name="exception">The <see cref="System.Exception"/></param>
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
-        public void Exception2(object data, Exception exception, string format, params object[] values) { Write(exception, data, ExceptionLogMessageType, format, values); }
+        public void Exception2(object data, Exception exception, string format, params object[] values) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, format, values); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Error"/> log message.
@@ -335,11 +336,13 @@ namespace Beef.Diagnostics
         #endregion
     }
 
+#pragma warning disable CA1710 // Identifiers should have correct suffix; this is acceptable.
     /// <summary>
     /// The <see cref="Logger"/> arguments used for the binder (see <see cref="Logger.RegisterGlobal(Action{LoggerArgs})"/> and <see cref="ExecutionContext.RegisterLogger(Action{LoggerArgs})"/>).
     /// </summary>
     /// <remarks>Leverage the <see cref="ExecutionContext"/> to get access to the likes of the correlation identifier and user name.</remarks>
     public class LoggerArgs : EventArgs
+#pragma warning restore CA1710 
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggerArgs"/> class for a specified <paramref name="type"/> and <paramref name="text"/>.
@@ -397,7 +400,7 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Gets the composite format values.
         /// </summary>
-        public object[] Values { get; private set; }
+        public IEnumerable<object> Values { get; private set; }
 
         /// <summary>
         /// Indicates whether the composite <see cref="Format"/> and <see cref="Values"/> were specified; or simply the <see cref="Text"/>.
@@ -425,7 +428,7 @@ namespace Beef.Diagnostics
         /// <returns>The output <see cref="string"/>.</returns>
         public override string ToString()
         {
-            var str = (IsCompositeFormat) ? string.Format(Format, Values) : Text;
+            var str = (IsCompositeFormat) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Format, (object[])Values) : Text;
             return IsException ? $"{str} Exception: {Exception.ToString()}" : str;
         }
 
@@ -458,7 +461,9 @@ namespace Beef.Diagnostics
     /// Represents the <see cref="Logger"/> message type.
     /// </summary>
     [Flags()]
+#pragma warning disable CA1714 // Flags enums should have plural names; 
     public enum LogMessageType
+#pragma warning restore CA1714
     {
         /// <summary>Indicates no messages (ignore).</summary>
         None = 0,

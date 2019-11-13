@@ -71,7 +71,7 @@ namespace Beef.Mapper
         object ConvertToSrceValue(object destinationPropertyValue, OperationTypes operationType);
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
+        /// Gets the <see cref="CollectionTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
         /// </summary>
         ComplexTypeReflector DestComplexTypeReflector { get; }
 
@@ -440,6 +440,7 @@ namespace Beef.Mapper
             SetSrceValue(entity, (TSrceProperty)value, operationType);
         }
 
+#pragma warning disable IDE0060, CA1801 // Remove unused parameter; by-design to have consistent interface
         /// <summary>
         /// Gets the destination property value.
         /// </summary>
@@ -447,6 +448,7 @@ namespace Beef.Mapper
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
         protected TDestProperty GetDestValue(TDest entity, OperationTypes operationType)
+#pragma warning restore IDE0060, CA1801
         {
             return DestPropertyExpression.GetValue(entity);
         }

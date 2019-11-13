@@ -8,7 +8,7 @@ namespace Beef.Caching.Policy
     /// A daily cache policy; in that the cache expires after a specified <see cref="Duration"/> in relation to,
     /// and resetting, at the start of the day.
     /// </summary>
-    public class DailyCachePolicy : ICachePolicy
+    public sealed class DailyCachePolicy : ICachePolicy
     {
         private TimeSpan _duration = new TimeSpan(24, 0, 0);
         private TimeSpan? _randomizerOffset;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Beef.FlatFile
@@ -26,7 +27,7 @@ namespace Beef.FlatFile
         /// <summary>
         /// Gets or sets the corresponding columns where applicable to format.
         /// </summary>
-        public string[] Columns { get; set; }
+        public List<string> Columns { get; internal set; }
 
         /// <summary>
         /// Gets or sets the hierarchy record identifier.

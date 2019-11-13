@@ -78,7 +78,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.AreEqual(hasErrors, result.HasErrors);
                 Assert.IsNotNull(result.Records);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
 
                 var rec = result.Records[0];
                 Assert.AreEqual(1, rec.LineNumber);
@@ -103,7 +103,7 @@ namespace Beef.Core.UnitTest.FlatFile
                     Assert.IsNull(rec.Columns);
                 else
                 {
-                    Assert.AreEqual(cols.Length, rec.Columns.Length);
+                    Assert.AreEqual(cols.Length, rec.Columns.Count);
                     for (int i = 0; i < cols.Length; i++)
                     {
                         Assert.AreEqual(cols[i], rec.Columns[i]);

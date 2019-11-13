@@ -11,6 +11,7 @@ namespace Beef.Caching
     public abstract class CacheCoreBase : ICacheCore
     {
         private readonly ICachePolicy _policy;
+        private bool _disposed;
 
         /// <summary>
         /// Gets the internal <see cref="PolicyKey"/> string format.
@@ -64,7 +65,7 @@ namespace Beef.Caching
         /// </summary>
         protected void RegisterInternalPolicyKey()
         {
-            var overridePolicyKey = string.Format(InternalPolicyKeyFormat, PolicyKey);
+            var overridePolicyKey = string.Format(System.Globalization.CultureInfo.InvariantCulture, InternalPolicyKeyFormat, PolicyKey);
             CachePolicyManager.Register(this, overridePolicyKey);
             CachePolicyManager.Set(overridePolicyKey, new NoCachePolicy());
         }
@@ -91,15 +92,41 @@ namespace Beef.Caching
         protected abstract void OnFlushCache(bool ignoreExpiry);
 
         /// <summary>
-        /// Disposes all resources (see <see cref="Flush(bool)"/>) and invokes the <see cref="CachePolicyManager.Unregister(string)"/> for the <see cref="PolicyKey"/>.
+        /// Releases all resources (see <see cref="Flush(bool)"/>) and invokes the <see cref="CachePolicyManager.Unregister(string)"/> for the <see cref="PolicyKey"/>.
         /// </summary>
         public void Dispose()
         {
-            lock (Lock)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="CacheCoreBase"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
             {
-                Flush(true);
-                CachePolicyManager.Unregister(PolicyKey);
+                lock (Lock)
+                {
+                    Flush(true);
+                    CachePolicyManager.Unregister(PolicyKey);
+                }
             }
+
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~CacheCoreBase()
+        {
+            Dispose(false);
         }
     }
 }

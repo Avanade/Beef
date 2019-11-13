@@ -44,7 +44,7 @@ namespace Beef.FlatFile.Reflectors
 
             _valueConverter = FileFormat.Converters.Get(PropertyInfo.PropertyType, FileColumn.TextValueConverterKey, FileColumn.TextValueConverterType);
             if (!string.IsNullOrEmpty(FileColumn.TextValueConverterKey) && _valueConverter == null)
-                throw new InvalidOperationException(string.Format("FileColumnAttribute has TextValueConverterKey of '{0}' is not found within the FileFormat.Converters.", FileColumn.TextValueConverterKey));
+                throw new InvalidOperationException($"FileColumnAttribute has TextValueConverterKey of '{FileColumn.TextValueConverterKey}' is not found within the FileFormat.Converters.");
 
             if (FileColumn.IsLineNumber && PropertyTypeCode != TypeCode.Int32 && PropertyTypeCode != TypeCode.Int64)
                 throw new InvalidOperationException("FileColumnAttribute has IsLineNumber set to true; the underlying property type must be either Int32 or Int64.");

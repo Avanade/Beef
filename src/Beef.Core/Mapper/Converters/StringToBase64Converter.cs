@@ -37,7 +37,7 @@ namespace Beef.Mapper.Converters
         public byte[] ConvertToDest(string value)
         {
             if (value == null)
-                return new byte[0];
+                return Array.Empty<byte>();
 
             return Convert.FromBase64String(value);
         }

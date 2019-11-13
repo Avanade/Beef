@@ -36,7 +36,7 @@ namespace Beef
         /// <param name="fallbackText">The fallback text to be used when not found by the <see cref="TextProvider"/>.</param>
         public LText(int key, string fallbackText = null)
         {
-            KeyAndOrText = key <= 0 ? throw new ArgumentException("Key must be a positive integer.", nameof(key)) : key.ToString(IntKeyFormat);
+            KeyAndOrText = key <= 0 ? throw new ArgumentException("Key must be a positive integer.", nameof(key)) : key.ToString(IntKeyFormat, System.Globalization.CultureInfo.InvariantCulture);
             FallbackText = fallbackText;
         }
 
@@ -69,11 +69,13 @@ namespace Beef
             return TextProvider.Current.GetText(text);
         }
 
+#pragma warning disable CA2225 // Operator overloads have named alternates; by-design and valid.
         /// <summary>
         /// An implicit cast from a text <see cref="string"/> to an <see cref="LText"/> value updating the <see cref="LText.KeyAndOrText"/>.
         /// </summary>
         /// <param name="keyAndOrText">The key and/or text.</param>
         public static implicit operator LText(string keyAndOrText)
+#pragma warning restore CA2225 
         {
             return new LText(keyAndOrText);
         }

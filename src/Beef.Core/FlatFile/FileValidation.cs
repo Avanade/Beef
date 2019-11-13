@@ -8,7 +8,9 @@ namespace Beef.FlatFile
     /// Represents the overall file validation(s) required. 
     /// </summary>
     [Flags]
+#pragma warning disable CA1714 // Flags enums should have plural names; not required.
     public enum FileValidation
+#pragma warning restore CA1714
     {
         /// <summary>
         /// Indicates that the validation is unspecified.

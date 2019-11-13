@@ -14,7 +14,7 @@ namespace Beef.Executors
     /// <summary>
     /// Provides the <see cref="Executor"/> create and run capabilities.
     /// </summary>
-    public class ExecutionManager
+    public class ExecutionManager : IDisposable
     {
         /// <summary>
         /// Gets the interval (milliseconds) to wait for a process to complete.
@@ -27,6 +27,7 @@ namespace Beef.Executors
         private readonly Dictionary<Guid, Executor> _executors = new Dictionary<Guid, Executor>();
         private Stopwatch _stopwatch;
         private Exception _ctorException;
+        private bool _disposed;
 
         /// <summary>
         /// Indicates whether internal tracing is enabled (and output) for all executors.
@@ -290,20 +291,13 @@ namespace Beef.Executors
         {
             get
             {
-                switch (StopReason)
+                return StopReason switch
                 {
-                    case ExecutionManagerStopReason.ExecutionManagerException:
-                        return _ctorException;
-
-                    case ExecutionManagerStopReason.TriggerException:
-                        return Trigger.Exception;
-
-                    case ExecutionManagerStopReason.ExecutorExceptionStop:
-                        return StopExecutor.Exception;
-
-                    default:
-                        return null;
-                }
+                    ExecutionManagerStopReason.ExecutionManagerException => _ctorException,
+                    ExecutionManagerStopReason.TriggerException => Trigger.Exception,
+                    ExecutionManagerStopReason.ExecutorExceptionStop => StopExecutor.Exception,
+                    _ => null,
+                };
             }
         }
 
@@ -361,10 +355,12 @@ namespace Beef.Executors
             {
                 PerRunType?.Invoke(args);
             }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design logs and swallows.
             catch (Exception ex)
             {
                 Trace(() => Logger.Default.Trace($"ExecutionManager '{InstanceId}' AfterRun action threw an Exception (this exception was swallowed by design and otherwise not logged): {ex.ToString()}"));
             }
+#pragma warning restore CA1031
         }
 
         /// <summary>
@@ -432,7 +428,10 @@ namespace Beef.Executors
                 finally
                 {
                     if (_waiter != null)
+                    {
                         _waiter.Dispose();
+                        _waiter = null;
+                    }
                 }
             });
         }
@@ -522,11 +521,13 @@ namespace Beef.Executors
                     {
                         Task.WaitAll(tasks.ToArray());
                     }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, intended to log and swallow.
                     catch (Exception ex)
                     {
                         // Too late to do anything about it; just keep on keeping on.
                         Logger.Default.Exception(ex, $"ExecutionManager '{InstanceId}' caught (and swallowed) an exception whilst waiting for {tasks.Count} Executor(s) to Stop.");
                     }
+#pragma warning restore CA1031
 
                     // This is a safety net; should not have any outstanding Executors at this point.
                     while (_executors.Count > 0)
@@ -619,6 +620,7 @@ namespace Beef.Executors
                     ExecutorCount++;
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design to log and bubble internally.
             catch (Exception ex)
             {
                 Logger.Default.Exception(ex, $"ExecutionManager '{InstanceId}' unable to create Executor instance: {ex.Message}.");
@@ -626,6 +628,7 @@ namespace Beef.Executors
                 await StopExecution(ExecutionManagerStopReason.ExecutionManagerException);
                 return;
             }
+#pragma warning restore CA1031
 
             await RunWrapperAsync(() => executor.RunExecutorAsync(args), executor);
 
@@ -634,6 +637,41 @@ namespace Beef.Executors
                 await StopExecution(ExecutionManagerStopReason.ExecutorExceptionStop, executor);
                 return;
             }
+        }
+
+        /// <summary>
+        /// Release/dispose of all resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ExecutionManager"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                if (_waiter != null)
+                    _waiter.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~ExecutionManager()
+        {
+            Dispose(false);
         }
     }
 }

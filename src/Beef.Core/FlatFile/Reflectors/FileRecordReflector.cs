@@ -27,7 +27,7 @@ namespace Beef.FlatFile.Reflectors
             Type = type;
             TypeInfo = type.GetTypeInfo();
             if (!TypeInfo.IsClass)
-                throw new ArgumentException(string.Format("Type '{0}' must be a class.", type.Name), nameof(type));
+                throw new ArgumentException($"Type '{type.Name}' must be a class.", nameof(type));
 
             // Get all the property/column metadata.
             FileFormat = ff;
@@ -42,7 +42,7 @@ namespace Beef.FlatFile.Reflectors
                 var fha = pi.GetCustomAttribute<FileHierarchyAttribute>();
 
                 if (fca != null && fha != null)
-                    throw new InvalidOperationException(string.Format("Type '{0}' property '{1}' cannot specify both a FileColumnAttribute and FileHierarchyAttribute.", type.Name, pi.Name));
+                    throw new InvalidOperationException($"Type '{type.Name}' property '{pi.Name}' cannot specify both a FileColumnAttribute and FileHierarchyAttribute.");
 
                 if (fca != null)
                     columns.Add(new FileColumnReflector(i, fca, pi, FileFormat));
@@ -51,17 +51,17 @@ namespace Beef.FlatFile.Reflectors
                 {
                     var fhr = new FileHierarchyReflector(i, fha, pi, ff);
                     if (children.SingleOrDefault(x => x.RecordIdentifier == fhr.RecordIdentifier) != null)
-                        throw new InvalidOperationException(string.Format("Type '{0}' property '{1}' FileHierarchyAttribute has a duplicate Record Identifier '{2}' (must be unique within Type).", type.Name, pi.Name, fhr.RecordIdentifier));
+                        throw new InvalidOperationException($"Type '{type.Name}' property '{pi.Name}' FileHierarchyAttribute has a duplicate Record Identifier '{fhr.RecordIdentifier}' (must be unique within Type).");
 
                     children.Add(new FileHierarchyReflector(i, fha, pi, ff));
                 }
             }
 
             // Order the Columns and Children by Order and Index for usage.
-            Columns = columns.OrderBy(x => x.Order).ThenBy(x => x.Index).ToArray();
-            Children = children.OrderBy(x => x.Order).ThenBy(x => x.Index).ToArray();
+            Columns = columns.OrderBy(x => x.Order).ThenBy(x => x.Index).ToList();
+            Children = children.OrderBy(x => x.Order).ThenBy(x => x.Index).ToList();
 
-            for (int j = 0; j < Children.Length; j++)
+            for (int j = 0; j < Children.Count; j++)
             {
                 _childrenIndexes.Add(Children[j].RecordIdentifier, j);
             }
@@ -80,12 +80,12 @@ namespace Beef.FlatFile.Reflectors
         /// <summary>
         /// Gets the corresponding <see cref="FileColumnReflector"/> array.
         /// </summary>
-        public FileColumnReflector[] Columns { get; private set; }
+        public List<FileColumnReflector> Columns { get; private set; }
 
         /// <summary>
         /// Gets the corresponding children <see cref="FileHierarchyReflector"/> array.
         /// </summary>
-        public FileHierarchyReflector[] Children { get; private set; }
+        public List<FileHierarchyReflector> Children { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="FileFormatBase"/>.
@@ -122,7 +122,7 @@ namespace Beef.FlatFile.Reflectors
         {
             Type gt = typeof(Validator<,>).MakeGenericType(new Type[] { Type, validatorType });
             if (!validatorType.GetTypeInfo().IsSubclassOf(gt))
-                throw new ArgumentException(string.Format("Validator Type '{0}' must be a subclass of '{1}'.", Type.Name, gt.FullName), nameof(validatorType));
+                throw new ArgumentException($"Validator Type '{Type.Name}' must be a subclass of '{gt.FullName}'.", nameof(validatorType));
 
             SetValidator(gt.GetProperty("Default", BindingFlags.Public | BindingFlags.Static).GetValue(null));
         }
@@ -138,7 +138,7 @@ namespace Beef.FlatFile.Reflectors
 
             Type gt = typeof(ValidatorBase<>).MakeGenericType(new Type[] { Type });
             if (!validator.GetType().GetTypeInfo().IsSubclassOf(gt))
-                throw new ArgumentException(string.Format("Validator '{0}' must be a subclass of '{1}'.", Type.Name, gt.FullName), nameof(validator));
+                throw new ArgumentException($"Validator '{Type.Name}' must be a subclass of '{gt.FullName}'.", nameof(validator));
 
             _validator = validator;
             _validateMI = validator.GetType().GetMethod("Validate", new Type[] { Type, typeof(ValidationArgs) });

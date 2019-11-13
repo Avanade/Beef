@@ -5,7 +5,7 @@ namespace Beef.Caching.Policy
     /// <summary>
     /// A no expiry cache policy; in that the cache never automatically expires.
     /// </summary>
-    public class NoExpiryCachePolicy : ICachePolicy
+    public sealed class NoExpiryCachePolicy : ICachePolicy
     {
         /// <summary>
         /// Indicates whether the cache has expired and must be refreshed.

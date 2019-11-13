@@ -30,20 +30,17 @@ namespace Beef.FlatFile.Internal
         private static void Get(FileFormatBase fileFormat, Dictionary<string, FileRecordHierarchyItem> dict, FileRecordHierarchyItem item, PropertyInfo pi)
         {
             if (dict.ContainsKey(item.RecordIdentifier))
-                throw new InvalidOperationException(string.Format("Type '{0}' property '{1}' FileHierarchyAttribute has a duplicate Record Identifier '{2}'; must be unique within hierarchy).",
-                    pi.DeclaringType.Name, pi.Name, item.RecordIdentifier));
+                throw new InvalidOperationException($"Type '{pi.DeclaringType.Name}' property '{pi.Name}' FileHierarchyAttribute has a duplicate Record Identifier '{item.RecordIdentifier}'; must be unique within hierarchy).");
 
             if (fileFormat.HeaderRecordIdentifier != null && item.RecordIdentifier == fileFormat.HeaderRecordIdentifier)
-                throw new InvalidOperationException(string.Format("Type '{0}' property '{1}' FileHierarchyAttribute has a duplicate Record Identifier '{2}'; must be different to the Header Record Identifier).",
-                    pi.DeclaringType.Name, pi.Name, item.RecordIdentifier));
+                throw new InvalidOperationException($"Type '{pi.DeclaringType.Name}' property '{pi.Name}' FileHierarchyAttribute has a duplicate Record Identifier '{item.RecordIdentifier}'; must be different to the Header Record Identifier).");
 
             if (fileFormat.TrailerRecordIdentifier != null && item.RecordIdentifier == fileFormat.TrailerRecordIdentifier)
-                throw new InvalidOperationException(string.Format("Type '{0}' property '{1}' FileHierarchyAttribute has a duplicate Record Identifier '{2}'; must be different to the Trailer Record Identifier).",
-                    pi.DeclaringType.Name, pi.Name, item.RecordIdentifier));
+                throw new InvalidOperationException($"Type '{pi.DeclaringType.Name}' property '{pi.Name}' FileHierarchyAttribute has a duplicate Record Identifier '{item.RecordIdentifier}'; must be different to the Trailer Record Identifier).");
 
             dict.Add(item.RecordIdentifier, item);
 
-            if (item.RecordReflector.Children == null || item.RecordReflector.Children.Length == 0)
+            if (item.RecordReflector.Children == null || item.RecordReflector.Children.Count == 0)
                 return;
 
             foreach (var fhr in item.RecordReflector.Children)
@@ -100,9 +97,6 @@ namespace Beef.FlatFile.Internal
         /// <summary>
         /// Indicates whether the file record hierarch item is the root.
         /// </summary>
-        public bool IsRoot
-        {
-            get { return Parent == null; }
-        }
+        public bool IsRoot => Parent == null;
     }
 }

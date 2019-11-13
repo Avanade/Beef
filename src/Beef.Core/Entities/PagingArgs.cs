@@ -166,11 +166,11 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the list of <b>included</b> fields (JSON property names) to limit serialization data payload.
         /// </summary>
-        public List<string> IncludeFields { get; set; } = new List<string>();
+        public List<string> IncludeFields { get; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the list of <b>excluded</b> fields (JSON property names) to limit serialization data payload.
         /// </summary>
-        public List<string> ExcludeFields { get; set; } = new List<string>();
+        public List<string> ExcludeFields { get; } = new List<string>();
     }
 }

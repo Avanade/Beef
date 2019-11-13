@@ -40,7 +40,7 @@ namespace Beef.Mapper
         /// <returns>The destination entity.</returns>
         protected override ChangeLog OnMapToSrce(TDestEntity destinationEntity, ChangeLog sourceEntity, OperationTypes operationType)
         {
-            return sourceEntity.IsInitial ? null : sourceEntity;
+            return sourceEntity == null || sourceEntity.IsInitial ? null : sourceEntity;
         }
     }
 

@@ -73,7 +73,7 @@ namespace Beef.FlatFile
             if (!IsHierarchical)
                 return null;
 
-            if (HierarchyColumnPosition >= record.LineData.Length)
+            if (HierarchyColumnPosition >= Check.NotNull(record, nameof(record)).LineData.Length)
             {
                 record.Messages.Add(MessageType.Error, "Unable to determine the code identitier as the hierarchy column position is outside the bounds (length) of the record.");
                 return null;
@@ -92,12 +92,12 @@ namespace Beef.FlatFile
         /// <returns>The <see cref="Type"/> instance.</returns>
         protected override object ReadCreateRecordValue(FileRecord record, Type type)
         {
+            Check.NotNull(record, nameof(record));
+
             var frr = GetFileRecordReflector(type);
             var val = frr.CreateInstance();
             var pos = 0;
             var cols = new List<string>();
-            string col = null;
-
             foreach (var fcr in frr.Columns)
             {
                 // When less columns in record data than expected; we update with null only. 
@@ -108,9 +108,9 @@ namespace Beef.FlatFile
                 }
 
                 if (fcr.FileColumn.Width <= 0)
-                    throw new InvalidOperationException(string.Format("Type '{0}' has column '{1}' with no width specified; this is required for a fixed file format.", type.Name, fcr.PropertyInfo.Name));
+                    throw new InvalidOperationException($"Type '{type.Name}' has column '{fcr.PropertyInfo.Name}' with no width specified; this is required for a fixed file format.");
 
-                col = pos + fcr.FileColumn.Width > record.LineData.Length ? record.LineData.Substring(pos) : record.LineData.Substring(pos, fcr.FileColumn.Width);
+                string col = pos + fcr.FileColumn.Width > record.LineData.Length ? record.LineData.Substring(pos) : record.LineData.Substring(pos, fcr.FileColumn.Width);
                 cols.Add(col);
                 fcr.SetValue(record, CleanString(col, fcr.FileColumn), val);
                 pos += fcr.FileColumn.Width;
@@ -120,7 +120,7 @@ namespace Beef.FlatFile
             if (pos < record.LineData.Length - 1)
                 cols.Add(record.LineData.Substring(pos));
 
-            record.Columns = cols.ToArray();
+            record.Columns = cols;
 
             // Validate that the actual and expected column counts match as per configuration.
             ValidateColumnCount(record, frr);
@@ -138,8 +138,11 @@ namespace Beef.FlatFile
         /// <returns><c>true</c> indicates that the column write was successful; otherwise, <c>false</c>.</returns>
         protected override bool WriteColumnToLineData(FileColumnReflector fcr, FileRecord record, int column, StringBuilder sb)
         {
+            Check.NotNull(fcr, nameof(fcr));
+            Check.NotNull(sb, nameof(sb));
+            
             // Get the string value and correct the width if needed.
-            var str = column > record.Columns.Length ? null : record.Columns[column];
+            var str = column > Check.NotNull(record, nameof(record)).Columns.Count ? null : record.Columns[column];
 
             if (string.IsNullOrEmpty(str))
                 sb.Append(PaddingChar, fcr.FileColumn.Width);
@@ -162,7 +165,7 @@ namespace Beef.FlatFile
         /// <param name="sb">The line data <see cref="StringBuilder"/>.</param>
         protected override void WritePostProcessLineData(FileRecord record, StringBuilder sb)
         {
-            base.WritePostProcessLineData(record, sb);
+            base.WritePostProcessLineData(Check.NotNull(record, nameof(record)), Check.NotNull(sb, nameof(sb)));
 
             // Add the Hierarchy data.
             if (HierarchyColumnPosition.HasValue)
@@ -185,7 +188,7 @@ namespace Beef.FlatFile
             foreach (var fcr in frr.Columns)
             {
                 if (fcr.FileColumn.Width <= 0)
-                    throw new InvalidOperationException(string.Format("Type '{0}' has column '{1}' with no width specified; this is required for a fixed file format.", type.Name, fcr.PropertyInfo.Name));
+                    throw new InvalidOperationException($"Type '{type.Name}' has column '{fcr.PropertyInfo.Name}' with no width specified; this is required for a fixed file format.");
 
                 length += fcr.FileColumn.Width;
             }

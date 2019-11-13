@@ -262,6 +262,7 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="IActionResult"/>.</returns>
         protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode)
         {
+            Check.NotNull(context, nameof(context));
             if (statusCode == HttpStatusCode.NotFound)
             {
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorTypeHeaderName, ErrorType.NotFoundError.ToString());
@@ -280,6 +281,7 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="IActionResult"/>.</returns>
         protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken json)
         {
+            Check.NotNull(context, nameof(context));
             return new ObjectResult(json) { StatusCode = (int)statusCode };
         }
 

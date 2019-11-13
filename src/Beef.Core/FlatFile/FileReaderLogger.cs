@@ -16,8 +16,8 @@ namespace Beef.FlatFile
         /// Initializes a new instance of the <see cref="FileReaderLoggerData"/> class.
         /// </summary>
         /// <param name="operationResult">The <see cref="FileOperationResult"/>.</param>
-        /// <param name="fileRecord">The corresponding <see cref="T:FileRecord"/> to the logged message.</param>
-        /// <param name="messageItem">The specific <see cref="T:MessageItem"/> from the <see cref="FileRecord"/> being logged.</param>
+        /// <param name="fileRecord">The corresponding <see cref="Beef.FlatFile.FileRecord"/> to the logged message.</param>
+        /// <param name="messageItem">The specific <see cref="Beef.Entities.MessageItem"/> from the <see cref="FileRecord"/> being logged.</param>
         public FileReaderLoggerData(FileOperationResult operationResult, FileRecord fileRecord = null, MessageItem messageItem = null)
         {
             OperationResult = operationResult ?? throw new ArgumentNullException(nameof(operationResult));
@@ -31,12 +31,12 @@ namespace Beef.FlatFile
         public FileOperationResult OperationResult { get; private set; }
 
         /// <summary>
-        /// Gets the corresponding <see cref="T:FileRecord"/> to the logged message (where applicable).
+        /// Gets the corresponding <see cref="Beef.FlatFile.FileRecord"/> to the logged message (where applicable).
         /// </summary>
         public FileRecord FileRecord { get; private set; }
 
         /// <summary>
-        /// Gets the specific <see cref="T:MessageItem"/> from the <see cref="FileRecord"/> being logged (where applicable).
+        /// Gets the specific <see cref="Beef.Entities.MessageItem"/> from the <see cref="FileRecord"/> being logged (where applicable).
         /// </summary>
         public MessageItem MessageItem { get; private set; }
     }
@@ -102,7 +102,7 @@ namespace Beef.FlatFile
         /// <param name="e">The <see cref="FileOperationEventArgs"/>.</param>
         public void LogFileOperation(object sender, FileOperationEventArgs e)
         {
-            var or = e.OperationResult;
+            var or = Check.NotNull(e, nameof(e)).OperationResult;
 
             switch (or.Status)
             {
@@ -150,13 +150,13 @@ namespace Beef.FlatFile
 
                 case FileContentStatus.EndOfFile:
                     if (EndOfFileMessage != null)
-                        Logger.Default.Info2(new FileReaderLoggerData(or), string.Format(EndOfFileMessage, e.OperationResult.TotalLines));
+                        Logger.Default.Info2(new FileReaderLoggerData(or), string.Format(System.Globalization.CultureInfo.InvariantCulture, EndOfFileMessage, e.OperationResult.TotalLines));
 
                     break;
             }
 
             // Log any/all corresponding messages.
-            if (or.Records != null && or.Records.Length > 0)
+            if (or.Records != null && or.Records.Any())
             {
                 foreach (var rec in or.Records.Where(x => x.HasMessages))
                 {

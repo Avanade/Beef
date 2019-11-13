@@ -34,7 +34,7 @@ namespace Beef.Entities
             get
             {
                 if (_args == null)
-                    _args = new object[] { };
+                    _args = Array.Empty<object>();
 
                 return _args;
             }

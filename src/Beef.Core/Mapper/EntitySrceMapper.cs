@@ -57,14 +57,13 @@ namespace Beef.Mapper
         /// <param name="mapping">The <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}"/>.</param>
         protected void AddPropertyMapper<TSrceProperty>(PropertyMapperCustomBase<TSrce, TSrceProperty> mapping)
         {
-            if (mapping == null)
-                throw new ArgumentNullException(nameof(mapping));
+            Check.NotNull(mapping, nameof(mapping));
 
             if (_srceMappings.ContainsKey(mapping.SrcePropertyName))
-                throw new ArgumentException(string.Format("Source property '{0}' mapping can not be specified more than once.", mapping.SrcePropertyName), "SourcePropertyName");
+                throw new ArgumentException($"Source property '{mapping.SrcePropertyName}' mapping can not be specified more than once.", nameof(mapping));
 
             if (_destMappings.ContainsKey(mapping.DestPropertyName))
-                throw new ArgumentException(string.Format("Destination property '{0}' mapping can not be specified more than once.", mapping.DestPropertyName), "DestinationPropertyName");
+                throw new ArgumentException($"Destination property '{mapping.DestPropertyName}' mapping can not be specified more than once.", nameof(mapping));
 
             _srceMappings.Add(mapping.SrcePropertyName, mapping);
             _destMappings.Add(mapping.DestPropertyName, mapping);

@@ -43,7 +43,7 @@ namespace Beef.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBase"/> class.
         /// </summary>
-        public EntityBase()
+        protected EntityBase()
         {
             if (ShouldTrackChanges)
                 TrackChanges();
@@ -59,11 +59,13 @@ namespace Beef.Entities
             CopyFrom((EntityBase)from);
         }
 
+#pragma warning disable CA1801, CA1822, IDE0060 // Mark members as static; this is intended as an instance method.
         /// <summary>
         /// Performs a deep copy from another object updating this instance.
         /// </summary>
         /// <param name="from">The object to copy from.</param>
         public void CopyFrom(EntityBase from) { }
+#pragma warning restore CA1801, CA1822, IDE0060
 
         /// <summary>
         /// Validates the <see cref="CopyFrom(object)"/> <see cref="Type"/> is valid.
@@ -71,13 +73,12 @@ namespace Beef.Entities
         /// <typeparam name="T">The expected <see cref="Type"/>.</typeparam>
         /// <param name="from">The object to copy from.</param>
         /// <returns>The <paramref name="from"/> value casted to <typeparamref name="T"/>.</returns>
-        protected T ValidateCopyFromType<T>(object from) where T : class
+        protected static T ValidateCopyFromType<T>(object from) where T : class
         {
-            if (from == null)
-                throw new ArgumentNullException("from");
+            Check.NotNull(from, nameof(from));
 
             if (!(from is T val))
-                throw new ArgumentException(string.Format("Cannot copy from Type '{0}' as it is incompatible.", from.GetType().FullName), "from");
+                throw new ArgumentException($"Cannot copy from Type '{from?.GetType().FullName}' as it is incompatible.", nameof(from));
 
             return val;
         }
@@ -171,10 +172,12 @@ namespace Beef.Entities
             get { return UniqueKey.Empty; }
         }
 
+#pragma warning disable CA1819 // Properties should not return arrays; is OK as changes cannot have a side-effect.
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public virtual string[] UniqueKeyProperties => new string[0];
+        public virtual string[] UniqueKeyProperties => Array.Empty<string>();
+#pragma warning restore CA1819
 
         #endregion
 

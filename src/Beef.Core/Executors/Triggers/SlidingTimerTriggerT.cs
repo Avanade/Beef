@@ -71,11 +71,13 @@ namespace Beef.Executors.Triggers
                 else
                     RestartTimer();
             }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, bubbles out internally.
             catch (Exception ex)
             {
                 Logger.Default.Exception(ex, $"Trigger '{InstanceId}' encountered an exception whilst executing OnTimer: {ex.Message}");
                 Stop(ex);
             }
+#pragma warning restore CA1031
         }
 
         /// <summary>
@@ -113,6 +115,21 @@ namespace Beef.Executors.Triggers
         protected override void OnStopped()
         {
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ExecutionManager"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _timer != null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

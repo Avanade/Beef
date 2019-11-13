@@ -81,11 +81,13 @@ namespace Beef.WebApi
         /// </summary>
         public abstract bool IsDefault { get; }
 
+#pragma warning disable CA1055 // Uri return values should not be strings; by-design to only return part of a query string.
         /// <summary>
         /// Returns the name and value formatted (see <see cref="QueryStringFormat"/>) for a URL query string.
         /// </summary>
         /// <returns>The URL string.</returns>
         public abstract string ToUrlQueryString();
+#pragma warning restore CA1055
 
         /// <summary>
         /// Gets the underlying value.
@@ -111,10 +113,12 @@ namespace Beef.WebApi
             Value = value;
         }
 
+#pragma warning disable CA1721 // Property names should not match get methods; by-design as interface required GetValue.
         /// <summary>
-        /// Gets or sets the argument value.
+        /// Gets (same as <see cref="GetValue"/>) or sets the argument value.
         /// </summary>
         public T Value { get; set; }
+#pragma warning restore CA1721
 
         /// <summary>
         /// Indicates whether the value is null or default and therefore should be ignored.
@@ -175,7 +179,7 @@ namespace Beef.WebApi
                 return UriFormat(name, (string)value);
 
             if (value is DateTime)
-                return UriFormat(name, (((DateTime)value).ToString("o")));
+                return UriFormat(name, (((DateTime)value).ToString("o", System.Globalization.CultureInfo.InvariantCulture)));
 
             TypeInfo ti = value.GetType().GetTypeInfo();
             if (ti.IsEnum || ti.IsValueType)
@@ -230,42 +234,42 @@ namespace Beef.WebApi
                     else
                         ThrowComplexityException(ti);
 
-                    UriAppend(sb, UriFormat(pName, pVal is DateTime ? ((DateTime)pVal).ToString("o") : pVal.ToString()));
+                    UriAppend(sb, UriFormat(pName, pVal is DateTime ? ((DateTime)pVal).ToString("o", System.Globalization.CultureInfo.InvariantCulture) : pVal.ToString()));
                 }
 
                 return sb.ToString();
             }
 
-            return string.Format(QueryStringFormat, base.Name, Uri.EscapeDataString(value.ToString()));
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, base.Name, Uri.EscapeDataString(value.ToString()));
         }
 
+#pragma warning disable CA1054 // Uri parameters should not be strings; by-design as only part-of.
         /// <summary>
-        /// Adds the name+value pair to the URI.
+        /// Appends the name+value pair value to the URI.
         /// </summary>
-        protected void UriAppend(StringBuilder sb, string uri)
+        protected void UriAppend(StringBuilder sb, string uriValue)
+#pragma warning restore CA1054 
         {
-            if (sb.Length > 0)
+            if (Check.NotNull(sb, nameof(sb)).Length > 0)
                 sb.Append("&");
 
-            sb.Append(uri);
+            sb.Append(uriValue);
         }
 
         /// <summary>
         /// Formats the name+value URI.
         /// </summary>
+#pragma warning disable CA1055 // Uri parameters should not be strings; by-design as only part-of.
         protected string UriFormat(string name, string value)
+#pragma warning restore CA1055 
         {
-            return string.Format(QueryStringFormat, name, Uri.EscapeDataString(value));
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, name, Uri.EscapeDataString(value));
         }
 
         /// <summary>
         /// Type is too complex and can not be converted to a URI.
         /// </summary>
-        private void ThrowComplexityException(TypeInfo ti)
-        {
-            throw new InvalidOperationException(
-                string.Format("Type '{0}' Property '{1}' cannot be serialized to a URI; Type should be passed using Request Body [FromBody] given complexity.", ti.FullName, ti.Name));
-        }
+        private void ThrowComplexityException(TypeInfo ti) => throw new InvalidOperationException($"Type '{ti.FullName}' Property '{ti.Name}' cannot be serialized to a URI; Type should be passed using Request Body [FromBody] given complexity.");
     }
 
     /// <summary>
@@ -331,28 +335,28 @@ namespace Beef.WebApi
             if (Value.IsSkipTake)
             {
                 if (Value.Skip > 0)
-                    UriAppend(sb, UriFormat(PagingArgsSkipQueryStringName, Value.Skip.ToString()));
+                    UriAppend(sb, UriFormat(PagingArgsSkipQueryStringName, Value.Skip.ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
                 if (Value.Take > 0)
-                    UriAppend(sb, UriFormat(PagingArgsTakeQueryStringName, Value.Take.ToString()));
+                    UriAppend(sb, UriFormat(PagingArgsTakeQueryStringName, Value.Take.ToString(System.Globalization.CultureInfo.InvariantCulture)));
             }
             else
             {
                 if (Value.Page.HasValue && Value.Page.Value > 0)
-                    UriAppend(sb, UriFormat(PagingArgsPageQueryStringName, Value.Page.ToString()));
+                    UriAppend(sb, UriFormat(PagingArgsPageQueryStringName, Value.Page?.ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
                 if (Value.Size > 0)
-                    UriAppend(sb, UriFormat(PagingArgsSizeQueryStringName, Value.Size.ToString()));
+                    UriAppend(sb, UriFormat(PagingArgsSizeQueryStringName, Value.Size.ToString(System.Globalization.CultureInfo.InvariantCulture)));
             }
 
             if (Value.IsGetCount)
                 UriAppend(sb, UriFormat(PagingArgsCountQueryStringName, "true"));
 
             if (Value.IncludeFields != null && Value.IncludeFields.Count > 0 && Value.IncludeFields.Any(x => !string.IsNullOrEmpty(x)))
-                UriAppend(sb, UriFormat(IncludeFieldsQueryStringName, String.Join(",", Value.IncludeFields.Where(x => !string.IsNullOrEmpty(x)))));
+                UriAppend(sb, UriFormat(IncludeFieldsQueryStringName, string.Join(",", Value.IncludeFields.Where(x => !string.IsNullOrEmpty(x)))));
 
             if (Value.ExcludeFields != null && Value.ExcludeFields.Count > 0 && Value.ExcludeFields.Any(x => !string.IsNullOrEmpty(x)))
-                UriAppend(sb, UriFormat(ExcludeFieldsQueryStringName, String.Join(",", Value.ExcludeFields.Where(x => !string.IsNullOrEmpty(x)))));
+                UriAppend(sb, UriFormat(ExcludeFieldsQueryStringName, string.Join(",", Value.ExcludeFields.Where(x => !string.IsNullOrEmpty(x)))));
 
             return sb.ToString();
         }

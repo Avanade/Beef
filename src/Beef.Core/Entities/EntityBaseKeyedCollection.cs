@@ -22,7 +22,7 @@ namespace Beef.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseKeyedCollection{TKey, TEntity}" /> class.
         /// </summary>
-        public EntityBaseKeyedCollection(Func<TEntity, TKey> getKeyForItem = null)
+        protected EntityBaseKeyedCollection(Func<TEntity, TKey> getKeyForItem = null)
             : base()
         {
             _getKeyForItem = getKeyForItem;
@@ -32,10 +32,13 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="EntityBaseKeyedCollection{TKey, TEntity}" /> class.
         /// </summary>
         /// <param name="collection">The collection.</param>
-        public EntityBaseKeyedCollection(IEnumerable<TEntity> collection)
+        protected EntityBaseKeyedCollection(IEnumerable<TEntity> collection)
         {
+            if (collection == null)
+                return; 
+
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -54,7 +57,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -100,10 +103,12 @@ namespace Beef.Entities
                 item.CleanUp();
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
         /// <summary>
         /// Collections do not support an initial state; will always be <c>false</c>.
         /// </summary>
         bool ICleanUp.IsInitial => false;
+#pragma warning restore CA1033
 
         /// <summary>
         /// When implemented in a derived class, extracts the key from the specified element.

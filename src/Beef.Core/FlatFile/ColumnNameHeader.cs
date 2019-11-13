@@ -31,13 +31,13 @@ namespace Beef.FlatFile
         {
             var frr = CheckConfiguration(fileFormat, record);
 
-            for (int i = 0; i < frr.Columns.Length; i++)
+            for (int i = 0; i < frr.Columns.Count; i++)
             {
-                if (i >= record.Columns.Length)
+                if (i >= record.Columns.Count)
                     break;
 
                 if (StringComparer.OrdinalIgnoreCase.Compare(frr.Columns[i].Name, record.Columns[i]) != 0)
-                    record.Messages.Add(Entities.MessageType.Error, "Column (position {0}) content '{1}' does not match the expected name '{2}'.", i + 1, record.Columns[i], frr.Columns[i].Name);
+                    record.Messages.Add(Entities.MessageType.Error, string.Format(System.Globalization.CultureInfo.InvariantCulture, "Column (position {0}) content '{1}' does not match the expected name '{2}'.", i + 1, record.Columns[i], frr.Columns[i].Name));
             }
         }
 
@@ -52,13 +52,13 @@ namespace Beef.FlatFile
             var sb = new StringBuilder();
 
             var cols = new List<string>();
-            for (int i = 0; i < frr.Columns.Length; i++)
+            for (int i = 0; i < frr.Columns.Count; i++)
             {
                 cols.Add(frr.Columns[i].Text);
             }
 
-            record.Columns = cols.ToArray();
-            for (int i = 0; i < frr.Columns.Length; i++)
+            record.Columns = cols;
+            for (int i = 0; i < frr.Columns.Count; i++)
             {
                 if (!fileFormat.WriteColumnToLineDataInternal(frr.Columns[i], record, i, sb))
                     return;
@@ -79,8 +79,8 @@ namespace Beef.FlatFile
             if (record.LineNumber != 1 || fileFormat.HeaderRowType == null || fileFormat.HeaderRowType != typeof(ColumnNameHeader))
                 throw new InvalidOperationException("The ColumnNameHeader can only be used for a Header row.");
 
-            if (record.Columns.Length != frr.Columns.Length)
-                record.Messages.Add(Entities.MessageType.Warning, "The number of Header columns '{0}' does not match that specified for the expected Content '{1}'.", record.Columns.Length, frr.Columns.Length);
+            if (record.Columns.Count != frr.Columns.Count)
+                record.Messages.Add(Entities.MessageType.Warning, "The number of Header columns '{0}' does not match that specified for the expected Content '{1}'.", record.Columns.Count, frr.Columns.Count);
 
             return frr;
         }

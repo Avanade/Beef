@@ -456,7 +456,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 var result = fw.Write(new Data { Col1 = "ABCDE", Col2 = "ABCDEFGHIJKL", Col3 = "ABCDEFGHIJKLM" });
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNull(result.Value);
                 Assert.AreEqual(2, result.Records[0].Messages.Count);
 
@@ -478,7 +478,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 var result = fw.Write(CreateHierarchyA());
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(13, result.Records.Length);
+                Assert.AreEqual(13, result.Records.Count);
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
                 AssertFileRecord(3, "C", 1, false, result.Records[2]);
@@ -511,7 +511,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 var result = fw.Write(CreateHierarchyA());
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(13, result.Records.Length);
+                Assert.AreEqual(13, result.Records.Count);
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
                 AssertFileRecord(3, "C", 1, false, result.Records[2]);

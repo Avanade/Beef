@@ -15,66 +15,6 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
     public class BooleanConverterTest
     {
         [Test]
-        public void Prop_TrueValues_NullException()
-        {
-            ExpectException.Throws<ArgumentException>("There must be at least a single item for both the TrueValues and FalseValues properties.", () =>
-            {
-                var bc = new BooleanConverter();
-                bc.TrueValues = null;
-            });
-        }
-
-        [Test]
-        public void Prop_TrueValues_EmptyException()
-        {
-            ExpectException.Throws<ArgumentException>("There must be at least a single item for both the TrueValues and FalseValues properties.", () =>
-            {
-                var bc = new BooleanConverter();
-                bc.TrueValues = new string[] { };
-            });
-        }
-
-        [Test]
-        public void Prop_TrueValues()
-        {
-            var bc = new BooleanConverter();
-            bc.TrueValues = new string[] { "True", "T" };
-            Assert.AreEqual(2, bc.TrueValues.Length);
-            Assert.AreEqual("True", bc.TrueValues[0]);
-            Assert.AreEqual("T", bc.TrueValues[1]);
-        }
-
-        [Test]
-        public void Prop_FalseValues_NullException()
-        {
-            ExpectException.Throws<ArgumentException>("There must be at least a single item for both the TrueValues and FalseValues properties.", () =>
-            {
-                var bc = new BooleanConverter();
-                bc.FalseValues = null;
-            });
-        }
-
-        [Test]
-        public void Prop_FalseValues_EmptyException()
-        {
-            ExpectException.Throws<ArgumentException>("There must be at least a single item for both the TrueValues and FalseValues properties.", () =>
-            {
-                var bc = new BooleanConverter();
-                bc.FalseValues = new string[] { };
-            });
-        }
-
-        [Test]
-        public void Prop_FalseValues()
-        {
-            var bc = new BooleanConverter();
-            bc.FalseValues = new string[] { "False", "F" };
-            Assert.AreEqual(2, bc.FalseValues.Length);
-            Assert.AreEqual("False", bc.FalseValues[0]);
-            Assert.AreEqual("F", bc.FalseValues[1]);
-        }
-
-        [Test]
         public void Prop_StringComparer()
         {
             var bc = new BooleanConverter();
@@ -88,8 +28,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         public void TryFormat()
         {
             var bc = new BooleanConverter();
-            string result = null;
-            Assert.IsTrue(bc.TryFormat(true, out result));
+            Assert.IsTrue(bc.TryFormat(true, out string result));
             Assert.AreEqual("Y", result);
 
             Assert.IsTrue(bc.TryFormat(false, out result));
@@ -101,8 +40,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         {
             var bcx = new BooleanConverter();
             var bc = (ITextValueConverter)bcx;
-            string result = null;
-            Assert.IsTrue(bc.TryFormat(true, out result));
+            Assert.IsTrue(bc.TryFormat(true, out string result));
             Assert.AreEqual("Y", result);
 
             Assert.IsTrue(bc.TryFormat(false, out result));
@@ -113,8 +51,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         public void TryParse()
         {
             var bc = new BooleanConverter();
-            bool result = false;
-            Assert.IsFalse(bc.TryParse(null, out result));
+            Assert.IsFalse(bc.TryParse(null, out bool result));
             Assert.IsFalse(result);
 
             Assert.IsTrue(bc.TryParse(string.Empty, out result));
@@ -141,8 +78,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         {
             var bcx = new BooleanConverter();
             var bc = (ITextValueConverter)bcx;
-            object result = false;
-            Assert.IsFalse(bc.TryParse(null, out result));
+            Assert.IsFalse(bc.TryParse(null, out object result));
             Assert.IsFalse((bool)result);
 
             Assert.IsTrue(bc.TryParse(string.Empty, out result));

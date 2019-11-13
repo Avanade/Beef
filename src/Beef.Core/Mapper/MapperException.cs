@@ -8,16 +8,25 @@ namespace Beef.Mapper
     public class MapperException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MapperException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="MapperException"/> class.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public MapperException(string message = null)
+        public MapperException()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MapperException"/>cclass with a specified messsage.
+        /// </summary>
+        /// <param name="message">The message text.</param>
+        public MapperException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MapperException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="MapperException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

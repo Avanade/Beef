@@ -7,7 +7,7 @@ namespace Beef.Caching.Policy
     /// <summary>
     /// An absolute cache policy; in that the cache expires after a specified <see cref="Duration"/> since last refresh.
     /// </summary>
-    public class AbsoluteCachePolicy : ICachePolicy
+    public sealed class AbsoluteCachePolicy : ICachePolicy
     {
         private TimeSpan _duration = new TimeSpan(1, 0, 0);
         private TimeSpan? _randomizerOffset;

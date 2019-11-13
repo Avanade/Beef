@@ -12,6 +12,7 @@ namespace Beef.Entities
     public class ChangeLog : EntityBase
     {
         #region PropertyNames
+        #pragma warning disable CA1707 // Identifiers should not contain underscores
 
         /// <summary>
         /// Represents the <see cref="CreatedDate"/> property name.
@@ -33,6 +34,7 @@ namespace Beef.Entities
         /// </summary>
         public const string Property_UpdatedBy = "UpdatedBy";
 
+        #pragma warning restore CA1707
         #endregion
 
         #region Privates

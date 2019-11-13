@@ -83,17 +83,15 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Writes an <see cref="LogMessageType.Info"/> log message.
         /// </summary>
-        /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Info(object data, string text) { Logger.Default.Info2(DataArgs, text); }
+        public void Info(string text) { Logger.Default.Info2(DataArgs, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Info"/> log message using a composite format string.
         /// </summary>
-        /// <param name="data">Additional contextual data.</param>
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
-        public void Info(object data, string format, params object[] values) { Logger.Default.Info2(DataArgs, format, values); }
+        public void Info(string format, params object[] values) { Logger.Default.Info2(DataArgs, format, values); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Debug"/> log message.

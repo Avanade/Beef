@@ -8,10 +8,12 @@ using System.Linq;
 
 namespace Beef.Entities
 {
+#pragma warning disable CA1010 // Collections should implement generic interface; not-required by-design.
     /// <summary>
     /// Represents the core <see cref="EntityBase"/> collection capabilities.
     /// </summary>
     public interface IEntityBaseCollection : IEditableObject, IChangeTracking, ICloneable, ICleanUp, ICollection
+#pragma warning restore CA1010 // Collections should implement generic interface
     {
         /// <summary>
         /// Adds the items of the specified collection to the end of the <see cref="EntityBaseCollection{TEntity}"/>.
@@ -38,7 +40,7 @@ namespace Beef.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
-        public EntityBaseCollection()
+        protected EntityBaseCollection()
             : base()
         {
         }
@@ -47,7 +49,7 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
         /// <param name="collection">The entities.</param>
-        public EntityBaseCollection(IEnumerable<TEntity> collection)
+        protected EntityBaseCollection(IEnumerable<TEntity> collection)
             : base(collection)
         {
         }
@@ -68,7 +70,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -123,10 +125,12 @@ namespace Beef.Entities
                 item.CleanUp();
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
         /// <summary>
         /// Collections do not support an initial state; will always be <c>false</c>.
         /// </summary>
         bool ICleanUp.IsInitial => false;
+#pragma warning restore CA1033
 
         /// <summary>
         /// Overrides the <see cref="ObservableCollection{TEntity}.OnCollectionChanged"/> method.
@@ -144,7 +148,7 @@ namespace Beef.Entities
         /// </summary>
         public void BeginEdit()
         {
-            _editCopy = this.Clone();
+            _editCopy = Clone();
         }
 
         /// <summary>
@@ -155,8 +159,8 @@ namespace Beef.Entities
         {
             if (_editCopy != null)
             {
-                this.Clear();
-                this.AddRange((IEnumerable<TEntity>)_editCopy);
+                Clear();
+                AddRange((IEnumerable<TEntity>)_editCopy);
             }
 
             AcceptChanges();

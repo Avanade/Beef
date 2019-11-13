@@ -17,23 +17,22 @@ namespace Beef.Entities
         /// <remarks>Where the <paramref name="pagingArgs"/> and <paramref name="totalCount"/> are both provided the <see cref="TotalPages"/> will be automatically created.</remarks>
         public PagingResult(PagingArgs pagingArgs, long? totalCount = null)
         {
-            if (pagingArgs == null)
-                throw new ArgumentNullException();
+            Check.NotNull(pagingArgs, nameof(pagingArgs));
 
             Skip = pagingArgs.Skip;
             Take = pagingArgs.Take;
             Page = pagingArgs.Page;
             IsGetCount = pagingArgs.IsGetCount;
             TotalCount = (totalCount.HasValue && totalCount.Value < 0) ? null : totalCount;
-            IncludeFields = pagingArgs.IncludeFields;
-            ExcludeFields = pagingArgs.ExcludeFields;
+            IncludeFields.AddRange(pagingArgs.IncludeFields);
+            ExcludeFields.AddRange(pagingArgs.ExcludeFields);
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PagingResult"/> class from a <see cref="PagingResult"/> (copies values).
         /// </summary>
-        /// <param name="pagingResult"></param>
-        public PagingResult(PagingResult pagingResult) : this(pagingResult, pagingResult.TotalCount) { }
+        /// <param name="pagingResult">The <see cref="PagingResult"/>.</param>
+        public PagingResult(PagingResult pagingResult) : this(pagingResult, pagingResult?.TotalCount) { }
 
         /// <summary>
         /// Gets or sets the total count of the elements in the sequence (a <c>null</c> value indicates that the total count is unknown).

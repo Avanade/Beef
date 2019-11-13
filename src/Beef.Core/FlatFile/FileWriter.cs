@@ -125,7 +125,7 @@ namespace Beef.FlatFile
         public FileOperationResult<TContent>[] Write(IEnumerable<TContent> content)
         {
             if (content == null)
-                return new FileOperationResult<TContent>[] { };
+                return Array.Empty<FileOperationResult<TContent>>();
 
             var results = new List<FileOperationResult<TContent>>();
             foreach (var c in content)
@@ -183,7 +183,7 @@ namespace Beef.FlatFile
             if (!isHeader && _lineNumber == 0 && _fileFormat.FileValidation.HasFlag(FileValidation.MustHaveHeaderRow) && !_writtenHeader)
                 throw new FileValidationException(FileValidation.MustHaveHeaderRow, "The first record must be identified as a Header row.");
 
-            if (_writtenTrailer)
+            if (!isTrailer && _writtenTrailer)
                 throw new InvalidOperationException("Attempt made to write past a Trailer row; Trailer must be the last record.");
         }
 
@@ -198,14 +198,14 @@ namespace Beef.FlatFile
         /// <summary>
         /// Compose the <see cref="FileRecord"/> array from the <paramref name="value"/>.
         /// </summary>
-        private FileRecord[] ComposeRecords(Type type, object value, string recordIdentifier, bool composeChildren)
+        private List<FileRecord> ComposeRecords(Type type, object value, string recordIdentifier, bool composeChildren)
         {
             if (value == null)
                 return null;
 
             var records = new List<FileRecord>();
             ComposeRecord(records, type, 0, recordIdentifier, value, composeChildren);
-            return records.ToArray();
+            return records;
         }
 
         /// <summary>
@@ -217,26 +217,22 @@ namespace Beef.FlatFile
                 return null;
 
             var frf = _fileFormat.GetFileRecordReflector(type ?? value.GetType());
-            var record = new FileRecord { LineNumber = GetNextLineNumber(), Value = value, Level = level, RecordIdentifier = recordIdentifier, Columns = new string[frf.Columns.Length] };
+            var record = new FileRecord { LineNumber = GetNextLineNumber(), Value = value, Level = level, RecordIdentifier = recordIdentifier, Columns = new List<string>() };
             records.Add(record);
-
-            var col = 0;
-            string str = null;
 
             foreach (var fcr in frf.Columns)
             {
-                fcr.GetValue(record, out str);
-                record.Columns[col++] = _fileFormat.CleanString(str, fcr.FileColumn);
+                fcr.GetValue(record, out var str);
+                record.Columns.Add(_fileFormat.CleanString(str, fcr.FileColumn));
             }
 
-            IFileRecord ifr = value as IFileRecord;
-            if (!record.HasErrors && ifr != null)
+            if (!record.HasErrors && value is IFileRecord ifr)
                 ifr.OnWrite(_fileFormat, record);
 
             if (!record.HasErrors && record.LineData == null)
             {
                 // Update column-by-column.
-                col = 0;
+                var col = 0;
                 var sb = new StringBuilder();
                 foreach (var fcr in frf.Columns)
                 {
@@ -252,7 +248,7 @@ namespace Beef.FlatFile
                 }
             }
 
-            if (composeChildren && _fileFormat.IsHierarchical && frf.Children != null && frf.Children.Length > 0)
+            if (composeChildren && _fileFormat.IsHierarchical && frf.Children != null && frf.Children.Count > 0)
                 ComposeChildren(records, frf, record);
 
             return record;

@@ -9,13 +9,14 @@ namespace Beef
     /// Manages the automatic creation and lifetime of the likes of connections across multiple invocations within the context of an executing
     /// <b>Thread</b> (see <see cref="ExecutionContext"/>). This enables the likes of database connections, contexts, or other expensive objects to be shared.
     /// </summary>
-    public class DataContextScope : IDisposable
+    public sealed class DataContextScope : IDisposable
     {
         private static readonly Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
 
         private readonly DataContextScope _parent;
         private readonly DataContextScopeOption _option;
         private readonly Dictionary<Type, object> _dataContexts = null;
+        private bool _disposed;
 
         /// <summary>
         /// Register a <b>context</b> and its creation function.
@@ -25,9 +26,7 @@ namespace Beef
         /// <param name="create">The data context creation function.</param>
         public static void RegisterContext<T, TDc>(Func<TDc> create) where TDc : class
         {
-            if (create == null)
-                throw new ArgumentNullException("create");
-
+            Check.NotNull(create, nameof(create));
             _registered.Add(typeof(T), create);
         }
 
@@ -142,8 +141,26 @@ namespace Beef
         /// </summary>
         public void Dispose()
         {
-            DisposeAll();
-            Current = _parent;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="DataContextScope"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                DisposeAll();
+                Current = _parent;
+            }
+
+            _disposed = true;
         }
 
         /// <summary>
@@ -168,6 +185,14 @@ namespace Beef
             }
 
             _dataContexts.Clear();
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~DataContextScope()
+        {
+            Dispose(false);
         }
     }
 }

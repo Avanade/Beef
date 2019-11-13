@@ -16,17 +16,26 @@ namespace Beef
         /// </summary>
         public static bool ShouldExceptionBeLogged { get; set; }
 
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConflictException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="ConflictException"/> class.
+        /// </summary>
+        public ConflictException()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConflictException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ConflictException(string message = null)
+        public ConflictException(string message)
             : base(message ?? new LText("Beef.ConflictException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConflictException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="ConflictException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

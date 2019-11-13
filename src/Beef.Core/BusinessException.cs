@@ -17,16 +17,21 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BusinessException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="BusinessException"/> class.
+        /// </summary>
+        public BusinessException() : this(null) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BusinessException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public BusinessException(string message = null)
+        public BusinessException(string message)
             : base(message ?? new LText("Beef.BusinessException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BusinessException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="BusinessException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

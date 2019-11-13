@@ -39,7 +39,7 @@ namespace Beef.Mapper
         protected PropertyExpression<TSrce, TSrceProperty> SrcePropertyExpression { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
+        /// Gets the <see cref="CollectionTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
         public ComplexTypeReflector SrceComplexTypeReflector { get; private set; }
 

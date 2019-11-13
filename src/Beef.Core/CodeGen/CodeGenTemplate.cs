@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Represents the template XML used for code generation.
     /// </summary>
-    internal class CodeGenTemplate
+    internal sealed class CodeGenTemplate : IDisposable
     {
         private readonly CodeGenerator _codeGenerator;
         private readonly XElement _xmlTemplate;
@@ -47,15 +48,7 @@ namespace Beef.CodeGen
             _eventArgs = new CodeGeneratorEventArgs { OutputGenDirName = CodeGenConfig.GetXmlVal<string>(_xmlTemplate, "OutputGenDirName", null, false) };
 
             // Invoke the XML.
-            try
-            {
-                ExecuteXml(_xmlTemplate, _codeGenerator.Root);
-            }
-            finally
-            {
-                if (_tw != null)
-                    _tw.Dispose();
-            }
+            ExecuteXml(_xmlTemplate, _codeGenerator.Root);
         }
 
         /// <summary>
@@ -116,12 +109,12 @@ namespace Beef.CodeGen
                                 break;
 
                             case "Config":
-                                throw new CodeGenException(string.Format("Unexpected XML Element '{0}' encountered.", xmlE.Name.LocalName));
+                                throw new CodeGenException($"Unexpected XML Element '{xmlE.Name.LocalName}' encountered.");
 
                             default:
                                 List<CodeGenConfig> configList;
 
-                                if (xmlE.Attribute("FullSearch") != null && xmlE.Attribute("FullSearch").Value.ToLower() == "true")
+                                if (xmlE.Attribute("FullSearch") != null && xmlE.Attribute("FullSearch").Value.ToUpperInvariant() == "TRUE")
                                     configList = CodeGenConfig.FindConfigAll(_codeGenerator.Root, xmlE.Name.LocalName);
                                 else
                                     configList = CodeGenConfig.FindConfigList(config, xmlE.Name.LocalName);
@@ -134,7 +127,7 @@ namespace Beef.CodeGen
                                     {
                                         if (ExecuteIfCondition((XElement)xml, item))
                                         {
-                                            _codeGenerator.System.AttributeUpdate("Index", index.ToString());
+                                            _codeGenerator.System.AttributeUpdate("Index", index.ToString(CultureInfo.InvariantCulture));
                                             ExecuteXml(xmlE, item);
                                             index++;
                                         }
@@ -149,7 +142,7 @@ namespace Beef.CodeGen
                         break;
 
                     default:
-                        throw new CodeGenException(string.Format("Unexpected XML Node Type '{0}' encountered: '{1}' - '{2}'.", xml.NodeType, xml.ToString(), xml.Parent.ToString()));
+                        throw new CodeGenException($"Unexpected XML Node Type '{xml.NodeType}' encountered: '{xml.ToString()}' - '{xml.Parent.ToString()}'.");
                 }
             }
 
@@ -265,7 +258,7 @@ namespace Beef.CodeGen
                     ExecuteXml(elseXml, config);
             }
             catch (CodeGenException) { throw; }
-            catch (Exception ex) { throw new CodeGenException(string.Format("If/Then/Else element is invalid ({1}): {0}.", xmlCon.ToString(), ex.Message)); }
+            catch (Exception ex) { throw new CodeGenException($"If/Then/Else element is invalid ({ex.Message}): {xmlCon.ToString()}."); }
         }
 
         /// <summary>
@@ -284,9 +277,9 @@ namespace Beef.CodeGen
 
             foreach (string part in parts)
             {
-                switch (part.ToLower())
+                switch (part.ToUpperInvariant())
                 {
-                    case "and":
+                    case "AND":
                     case "&&":
                         if (!ExecuteIfConditionStmt(stmt, config, condition))
                             return ApplyNotCondition(false, notCondition);
@@ -294,7 +287,7 @@ namespace Beef.CodeGen
                         stmt.Clear();
                         break;
 
-                    case "or":
+                    case "OR":
                     case "||":
                         if (ExecuteIfConditionStmt(stmt, config, condition))
                             return ApplyNotCondition(true, notCondition);
@@ -311,13 +304,13 @@ namespace Beef.CodeGen
             if (stmt.Count > 0)
                 return ApplyNotCondition(ExecuteIfConditionStmt(stmt, config, condition), notCondition);
 
-            throw new CodeGenException(string.Format("Condition is invalid: {0}.", condition));
+            throw new CodeGenException($"Condition is invalid: {condition}.");
         }
 
         /// <summary>
         /// Apply Not condition (reverse condition result).
         /// </summary>
-        private bool ApplyNotCondition(bool result, bool not)
+        private static bool ApplyNotCondition(bool result, bool not)
         {
             return (!not) ? result : !result;
         }
@@ -331,12 +324,12 @@ namespace Beef.CodeGen
             {
                 bool? stmtResult = ExecuteIfConditionStmt(stmt, config);
                 if (stmtResult == null)
-                    throw new CodeGenException(string.Format("Condition is invalid: {0}.", condition));
+                    throw new CodeGenException($"Condition is invalid: {condition}.");
 
                 return stmtResult.Value;
             }
             catch (CodeGenException) { throw; }
-            catch (Exception) { throw new CodeGenException(string.Format("Condition is invalid: {0}.", condition)); }
+            catch (Exception) { throw new CodeGenException($"Condition is invalid: {condition}."); }
         }
 
         /// <summary>
@@ -355,9 +348,9 @@ namespace Beef.CodeGen
 
                 if (lVal is string slVal)
                 {
-                    if (slVal.ToLower() == "true")
+                    if (slVal.ToUpperInvariant() == "TRUE")
                         return true;
-                    else if (slVal.ToLower() == "false")
+                    else if (slVal.ToUpperInvariant() == "FALSE")
                         return false;
                 }
 
@@ -384,16 +377,16 @@ namespace Beef.CodeGen
             if (lVal != null || rVal != null)
             {
                 if (lVal is bool || rVal is bool)
-                    res = Comparer<bool>.Default.Compare((bool)Convert.ChangeType(lVal, typeof(bool)), (bool)Convert.ChangeType(rVal, typeof(bool)));
+                    res = Comparer<bool>.Default.Compare((bool)Convert.ChangeType(lVal, typeof(bool), CultureInfo.InvariantCulture), (bool)Convert.ChangeType(rVal, typeof(bool), CultureInfo.InvariantCulture));
                 else if (lVal is decimal || rVal is decimal)
-                    res = Comparer<decimal>.Default.Compare((decimal)Convert.ChangeType(lVal, typeof(decimal)), (decimal)Convert.ChangeType(rVal, typeof(decimal)));
+                    res = Comparer<decimal>.Default.Compare((decimal)Convert.ChangeType(lVal, typeof(decimal), CultureInfo.InvariantCulture), (decimal)Convert.ChangeType(rVal, typeof(decimal), CultureInfo.InvariantCulture));
                 else if (lVal is int || rVal is int)
-                    res = Comparer<int>.Default.Compare((int)Convert.ChangeType(lVal, typeof(int)), (int)Convert.ChangeType(rVal, typeof(int)));
+                    res = Comparer<int>.Default.Compare((int)Convert.ChangeType(lVal, typeof(int), CultureInfo.InvariantCulture), (int)Convert.ChangeType(rVal, typeof(int), CultureInfo.InvariantCulture));
                 else
-                    res = Comparer<string>.Default.Compare((string)Convert.ChangeType(lVal, typeof(string)), (string)Convert.ChangeType(rVal, typeof(string)));
+                    res = Comparer<string>.Default.Compare((string)Convert.ChangeType(lVal, typeof(string), CultureInfo.InvariantCulture), (string)Convert.ChangeType(rVal, typeof(string), CultureInfo.InvariantCulture));
             }
 
-            switch (stmt[1].ToLower())
+            switch (stmt[1].ToUpperInvariant())
             {
                 case "==":
                     return (res == 0);
@@ -413,7 +406,7 @@ namespace Beef.CodeGen
                 case "<=":
                     return (res <= 0);
 
-                case "contains":
+                case "CONTAINS":
                     if (!(lVal is string slVal))
                         throw new CodeGenException("LVal is not string; required for a 'contains' condition.");
 
@@ -434,24 +427,24 @@ namespace Beef.CodeGen
             if (value == null)
                 return null;
 
-            if (value == string.Empty)
+            if (string.IsNullOrEmpty(value))
                 return string.Empty;
 
             // Check for standard strings.
-            switch (value.ToLower())
+            switch (value.ToUpperInvariant())
             {
-                case "true":
+                case "TRUE":
                     return true;
 
-                case "false":
+                case "FALSE":
                     return false;
 
-                case "null":
+                case "NULL":
                     return null;
             }
 
             // Check for a string constant.
-            if (value.Length > 1 && value.StartsWith("'") && value.EndsWith("'"))
+            if (value.Length > 1 && value.StartsWith("'", StringComparison.InvariantCultureIgnoreCase) && value.EndsWith("'", StringComparison.InvariantCultureIgnoreCase))
                 return TemplateReplace(value.Substring(1, value.Length - 2), config);
 
             // Check and see if it is a number constant.
@@ -483,7 +476,7 @@ namespace Beef.CodeGen
                 var stmt = new List<string> { lval, "==", rval };
                 var stmtResult = ExecuteIfConditionStmt(stmt, config);
                 if (stmtResult == null)
-                    throw new CodeGenException(string.Format("Switch-case conditional statement is invalid: {0}.", string.Join(" ", stmt)), xml.ToString());
+                    throw new CodeGenException(string.Format(CultureInfo.InvariantCulture, "Switch-case conditional statement is invalid: {0}.", string.Join(" ", stmt)), xml.ToString());
 
                 if (!stmtResult.Value)
                     continue;
@@ -524,22 +517,24 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(transform) || string.IsNullOrEmpty(value))
                 return value;
 
-            switch (transform.ToLower())
+            return (transform.ToUpperInvariant()) switch
             {
-                case "tolowercase": return value.ToLower();
-                case "touppercase": return value.ToUpper();
-                case "toprivatecase": return CodeGenerator.ToPrivateCase(value);
-                case "toargumentcase": return CodeGenerator.ToCamelCase(value);
-                case "tosentencecase": return CodeGenerator.ToSentenceCase(value);
-                case "topascalcase": return CodeGenerator.ToPascalCase(value);
-                case "tocamelcase": return CodeGenerator.ToCamelCase(value);
-                case "tosnakecase": return CodeGenerator.ToSnakeCase(value);
-                case "tokebabcase": return CodeGenerator.ToKebabCase(value);
-                case "toplural": return CodeGenerator.ToPlural(value);
-                case "tocomments": return CodeGenerator.ToComments(value);
-                case "toseecomments": return CodeGenerator.ToSeeComments(value);
-                default: throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent.ToString());
-            }
+#pragma warning disable CA1308 // This is an intended "to lower" action.
+                "TOLOWERCASE" => value.ToLowerInvariant(),
+#pragma warning restore CA1308
+                "TOUPPERCASE" => value.ToUpperInvariant(),
+                "TOPRIVATECASE" => CodeGenerator.ToPrivateCase(value),
+                "TOARGUMENTCASE" => CodeGenerator.ToCamelCase(value),
+                "TOSENTENCECASE" => CodeGenerator.ToSentenceCase(value),
+                "TOPASCALCASE" => CodeGenerator.ToPascalCase(value),
+                "TOCAMELCASE" => CodeGenerator.ToCamelCase(value),
+                "TOSNAKECASE" => CodeGenerator.ToSnakeCase(value),
+                "TOKEBABCASE" => CodeGenerator.ToKebabCase(value),
+                "TOPLURAL" => CodeGenerator.ToPlural(value),
+                "TOCOMMENTS" => CodeGenerator.ToComments(value),
+                "TOSEECOMMENTS" => CodeGenerator.ToSeeComments(value),
+                _ => throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent.ToString()),
+            };
         }
 
         /// <summary>
@@ -578,7 +573,7 @@ namespace Beef.CodeGen
             if (ExecuteIfCondition(xml, config))
             {
                 dlval += drval;
-                this.SetConfigValue(name, config, dlval.ToString());
+                SetConfigValue(name, config, dlval.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -610,7 +605,7 @@ namespace Beef.CodeGen
                     _codeGenerator.System.Attributes["Value"] = item;
                     if (ExecuteIfCondition(xml, config))
                     {
-                        _codeGenerator.System.AttributeUpdate("Index", index.ToString());
+                        _codeGenerator.System.AttributeUpdate("Index", index.ToString(CultureInfo.InvariantCulture));
                         ExecuteXml(xml, config);
                         index++;
                     }
@@ -632,7 +627,7 @@ namespace Beef.CodeGen
 
             if (ExecuteIfCondition(xml, config))
             {
-                throw new CodeGenException(string.Format("Template Exception: {0}", TemplateReplace(message, config)));
+                throw new CodeGenException($"Template Exception: {TemplateReplace(message, config)}");
             }
         }
 
@@ -650,8 +645,8 @@ namespace Beef.CodeGen
 
             while (true)
             {
-                start = temp.IndexOf("{{");
-                end = temp.IndexOf("}}");
+                start = temp.IndexOf("{{", StringComparison.InvariantCultureIgnoreCase);
+                end = temp.IndexOf("}}", StringComparison.InvariantCultureIgnoreCase);
 
                 if (start < 0 && end < 0)
                     return temp;
@@ -672,7 +667,7 @@ namespace Beef.CodeGen
         /// </summary>
         private string GetConfigValue(string name, CodeGenConfig config)
         {
-            if (name.StartsWith("$"))
+            if (name.StartsWith("$", StringComparison.InvariantCultureIgnoreCase))
                 return TemplateReplace(name.Substring(1), config);
 
             CodeGenConfig val = GetConfig(name, config, out string propertyName);
@@ -706,7 +701,7 @@ namespace Beef.CodeGen
         {
             string[] parts = name.Split('.');
             if (parts.Length != 2)
-                throw new CodeGenException(string.Format("Parameter '{0}' is invalid.", name), _xmlCurrent.ToString());
+                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent.ToString());
 
             CodeGenConfig val;
             if (parts[0] == "System")
@@ -715,10 +710,19 @@ namespace Beef.CodeGen
                 val = CodeGenConfig.FindConfig(config, parts[0]);
 
             if (val == null)
-                throw new CodeGenException(string.Format("Parameter '{0}' is invalid.", name), _xmlCurrent.ToString());
+                throw new CodeGenException("Parameter '{name}' is invalid.", _xmlCurrent.ToString());
 
             propertyName = parts[1];
             return val;
+        }
+
+        public void Dispose()
+        {
+            if (_tw != null)
+            {
+                _tw.Dispose();
+                _tw = null;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -9,16 +10,16 @@ namespace Beef.FlatFile
     /// <summary>
     /// Represents the result for a file operation; where a single read/write contains the full hierarchical record(s) group.
     /// </summary>
-    [DebuggerDisplay("Status = {Status}, HasErrors = {HasErrors}, Records = {Records.Length}")]
+    [DebuggerDisplay("Status = {Status}, HasErrors = {HasErrors}, Records = {Records.Count}")]
     public class FileOperationResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileOperationResult"/> class.
         /// </summary>
         /// <param name="status">The <see cref="FileContentStatus"/>.</param>
-        /// <param name="records">The resulting <see cref="FileRecord"/> array.</param>
+        /// <param name="records">The resulting <see cref="FileRecord"/> list.</param>
         /// <param name="totalLines">The total number of lines read/written (where less than zero will derive from <paramref name="records"/>).</param>
-        public FileOperationResult(FileContentStatus status, FileRecord[] records, long totalLines = -1)
+        public FileOperationResult(FileContentStatus status, List<FileRecord> records, long totalLines = -1)
         {
             Status = status;
             Records = records;
@@ -26,7 +27,7 @@ namespace Beef.FlatFile
 
             if (totalLines < 0)
             {
-                if (records == null || records.Length == 0)
+                if (records == null || records.Count == 0)
                     throw new ArgumentException("Total lines must be specified where there are no corresponding records.", nameof(totalLines));
 
                 TotalLines = records.Last().LineNumber;
@@ -41,9 +42,9 @@ namespace Beef.FlatFile
         public FileContentStatus Status { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="FileRecord"/> array that represents the hierarchical record(s) group.
+        /// Gets the <see cref="FileRecord"/> list that represents the hierarchical record(s) group.
         /// </summary>
-        public FileRecord[] Records { get; private set; }
+        public List<FileRecord> Records { get; private set; }
 
         /// <summary>
         /// Indicates whether the result has errors (that there were one or more errors encountered during the <b>read</b>, or preparing for the <b>write</b>,
@@ -54,7 +55,7 @@ namespace Beef.FlatFile
         /// <summary>
         /// Gets the line number for the first record (see <see cref="Records"/>).
         /// </summary>
-        public long LineNumber => Records == null || Records.Length == 0 ? -1 : Records[0].LineNumber;
+        public long LineNumber => Records == null || !Records.Any() ? -1 : Records.First().LineNumber;
 
         /// <summary>
         /// Gets the total number of lines read/written.
@@ -67,7 +68,7 @@ namespace Beef.FlatFile
         /// </summary>
         public object Value
         {
-            get { return HasErrors || Records == null || Records.Length == 0 ? null : Records[0].Value; }
+            get { return HasErrors || Records == null || !Records.Any() ? null : Records.First().Value; }
         }
     }
 
@@ -81,9 +82,9 @@ namespace Beef.FlatFile
         /// Initializes a new instance of the <see cref="FileOperationResult{T}"/> class.
         /// </summary>
         /// <param name="status">The <see cref="FileContentStatus"/>.</param>
-        /// <param name="records">The resulting <see cref="FileRecord"/> array.</param>
+        /// <param name="records">The resulting <see cref="FileRecord"/> list.</param>
         /// <param name="totalLines">The total number of lines read/written (where less than zero will derive from <paramref name="records"/>).</param>
-        public FileOperationResult(FileContentStatus status, FileRecord[] records, long totalLines = -1)
+        public FileOperationResult(FileContentStatus status, List<FileRecord> records, long totalLines = -1)
             : base(status, records, totalLines) { }
 
         /// <summary>
