@@ -14,7 +14,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private static async Task MarkOnAfterAsync()
         {
-            await Beef.Events.Event.PublishAsync("Demo.Mark");
+            await Beef.Events.Event.PublishAsync("Wahlberg", "Demo.Mark", "Marked");
         }
     }
 }
