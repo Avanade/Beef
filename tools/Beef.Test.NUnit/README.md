@@ -81,8 +81,8 @@ Method | Description
 `IgnoreETag` | Ignores the [`IETag`](../../src/Beef.Core/Entities/IETag.cs) property.
 `ExpectETag` | Expects the [`IETag`](../../src/Beef.Core/Entities/IETag.cs) to be implemented for the response with a generated value different to the previous value.
 `ExpectUniqueKey` | Expects the [`IUniqueKey`](../../src/Beef.Core/Entities/IUniqueKey.cs) to be implemented for the response with a generated value.
-`ExpectEvent` | Expects an `Event` was published that matched the `Template` (which may contain wildcards) and optional `Action.`
-`ExpectNoEvent` | Expects that *no* `Event` was published that matched the `Template` (which may contain wildcards) and optional `Action.`
+`ExpectEvent` | Expects an event is published (in order specified). The expected event can use wildcards for `EventData.Subject` and optionally define         `EventData.Action`. An `EventData.Value` can be optionally specified including any corresponding members to igore for the comparison. Finally, the remaining `EventData` properties are not compared. Once an event is speficied then all expected events must be specified. 
+`ExpectEventWithValue` | Same as `ExpectEvent` above defaulting the `EventData.Value` to the return value. 
 `ExpectNoEvents` | Expects that *no* `Event` was published.
 
 An example usage is as follows (see [`PersonTest`](../../samples/Demo/Beef.Demo.Test/PersonTest.cs) for more complete usage):
@@ -102,6 +102,19 @@ public void A140_Validation_ServiceAgentInvalid()
             "Birthday must be less than or equal to Today.")
         .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
 }
+```
+
+Another example usage is as follows (see [`RobotTest`](../../samples/Demo/Beef.Demo.Test/RobotTest.cs) for more complete usage):
+
+``` csharp
+AgentTester.Create<RobotAgent, Robot>()
+    .ExpectStatusCode(HttpStatusCode.OK)
+    .ExpectChangeLogUpdated()
+    .ExpectETag(v.ETag)
+    .ExpectUniqueKey()
+    .ExpectEventWithValue("Demo.Robot.*", "Update")
+    .ExpectValue((t) => v)
+    .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid())).Value;
 ```
 
 <br/>

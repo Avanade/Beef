@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+- *Added:* The `CosmosDbArgs` supports a new `SetAuthorizedFilter` that allows a filter to be specified to remove any records that should not be accessed. For a query operation it will automatically add to the `IQueryable`. For the other operations it will be used before enabling access and result in an `AuthorizationException`.
+
 ## v2.1.6
 - *Added:* The `ImportValueRefDataBatchAsync` has been updated to use the new `IReferenceDataProvider`.
 

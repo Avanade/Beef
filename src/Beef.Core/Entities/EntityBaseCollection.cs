@@ -120,7 +120,7 @@ namespace Beef.Entities
         public void CleanUp()
         {
             foreach (TEntity item in this)
-                item.CleanUp();
+                item?.CleanUp();
         }
 
         /// <summary>

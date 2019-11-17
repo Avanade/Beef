@@ -92,6 +92,15 @@ namespace Beef.Data.Cosmos
             return DbArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
         }
 
+        /// <summary>
+        /// Check the value to determine whether users are authorised using the CosmosDbArgs.AuthorizationFilter.
+        /// </summary>
+        private void CheckAuthorized(TModel model)
+        {
+            if (model != default && DbArgs.AuthorizationFilter != null && !((IQueryable<TModel>)DbArgs.AuthorizationFilter(new TModel[] { model }.AsQueryable())).Any())
+                throw new AuthorizationException();
+        }
+
         #region Query
 
         /// <summary>
@@ -132,6 +141,7 @@ namespace Beef.Data.Cosmos
                 try
                 {
                     var val = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                    CheckAuthorized(val);
                     return GetResponseValue(val);
                 }
                 catch (CosmosException dcex)
@@ -161,6 +171,7 @@ namespace Beef.Data.Cosmos
             {
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
+                CheckAuthorized(model);
 
                 var resp = await Container.CreateItemAsync(model, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
                 return GetResponseValue(resp);
@@ -192,6 +203,7 @@ namespace Beef.Data.Cosmos
                     
                 // Must read existing to update.
                 var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, ro);
+                CheckAuthorized(resp);
 
                 ro.SessionToken = resp.Headers?.Session;
                 DbArgs.Mapper.MapToDest(value, resp.Resource, Mapper.OperationTypes.Update);
@@ -217,6 +229,13 @@ namespace Beef.Data.Cosmos
             {
                 try
                 {
+                    // Must read the existing to validate.
+                    var ro = CosmosDb.GetItemRequestOptions(DbArgs);
+                    var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, ro);
+                    if (resp?.Resource == null)
+                        return;
+
+                    CheckAuthorized(resp.Resource);
                     await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
                 }
                 catch (CosmosException cex)

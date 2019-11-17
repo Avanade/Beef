@@ -70,6 +70,9 @@ namespace Beef.Data.Cosmos
             IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
             q = _query == null ? q : _query(q);
 
+            if (QueryArgs.AuthorizationFilter != null)
+                q = (IQueryable<TModel>)QueryArgs.AuthorizationFilter(q);
+
             execute?.Invoke(q);
             return q;
         }

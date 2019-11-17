@@ -67,6 +67,7 @@ Property | Description
 `QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
 `NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
 `SetIdentifierOnCreate` | Indicates whether to the set (override) the identifier on `Create` where the entity implements [`IIdentifer`](../Beef.Core/Entities/IIdentifier.cs).
+`SetAuthorizedFilter` | Sets the filter (`IQueryable`) for all operations to ensure consistent authorisation is applied. Applies automatically to all queries, in that the filter is applied each time a `CosmosDbQuery` or `CosmosDbValueQuery` is executed. Additionally, the filter is applied to the standard `Get`, `Create`, `Update` and `Delete` (CRUD) operations to ensure only authorised data is accessed and modified.
 
 The following demonstrates the usage:
 
@@ -142,6 +143,26 @@ Operation | Description
 Where the _Entity_ does not naturally map to a Cosmos _Model_ a couple of options are provided:
 - Inherit _Model_ from [`CosmosDbModelBase`](./CosmosDbModelBase.cs); this provides the basic `Id`, `_etag` and [`ttl`](https://docs.microsoft.com/en-us/azure/cosmos-db/time-to-live).
 - Use the `CosmosDbValueContainer` that in turn leverages the [`CosmosDbValue`](./CosmosDbValue.cs) for persisting the _Model_ `Value`. This inherits from `CosmosDbModelBase`, and extends by adding a `Type` (enables values with multiple types to be persisted in a single containger; for example, reference data), and the `Value` itself.
+
+<br/>
+
+## Row-level Authorisation
+
+Additional row-level like authorisation can be applied to all CRUD and Query operations. The [`CosmosDbArgs.SetAuthorizedFilter`](./CosmosDbArgs.cs) (described [here](#Operation-Arguments)) defines the authorization filter. This should be set before any operation is performed. The _beef_ code-generation provides a `_onDataArgsCreate` method that can be set to perform; this will be invoked each time a `CosmosDbArgs` is instantiated.
+
+Example as follows. This demonstrates filtering a `Content` entity by allowable `ContentType` that has been added to the `ExecutionContext` set when the user is configured at startup:
+
+``` csharp
+_onDataArgsCreate = OnDataArgsCreate;
+
+...
+
+private void OnDataArgsCreate(ICosmosDbArgs dbArgs)
+{
+    var cda = (CosmosDbArgs<Content, Content>)dbArgs;
+    cda.SetAuthorizedFilter((q) => ((IQueryable<CosmosDbValue<Content>>)q).Where(c => ExecutionContext.Current.ContentType.Contains(c.Value.ContentType)));
+}
+```
 
 <br/>
 

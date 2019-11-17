@@ -50,12 +50,17 @@ namespace Beef.Data.Cosmos
                 _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
 
             q = _query == null ?
-                Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name) :
-                _query(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name));
+                AuthorizationFilter(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name)) :
+                _query(AuthorizationFilter(Internal.CosmosDbHelper.AddTypeWhereClause(q, typeof(TModel).Name)));
 
             execute?.Invoke(q);
             return q;
         }
+
+        /// <summary>
+        /// Apply the authorization filter where configured.
+        /// </summary>
+        private IQueryable<CosmosDbValue<TModel>> AuthorizationFilter(IQueryable<CosmosDbValue<TModel>> q) => QueryArgs.AuthorizationFilter == null ? q : (IQueryable<CosmosDbValue<TModel>>)QueryArgs.AuthorizationFilter(q);
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.
