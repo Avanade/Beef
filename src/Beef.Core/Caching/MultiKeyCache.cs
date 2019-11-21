@@ -48,7 +48,7 @@ namespace Beef.Caching
             if (_dict.TryGetValue(key, out TCache cache) && !cache.GetPolicy().HasExpired())
                 return cache;
 
-            using (_keyLock.Lock(key))
+            lock (_keyLock.Lock(key))
             {
                 if (_dict.TryGetValue(key, out cache) && !cache.GetPolicy().HasExpired())
                     return cache;
@@ -91,7 +91,7 @@ namespace Beef.Caching
         /// <param name="key">The cache key.</param>
         public void Remove(TKey key)
         {
-            using (_keyLock.Lock(key))
+            lock (_keyLock.Lock(key))
             {
                 if (_dict.TryRemove(key, out TCache cache))
                     cache.Dispose();

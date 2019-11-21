@@ -126,39 +126,57 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void Concurrency()
         {
-            ConcurrenyRun();
-            ConcurrenyRun();
-            ConcurrenyRun();
-            ConcurrenyRun();
-            ConcurrenyRun();
-        }
+            // No way to effectively validate; console output needs to be reviewed.
 
-        private void ConcurrenyRun()
-        { 
             int key1Count = 0;
             int key2Count = 0;
+            int dataValue1 = 100;
+            int dataValue2 = 200;
 
-            CachePolicyManager.Reset();
+            var random = new System.Random();
 
             var mtc = new TwoKeyValueCache<int, string, string>(
-                (key1) => { key1Count++; Thread.Sleep(10); return (key1 == 99) ? (false, null, null) : (true, key1.ToString(), $"x{key1}x"); },
-                (key2) => { key2Count++;  Thread.Sleep(10); return (true, int.Parse(key2), $"x{int.Parse(key2)}x"); },
-                "TwoKeyValueCacheTest");
+                (key1) => { System.Console.WriteLine($"get1 >> {key1Count++}"); Thread.Sleep(random.Next(0, 10)); return (key1 == 99) ? (false, null, null) : (true, key1.ToString(), $"x{dataValue1++}x"); },
+                (key2) => { System.Console.WriteLine($"get2 >> {key2Count++}"); Thread.Sleep(random.Next(0, 10)); return (true, int.Parse(key2), $"y{dataValue2++}y"); },
+                "TwoKeyValueCacheTest2");
 
-            var tasks = new Task[8];
-            tasks[0] = Task.Run(() => mtc.GetByKey1(1));
-            tasks[1] = Task.Run(() => mtc.GetByKey2("1"));
-            tasks[2] = Task.Run(() => mtc.GetByKey1(1));
-            tasks[3] = Task.Run(() => mtc.GetByKey2("1"));
-            tasks[4] = Task.Run(() => mtc.GetByKey1(1));
-            tasks[5] = Task.Run(() => mtc.GetByKey2("1"));
-            tasks[6] = Task.Run(() => mtc.GetByKey1(1));
-            tasks[7] = Task.Run(() => mtc.GetByKey2("1"));
+            var tasks = new Task[9];
 
-            Task.WaitAll(tasks);
+            for (int i = 0; i < 10; i++)
+            {
+                if (i % 2 == 0)
+                { 
+                    tasks[0] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"0 >> {r}"); });
+                    tasks[1] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"1 >> {r}"); });
+                    tasks[2] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"2 >> {r}"); });
+                    tasks[3] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"3 >> {r}"); });
+                    tasks[4] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); System.Console.WriteLine("4 >> removed"); mtc.Remove2("1"); });
+                    tasks[5] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"5 >> {r}"); });
+                    tasks[6] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"6 >> {r}"); });
+                    tasks[7] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"7 >> {r}"); });
+                    tasks[8] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"8 >> {r}"); });
 
-            Assert.AreEqual(1, key1Count);
-            Assert.AreEqual(1, key2Count);
+                    Task.WaitAll(tasks);
+
+                    System.Console.WriteLine($"one> key1: {key1Count}; key2: {key2Count}");
+                }
+                else
+                {
+                    tasks[0] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"0 >> {r}"); });
+                    tasks[1] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"1 >> {r}"); });
+                    tasks[2] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"2 >> {r}"); });
+                    tasks[3] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"3 >> {r}"); });
+                    tasks[4] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); System.Console.WriteLine("4 >> removed"); mtc.Remove1(1); });
+                    tasks[5] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"5 >> {r}"); });
+                    tasks[6] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey1(1); System.Console.WriteLine($"6 >> {r}"); });
+                    tasks[7] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"7 >> {r}"); });
+                    tasks[8] = Task.Run(() => { Thread.Sleep(random.Next(0, 10)); var r = mtc.GetByKey2("1"); System.Console.WriteLine($"8 >> {r}"); });
+
+                    Task.WaitAll(tasks);
+
+                    System.Console.WriteLine($"two> key1: {key1Count}; key2: {key2Count}");
+                }
+            }
         }
     }
 }

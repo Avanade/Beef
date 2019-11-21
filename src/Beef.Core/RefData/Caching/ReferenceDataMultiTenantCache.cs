@@ -82,7 +82,7 @@ namespace Beef.RefData.Caching
 
             // Lock against the key to minimise concurrent gets (which could be expensive).
             TColl coll = default;
-            using (_keyLock.Lock(tenantId))
+            lock (_keyLock.Lock(tenantId))
             {
                 if (_dict.TryGetValue(tenantId, out cv) && !cv.Policy.HasExpired())
                     return cv.Value;
@@ -147,7 +147,7 @@ namespace Beef.RefData.Caching
         {
             var tenantId = GetTenantId();
 
-            using (_keyLock.Lock(tenantId))
+            lock (_keyLock.Lock(tenantId))
             {
                 var coll = GetByTenantId(tenantId);
                 coll.Clear();
@@ -179,7 +179,7 @@ namespace Beef.RefData.Caching
         /// <param name="tenantId">The tenant identifier.</param>
         public void Remove(Guid tenantId)
         {
-            using (_keyLock.Lock(tenantId))
+            lock (_keyLock.Lock(tenantId))
             {
                 _dict.TryRemove(tenantId, out CacheValue<TColl> cv);
                 _keyLock.Remove(tenantId);

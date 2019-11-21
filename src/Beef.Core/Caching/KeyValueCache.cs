@@ -124,7 +124,7 @@ namespace Beef.Caching
 
             // Lock against the key to minimise concurrent gets (which could be expensive).
             TValue v = default;
-            using (_keyLock.Lock(key))
+            lock (_keyLock.Lock(key))
             {
                 if (_dict.TryGetValue(key, out cv) && !cv.Policy.HasExpired())
                 {
@@ -164,7 +164,7 @@ namespace Beef.Caching
         /// <param name="key">The key.</param>
         public void Remove(TKey key)
         {
-            using (_keyLock.Lock(key))
+            lock (_keyLock.Lock(key))
             {
                 _dict.TryRemove(key, out CacheValue<TValue> cv);
                 _keyLock.Remove(key);

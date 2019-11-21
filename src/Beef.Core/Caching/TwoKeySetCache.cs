@@ -104,12 +104,14 @@ namespace Beef.Caching
         {
             if (_dict1 == null)
                 _dict1 = new Dictionary<TKey1, TKey2>();
+            else
+                _dict1.Clear();
 
             if (_dict2 == null)
                 _dict2 = new Dictionary<TKey2, TKey1>();
+            else
+                _dict2.Clear();
 
-            _dict1.Clear();
-            _dict2.Clear();
             if (items == null)
                 return;
 

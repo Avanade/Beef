@@ -15,12 +15,15 @@ namespace Beef.Caching
     /// <typeparam name="TKey1">The first key <see cref="Type"/>.</typeparam>
     /// <typeparam name="TKey2">The second key <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
+    /// <remarks>To ensure the most effective concurrency throughput and consistency <i>Key1</i> is the primary and is used for all cross-thread locking scenarios; as such,
+    /// <i>Key2</i> is considered secondary. Therefore, it is possible that if an access it made for both <i>Key1</i> and <i>Key2</i> concurrently each will result in a <i>Value</i> get;
+    /// in this case the value for <i>Key1</i> is always used.</remarks>
     public class TwoKeyValueCache<TKey1, TKey2, TValue> : CacheCoreBase
     {
         private readonly ConcurrentDictionary<TKey1, CacheValue> _dict1 = new ConcurrentDictionary<TKey1, CacheValue>();
         private readonly ConcurrentDictionary<TKey2, CacheValue> _dict2 = new ConcurrentDictionary<TKey2, CacheValue>();
-        private readonly KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>();
-        private readonly KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>();
+        private readonly KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>(); // this is the primary key used for *all* concurrency management.
+        private readonly KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>(); // this is a secondary key, used to minimise get2 concurrency only.
 
         private readonly Func<TKey1, (bool hasValue, TKey2 key2, TValue value)> _get1;
         private readonly Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>> _getAsync1;
@@ -113,7 +116,7 @@ namespace Beef.Caching
         }
 
         /// <summary>
-        /// Gets the value from the cache using the key1. A return value indicates whether the value was found.
+        /// Gets the value from the cache using the specified key1. A return value indicates whether the value was found.
         /// </summary>
         /// <param name="key1">The key.</param>
         /// <param name="value">The value.</param>
@@ -128,33 +131,38 @@ namespace Beef.Caching
             }
 
             // Lock against the key to minimise concurrent gets (which could be expensive).
-            using (_keyLock1.Lock(key1))
+            lock (_keyLock1.Lock(key1))
             {
+                // Check existence again, and use if found.
                 if (_dict1.TryGetValue(key1, out cv) && !cv.Policy.HasExpired())
                 {
                     value = cv.Value;
                     return true;
                 }
-
+                
+                // Get the value by key1.
                 var r = _get1 != null ? _get1(key1) : _getAsync1(key1).Result;
-                if (!r.hasValue)
+                if (r.hasValue)
                 {
-                    value = default;
-                    return false;
+                    var policy = (ICachePolicy)GetPolicy().Clone();
+                    policy.Reset();
+
+                    cv = new CacheValue { Key1 = key1, Key2 = r.key2, Policy = policy, Value = value = r.value };
+
+                    // Make sure that the cache does not have a copy with different key combination.
+                    if (_dict2.TryGetValue(cv.Key2, out var cv2) && Comparer<TKey1>.Default.Compare(cv2.Key1, cv.Key1) != 0)
+                        throw new ArgumentException("An element with the same key2 already exists in the cache.");
+
+                    _dict1.GetOrAdd(cv.Key1, cv);
+                    _dict2.AddOrUpdate(cv.Key2, cv, (_, __) => cv);
+                    return true;
                 }
-
-                var policy = (ICachePolicy)GetPolicy().Clone();
-                policy.Reset();
-
-                cv = new CacheValue { Key1 = key1, Key2 = r.key2, Policy = policy, Value = value = r.value };
-
-                var cv2 = _dict2.GetOrAdd(cv.Key2, cv);
-                if (Comparer<TKey2>.Default.Compare(cv2.Key2, cv.Key2) != 0)
-                    throw new ArgumentException("An element with the same key2 already exists in the cache.");
-
-                _dict1.GetOrAdd(cv.Key1, cv);
-                return true;
             }
+
+            // Nothing found.
+            Remove1(cv.Key1);
+            value = default;
+            return false;
         }
 
         /// <summary>
@@ -173,16 +181,25 @@ namespace Beef.Caching
         /// <param name="key1">The key.</param>
         public void Remove1(TKey1 key1)
         {
-            using (_keyLock1.Lock(key1))
-            {
-                if (_dict1.TryRemove(key1, out CacheValue cv))
-                {
-                    _dict2.TryRemove(cv.Key2, out CacheValue cv2);
-                    _keyLock2.Remove(cv.Key2);
-                }
+            if (!_dict1.TryGetValue(key1, out CacheValue cv))
+                return;
 
-                _keyLock1.Remove(key1);
+            lock (_keyLock1.Lock(cv.Key1))
+            {
+                Remove(cv.Key1, cv.Key2);
             }
+        }
+
+        /// <summary>
+        /// Internal remove logic; assumed locking is performed by the consumer.
+        /// </summary>
+        private void Remove(TKey1 key1, TKey2 key2)
+        {
+            _dict2.TryRemove(key2, out _);
+            _keyLock2.Remove(key2);
+
+            _dict1.TryRemove(key1, out _);
+            _keyLock1.Remove(key1);
         }
 
         /// <summary>
@@ -228,8 +245,9 @@ namespace Beef.Caching
                 return true;
             }
 
-            // Lock against the key to minimise concurrent gets (which could be expensive).
-            using (_keyLock2.Lock(key2))
+            // Does not exist so get result to access key 1 for primary locking purposes. We lock key2 briefly to minimise concurrency (expense) on the actual get.
+            (bool hasValue, TKey1 key1, TValue value) r;
+            lock (_keyLock2.Lock(key2))
             {
                 if (_dict2.TryGetValue(key2, out cv) && !cv.Policy.HasExpired())
                 {
@@ -237,24 +255,39 @@ namespace Beef.Caching
                     return true;
                 }
 
-                var r = _get2 != null ? _get2(key2) : _getAsync2(key2).Result;
+                r = _get2 != null ? _get2(key2) : _getAsync2(key2).Result;
+
+                // Exit where no data found.
                 if (!r.hasValue)
                 {
+                    Remove1(cv.Key1);
                     value = default;
                     return false;
                 }
 
-                var policy = (ICachePolicy)GetPolicy().Clone();
-                policy.Reset();
+                // Lock against key1 to control concurrency.
+                lock (_keyLock1.Lock(r.key1))
+                {
+                    // Where a value now exists use.
+                    if (_dict2.TryGetValue(key2, out cv) && !cv.Policy.HasExpired())
+                    {
+                        value = cv.Value;
+                        return true;
+                    }
 
-                cv = new CacheValue { Key1 = r.key1, Key2 = key2, Policy = policy, Value = value = r.value };
+                    var policy = (ICachePolicy)GetPolicy().Clone();
+                    policy.Reset();
 
-                var cv2 = _dict1.GetOrAdd(cv.Key1, cv);
-                if (Comparer<TKey1>.Default.Compare(cv2.Key1, cv.Key1) != 0)
-                    throw new ArgumentException("An element with the same key1 already exists in the cache.");
+                    cv = new CacheValue { Key1 = r.key1, Key2 = key2, Policy = policy, Value = value = r.value };
 
-                _dict2.GetOrAdd(cv.Key2, cv);
-                return true;
+                    // Make sure that the cache does not have a copy with different key combination.
+                    if (_dict1.TryGetValue(cv.Key1, out var cv2) && Comparer<TKey1>.Default.Compare(cv2.Key1, cv.Key1) != 0)
+                        throw new ArgumentException("An element with the same key1 already exists in the cache.");
+
+                    _dict2.GetOrAdd(cv.Key2, cv);
+                    _dict1.AddOrUpdate(cv.Key1, cv, (_, __) => cv);
+                    return true;
+                }
             }
         }
 
@@ -274,16 +307,10 @@ namespace Beef.Caching
         /// <param name="key2">The key.</param>
         public void Remove2(TKey2 key2)
         {
-            using (_keyLock2.Lock(key2))
-            {
-                if (_dict2.TryRemove(key2, out CacheValue cv))
-                {
-                    _dict1.TryRemove(cv.Key1, out CacheValue cv2);
-                    _keyLock1.Remove(cv.Key1);
-                }
+            if (!_dict2.TryGetValue(key2, out CacheValue cv))
+                return;
 
-                _keyLock2.Remove(key2);
-            }
+            Remove1(cv.Key1);
         }
 
         /// <summary>

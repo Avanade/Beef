@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.23
+- *Fixed:* `TwoKeyValueCache` has had the concurrency logic refactored to resolve an issue where the value could be overridden with an incorrect version as the locking between the two keys was not correctly synchronized.
+
 ## v2.1.22
 - *Added:* `ReferenceDataFilter.ApplyFilter` supports new parameter `isActiveOnly` (defaults to `true`) that indicates whether to include `ReferenceDataBase.IsActive` entries only; otherwise, `false` for all.
 - *Added:* `EntityBasicBase.GetRefDataText` added to enable the conditional runtime getting of reference data text during serialization. `ExecutionContext.IsRefDataTextSerializationEnabled` also added to enable.
