@@ -173,7 +173,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the <b>CosmosDb/DocumentDb</b> key from the entity value.
         /// </summary>
-        /// <param name="value">The entity value.</param>
+        /// <param name="value">The entity value.</param>in
         /// <returns>The cosmos key.</returns>
         internal string GetCosmosKey(T value)
         {
@@ -183,5 +183,19 @@ namespace Beef.Data.Cosmos
             var v = Mapper.UniqueKey[0].GetSrceValue(value, OperationTypes.Unspecified);
             return Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified).ToString();
         }
+
+        /// <summary>
+        /// Sets the filter for all operations to ensure authorisation is applied. Applies automatically to all queries, plus create, update, delete and get.
+        /// </summary>
+        /// <param name="filter">The filter query.</param>
+        public void SetAuthorizedFilter(Func<IQueryable, IQueryable> filter)
+        {
+            AuthorizationFilter = Check.NotNull(filter, nameof(filter));
+        }
+
+        /// <summary>
+        /// Gets the authorisation filter (see <see cref="SetAuthorizedFilter"/>).
+        /// </summary>
+        internal Func<IQueryable, IQueryable> AuthorizationFilter { get; set; }
     }
 }

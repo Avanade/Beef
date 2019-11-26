@@ -119,12 +119,19 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
       <!-- Private Funcs/Actions as Partial Methods do not support Async :-( -->
       <Set Name="System.EndRegion" Value="false"/>
+      <Set Name="System.FirstTime" Condition="System.UsesCosmos == true" Value="true" Otherwise="false"/>
       <Operation Condition="Operation.ExcludeData == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch'">
         <If Condition="Operation.OperationType != 'Custom' and Operation.AutoImplement != 'None'">
           <If Condition="System.EndRegion == false">
             <Set Name="System.EndRegion" Value="true"/>
             <![CDATA[        #region Private
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+]]>
+          </If>
+          <If Condition="System.FirstTime">
+            <Set Name="System.FirstTime" Value="false"/>
+            <![CDATA[
+        private readonly Action<ICosmosDbArgs> _onDataArgsCreate;
 ]]>
           </If>
           <![CDATA[
@@ -570,7 +577,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                 <Then><![CDATA[, PartitionKey.None]]></Then>
                 <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>
               </If>
-              <![CDATA[);]]>
+              <![CDATA[);
+                _onDataArgsCreate?.Invoke(__dataArgs);]]>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
               <If Condition="Operation.PagingArgs == true">

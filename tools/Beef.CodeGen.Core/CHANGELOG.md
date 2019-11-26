@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.22
+- *Added:* Code-gen of the data access for `Cosmos` adds a new method `_onDataArgsCreate` that is invoked each time a `CosmosDbArgs` is created.
+
 ## v2.1.21
 - *Added:* Code-gen attribute `RefDataText=true|false` has been added to `Config`, `Entity` and `Property` elements. Where set to true for a reference data value a corresponding property `xxxText` will be created. This will only be populated during serialization when `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true`.
 - *Fixed:* Optimised the reference data `Controller` code-gen including corresponding `ETag` value.

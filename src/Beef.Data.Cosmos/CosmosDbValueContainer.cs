@@ -69,6 +69,15 @@ namespace Beef.Data.Cosmos
             return DbArgs.Mapper.MapToSrce(model.Value, Mapper.OperationTypes.Get);
         }
 
+        /// <summary>
+        /// Check the value to determine whether users are authorised using the CosmosDbArgs.AuthorizationFilter.
+        /// </summary>
+        private void CheckAuthorized(CosmosDbValue<TModel> model)
+        {
+            if (model != null && model.Value != default && DbArgs.AuthorizationFilter != null && !((IQueryable<CosmosDbValue<TModel>>)DbArgs.AuthorizationFilter(new CosmosDbValue<TModel>[] { model }.AsQueryable())).Any())
+                throw new AuthorizationException();
+        }
+
         #region Query
 
         /// <summary>
@@ -119,6 +128,7 @@ namespace Beef.Data.Cosmos
                             throw new NotFoundException();
                     }
 
+                    CheckAuthorized(val);
                     return GetResponseValue(val);
                 }
                 catch (CosmosException dcex)
@@ -149,6 +159,7 @@ namespace Beef.Data.Cosmos
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
                 var cvm = new CosmosDbValue<TModel>(model);
+                CheckAuthorized(cvm);
                 ((ICosmosDbValue)cvm).PrepareBefore();
 
                 var resp = await Container.CreateItemAsync(cvm, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
@@ -184,6 +195,7 @@ namespace Beef.Data.Cosmos
                 if (resp?.Resource == null || resp.Resource.Type != _typeName)
                     throw new NotFoundException();
 
+                CheckAuthorized(resp.Resource);
                 ro.SessionToken = resp.Headers?.Session;
                 DbArgs.Mapper.MapToDest(value, resp.Resource.Value, Mapper.OperationTypes.Update);
                 ((ICosmosDbValue)resp.Resource).PrepareBefore();
@@ -217,6 +229,7 @@ namespace Beef.Data.Cosmos
                     if (resp?.Resource == null || resp.Resource.Type != _typeName)
                         return;
 
+                    CheckAuthorized(resp.Resource);
                     ro.SessionToken = resp.Headers?.Session;
 
                     await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, ro);

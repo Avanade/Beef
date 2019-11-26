@@ -122,7 +122,7 @@ namespace Beef.Entities
         public void CleanUp()
         {
             foreach (TEntity item in this)
-                item.CleanUp();
+                item?.CleanUp();
         }
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
