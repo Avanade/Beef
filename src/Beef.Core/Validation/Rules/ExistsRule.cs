@@ -64,6 +64,8 @@ namespace Beef.Validation.Rules
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
+
             if (_predicate != null)
             {
                 if (!_predicate(context.Parent.Value))

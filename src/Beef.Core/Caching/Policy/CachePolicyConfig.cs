@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 
 namespace Beef.Caching.Policy
 {
@@ -116,54 +117,54 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets or sets the <see cref="CachePolicyConfigPolicy"/> array.
         /// </summary>
-        public CachePolicyConfigPolicy[] Policies { get; set; }
+        public IEnumerable<CachePolicyConfigPolicy> Policies { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the <see cref="CachePolicyConfig"/> policy definition.
+    /// </summary>
+    public class CachePolicyConfigPolicy
+    {
+        /// <summary>
+        /// Gets or sets the policy name.
+        /// </summary>
+        public string Name { get; set; }
 
         /// <summary>
-        /// Represents the <see cref="CachePolicyConfig"/> policy definition.
+        /// Indicates whether the policy is the <see cref="CachePolicyManager.DefaultPolicy"/>.
         /// </summary>
-        public class CachePolicyConfigPolicy
-        {
-            /// <summary>
-            /// Gets or sets the policy name.
-            /// </summary>
-            public string Name { get; set; }
-
-            /// <summary>
-            /// Indicates whether the policy is the <see cref="CachePolicyManager.DefaultPolicy"/>.
-            /// </summary>
-            public bool IsDefault { get; set; }
-
-            /// <summary>
-            /// Gets or sets the policy <see cref="Type"/> name.
-            /// </summary>
-            public string Policy { get; set; }
-
-            /// <summary>
-            /// Gets or sets the <see cref="CachePolicyConfigPolicyProperty"/> array.
-            /// </summary>
-            public CachePolicyConfigPolicyProperty[] Properties { get; set; }
-
-            /// <summary>
-            /// Gets or sets the related cache policy names.
-            /// </summary>
-            public string[] Caches { get; set; }
-        }
+        public bool IsDefault { get; set; }
 
         /// <summary>
-        /// Represents the <see cref="CachePolicyConfigPolicy"/> property.
+        /// Gets or sets the policy <see cref="Type"/> name.
         /// </summary>
-        public class CachePolicyConfigPolicyProperty
-        {
-            /// <summary>
-            /// Gets or sets the property name.
-            /// </summary>
-            public string Name { get; set; }
+        public string Policy { get; set; }
 
-            /// <summary>
-            /// Gets or sets the property value.
-            /// </summary>
-            public object Value { get; set; }
-        }
+        /// <summary>
+        /// Gets or sets the <see cref="CachePolicyConfigPolicyProperty"/> array.
+        /// </summary>
+        public IEnumerable<CachePolicyConfigPolicyProperty> Properties { get; set; }
+
+        /// <summary>
+        /// Gets or sets the related cache policy names.
+        /// </summary>
+        public IEnumerable<string> Caches { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the <see cref="CachePolicyConfigPolicy"/> property.
+    /// </summary>
+    public class CachePolicyConfigPolicyProperty
+    {
+        /// <summary>
+        /// Gets or sets the property name.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property value.
+        /// </summary>
+        public object Value { get; set; }
     }
 
     /// <summary>
@@ -171,6 +172,11 @@ namespace Beef.Caching.Policy
     /// </summary>
     public class CachePolicyConfigException : Exception
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CachePolicyConfigException"/> class.
+        /// </summary>
+        public CachePolicyConfigException() : base() { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CachePolicyConfigException"/> class with a <paramref name="message"/>.
         /// </summary>

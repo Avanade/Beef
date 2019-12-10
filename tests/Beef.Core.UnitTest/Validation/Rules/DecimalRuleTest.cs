@@ -115,67 +115,67 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public void CalcIntegralLength()
         {
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcIntegerPartLength(0m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcIntegerPartLength(0.0000001m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcIntegerPartLength(0.9999999m));
-            Assert.AreEqual(1, DecimalRule<TestData, decimal>.CalcIntegerPartLength(1.0000001m));
-            Assert.AreEqual(1, DecimalRule<TestData, decimal>.CalcIntegerPartLength(9.9999999m));
-            Assert.AreEqual(2, DecimalRule<TestData, decimal>.CalcIntegerPartLength(10.0000001m));
-            Assert.AreEqual(2, DecimalRule<TestData, decimal>.CalcIntegerPartLength(99.9999999m));
-            Assert.AreEqual(29, DecimalRule<TestData, decimal>.CalcIntegerPartLength(decimal.MaxValue));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcIntegerPartLength(0m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcIntegerPartLength(0.0000001m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcIntegerPartLength(0.9999999m));
+            Assert.AreEqual(1, DecimalRuleHelper.CalcIntegerPartLength(1.0000001m));
+            Assert.AreEqual(1, DecimalRuleHelper.CalcIntegerPartLength(9.9999999m));
+            Assert.AreEqual(2, DecimalRuleHelper.CalcIntegerPartLength(10.0000001m));
+            Assert.AreEqual(2, DecimalRuleHelper.CalcIntegerPartLength(99.9999999m));
+            Assert.AreEqual(29, DecimalRuleHelper.CalcIntegerPartLength(decimal.MaxValue));
 
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-0.0000001m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-0.9999999m));
-            Assert.AreEqual(1, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-1.0000001m));
-            Assert.AreEqual(1, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-9.9999999m));
-            Assert.AreEqual(2, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-10.0000001m));
-            Assert.AreEqual(2, DecimalRule<TestData, decimal>.CalcIntegerPartLength(-99.9999999m));
-            Assert.AreEqual(29, DecimalRule<TestData, decimal>.CalcIntegerPartLength(decimal.MinValue));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcIntegerPartLength(-0.0000001m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcIntegerPartLength(-0.9999999m));
+            Assert.AreEqual(1, DecimalRuleHelper.CalcIntegerPartLength(-1.0000001m));
+            Assert.AreEqual(1, DecimalRuleHelper.CalcIntegerPartLength(-9.9999999m));
+            Assert.AreEqual(2, DecimalRuleHelper.CalcIntegerPartLength(-10.0000001m));
+            Assert.AreEqual(2, DecimalRuleHelper.CalcIntegerPartLength(-99.9999999m));
+            Assert.AreEqual(29, DecimalRuleHelper.CalcIntegerPartLength(decimal.MinValue));
         }
 
         [Test]
         public void CalcDecimalPlaces()
         {
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(0m));
-            Assert.AreEqual(7, DecimalRule<TestData, decimal>.CalcFractionalPartLength(0.0000001m));
-            Assert.AreEqual(4, DecimalRule<TestData, decimal>.CalcFractionalPartLength(0.0001000m));
-            Assert.AreEqual(7, DecimalRule<TestData, decimal>.CalcFractionalPartLength(1.0000001m));
-            Assert.AreEqual(3, DecimalRule<TestData, decimal>.CalcFractionalPartLength(450.678m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(1500m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(decimal.MaxValue));
-            Assert.AreEqual(4, DecimalRule<TestData, decimal>.CalcFractionalPartLength(long.MaxValue + 1.0001m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(0m));
+            Assert.AreEqual(7, DecimalRuleHelper.CalcFractionalPartLength(0.0000001m));
+            Assert.AreEqual(4, DecimalRuleHelper.CalcFractionalPartLength(0.0001000m));
+            Assert.AreEqual(7, DecimalRuleHelper.CalcFractionalPartLength(1.0000001m));
+            Assert.AreEqual(3, DecimalRuleHelper.CalcFractionalPartLength(450.678m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(1500m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(decimal.MaxValue));
+            Assert.AreEqual(4, DecimalRuleHelper.CalcFractionalPartLength(long.MaxValue + 1.0001m));
 
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(0m));
-            Assert.AreEqual(7, DecimalRule<TestData, decimal>.CalcFractionalPartLength(-0.0000001m));
-            Assert.AreEqual(4, DecimalRule<TestData, decimal>.CalcFractionalPartLength(-0.0001000m));
-            Assert.AreEqual(7, DecimalRule<TestData, decimal>.CalcFractionalPartLength(-1.0000001m));
-            Assert.AreEqual(3, DecimalRule<TestData, decimal>.CalcFractionalPartLength(-450.678m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(-1500m));
-            Assert.AreEqual(0, DecimalRule<TestData, decimal>.CalcFractionalPartLength(decimal.MinValue));
-            Assert.AreEqual(4, DecimalRule<TestData, decimal>.CalcFractionalPartLength(long.MinValue - 1.0001m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(0m));
+            Assert.AreEqual(7, DecimalRuleHelper.CalcFractionalPartLength(-0.0000001m));
+            Assert.AreEqual(4, DecimalRuleHelper.CalcFractionalPartLength(-0.0001000m));
+            Assert.AreEqual(7, DecimalRuleHelper.CalcFractionalPartLength(-1.0000001m));
+            Assert.AreEqual(3, DecimalRuleHelper.CalcFractionalPartLength(-450.678m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(-1500m));
+            Assert.AreEqual(0, DecimalRuleHelper.CalcFractionalPartLength(decimal.MinValue));
+            Assert.AreEqual(4, DecimalRuleHelper.CalcFractionalPartLength(long.MinValue - 1.0001m));
         }
 
         [Test]
         public void CheckMaxDigits()
         {
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckMaxDigits(0m, 5));
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckMaxDigits(12345m, 5));
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckMaxDigits(123.45m, 5));
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckMaxDigits(1.2345m, 5));
+            Assert.IsTrue(DecimalRuleHelper.CheckMaxDigits(0m, 5));
+            Assert.IsTrue(DecimalRuleHelper.CheckMaxDigits(12345m, 5));
+            Assert.IsTrue(DecimalRuleHelper.CheckMaxDigits(123.45m, 5));
+            Assert.IsTrue(DecimalRuleHelper.CheckMaxDigits(1.2345m, 5));
 
-            Assert.IsFalse(DecimalRule<TestData, decimal>.CheckMaxDigits(123456m, 5));
-            Assert.IsFalse(DecimalRule<TestData, decimal>.CheckMaxDigits(123.456m, 5));
-            Assert.IsFalse(DecimalRule<TestData, decimal>.CheckMaxDigits(1.23456m, 5));
+            Assert.IsFalse(DecimalRuleHelper.CheckMaxDigits(123456m, 5));
+            Assert.IsFalse(DecimalRuleHelper.CheckMaxDigits(123.456m, 5));
+            Assert.IsFalse(DecimalRuleHelper.CheckMaxDigits(1.23456m, 5));
         }
 
         [Test]
         public void CheckDecimalPlaces()
         {
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckDecimalPlaces(0m, 2));
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckDecimalPlaces(1.1m, 2));
-            Assert.IsTrue(DecimalRule<TestData, decimal>.CheckDecimalPlaces(1.12m, 2));
-            Assert.IsFalse(DecimalRule<TestData, decimal>.CheckDecimalPlaces(1.123m, 2));
-            Assert.IsFalse(DecimalRule<TestData, decimal>.CheckDecimalPlaces(1.1234m, 2));
+            Assert.IsTrue(DecimalRuleHelper.CheckDecimalPlaces(0m, 2));
+            Assert.IsTrue(DecimalRuleHelper.CheckDecimalPlaces(1.1m, 2));
+            Assert.IsTrue(DecimalRuleHelper.CheckDecimalPlaces(1.12m, 2));
+            Assert.IsFalse(DecimalRuleHelper.CheckDecimalPlaces(1.123m, 2));
+            Assert.IsFalse(DecimalRuleHelper.CheckDecimalPlaces(1.1234m, 2));
         }
     }
 }

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.4</Version>
+    <Version>2.1.5</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) Entity Framework (EF) Core extensions.</Description>
     <Authors>Beef Developers</Authors>
@@ -10,11 +10,12 @@
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
-    <AssemblyVersion>2.1.4</AssemblyVersion>
-    <FileVersion>2.1.4</FileVersion>
+    <AssemblyVersion>2.1.5</AssemblyVersion>
+    <FileVersion>2.1.5</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -36,6 +37,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\Beef.Data.Database\Beef.Data.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

@@ -24,7 +24,7 @@ namespace Beef
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            foreach (TItem element in sequence)
+            foreach (TItem element in Check.NotNull(sequence, nameof(sequence)))
             {
                 action(element);
             }

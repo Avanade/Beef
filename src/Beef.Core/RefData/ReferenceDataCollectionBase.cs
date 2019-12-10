@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace Beef.RefData
 {
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design, as is a CollectionBase.
     /// <summary>
     /// Represents a <see cref="ReferenceDataBase"/> collection where the primary key is the <see cref="ReferenceDataBase.Id"/> and <see cref="ReferenceDataBase.Code"/>.
     /// </summary>
@@ -18,6 +19,7 @@ namespace Beef.RefData
     /// i.e. they are not combined to form a composite key.
     /// <para>This collection only supports the <see cref="Add"/> of items; no other updates are supported.</para></remarks>
     public abstract class ReferenceDataCollectionBase<TItem> : IEnumerable<TItem>, ICollection<TItem>, IReferenceDataCollection, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
+#pragma warning restore CA1710
     {
         private readonly object _lock = new object();
         private readonly ReferenceDataIdCollection _rdcId;
@@ -75,13 +77,7 @@ namespace Beef.RefData
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Id"/>.</returns>
-            protected override object GetKeyForItem(TItem item)
-            {
-                if (item == null)
-                    throw new ArgumentNullException("item");
-
-                return item.Id;
-            }
+            protected override object GetKeyForItem(TItem item) => Check.NotNull(item, nameof(item)).Id;
         }
 
         /// <summary>
@@ -105,13 +101,7 @@ namespace Beef.RefData
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Code"/>.</returns>
-            protected override string GetKeyForItem(TItem item)
-            {
-                if (item == null)
-                    throw new ArgumentNullException("item");
-
-                return _owner.ConvertCode(item.Code);
-            }
+            protected override string GetKeyForItem(TItem item) => _owner.ConvertCode(Check.NotNull(item, nameof(item)).Code);
         }
 
         /// <summary>
@@ -133,7 +123,9 @@ namespace Beef.RefData
         /// <param name="item">The item to add.</param>
         public void Add(TItem item)
         {
+#pragma warning disable CA1062 // Validate arguments of public methods; by-design, the 'AddItem' method checks.
             AddItem(item);
+#pragma warning restore CA1062 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
@@ -142,17 +134,16 @@ namespace Beef.RefData
         /// </summary>
         private void AddItem(TItem item)
         {
-            if (item == null)
-                throw new ArgumentNullException("item");
+            Check.NotNull(item, nameof(item));
 
             lock (_lock)
             {
                 // Check uniqueness of Id, Code and Mappings.
                 if (_rdcId.Contains(item.Id))
-                    throw new ArgumentException(string.Format("Item with Id '{0}' already exists within the collection.", item.Id.ToString()));
+                    throw new ArgumentException($"Item with Id '{item.Id}' already exists within the collection.", nameof(item));
 
                 if (_rdcCode.Contains(ConvertCode(item.Code)))
-                    throw new ArgumentException(string.Format("Item with Code '{0}' already exists within the collection.", item.Code.ToString()));
+                    throw new ArgumentException($"Item with Code '{item.Code}' already exists within the collection.", nameof(item));
 
                 if (item.HasMappings)
                 {
@@ -189,7 +180,7 @@ namespace Beef.RefData
             bool somethingAdded = false;
             foreach (TItem item in collection)
             {
-                this.AddItem(item);
+                AddItem(item);
                 somethingAdded = true;
             }
 
@@ -235,6 +226,7 @@ namespace Beef.RefData
         /// <returns><c>true</c> indicates valid; otherwise, <c>false</c>.</returns>
         protected virtual bool IsItemValid(TItem item)
         {
+            Check.NotNull(item, nameof(item));
             return item.IsValid;
         }
 
@@ -408,12 +400,14 @@ namespace Beef.RefData
             private set { throw new NotSupportedException(); }
         }
 
+#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, is acceptable.
         /// <summary>
         /// Gets the item for the <see cref="ReferenceDataBase.Id"/> (see <see cref="GetById(Guid)"/>).
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
         public TItem this[Guid id]
+#pragma warning restore CA1043 
         {
             get { return GetById(id); }
             private set { throw new NotSupportedException(); }
@@ -518,7 +512,7 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the number of items in the collection.
         /// </summary>
-        int ICollection<TItem>.Count
+        public int Count
         {
             get
             {
@@ -529,7 +523,7 @@ namespace Beef.RefData
         /// <summary>
         /// Indicates whether the collection is read only; it is not (returns <c>false</c>).
         /// </summary>
-        bool ICollection<TItem>.IsReadOnly
+        public bool IsReadOnly
         {
             get { return false; }
         }
@@ -539,7 +533,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        bool ICollection<TItem>.Contains(TItem item)
+        public bool Contains(TItem item)
         {
             return _rdcId.Contains<TItem>(item);
         }
@@ -578,7 +572,9 @@ namespace Beef.RefData
         /// </summary>
         public void GenerateETag()
         {
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; by-design, used for hashing (speed considered over security).
             using var md5 = System.Security.Cryptography.MD5.Create();
+#pragma warning restore CA5351
             var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(this));
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             ETag = Convert.ToBase64String(hash);

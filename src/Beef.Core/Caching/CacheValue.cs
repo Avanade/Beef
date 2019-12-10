@@ -7,7 +7,7 @@ namespace Beef.Caching
     /// <summary>
     /// Represents the internal cached <see cref="Value"/> and corresponding <see cref="Policy"/>.
     /// </summary>
-    public struct CacheValue<TValue>
+    internal struct CacheValue<TValue>
     {
         /// <summary>
         /// Gets the <see cref="ICachePolicy"/>.

@@ -10,7 +10,7 @@ namespace Beef.Demo.Business.Validation
     /// </summary>
     public class PersonDetailValidator : Validator<PersonDetail, PersonDetailValidator>
     {
-        private static readonly Validator<WorkHistory> _workHistoryValidator = Validator<WorkHistory>.Create()
+        private static readonly Validator<WorkHistory> _workHistoryValidator = Validator.Create<WorkHistory>()
             .HasProperty(x => x.Name, p => p.Mandatory().Common(CommonValidators.Text))
             .HasProperty(x => x.StartDate, p => p.Mandatory().CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "today"))
             .HasProperty(x => x.EndDate, p => p.WhenHasValue().DependsOn(o => o.StartDate).CompareProperty(CompareOperator.GreaterThanEqual, o => o.StartDate));

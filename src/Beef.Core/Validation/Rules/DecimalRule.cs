@@ -59,11 +59,12 @@ namespace Beef.Validation.Rules
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
             // Where the value is null, do nothing; i.e. Nullable<Type>.
+            Beef.Check.NotNull(context, nameof(context));
             if (Comparer<object>.Default.Compare(context.Value, null) == 0)
                 return;
 
             // Convert numeric to a decimal value.
-            decimal value = Convert.ToDecimal(context.Value);
+            decimal value = Convert.ToDecimal(context.Value, System.Globalization.CultureInfo.CurrentCulture);
 
             // Check if negative.
             if (!AllowNegatives && value < 0)
@@ -72,117 +73,22 @@ namespace Beef.Validation.Rules
                 return;
             }
 
-            int il = MaxDigits.HasValue ? CalcIntegerPartLength(value) : 0;
-            int dp = MaxDigits.HasValue || DecimalPlaces.HasValue ? CalcFractionalPartLength(value) : 0;
+            int il = MaxDigits.HasValue ? DecimalRuleHelper.CalcIntegerPartLength(value) : 0;
+            int dp = MaxDigits.HasValue || DecimalPlaces.HasValue ? DecimalRuleHelper.CalcFractionalPartLength(value) : 0;
 
             // Check max digits.
-            if (MaxDigits.HasValue && !CheckMaxDigits(MaxDigits.Value, DecimalPlaces, il, dp))
+            if (MaxDigits.HasValue && !DecimalRuleHelper.CheckMaxDigits(MaxDigits.Value, DecimalPlaces, il, dp))
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MaxDigitsFormat, MaxDigits);
                 return;
             }
 
             // Check decimal places.
-            if (DecimalPlaces.HasValue && !CheckDecimalPlaces(DecimalPlaces.Value, dp))
+            if (DecimalPlaces.HasValue && !DecimalRuleHelper.CheckDecimalPlaces(DecimalPlaces.Value, dp))
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.DecimalPlacesFormat, DecimalPlaces);
                 return;
             }
-        }
-
-        /// <summary>
-        /// Checks the <paramref name="value"/> for the max digits.
-        /// </summary>
-        /// <param name="value">The value to check.</param>
-        /// <param name="maxDigits">The maximum digits (including <paramref name="decimalPlaces"/>).</param>
-        /// <param name="decimalPlaces">The maximum number of decimal places.</param>
-        /// <returns><c>true</c> where valid; otherwise, <c>false</c>.</returns>
-        public static bool CheckMaxDigits(decimal value, int maxDigits, int? decimalPlaces = null)
-        {
-            if (maxDigits < 1)
-                throw new ArgumentException("MaxDigits must be 1 or greater.", nameof(maxDigits));
-
-            if (decimalPlaces.HasValue && decimalPlaces.Value < 0)
-                throw new ArgumentException("DecimalPlaces cannot be negative.", nameof(decimalPlaces));
-
-            if (value == 0)
-                return true;
-
-            return CheckMaxDigits(maxDigits, decimalPlaces, CalcIntegerPartLength(value), CalcFractionalPartLength(value));
-        }
-
-        /// <summary>
-        /// Checks the max digits.
-        /// </summary>
-        private static bool CheckMaxDigits(int maxDigits, int? decimalPlaces, int il, int dp)
-        {
-            return (il + (decimalPlaces ?? dp)) <= maxDigits;
-        }
-
-        /// <summary>
-        /// Checks the <paramref name="value"/> to determine whether the fractional-part length is greater than the specified maximum number of decimal places.
-        /// </summary>
-        /// <param name="value">The value to check.</param>
-        /// <param name="decimalPlaces">The maximum number of decimal places.</param>
-        /// <returns><c>true</c> where valid; otherwise, <c>false</c>.</returns>
-        public static bool CheckDecimalPlaces(decimal value, int decimalPlaces)
-        {
-            if (decimalPlaces < 0)
-                throw new ArgumentException("DecimalPlaces cannot be negative.", nameof(decimalPlaces));
-
-            if (value == 0)
-                return true;
-
-            return CheckDecimalPlaces(decimalPlaces, CalcFractionalPartLength(value));
-        }
-
-        /// <summary>
-        /// Checks the decimal places.
-        /// </summary>
-        private static bool CheckDecimalPlaces(int decimalPlaces, int dp)
-        {
-            return dp <= decimalPlaces;
-        }
-
-        /// <summary>
-        /// Calculates the integer-part length for a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The integer-part length.</returns>
-        public static int CalcIntegerPartLength(decimal value)
-        {
-            if (value == 0)
-                return 0;
-
-            var floor = (double)Math.Floor(Math.Abs(value));
-            if (floor == 0)
-                return 0;
-
-            return (int)Math.Floor(Math.Log10(floor)) + 1;
-        }
-
-        /// <summary>
-        /// Calculates the fractional-part length for a <see cref="decimal"/> value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The fractional-part length.</returns>
-        public static int CalcFractionalPartLength(decimal value)
-        {
-            if (value == 0)
-                return 0;
-
-            value = value % 1;
-            if (value == 0)
-                return 0;
-
-            int count = -1;
-            while (value % 10m != 0m)
-            {
-                value *= 10m;
-                count++;
-            }
-
-            return count < 0 ? 0 : count;
         }
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.Demo.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "datamodel",
+      "commandLineArgs": "entity",
       "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Demo\\Beef.Demo.CodeGen"
     }
   }

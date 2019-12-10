@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Beef.Entities
@@ -22,7 +23,7 @@ namespace Beef.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseKeyedCollection{TKey, TEntity}" /> class.
         /// </summary>
-        public EntityBaseKeyedCollection(Func<TEntity, TKey> getKeyForItem = null)
+        protected EntityBaseKeyedCollection(Func<TEntity, TKey> getKeyForItem = null)
             : base()
         {
             _getKeyForItem = getKeyForItem;
@@ -32,10 +33,13 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="EntityBaseKeyedCollection{TKey, TEntity}" /> class.
         /// </summary>
         /// <param name="collection">The collection.</param>
-        public EntityBaseKeyedCollection(IEnumerable<TEntity> collection)
+        protected EntityBaseKeyedCollection(IEnumerable<TEntity> collection)
         {
+            if (collection == null)
+                return; 
+
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -67,7 +71,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -100,10 +104,12 @@ namespace Beef.Entities
                 item.CleanUp();
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
         /// <summary>
         /// Collections do not support an initial state; will always be <c>false</c>.
         /// </summary>
         bool ICleanUp.IsInitial => false;
+#pragma warning restore CA1033
 
         /// <summary>
         /// When implemented in a derived class, extracts the key from the specified element.
@@ -168,7 +174,38 @@ namespace Beef.Entities
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(this, e);
+
+            if (e?.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var ei = (EntityBase)item;
+                    ei.PropertyChanged -= Item_PropertyChanged;
+                }
+            }
+
+            if (e?.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var ei = (EntityBase)item;
+                    ei.PropertyChanged += Item_PropertyChanged;
+
+                    if (IsChangeTracking && !ei.IsChangeTracking)
+                        ei.TrackChanges();
+                }
+            }
+
             IsChanged = true;
+        }
+
+        /// <summary>
+        /// Updates IsChanged where required.
+        /// </summary>
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            IsChanged = true;
+            //TODO: PropertyChanged event needs to be raised.
         }
 
         /// <summary>
@@ -213,8 +250,39 @@ namespace Beef.Entities
         public virtual void AcceptChanges()
         {
             _editCopy = null;
+
+            foreach (var item in this)
+            {
+                item.AcceptChanges();
+            }
+
             IsChanged = false;
+            IsChangeTracking = false;
         }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>) for each item.
+        /// </summary>
+        public virtual void TrackChanges()
+        {
+            foreach (var item in this)
+            {
+                if (!item.IsChangeTracking)
+                    item.TrackChanges();
+            }
+
+            IsChangeTracking = true;
+        }
+
+        /// <summary>
+        /// Lists the properties (names of) that have been changed (note that this property is not JSON serialized). <i>Note:</i> always returns <c>null</c> as properties are not tracked for a collection.
+        /// </summary>
+        public StringCollection ChangeTracking => null;
+
+        /// <summary>
+        /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.
+        /// </summary>
+        public bool IsChangeTracking { get; private set; }
 
         /// <summary>
         /// Indicates whether the entity has changed.

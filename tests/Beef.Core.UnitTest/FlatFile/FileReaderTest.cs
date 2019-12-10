@@ -390,7 +390,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(13, result.Records.Length);
+                Assert.AreEqual(13, result.Records.Count);
                 Assert.AreEqual(13, result.TotalLines);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
@@ -460,7 +460,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(2, result.Records.Length);
+                Assert.AreEqual(2, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "F", 1, true, result.Records[1]);
@@ -485,7 +485,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -511,7 +511,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(2, result.Records.Length);
+                Assert.AreEqual(2, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -535,7 +535,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -562,7 +562,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(8, result.Records.Length);
+                Assert.AreEqual(8, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -594,7 +594,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(5, result.Records.Length);
+                Assert.AreEqual(5, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -621,7 +621,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(6, result.Records.Length);
+                Assert.AreEqual(6, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -653,7 +653,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
 
                 AssertFileRecord(1, "X", -1, true, result.Records[0]);
                 Assert.AreEqual("Record identifier is unknown.", result.Records[0].Messages[0].Text);
@@ -662,7 +662,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(2, result.Records.Length);
+                Assert.AreEqual(2, result.Records.Count);
 
                 AssertFileRecord(2, "A", 0, false, result.Records[0]);
                 AssertFileRecord(3, "B", 1, false, result.Records[1]);
@@ -686,7 +686,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "X", -1, true, result.Records[1]);
@@ -713,7 +713,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -740,7 +740,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(6, result.Records.Length);
+                Assert.AreEqual(6, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -770,7 +770,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(6, result.Records.Length);
+                Assert.AreEqual(6, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -800,7 +800,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, false, result.Records[1]);
@@ -994,7 +994,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(3, result.Records.Length);
+                Assert.AreEqual(3, result.Records.Count);
 
                 AssertFileRecord(1, "A", 0, false, result.Records[0]);
                 AssertFileRecord(2, "B", 1, true, result.Records[1]);
@@ -1023,11 +1023,11 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNotNull(result.Value);
                 Assert.IsInstanceOf(typeof(ColumnTypeData), result.Value);
 
-                Assert.AreEqual(15, result.Records[0].Columns.Length);
+                Assert.AreEqual(15, result.Records[0].Columns.Count);
                 Assert.AreEqual("X", result.Records[0].Columns[0]);
                 Assert.AreEqual("true", result.Records[0].Columns[1]);
                 Assert.AreEqual("Q", result.Records[0].Columns[2]);
@@ -1091,11 +1091,11 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsFalse(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNotNull(result.Value);
                 Assert.IsInstanceOf(typeof(ColumnNullableTypeData), result.Value);
 
-                Assert.AreEqual(15, result.Records[0].Columns.Length);
+                Assert.AreEqual(15, result.Records[0].Columns.Count);
                 Assert.AreEqual("X", result.Records[0].Columns[0]);
                 Assert.AreEqual("true", result.Records[0].Columns[1]);
                 Assert.AreEqual("Q", result.Records[0].Columns[2]);
@@ -1143,7 +1143,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNull(result.Value);
                 Assert.AreEqual(14, result.Records[0].Messages.Count);
 
@@ -1176,7 +1176,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNull(result.Value);
                 Assert.AreEqual(14, result.Records[0].Messages.Count);
 
@@ -1211,7 +1211,7 @@ namespace Beef.Core.UnitTest.FlatFile
                 Assert.IsNotNull(result);
                 Assert.AreEqual(FileContentStatus.Content, result.Status);
                 Assert.IsTrue(result.HasErrors);
-                Assert.AreEqual(1, result.Records.Length);
+                Assert.AreEqual(1, result.Records.Count);
                 Assert.IsNull(result.Value);
                 Assert.AreEqual(3, result.Records[0].Messages.Count);
 

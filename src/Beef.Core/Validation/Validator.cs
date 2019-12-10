@@ -20,10 +20,12 @@ namespace Beef.Validation
     {
         private readonly static TValidator _default = new TValidator();
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets the current instance of the validator.
         /// </summary>
         public static TValidator Default
+#pragma warning restore CA1000
         {
             get
             {
@@ -32,6 +34,26 @@ namespace Beef.Validation
 
                 return _default;
             }
+        }
+    }
+
+    /// <summary>
+    /// Provides access to the validator capabilities.
+    /// </summary>
+    public static class Validator
+    {
+        /// <summary>
+        /// Gets or sets the default value name (used by the <see cref="ValueValidator{T}"/>).
+        /// </summary>
+        public static string ValueNameDefault { get; set; } = "Value";
+
+        /// <summary>
+        /// Creates a <see cref="Validator{TEntity}"/>.
+        /// </summary>
+        /// <returns>A <see cref="Validator{TEntity}"/>.</returns>
+        public static Validator<TEntity> Create<TEntity>() where TEntity : class
+        {
+            return new Validator<TEntity>();
         }
     }
 
@@ -46,38 +68,13 @@ namespace Beef.Validation
         private Action<ValidationContext<TEntity>> _additional = null;
 
         /// <summary>
-        /// Throws a <see cref="ValidationException"/> where the <see cref="MessageItem"/> <see cref="MessageItem.Property"/> is set based on the <paramref name="propertyExpression"/>.
-        /// </summary>
-        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <param name="text">The message text.</param>
-        public static void ThrowValidationException<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, LText text)
-        {
-            var p = PropertyExpression<TEntity, TProperty>.Create(propertyExpression, true);
-            throw new ValidationException(MessageItem.CreateErrorMessage(ValidationArgs.DefaultUseJsonNames ? p.JsonName : p.Name, text));
-        }
-
-        /// <summary>
-        /// Throws a <see cref="ValidationException"/> where the <see cref="MessageItem"/> <see cref="MessageItem.Property"/> is set based on the <paramref name="propertyExpression"/>. The property
-        /// friendly text and <paramref name="propertyValue"/> are automatically passed as the first two arguments to the string formatter.
-        /// </summary>
-        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <param name="format">The composite format string.</param>
-        /// <param name="propertyValue">The property values (to be used as part of the format).</param>
-        /// <param name="values"></param>
-        public static void ThrowValidationException<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, LText format, TProperty propertyValue, params object[] values)
-        {
-            var p = PropertyExpression<TEntity, TProperty>.Create(propertyExpression, true);
-            throw new ValidationException(MessageItem.CreateErrorMessage(ValidationArgs.DefaultUseJsonNames ? p.JsonName : p.Name,
-                string.Format(format, new object[] { p.Text, propertyValue }.Concat(values).ToArray())));
-        }
-
-        /// <summary>
         /// Creates an <see cref="Validator{TEntity}"/>.
         /// </summary>
         /// <returns>A <see cref="Validator{TEntity}"/>.</returns>
+        [Obsolete("Please use Validator.Create<TEntity>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static Validator<TEntity> Create()
+#pragma warning restore CA1000
         {
             return new Validator<TEntity>();
         }
@@ -223,6 +220,34 @@ namespace Beef.Validation
             // Add the ruleset to the rules.
             Rules.Add(ruleSet);
             return ruleSet;
+        }
+
+        /// <summary>
+        /// Throws a <see cref="ValidationException"/> where the <see cref="MessageItem"/> <see cref="MessageItem.Property"/> is set based on the <paramref name="propertyExpression"/>.
+        /// </summary>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
+        /// <param name="text">The message text.</param>
+        public void ThrowValidationException<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, LText text)
+        {
+            var p = PropertyExpression.Create(propertyExpression, true);
+            throw new ValidationException(MessageItem.CreateErrorMessage(ValidationArgs.DefaultUseJsonNames ? p.JsonName : p.Name, text));
+        }
+
+        /// <summary>
+        /// Throws a <see cref="ValidationException"/> where the <see cref="MessageItem"/> <see cref="MessageItem.Property"/> is set based on the <paramref name="propertyExpression"/>. The property
+        /// friendly text and <paramref name="propertyValue"/> are automatically passed as the first two arguments to the string formatter.
+        /// </summary>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
+        /// <param name="format">The composite format string.</param>
+        /// <param name="propertyValue">The property values (to be used as part of the format).</param>
+        /// <param name="values"></param>
+        public void ThrowValidationException<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, LText format, TProperty propertyValue, params object[] values)
+        {
+            var p = PropertyExpression.Create(propertyExpression, true);
+            throw new ValidationException(MessageItem.CreateErrorMessage(ValidationArgs.DefaultUseJsonNames ? p.JsonName : p.Name,
+                string.Format(System.Globalization.CultureInfo.CurrentCulture, format, new object[] { p.Text, propertyValue }.Concat(values).ToArray())));
         }
     }
 }

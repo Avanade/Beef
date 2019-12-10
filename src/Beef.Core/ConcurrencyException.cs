@@ -16,16 +16,24 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrencyException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="ConcurrencyException"/> class.
+        /// </summary>
+        public ConcurrencyException()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConcurrencyException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ConcurrencyException(string message = null)
+        public ConcurrencyException(string message)
             : base(message ?? new LText("Beef.ConcurrencyException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConcurrencyException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="ConcurrencyException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

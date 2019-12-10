@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -97,11 +98,11 @@ namespace Beef.CodeGen
             // Update the Count and Index attributes.
             foreach (KeyValuePair<string, List<CodeGenConfig>> kvp in config.Children)
             {
-                config.AttributeUpdate(string.Format("{0}Count", kvp.Key), kvp.Value.Count.ToString());
+                config.AttributeUpdate($"{kvp.Key}Count", kvp.Value.Count.ToString(CultureInfo.InvariantCulture));
                 int index = 0;
                 foreach (CodeGenConfig child in kvp.Value)
                 {
-                    child.AttributeUpdate(string.Format("{0}Index", child.Name), index++.ToString());
+                    child.AttributeUpdate($"{child.Name}Index", index++.ToString(CultureInfo.InvariantCulture));
                     UpdateCountAndIndex(child);
                 }
             }
@@ -121,7 +122,7 @@ namespace Beef.CodeGen
             if (xml.Attribute(name) == null)
             {
                 if (mandatory)
-                    throw new CodeGenException(string.Format("Attribute '{0}' value not found; is mandatory.", name));
+                    throw new CodeGenException($"Attribute '{name}' value not found; is mandatory.");
                 else
                     return defaultVal;
             }
@@ -134,7 +135,7 @@ namespace Beef.CodeGen
                     if (val.Length == 0)
                     {
                         if (mandatory)
-                            throw new CodeGenException(string.Format("Attribute '{0}' has no value; is mandatory.", name));
+                            throw new CodeGenException($"Attribute '{name}' has no value; is mandatory.");
                         else
                             return defaultVal;
                     }
@@ -148,15 +149,15 @@ namespace Beef.CodeGen
                 else if (typeof(T) == typeof(Enum))
                     return (T)Enum.Parse(typeof(T), val);
                 else
-                    throw new CodeGenException(string.Format("Attribute '{0} value can not be converted to Type {1}.", name, typeof(T).Name));
+                    throw new CodeGenException($"Attribute '{name} value can not be converted to Type {typeof(T).Name}.");
             }
             catch (FormatException fex)
             {
-                throw new CodeGenException(string.Format("Attribute '{0}' value can not be converted to Type {1}: {2}", name, typeof(T).Name, fex.Message));
+                throw new CodeGenException($"Attribute '{name}' value can not be converted to Type {typeof(T).Name}: {fex.Message}");
             }
             catch (ArgumentException aex)
             {
-                throw new CodeGenException(string.Format("Attribute '{0}' value can not be converted to Type {1}: {2}", name, typeof(T).Name, aex.Message));
+                throw new CodeGenException($"Attribute '{name}' value can not be converted to Type {typeof(T).Name}: {aex.Message}");
             }
         }
 
@@ -168,7 +169,8 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenConfig"/> where found; otherwise, <c>null</c>.</returns>
         public static CodeGenConfig FindConfig(CodeGenConfig config, string name)
         {
-            CheckParameters(config, name);
+            Check.NotNull(config, nameof(config));
+            Check.NotNull(name, nameof(name));
 
             if (config.Name == name)
                 return config;
@@ -187,7 +189,8 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenConfig"/> list where found; otherwise, <c>null</c>.</returns>
         public static List<CodeGenConfig> FindConfigList(CodeGenConfig config, string name)
         {
-            CheckParameters(config, name);
+            Check.NotNull(config, nameof(config));
+            Check.NotNull(name, nameof(name));
 
             // Search children for named list.
             if (config.Children != null)
@@ -214,7 +217,8 @@ namespace Beef.CodeGen
         /// <returns>The <see cref="CodeGenConfig"/> list.</returns>
         public static List<CodeGenConfig> FindConfigAll(CodeGenConfig config, string name)
         {
-            CheckParameters(config, name);
+            Check.NotNull(config, nameof(config));
+            Check.NotNull(name, nameof(name));
 
             List<CodeGenConfig> list = new List<CodeGenConfig>();
 
@@ -233,18 +237,6 @@ namespace Beef.CodeGen
             }
 
             return list;
-        }
-
-        /// <summary>
-        /// Check that the parameters are A-OK.
-        /// </summary>
-        private static void CheckParameters(CodeGenConfig config, string name)
-        {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
-            if (name == null)
-                throw new ArgumentNullException("name");
         }
 
         #endregion
@@ -334,7 +326,7 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(val))
                 return default;
 
-            return (T)Convert.ChangeType(val, typeof(T));
+            return (T)Convert.ChangeType(val, typeof(T), CultureInfo.InvariantCulture);
         }
 
         /// <summary>

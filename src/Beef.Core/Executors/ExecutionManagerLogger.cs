@@ -50,17 +50,17 @@ namespace Beef.Executors
         /// <param name="args">The <see cref="IExecutorArgs"/>.</param>
         public void LogExecutionRun(IExecutorArgs args)
         {
-            switch (args.RunType)
+            switch (Check.NotNull(args, nameof(args)).RunType)
             {
                 case ExecutorRunType.CollectionRun:
                     if (args.Exception != null)
-                        Logger.Default.Exception2(args, args.Exception, string.Format(UnexpectedCollectionRunExceptionMessage ?? "{0}", args.Exception.Message));
+                        Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedCollectionRunExceptionMessage ?? "{0}", args.Exception.Message));
 
                     break;
 
                 case ExecutorRunType.CollectionIterate:
                     if (args.Exception != null)
-                        Logger.Default.Exception2(args, args.Exception, string.Format(UnexpectedCollectionIterateExceptionMessage ?? "{0}", args.Exception.Message));
+                        Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedCollectionIterateExceptionMessage ?? "{0}", args.Exception.Message));
 
                     break;
 
@@ -68,22 +68,22 @@ namespace Beef.Executors
                     if (args.Exception != null)
                     {
                         if (args is ExecutorItemRunArgs<FileOperationResult> irargs)
-                            Logger.Default.Exception2(new FileReaderLoggerData(irargs.Item), args.Exception, string.Format(UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
+                            Logger.Default.Exception2(new FileReaderLoggerData(irargs.Item), args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
                         else
-                            Logger.Default.Exception2(args, args.Exception, string.Format(UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
+                            Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
                     }
 
                     break;
 
                 case ExecutorRunType.CompletionRun:
                     if (args.Exception != null)
-                        Logger.Default.Exception2(args, args.Exception, string.Format(UnexpectedCompletionRunExceptionMessage ?? "{0}", args.Exception.Message));
+                        Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedCompletionRunExceptionMessage ?? "{0}", args.Exception.Message));
 
                     break;
 
                 case ExecutorRunType.Run:
                     if (args.Exception != null)
-                        Logger.Default.Exception2(args, args.Exception, string.Format(UnexpectedRunExceptionMessage ?? "{0}", args.Exception.Message));
+                        Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedRunExceptionMessage ?? "{0}", args.Exception.Message));
 
                     break;
             }

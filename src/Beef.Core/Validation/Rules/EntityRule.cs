@@ -21,7 +21,7 @@ namespace Beef.Validation.Rules
         /// <param name="validator">The <see cref="Beef.Validation.Validator{TProperty, TValidator}"/>.</param>
         public EntityRule(Validator<TProperty> validator)
         {
-            Validator = validator ?? throw new ArgumentNullException("validator");
+            Validator = Beef.Check.NotNull(validator, nameof(validator));
         }
 
         /// <summary>
@@ -36,6 +36,7 @@ namespace Beef.Validation.Rules
         /// <returns><c>true</c> where validation is to continue; otherwise, <c>false</c> to stop.</returns>
         public override bool Check(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
             return context.Parent.ShallowValidation ? false : base.Check(context);
         }
 
@@ -46,6 +47,7 @@ namespace Beef.Validation.Rules
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
             // Exit where nothing to validate.
+            Beef.Check.NotNull(context, nameof(context));
             if (context.Value == null)
                 return;
 

@@ -45,7 +45,30 @@ namespace Beef.Demo.Common.Entities
         public WorkHistoryCollection History
         {
             get { return _history; }
-            set { SetValue<WorkHistoryCollection>(ref _history, value, false, false, Property_History); }
+            set { SetValue<WorkHistoryCollection>(ref _history, value, false, true, Property_History); }
+        }
+
+        #endregion
+
+        #region IChangeTracking
+          
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+            History?.AcceptChanges();
+            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+            History?.TrackChanges();
+            base.TrackChanges();
         }
 
         #endregion
@@ -69,7 +92,7 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(PersonDetail from)
         {
             CopyFrom((Person)from);
-            History = from.History;
+            History = CopyOrClone(from.History, History);
 
             OnAfterCopyFrom(from);
         }

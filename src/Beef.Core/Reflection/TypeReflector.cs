@@ -18,7 +18,7 @@ namespace Beef.Reflection
         /// <returns>The corresponding <see cref="PropertyInfo"/> <see cref="Array"/>.</returns>
         public static PropertyInfo[] GetProperties(Type type)
         {
-            return type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance)
+            return Check.NotNull(type, nameof(type)).GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Instance)
                 .Where(x => x.CanRead && x.CanWrite).GroupBy(x => x.Name).Select(g => g.First()).ToArray();
         }
 

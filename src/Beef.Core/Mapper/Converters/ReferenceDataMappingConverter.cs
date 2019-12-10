@@ -18,10 +18,12 @@ namespace Beef.Mapper.Converters
     {
         private static readonly Lazy<TDefault> _default = new Lazy<TDefault>(() => new TDefault(), true);
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets the default (singleton) instance.
         /// </summary>
         public static TDefault Default { get { return _default.Value; } }
+#pragma warning restore CA1000 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataMappingConverter{TDefault, TSrceProperty, TDestProperty}"/> class.

@@ -200,10 +200,12 @@ namespace Beef.Events
         private T _value;
 
         /// <summary>
-        /// Gets or sets the event value (automatically setting the <see cref="EventData.ETag"/> where not already set).
+        /// Gets (same as <see cref="GetValue"/>) or sets the event value (automatically setting the <see cref="EventData.ETag"/> where not already set).
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
+#pragma warning disable CA1721 // Property names should not match get methods; by-design, most meaningful name (are same-same).
         public T Value
+#pragma warning restore CA1721 
         {
             get => _value;
 

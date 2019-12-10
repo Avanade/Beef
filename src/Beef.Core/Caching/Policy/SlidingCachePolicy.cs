@@ -8,7 +8,7 @@ namespace Beef.Caching.Policy
     /// A sliding cache policy; in that the cache expires if a request is not made within a specified <see cref="Duration"/> 
     /// otherwise it slides (extends) by the <see cref="Duration"/> until the optional <see cref="MaxDuration"/> is reached.
     /// </summary>
-    public class SlidingCachePolicy : ICachePolicy
+    public sealed class SlidingCachePolicy : ICachePolicy
     {
         private TimeSpan _duration = new TimeSpan(1, 0, 0);
         private TimeSpan? _randomizerOffset;

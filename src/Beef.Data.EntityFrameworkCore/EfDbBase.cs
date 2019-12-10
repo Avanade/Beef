@@ -96,7 +96,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             CheckKeys(getArgs, keys);
             var efKeys = new object[keys.Length];
-            for (int i = 0; i < getArgs.Mapper.UniqueKey.Length; i++)
+            for (int i = 0; i < getArgs.Mapper.UniqueKey.Count; i++)
             {
                 efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
             }
@@ -180,8 +180,8 @@ namespace Beef.Data.EntityFrameworkCore
                     if (OnUpdatePreReadForNotFound)
                     {
                         // Check (find) if the entity exists.
-                        var efKeys = new object[saveArgs.Mapper.UniqueKey.Length];
-                        for (int i = 0; i < saveArgs.Mapper.UniqueKey.Length; i++)
+                        var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
+                        for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
                         {
                             var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
                             efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified);
@@ -219,7 +219,7 @@ namespace Beef.Data.EntityFrameworkCore
             CheckSaveArgs(saveArgs);
             CheckKeys(saveArgs, keys);
             var efKeys = new object[keys.Length];
-            for (int i = 0; i < saveArgs.Mapper.UniqueKey.Length; i++)
+            for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
             {
                 efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
             }
@@ -249,8 +249,8 @@ namespace Beef.Data.EntityFrameworkCore
             if (keys == null || keys.Length == 0)
                 throw new ArgumentNullException(nameof(keys));
 
-            if (keys.Length != args.Mapper.UniqueKey.Length)
-                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{args.Mapper.UniqueKey.Length}'.", nameof(keys));
+            if (keys.Length != args.Mapper.UniqueKey.Count)
+                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{args.Mapper.UniqueKey.Count}'.", nameof(keys));
         }
 
         /// <summary>

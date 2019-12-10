@@ -10,8 +10,8 @@ namespace Beef.Core.UnitTest.Validation
     [TestFixture]
     public class CommonValidatorTest
     {
-        private static readonly CommonValidator<string> _cv = CommonValidator<string>.Create(v => v.String(5).Must(x => x.Value != "XXXXX"));
-        private static readonly CommonValidator<int?> _cv2 = CommonValidator<int?>.Create(v => v.CompareValue(CompareOperator.NotEqual, 1));
+        private static readonly CommonValidator<string> _cv = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
+        private static readonly CommonValidator<int?> _cv2 = CommonValidator.Create<int?>(v => v.CompareValue(CompareOperator.NotEqual, 1));
 
         [Test]
         public void Validate()
@@ -40,7 +40,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Common()
         {
-            var r = Validator<TestData>.Create()
+            var r = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
                 .Validate(new TestData { Text = "XXXXXX" });
 
@@ -51,7 +51,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = Validator<TestData>.Create()
+            r = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
                 .Validate(new TestData { Text = "XXXXX" });
 
@@ -62,7 +62,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = Validator<TestData>.Create()
+            r = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().Common(_cv))
                 .Validate(new TestData { Text = "XXX" });
 
@@ -86,7 +86,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Common_Nullable()
         {
-            var r = Validator<TestData>.Create()
+            var r = Validator.Create<TestData>()
                 .HasProperty(x => x.CountB, p => p.Mandatory().Common(_cv2))
                 .Validate(new TestData { CountB = 1 });
 

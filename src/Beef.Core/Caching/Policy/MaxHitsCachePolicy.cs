@@ -7,7 +7,7 @@ namespace Beef.Caching.Policy
     /// <summary>
     /// A maximum hits cache policy; in that the cache expires after the specified <see cref="MaxHits"/> has been reached.
     /// </summary>
-    public class MaxHitsCachePolicy : ICachePolicy
+    public sealed class MaxHitsCachePolicy : ICachePolicy
     {
         private int _maxHits = 100;
         private bool _expire = false;

@@ -13,25 +13,27 @@ namespace Beef.Reflection
     /// </summary>
     public enum ComplexTypeCode
     {
+#pragma warning disable CA1720 // Identifier contains type name; by-design, as it represents the Type name.
         /// <summary>
-        /// Is an <see cref="T:Object"/> (not identified as one of the possible collection types).
+        /// Is an <see cref="System.Object"/> (not identified as one of the possible collection types).
         /// </summary>
         Object,
 
         /// <summary>
-        /// Is an <see cref="T:Array"/>.
+        /// Is an <see cref="System.Array"/>.
         /// </summary>
         Array,
 
         /// <summary>
-        /// Is an <see cref="T:ICollection"/>.
+        /// Is an <see cref="System.Collections.ICollection"/>.
         /// </summary>
         ICollection,
 
         /// <summary>
-        /// Is an <see cref="T:IEnumerable"/>.
+        /// Is an <see cref="System.Collections.IEnumerable"/>.
         /// </summary>
         IEnumerable
+#pragma warning restore CA1720 // Identifier contains type name
     }
 
     /// <summary>
@@ -47,7 +49,7 @@ namespace Beef.Reflection
         public PropertyInfo PropertyInfo { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="T:CollectionType"/>.
+        /// Gets or sets the <see cref="ComplexTypeCode"/>.
         /// </summary>
         public ComplexTypeCode ComplexTypeCode { get; private set; }
 
@@ -135,6 +137,7 @@ namespace Beef.Reflection
         /// <returns>The item <see cref="Type"/>.</returns>
         public static Type GetItemType(Type type)
         {
+            Check.NotNull(type, nameof(type));
             if (type == typeof(string) || type.IsPrimitive || type.IsValueType)
                 return type;
 
@@ -207,14 +210,14 @@ namespace Beef.Reflection
         /// <summary>
         /// Sets the property value.
         /// </summary>
-        /// <param name="obj">The object whose property value will be set.</param>
+        /// <param name="objValue">The object whose property value will be set.</param>
         /// <param name="value">The property value(s) to set.</param>
-        public void SetValue(object obj, IEnumerable value)
+        public void SetValue(object objValue, IEnumerable value)
         {
-            if (obj == null || value == null)
+            if (objValue == null || value == null)
                 return;
 
-            PropertyInfo.SetValue(obj, CreateValue(value));
+            PropertyInfo.SetValue(objValue, CreateValue(value));
         }
 
         /// <summary>
@@ -291,21 +294,24 @@ namespace Beef.Reflection
                 }
             }
 
-            foreach (var val in value)
+            if (value != null)
             {
-                if (!IsCollection)
-                    return val;
-
-                switch (ComplexTypeCode)
+                foreach (var val in value)
                 {
-                    case ComplexTypeCode.Array:
-                    case ComplexTypeCode.IEnumerable:
-                        a.Add(val);
-                        break;
+                    if (!IsCollection)
+                        return val;
 
-                    case ComplexTypeCode.ICollection:
-                        _addMethod.Invoke(c, new object[] { val });
-                        break;
+                    switch (ComplexTypeCode)
+                    {
+                        case ComplexTypeCode.Array:
+                        case ComplexTypeCode.IEnumerable:
+                            a.Add(val);
+                            break;
+
+                        case ComplexTypeCode.ICollection:
+                            _addMethod.Invoke(c, new object[] { val });
+                            break;
+                    }
                 }
             }
 
@@ -351,8 +357,10 @@ namespace Beef.Reflection
                 case ComplexTypeCode.Array:
                     var al = (Array)left;
                     var ar = (Array)right;
+#pragma warning disable CA1062 // Validate arguments of public methods; by-design, above logic will ensure they are not null.
                     if (al.Length != ar.Length)
                         return false;
+#pragma warning restore CA1062 
 
                     break;
 

@@ -34,7 +34,7 @@ namespace Beef.FlatFile.Reflectors
 
             // Where an intrinsic type then we have an issue.
             if (FileColumnReflector.GetTypeCode(PropertyInfo.PropertyType) != TypeCode.Object)
-                throw new ArgumentException(string.Format("Type '{0}' Property '{1}' must be a class or collection (FileHierarchyAttribute).", PropertyInfo.DeclaringType.Name, PropertyInfo.Name), nameof(pi));
+                throw new ArgumentException($"Type '{PropertyInfo.DeclaringType.Name}' Property '{PropertyInfo.Name}' must be a class or collection (FileHierarchyAttribute).", nameof(pi));
 
             // Determine the collection type.
             _collTypeReflector = ComplexTypeReflector.Create(PropertyInfo);
@@ -130,21 +130,21 @@ namespace Beef.FlatFile.Reflectors
         /// <summary>
         /// Gets the property value.
         /// </summary>
-        /// <param name="obj">The object whose property value will be returned.</param>
+        /// <param name="parent">The object whose property value will be returned.</param>
         /// <returns>The property value.</returns>
-        public object GetValue(object obj)
+        internal object GetValue(object parent)
         {
-            return PropertyInfo.GetValue(obj);
+            return PropertyInfo.GetValue(parent);
         }
 
         /// <summary>
         /// Sets the property value.
         /// </summary>
-        /// <param name="obj">The object whose property value will be set.</param>
+        /// <param name="parent">The object whose property value will be set.</param>
         /// <param name="value">The property value(s) to set.</param>
-        public void SetValue(object obj, object[] value)
+        internal void SetValue(object parent, object[] value)
         {
-            _collTypeReflector.SetValue(obj, value);
+            _collTypeReflector.SetValue(parent, value);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateErrorMessage(FileRecord record, string format, params object[] values)
         {
             var mi = MessageItem.CreateErrorMessage(PropertyInfo.Name, format, (new string[] { Text, null }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
 
@@ -171,7 +171,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateWarningMessage(FileRecord record, string format, params object[] values)
         {
             var mi = MessageItem.CreateMessage(PropertyInfo.Name, MessageType.Warning, format, (new string[] { Text, null }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
 
@@ -185,7 +185,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateInfoMessage(FileRecord record, string format, params object[] values)
         {
             var mi = MessageItem.CreateMessage(PropertyInfo.Name, MessageType.Info, format, (new string[] { Text, null }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
     }

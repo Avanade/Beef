@@ -23,7 +23,9 @@ namespace Beef.AspNetCore.WebApi
             Check.NotNull(logger, nameof(logger));
             Check.NotNull(args, nameof(args));
 
+#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
             switch (args.Type)
+#pragma warning restore CA1062 
             {
                 case LogMessageType.Critical:
                     logger.LogCritical(args.ToString());

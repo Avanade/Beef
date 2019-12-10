@@ -22,9 +22,9 @@ namespace Beef.Mapper
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="destPropertyName">The name of the destination property (defaults to <see cref="SrcePropertyName"/> where null).</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
-        public PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string destPropertyName, OperationTypes operationTypes = OperationTypes.Any)
+        protected PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string destPropertyName, OperationTypes operationTypes = OperationTypes.Any)
         {
-            SrcePropertyExpression = PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression)));
+            SrcePropertyExpression = PropertyExpression.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression)));
             SrcePropertyInfo = TypeReflector.GetPropertyInfo(typeof(TSrce), SrcePropertyName);
             DestPropertyName = string.IsNullOrEmpty(destPropertyName) ? SrcePropertyExpression.Name : destPropertyName;
             OperationTypes = operationTypes;
@@ -39,7 +39,7 @@ namespace Beef.Mapper
         protected PropertyExpression<TSrce, TSrceProperty> SrcePropertyExpression { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
+        /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
         public ComplexTypeReflector SrceComplexTypeReflector { get; private set; }
 
@@ -236,7 +236,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default(TSrceProperty);
+                return default;
         }
 
         /// <summary>

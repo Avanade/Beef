@@ -16,7 +16,9 @@ namespace Beef.RefData
     /// <remarks>For equality and comparision checking the <see cref="Id"/> and <see cref="Code"/> combination is used.</remarks>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, Active = {IsActive}, IsValid = {IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
+#pragma warning disable CA1036 // Override methods on comparable types; support for <, <=, > and >= not supported by-design.
     public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IETag, IChangeLog, IIdentifier
+#pragma warning restore CA1036
     {
         #region RefDataKey
 
@@ -92,7 +94,7 @@ namespace Beef.RefData
         public static ReferenceDataIdTypeCode GetIdTypeCode(Type type)
         {
             if (type == null)
-                throw new ArgumentNullException(nameof(Type));
+                throw new ArgumentNullException(nameof(type));
 
             if (_typeCodeDict.ContainsKey(type))
                 return _typeCodeDict[type];
@@ -498,7 +500,7 @@ namespace Beef.RefData
         public static bool operator ==(ReferenceDataBase a, ReferenceDataBase b)
         {
             // If both are null, or both are same instance, return true.
-            if (Object.ReferenceEquals(a, b))
+            if (ReferenceEquals(a, b))
                 return true;
 
             // If one is null, but not both, return false.
@@ -519,12 +521,14 @@ namespace Beef.RefData
             return !(a == b);
         }
 
+#pragma warning disable CA2225 // Operator overloads have named alternates; by-design for casting, the developer should use properties etc. in this scenario versus proposed methods.
         /// <summary>
         /// An implicit cast from the <see cref="ReferenceDataBase"/> to an <see cref="int"/> value.
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Id"/> value; where <c>null</c> then <b>zero</b> will be returned.</returns>
         public static implicit operator int(ReferenceDataBase value)
+
         {
             if (value == null)
                 return 0;
@@ -570,6 +574,7 @@ namespace Beef.RefData
             else
                 return (value.Id != null && value.Id is Guid) ? (Guid)value.Id : Guid.Empty;
         }
+#pragma warning restore CA2225
 
         /// <summary>
         /// An implicit cast from the <see cref="ReferenceDataBase"/> to a <see cref="string"/> value.
@@ -611,9 +616,7 @@ namespace Beef.RefData
         /// <param name="from">The <see cref="ReferenceDataBase"/> to copy from.</param>
         public void CopyFrom(ReferenceDataBase from)
         {
-            if (from == null)
-                throw new ArgumentNullException("from");
-
+            Check.NotNull(from, nameof(from));
             Id = from.Id;
             Code = from.Code;
             Text = from.Text;
@@ -698,13 +701,14 @@ namespace Beef.RefData
         /// <returns>The appropriately formatted string.</returns>
         public string ToString(string stringFormat)
         {
-            return string.Format(stringFormat, Id, Code, Text);
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, stringFormat, Id, Code, Text);
         }
 
         #endregion
 
         #region IConvertible
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, does not need to be called.
         /// <summary>
         /// Gets the <see cref="TypeCode"/> being <see cref="TypeCode.Object"/>.
         /// </summary>
@@ -830,10 +834,13 @@ namespace Beef.RefData
         /// <returns>Throws a <see cref="InvalidCastException"/>.</returns>
         ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException();
 
+#pragma warning restore CA1033
+
         #endregion
 
         #region PropertyNames
 
+#pragma warning disable CA1707 // Identifiers should not contain underscores; by-design, new introduced convention.
         /// <summary>
         /// Represents the <see cref="Id"/> property name.
         /// </summary>
@@ -888,6 +895,7 @@ namespace Beef.RefData
         /// Represents the <see cref="ChangeLog"/> property name.
         /// </summary>
         public const string Property_ChangeLog = "ChangeLog";
+#pragma warning restore CA1707
 
         #endregion
     }

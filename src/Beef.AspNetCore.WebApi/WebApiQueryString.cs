@@ -62,10 +62,13 @@ namespace Beef.AspNetCore.WebApi
         /// <remarks>Will return the <see cref="ExecutionContext"/> <see cref="ExecutionContext.PagingArgs"/> where already set; otherwise, will update it once value inferred.</remarks>
         public static PagingArgs CreatePagingArgs(this ControllerBase controller)
         {
+            Check.NotNull(controller, nameof(controller));
             if (ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs != null)
                 return ExecutionContext.Current.PagingArgs;
 
-            var q = controller.HttpContext.Request.Query;
+#pragma warning disable CA1062 // Validate arguments of public methods; see earlier Check.
+            var q = controller.HttpContext?.Request?.Query;
+#pragma warning restore CA1062
             PagingArgs pa;
 
             if (q == null || q.Count == 0)
@@ -143,7 +146,9 @@ namespace Beef.AspNetCore.WebApi
         public static bool IncludeInactive(this ControllerBase controller)
         {
             Check.NotNull(controller, nameof(controller));
+#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
             return ParseBoolValue(GetNamedQueryString(controller, IncludeInactiveQueryStringNames));
+#pragma warning restore CA1062 
         }
 
         /// <summary>
@@ -154,7 +159,9 @@ namespace Beef.AspNetCore.WebApi
         public static bool IncludeRefDataText(this ControllerBase controller)
         {
             Check.NotNull(controller, nameof(controller));
+#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
             return ParseBoolValue(GetNamedQueryString(controller, IncludeRefDataTextQueryStringNames));
+#pragma warning restore CA1062 
         }
 
         /// <summary>
@@ -167,7 +174,9 @@ namespace Beef.AspNetCore.WebApi
             Check.NotNull(controller, nameof(controller));
 
             var dict = new Dictionary<string, KeyValuePair<string, StringValues>>();
+#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
             if (controller.HttpContext.Request.Query.Count() == 0)
+#pragma warning restore CA1062
             {
                 ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. api/v1/demo/ref?entity=codeX,codeY&entity2=codeZ&entity3");
                 return dict.Values;
@@ -175,7 +184,7 @@ namespace Beef.AspNetCore.WebApi
 
             foreach (var q in controller.HttpContext.Request.Query.Where(x => !string.IsNullOrEmpty(x.Key)))
             {
-                if (string.Compare(q.Key, "names", true) == 0)
+                if (string.Compare(q.Key, "names", StringComparison.InvariantCultureIgnoreCase) == 0)
                 {
                     foreach (var v in q.Value.Where(x => !string.IsNullOrEmpty(x)))
                     {

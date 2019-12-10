@@ -16,16 +16,24 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="DuplicateException"/> class.
+        /// </summary>
+        public DuplicateException()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DuplicateException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public DuplicateException(string message = null)
+        public DuplicateException(string message)
             : base(message ?? new LText("Beef.DuplicateException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DuplicateException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="DuplicateException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

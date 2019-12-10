@@ -15,10 +15,12 @@ namespace Beef
     [DebuggerStepThrough()]
     public abstract class InvokerBase<TInvoker, TParam> where TInvoker : InvokerBase<TInvoker, TParam>, new()
     {
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets or sets the default instance.
         /// </summary>
         public static InvokerBase<TInvoker, TParam> Default { get; set; } = new TInvoker();
+#pragma warning restore CA1000 
 
         #region NoResult
 
@@ -44,7 +46,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected virtual void WrapInvoke(object caller, Action action, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => action();
+            => Check.NotNull(action, nameof(action)).Invoke();
 
         /// <summary>
         /// Invokes a <paramref name="func"/> asynchronously.
@@ -68,7 +70,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected virtual Task WrapInvokeAsync(object caller, Func<Task> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => func();
+            => Check.NotNull(func, nameof(func)).Invoke();
 
         #endregion
 
@@ -100,7 +102,7 @@ namespace Beef
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
         protected virtual TResult WrapInvoke<TResult>(object caller, Func<TResult> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => func();
+            => Check.NotNull(func, nameof(func)).Invoke();
 
         /// <summary>
         /// Invokes a <paramref name="func"/> with a <typeparamref name="TResult"/> asynchronously.
@@ -128,7 +130,7 @@ namespace Beef
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
         protected virtual Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => func();
+            => Check.NotNull(func, nameof(func)).Invoke();
 
         #endregion
     }

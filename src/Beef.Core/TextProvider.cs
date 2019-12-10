@@ -20,7 +20,7 @@ namespace Beef
         /// <param name="textProvider">The concrete <see cref="TextProvider"/> instance.</param>
         public static void Create(TextProvider textProvider)
         {
-            _current = textProvider ?? throw new ArgumentNullException("textProvider");
+            _current = textProvider ?? throw new ArgumentNullException(nameof(textProvider));
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Beef
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            return _resourceManager.GetString(key.KeyAndOrText);
+            return _resourceManager.GetString(key.KeyAndOrText, System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

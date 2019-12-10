@@ -33,10 +33,12 @@ namespace Beef.WebApi
         /// </summary>
         public HttpResponseMessage Response { get; private set; }
 
+#pragma warning disable CA2227 // Collection properties should be read only; by-design, can be updated.
         /// <summary>
         /// Gets or sets the <see cref="MessageItemCollection"/>.
         /// </summary>
         public MessageItemCollection Messages { get; set; }
+#pragma warning restore CA2227
 
         /// <summary>
         /// Gets or sets the <see cref="HttpStatusCode"/>.
@@ -114,7 +116,7 @@ namespace Beef.WebApi
     public class WebApiAgentResult<T> : WebApiAgentResult
     {
         private bool _isValueSet = false;
-        private T _value = default(T);
+        private T _value = default;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiAgentResult{T}"/> class.

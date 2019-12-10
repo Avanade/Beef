@@ -307,7 +307,7 @@ namespace Beef.Data.OData
         /// <returns>The formatted unique key.</returns>
         public string GetKeyUrl(params IComparable[] keys)
         {
-            if (keys == null || keys.Length != UniqueKey.Length)
+            if (keys == null || keys.Length != UniqueKey.Count)
                 throw new ArgumentException("The number of keys supplied must equal the number of properties identified as IsUniqueKey.", nameof(keys));
 
             var sb = new StringBuilder("(");

@@ -24,11 +24,13 @@ namespace Beef.Validation.Rules
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
             // Where allowing negatives or the value is null, do nothing; i.e. Nullable<Type>.
+            Beef.Check.NotNull(context, nameof(context));
+
             if (AllowNegatives || Comparer<object>.Default.Compare(context.Value, null) == 0)
                 return;
 
             // Convert numeric to a double value.
-            double value = Convert.ToDouble(context.Value);
+            double value = Convert.ToDouble(context.Value, System.Globalization.CultureInfo.InvariantCulture);
 
             // Determine if the value is negative and is/isn't allowed.
             if (!AllowNegatives && value < 0)

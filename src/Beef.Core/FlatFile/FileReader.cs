@@ -11,6 +11,7 @@ using System.Linq;
 
 namespace Beef.FlatFile
 {
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design as FileReaderCollection would be confusing.
     /// <summary>
     /// Represents the file reader.
     /// </summary>
@@ -20,6 +21,7 @@ namespace Beef.FlatFile
     /// <see cref="FileReaderBase.OnRecordRead"/> event will be invoked for every corresponding record read regardless of whether it has errors or not.
     /// <para>The <see cref="FileReaderBase.StopOnError"/> will cause the enumerator to stop when an error is encountered.</para></remarks>
     public sealed class FileReader<TContent> : FileReaderBase, IEnumerable<FileOperationResult<TContent>> where TContent : class, new()
+#pragma warning restore CA1710 
     {
         private readonly TextReader _textReader;
         private readonly FileFormat<TContent> _fileFormat;
@@ -133,7 +135,7 @@ namespace Beef.FlatFile
                 }
             }
 
-            return new FileOperationResult<TContent>(FileContentStatus.Content, records.ToArray());
+            return new FileOperationResult<TContent>(FileContentStatus.Content, records);
         }
 
         /// <summary>
@@ -192,7 +194,7 @@ namespace Beef.FlatFile
             if (_fileFormat.ContentValidator != null)
                 _contentReflector.SetValidator(_fileFormat.ContentValidator);
 
-            _hasHierarchy = _fileFormat.IsHierarchical && _contentReflector.Children.Length > 0;
+            _hasHierarchy = _fileFormat.IsHierarchical && _contentReflector.Children.Count > 0;
             if (_hasHierarchy)
                 _hierarchy = FileRecordHierarchyItem.GetHierarchy(_fileFormat);
         }
@@ -248,7 +250,7 @@ namespace Beef.FlatFile
 
             RecordProcess(record);
 
-            return new FileOperationResult(FileContentStatus.Header, new FileRecord[] { record });
+            return new FileOperationResult(FileContentStatus.Header, new List<FileRecord> { record });
         }
 
         /// <summary>
@@ -284,7 +286,7 @@ namespace Beef.FlatFile
 
             RecordProcess(record);
 
-            return new FileOperationResult(FileContentStatus.Trailer, new FileRecord[] { record });
+            return new FileOperationResult(FileContentStatus.Trailer, new List<FileRecord> { record });
         }
 
         /// <summary>
@@ -330,7 +332,7 @@ namespace Beef.FlatFile
             RecordProcess(record);
 
             _readContent = true;
-            return new FileOperationResult<TContent>(FileContentStatus.Content, new FileRecord[] { record });
+            return new FileOperationResult<TContent>(FileContentStatus.Content, new List<FileRecord> { record });
         }
 
         /// <summary>

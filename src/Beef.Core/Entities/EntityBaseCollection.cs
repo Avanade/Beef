@@ -3,15 +3,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 
 namespace Beef.Entities
 {
+#pragma warning disable CA1010 // Collections should implement generic interface; not-required by-design.
     /// <summary>
     /// Represents the core <see cref="EntityBase"/> collection capabilities.
     /// </summary>
-    public interface IEntityBaseCollection : IEditableObject, IChangeTracking, ICloneable, ICleanUp, ICollection
+    public interface IEntityBaseCollection : IEditableObject, IChangeTracking, IChangeTrackingLogging, ICloneable, ICleanUp, ICollection
+#pragma warning restore CA1010 // Collections should implement generic interface
     {
         /// <summary>
         /// Adds the items of the specified collection to the end of the <see cref="EntityBaseCollection{TEntity}"/>.
@@ -28,6 +31,24 @@ namespace Beef.Entities
     }
 
     /// <summary>
+    /// Provides data for the <see cref="INotifyPropertyChanged.PropertyChanged"/> when an item within an <see cref="IEntityBaseCollection"/> is changed.
+    /// </summary>
+    public class ItemPropertyChangedEventArgs : PropertyChangedEventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ItemPropertyChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="item">The item that had the property change.</param>
+        /// <param name="propertyName">The name of the property that changed.</param>
+        public ItemPropertyChangedEventArgs(object item, string propertyName) : base(propertyName) => Item = item;
+
+        /// <summary>
+        /// Gets the item that had the property change.
+        /// </summary>
+        public object Item { get; }
+    }
+
+    /// <summary>
     /// Represents an <see cref="EntityBase"/> collection class.
     /// </summary>
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="System.Type"/>.</typeparam>
@@ -38,7 +59,7 @@ namespace Beef.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
-        public EntityBaseCollection()
+        protected EntityBaseCollection()
             : base()
         {
         }
@@ -47,7 +68,7 @@ namespace Beef.Entities
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
         /// <param name="collection">The entities.</param>
-        public EntityBaseCollection(IEnumerable<TEntity> collection)
+        protected EntityBaseCollection(IEnumerable<TEntity> collection)
             : base(collection)
         {
         }
@@ -68,7 +89,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -81,7 +102,7 @@ namespace Beef.Entities
                 return;
 
             foreach (TEntity item in collection)
-                this.Add(item);
+                Add(item);
         }
 
         /// <summary>
@@ -123,20 +144,53 @@ namespace Beef.Entities
                 item?.CleanUp();
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
         /// <summary>
         /// Collections do not support an initial state; will always be <c>false</c>.
         /// </summary>
         bool ICleanUp.IsInitial => false;
+#pragma warning restore CA1033
 
         /// <summary>
         /// Overrides the <see cref="ObservableCollection{TEntity}.OnCollectionChanged"/> method.
         /// </summary>
         /// <param name="e">The <see cref="System.Collections.Specialized.NotifyCollectionChangedEventArgs"/>.</param>
         /// <remarks>Sets <see cref="IsChanged"/> to <c>true</c>.</remarks>
-        protected override void OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnCollectionChanged(e);
+
+            if (e?.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var ei = (EntityBase)item;
+                    ei.PropertyChanged -= Item_PropertyChanged;
+                }
+            }
+
+            if (e?.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var ei = (EntityBase)item;
+                    ei.PropertyChanged += Item_PropertyChanged;
+
+                    if (IsChangeTracking && !ei.IsChangeTracking)
+                        ei.TrackChanges();
+                }
+            }
+
             IsChanged = true;
+        }
+
+        /// <summary>
+        /// Updates IsChanged where required.
+        /// </summary>
+        private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            IsChanged = true;
+            OnPropertyChanged(new ItemPropertyChangedEventArgs(sender, e.PropertyName));
         }
 
         /// <summary>
@@ -144,7 +198,7 @@ namespace Beef.Entities
         /// </summary>
         public void BeginEdit()
         {
-            _editCopy = this.Clone();
+            _editCopy = Clone();
         }
 
         /// <summary>
@@ -155,8 +209,8 @@ namespace Beef.Entities
         {
             if (_editCopy != null)
             {
-                this.Clear();
-                this.AddRange((IEnumerable<TEntity>)_editCopy);
+                Clear();
+                AddRange((IEnumerable<TEntity>)_editCopy);
             }
 
             AcceptChanges();
@@ -176,8 +230,39 @@ namespace Beef.Entities
         public virtual void AcceptChanges()
         {
             _editCopy = null;
+
+            foreach (var item in this)
+            {
+                item.AcceptChanges();
+            }
+
             IsChanged = false;
+            IsChangeTracking = false;
         }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>) for each item.
+        /// </summary>
+        public virtual void TrackChanges()
+        {
+            foreach (var item in this)
+            {
+                if (!item.IsChangeTracking)
+                    item.TrackChanges();
+            }
+
+            IsChangeTracking = true;
+        }
+
+        /// <summary>
+        /// Lists the properties (names of) that have been changed (note that this property is not JSON serialized). <i>Note:</i> always returns <c>null</c> as properties are not tracked for a collection.
+        /// </summary>
+        public StringCollection ChangeTracking => null;
+
+        /// <summary>
+        /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.
+        /// </summary>
+        public bool IsChangeTracking { get; private set; }
 
         /// <summary>
         /// Indicates whether the entity has changed.

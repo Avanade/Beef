@@ -37,7 +37,7 @@ namespace Beef.Validation.Rules
     /// Provides validation configuration for an item within a <see cref="CollectionRule{TEntity, TProperty}"/>.
     /// </summary>
     /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
-    public class CollectionRuleItem<TItemEntity> : ICollectionRuleItem where TItemEntity : class
+    public sealed class CollectionRuleItem<TItemEntity> : ICollectionRuleItem where TItemEntity : class
     {
         private bool _duplicateCheck = false;
         private IPropertyExpression _propertyExpression;
@@ -80,7 +80,7 @@ namespace Beef.Validation.Rules
             if (ItemType.GetInterface(typeof(IUniqueKey).Name) == null)
                 throw new InvalidOperationException("A CollectionRuleItem ItemType '{_itemType.Name}' must implement 'IUniqueKey' to support UniqueKeyDuplicateCheck.");
 
-            IUniqueKey uk = null;
+            IUniqueKey uk;
             try
             {
                 uk = (IUniqueKey)Activator.CreateInstance(ItemType);
@@ -117,7 +117,7 @@ namespace Beef.Validation.Rules
             if (_duplicateCheck)
                 throw new InvalidOperationException("A DuplicateCheck or UniqueKeyDuplicateCheck can only be specified once.");
 
-            _propertyExpression = PropertyExpression<TItemEntity, TItemProperty>.Create(Check.NotNull(propertyExpression, nameof(propertyExpression)), true);
+            _propertyExpression = PropertyExpression.Create(Check.NotNull(propertyExpression, nameof(propertyExpression)), true);
             _duplicateText = duplicateText ?? _propertyExpression.Text;
             _duplicateCheck = true;
 
@@ -239,6 +239,7 @@ namespace Beef.Validation.Rules
         /// <returns><c>true</c> where validation is to continue; otherwise, <c>false</c> to stop.</returns>
         public override bool Check(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
             return context.Parent.ShallowValidation ? false : base.Check(context);
         }
 
@@ -248,6 +249,7 @@ namespace Beef.Validation.Rules
         /// <param name="context">The <see cref="PropertyContext{TEntity, IEnumerable}"/>.</param>
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
             if (context.Value == null)
                 return;
 

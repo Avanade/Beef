@@ -317,8 +317,7 @@ namespace Beef.FlatFile
         /// </summary>
         /// <param name="record">The related <see cref="FileRecord"/>.</param>
         /// <param name="sb">The line data <see cref="StringBuilder"/>.</param>
-        protected virtual void WritePostProcessLineData(FileRecord record, StringBuilder sb)
-        { }
+        protected virtual void WritePostProcessLineData(FileRecord record, StringBuilder sb) { }
 
         /// <summary>
         /// Get the <see cref="FileRecordReflector"/> for the specified <see cref="Type"/>.
@@ -354,21 +353,21 @@ namespace Beef.FlatFile
         /// <param name="frr">The <see cref="FileRecordReflector"/>.</param>
         protected void ValidateColumnCount(FileRecord record, FileRecordReflector frr)
         {
-            if (ColumnCountValidation == ColumnCountValidation.None || record.Columns.Length == frr.Columns.Length)
+            if (ColumnCountValidation == ColumnCountValidation.None || Check.NotNull(record, nameof(record)).Columns.Count == Check.NotNull(frr, nameof(frr)).Columns.Count)
                 return;
 
-            if (record.Columns.Length < frr.Columns.Length)
+            if (record.Columns.Count < frr.Columns.Count)
             {
                 switch (ColumnCountValidation)
                 {
                     case ColumnCountValidation.LessThanError:
                     case ColumnCountValidation.LessAndGreaterThanError:
-                        record.Messages.Add(MessageType.Error, LessColumnsThanExpectedFormat, record.Columns.Length, frr.Columns.Length);
+                        record.Messages.Add(MessageType.Error, LessColumnsThanExpectedFormat, record.Columns.Count, frr.Columns.Count);
                         break;
 
                     case ColumnCountValidation.LessThanWarning:
                     case ColumnCountValidation.LessAndGreaterThanWarning:
-                        record.Messages.Add(MessageType.Warning, LessColumnsThanExpectedFormat, record.Columns.Length, frr.Columns.Length);
+                        record.Messages.Add(MessageType.Warning, LessColumnsThanExpectedFormat, record.Columns.Count, frr.Columns.Count);
                         break;
                 }
             }
@@ -378,12 +377,12 @@ namespace Beef.FlatFile
                 {
                     case ColumnCountValidation.GreaterThanError:
                     case ColumnCountValidation.LessAndGreaterThanError:
-                        record.Messages.Add(MessageType.Error, GreaterColumnsThanExpectedFormat, record.Columns.Length, frr.Columns.Length);
+                        record.Messages.Add(MessageType.Error, GreaterColumnsThanExpectedFormat, record.Columns.Count, frr.Columns.Count);
                         break;
 
                     case ColumnCountValidation.GreaterThanWarning:
                     case ColumnCountValidation.LessAndGreaterThanWarning:
-                        record.Messages.Add(MessageType.Warning, GreaterColumnsThanExpectedFormat, record.Columns.Length, frr.Columns.Length);
+                        record.Messages.Add(MessageType.Warning, GreaterColumnsThanExpectedFormat, record.Columns.Count, frr.Columns.Count);
                         break;
                 }
             }

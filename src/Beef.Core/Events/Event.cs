@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace Beef.Events
 {
+#pragma warning disable CA1716 // Identifiers should not match keywords; by-design, most meaningful name.
     /// <summary>
     /// Provides the standardised <b>Event</b> processing/publishing.
     /// </summary>
     public static class Event
+#pragma warning restore CA1716 // Identifiers should not match keywords
     {
         private static readonly List<Func<EventData[], Task>> _publishFuncs = new List<Func<EventData[], Task>>();
 
@@ -39,8 +41,8 @@ namespace Beef.Events
 
             while (true)
             {
-                start = subject.IndexOf("{");
-                end = subject.IndexOf("}");
+                start = subject.IndexOf("{", StringComparison.InvariantCultureIgnoreCase);
+                end = subject.IndexOf("}", StringComparison.InvariantCultureIgnoreCase);
 
                 if (start < 0 && end < 0)
                     return subject;
@@ -90,7 +92,7 @@ namespace Beef.Events
         public static bool Match(string[] templateParts, string[] subjectParts)
         {
             // No match where template has more parts than the subject to match.
-            if (templateParts.Length > subjectParts.Length)
+            if (Check.NotNull(templateParts, nameof(templateParts)).Length > Check.NotNull(subjectParts, nameof(subjectParts)).Length)
                 return false;
 
             // Compare each part for an exact match or wildcard.

@@ -4,10 +4,12 @@ using System;
 
 namespace Beef.FlatFile
 {
+#pragma warning disable CA1032 // Implement standard exception constructors; only the specified constructor is required.
     /// <summary>
     /// Represents a <see cref="FileValidation"/> <see cref="Exception"/>.
     /// </summary>
     public class FileValidationException : Exception
+#pragma warning restore CA1032
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileValidationException"/> class.
@@ -15,7 +17,7 @@ namespace Beef.FlatFile
         /// <param name="fileValidation">The <see cref="FileValidation"/> rule that caused the exception.</param>
         /// <param name="message">The message.</param>
         /// <param name="record">The <see cref="FileRecord"/> where applicable.</param>
-        public FileValidationException(FileValidation fileValidation, string message, FileRecord record = null) : base(message)
+        internal FileValidationException(FileValidation fileValidation, string message, FileRecord record = null) : base(message)
         {
             FileValidation = fileValidation;
             Record = record;

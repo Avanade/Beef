@@ -13,7 +13,7 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceTimer"/> class.
         /// </summary>
-        public PerformanceTimer()
+        protected PerformanceTimer()
         {
             Stopwatch = new Stopwatch();
             Stopwatch.Start();
@@ -46,8 +46,26 @@ namespace Beef.Diagnostics
         /// </summary>
         public void Dispose()
         {
-            if (Stopwatch != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="PerformanceTimer"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && Stopwatch != null)
                 Stop();
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~PerformanceTimer()
+        {
+            Dispose(false);
         }
     }
 }

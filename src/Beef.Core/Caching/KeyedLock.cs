@@ -31,6 +31,8 @@ namespace Beef.Caching
         /// <returns>The resultant value.</returns>
         public TResult Lock<TResult>(TKey key, Func<TResult> func)
         {
+            Check.NotNull(func, nameof(func));
+
             lock (GetLock(key))
             {
                 return func();
@@ -44,6 +46,8 @@ namespace Beef.Caching
         /// <param name="action">The action to invoke within the lock.</param>
         public void Lock(TKey key, Action action)
         {
+            Check.NotNull(action, nameof(action));
+
             lock (GetLock(key))
             {
                 action();

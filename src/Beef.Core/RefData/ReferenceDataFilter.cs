@@ -21,11 +21,13 @@ namespace Beef.RefData
         IEnumerable<ReferenceDataBase> Collection { get; }
     }
 
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design, class is a result (that supports collection serialization).
     /// <summary>
     /// The underlying <see cref="ReferenceDataFilter"/> result/collection.
     /// </summary>
     /// <typeparam name="TItem">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</typeparam>
     public class ReferenceDataFilterResult<TItem> : EntityBaseCollection<TItem>, IReferenceDataFilterResult where TItem : ReferenceDataBase
+#pragma warning restore CA1710 
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataFilterResult{TItem}" /> class.
@@ -43,10 +45,12 @@ namespace Beef.RefData
         /// </summary>
         public string ETag { get; set; }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, hiding is the desired outcome.
         /// <summary>
         /// Gets the underlying <see cref="ReferenceDataBase"/> collection.
         /// </summary>
         IEnumerable<ReferenceDataBase> IReferenceDataFilterResult.Collection => this;
+#pragma warning restore CA1033 
 
         /// <summary>
         /// Creates a deep copy of the <see cref="ReferenceDataFilterResult{TItem}"/>.
@@ -76,7 +80,7 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the validator to ensure the wildcards are considered valid.
         /// </summary>
-        public static Validator<ReferenceDataFilter> Validator { get; } = Validator<ReferenceDataFilter>.Create().HasProperty(x => x.Text, p => p.Wildcard());
+        public static Validator<ReferenceDataFilter> Validator { get; } = Validation.Validator.Create<ReferenceDataFilter>().HasProperty(x => x.Text, p => p.Wildcard());
 
         /// <summary>
         /// Validates the <paramref name="codes"/> and <paramref name="text"/> then applies as a filter to the reference data <paramref name="coll"/>.
@@ -125,6 +129,7 @@ namespace Beef.RefData
         /// <returns>The filtered collection and corresponding ETag.</returns>
         public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, ReferenceDataFilter filter, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
+            Check.NotNull(coll, nameof(coll));
             Check.NotNull(filter, nameof(filter));
             if (!filter.Codes.Any() && string.IsNullOrEmpty(filter.Text) && !includeInactive)
                 return new ReferenceDataFilterResult<TItem>(coll.ActiveList) { ETag = coll.ETag };
@@ -146,7 +151,9 @@ namespace Beef.RefData
         /// </summary>
         private static string GenerateETag(IEnumerable<ReferenceDataBase> items)
         {
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; by-design, used for hashing (speed considered over security).
             using var md5 = System.Security.Cryptography.MD5.Create();
+#pragma warning restore CA5351
             var buf = System.Text.Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(items));
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             return Convert.ToBase64String(hash);
@@ -216,6 +223,7 @@ namespace Beef.RefData
         /// <param name="from">The <see cref="ReferenceDataFilter"/> to copy from.</param>
         public void CopyFrom(ReferenceDataFilter from)
         {
+            Check.NotNull(from, nameof(from));
             CopyFrom((EntityBase)from);
             Codes = from.Codes;
             Text = from.Text;

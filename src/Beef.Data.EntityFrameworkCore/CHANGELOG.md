@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.5
+- *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
+
 ## v2.1.4
 - *Enhanced:* `EfDbMapper<>.AddStandardProperties` now returns `this` instance to enable fluent-style method-chaining.
 

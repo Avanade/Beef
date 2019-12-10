@@ -103,7 +103,7 @@ namespace Beef.FlatFile.Converters
                     if (!Decimal.TryParse(str, NumberStyles, FormatProvider, out mval))
                         return false;
 
-                    result = (T)Convert.ChangeType(mval, typeof(T));
+                    result = (T)Convert.ChangeType(mval, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Double:
@@ -111,7 +111,7 @@ namespace Beef.FlatFile.Converters
                     if (!Double.TryParse(str, NumberStyles, FormatProvider, out dval))
                         return false;
 
-                    result = (T)Convert.ChangeType(dval, typeof(T));
+                    result = (T)Convert.ChangeType(dval, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Int16:
@@ -119,7 +119,7 @@ namespace Beef.FlatFile.Converters
                     if (!Int16.TryParse(str, NumberStyles, FormatProvider, out i16val))
                         return false;
 
-                    result = (T)Convert.ChangeType(i16val, typeof(T));
+                    result = (T)Convert.ChangeType(i16val, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Int32:
@@ -127,7 +127,7 @@ namespace Beef.FlatFile.Converters
                     if (!Int32.TryParse(str, NumberStyles, FormatProvider, out i32val))
                         return false;
 
-                    result = (T)Convert.ChangeType(i32val, typeof(T));
+                    result = (T)Convert.ChangeType(i32val, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Int64:
@@ -135,7 +135,7 @@ namespace Beef.FlatFile.Converters
                     if (!Int64.TryParse(str, NumberStyles, FormatProvider, out i64val))
                         return false;
 
-                    result = (T)Convert.ChangeType(i64val, typeof(T));
+                    result = (T)Convert.ChangeType(i64val, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Single:
@@ -143,7 +143,7 @@ namespace Beef.FlatFile.Converters
                     if (!Single.TryParse(str, NumberStyles, FormatProvider, out sival))
                         return false;
 
-                    result = (T)Convert.ChangeType(sival, typeof(T));
+                    result = (T)Convert.ChangeType(sival, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.Byte:
@@ -151,7 +151,7 @@ namespace Beef.FlatFile.Converters
                     if (!Byte.TryParse(str, NumberStyles, FormatProvider, out byval))
                         return false;
 
-                    result = (T)Convert.ChangeType(byval, typeof(T));
+                    result = (T)Convert.ChangeType(byval, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.SByte:
@@ -159,7 +159,7 @@ namespace Beef.FlatFile.Converters
                     if (!SByte.TryParse(str, NumberStyles, FormatProvider, out sbyval))
                         return false;
 
-                    result = (T)Convert.ChangeType(sbyval, typeof(T));
+                    result = (T)Convert.ChangeType(sbyval, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.UInt16:
@@ -167,7 +167,7 @@ namespace Beef.FlatFile.Converters
                     if (!UInt16.TryParse(str, NumberStyles, FormatProvider, out ui16val))
                         return false;
 
-                    result = (T)Convert.ChangeType(ui16val, typeof(T));
+                    result = (T)Convert.ChangeType(ui16val, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.UInt32:
@@ -175,7 +175,7 @@ namespace Beef.FlatFile.Converters
                     if (!UInt32.TryParse(str, NumberStyles, FormatProvider, out ui32val))
                         return false;
 
-                    result = (T)Convert.ChangeType(ui32val, typeof(T));
+                    result = (T)Convert.ChangeType(ui32val, typeof(T), FormatProvider);
                     return true;
 
                 case TypeCode.UInt64:
@@ -183,7 +183,7 @@ namespace Beef.FlatFile.Converters
                     if (!UInt64.TryParse(str, NumberStyles, FormatProvider, out ui64val))
                         return false;
 
-                    result = (T)Convert.ChangeType(ui64val, typeof(T));
+                    result = (T)Convert.ChangeType(ui64val, typeof(T), FormatProvider);
                     return true;
 
                 default:

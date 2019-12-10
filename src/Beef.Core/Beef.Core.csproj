@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Beef</RootNamespace>
-    <AssemblyVersion>2.1.23</AssemblyVersion>
-    <FileVersion>2.1.23</FileVersion>
-    <Version>2.1.23</Version>
+    <AssemblyVersion>2.1.24</AssemblyVersion>
+    <FileVersion>2.1.24</FileVersion>
+    <Version>2.1.24</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -25,21 +25,31 @@
     <Title>Business Entity Execution Framework (Beef) core framework.</Title>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef framework entity validation referencedata caching</PackageTags>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <DocumentationFile>.\bin\debug\Beef.Core.xml</DocumentationFile>
+    <NoWarn>1701;1702;CA1303;CA2007</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="YamlDotNet" Version="6.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
 </Project>

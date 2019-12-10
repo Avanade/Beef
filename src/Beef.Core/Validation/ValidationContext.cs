@@ -477,7 +477,7 @@ namespace Beef.Validation
         /// </summary>
         private PropertyExpression<TEntity, TProperty> CreatePropertyExpression<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
         {
-            return PropertyExpression<TEntity, TProperty>.Create(propertyExpression, true);
+            return PropertyExpression.Create(propertyExpression, true);
         }
 
         /// <summary>

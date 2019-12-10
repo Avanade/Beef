@@ -4,11 +4,13 @@ using System;
 
 namespace Beef.Executors
 {
+#pragma warning disable CA1032 // Implement standard exception constructors; for internal throwing only.
     /// <summary>
     /// Internal exception used to orchestrate the <see cref="Executor"/> <see cref="Executor.Stop"/> method. This exception should not be caught as it is used internally; swallowing exception will
     /// result in unexpected side effects.
     /// </summary>
-    internal class ExecutorStopException : Exception
+    public class ExecutorStopException : Exception
+#pragma warning restore CA1032
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutorStopException"/> class.

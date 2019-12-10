@@ -16,16 +16,21 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthorizationException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="AuthorizationException"/> class.
+        /// </summary>
+        public AuthorizationException() : this(null) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthorizationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public AuthorizationException(string message = null)
+        public AuthorizationException(string message)
             : base(message ?? new LText("Beef.AuthorizationException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthorizationException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="AuthorizationException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

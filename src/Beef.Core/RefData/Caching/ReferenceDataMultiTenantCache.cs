@@ -81,13 +81,12 @@ namespace Beef.RefData.Caching
                 return cv.Value;
 
             // Lock against the key to minimise concurrent gets (which could be expensive).
-            TColl coll = default;
             lock (_keyLock.Lock(tenantId))
             {
                 if (_dict.TryGetValue(tenantId, out cv) && !cv.Policy.HasExpired())
                     return cv.Value;
 
-                coll = GetCollectionInternal();
+                var coll = GetCollectionInternal();
 
                 var policy = (ICachePolicy)GetPolicy().Clone();
                 policy.Reset();
@@ -141,8 +140,7 @@ namespace Beef.RefData.Caching
         /// Sets the cached <see cref="ReferenceDataCollectionBase{TItem}"/> with the contents of the passed collection.
         /// </summary>
         /// <param name="items">The source collection.</param>
-        /// <remarks>This provides a means to override the loading of the collection on as needed basis. Also, resets
-        /// the cache expiry (<see cref="ICachePolicy.Reset"/>).</remarks>
+        /// <remarks>This provides a means to override the loading of the collection on as needed basis. Also, resets the cache expiry (<see cref="ICachePolicy.Reset"/>).</remarks>
         public void SetCollection(IEnumerable<TItem> items)
         {
             var tenantId = GetTenantId();
@@ -152,10 +150,13 @@ namespace Beef.RefData.Caching
                 var coll = GetByTenantId(tenantId);
                 coll.Clear();
 
-                foreach (var item in items)
+                if (items != null)
                 {
-                    item.MakeReadOnly();
-                    coll.Add(item);
+                    foreach (var item in items)
+                    {
+                        item.MakeReadOnly();
+                        coll.Add(item);
+                    }
                 }
 
                 coll.GenerateETag();

@@ -103,7 +103,7 @@ namespace Beef.FlatFile.Converters
             if (converterType != null)
                 return (ITextValueConverter)Activator.CreateInstance(converterType);
 
-            if (!_dict.TryGetValue(GetKey(key, type), out TextValueConverter tvc) || tvc.Type != type)
+            if (!_dict.TryGetValue(GetKey(key, Check.NotNull(type, nameof(type))), out TextValueConverter tvc) || tvc.Type != type)
                 return null;
 
             return (ITextValueConverter)tvc.Converter;
@@ -126,13 +126,13 @@ namespace Beef.FlatFile.Converters
             if (converterType != null)
                 return (ITextValueConverter)Activator.CreateInstance(converterType);
 
-            return Get(type, key) ?? Get(type, null);
+            return Get(Check.NotNull(type, nameof(type)), key) ?? Get(type, null);
         }
 
         /// <summary>
         /// Gets the key.
         /// </summary>
-        private string GetKey(string key, Type type)
+        private static string GetKey(string key, Type type)
         {
             return key ?? type.FullName;
         }

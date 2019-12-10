@@ -35,7 +35,10 @@ namespace Beef.Yaml
         /// <returns>The <see cref="YamlConverter"/>.</returns>
         public static YamlConverter ReadYaml(string yaml)
         {
-            return ReadYaml(new StringReader(yaml));
+            using (var sr = new StringReader(yaml))
+            {
+                return ReadYaml(sr);
+            }
         }
 
         /// <summary>
@@ -45,7 +48,10 @@ namespace Beef.Yaml
         /// <returns>The <see cref="YamlConverter"/>.</returns>
         public static YamlConverter ReadYaml(Stream s)
         {
-            return ReadYaml(new StreamReader(s));
+            using (var sr = new StreamReader(s))
+            {
+                return ReadYaml(sr);
+            }
         }
 
         /// <summary>
@@ -134,7 +140,7 @@ namespace Beef.Yaml
                 {
                     var jv = (JValue)j;
                     var s = jv.Value as string;
-                    if (!string.IsNullOrEmpty(s) && s.StartsWith("^") && int.TryParse(s.Substring(1), out var i))
+                    if (!string.IsNullOrEmpty(s) && s.StartsWith("^", StringComparison.InvariantCultureIgnoreCase) && int.TryParse(s.Substring(1), out var i))
                         jv.Value = new Guid(i, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 }
                 else

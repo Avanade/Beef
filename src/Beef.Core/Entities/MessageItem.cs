@@ -48,7 +48,7 @@ namespace Beef.Entities
             return new MessageItem
             {
                 Type = type,
-                Text = string.Format(format, values)
+                Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, format, values)
             };
         }
 
@@ -83,7 +83,7 @@ namespace Beef.Entities
             {
                 Property = property,
                 Type = type,
-                Text = string.Format(format, values)
+                Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, format, values)
             };
         }
 
@@ -116,7 +116,7 @@ namespace Beef.Entities
             {
                 Property = property,
                 Type = MessageType.Error,
-                Text = string.Format(format, values)
+                Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, format, values)
             };
         }
 

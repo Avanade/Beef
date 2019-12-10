@@ -124,7 +124,7 @@ namespace Beef.RefData.Caching
                     _coll = new TColl();
 
                 _coll.Clear();
-                foreach (var item in items)
+                foreach (var item in Check.NotNull(items, nameof(items)))
                 {
                     item.MakeReadOnly();
                     _coll.Add(item);

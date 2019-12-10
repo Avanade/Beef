@@ -23,6 +23,9 @@ namespace Beef.RefData
         /// <param name="refDataResult">The <see cref="IReferenceDataFilterResult"/>.</param>
         public ReferenceDataMultiItem(string name, IReferenceDataFilterResult refDataResult)
         {
+            Check.NotEmpty(name, nameof(name));
+            Check.NotNull(refDataResult, nameof(refDataResult));
+
             Name = name;
             Items = refDataResult.Collection;
             ETag = refDataResult.ETag;

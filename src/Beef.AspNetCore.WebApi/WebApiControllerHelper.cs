@@ -40,7 +40,7 @@ namespace Beef.AspNetCore.WebApi
                 throw new ArgumentNullException(nameof(response));
 
             if (!string.IsNullOrEmpty(eTag))
-                response.GetTypedHeaders().ETag = new EntityTagHeaderValue(eTag.StartsWith("\"") ? eTag : "\"" + eTag + "\"");
+                response.GetTypedHeaders().ETag = new EntityTagHeaderValue(eTag.StartsWith("\"", StringComparison.OrdinalIgnoreCase) ? eTag : "\"" + eTag + "\"");
         }
 
         /// <summary>
@@ -58,20 +58,20 @@ namespace Beef.AspNetCore.WebApi
 
             if (paging.IsSkipTake)
             {
-                response.Headers[WebApiConsts.PagingSkipHeaderName] = paging.Skip.ToString();
-                response.Headers[WebApiConsts.PagingTakeHeaderName] = paging.Take.ToString();
+                response.Headers[WebApiConsts.PagingSkipHeaderName] = paging.Skip.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                response.Headers[WebApiConsts.PagingTakeHeaderName] = paging.Take.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
             else
             {
-                response.Headers[WebApiConsts.PagingPageNumberHeaderName] = paging.Page.Value.ToString();
-                response.Headers[WebApiConsts.PagingPageSizeHeaderName] = paging.Take.ToString();
+                response.Headers[WebApiConsts.PagingPageNumberHeaderName] = paging.Page.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                response.Headers[WebApiConsts.PagingPageSizeHeaderName] = paging.Take.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
             if (paging.TotalCount.HasValue)
-                response.Headers[WebApiConsts.PagingTotalCountHeaderName] = paging.TotalCount.Value.ToString();
+                response.Headers[WebApiConsts.PagingTotalCountHeaderName] = paging.TotalCount.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (paging.TotalPages.HasValue)
-                response.Headers[WebApiConsts.PagingTotalPagesHeaderName] = paging.TotalPages.Value.ToString();
+                response.Headers[WebApiConsts.PagingTotalPagesHeaderName] = paging.TotalPages.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         /// <summary>

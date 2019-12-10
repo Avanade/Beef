@@ -12,17 +12,17 @@ namespace Beef.Core.UnitTest.Caching.Policy
         {
             var cpc = new CachePolicyConfig
             {
-                Policies = new CachePolicyConfig.CachePolicyConfigPolicy[]
+                Policies = new CachePolicyConfigPolicy[]
                 {
-                    new CachePolicyConfig.CachePolicyConfigPolicy
+                    new CachePolicyConfigPolicy
                     {
                         Name = "MyTest",
                         Policy = "Beef.Caching.Policy.SlidingCachePolicy, Beef.Core",
-                        Properties = new CachePolicyConfig.CachePolicyConfigPolicyProperty[]
+                        Properties = new CachePolicyConfigPolicyProperty[]
                         {
-                            new CachePolicyConfig.CachePolicyConfigPolicyProperty { Name = "Duration", Value = "00:30:00" },
-                            new CachePolicyConfig.CachePolicyConfigPolicyProperty { Name = "MaxDuration", Value = "02:00:00" },
-                            new CachePolicyConfig.CachePolicyConfigPolicyProperty { Name = "RandomizerOffset", Value = "00:10:00" }
+                            new CachePolicyConfigPolicyProperty { Name = "Duration", Value = "00:30:00" },
+                            new CachePolicyConfigPolicyProperty { Name = "MaxDuration", Value = "02:00:00" },
+                            new CachePolicyConfigPolicyProperty { Name = "RandomizerOffset", Value = "00:10:00" }
                         },
                         Caches = new string[] { "BlahX" }
                     }

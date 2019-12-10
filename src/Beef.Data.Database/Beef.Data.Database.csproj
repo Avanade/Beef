@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>2.1.5</AssemblyVersion>
-    <FileVersion>2.1.5</FileVersion>
-    <Version>2.1.5</Version>
+    <AssemblyVersion>2.1.6</AssemblyVersion>
+    <FileVersion>2.1.6</FileVersion>
+    <Version>2.1.6</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -15,6 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -36,6 +37,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

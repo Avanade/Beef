@@ -51,8 +51,7 @@ namespace Beef.Entities
         /// <returns><c>true</c> indicates that the property change is to be cancelled; otherwise, <c>false</c>.</returns>
         protected virtual bool OnBeforePropertyChanged(string propertyName, object newValue)
         {
-            if (propertyName == null)
-                throw new ArgumentNullException("propertyName");
+            Check.NotNull(propertyName, nameof(propertyName));
 
             if (BeforePropertyChanged != null)
             {
@@ -93,16 +92,15 @@ namespace Beef.Entities
             RaisePropertyChanged(propertyName);
         }
 
+#pragma warning disable CA1030 // Use events where appropriate; by-design, this enables the raising of the underlying event.
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event only (<see cref="OnPropertyChanged"/>).
         /// </summary>
-        /// <param name="propertyName"></param>
+        /// <param name="propertyName">The property name.</param>
         public void RaisePropertyChanged(string propertyName)
+#pragma warning restore CA1030
         {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Check.NotNull(propertyName, nameof(propertyName))));
         }
 
         /// <summary>
@@ -110,7 +108,7 @@ namespace Beef.Entities
         /// </summary>
         /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
         /// <param name="propertyValue">The property value to get.</param>
-        protected T GetAutoValue<T>(ref T propertyValue) where T : class, new()
+        static protected T GetAutoValue<T>(ref T propertyValue) where T : class, new()
         {
             if (propertyValue == null)
                 propertyValue = new T();
@@ -174,7 +172,7 @@ namespace Beef.Entities
                     return !isChanged ? false : throw new InvalidOperationException(EntityIsReadOnlyMessage);
 
                 // Test immutability.
-                if (immutable && isChanged && Comparer<T>.Default.Compare(propertyValue, default(T)) != 0)
+                if (immutable && isChanged && Comparer<T>.Default.Compare(propertyValue, default) != 0)
                     throw new InvalidOperationException(ValueIsImmutableMessage);
 
                 // Handle on before property changed.
@@ -195,6 +193,10 @@ namespace Beef.Entities
                     if (npc != null)
                         npc.PropertyChanged -= GetValue_PropertyChanged(propertyNames);
                 }
+
+                // Track changes for the new value where parent (this) is tracking.
+                if (this is IChangeTrackingLogging ct && ct.IsChangeTracking && setValue is IChangeTrackingLogging sct && !sct.IsChangeTracking)
+                    sct.TrackChanges();
 
                 // Update the property and trigger the property changed.
                 propertyValue = setValue;
@@ -418,7 +420,7 @@ namespace Beef.Entities
         /// <summary>
         /// Validate the set value property names list.
         /// </summary>
-        private void ValidateSetValuePropertyNames(params string[] propertyNames)
+        private static void ValidateSetValuePropertyNames(params string[] propertyNames)
         {
             if (propertyNames.Length == 0)
                 throw new ArgumentException("At least one property name must be specified.");

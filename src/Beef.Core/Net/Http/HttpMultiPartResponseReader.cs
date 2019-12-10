@@ -14,7 +14,7 @@ namespace Beef.Net.Http
     /// <summary>
     /// Represents an HTTP multi-part response reader.
     /// </summary>
-    public class HttpMultiPartResponseReader : IDisposable
+    public sealed class HttpMultiPartResponseReader : IDisposable
     {
         private static readonly MultiPartReadState[] DataOrEmptyStates = new MultiPartReadState[] { MultiPartReadState.Data, MultiPartReadState.Empty };
 
@@ -142,7 +142,7 @@ namespace Beef.Net.Http
                     if (val.Length > 1)
                     {
                         var nvp = SplitNameValuePair(val[1]);
-                        if (nvp.Item1 == "boundary" && nvp.Item2.StartsWith("changesetresponse_"))
+                        if (nvp.Item1 == "boundary" && nvp.Item2.StartsWith("changesetresponse_", StringComparison.OrdinalIgnoreCase))
                             isInvalidMultiPart = false;
                     }
 
@@ -209,10 +209,10 @@ namespace Beef.Net.Http
                     else
                         return MultiPartReadState.Empty;
                 }
-                else if (_line.StartsWith("--batchresponse_"))
-                    return _line.EndsWith("--") ? MultiPartReadState.EndOfBatch : MultiPartReadState.StartOfBatch;
-                else if (_line.StartsWith("--changesetresponse_"))
-                    return _line.EndsWith("--") ? MultiPartReadState.EndOfChangeSet : MultiPartReadState.StartOfChangeSet;
+                else if (_line.StartsWith("--batchresponse_", StringComparison.OrdinalIgnoreCase))
+                    return _line.EndsWith("--", StringComparison.OrdinalIgnoreCase) ? MultiPartReadState.EndOfBatch : MultiPartReadState.StartOfBatch;
+                else if (_line.StartsWith("--changesetresponse_", StringComparison.OrdinalIgnoreCase))
+                    return _line.EndsWith("--", StringComparison.OrdinalIgnoreCase) ? MultiPartReadState.EndOfChangeSet : MultiPartReadState.StartOfChangeSet;
                 else
                     return MultiPartReadState.Data;
             }
@@ -221,7 +221,7 @@ namespace Beef.Net.Http
         /// <summary>
         /// Checks that the read state is valid.
         /// </summary>
-        private MultiPartReadState CheckValidReadStates(MultiPartReadState state, bool statesAreValid, params MultiPartReadState[] states)
+        private static MultiPartReadState CheckValidReadStates(MultiPartReadState state, bool statesAreValid, params MultiPartReadState[] states)
         {
             if (states == null || states.Length == 0)
                 return state;
@@ -235,9 +235,9 @@ namespace Beef.Net.Http
         /// <summary>
         /// Parses a header string into appropriate parts.
         /// </summary>
-        private bool TryParseHeader(string text, out KeyValuePair<string, string[]> header)
+        private static bool TryParseHeader(string text, out KeyValuePair<string, string[]> header)
         {
-            var i = text.IndexOf(": ");
+            var i = text.IndexOf(": ", StringComparison.OrdinalIgnoreCase);
             if (i < 0)
             {
                 header = new KeyValuePair<string, string[]>();
@@ -258,7 +258,7 @@ namespace Beef.Net.Http
         /// <summary>
         /// Parses the status code.
         /// </summary>
-        private bool TryParseStatusCode(string text, out HttpStatusCode statusCode)
+        private static bool TryParseStatusCode(string text, out HttpStatusCode statusCode)
         {
             statusCode = HttpStatusCode.BadRequest;
             var parts = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -274,7 +274,7 @@ namespace Beef.Net.Http
         /// <summary>
         /// Splits a name=value pair.
         /// </summary>
-        private Tuple<string, string> SplitNameValuePair(string text)
+        private static Tuple<string, string> SplitNameValuePair(string text)
         {
             var parts = text.Split(new char[] { '=', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length != 2)

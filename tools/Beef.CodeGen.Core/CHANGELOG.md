@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.23
+- *Fixed:* Entity code-gen updated to override AcceptChanges and TrackChanges to support change tracking through the entity object graph. There are required changes within `Beef.Core` to enable.
+
 ## v2.1.22
 - *Added:* Code-gen of the data access for `Cosmos` adds a new method `_onDataArgsCreate` that is invoked each time a `CosmosDbArgs` is created.
 

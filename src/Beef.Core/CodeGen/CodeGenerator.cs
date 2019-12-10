@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -59,7 +60,7 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            return char.ToLower(text[0]) + text.Substring(1);
+            return char.ToLower(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            return char.ToUpper(text[0]) + text.Substring(1);
+            return char.ToUpper(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace Beef.CodeGen
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
             s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
-            return char.ToUpper(s[0]) + s.Substring(1); // Make sure the first character is always upper case.
+            return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s.Substring(1); // Make sure the first character is always upper case.
         }
 
         /// <summary>
@@ -115,7 +116,9 @@ namespace Beef.CodeGen
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
             s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+#pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "_").ToLowerInvariant(); // Replace space with _ and make lowercase.
+#pragma warning restore CA1308 
         }
 
         /// <summary>
@@ -130,7 +133,9 @@ namespace Beef.CodeGen
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
             s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+#pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "-").ToLowerInvariant(); // Replace space with _ and make lowercase.
+#pragma warning restore CA1308 
         }
 
         /// <summary>
@@ -161,8 +166,8 @@ namespace Beef.CodeGen
             var s = text;
             while (true)
             {
-                var start = s.IndexOf("{{");
-                var end = s.IndexOf("}}");
+                var start = s.IndexOf("{{", StringComparison.InvariantCultureIgnoreCase);
+                var end = s.IndexOf("}}", StringComparison.InvariantCultureIgnoreCase);
 
                 if (start < 0 && end < 0)
                     break;
@@ -173,7 +178,7 @@ namespace Beef.CodeGen
                 string sub = s.Substring(start, end - start + 2);
                 string mid = ReplaceGenericsBracketWithCommentsBracket(sub.Substring(2, sub.Length - 4));
 
-                s = s.Replace(sub, string.Format("<see cref=\"{0}\"/>", mid));
+                s = s.Replace(sub, string.Format(CultureInfo.InvariantCulture, "<see cref=\"{0}\"/>", mid));
             }
 
             return s;
@@ -215,10 +220,10 @@ namespace Beef.CodeGen
                 foreach (var l in loaders)
                 {
                     if (l.Name == SystemConfigName)
-                        throw new ArgumentException(string.Format("A ConfigLoader with the Name of '{0}' is reserved for internal use only.", SystemConfigName));
+                        throw new ArgumentException($"A ConfigLoader with the Name of '{SystemConfigName}' is reserved for internal use only.", nameof(loaders));
 
                     if (cg.Loaders.ContainsKey(l.Name))
-                        throw new ArgumentException(string.Format("A ConfigLoader with the Name of '{0}' has already been defined (must be unique).", l.Name));
+                        throw new ArgumentException($"A ConfigLoader with the Name of '{l.Name}' has already been defined (must be unique).", nameof(loaders));
 
                     cg.Loaders.Add(l.Name, l);
                 }
@@ -296,8 +301,10 @@ namespace Beef.CodeGen
             // Creates the root configuration.
             CodeGenConfig.Create(this);
 
-            var t = new CodeGenTemplate(this, xmlTemplate);
-            t.Execute();
+            using (var t = new CodeGenTemplate(this, xmlTemplate))
+            {
+                t.Execute();
+            }
         }
 
         /// <summary>

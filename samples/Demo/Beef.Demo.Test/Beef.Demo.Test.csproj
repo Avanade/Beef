@@ -8,6 +8,10 @@
     <StartupObject />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CA1707</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Schema\**\*" />
     <EmbeddedResource Include="Scripts\**\*" />

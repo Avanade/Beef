@@ -63,7 +63,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public void Validate_Item()
         {
-            var iv = Validator<TestItem>.Create().HasProperty(x => x.Code, p => p.Mandatory());
+            var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
             var v1 = new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).Run();
             Assert.IsFalse(v1.HasError);
@@ -79,7 +79,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public void Validate_Item_Duplicates()
         {
-            var iv = Validator<TestItem>.Create().HasProperty(x => x.Code, p => p.Mandatory());
+            var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
             var v1 = new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).Run();
             Assert.IsFalse(v1.HasError);

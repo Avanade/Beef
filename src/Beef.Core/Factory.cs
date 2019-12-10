@@ -102,18 +102,12 @@ namespace Beef
         /// <param name="concreteType">The concrete <see cref="Type"/>.</param>
         public static void Set(Type interfaceType, Type concreteType)
         {
-            if (interfaceType == null)
-                throw new ArgumentNullException("interfaceType");
+            if (!Check.NotNull(interfaceType, nameof(interfaceType)).GetTypeInfo().IsInterface)
+                throw new ArgumentException($"Type '{interfaceType.AssemblyQualifiedName}' is not an interface.", nameof(interfaceType));
 
-            if (!interfaceType.GetTypeInfo().IsInterface)
-                throw new ArgumentException(string.Format("Type '{0}' is not an interface.", interfaceType.AssemblyQualifiedName), "interfaceType");
-
-            if (concreteType == null)
-                throw new ArgumentNullException("concreteType");
-
-            TypeInfo ti = concreteType.GetTypeInfo();
+            TypeInfo ti = Check.NotNull(concreteType, nameof(concreteType)).GetTypeInfo();
             if (!ti.IsClass && ti.IsAssignableFrom(interfaceType.GetTypeInfo()))
-                throw new ArgumentException(string.Format("Type '{0}' must implement the interface.", concreteType.AssemblyQualifiedName), "concreteType");
+                throw new ArgumentException($"Type '{concreteType.AssemblyQualifiedName}' must implement the interface.", nameof(concreteType));
 
             lock (_lock)
             {
@@ -135,18 +129,12 @@ namespace Beef
         /// <remarks>This can be called multiple times to define all required substitution relationships.</remarks>
         public static void SetSubstitution(Type interfaceTypeExample, Type concreteTypeExample, Regex nameSubstitutionRegex = null)
         {
-            if (interfaceTypeExample == null)
-                throw new ArgumentNullException("interfaceTypeExample");
+            if (!Check.NotNull(interfaceTypeExample, nameof(interfaceTypeExample)).GetTypeInfo().IsInterface)
+                throw new ArgumentException($"Type '{interfaceTypeExample.AssemblyQualifiedName}' is not an interface.", nameof(interfaceTypeExample));
 
-            if (!interfaceTypeExample.GetTypeInfo().IsInterface)
-                throw new ArgumentException(string.Format("Type '{0}' is not an interface.", interfaceTypeExample.AssemblyQualifiedName), "interfaceTypeExample");
-
-            if (concreteTypeExample == null)
-                throw new ArgumentNullException("concreteTypeExample");
-
-            TypeInfo ti = concreteTypeExample.GetTypeInfo();
+            TypeInfo ti = Check.NotNull(concreteTypeExample, nameof(concreteTypeExample)).GetTypeInfo();
             if (!ti.IsClass && ti.IsAssignableFrom(interfaceTypeExample.GetTypeInfo()))
-                throw new ArgumentException(string.Format("Type '{0}' must implement the interface.", concreteTypeExample.AssemblyQualifiedName), "concreteTypeExample");
+                throw new ArgumentException($"Type '{concreteTypeExample.AssemblyQualifiedName}' must implement the interface.", nameof(concreteTypeExample));
 
             _substitutions.Add(new Substitution(interfaceTypeExample, concreteTypeExample, nameSubstitutionRegex ?? SubstitutionRegex));
         }
@@ -160,10 +148,9 @@ namespace Beef
         {
             Type typeKey = typeof(T);
             if (!typeKey.GetTypeInfo().IsInterface)
-                throw new InvalidOperationException(string.Format("Factory does not support Type '{0}' as this is not an Interface.", typeKey.AssemblyQualifiedName));
+                throw new InvalidOperationException($"Factory does not support Type '{typeKey.AssemblyQualifiedName}' as this is not an Interface.");
 
-            if (value == null)
-                throw new ArgumentNullException("value");
+            Check.NotNull(value, nameof(value));
 
             lock (_lock)
             {
@@ -183,10 +170,9 @@ namespace Beef
         {
             Type typeKey = typeof(T);
             if (!typeKey.GetTypeInfo().IsInterface)
-                throw new InvalidOperationException(string.Format("Factory does not support Type '{0}' as this is not an Interface.", typeKey.AssemblyQualifiedName));
+                throw new InvalidOperationException($"Factory does not support Type '{typeKey.AssemblyQualifiedName}' as this is not an Interface.");
 
-            if (value == null)
-                throw new ArgumentNullException("value");
+            Check.NotNull(value, nameof(value));
 
             lock (_lock)
             {
@@ -241,7 +227,7 @@ namespace Beef
                 return (T)Activator.CreateInstance(_typeCache[typeKey], args);
 
             if (!typeKey.GetTypeInfo().IsInterface)
-                throw new InvalidOperationException(string.Format("Factory can not create an instance of Type '{0}' as this is not an Interface.", typeKey.AssemblyQualifiedName));
+                throw new InvalidOperationException($"Factory can not create an instance of Type '{typeKey.AssemblyQualifiedName}' as this is not an Interface.");
 
             if (_typeProviders.ContainsKey(typeKey.AssemblyQualifiedName))
                 typeVal = Type.GetType(_typeProviders[typeKey.AssemblyQualifiedName], false);
@@ -267,7 +253,7 @@ namespace Beef
             }
 
             if (typeVal == null)
-                throw new InvalidOperationException(string.Format("Factory can not create an instance of Type '{0}'; please check the naming convention and substitution rules.", typeKey.AssemblyQualifiedName));
+                throw new InvalidOperationException($"Factory can not create an instance of Type '{typeKey.AssemblyQualifiedName}'; please check the naming convention and substitution rules.");
 
             lock (_lock)
             {

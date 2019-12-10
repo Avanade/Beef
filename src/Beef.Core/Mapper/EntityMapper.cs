@@ -3,6 +3,7 @@ using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -97,7 +98,36 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the properties that form the unique key.
         /// </summary>
-        IPropertyMapper<TSrce, TDest>[] UniqueKey { get; }
+        IReadOnlyList<IPropertyMapper<TSrce, TDest>> UniqueKey { get; }
+    }
+
+    /// <summary>
+    /// Provides access to the common entity mapper capabilities.
+    /// </summary>
+    public static class EntityMapper
+    {
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> automatically mapping the properties where they share the same name.
+        /// </summary>
+        /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
+        /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        public static EntityMapper<TSrce, TDest> CreateAuto<TSrce, TDest>(params string[] ignoreSrceProperties)
+            where TSrce : class, new()
+            where TDest : class, new()
+        {
+            return new EntityMapper<TSrce, TDest>(true, ignoreSrceProperties);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> where properties are added manually.
+        /// </summary>
+        /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        public static EntityMapper<TSrce, TDest> Create<TSrce, TDest>()
+            where TSrce : class, new()
+            where TDest : class, new()
+        {
+            return new EntityMapper<TSrce, TDest>(false);
+        }
     }
 
     /// <summary>
@@ -119,7 +149,10 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
         /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        [Obsolete("Please use EntityMapper.Create<TSrce, TDest>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static EntityMapper<TSrce, TDest> CreateAuto(params string[] ignoreSrceProperties)
+#pragma warning restore CA1000
         {
             return new EntityMapper<TSrce, TDest>(true, ignoreSrceProperties);
         }
@@ -128,7 +161,10 @@ namespace Beef.Mapper
         /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> where properties are added manually.
         /// </summary>
         /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
+        [Obsolete("Please use EntityMapper.Create<TSrce, TDest>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static EntityMapper<TSrce, TDest> Create()
+#pragma warning restore CA1000
         {
             return new EntityMapper<TSrce, TDest>(false);
         }
@@ -309,6 +345,7 @@ namespace Beef.Mapper
             }
         }
 
+#pragma warning disable CA1716 // Identifiers should not match keywords; Property is the best name and stays.
         /// <summary>
         /// Adds a <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/> to the mapper.
         /// </summary>
@@ -318,6 +355,7 @@ namespace Beef.Mapper
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
         /// <returns>The <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</returns>
         public virtual PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> Property<TSrceProperty, TDestProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression)
+#pragma warning restore CA1716
         {
             return PropertySrceAndDest(srcePropertyExpression, destPropertyExpression);
         }
@@ -345,9 +383,9 @@ namespace Beef.Mapper
         /// <typeparam name="TDestProperty">The destination property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
-        /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
+        /// <param name="propertyAction">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public virtual EntityMapper<TSrce, TDest> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression, Action<PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>> property = null)
+        public virtual EntityMapper<TSrce, TDest> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression, Action<PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>> propertyAction = null)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -355,8 +393,8 @@ namespace Beef.Mapper
             if (destPropertyExpression == null)
                 throw new ArgumentNullException(nameof(destPropertyExpression));
 
-            var spe = PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression);
-            var dpe = PropertyExpression<TDest, TDestProperty>.Create(destPropertyExpression);
+            var spe = PropertyExpression.Create(srcePropertyExpression);
+            var dpe = PropertyExpression.Create(destPropertyExpression);
 
             var px = GetBySrcePropertyName(spe.Name);
             if (px != null && (px.DestPropertyName != dpe.Name))
@@ -371,7 +409,7 @@ namespace Beef.Mapper
             else
                 p = (PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>)px;
 
-            property?.Invoke(p);
+            propertyAction?.Invoke(p);
             return this;
         }
 
@@ -397,15 +435,15 @@ namespace Beef.Mapper
         /// </summary>
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
-        /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
+        /// <param name="propertyAction">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public virtual EntityMapper<TSrce, TDest> HasSrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Action<PropertySrceMapper<TSrce, TSrceProperty, TDest>> property = null)
+        public virtual EntityMapper<TSrce, TDest> HasSrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Action<PropertySrceMapper<TSrce, TSrceProperty, TDest>> propertyAction = null)
             where TSrceProperty : class
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
 
-            var spe = PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression);
+            var spe = PropertyExpression.Create(srcePropertyExpression);
 
             var px = GetBySrcePropertyName(spe.Name);
             if (px != null && (px.DestPropertyName != null))
@@ -420,7 +458,7 @@ namespace Beef.Mapper
             else
                 p = (PropertySrceMapper<TSrce, TSrceProperty, TDest>)px;
 
-            property?.Invoke(p);
+            propertyAction?.Invoke(p);
             return this;
         }
 
@@ -430,11 +468,12 @@ namespace Beef.Mapper
         /// <param name="mapping">The <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}"/>.</param>
         protected void AddPropertyMapper(IPropertyMapper<TSrce, TDest> mapping)
         {
+            Check.NotNull(mapping, nameof(mapping));
             if (_srceMappings.ContainsKey(mapping.SrcePropertyName))
-                throw new ArgumentException(string.Format("Source property '{0}' mapping can not be specified more than once.", mapping.SrcePropertyName), "SourcePropertyExpression");
+                throw new ArgumentException($"Source property '{mapping.SrcePropertyName}' mapping can not be specified more than once.", nameof(mapping));
 
             if (mapping.DestPropertyName != null && _destMappings.ContainsKey(mapping.DestPropertyName))
-                throw new ArgumentException(string.Format("Destination property '{0}' mapping can not be specified more than once.", mapping.DestPropertyName), "DestPropertyExpression");
+                throw new ArgumentException($"Destination property '{mapping.DestPropertyName}' mapping can not be specified more than once.", nameof(mapping));
 
             _srceMappings.Add(mapping.SrcePropertyName, mapping);
             if (mapping.DestPropertyName != null)
@@ -472,7 +511,7 @@ namespace Beef.Mapper
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
         public virtual EntityMapper<TSrce, TDest> Ignore<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
         {
-            return Ignore(PropertyExpression<TSrce, TSrceProperty>.GetPropertyName(srcePropertyExpression));
+            return Ignore(PropertyExpression.GetPropertyName(srcePropertyExpression));
         }
 
         /// <summary>
@@ -659,15 +698,15 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the properties that form the unique key.
         /// </summary>
-        public IPropertyMapper<TSrce, TDest>[] UniqueKey
+        public IReadOnlyList<IPropertyMapper<TSrce, TDest>> UniqueKey
         {
             get
             {
                 if (_uniqueKey != null)
-                    return _uniqueKey;
+                    return new ReadOnlyCollection<IPropertyMapper<TSrce, TDest>>(_uniqueKey);
 
                 _uniqueKey = Mappings.Where(x => x.IsUniqueKey).ToArray();
-                return _uniqueKey;
+                return new ReadOnlyCollection<IPropertyMapper<TSrce, TDest>>(_uniqueKey);
             }
         }
     }
@@ -685,10 +724,12 @@ namespace Beef.Mapper
     {
         private static readonly TMapper _default = new TMapper();
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets the current instance of the mapper.
         /// </summary>
         public static TMapper Default
+#pragma warning restore CA1000
         {
             get
             {
@@ -703,6 +744,6 @@ namespace Beef.Mapper
         /// Initializes a new instance of the <see cref="EntityMapper{TSrce, TDest, TMapper}"/> class.
         /// </summary>
         /// <param name="autoMap">Indicates whether the two entities should automatically map where the properties share the same name and <see cref="Type"/>.</param>
-        public EntityMapper(bool autoMap = false) : base(autoMap) { }
+        protected EntityMapper(bool autoMap = false) : base(autoMap) { }
     }
 }

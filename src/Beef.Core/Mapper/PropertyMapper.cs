@@ -71,7 +71,7 @@ namespace Beef.Mapper
         object ConvertToSrceValue(object destinationPropertyValue, OperationTypes operationType);
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
+        /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
         /// </summary>
         ComplexTypeReflector DestComplexTypeReflector { get; }
 
@@ -104,8 +104,8 @@ namespace Beef.Mapper
         /// <param name="destPropertyExpression">The <see cref="LambdaExpression"/> to reference the destination entity property.</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         public PropertyMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression, OperationTypes operationTypes = OperationTypes.Any)
-            : this(PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression))),
-                   PropertyExpression<TDest, TDestProperty>.Create(destPropertyExpression ?? throw new ArgumentNullException(nameof(destPropertyExpression))),
+            : this(PropertyExpression.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression))),
+                   PropertyExpression.Create(destPropertyExpression ?? throw new ArgumentNullException(nameof(destPropertyExpression))),
                    operationTypes)
         { }
 
@@ -146,7 +146,7 @@ namespace Beef.Mapper
                     SetMapper((IEntityMapperBase)typeof(EntityMapper<,>)
                             .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
                             .GetMethod("CreateAuto", BindingFlags.Public | BindingFlags.Static)
-                            .Invoke(null, new object[] { new string[0] }));
+                            .Invoke(null, new object[] { Array.Empty<string>() }));
                 }
             }
 
@@ -209,7 +209,7 @@ namespace Beef.Mapper
         protected Type DestUnderlyingPropertyType { get; } = Nullable.GetUnderlyingType(typeof(TDestProperty)) ?? typeof(TDestProperty);
 
         /// <summary>
-        /// Gets the source <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
+        /// Gets the source <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
         public ComplexTypeReflector SrceComplexTypeReflector { get; private set; }
 
@@ -219,7 +219,7 @@ namespace Beef.Mapper
         public bool IsSrceComplexType => SrceComplexTypeReflector != null;
 
         /// <summary>
-        /// Gets the destination <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
+        /// Gets the destination <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
         /// </summary>
         public ComplexTypeReflector DestComplexTypeReflector { get; private set; }
 
@@ -440,6 +440,7 @@ namespace Beef.Mapper
             SetSrceValue(entity, (TSrceProperty)value, operationType);
         }
 
+#pragma warning disable IDE0060, CA1801 // Remove unused parameter; by-design to have consistent interface
         /// <summary>
         /// Gets the destination property value.
         /// </summary>
@@ -447,6 +448,7 @@ namespace Beef.Mapper
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
         protected TDestProperty GetDestValue(TDest entity, OperationTypes operationType)
+#pragma warning restore IDE0060, CA1801
         {
             return DestPropertyExpression.GetValue(entity);
         }
@@ -562,7 +564,7 @@ namespace Beef.Mapper
                 if (Mapper != null)
                     return (TDestProperty)((IEntityMapper)Mapper).MapToDest(sourcePropertyValue, operationType);
 
-                return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType);
+                return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
             if (SrceComplexTypeReflector.IsCollection)
@@ -573,7 +575,7 @@ namespace Beef.Mapper
                     if (Mapper != null)
                         c.Add(((IEntityMapper)Mapper).MapToDest(item, operationType));
                     else
-                        c.Add(Convert.ChangeType(item, DestUnderlyingPropertyType));
+                        c.Add(Convert.ChangeType(item, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
                 }
 
                 return (TDestProperty)DestComplexTypeReflector.CreateValue(c);
@@ -581,7 +583,7 @@ namespace Beef.Mapper
 
             try
             {
-                return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType);
+                return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {
@@ -671,7 +673,7 @@ namespace Beef.Mapper
                 if (Mapper != null)
                     return (TSrceProperty)((IEntityMapper)Mapper).MapToSrce(destinationPropertyValue, operationType);
 
-                return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType);
+                return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
             if (IsSrceComplexType && SrceComplexTypeReflector.IsCollection)
@@ -682,7 +684,7 @@ namespace Beef.Mapper
                     if (Mapper != null)
                         c.Add(((IEntityMapper)Mapper).MapToSrce(item, operationType));
                     else
-                        c.Add(Convert.ChangeType(item, SrceUnderlyingPropertyType));
+                        c.Add(Convert.ChangeType(item, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
                 }
 
                 return (TSrceProperty)SrceComplexTypeReflector.CreateValue(c);
@@ -690,7 +692,7 @@ namespace Beef.Mapper
 
             try
             {
-                return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType);
+                return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (Exception ex)
             {

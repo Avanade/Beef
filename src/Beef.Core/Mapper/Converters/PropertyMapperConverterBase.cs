@@ -17,10 +17,12 @@ namespace Beef.Mapper.Converters
         : TwoKeySetCache<TSrceProperty, TDestProperty>, IPropertyMapperConverter<TSrceProperty, TDestProperty>
         where T : PropertyMapperConverterBase<T, TSrceProperty, TDestProperty>, new()
     {
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets or sets the default instance.
         /// </summary>
         public static T Default { get; set; } = new T();
+#pragma warning restore CA1000
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TwoKeySetCache{TColl, TItem}"/> class.

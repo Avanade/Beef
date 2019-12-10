@@ -70,7 +70,7 @@ namespace Beef
         public static void IsTrue(bool predicate, string paramName, string message)
         {
             if (!predicate)
-                throw new ArgumentException(message ?? "Argument is not valid.");
+                throw new ArgumentException(message ?? "Argument is not valid.", paramName);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Beef
         public static void IsFalse(bool predicate, string paramName, string message)
         {
             if (predicate)
-                throw new ArgumentException(message ?? "Argument is not valid.");
+                throw new ArgumentException(message ?? "Argument is not valid.", paramName);
         }
 
         /// <summary>

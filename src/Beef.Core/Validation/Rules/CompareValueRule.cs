@@ -47,6 +47,7 @@ namespace Beef.Validation.Rules
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
             var compareToValue = _compareToValueFunction == null ? _compareToValue : _compareToValueFunction.Invoke(context.Parent.Value);
             if (!Compare(context.Value, compareToValue))
             {

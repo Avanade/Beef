@@ -11,15 +11,15 @@ namespace Beef.WebApi
     /// </summary>
     public static class WebApiServiceAgentManager
     {
-        private static readonly Dictionary<string, RegisteredData> _dict = new Dictionary<string, RegisteredData>();
+        private static readonly Dictionary<string, WebApiServiceAgentRegisteredData> _dict = new Dictionary<string, WebApiServiceAgentRegisteredData>();
         private static readonly object _lock = new object();
-        private static Func<RegisteredData, HttpClient> _httpClientCreate;
+        internal static Func<WebApiServiceAgentRegisteredData, HttpClient> _httpClientCreate;
 
         /// <summary>
         /// Register a <paramref name="httpClientCreate"/> function to create the <see cref="HttpClient"/> where not previously set.
         /// </summary>
         /// <param name="httpClientCreate">The function to create the <see cref="HttpClient"/>.</param>
-        public static void RegisterHttpClientCreate(Func<RegisteredData, HttpClient> httpClientCreate)
+        public static void RegisterHttpClientCreate(Func<WebApiServiceAgentRegisteredData, HttpClient> httpClientCreate)
         {
             _httpClientCreate = httpClientCreate;
         }
@@ -40,7 +40,7 @@ namespace Beef.WebApi
 
             lock (_lock)
             {
-                _dict[nameSpace] = new RegisteredData { Client = client, BeforeRequest = beforeRequest };
+                _dict[nameSpace] = new WebApiServiceAgentRegisteredData { Client = client, BeforeRequest = beforeRequest };
             }
         }
 
@@ -60,88 +60,90 @@ namespace Beef.WebApi
 
             lock (_lock)
             {
-                _dict[nameSpace] = new RegisteredData { BaseAddress = baseAddress, BeforeRequest = beforeRequest };
+                _dict[nameSpace] = new WebApiServiceAgentRegisteredData { BaseAddress = baseAddress, BeforeRequest = beforeRequest };
             }
         }
 
         /// <summary>
-        /// Gets the <see cref="RegisteredData"/> using the namespace for <typeparamref name="T"/>.
+        /// Gets the <see cref="WebApiServiceAgentRegisteredData"/> using the namespace for <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> to derive the namespace for.</typeparam>
-        /// <returns>The <see cref="RegisteredData"/> where found; otherwise, <c>null</c>.</returns>
-        public static RegisteredData Get<T>()
+        /// <returns>The <see cref="WebApiServiceAgentRegisteredData"/> where found; otherwise, <c>null</c>.</returns>
+        public static WebApiServiceAgentRegisteredData Get<T>()
         {
             return Get(typeof(T).Namespace);
         }
 
         /// <summary>
-        /// Gets the <see cref="RegisteredData"/> for the specified .NET <paramref name="nameSpace"/>.
+        /// Gets the <see cref="WebApiServiceAgentRegisteredData"/> for the specified .NET <paramref name="nameSpace"/>.
         /// </summary>
         /// <param name="nameSpace">The namespace.</param>
-        /// <returns>The <see cref="RegisteredData"/> where found; otherwise, <c>null</c>.</returns>
-        public static RegisteredData Get(string nameSpace)
+        /// <returns>The <see cref="WebApiServiceAgentRegisteredData"/> where found; otherwise, <c>null</c>.</returns>
+        public static WebApiServiceAgentRegisteredData Get(string nameSpace)
         {
-            if (_dict.TryGetValue(nameSpace, out RegisteredData rd))
+            if (_dict.TryGetValue(nameSpace, out WebApiServiceAgentRegisteredData rd))
                 return rd;
 
             return null;
         }
+    }
+
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable; by design, statically cached values that cannot be disposed.
+    /// <summary>
+    /// Represents the registered data.
+    /// </summary>
+    public class WebApiServiceAgentRegisteredData
+#pragma warning restore CA1001
+    {
+        private static readonly Dictionary<Uri, HttpClient> _clientCache = new Dictionary<Uri, HttpClient>();
+
+        private HttpClient _client;
+        private Uri _baseAddress;
+        private readonly object _lock = new object();
 
         /// <summary>
-        /// Represents the registered data.
+        /// Gets the <see cref="HttpClient"/>.
         /// </summary>
-        public class RegisteredData
+        public HttpClient Client
         {
-            private static readonly Dictionary<Uri, HttpClient> _clientCache = new Dictionary<Uri, HttpClient>();
-
-            private HttpClient _client;
-            private Uri _baseAddress;
-            private readonly object _lock = new object();
-
-            /// <summary>
-            /// Gets the <see cref="HttpClient"/>.
-            /// </summary>
-            public HttpClient Client
+            get
             {
-                get
+                if (_client == null && WebApiServiceAgentManager._httpClientCreate != null)
+                    return WebApiServiceAgentManager._httpClientCreate(this);
+
+                if (_client != null)
+                    return _client;
+
+                lock (_lock)
                 {
-                    if (_client == null && _httpClientCreate != null)
-                        return _httpClientCreate(this);
-
-                    if (_client != null)
-                        return _client;
-
-                    lock (_lock)
+                    if (_client == null)
                     {
-                        if (_client == null)
+                        if (!_clientCache.TryGetValue(BaseAddress, out _client))
                         {
-                            if (!_clientCache.TryGetValue(BaseAddress, out _client))
-                            {
-                                _client = new HttpClient() { BaseAddress = BaseAddress };
-                                _clientCache.Add(BaseAddress, _client);
-                            }
+                            _client = new HttpClient() { BaseAddress = BaseAddress };
+                            _clientCache.Add(BaseAddress, _client);
                         }
-
-                        return _client;
                     }
+
+                    return _client;
                 }
-
-                internal set { _client = value ?? throw new ArgumentNullException(nameof(Client)); }
             }
 
-            /// <summary>
-            /// Gets the <see cref="BaseAddress"/>.
-            /// </summary>
-            public Uri BaseAddress
-            {
-                get { return _baseAddress ?? _client?.BaseAddress; }
-                internal set { _baseAddress = value ?? throw new ArgumentNullException(nameof(BaseAddress)); }
-            }
-
-            /// <summary>
-            /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).
-            /// </summary>
-            public Action<HttpRequestMessage> BeforeRequest { get; internal set; }
+            internal set { _client = value ?? throw new ArgumentNullException(nameof(Client)); }
         }
+
+        /// <summary>
+        /// Gets the <see cref="BaseAddress"/>.
+        /// </summary>
+        public Uri BaseAddress
+        {
+            get { return _baseAddress ?? _client?.BaseAddress; }
+            internal set { _baseAddress = value ?? throw new ArgumentNullException(nameof(BaseAddress)); }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).
+        /// </summary>
+        public Action<HttpRequestMessage> BeforeRequest { get; internal set; }
     }
 }

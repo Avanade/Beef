@@ -26,6 +26,8 @@ namespace Beef.Business
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected override void WrapInvoke(object caller, Action action, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            Check.NotNull(action, nameof(action));
+
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
@@ -71,6 +73,8 @@ namespace Beef.Business
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected async override Task WrapInvokeAsync(object caller, Func<Task> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            Check.NotNull(func, nameof(func));
+
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
@@ -122,6 +126,8 @@ namespace Beef.Business
         /// <returns>The result.</returns>
         protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            Check.NotNull(func, nameof(func));
+
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope txn = null;
             DataContextScope ctx = null;
@@ -171,7 +177,9 @@ namespace Beef.Business
         /// <returns>The result.</returns>
         protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
+            Check.NotNull(func, nameof(func));
+
+            BusinessInvokerArgs bia = Check.NotNull(param ?? BusinessInvokerArgs.Default, nameof(param));
             TransactionScope txn = null;
             DataContextScope ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
@@ -216,25 +224,25 @@ namespace Beef.Business
     public class BusinessInvokerArgs
     {
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, and
+        /// Gets or sets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, and
         /// <see cref="IncludeTransactionScope"/> is <c>false</c>.
         /// </summary>
-        public static BusinessInvokerArgs Default = new BusinessInvokerArgs();
+        public static BusinessInvokerArgs Default { get; set; } = new BusinessInvokerArgs();
 
         /// <summary>
         /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.RequiresNew"/>, 
         /// <see cref="IncludeTransactionScope"/> is <c>true</c> and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.Suppress"/>.
         /// </summary>
-        public static BusinessInvokerArgs RequiresNewAndTransactionSuppress = new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.RequiresNew, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.Suppress };
+        public static BusinessInvokerArgs RequiresNewAndTransactionSuppress => new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.RequiresNew, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.Suppress };
 
         /// <summary>
         /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, 
         /// <see cref="IncludeTransactionScope"/> is <c>true</c> and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.RequiresNew"/>.
         /// </summary>
-        public static BusinessInvokerArgs UseExistingAndRequiresNew = new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.UseExisting, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.RequiresNew };
+        public static BusinessInvokerArgs UseExistingAndRequiresNew => new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.UseExisting, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.RequiresNew };
 
         /// <summary>
-        /// Gets or sets the <see cref="T:DataContextScopeOption"/>. Defaults to <see cref="DataContextScopeOption.UseExisting"/>.
+        /// Gets or sets the <see cref="Beef.DataContextScopeOption"/>. Defaults to <see cref="DataContextScopeOption.UseExisting"/>.
         /// </summary>
         public DataContextScopeOption DataContextScopeOption { get; set; } = DataContextScopeOption.UseExisting;
 
@@ -244,7 +252,7 @@ namespace Beef.Business
         public bool IncludeTransactionScope { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the <see cref="T:TransactionScopeOption"/> (see <see cref="IncludeTransactionScope"/>). Defaults to <see cref="TransactionScopeOption.Required"/>.
+        /// Gets or sets the <see cref="System.Transactions.TransactionScopeOption"/> (see <see cref="IncludeTransactionScope"/>). Defaults to <see cref="TransactionScopeOption.Required"/>.
         /// </summary>
         public TransactionScopeOption TransactionScopeOption { get; set; } = TransactionScopeOption.Required;
 

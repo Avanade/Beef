@@ -57,7 +57,7 @@ namespace Beef
             if (coll == null)
                 throw new ArgumentNullException(nameof(coll));
 
-            foreach (var item in query)
+            foreach (var item in Check.NotNull(query, nameof(query)))
             {
                 coll.Add(item);
             }
@@ -81,7 +81,7 @@ namespace Beef
             if (coll == null)
                 throw new ArgumentNullException(nameof(coll));
 
-            foreach (var element in query)
+            foreach (var element in Check.NotNull(query, nameof(query)))
             {
                 coll.Add(mapToItem(element));
             }
@@ -98,6 +98,7 @@ namespace Beef
         /// <returns>The resulting query.</returns>
         public static IQueryable<TElement> WhereWhen<TElement>(this IQueryable<TElement> query, bool when, Expression<Func<TElement, bool>> predicate)
         {
+            Check.NotNull(query, nameof(query));
             if (when)
                 return query.Where(predicate);
             else
@@ -116,6 +117,7 @@ namespace Beef
         /// <returns>The resulting query.</returns>
         public static IQueryable<TElement> WhereWith<TElement, T>(this IQueryable<TElement> query, T with, Expression<Func<TElement, bool>> predicate)
         {
+            Check.NotNull(query, nameof(query));
             if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
             {
                 if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
@@ -157,7 +159,7 @@ namespace Beef
             var s = wr.GetTextWithoutWildcards();
             if (ignoreCase)
             {
-                s = s.ToUpper();
+                s = s.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
                 exp = Expression.Call(me, typeof(string).GetMethod("ToUpper", System.Type.EmptyTypes));
             }
 

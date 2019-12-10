@@ -138,7 +138,7 @@ namespace Beef.Executors
             var result = new RunWrapperResult();
             await ExecutorInvoker.Default.InvokeAsync(this, async () =>
             {
-#pragma warning disable CS4014  // Justification: not awaited by design as the Stop needs to run/complete outside of this current execution task/thread.
+#pragma warning disable CS4014, CA1031  // Justification: not awaited by design as the Stop needs to run/complete outside of this current execution task/thread.
                 try
                 {
                     lock (_lock)
@@ -269,6 +269,7 @@ namespace Beef.Executors
 
         #region Stop
 
+#pragma warning disable CA1822 // Mark members as static; by-design - want to give illusion they are instance oriented.
         /// <summary>
         /// Stops the executor; being this currently executing executor.
         /// </summary>
@@ -288,6 +289,7 @@ namespace Beef.Executors
         {
             throw new ExecutorStopException(true, exception);
         }
+#pragma warning restore CA1822
 
         /// <summary>
         /// Stops the execution.

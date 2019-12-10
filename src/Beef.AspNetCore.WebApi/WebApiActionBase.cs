@@ -107,7 +107,7 @@ namespace Beef.AspNetCore.WebApi
 
             WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
             context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorTypeHeaderName, ex.ErrorType.ToString());
-            context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ex.ErrorType).ToString());
+            context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ex.ErrorType).ToString(System.Globalization.CultureInfo.InvariantCulture));
 
             return result;
         }
@@ -137,7 +137,7 @@ namespace Beef.AspNetCore.WebApi
         /// Initializes a new instance of the <see cref="WebApiActionBase"/> class.
         /// </summary>
         /// <param name="controller">The initiating <see cref="ControllerBase"/>.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/>.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller.</param>
@@ -198,7 +198,7 @@ namespace Beef.AspNetCore.WebApi
         public ControllerBase Controller { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:OperationType"/>.
+        /// Gets the <see cref="Beef.OperationType"/>.
         /// </summary>
         public OperationType OperationType { get; private set; }
 
@@ -262,10 +262,14 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="IActionResult"/>.</returns>
         protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode)
         {
+            Check.NotNull(context, nameof(context));
+
             if (statusCode == HttpStatusCode.NotFound)
             {
+#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
                 context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorTypeHeaderName, ErrorType.NotFoundError.ToString());
-                context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ErrorType.NotFoundError).ToString());
+                context.HttpContext.Response.Headers.Add(WebApiConsts.ErrorCodeHeaderName, ((int)ErrorType.NotFoundError).ToString(System.Globalization.CultureInfo.InvariantCulture));
+#pragma warning restore CA1062 
             }
 
             return new StatusCodeResult((int)statusCode);
@@ -280,6 +284,7 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="IActionResult"/>.</returns>
         protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken json)
         {
+            Check.NotNull(context, nameof(context));
             return new ObjectResult(json) { StatusCode = (int)statusCode };
         }
 
@@ -388,6 +393,8 @@ namespace Beef.AspNetCore.WebApi
         /// </list></remarks>
         protected (JToken json, string etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
         {
+            Check.NotNull(context, nameof(context));
+
             if (result == null)
                 return (null, null);
 
@@ -425,8 +432,10 @@ namespace Beef.AspNetCore.WebApi
                     sb = null;
             }
 
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to hash to calculate an etag.
             using var md5 = System.Security.Cryptography.MD5.Create();
-            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context.HttpContext.Request.QueryString.Value}");
+#pragma warning restore CA5351 
+            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context?.HttpContext.Request.QueryString.Value}");
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             return (json, Convert.ToBase64String(hash));
         }
@@ -475,7 +484,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -518,7 +527,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -593,7 +602,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
@@ -631,7 +640,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -673,7 +682,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
@@ -711,7 +720,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -753,7 +762,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="controller">The <see cref="ControllerBase"/>.</param>
         /// <param name="func">The function to invoke.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/>.</param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
@@ -800,7 +809,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="value">The <see cref="JToken"/> value that contains the content to patch.</param>
         /// <param name="getFunc">The function to invoke to perform the <b>get</b>.</param>
         /// <param name="updateFuncNoResult">The function to invoke to perform the <b>update</b> with no result.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -823,7 +832,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="value">The <see cref="JToken"/> value that contains the content to patch.</param>
         /// <param name="getFunc">The function to invoke to perform the <b>get</b>.</param>
         /// <param name="updateFuncWithResult">The function to invoke to perform the <b>update</b> with a result.</param>
-        /// <param name="operationType">The <see cref="T:OperationType"/></param>
+        /// <param name="operationType">The <see cref="Beef.OperationType"/>.</param>
         /// <param name="statusCode">The primary <see cref="HttpStatusCode"/> when there is a result.</param>
         /// <param name="alternateStatusCode">The alternate <see cref="HttpStatusCode"/> when there is no result (where supported; i.e. not <c>null</c>).</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
@@ -1081,7 +1090,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Update the value using a <see cref="WebApiPatchOption.JsonPatch"/>.
         /// </summary>
-        private async Task<bool> UpdateUsingJsonPatchAsync(ActionContext context, T value, JsonPatchDocument<T> patch)
+        private static async Task<bool> UpdateUsingJsonPatchAsync(ActionContext context, T value, JsonPatchDocument<T> patch)
         {
             var msgs = new MessageItemCollection();
             patch.ApplyTo(value, (e) => msgs.AddError(nameof(value), e.ErrorMessage));

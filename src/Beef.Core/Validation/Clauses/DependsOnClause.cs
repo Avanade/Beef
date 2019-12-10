@@ -22,10 +22,9 @@ namespace Beef.Validation.Clauses
         public DependsOnClause(Expression<Func<TEntity, TProperty>> dependsOnExpression)
         {
             // Validate the expression.
-            if (dependsOnExpression == null)
-                throw new ArgumentNullException("dependsOnExpression");
+            Beef.Check.NotNull(dependsOnExpression, nameof(dependsOnExpression));
 
-            _dependsOn = PropertyExpression<TEntity, TProperty>.Create(dependsOnExpression, true);
+            _dependsOn = PropertyExpression.Create(dependsOnExpression, true);
         }
 
         /// <summary>
@@ -36,6 +35,7 @@ namespace Beef.Validation.Clauses
         public bool Check(IPropertyContext context)
         {
             // Do not continue where the depends on property is in error.
+            Beef.Check.NotNull(context, nameof(context));
             if (context.Parent.HasError(context.CreateFullyQualifiedPropertyName(_dependsOn.Name)))
                 return false;
 

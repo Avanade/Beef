@@ -58,7 +58,7 @@ namespace Beef.Caching.Policy
         public static ICachePolicy DefaultPolicy
         {
             get => _defaultPolicy;
-            set => _defaultPolicy = value ?? throw new ArgumentNullException();
+            set => _defaultPolicy = Check.NotNull(value, nameof(value));
         }
 
         /// <summary>
@@ -116,10 +116,13 @@ namespace Beef.Caching.Policy
                 return;
 
             _registered.TryRemove(policyKey, out ICacheCore cv);
-            _policies.TryRemove(policyKey, out ICachePolicy policy);
+            _policies.TryRemove(policyKey, out _);
 
             if (cv != null)
+            {
                 cv.Flush(true);
+                cv.Dispose();
+            }
         }
 
         /// <summary>

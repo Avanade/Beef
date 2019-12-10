@@ -17,7 +17,7 @@ namespace Beef.Validation.Rules
         /// Initializes a new instance of the <see cref="CompareRuleBase{TEntity, TProperty}"/> class.
         /// </summary>
         /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
-        public CompareRuleBase(CompareOperator compareOperator)
+        protected CompareRuleBase(CompareOperator compareOperator)
         {
             Operator = compareOperator;
         }
@@ -37,29 +37,16 @@ namespace Beef.Validation.Rules
         {
             Comparer<TProperty> comparer = Comparer<TProperty>.Default;
 
-            switch (Operator)
+            return Operator switch
             {
-                case CompareOperator.Equal:
-                    return (comparer.Compare(lValue, rValue) == 0);
-
-                case CompareOperator.NotEqual:
-                    return (comparer.Compare(lValue, rValue) != 0);
-
-                case CompareOperator.LessThan:
-                    return (comparer.Compare(lValue, rValue) < 0);
-
-                case CompareOperator.LessThanEqual:
-                    return (comparer.Compare(lValue, rValue) <= 0);
-
-                case CompareOperator.GreaterThan:
-                    return (comparer.Compare(lValue, rValue) > 0);
-
-                case CompareOperator.GreaterThanEqual:
-                    return (comparer.Compare(lValue, rValue) >= 0);
-
-                default:
-                    throw new InvalidOperationException("An invalid Operator value was encountered.");
-            }
+                CompareOperator.Equal => (comparer.Compare(lValue, rValue) == 0),
+                CompareOperator.NotEqual => (comparer.Compare(lValue, rValue) != 0),
+                CompareOperator.LessThan => (comparer.Compare(lValue, rValue) < 0),
+                CompareOperator.LessThanEqual => (comparer.Compare(lValue, rValue) <= 0),
+                CompareOperator.GreaterThan => (comparer.Compare(lValue, rValue) > 0),
+                CompareOperator.GreaterThanEqual => (comparer.Compare(lValue, rValue) >= 0),
+                _ => throw new InvalidOperationException("An invalid Operator value was encountered."),
+            };
         }
 
         /// <summary>
@@ -69,6 +56,7 @@ namespace Beef.Validation.Rules
         /// <param name="compareToText">The compare text <see cref="LText"/> to be passed for the error message.</param>
         protected void CreateErrorMessage(PropertyContext<TEntity, TProperty> context, LText compareToText)
         {
+            Beef.Check.NotNull(context, nameof(context));
             switch (Operator)
             {
                 case CompareOperator.Equal:

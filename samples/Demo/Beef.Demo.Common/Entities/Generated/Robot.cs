@@ -183,7 +183,30 @@ namespace Beef.Demo.Common.Entities
         public ChangeLog ChangeLog
         {
             get { return _changeLog; }
-            set { SetValue<ChangeLog>(ref _changeLog, value, false, false, Property_ChangeLog); }
+            set { SetValue<ChangeLog>(ref _changeLog, value, false, true, Property_ChangeLog); }
+        }
+
+        #endregion
+
+        #region IChangeTracking
+          
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+            ChangeLog?.AcceptChanges();
+            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+            ChangeLog?.TrackChanges();
+            base.TrackChanges();
         }
 
         #endregion
@@ -251,7 +274,7 @@ namespace Beef.Demo.Common.Entities
             EyeColorSid = from.EyeColorSid;
             PowerSourceSid = from.PowerSourceSid;
             ETag = from.ETag;
-            ChangeLog = from.ChangeLog;
+            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
 
             OnAfterCopyFrom(from);
         }

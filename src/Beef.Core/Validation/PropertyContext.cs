@@ -210,7 +210,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="MessageItem"/>.</returns>
         public MessageItem CreateErrorMessage(LText format)
         {
-            return CreateErrorMessage(format, new object[0]);
+            return CreateErrorMessage(format, Array.Empty<object>());
         }
 
         /// <summary>

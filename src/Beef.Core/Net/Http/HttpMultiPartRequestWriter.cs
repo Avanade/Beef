@@ -10,7 +10,7 @@ namespace Beef.Net.Http
     /// <summary>
     /// Represents an HTTP multi-part request writer.
     /// </summary>
-    public class HttpMultiPartRequestWriter : IDisposable
+    public sealed class HttpMultiPartRequestWriter : IDisposable
     {
         private readonly TextWriter _writer;
         private Guid _batchId;

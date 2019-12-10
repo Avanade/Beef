@@ -60,6 +60,7 @@ namespace Beef.Json
         /// <returns>The resulting <see cref="JsonEntityMergeResult"/>.</returns>
         public JsonEntityMergeResult Log(MessageItem message)
         {
+            Check.NotNull(message, nameof(message));
             if (TreatWarningsAsErrors && message.Type == MessageType.Warning)
                 message.Type = MessageType.Error;
 
@@ -76,7 +77,7 @@ namespace Beef.Json
     /// <see cref="IUniqueKey.HasUniqueKey"/> is set for the <see cref="Type"/> then the item will be matched (finds existing item) and updates, versus full array replacement (normal
     /// behaviour).</para>
     /// </remarks>
-    public class JsonEntityMerge
+    public static class JsonEntityMerge
     {
         /// <summary>
         /// Manages the unique key config.
@@ -177,7 +178,7 @@ namespace Beef.Json
         {
             Check.NotNull(json, nameof(json));
             Check.NotNull(value, nameof(value));
-            args = args ?? new JsonEntityMergeArgs();
+            args ??= new JsonEntityMergeArgs();
 
             if (json.Type != JTokenType.Object)
                 return args.Log(MessageItem.CreateMessage(json.Path, MessageType.Error, $"The JSON document is malformed and could not be parsed."));
@@ -278,7 +279,7 @@ namespace Beef.Json
 
                 // Where empty array then update as such.
                 if (!jp.Value.HasValues)
-                    return UpdateArrayValue(args, pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue());
+                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue());
 
                 // Handle array with primitive types.
                 if (!pr.ComplexTypeReflector.IsItemComplexType)
@@ -289,7 +290,7 @@ namespace Beef.Json
                         lo.Add(iv.ToObject(pr.ComplexTypeReflector.ItemType));
                     }
 
-                    return UpdateArrayValue(args, pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue(lo));
+                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue(lo));
                 }
 
                 // Finally, handle array with complex entity items.
@@ -374,7 +375,7 @@ namespace Beef.Json
 
                     try
                     {
-                        uk[i] = ukpr[i].GetJtokenValue(jk);
+                        uk[i] = ukpr[i].GetJTokenValue(jk);
                     }
                     catch (FormatException fex)
                     {
@@ -432,7 +433,7 @@ namespace Beef.Json
         /// <summary>
         /// Updates the array value.
         /// </summary>
-        private static JsonEntityMergeResult UpdateArrayValue(JsonEntityMergeArgs args, IPropertyReflector pr, object entity, IEnumerable curVal, IEnumerable newVal)
+        private static JsonEntityMergeResult UpdateArrayValue(IPropertyReflector pr, object entity, IEnumerable curVal, IEnumerable newVal)
         {
             if (pr.ComplexTypeReflector.CompareSequence(newVal, curVal))
                 return JsonEntityMergeResult.SuccessNoChanges;

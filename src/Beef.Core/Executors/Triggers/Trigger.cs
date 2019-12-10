@@ -9,10 +9,11 @@ namespace Beef.Executors.Triggers
     /// <summary>
     /// Represents the core (internal) trigger capabilities. Basically, this class enables <see cref="TriggerBase"/> and <see cref="TriggerBase{TInput}"/>.
     /// </summary>
-    public abstract class Trigger
+    public abstract class Trigger : IDisposable
     {
         private readonly object _lock = new object();
         private ExecutionManager _executionManager;
+        private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Trigger"/> class.
@@ -81,11 +82,13 @@ namespace Beef.Executors.Triggers
             {
                 OnStarted();
             }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, needs to fail!
             catch (Exception ex)
             {
                 Logger.Default.Exception(ex, $"Trigger '{InstanceId}' encountered an exception whilst executing OnStarted: {ex.Message}");
                 Stop(ex);
             }
+#pragma warning restore CA1031
         }
 
         /// <summary>
@@ -127,12 +130,14 @@ namespace Beef.Executors.Triggers
                 {
                     OnStopped();
                 }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design needs to catch-all.
                 catch (Exception ex)
                 {
                     Result = TriggerResult.Unsuccessful;
                     Exception = ex;
                     Logger.Default.Exception(ex, $"Trigger '{InstanceId}' encountered an exception whilst executing OnStopped/OnStopExecution: {ex.Message}");
                 }
+#pragma warning restore CA1031 
             }
 
             if (raiseOnStopExecution)
@@ -160,6 +165,7 @@ namespace Beef.Executors.Triggers
         /// <param name="completionCallback">An optional callback for post <see cref="Executor"/> <b>Run</b> notification/processing.</param>
         internal void Run(object sender, object args, Action completionCallback)
         {
+            Check.NotNull(sender, nameof(sender));
             if (State == TriggerState.Stopped || State == TriggerState.Stopping)
                 return;
             else if (State != TriggerState.Running)
@@ -173,5 +179,34 @@ namespace Beef.Executors.Triggers
         /// Action to run when the trigger initiated a <b>Run</b>.
         /// </summary>
         internal Func<TriggerEventArgs, Task> OnRunAsync { get; set; }
+
+        /// <summary>
+        /// Release/dispose of all resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ExecutionManager"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// Finalizer.
+        /// </summary>
+        ~Trigger()
+        {
+            Dispose(false);
+        }
     }
 }

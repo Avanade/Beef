@@ -107,7 +107,7 @@ namespace Beef.FlatFile
             bool isQualified = false;
 
             // Iterate and split the record data into multiple columns.
-            for (int i = 0; i < record.LineData.Length; i++)
+            for (int i = 0; i < Check.NotNull(record, nameof(record)).LineData.Length; i++)
             {
                 c = record.LineData[i];
                 if (c == Delimiter)
@@ -218,12 +218,12 @@ namespace Beef.FlatFile
             if (sb.Length > 0)
                 cols.Add(sb.ToString());
 
-            record.Columns = cols.ToArray();
+            record.Columns = cols;
 
             // Determine the record identifier.
             if (IsHierarchical)
             {
-                if (HierarchyColumnIndex >= record.Columns.Length)
+                if (HierarchyColumnIndex >= record.Columns.Count)
                     record.Messages.Add(MessageType.Error, "Unable to determine the code identitier as the hierarchy column index is outside the bounds of the number of columns found for the record.");
                 else
                     return record.Columns[HierarchyColumnIndex.Value];
@@ -244,13 +244,13 @@ namespace Beef.FlatFile
             var val = frr.CreateInstance();
             var col = 0;
 
-            if (record.Columns == null)
+            if (Check.NotNull(record, nameof(record)).Columns == null)
                 return val;
 
             foreach (var fcr in frr.Columns)
             {
                 // When less columns in record data than expected; we update with null. 
-                if (col >= record.Columns.Length)
+                if (col >= record.Columns.Count)
                     fcr.SetValue(record, CleanString(null, fcr.FileColumn), val);
                 else
                     // Set the value.
@@ -275,12 +275,13 @@ namespace Beef.FlatFile
         /// <returns><c>true</c> indicates that the column write was successful; otherwise, <c>false</c>.</returns>
         protected override bool WriteColumnToLineData(FileColumnReflector fcr, FileRecord record, int column, StringBuilder sb)
         {
-            // Delimit each column. 
+            // Delimit each column.
+            Check.NotNull(sb, nameof(sb));
             if (column > 0)
                 sb.Append(Delimiter);
 
             // Get the string value and correct the width if needed.
-            var str = column > record.Columns.Length ? null : record.Columns[column];
+            var str = column > Check.NotNull(record, nameof(record)).Columns.Count ? null : record.Columns[column];
 
             // Override if it is the hierarchy column.
             if (HierarchyColumnIndex.HasValue && HierarchyColumnIndex.Value == column)
@@ -291,7 +292,7 @@ namespace Beef.FlatFile
                 return true;
 
             // Validate/correct the string value to ensure column width conformance.
-            if (!fcr.StringWidthCorrector(record, ref str))
+            if (!Check.NotNull(fcr, nameof(fcr)).StringWidthCorrector(record, ref str))
                 return false;
 
             // Check if the column content contains the delimiter and handle accordingly.
@@ -314,7 +315,7 @@ namespace Beef.FlatFile
                     qualify = true;
 
                 if (qualify)
-                    str = str.Replace(TextQualifier.ToString(), new string(TextQualifier, 2));
+                    str = str.Replace(TextQualifier.ToString(System.Globalization.CultureInfo.InvariantCulture), new string(TextQualifier, 2));
             }
 
             if (qualify)

@@ -51,7 +51,7 @@ namespace Beef.Reflection
         public Func<IPropertyReflector, bool> PropertyBuilder { get; set; } = null;
 
         /// <summary>
-        /// Defines the <see cref="T:StringComparer"/> for finding the property/JSON names (defaults to <see cref="StringComparer.Ordinal"/>).
+        /// Defines the <see cref="StringComparer"/> for finding the property/JSON names (defaults to <see cref="StringComparer.Ordinal"/>).
         /// </summary>
         public StringComparer NameComparer { get; set; } = StringComparer.Ordinal;
 
@@ -82,7 +82,7 @@ namespace Beef.Reflection
             return Cache.GetOrAdd(type, _ =>
             {
                 if (!type.IsClass || type == typeof(string) || type.GetConstructor(Type.EmptyTypes) == null)
-                    throw new ArgumentException($"Type '{type.Name}' must be a class and have a default (parameter-less) constructor.", nameof(Type));
+                    throw new ArgumentException($"Type '{type.Name}' must be a class and have a default (parameter-less) constructor.", nameof(type));
 
                 var er = (IEntityReflector)Activator.CreateInstance(typeof(EntityReflector<>).MakeGenericType(type), this);
                 EntityBuilder?.Invoke(er);
@@ -213,10 +213,10 @@ namespace Beef.Reflection
                 throw new ArgumentNullException(nameof(propertyReflector));
 
             if (_properties.ContainsKey(propertyReflector.PropertyName))
-                throw new ArgumentException(string.Format($"Property with name '{propertyReflector.PropertyName}' can not be specified more than once."), nameof(propertyReflector));
+                throw new ArgumentException($"Property with name '{propertyReflector.PropertyName}' can not be specified more than once.", nameof(propertyReflector));
 
             if (propertyReflector.JsonName != null && _jsonProperties.ContainsKey(propertyReflector.JsonName))
-                throw new ArgumentException(string.Format($"Property with name '{propertyReflector.JsonName}' can not be specified more than once."), nameof(propertyReflector));
+                throw new ArgumentException($"Property with name '{propertyReflector.JsonName}' can not be specified more than once.", nameof(propertyReflector));
 
             _properties.Add(propertyReflector.PropertyName, propertyReflector);
             if (propertyReflector.JsonName != null)
@@ -292,7 +292,7 @@ namespace Beef.Reflection
         IPropertyExpression PropertyExpression { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionEntityReflector"/> (only set where the property <see cref="IsComplexType"/>).
+        /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsComplexType"/>).
         /// </summary>
         ComplexTypeReflector ComplexTypeReflector { get; }
 
@@ -343,7 +343,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        object GetJtokenValue(JToken jtoken);
+        object GetJTokenValue(JToken jtoken);
 
         /// <summary>
         /// Sets the property value from a <see cref="JToken"/>.
@@ -422,7 +422,7 @@ namespace Beef.Reflection
         public PropertyReflector(EntityReflectorArgs args, Expression<Func<TEntity, TProperty>> propertyExpression)
         {
             Args = args ?? throw new ArgumentNullException(nameof(args));
-            PropertyExpression = PropertyExpression<TEntity, TProperty>.Create(propertyExpression ?? throw new ArgumentNullException(nameof(propertyExpression)));
+            PropertyExpression = Reflection.PropertyExpression.Create(propertyExpression ?? throw new ArgumentNullException(nameof(propertyExpression)));
             PropertyInfo = TypeReflector.GetPropertyInfo(typeof(TEntity), PropertyName);
 
             if (PropertyInfo.PropertyType.IsClass && PropertyInfo.PropertyType != typeof(string))
@@ -455,7 +455,7 @@ namespace Beef.Reflection
         public PropertyExpression<TEntity, TProperty> PropertyExpression { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionEntityReflector"/> (only set where the property <see cref="IsComplexType"/>).
+        /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsComplexType"/>).
         /// </summary>
         public ComplexTypeReflector ComplexTypeReflector { get; private set; }
 
@@ -516,14 +516,16 @@ namespace Beef.Reflection
             return Args.GetReflector(ComplexTypeReflector.ItemType);
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, should use the other GetJtokenValue
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        object IPropertyReflector.GetJtokenValue(JToken jtoken)
+        object IPropertyReflector.GetJTokenValue(JToken jtoken)
+#pragma warning restore CA1033 
         {
-            return GetJtokenValue(jtoken);
+            return GetJTokenValue(jtoken);
         }
 
         /// <summary>
@@ -531,7 +533,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        TProperty GetJtokenValue(JToken jtoken)
+        TProperty GetJTokenValue(JToken jtoken)
         {
             return jtoken.ToObject<TProperty>();
         }
@@ -555,7 +557,9 @@ namespace Beef.Reflection
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
         public bool SetValueFromJToken(TEntity entity, JToken jtoken)
         {
-            return SetValue(entity, GetJtokenValue(jtoken));
+            Check.NotNull(entity, nameof(entity));
+            Check.NotNull(jtoken, nameof(jtoken));
+            return SetValue(entity, GetJTokenValue(jtoken));
         }
 
         /// <summary>

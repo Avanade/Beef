@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Beef.Executors
 {
     /// <summary>
-    /// Provides the base <see cref="T:Executor"/> arguments.
+    /// Provides the base <see cref="Beef.Executors.Executor"/> arguments.
     /// </summary>
     public interface IExecutorBaseArgs
     {
@@ -27,7 +27,7 @@ namespace Beef.Executors
         ExecutorRunType RunType { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:Exception"/> raised when invoking the <see cref="RunType"/>.
+        /// Gets the <see cref="System.Exception"/> raised when invoking the <see cref="RunType"/>.
         /// </summary>
         Exception Exception { get; }
 
@@ -43,7 +43,7 @@ namespace Beef.Executors
     }
 
     /// <summary>
-    /// Provides the <see cref="T:Executor"/> arguments.
+    /// Provides the <see cref="Beef.Executors.Executor"/> arguments.
     /// </summary>
     public interface IExecutorArgs : IExecutorBaseArgs
     {
@@ -68,9 +68,6 @@ namespace Beef.Executors
     /// </summary>
     public abstract class ExecutorArgsBase : IExecutorBaseArgs
     {
-        private readonly Executor _executor;
-        private readonly ExecutorRunType _runType;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutorArgsBase"/> class.
         /// </summary>
@@ -78,8 +75,8 @@ namespace Beef.Executors
         /// <param name="runType">The <see cref="ExecutorRunType"/>.</param>
         internal ExecutorArgsBase(Executor executor, ExecutorRunType runType)
         {
-            _executor = executor;
-            _runType = runType;
+            Executor = Check.NotNull(executor, nameof(executor));
+            RunType = runType;
         }
 
         /// <summary>
@@ -94,20 +91,20 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the owning <see cref="Executor"/>.
         /// </summary>
-        Executor IExecutorBaseArgs.Executor => _executor;
+        public Executor Executor { get; }
 
         /// <summary>
         /// Gets the <see cref="Executor"/> <see cref="Executor.ExecutorArgs"/> value.
         /// </summary>
-        object IExecutorBaseArgs.Value => ((IExecutorBaseArgs)this).Executor.ExecutorArgs;
+        public object Value => Executor.ExecutorArgs;
 
         /// <summary>
         /// Gets the <see cref="ExecutorRunType"/>.
         /// </summary>
-        ExecutorRunType IExecutorBaseArgs.RunType => _runType;
+        public ExecutorRunType RunType { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:Exception"/> raised when invoking the <see cref="IExecutorBaseArgs.RunType"/>.
+        /// Gets the <see cref="System.Exception"/> raised when invoking the <see cref="IExecutorBaseArgs.RunType"/>.
         /// </summary>
         public Exception Exception { get; private set; }
 
@@ -202,7 +199,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> arguments value.
         /// </summary>
-        public TArgs Value => (TArgs)((IExecutorArgs)this).Value;
+        public new TArgs Value => (TArgs)((IExecutorArgs)this).Value;
 
         /// <summary>
         /// Gets the item index (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
@@ -266,7 +263,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> arguments value.
         /// </summary>
-        public TArgs Value => (TArgs)((IExecutorArgs)this).Value;
+        public new TArgs Value => (TArgs)((IExecutorArgs)this).Value;
 
         /// <summary>
         /// Gets the item index (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).

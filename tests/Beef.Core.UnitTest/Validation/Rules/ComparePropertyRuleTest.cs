@@ -14,7 +14,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
         [Test]
         public void Validate()
         {
-            var v = Validator<TestData>.Create()
+            var v = Validator.Create<TestData>()
                 .HasProperty(x => x.DateA, p => p.CompareValue(CompareOperator.GreaterThan, new DateTime(1950, 1, 1), "Minimum"))
                 .HasProperty(x => x.DateB, p => p.CompareProperty(CompareOperator.GreaterThanEqual, y => y.DateA));
 
