@@ -81,7 +81,7 @@ namespace Beef.Mapper
         void SetOperationTypes(OperationTypes operationTypes);
 
         /// <summary>
-        /// Gets the <see cref="Reflection.CollectionTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
+        /// Gets the <see cref="Beef.Reflection.ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
         ComplexTypeReflector SrceComplexTypeReflector { get; }
 

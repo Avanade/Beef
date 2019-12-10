@@ -49,6 +49,7 @@ namespace Beef.Validation.Clauses
         /// <returns><c>true</c> where validation is to continue; otherwise, <c>false</c> to stop.</returns>
         public bool Check(IPropertyContext context)
         {
+            Beef.Check.NotNull(context, nameof(context));
             return _when != null ? _when.Invoke()
                 : _entityPredicate != null ? _entityPredicate.Invoke((TEntity)context.Parent.Value)
                 : _propertyPredicate.Invoke((TProperty)context.Value);

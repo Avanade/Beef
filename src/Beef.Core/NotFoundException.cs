@@ -16,16 +16,24 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotFoundException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="NotFoundException"/> class.
+        /// </summary>
+        public NotFoundException()
+            : base(new LText("Beef.NotFoundException"))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotFoundException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public NotFoundException(string message = null)
+        public NotFoundException(string message)
             : base(message ?? new LText("Beef.NotFoundException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotFoundException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="NotFoundException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>

@@ -9,6 +9,7 @@ namespace Beef.RefData
     /// </summary>
     public enum ReferenceDataIdTypeCode
     {
+#pragma warning disable CA1720 // Identifier contains type name; by-design, as these relate exactly to the named types.
         /// <summary>
         /// Unknown <see cref="Type"/>, if any.
         /// </summary>
@@ -23,5 +24,6 @@ namespace Beef.RefData
         /// <see cref="ReferenceDataBase.Id"/> <see cref="Type"/> is <see cref="Guid"/>.
         /// </summary>
         Guid
+#pragma warning restore CA1720
     }
 }

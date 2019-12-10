@@ -4,11 +4,13 @@ using System;
 
 namespace Beef
 {
+#pragma warning disable CA1036 // Override methods on comparable types; by-design, do not want to directly support.
     /// <summary>
-    /// Represents a URL friendly Base-64 encoded <see cref="T:Guid"/>.
+    /// Represents a URL friendly Base-64 encoded <see cref="System.Guid"/>.
     /// </summary>
     /// <remarks>For example a GUID with a value of 'fc5ab925-2418-4c53-bb76-de5296f1f5ef' would be represented as 'Jbla_BgkU0y7dt5SlvH17w'.</remarks>
     public struct ShortGuid : IComparable, IComparable<ShortGuid>, IComparable<Guid>, IEquatable<ShortGuid>
+#pragma warning restore CA1036
     {
         // Base64 encoding guidance thanks to: http://madskristensen.net/post/A-shorter-and-URL-friendly-GUID
 
@@ -35,9 +37,7 @@ namespace Beef
         /// <param name="g">The Base64 encoded GUID.</param>
         public ShortGuid(string g)
         {
-            if (g == null)
-                throw new ArgumentNullException("g");
-
+            Check.NotNull(g, nameof(g));
             if (g.Length != 22)
                 throw new FormatException(_formatError);
 
@@ -52,62 +52,56 @@ namespace Beef
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShortGuid"/> structure from a <see cref="T:Guid"/>.
+        /// Initializes a new instance of the <see cref="ShortGuid"/> structure from a <see cref="System.Guid"/>.
         /// </summary>
         /// <param name="g">The <see cref="Guid"/>.</param>
         public ShortGuid(Guid g)
         {
-            if (g == null)
-                throw new ArgumentNullException("g");
-
+            Check.NotNull(g, nameof(g));
             _guid = g;
         }
 
         /// <summary>
-        /// Indicates whether the values of two specified <see cref="T:System.ShortGuid"/> values are equal.
+        /// Indicates whether the values of two specified <see cref="ShortGuid"/> values are equal.
         /// </summary>
-        /// <param name="a">The first <see cref="T:System.ShortGuid"/> value.</param>
-        /// <param name="b">The second <see cref="T:System.ShortGuid"/> value.</param>
+        /// <param name="a">The first <see cref="ShortGuid"/> value.</param>
+        /// <param name="b">The second <see cref="ShortGuid"/> value.</param>
         /// <returns><c>true</c> if <paramref name="a"/> and <paramref name="b"/> are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(ShortGuid a, ShortGuid b)
-        {
-            return (a._guid == b._guid);
-        }
+        public static bool operator ==(ShortGuid a, ShortGuid b) => (a._guid == b._guid);
 
         /// <summary>
-        /// Indicates whether the values of two specified <see cref="T:System.ShortGuid"/> values are not equal.
+        /// Indicates whether the values of two specified <see cref="ShortGuid"/> values are not equal.
         /// </summary>
-        /// <param name="a">The first <see cref="T:System.ShortGuid"/> value.</param>
-        /// <param name="b">The second <see cref="T:System.ShortGuid"/> value.</param>
+        /// <param name="a">The first <see cref="ShortGuid"/> value.</param>
+        /// <param name="b">The second <see cref="ShortGuid"/> value.</param>
         /// <returns><c>true</c> if <paramref name="a"/> and <paramref name="b"/> are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(ShortGuid a, ShortGuid b)
-        {
-            return !(a == b);
-        }
+        public static bool operator !=(ShortGuid a, ShortGuid b) => !(a == b);
 
         /// <summary>
-        /// Converts a <see cref="T:System.ShortGuid"/> to a <see cref="T:Guid"/>.
+        /// Converts a <see cref="ShortGuid"/> to a <see cref="System.Guid"/>.
         /// </summary>
         /// <param name="value">The <see cref="ShortGuid"/>.</param>
         /// <returns>The corresponding <see cref="Guid"/>.</returns>
         public static implicit operator Guid(ShortGuid value)
         {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
+            Check.NotNull(value, nameof(value));
             return value._guid;
         }
 
         /// <summary>
-        /// Converts a <see cref="T:System.ShortGuid"/> to a Base64 encoded GUID <see cref="string"/>.
+        /// Converts the <see cref="ShortGuid"/> to a <see cref="System.Guid"/>.
+        /// </summary>
+        /// <returns>The corresponding <see cref="Guid"/>.</returns>
+        public Guid ToGuid() => _guid;
+
+        /// <summary>
+        /// Converts a <see cref="ShortGuid"/> to a Base64 encoded GUID <see cref="string"/>.
         /// </summary>
         /// <param name="value">The <see cref="ShortGuid"/>.</param>
         /// <returns>The corresponding Base64 encoded GUID <see cref="string"/>.</returns>
         public static implicit operator string(ShortGuid value)
         {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
+            Check.NotNull(value, nameof(value));
             return value.ToString();
         }
 
@@ -115,7 +109,7 @@ namespace Beef
         /// Returns a value that indicates whether this instance is equal to a specified object.
         /// </summary>
         /// <param name="o">The object to compare with this instance.</param>
-        /// <returns><c>true</c> if <paramref name="o"/> is a <see cref="T:ShortGuid"/> that has the same value as this instance; otherwise, <c>false</c>.</returns>
+        /// <returns><c>true</c> if <paramref name="o"/> is a <see cref="ShortGuid"/> that has the same value as this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object o)
         {
             if (o == null)

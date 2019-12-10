@@ -40,6 +40,9 @@ namespace Beef.RefData.Caching
             where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
             where TItem : ReferenceDataBase, new()
         {
+            Check.NotNull(owner, nameof(owner));
+            Check.NotNull(loadCollection, nameof(loadCollection));
+
             return loadCollection();
         }
     }

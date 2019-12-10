@@ -76,12 +76,14 @@ namespace Beef.RefData
         /// </summary>
         string IReferenceDataProvider.ProviderName => typeof(ReferenceDataManager).FullName;
 
+#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, Type indexer seems perfectly reasonable.
         /// <summary>
-        /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
+        /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
-        /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
+        /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
         public IReferenceDataCollection this[Type type]
+#pragma warning restore CA1043 
         {
             get
             {
@@ -90,22 +92,31 @@ namespace Beef.RefData
                 if (_itemProviders.TryGetValue(type, out var provider))
                     return provider[type];
 
-                throw new ArgumentException(string.Format($"Type '{type.Name}' has not been configured within the registered providers."));
+                throw new ArgumentException($"Type '{type.Name}' has not been configured within the registered providers.");
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="IReferenceDataCollection"/> for the specified <see cref="ReferenceDataBase"/> <see cref="Type"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
+        /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
+        public IReferenceDataCollection GetByType(Type type) => this[type];
+
+#pragma warning disable CA1822 // Mark members as static; by-design.
         /// <summary>
         /// Gets the <see cref="Register(IReferenceDataProvider[])">registered</see> <see cref="IReferenceDataProvider"/> for the specified <paramref name="providerName"/>.
         /// </summary>
         /// <param name="providerName">The <see cref="IReferenceDataProvider.ProviderName"/>.</param>
         /// <returns>The <see cref="IReferenceDataProvider"/> instance.</returns>
         public IReferenceDataProvider GetProvider(string providerName)
+#pragma warning restore CA1822
         {
             Check.NotNull(providerName, nameof(providerName));
             if (_providers.TryGetValue(providerName, out var provider))
                 return provider;
 
-            throw new ArgumentException(string.Format($"Provider with Name '{providerName}' has not been registered."));
+            throw new ArgumentException($"Provider with Name '{providerName}' has not been registered.");
         }
 
         /// <summary>

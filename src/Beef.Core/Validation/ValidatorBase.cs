@@ -37,6 +37,7 @@ namespace Beef.Validation
         /// </summary>
         internal protected List<IPropertyRule<TEntity>> Rules { get; } = new List<IPropertyRule<TEntity>>();
 
+#pragma warning disable CA1716 // Identifiers should not match keywords; by-design, best name.
         /// <summary>
         /// Adds a <see cref="PropertyRule{TEntity, TProperty}"/> to the validator.
         /// </summary>
@@ -44,6 +45,7 @@ namespace Beef.Validation
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
         /// <returns>The <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public virtual PropertyRule<TEntity, TProperty> Property<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
+#pragma warning restore CA1716
         {
             PropertyRule<TEntity, TProperty> rule = new PropertyRule<TEntity, TProperty>(propertyExpression);
             Rules.Add(rule);
@@ -72,9 +74,11 @@ namespace Beef.Validation
             return Validate((TEntity)value, args);
         }
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, need not be overridden.
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
         /// </summary>
         Type IValidator.EntityType => typeof(TEntity);
+#pragma warning restore CA1033
     }
 }

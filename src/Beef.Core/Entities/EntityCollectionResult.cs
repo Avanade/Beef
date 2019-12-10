@@ -61,7 +61,7 @@ namespace Beef.Entities
                 _paging = new PagingResult(paging);
         }
 
-#pragma warning disable CA2227 // Collection properties should be read only; special purpose - by-design.
+#pragma warning disable CA2227 // Collection properties should be read only; by-design, this Result is absolutely intended to be changed/set.
         /// <summary>
         /// Gets or sets the result.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Beef.Entities
         /// </summary>
         ICollection IEntityCollectionResult.Collection
         {
-#pragma warning disable CA1033 // Interface methods should be callable by child types; special purpose - by-design.
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
 #pragma warning restore CA1033
         }
@@ -102,7 +102,7 @@ namespace Beef.Entities
         /// </summary>
         ICollection<TEntity> IEntityCollectionResult<TEntity>.Collection
         {
-#pragma warning disable CA1033 // Interface methods should be callable by child types; special purpose - by-design.
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
 #pragma warning restore CA1033
         }
@@ -114,7 +114,7 @@ namespace Beef.Entities
         public override void CopyFrom(object from)
         {
             var fval = ValidateCopyFromType<EntityCollectionResult<TColl, TEntity>>(from);
-            base.CopyFrom(fval);
+            CopyFrom(fval);
             Result = (fval.Result == null) ? null : (TColl)fval.Result.Clone();
             Paging = (fval.Paging == null) ? null : new PagingResult(fval.Paging);
         }

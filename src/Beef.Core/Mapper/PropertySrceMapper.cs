@@ -28,7 +28,7 @@ namespace Beef.Mapper
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         public PropertySrceMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, OperationTypes operationTypes = OperationTypes.Any)
-            : this(PropertyExpression<TSrce, TSrceProperty>.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression))), operationTypes)
+            : this(PropertyExpression.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression))), operationTypes)
         { }
 
         /// <summary>
@@ -77,6 +77,7 @@ namespace Beef.Mapper
         /// </summary>
         public Type SrcePropertyType => typeof(TSrceProperty);
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, are hidden on purpose.
         /// <summary>
         /// Gets the destination property <see cref="Type"/>.
         /// </summary>
@@ -86,9 +87,10 @@ namespace Beef.Mapper
         /// Gets the destination property name.
         /// </summary>
         string IPropertyMapperBase.DestPropertyName => null;
+#pragma warning restore CA1033
 
         /// <summary>
-        /// Gets the <see cref="T:CollectionTypeReflector"/> (only set where the property <see cref="IPropertyMapper{TSrce, TDest}.IsDestComplexType"/>).
+        /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IPropertyMapper{TSrce, TDest}.IsDestComplexType"/>).
         /// </summary>
         ComplexTypeReflector IPropertyMapper<TSrce, TDest>.DestComplexTypeReflector { get; }
 
@@ -99,10 +101,12 @@ namespace Beef.Mapper
 
         #region UniqueKey
 
+#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, is hidden on purpose.
         /// <summary>
         /// Indicates whether the property forms part of the unique (primary) key. 
         /// </summary>
         bool IPropertyMapperBase.IsUniqueKey => false;
+#pragma warning restore CA1033
 
         /// <summary>
         /// Indicates whether the destination property value is auto-generated on create. 
@@ -224,7 +228,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default(TSrceProperty);
+                return default;
         }
 
         /// <summary>
@@ -347,7 +351,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return entity;
             else
-                return default(TDest);
+                return default;
         }
 
         /// <summary>
@@ -356,18 +360,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IPropertyMapper<TSrce, TDest>.SetDestValue(TDest entity, object value, OperationTypes operationType)
-        {
-            SetDestValue(entity, (TDest)value, operationType);
-        }
-
-        /// <summary>
-        /// Sets the destination property value.
-        /// </summary>
-        /// <param name="entity">The entity value.</param>
-        /// <param name="value">The property value.</param>
-        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        public void SetDestValue(TDest entity, TDest value, OperationTypes operationType) => throw new NotSupportedException();
+        void IPropertyMapper<TSrce, TDest>.SetDestValue(TDest entity, object value, OperationTypes operationType) => throw new NotSupportedException();
 
         /// <summary>
         /// Maps the source property to the destination property.

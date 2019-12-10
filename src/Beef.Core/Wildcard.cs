@@ -2,6 +2,8 @@
 
 using Beef.Entities;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -78,7 +80,7 @@ namespace Beef
             Supported = supported;
             MultiWildcard = multiWildcard;
             SingleWildcard = singleWildcard;
-            CharactersNotAllowed = charactersNotAllowed;
+            CharactersNotAllowed = new ReadOnlyCollection<char>(charactersNotAllowed != null ? (char[])charactersNotAllowed.Clone() : Array.Empty<char>());
             SpaceTreatment = spaceTreatment;
             Transform = transform;
         }
@@ -103,7 +105,7 @@ namespace Beef
         /// <summary>
         /// Gets the list of characters that are not allowed.
         /// </summary>
-        public char[] CharactersNotAllowed { get; private set; }
+        public IReadOnlyList<char> CharactersNotAllowed { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="StringTransform"/> option for the wildcard text.
@@ -163,7 +165,7 @@ namespace Beef
             var sb = new StringBuilder();
             var wr = new WildcardResult { Wildcard = this, Selection = WildcardSelection.Undetermined };
 
-            if (CharactersNotAllowed != null && CharactersNotAllowed.Count() > 0 && text.IndexOfAny(CharactersNotAllowed) >= 0)
+            if (CharactersNotAllowed != null && CharactersNotAllowed.Count > 0 && text.IndexOfAny(CharactersNotAllowed.ToArray()) >= 0)
                 wr.Selection |= WildcardSelection.InvalidCharacter;
 
             var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter) >= 0;
@@ -345,7 +347,7 @@ namespace Beef
         /// <summary>
         /// Create the <see cref="Regex"/>.
         /// </summary>
-        private Regex CreateRegex(string pattern, bool ignoreCase)
+        private static Regex CreateRegex(string pattern, bool ignoreCase)
         {
             return ignoreCase ? new Regex(pattern, RegexOptions.IgnoreCase) : new Regex(pattern);
         }
@@ -377,7 +379,9 @@ namespace Beef
     /// Represents the wildcard selection.
     /// </summary>
     [Flags]
+#pragma warning disable CA1714 // Flags enums should have plural names; by-design, selection can imply more than one.
     public enum WildcardSelection
+#pragma warning restore CA1714
     {
         /// <summary>
         /// Indicates that the wildcard selection is undetermined.
@@ -394,10 +398,12 @@ namespace Beef
         /// </summary>
         Equal = 2,
 
+#pragma warning disable CA1720 // Identifier contains type name; by-design, best name.
         /// <summary>
         /// Indicates a single wildcard character (e.g. '*' or '?').
         /// </summary>
         Single = 4,
+#pragma warning restore CA1720 
 
         /// <summary>
         /// Indicates the selection contains a starts with operation (e.g. 'xxx*', 'xxx?', 'xx*x*', etc).

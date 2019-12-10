@@ -30,8 +30,8 @@ namespace Beef.Validation
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/></param>
         public void Validate(ValidationContext<TEntity> context)
         {
-            TInclude val = context.Value as TInclude;
-            if (val == null)
+            Check.NotNull(context, nameof(context));
+            if (!(context.Value is TInclude val))
                 throw new InvalidOperationException($"Type {typeof(TEntity).Name} must inherit from {typeof(TInclude).Name}.");
 
             var ctx = new ValidationContext<TInclude>(val, new ValidationArgs

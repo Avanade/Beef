@@ -15,10 +15,12 @@ namespace Beef
     [DebuggerStepThrough()]
     public abstract class InvokerBase<TInvoker, TParam> where TInvoker : InvokerBase<TInvoker, TParam>, new()
     {
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets or sets the default instance.
         /// </summary>
         public static InvokerBase<TInvoker, TParam> Default { get; set; } = new TInvoker();
+#pragma warning restore CA1000 
 
         #region NoResult
 

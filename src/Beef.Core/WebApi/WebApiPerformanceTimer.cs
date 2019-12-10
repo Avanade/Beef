@@ -20,22 +20,26 @@ namespace Beef.WebApi
         /// <param name="action">The action that is called when the timer is stopped (passes the <see cref="Url"/>).</param>
         public static void OnTimerStopped(Action<string, Stopwatch> action)
         {
-            _action = action ?? throw new ArgumentNullException("action");
+            _action = Check.NotNull(action, nameof(action));
         }
 
+#pragma warning disable CA1054 // Uri parameters should not be strings; by design.
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPerformanceTimer"/> class with a specified <see cref="Url"/>.
         /// </summary>
         /// <param name="url">The <see cref="Url"/>.</param>
         public WebApiPerformanceTimer(string url)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
             Url = url;
         }
 
+#pragma warning disable CA1056 // Uri properties should not be strings; by design.
         /// <summary>
         /// Gets or sets the URL string.
         /// </summary>
         public string Url { get; set; }
+#pragma warning restore CA1056 // Uri properties should not be strings
 
         /// <summary>
         /// Overrides the <see cref="PerformanceTimer.OnStopped"/> to invoke the action on stop.

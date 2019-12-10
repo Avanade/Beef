@@ -40,20 +40,15 @@ namespace Beef.Validation
     public class ValueValidator<T> : PropertyRuleBase<ValidationValue<T>, T>
     {
         /// <summary>
-        /// Gets or sets the default value name.
-        /// </summary>
-        public static string ValueNameDefault { get; set; } = "Value";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ValueValidator{T}"/> class.
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <param name="name">The value name (defaults to <see cref="ValueNameDefault"/>).</param>
+        /// <param name="name">The value name (defaults to <see cref="Validator.ValueNameDefault"/>).</param>
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
         public ValueValidator(T value, string name = null, LText text = null)
         {
             ValidationValue = new ValidationValue<T>(null, value);
-            Name = string.IsNullOrEmpty(name) ? ValueNameDefault : name;
+            Name = string.IsNullOrEmpty(name) ? Validator.ValueNameDefault : name;
             Text = text ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(Name);
         }
 

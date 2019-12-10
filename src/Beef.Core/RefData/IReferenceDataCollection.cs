@@ -3,14 +3,15 @@
 using Beef.Entities;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Beef.RefData
 {
+#pragma warning disable CA1010 // Collections should implement generic interface; this is by design.
     /// <summary>
     /// Provides <b>GetById</b> and <see cref="GetByCode"/> functionality for a <see cref="ReferenceDataBase"/> collection (see <see cref="ReferenceDataCollectionBase{ReferenceDataBase}"/>).
     /// </summary>
     public interface IReferenceDataCollection : IEnumerable, IETag
+#pragma warning restore CA1010 
     {
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.

@@ -269,7 +269,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Type is too complex and can not be converted to a URI.
         /// </summary>
-        private void ThrowComplexityException(TypeInfo ti) => throw new InvalidOperationException($"Type '{ti.FullName}' Property '{ti.Name}' cannot be serialized to a URI; Type should be passed using Request Body [FromBody] given complexity.");
+        private static void ThrowComplexityException(TypeInfo ti) => throw new InvalidOperationException($"Type '{ti.FullName}' Property '{ti.Name}' cannot be serialized to a URI; Type should be passed using Request Body [FromBody] given complexity.");
     }
 
     /// <summary>

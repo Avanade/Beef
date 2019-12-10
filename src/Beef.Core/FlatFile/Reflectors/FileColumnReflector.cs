@@ -173,6 +173,8 @@ namespace Beef.FlatFile.Reflectors
         /// <returns>Indicates whether the value was updated successfully.</returns>
         public bool SetValue(FileRecord record, string str, object value)
         {
+            Check.NotNull(record, nameof(record));
+
             if (FileColumn.IsMandatory && (string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str)))
                 return CreateValueError(record, "{0} is required.", str);
 
@@ -197,7 +199,7 @@ namespace Beef.FlatFile.Reflectors
             var hasError = false;
             if (FileColumn.IsLineNumber)
             {
-                long lineNumber = 0;
+                long lineNumber;
                 if (PropertyTypeCode == TypeCode.Int32)
                     lineNumber = (int)val;
                 else
@@ -236,7 +238,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Boolean:
-                    bool bval = false;
+                    bool bval;
                     if (!Boolean.TryParse(str, out bval))
                         return false;
 
@@ -244,7 +246,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Char:
-                    char cval = char.MinValue;
+                    char cval;
                     if (!Char.TryParse(str, out cval))
                         return false;
 
@@ -252,7 +254,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.DateTime:
-                    DateTime dtval = DateTime.MinValue;
+                    DateTime dtval;
                     if (!DateTime.TryParse(str, out dtval))
                         return false;
 
@@ -260,7 +262,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Decimal:
-                    Decimal mval = 0m;
+                    decimal mval;
                     if (!Decimal.TryParse(str, out mval))
                         return false;
 
@@ -268,7 +270,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Double:
-                    Double dval = 0d;
+                    double dval;
                     if (!Double.TryParse(str, out dval))
                         return false;
 
@@ -276,7 +278,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Int16:
-                    Int16 i16val = 0;
+                    short i16val;
                     if (!Int16.TryParse(str, out i16val))
                         return false;
 
@@ -284,7 +286,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Int32:
-                    Int32 i32val = 0;
+                    int i32val;
                     if (!Int32.TryParse(str, out i32val))
                         return false;
 
@@ -292,7 +294,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Int64:
-                    Int64 i64val = 0;
+                    long i64val;
                     if (!Int64.TryParse(str, out i64val))
                         return false;
 
@@ -300,7 +302,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Byte:
-                    Byte byval = Byte.MinValue;
+                    byte byval;
                     if (!Byte.TryParse(str, out byval))
                         return false;
 
@@ -308,7 +310,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.SByte:
-                    SByte sbyval = SByte.MinValue;
+                    sbyte sbyval;
                     if (!SByte.TryParse(str, out sbyval))
                         return false;
 
@@ -316,7 +318,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Single:
-                    Single sival = 0.0f;
+                    float sival;
                     if (!Single.TryParse(str, out sival))
                         return false;
 
@@ -324,7 +326,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.UInt16:
-                    UInt16 ui16val = 0;
+                    ushort ui16val;
                     if (!UInt16.TryParse(str, out ui16val))
                         return false;
 
@@ -332,7 +334,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.UInt32:
-                    UInt32 ui32val = 0;
+                    uint ui32val;
                     if (!UInt32.TryParse(str, out ui32val))
                         return false;
 
@@ -340,7 +342,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.UInt64:
-                    UInt64 ui64val = 0;
+                    ulong ui64val;
                     if (!UInt64.TryParse(str, out ui64val))
                         return false;
 
@@ -348,7 +350,7 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 default:
-                    throw new InvalidOperationException(string.Format("Type '{0}' is unexpected; no ITextValueConverter or default native Parser has been defined.", PropertyInfo.PropertyType.Name));
+                    throw new InvalidOperationException($"Type '{PropertyInfo.PropertyType.Name}' is unexpected; no ITextValueConverter or default native Parser has been defined.");
             }
         }
 
@@ -360,7 +362,8 @@ namespace Beef.FlatFile.Reflectors
         /// <returns>Indicates whether the value was retrieved successfully.</returns>
         public bool GetValue(FileRecord record, out string str)
         {
-            object val = null;
+            Check.NotNull(record, nameof(record));
+            object val;
             if (FileColumn.IsLineNumber)
             {
                 if (PropertyTypeCode == TypeCode.Int32)
@@ -429,63 +432,63 @@ namespace Beef.FlatFile.Reflectors
                     return true;
 
                 case TypeCode.Boolean:
-                    str = ((bool)value).ToString();
+                    str = ((bool)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Char:
-                    str = ((char)value).ToString();
+                    str = ((char)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.DateTime:
-                    str = ((DateTime)value).ToString(FileColumn.WriteFormatString);
+                    str = ((DateTime)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Decimal:
-                    str = ((decimal)value).ToString(FileColumn.WriteFormatString);
+                    str = ((decimal)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Double:
-                    str = ((double)value).ToString(FileColumn.WriteFormatString);
+                    str = ((double)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Int16:
-                    str = ((Int16)value).ToString(FileColumn.WriteFormatString);
+                    str = ((Int16)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Int32:
-                    str = ((Int32)value).ToString(FileColumn.WriteFormatString);
+                    str = ((Int32)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Int64:
-                    str = ((Int64)value).ToString(FileColumn.WriteFormatString);
+                    str = ((Int64)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Byte:
-                    str = ((Byte)value).ToString(FileColumn.WriteFormatString);
+                    str = ((Byte)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.SByte:
-                    str = ((SByte)value).ToString(FileColumn.WriteFormatString);
+                    str = ((SByte)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.Single:
-                    str = ((Single)value).ToString(FileColumn.WriteFormatString);
+                    str = ((Single)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.UInt16:
-                    str = ((UInt16)value).ToString(FileColumn.WriteFormatString);
+                    str = ((UInt16)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.UInt32:
-                    str = ((UInt32)value).ToString(FileColumn.WriteFormatString);
+                    str = ((UInt32)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 case TypeCode.UInt64:
-                    str = ((UInt64)value).ToString(FileColumn.WriteFormatString);
+                    str = ((UInt64)value).ToString(FileColumn.WriteFormatString, System.Globalization.CultureInfo.InvariantCulture);
                     return true;
 
                 default:
-                    throw new InvalidOperationException(string.Format("Type '{0}' is unexpected; no ITextValueConverter or default native Formatter has been defined.", PropertyInfo.PropertyType.Name));
+                    throw new InvalidOperationException($"Type '{PropertyInfo.PropertyType.Name}' is unexpected; no ITextValueConverter or default native Formatter has been defined.");
             }
         }
 
@@ -500,7 +503,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateErrorMessage(FileRecord record, string format, string str, params object[] values)
         {
             var mi = MessageItem.CreateErrorMessage(PropertyInfo.Name, format, (new string[] { Text, str }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
 
@@ -515,7 +518,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateWarningMessage(FileRecord record, string format, string str, params object[] values)
         {
             var mi = MessageItem.CreateMessage(PropertyInfo.Name, MessageType.Warning, format, (new string[] { Text, str }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
 
@@ -530,7 +533,7 @@ namespace Beef.FlatFile.Reflectors
         public MessageItem CreateInfoMessage(FileRecord record, string format, string str, params object[] values)
         {
             var mi = MessageItem.CreateMessage(PropertyInfo.Name, MessageType.Info, format, (new string[] { Text, str }).Concat(values).ToArray());
-            record.Messages.Add(mi);
+            Check.NotNull(record, nameof(record)).Messages.Add(mi);
             return mi;
         }
     }

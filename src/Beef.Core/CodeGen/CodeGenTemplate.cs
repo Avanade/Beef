@@ -710,7 +710,7 @@ namespace Beef.CodeGen
                 val = CodeGenConfig.FindConfig(config, parts[0]);
 
             if (val == null)
-                throw new CodeGenException("Parameter '{name}' is invalid.", _xmlCurrent.ToString());
+                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent.ToString());
 
             propertyName = parts[1];
             return val;

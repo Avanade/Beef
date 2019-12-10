@@ -17,7 +17,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_Null()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToDest(null);
 
@@ -27,7 +27,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_StringNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToDest(new PersonA());
 
@@ -38,7 +38,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_StringValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToDest(new PersonA { Name = "AAA" });
 
@@ -49,7 +49,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_NullableNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Salary, d => d.Salary)
                 .MapToDest(new PersonA { Salary = null });
 
@@ -60,7 +60,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_NullableValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Salary, d => d.Salary)
                 .MapToDest(new PersonA { Salary = 10m });
 
@@ -71,7 +71,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_IntValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Age, d => d.Age)
                 .MapToDest(new PersonA { Age = 10 });
 
@@ -82,7 +82,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_ArrayNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToDest(new PersonA { Codes = null });
 
@@ -93,7 +93,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_ArrayEmpty()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToDest(new PersonA { Codes = new int[0] { } });
 
@@ -105,7 +105,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_ArrayValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToDest(new PersonA { Codes = new int[] { 1, 2 } });
 
@@ -119,7 +119,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_EntityNull_AutoPropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Address, d => d.AddressX)
                 .MapToDest(new PersonA());
 
@@ -130,7 +130,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_EntityValue_AutoPropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Address, d => d.AddressX)
                 .MapToDest(new PersonA { Address = new Address { Street = "AAA", City = "BBB" } });
 
@@ -143,8 +143,8 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_EntityValue_PropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
-                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper<Address, AddressX>.Create().HasProperty(sa => sa.Street, da => da.City)))
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper.Create<Address, AddressX>().HasProperty(sa => sa.Street, da => da.City)))
                 .MapToDest(new PersonA { Address = new Address { Street = "AAA", City = "BBB" } });
 
             Assert.IsNotNull(r);
@@ -156,7 +156,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_CollNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
                 .MapToDest(new PersonA());
 
@@ -167,9 +167,9 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_CollEmpty()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
-                .MapToDest(new PersonA {  Addresses = new Address[] { } });
+                .MapToDest(new PersonA {  Addresses = System.Array.Empty<Address>() });
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Addresses);
@@ -179,7 +179,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_CollValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
                 .MapToDest(new PersonA { Addresses = new Address[] { new Address { Street = "AAA", City = "BBB" }, new Address { Street = "YYY", City = "ZZZ" }, } });
 
@@ -195,7 +195,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_Null()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToSrce(null);
 
@@ -205,7 +205,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_StringNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToSrce(new PersonB());
 
@@ -216,7 +216,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_StringValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Name, d => d.Name)
                 .MapToSrce(new PersonB { Name = "AAA" });
 
@@ -227,7 +227,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_NullableZero()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Salary, d => d.Salary)
                 .MapToSrce(new PersonB { Salary = 0 });
 
@@ -238,7 +238,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_NullableValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Salary, d => d.Salary)
                 .MapToSrce(new PersonB { Salary = 10m });
 
@@ -249,7 +249,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_IntValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Age, d => d.Age)
                 .MapToSrce(new PersonB { Age = 10 });
 
@@ -260,7 +260,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_ArrayNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToSrce(new PersonB { Codes = null });
 
@@ -271,7 +271,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_ArrayEmpty()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToSrce(new PersonB { Codes = new int[0] { } });
 
@@ -283,7 +283,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_ArrayValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Codes, d => d.Codes)
                 .MapToSrce(new PersonB { Codes = new int[] { 1, 2 } });
 
@@ -297,7 +297,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_EntityNull_AutoPropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Address, d => d.AddressX)
                 .MapToSrce(new PersonB());
 
@@ -308,7 +308,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_EntityValue_AutoPropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Address, d => d.AddressX)
                 .MapToSrce(new PersonB { AddressX = new AddressX { Street = "AAA", City = "BBB" } });
 
@@ -321,8 +321,8 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_EntityValue_PropMapper()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
-                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper<Address, AddressX>.Create().HasProperty(sa => sa.Street, da => da.City)))
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper.Create<Address, AddressX>().HasProperty(sa => sa.Street, da => da.City)))
                 .MapToSrce(new PersonB { AddressX = new AddressX { Street = "AAA", City = "BBB" } });
 
             Assert.IsNotNull(r);
@@ -334,7 +334,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_CollNull()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
                 .MapToSrce(new PersonB());
 
@@ -345,7 +345,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_CollEmpty()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
                 .MapToSrce(new PersonB { Addresses = new List<AddressX>() });
 
@@ -357,7 +357,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_CollValue()
         {
-            var r = EntityMapper<PersonA, PersonB>.Create()
+            var r = EntityMapper.Create<PersonA, PersonB>()
                 .HasProperty(s => s.Addresses, d => d.Addresses)
                 .MapToSrce(new PersonB { Addresses = new List<AddressX> { new AddressX { Street = "AAA", City = "BBB" }, new AddressX { Street = "YYY", City = "ZZZ" }, } });
 

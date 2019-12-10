@@ -39,7 +39,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Run_Common_Error()
         {
-            var cv = CommonValidator<int>.Create(v => v.Mandatory());
+            var cv = CommonValidator.Create<int>(v => v.Mandatory());
 
             var r = new ValueValidator<TestData, int>(x => x.CountA, 0).Common(cv).Run();
             Assert.IsNotNull(r);

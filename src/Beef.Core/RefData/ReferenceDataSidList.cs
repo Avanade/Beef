@@ -32,6 +32,7 @@ namespace Beef.RefData
         public abstract List<ReferenceDataBase> ToRefDataList();
     }
 
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design; "List" is the most appropriate name.
     /// <summary>
     /// Represents a special purpose <see cref="ReferenceDataBase"/> collection specifically for managing a referenced list of <b>Serialization Identifiers</b> (SIDs) versus
     /// storing instances of the <see cref="ReferenceDataBase"/> items directly. This is a required capability to enable the serialization of a list of reference data items
@@ -42,14 +43,17 @@ namespace Beef.RefData
     /// <remarks>This collection wraps an externally referenced list of SIDs and maintains this directly. There is no <see cref="ReferenceDataBase"/> collection being managed
     /// within, it is just managing the casting between the <see cref="ReferenceDataBase"/> items and its SID giving the appearance that it is.</remarks>
     public class ReferenceDataSidList<TItem, TSid> : ReferenceDataSidListBase, IList<TItem>, IEnumerable<TItem>, INotifyCollectionChanged where TItem : ReferenceDataBase, new()
+#pragma warning restore CA1710
     {
-        private static readonly SidType _sidType = SidType.Unknown;
+        private static readonly SidType _sidType;
         private readonly List<TSid> _sids;
 
+#pragma warning disable CA1810 // Initialize reference type static fields inline; by-design, as value will differ depending on TSid Type.
         /// <summary>
         /// Static initializer.
         /// </summary>
         static ReferenceDataSidList()
+#pragma warning restore CA1810
         {
             if (typeof(TSid) == typeof(string))
                 _sidType = SidType.String;
@@ -57,9 +61,6 @@ namespace Beef.RefData
                 _sidType = SidType.Int32;
             else if (typeof(TSid) == typeof(Guid))
                 _sidType = SidType.Guid;
-
-            if (_sidType == SidType.Unknown)
-                throw new InvalidOperationException("Unsupported SID Type; must be String, Int32 or Guid.");
         }
 
         /// <summary>
@@ -191,25 +192,19 @@ namespace Beef.RefData
             if (sid == null)
                 return default;
 
-            switch (_sidType)
+            return _sidType switch
             {
-                case SidType.String:
-                    return ReferenceDataBase.ConvertFromCode<TItem>((string)sid);
-
-                case SidType.Int32:
-                    return ReferenceDataBase.ConvertFromId<TItem>((int)sid);
-
-                case SidType.Guid:
-                    return ReferenceDataBase.ConvertFromId<TItem>((Guid)sid);
-            }
-
-            return default;
+                SidType.String => ReferenceDataBase.ConvertFromCode<TItem>((string)sid),
+                SidType.Int32 => ReferenceDataBase.ConvertFromId<TItem>((int)sid),
+                SidType.Guid => ReferenceDataBase.ConvertFromId<TItem>((Guid)sid),
+                _ => default,
+            };
         }
 
         /// <summary>
         /// Gets the SID for an Item.
         /// </summary>
-        private TSid GetSidForItem(TItem item)
+        private static TSid GetSidForItem(TItem item)
         {
             if (item != null)
             {

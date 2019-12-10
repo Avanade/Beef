@@ -10,6 +10,6 @@ namespace Beef.Demo.Business.Validation
         /// <summary>
         /// Represents the standard text validator (max length of 50).
         /// </summary>
-        public static readonly CommonValidator<string> Text = CommonValidator<string>.Create(v => v.String(50));
+        public static readonly CommonValidator<string> Text = CommonValidator.Create<string>(v => v.String(50));
     }
 }

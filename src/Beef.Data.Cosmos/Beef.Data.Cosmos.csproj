@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.7</Version>
+    <Version>2.1.8</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) CosmosDB / DocumentDB Core extensions.</Description>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>beef cosmos cosmosdb documentdb nosql</PackageTags>
@@ -29,6 +30,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

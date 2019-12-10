@@ -18,7 +18,7 @@ namespace Beef.Entities
         private object[] _args;
 
         /// <summary>
-        /// Initializes a new <see cref="UniqueKey"/> structure.
+        /// Initializes a new <see cref="UniqueKey"/> structure with 
         /// </summary>
         /// <param name="args">Tthe argument values for the key.</param>
         public UniqueKey(params object[] args)
@@ -26,6 +26,7 @@ namespace Beef.Entities
             _args = Check.NotNull(args, nameof(args));
         }
 
+#pragma warning disable CA1819 // Properties should not return arrays; by-design, returns an immutable list.
         /// <summary>
         /// Gets the argument values for the key.
         /// </summary>
@@ -39,6 +40,7 @@ namespace Beef.Entities
                 return _args;
             }
         }
+#pragma warning restore CA1819
 
         /// <summary>
         /// Determines whether the current <see cref="UniqueKey"/> is equal to another <see cref="UniqueKey"/>.
@@ -72,6 +74,28 @@ namespace Beef.Entities
         public override int GetHashCode()
         {
             return (new UniqueKeyComparer()).GetHashCode(this);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="UniqueKey"/> types for equality.
+        /// </summary>
+        /// <param name="left">The left <see cref="UniqueKey"/>.</param>
+        /// <param name="right">The right <see cref="UniqueKey"/>.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator ==(UniqueKey left, UniqueKey right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="UniqueKey"/> types for non-equality.
+        /// </summary>
+        /// <param name="left">The left <see cref="UniqueKey"/>.</param>
+        /// <param name="right">The right <see cref="UniqueKey"/>.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator !=(UniqueKey left, UniqueKey right)
+        {
+            return !(left == right);
         }
     }
 
@@ -111,7 +135,7 @@ namespace Beef.Entities
         {
             int hashCode = 0;
             for (int i = 0; i < uKey.Args.Length; i++)
-                hashCode = hashCode ^ GetArgValue(uKey.Args[i]).GetHashCode();
+                hashCode ^= GetArgValue(uKey.Args[i]).GetHashCode();
 
             return hashCode;
         }

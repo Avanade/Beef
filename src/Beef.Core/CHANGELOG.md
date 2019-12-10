@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.24
+- *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
+- *Fixed:* The `IChangeTracking` has been extended to support tracking through sub-entities and collections. This includes `EntityBase.CopyOrClone` method to copy or clone entity; note that a collection is always cloned. 
+
 ## v2.1.23
 - *Fixed:* `TwoKeyValueCache` has had the concurrency logic refactored to resolve an issue where the value could be overridden with an incorrect version as the locking between the two keys was not correctly synchronized.
 

@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Beef</RootNamespace>
-    <AssemblyVersion>2.1.23</AssemblyVersion>
-    <FileVersion>2.1.23</FileVersion>
-    <Version>2.1.23</Version>
+    <AssemblyVersion>2.1.24</AssemblyVersion>
+    <FileVersion>2.1.24</FileVersion>
+    <Version>2.1.24</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -46,6 +46,10 @@
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="YamlDotNet" Version="6.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
 </Project>

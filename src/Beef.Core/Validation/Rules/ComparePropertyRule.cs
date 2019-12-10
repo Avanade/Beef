@@ -26,10 +26,8 @@ namespace Beef.Validation.Rules
         /// <param name="compareToText">The compare to text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself).</param>
         public ComparePropertyRule(CompareOperator compareOperator, Expression<Func<TEntity, TCompareProperty>> compareToPropertyExpression, LText compareToText = null) : base(compareOperator)
         {
-            if (compareToPropertyExpression == null)
-                throw new ArgumentNullException("compareToPropertyExpression");
-
-            _compareTo = PropertyExpression<TEntity, TCompareProperty>.Create(compareToPropertyExpression, true);
+            Beef.Check.NotNull(compareToPropertyExpression, nameof(compareToPropertyExpression));
+            _compareTo = PropertyExpression.Create(compareToPropertyExpression, true);
             _compareToText = compareToText;
         }
 
@@ -40,6 +38,7 @@ namespace Beef.Validation.Rules
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
             // Do not validate where the compare to property has an error.
+            Beef.Check.NotNull(context, nameof(context));
             if (context.Parent.HasError(_compareTo))
                 return;
 
@@ -47,8 +46,10 @@ namespace Beef.Validation.Rules
             try
             {
                 var compareToValue = (TProperty)(object)_compareTo.GetValue(context.Parent.Value);
+#pragma warning disable CA1062 // Validate arguments of public methods; by-design, null check already performed.
                 if (!Compare(context.Value, compareToValue))
                     CreateErrorMessage(context, _compareToText ?? _compareTo.Text);
+#pragma warning restore CA1062 
             }
             catch (InvalidCastException icex)
             {

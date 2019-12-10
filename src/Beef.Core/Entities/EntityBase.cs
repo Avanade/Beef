@@ -33,21 +33,7 @@ namespace Beef.Entities
             }
         }
 
-        /// <summary>
-        /// Determines whether changes for the entity should be tracked by default (see <see cref="TrackChanges"/>).
-        /// </summary>
-        public static bool ShouldTrackChanges { get; set; } = false;
-
         #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EntityBase"/> class.
-        /// </summary>
-        protected EntityBase()
-        {
-            if (ShouldTrackChanges)
-                TrackChanges();
-        }
 
         /// <summary>
         /// Performs a deep copy from another object updating this instance.
@@ -81,6 +67,34 @@ namespace Beef.Entities
                 throw new ArgumentException($"Cannot copy from Type '{from?.GetType().FullName}' as it is incompatible.", nameof(from));
 
             return val;
+        }
+
+        /// <summary>
+        /// Copies (<see cref="ICopyFrom"/>) or clones (<see cref="ICloneable"/>) the <paramref name="from"/> value.
+        /// </summary>
+        /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
+        /// <param name="from">The from value.</param>
+        /// <param name="to">The to value (required to support a <see cref="ICopyFrom.CopyFrom(object)"/>).</param>
+        /// <returns>The resulting to value.</returns>
+        /// <remarks>A <see cref="ICopyFrom.CopyFrom(object)"/> will be attempted first where supported, then a <see cref="ICloneable.Clone"/>; otherwise, a <see cref="InvalidOperationException"/> will be thrown.
+        /// <i>Note:</i> <see cref="ICopyFrom"/> is not supported for collections.</remarks>
+        /// <exception cref="InvalidOperationException">Thrown where neither <see cref="ICopyFrom"/>) or <see cref="ICloneable"/> are supported.</exception>
+        protected static T CopyOrClone<T>(T from, T to) where T : class
+        {
+            if (from == null)
+                return null;
+
+            if (to == default && from is ICloneable c)
+                return (T)c.Clone();
+            else if (to is ICopyFrom cf)
+            {
+                cf.CopyFrom(from);
+                return to;
+            }
+            else if (from is ICloneable c2)
+                return (T)c2.Clone();
+
+            throw new ArgumentException("The Type of the value must support ICopyFrom and/or ICloneable (minimum).", nameof(from));
         }
 
         /// <summary>
@@ -172,7 +186,7 @@ namespace Beef.Entities
             get { return UniqueKey.Empty; }
         }
 
-#pragma warning disable CA1819 // Properties should not return arrays; is OK as changes cannot have a side-effect.
+#pragma warning disable CA1819 // Properties should not return arrays; by-design, acceptable usage for DTO's and is OK as changes cannot have a side-effect.
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
@@ -186,7 +200,7 @@ namespace Beef.Entities
         /// <summary>
         /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="ChangeTracking"/>).
         /// </summary>
-        public void TrackChanges()
+        public virtual void TrackChanges()
         {
             if (ChangeTracking == null)
                 ChangeTracking = new StringCollection();
@@ -209,6 +223,12 @@ namespace Beef.Entities
         /// </summary>
         [JsonIgnore()]
         public StringCollection ChangeTracking { get; private set; }
+
+        /// <summary>
+        /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.
+        /// </summary>
+        [JsonIgnore()]
+        public bool IsChangeTracking => ChangeTracking != null;
 
         #endregion
     }

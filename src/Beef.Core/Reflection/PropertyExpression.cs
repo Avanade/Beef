@@ -48,6 +48,38 @@ namespace Beef.Reflection
     }
 
     /// <summary>
+    /// Provides access to the common property expression capabilities.
+    /// </summary>
+    public static class PropertyExpression
+    {
+        /// <summary>
+        /// Gets the property name from the property expression.
+        /// </summary>
+        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
+        /// <returns>The property name.</returns>
+        public static string GetPropertyName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
+        {
+            Check.NotNull(propertyExpression, nameof(propertyExpression));
+
+            if (propertyExpression.Body.NodeType != ExpressionType.MemberAccess)
+                throw new InvalidOperationException("Only Member access expressions are supported.");
+
+            return ((MemberExpression)propertyExpression.Body).Member.Name;
+        }
+
+        /// <summary>
+        /// Validates, creates and compiles the property expression; whilst also determinig the property friendly <see cref="PropertyExpression{TEntity, TProperty}.Text"/>.
+        /// </summary>
+        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
+        /// <param name="probeForJsonRefDataSidProperties">Indicates whether to probe for the <see cref="JsonPropertyAttribute"/> via alternate <c>Sid</c> or <c>Sids</c> properties as implemented for reference data.</param>
+        /// <returns>A <see cref="PropertyExpression{TEntity, TProperty}"/> which contains (in order) the compiled <see cref="System.Func{TEntity, TProperty}"/>, member name and resulting property text.</returns>
+        public static PropertyExpression<TEntity, TProperty> Create<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, bool probeForJsonRefDataSidProperties = false)
+        {
+            return PropertyExpression<TEntity, TProperty>.CreateInternal(Check.NotNull(propertyExpression, nameof(propertyExpression)), probeForJsonRefDataSidProperties);
+        }
+    }
+
+    /// <summary>
     /// Provides property <see cref="Expression"/> <see cref="Create(Expression{Func{TEntity, TProperty}}, bool)"/> capability.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
@@ -73,10 +105,12 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
         /// <returns>The property name.</returns>
+        [Obsolete("Please use PropertyExpression.GetPropertyName<TSrce, TDest>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static string GetPropertyName(Expression<Func<TEntity, TProperty>> propertyExpression)
+#pragma warning restore CA1000
         {
-            if (propertyExpression == null)
-                throw new ArgumentNullException("propertyExpression");
+            Check.NotNull(propertyExpression, nameof(propertyExpression));
 
             if (propertyExpression.Body.NodeType != ExpressionType.MemberAccess)
                 throw new InvalidOperationException("Only Member access expressions are supported.");
@@ -88,12 +122,25 @@ namespace Beef.Reflection
         /// Validates, creates and compiles the property expression; whilst also determinig the property friendly <see cref="Text"/>.
         /// </summary>
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <param name="probeForJsonRefDataSidProperties">Indicates whether to probe for the <see cref="T:JsonPropertyAttribute"/> via alternate <c>Sid</c> or <c>Sids</c> properties as implemented for reference data.</param>
+        /// <param name="probeForJsonRefDataSidProperties">Indicates whether to probe for the <see cref="JsonPropertyAttribute"/> via alternate <c>Sid</c> or <c>Sids</c> properties as implemented for reference data.</param>
         /// <returns>A <see cref="PropertyExpression{TEntity, TProperty}"/> which contains (in order) the compiled <see cref="System.Func{TEntity, TProperty}"/>, member name and resulting property text.</returns>
+        [Obsolete("Please use PropertyExpression.Create<TSrce, TDest>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static PropertyExpression<TEntity, TProperty> Create(Expression<Func<TEntity, TProperty>> propertyExpression, bool probeForJsonRefDataSidProperties = false)
+#pragma warning restore CA1000
         {
-            if (propertyExpression == null)
-                throw new ArgumentNullException("propertyExpression");
+            return CreateInternal(Check.NotNull(propertyExpression, nameof(propertyExpression)), probeForJsonRefDataSidProperties);
+        }
+
+        /// <summary>
+        /// Validates, creates and compiles the property expression; whilst also determinig the property friendly <see cref="Text"/>.
+        /// </summary>
+        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
+        /// <param name="probeForJsonRefDataSidProperties">Indicates whether to probe for the <see cref="JsonPropertyAttribute"/> via alternate <c>Sid</c> or <c>Sids</c> properties as implemented for reference data.</param>
+        /// <returns>A <see cref="PropertyExpression{TEntity, TProperty}"/> which contains (in order) the compiled <see cref="System.Func{TEntity, TProperty}"/>, member name and resulting property text.</returns>
+        internal static PropertyExpression<TEntity, TProperty> CreateInternal(Expression<Func<TEntity, TProperty>> propertyExpression, bool probeForJsonRefDataSidProperties = false)
+        {
+            Check.NotNull(propertyExpression, nameof(propertyExpression));
 
             if (propertyExpression.Body.NodeType != ExpressionType.MemberAccess)
                 throw new InvalidOperationException("Only Member access expressions are supported.");

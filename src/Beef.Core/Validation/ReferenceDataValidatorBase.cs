@@ -16,10 +16,12 @@ namespace Beef.Validation
     {
         private static readonly TValidator _default = new TValidator();
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
         /// <summary>
         /// Gets the current instance of the validator.
         /// </summary>
         public static TValidator Default
+#pragma warning restore CA1000 
         {
             get
             {

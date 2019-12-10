@@ -199,7 +199,7 @@ namespace Beef.Demo.Common.Entities
         public Address Address
         {
             get { return _address; }
-            set { SetValue<Address>(ref _address, value, false, false, Property_Address); }
+            set { SetValue<Address>(ref _address, value, false, true, Property_Address); }
         }
 
         /// <summary>
@@ -221,7 +221,32 @@ namespace Beef.Demo.Common.Entities
         public ChangeLog ChangeLog
         {
             get { return _changeLog; }
-            set { SetValue<ChangeLog>(ref _changeLog, value, false, false, Property_ChangeLog); }
+            set { SetValue<ChangeLog>(ref _changeLog, value, false, true, Property_ChangeLog); }
+        }
+
+        #endregion
+
+        #region IChangeTracking
+          
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+            Address?.AcceptChanges();
+            ChangeLog?.AcceptChanges();
+            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+            Address?.TrackChanges();
+            ChangeLog?.TrackChanges();
+            base.TrackChanges();
         }
 
         #endregion
@@ -290,9 +315,9 @@ namespace Beef.Demo.Common.Entities
             GenderSid = from.GenderSid;
             EyeColorSid = from.EyeColorSid;
             Birthday = from.Birthday;
-            Address = (from.Address == null) ? null : (Address)from.Address.Clone();
+            Address = CopyOrClone(from.Address, Address);
             ETag = from.ETag;
-            ChangeLog = from.ChangeLog;
+            ChangeLog = CopyOrClone(from.ChangeLog, ChangeLog);
 
             OnAfterCopyFrom(from);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Beef.Mapper
@@ -39,7 +40,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Initializes a new instance of the <see cref="EntitySrceMapper{TSrce}"/> class.
         /// </summary>
-        public EntitySrceMapper()
+        protected EntitySrceMapper()
         {
             if (typeof(TSrce) == typeof(string))
                 throw new InvalidOperationException("SrceType must not be a String.");
@@ -79,9 +80,9 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mappings.
         /// </summary>
-        public IPropertySrceMapper<TSrce>[] Mappings
+        public IReadOnlyCollection<IPropertySrceMapper<TSrce>> Mappings
         {
-            get { return _mappings.ToArray(); }
+            get { return new ReadOnlyCollection<IPropertySrceMapper<TSrce>>(_mappings.ToArray()); }
         }
 
         /// <summary>
@@ -127,15 +128,15 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the properties that form the unique key.
         /// </summary>
-        protected IPropertyMapperBase[] UniqueKey
+        protected IReadOnlyList<IPropertyMapperBase> UniqueKey
         {
             get
             {
                 if (_uniqueKey != null)
-                    return _uniqueKey;
+                    return new ReadOnlyCollection<IPropertyMapperBase>(_uniqueKey);
 
                 _uniqueKey = Mappings.Where(x => x.IsUniqueKey).ToArray();
-                return _uniqueKey;
+                return new ReadOnlyCollection<IPropertyMapperBase>(_uniqueKey);
             }
         }
     }

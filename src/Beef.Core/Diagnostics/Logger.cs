@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Beef.Diagnostics
 {
@@ -336,7 +338,7 @@ namespace Beef.Diagnostics
         #endregion
     }
 
-#pragma warning disable CA1710 // Identifiers should have correct suffix; this is acceptable.
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design, this is acceptable.
     /// <summary>
     /// The <see cref="Logger"/> arguments used for the binder (see <see cref="Logger.RegisterGlobal(Action{LoggerArgs})"/> and <see cref="ExecutionContext.RegisterLogger(Action{LoggerArgs})"/>).
     /// </summary>
@@ -373,7 +375,7 @@ namespace Beef.Diagnostics
             Data = data;
             Type = type;
             Format = format;
-            Values = values;
+            Values = new ReadOnlyCollection<object>(values);
             IsCompositeFormat = true;
         }
 
@@ -400,7 +402,7 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Gets the composite format values.
         /// </summary>
-        public IEnumerable<object> Values { get; private set; }
+        public IReadOnlyList<object> Values { get; private set; }
 
         /// <summary>
         /// Indicates whether the composite <see cref="Format"/> and <see cref="Values"/> were specified; or simply the <see cref="Text"/>.
@@ -428,7 +430,7 @@ namespace Beef.Diagnostics
         /// <returns>The output <see cref="string"/>.</returns>
         public override string ToString()
         {
-            var str = (IsCompositeFormat) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Format, (object[])Values) : Text;
+            var str = (IsCompositeFormat) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Format, Values.ToArray()) : Text;
             return IsException ? $"{str} Exception: {Exception.ToString()}" : str;
         }
 
@@ -461,7 +463,7 @@ namespace Beef.Diagnostics
     /// Represents the <see cref="Logger"/> message type.
     /// </summary>
     [Flags()]
-#pragma warning disable CA1714 // Flags enums should have plural names; 
+#pragma warning disable CA1714 // Flags enums should have plural names; by-design, name is ok.
     public enum LogMessageType
 #pragma warning restore CA1714
     {

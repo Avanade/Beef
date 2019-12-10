@@ -10,7 +10,7 @@
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
     <Property Name="Address" Type="Address" IsEntity="true" DataDatabaseMapper="AddressData.DbMapper" DataEntityFrameworkIgnore="true" />
     <Property Name="ETag" ArgumentName="etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" />
+    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
 
     <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
     <Operation Name="Update" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="{id}" DataSvcTransaction="true" />
@@ -64,7 +64,7 @@
   </Entity>
 
   <Entity Name="PersonDetail" Text="{{Person}} detail" Inherits="Person" Collection="true" CollectionResult="true" ExcludeAll="true">
-    <Property Name="History" Type="WorkHistoryCollection" />
+    <Property Name="History" Type="WorkHistoryCollection" IsEntity="true" />
   </Entity>
 
   <Entity Name="WorkHistory" Collection="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database">
@@ -99,7 +99,7 @@
     <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" RefDataType="string" />
     <Property Name="PowerSource" Type="RefDataNamespace.PowerSource" RefDataType="string" />
     <Property Name="ETag" ArgumentName="etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" />
+    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
 
     <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="">
       <Parameter Name="Args" Type="RobotArgs" Validator="RobotArgsValidator" />
@@ -150,6 +150,6 @@
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
     <Property Name="ETag" ArgumentName="etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" />
+    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   </Entity> 
  </CodeGeneration>

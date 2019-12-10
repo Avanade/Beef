@@ -506,9 +506,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
                 <Else><![CDATA[, true]]></Else>
               </If>
               <If Condition="Property.Type != 'DateTime' and Property.Type != 'string'">
-                <If Condition="Property.BubblePropertyChanged == false">
-                  <Then><![CDATA[, false]]></Then>
-                  <Else><![CDATA[, true]]></Else>
+                <If Condition="Property.IsEntity == true or Property.BubblePropertyChanged == true">
+                  <Then><![CDATA[, true]]></Then>
+                  <Else><![CDATA[, false]]></Else>
                 </If>
               </If>
               <If Condition="Property.Type == 'DateTime'">
@@ -544,6 +544,48 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         #endregion
 
 ]]>
+    </If>
+    <If Condition="Entity.OmitEntityBase == false">
+      <Set Name="System.EndMethod" Value="false"/>
+      <Property Condition="Property.IsEntity == true and Property.Inherited == false">
+        <If Condition="System.Index == 0">
+          <Set Name="System.EndMethod" Value="true"/>
+          <![CDATA[        #region IChangeTracking
+          
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+]]>
+        </If>
+        <![CDATA[            {{Property.Name}}?.AcceptChanges();
+]]>
+      </Property>
+      <If Condition="System.EndMethod == true">
+        <![CDATA[            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+]]>
+      </If>
+      <Property Condition="System.EndMethod == true and Property.IsEntity == true and Property.Inherited == false">
+        <![CDATA[            {{Property.Name}}?.TrackChanges();
+]]>
+      </Property>
+      <If Condition="System.EndMethod == true">
+        <![CDATA[            base.TrackChanges();
+        }
+
+        #endregion
+
+]]>
+      </If>
     </If>
     <Set Name="System.EndRegion" Value="false"/>
     <If Condition="Entity.OmitEntityBase == false">
@@ -713,7 +755,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
             </If>
           </Then>
           <Else>
-            <![CDATA[(from.{{Property.Name}} == null) ? null : ({{Property.Type}})from.{{Property.Name}}.Clone();
+            <![CDATA[CopyOrClone(from.{{Property.Name}}, {{Property.Name}});
 ]]>
           </Else>
         </If>

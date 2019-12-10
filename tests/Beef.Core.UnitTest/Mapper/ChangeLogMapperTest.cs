@@ -29,7 +29,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_Create_OperationAny()
         {
-            var r = EntityMapper<TestS, TestD>.Create()
+            var r = EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() });
 
@@ -44,7 +44,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToDest_Create_OperationUpdate()
         {
-            var r = EntityMapper<TestS, TestD>.Create()
+            var r = EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
 
@@ -60,7 +60,7 @@ namespace Beef.Core.UnitTest.Mapper
         public void MapToDest_Replace_OperationAny()
         {
             var r = new TestD { ChangeLog = CreateChangeLog2() };
-            EntityMapper<TestS, TestD>.Create()
+            EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() }, r);
 
@@ -76,7 +76,7 @@ namespace Beef.Core.UnitTest.Mapper
         public void MapToDest_Replace_OperationUpdate()
         {
             var r = new TestD { ChangeLog = CreateChangeLog2() };
-            EntityMapper<TestS, TestD>.Create()
+            EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToDest(new TestS { ChangeLog = CreateChangeLog() }, r, OperationTypes.Update);
 
@@ -91,7 +91,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_Create_OperationAny()
         {
-            var r = EntityMapper<TestS, TestD>.Create()
+            var r = EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToSrce(new TestD { ChangeLog = CreateChangeLog() });
 
@@ -106,7 +106,7 @@ namespace Beef.Core.UnitTest.Mapper
         [Test]
         public void MapToSrce_Create_OperationUpdate()
         {
-            var r = EntityMapper<TestS, TestD>.Create()
+            var r = EntityMapper.Create<TestS, TestD>()
                 .HasProperty(s => s.ChangeLog, d => d.ChangeLog, p => p.SetMapper(ChangeLogMapper.Default))
                 .MapToSrce(new TestD { ChangeLog = CreateChangeLog() }, OperationTypes.Update);
 

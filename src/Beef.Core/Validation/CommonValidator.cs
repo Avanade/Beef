@@ -5,6 +5,24 @@ using System;
 namespace Beef.Validation
 {
     /// <summary>
+    /// Provides access to the common validator capabilities.
+    /// </summary>
+    public static class CommonValidator
+    {
+        /// <summary>
+        /// Creates a new instance of the <see cref="CommonValidator{T}"/>.
+        /// </summary>
+        /// <param name="validator">An action with the <see cref="CommonValidator{T}"/>.</param>
+        /// <returns>The <see cref="CommonValidator{T}"/>.</returns>
+        public static CommonValidator<T> Create<T>(Action<CommonValidator<T>> validator)
+        {
+            var cv = new CommonValidator<T>();
+            validator?.Invoke(cv);
+            return cv;
+        }
+    }
+
+    /// <summary>
     /// Provides a common value rule that can be used by other validators that share the same <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
@@ -15,7 +33,10 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="validator">An action with the <see cref="CommonValidator{T}"/>.</param>
         /// <returns>The <see cref="CommonValidator{T}"/>.</returns>
+        [Obsolete("Please use CommonValidator.Create<TEntity>() instead.")]
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
         public static CommonValidator<T> Create(Action<CommonValidator<T>> validator)
+#pragma warning restore CA1000
         {
             var cv = new CommonValidator<T>();
             validator?.Invoke(cv);
@@ -25,7 +46,7 @@ namespace Beef.Validation
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonValidator{T}"/>.
         /// </summary>
-        private CommonValidator() { }
+        internal CommonValidator() { }
 
         /// <summary>
         /// The <b>Run</b> method is not supported.
@@ -41,7 +62,7 @@ namespace Beef.Validation
         /// Validates the value.
         /// </summary>
         /// <param name="value">The value to validate.</param>
-        /// <param name="name">The value name (defaults to <see cref="ValueValidator{T}.ValueNameDefault"/>).</param>
+        /// <param name="name">The value name (defaults to <see cref="Validator.ValueNameDefault"/>).</param>
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
@@ -49,7 +70,7 @@ namespace Beef.Validation
         {
             var vv = new ValidationValue<T>(null, value);
             var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(vv,
-                new ValidationArgs()), value, name ?? ValueValidator<T>.ValueNameDefault, null, text);
+                new ValidationArgs()), value, name ?? Validator.ValueNameDefault, null, text);
 
             Invoke(ctx);
             var res = new ValueValidatorResult<ValidationValue<T>, T>(ctx);
@@ -66,9 +87,7 @@ namespace Beef.Validation
         /// <param name="context">The related <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
         internal void Validate<TEntity>(PropertyContext<TEntity, T> context) where TEntity : class
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
-
+            Check.NotNull(context, nameof(context));
             var vv = new ValidationValue<T>(context.Parent.Value, context.Value);
             var vc = new ValidationContext<ValidationValue<T>>(vv, new ValidationArgs
             {

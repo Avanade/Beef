@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.11
+- *Fixed:* Introduced FxCop Analysis to `Beef.AspNetCore.WebApi`; this version represents the remediation based on the results.
+- *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
+
 ## v2.1.10
 - *Added:* `WebApiQueryString.` added to parse the query string for `$Text=true`. Where set then the `ExecutionContext.IsRefDataTextSerializationEnabled` will be automatically set to `true` before serializing the result enabling conditional *reference data* text output. An additional `XxxText` property must be explicitly added to enable; `RefDataText` attribute to code-gen to support.
 

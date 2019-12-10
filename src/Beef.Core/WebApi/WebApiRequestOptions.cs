@@ -15,9 +15,11 @@ namespace Beef.WebApi
         /// </summary>
         public string ETag { get; set; }
 
+#pragma warning disable CA1056 // Uri properties should not be strings; by-design, is the query string component only.
         /// <summary>
         /// Gets or sets the value to append to the URL query string.
         /// </summary>
         public string UrlQueryString { get; set; }
+#pragma warning restore CA1056 
     }
 }

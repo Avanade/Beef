@@ -375,7 +375,7 @@ namespace Beef.Json
 
                     try
                     {
-                        uk[i] = ukpr[i].GetJtokenValue(jk);
+                        uk[i] = ukpr[i].GetJTokenValue(jk);
                     }
                     catch (FormatException fex)
                     {

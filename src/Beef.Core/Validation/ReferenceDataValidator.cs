@@ -7,7 +7,7 @@ namespace Beef.Validation
     /// <summary>
     /// Represents the standard <see cref="ReferenceDataBase"/> validation configuration settings.
     /// </summary>
-    public class ReferenceDataValidation
+    public static class ReferenceDataValidation
     {
         /// <summary>
         /// Gets or sets the maximum length for the <see cref="ReferenceDataBase.Code"/>.

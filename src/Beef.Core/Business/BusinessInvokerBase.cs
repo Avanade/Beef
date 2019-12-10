@@ -224,7 +224,7 @@ namespace Beef.Business
     public class BusinessInvokerArgs
     {
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, and
+        /// Gets or sets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, and
         /// <see cref="IncludeTransactionScope"/> is <c>false</c>.
         /// </summary>
         public static BusinessInvokerArgs Default { get; set; } = new BusinessInvokerArgs();

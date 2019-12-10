@@ -164,8 +164,8 @@ namespace Beef.Data.Cosmos
             if (keys.Length != 1)
                 throw new NotSupportedException("Only a single key value is currently supported.");
 
-            if (keys.Length != Mapper.UniqueKey.Length)
-                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Length}'.", nameof(keys));
+            if (keys.Length != Mapper.UniqueKey.Count)
+                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Count}'.", nameof(keys));
 
             return Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified).ToString();
         }
@@ -177,7 +177,7 @@ namespace Beef.Data.Cosmos
         /// <returns>The cosmos key.</returns>
         internal string GetCosmosKey(T value)
         {
-            if (Mapper.UniqueKey.Length != 1)
+            if (Mapper.UniqueKey.Count != 1)
                 throw new NotSupportedException("Only a single key value is currently supported.");
 
             var v = Mapper.UniqueKey[0].GetSrceValue(value, OperationTypes.Unspecified);

@@ -80,6 +80,8 @@ namespace Beef.Validation
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
         protected void Invoke(PropertyContext<TEntity, TProperty> context)
         {
+            Check.NotNull(context, nameof(context));
+
             // Check all "this" clauses.
             foreach (var clause in _clauses)
             {
@@ -222,7 +224,7 @@ namespace Beef.Validation
         /// <param name="propertyExpression">The <see cref="LambdaExpression"/> to reference the entity property.</param>
         public PropertyRule(Expression<Func<TEntity, TProperty>> propertyExpression)
         {
-            _property = PropertyExpression<TEntity, TProperty>.Create(propertyExpression, true);
+            _property = PropertyExpression.Create(propertyExpression, true);
             Name = _property.Name;
             JsonName = _property.JsonName;
             Text = _property.Text;
@@ -234,8 +236,7 @@ namespace Beef.Validation
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/>.</param>
         public void Validate(ValidationContext<TEntity> context)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
+            Check.NotNull(context, nameof(context));
 
             if (context.Value == null)
                 return;

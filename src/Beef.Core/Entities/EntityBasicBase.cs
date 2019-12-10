@@ -92,18 +92,15 @@ namespace Beef.Entities
             RaisePropertyChanged(propertyName);
         }
 
-#pragma warning disable CA1030 // Use events where appropriate
+#pragma warning disable CA1030 // Use events where appropriate; by-design, this enables the raising of the underlying event.
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event only (<see cref="OnPropertyChanged"/>).
         /// </summary>
         /// <param name="propertyName">The property name.</param>
         public void RaisePropertyChanged(string propertyName)
-#pragma warning restore CA1030 // Use events where appropriate
+#pragma warning restore CA1030
         {
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Check.NotNull(propertyName, nameof(propertyName))));
         }
 
         /// <summary>
@@ -196,6 +193,10 @@ namespace Beef.Entities
                     if (npc != null)
                         npc.PropertyChanged -= GetValue_PropertyChanged(propertyNames);
                 }
+
+                // Track changes for the new value where parent (this) is tracking.
+                if (this is IChangeTrackingLogging ct && ct.IsChangeTracking && setValue is IChangeTrackingLogging sct && !sct.IsChangeTracking)
+                    sct.TrackChanges();
 
                 // Update the property and trigger the property changed.
                 propertyValue = setValue;

@@ -16,7 +16,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Create_NewValidator()
         {
-            var r = Validator<TestData>.Create()
+            var r = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().String(10))
                 .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
                 .Validate(new TestData { CountB = 0 });
@@ -37,10 +37,10 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Create_NewValidator_WithIncludeBase()
         {
-            var v = Validator<TestDataBase>.Create()
+            var v = Validator.Create<TestDataBase>()
                 .HasProperty(x => x.Text, p => p.Mandatory().String(10));
 
-            var r = Validator<TestData>.Create()
+            var r = Validator.Create<TestData>()
                 .IncludeBase(v)
                 .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
                 .Validate(new TestData { CountB = 0 });
@@ -84,7 +84,7 @@ namespace Beef.Core.UnitTest.Validation
 
         public void Ruleset_UsingInline()
         {
-            var v = Validator<TestItem>.Create()
+            var v = Validator.Create<TestItem>()
                 .HasRuleSet(x => x.Value.Code == "A", y =>
                 {
                     y.Property(x => x.Text).Mandatory().Must(x => x.Text == "A");
@@ -118,7 +118,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void CheckJsonNamesUsage()
         {
-            var v = Validator<TestData>.Create()
+            var v = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory())
                 .HasProperty(x => x.DateA, p => p.Mandatory())
                 .HasProperty(x => x.DateA, p => p.Mandatory());
@@ -145,7 +145,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Inline_OnValidate_WithWhen()
         {
-            var r = Validator<TestItem>.Create()
+            var r = Validator.Create<TestItem>()
                 .Additional(context =>
                 {
                     context.Check(x => x.Text, true, ValidatorStrings.MaxCountFormat, 10);
@@ -163,10 +163,10 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Multi_Common_Validator()
         {
-            var cv1 = CommonValidator<string>.Create(v => v.String(5).Must(x => x.Value != "XXXXX"));
-            var cv2 = CommonValidator<string>.Create(v => v.String(2).Must(x => x.Value != "YYY"));
+            var cv1 = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
+            var cv2 = CommonValidator.Create<string>(v => v.String(2).Must(x => x.Value != "YYY"));
 
-            var vx = Validator<TestItem>.Create()
+            var vx = Validator.Create<TestItem>()
                 .HasProperty(x => x.Code, p => p.Common(cv2))
                 .HasProperty(x => x.Text, p => p.Common(cv1));
 
@@ -179,7 +179,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Entity_SubEntity_Mandatory()
         {
-            var r = Validator<TestEntity>.Create()
+            var r = Validator.Create<TestEntity>()
                 .HasProperty(x => x.Items, (p) => p.Mandatory())
                 .HasProperty(x => x.Item, (p) => p.Mandatory())
                 .Validate(new TestEntity { Items = null });
@@ -244,9 +244,9 @@ namespace Beef.Core.UnitTest.Validation
             e.Items.Add(new TestItem { Code = "ABC", Text = "Def" });
             e.Items.Add(new TestItem { Code = "XYZ", Text = "Xyz" });
 
-            var v = Validator<TestItem>.Create();
+            var v = Validator.Create<TestItem>();
 
-            var r = Validator<TestEntity>.Create()
+            var r = Validator.Create<TestEntity>()
                 .HasProperty(x => x.Items, p => p.Collection(item: new CollectionRuleItem<TestItem>(v).DuplicateCheck(y => y.Code)))
                 .Validate(e);
 
@@ -264,7 +264,7 @@ namespace Beef.Core.UnitTest.Validation
         {
             try
             {
-                Validator<TestItem>.ThrowValidationException(x => x.Code, "Some text.");
+                Validator.Create<TestItem>().ThrowValidationException(x => x.Code, "Some text.");
                 Assert.Fail();
             }
             catch (ValidationException vex)
@@ -280,7 +280,7 @@ namespace Beef.Core.UnitTest.Validation
         {
             try
             {
-                Validator<TestItem>.ThrowValidationException(x => x.Code, "{0} {1} {2} Stuff.", "XXX", "ZZZ");
+                Validator.Create<TestItem>().ThrowValidationException(x => x.Code, "{0} {1} {2} Stuff.", "XXX", "ZZZ");
                 Assert.Fail();
             }
             catch (ValidationException vex)
@@ -305,7 +305,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void ManualProperty_Inject()
         {
-            var vx = Validator<TestInject>.Create()
+            var vx = Validator.Create<TestInject>()
                 .HasProperty(x => x.Text, p => p.Mandatory())
                 .HasProperty(x => x.Value, p => p.Mandatory().Custom(TestInjectValueValidate))
                 .Validate(new TestInject { Text = "X", Value = new TestInjectChild { Code = 5 } });
@@ -317,7 +317,7 @@ namespace Beef.Core.UnitTest.Validation
 
         private void TestInjectValueValidate(PropertyContext<TestInject, object> context)
         {
-            var vxc = Validator<TestInjectChild>.Create()
+            var vxc = Validator.Create<TestInjectChild>()
                 .HasProperty(x => x.Code, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10));
 
             var type = vxc.GetType();
@@ -329,11 +329,11 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public void Entity_ValueOverrideAndDefault()
         {
-            var vc = CommonValidator<decimal>.Create(v => v.Default(100));
+            var vc = CommonValidator.Create<decimal>(v => v.Default(100));
 
             var ti = new TestData { Text = "ABC", CountA = 1 };
 
-            var vx = Validator<TestData>.Create()
+            var vx = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Override("XYZ"))
                 .HasProperty(x => x.CountA, p => p.Default(x => 10))
                 .HasProperty(x => x.CountB, p => p.Default(x => 20))

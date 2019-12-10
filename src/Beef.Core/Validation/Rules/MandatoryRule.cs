@@ -20,6 +20,8 @@ namespace Beef.Validation.Rules
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
+            Beef.Check.NotNull(context, nameof(context));
+
             // Compare the value against its default.
             if (Comparer<TProperty>.Default.Compare(context.Value, default(TProperty)) == 0)
             {

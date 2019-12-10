@@ -41,17 +41,18 @@ namespace Beef.RefData
             set { _date = Cleaner.Clean(value, DateTimeTransform.DateOnly); }
         }
 
+#pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, is ok.
         /// <summary>
         /// Gets or sets a contextual validation date for a specific <see cref="ReferenceDataBase"/> <paramref name="type"/>.
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The contextual validation date.</returns>
         public DateTime? this[Type type]
+#pragma warning restore CA1043 
         {
             get
             {
-                if (type == null)
-                    throw new ArgumentNullException("type");
+                Check.NotNull(type, nameof(type));
 
                 if (_coll.ContainsKey(type))
                     return _coll[type];
@@ -61,8 +62,7 @@ namespace Beef.RefData
 
             set
             {
-                if (type == null)
-                    throw new ArgumentNullException("type");
+                Check.NotNull(type, nameof(type));
 
                 if (_coll.ContainsKey(type))
                 {

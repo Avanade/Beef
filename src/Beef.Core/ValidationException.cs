@@ -18,16 +18,24 @@ namespace Beef
         public static bool ShouldExceptionBeLogged { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationException"/> with a specified messsage.
+        /// Initializes a new instance of the <see cref="ValidationException"/> class.
+        /// </summary>
+        public ValidationException()
+            : base(new LText("Beef.ValidationException"))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ValidationException(string message = null)
+        public ValidationException(string message)
             : base(message ?? new LText("Beef.ValidationException"))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationException"/> with a specified messsage and inner exception.
+        /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified messsage and inner exception.
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
@@ -37,7 +45,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidationException"/> with a <see cref="MessageItem"/> list.
+        /// Initializes a new instance of the <see cref="ValidationException"/> class with a <see cref="MessageItem"/> list.
         /// </summary>
         /// <param path="messages">The <see cref="MessageItem"/> list.</param>
         public ValidationException(IEnumerable<MessageItem> messages)
