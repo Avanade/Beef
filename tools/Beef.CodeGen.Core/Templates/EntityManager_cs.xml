@@ -580,17 +580,22 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
             </If>
             <![CDATA[await {{Operation.Name}}OnImplementationAsync(]]>
+            <Set Name="System.Comma" Value="false" />
             <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Get' and Operation.OperationType != 'Custom'">
-              <Then><![CDATA[__result]]></Then>
+              <Then>
+                <Set Name="System.Comma" Value="true" />
+                <![CDATA[__result]]>
+              </Then>
             </If>
             <Parameter Condition="Parameter.LayerPassing == 'All'">
-              <If Condition="System.Index > 0">
+              <If Condition="System.Comma == true or System.Index > 0">
                 <![CDATA[, ]]>
               </If>
               <![CDATA[{{Parameter.ArgumentName}}]]>
+              <Set Name="System.Comma" Value="false" />
             </Parameter>
             <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-              <If Condition="Operation.ParameterCount > 0">
+              <If Condition="System.Comma == true or Operation.ParameterCount > 0">
                 <![CDATA[, ]]>
               </If>
               <![CDATA[paging]]>
@@ -600,8 +605,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
           </Then>
           <Else>
             <![CDATA[await {{Entity.Name}}DataSvc]]>
-          <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
-          <![CDATA[.{{Operation.Name}}Async(]]>
+            <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
+            <![CDATA[.{{Operation.Name}}Async(]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <![CDATA[value]]>
             </If>

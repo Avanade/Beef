@@ -3,6 +3,7 @@
 using Beef.Caching.Policy;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -133,7 +134,7 @@ namespace Beef.Caching
                 }
 
                 v = _get != null ? _get(key) : _getAsync(key).Result;
-                if (v == default)
+                if (EqualityComparer<TValue>.Default.Equals(v, default))
                 {
                     value = default;
                     if (!_cacheDefaultValues)
@@ -166,7 +167,7 @@ namespace Beef.Caching
         {
             lock (_keyLock.Lock(key))
             {
-                _dict.TryRemove(key, out CacheValue<TValue> cv);
+                _dict.TryRemove(key, out CacheValue<TValue> _);
                 _keyLock.Remove(key);
             }
         }

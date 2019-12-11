@@ -121,7 +121,7 @@ namespace Beef.AspNetCore.WebApi
         public static T Value<T>(T value)
         {
             // Get the WebApiActionBase instance from the ExecutionContext.
-            if (value != default && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ExecutionContextPropertyKey, out var val) && val is WebApiActionBase api)
+            if (!EqualityComparer<T>.Default.Equals(value, default) && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ExecutionContextPropertyKey, out var val) && val is WebApiActionBase api)
             {
                 // Where the value implements IETag and If-Match is specified, then this should be used as the preference.
                 if (api.IfMatchETags != null && api.IfMatchETags.Count > 0 && value is IETag etag && etag != null)

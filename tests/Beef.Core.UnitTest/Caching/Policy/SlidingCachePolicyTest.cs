@@ -23,7 +23,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
             Thread.Sleep(500);
             Assert.IsFalse(((ICachePolicy)scp).HasExpired());
-            Thread.Sleep(1000);
+            Thread.Sleep(1500);
             Assert.IsTrue(scp.IsExpired);
         }
 

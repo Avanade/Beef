@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.24
+- *Fixed:* Manager code-gen output fixed where `OperationType="GetColl"` and `ManagerCustom="true"`; a comma is now placed between the parameters correctly.
+
 ## v2.1.23
 - *Fixed:* Entity code-gen updated to override AcceptChanges and TrackChanges to support change tracking through the entity object graph. There are required changes within `Beef.Core` to enable.
 

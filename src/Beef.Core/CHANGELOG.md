@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.25
+- *Fixed:* Compile error from Visual Studio v16.4.1 corrected.
+
 ## v2.1.24
 - *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
 - *Fixed:* The `IChangeTracking` has been extended to support tracking through sub-entities and collections. This includes `EntityBase.CopyOrClone` method to copy or clone entity; note that a collection is always cloned. 

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.12
+- *Fixed:* Compile error from Visual Studio v16.4.1 corrected.
+
 ## v2.1.11
 - *Fixed:* Introduced FxCop Analysis to `Beef.AspNetCore.WebApi`; this version represents the remediation based on the results.
 - *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
