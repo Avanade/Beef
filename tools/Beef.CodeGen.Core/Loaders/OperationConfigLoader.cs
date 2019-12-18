@@ -22,6 +22,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadBeforeChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             CodeGenConfig entity = CodeGenConfig.FindConfig(config, "Entity");
 
             if (config.GetAttributeValue<bool>("UniqueKey"))
@@ -52,9 +55,9 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("ReturnType", "void");
 
             if (config.Attributes.ContainsKey("ReturnType"))
-                config.AttributeAdd("ReturnText", string.Format("A resultant {{{{{0}}}}}.", config.Attributes["ReturnType"]));
+                config.AttributeAdd("ReturnText", string.Format(System.Globalization.CultureInfo.InvariantCulture, "A resultant {{{{{0}}}}}.", config.Attributes["ReturnType"]));
             else
-                config.AttributeAdd("ReturnText", string.Format("A resultant {{{{{0}}}}}.", entity.Attributes["Name"]));
+                config.AttributeAdd("ReturnText", string.Format(System.Globalization.CultureInfo.InvariantCulture, "A resultant {{{{{0}}}}}.", entity.Attributes["Name"]));
           
             config.AttributeUpdate("ReturnText", config.Attributes["ReturnText"]);
 

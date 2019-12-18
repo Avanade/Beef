@@ -20,8 +20,11 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException>(string exceptionMessage, Action action) where TException : Exception
         {
-            Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
-            Check.NotNull(action, nameof(action));
+            if (exceptionMessage == null)
+                throw new ArgumentNullException(nameof(exceptionMessage));
+
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
 
             try
             {
@@ -34,7 +37,7 @@ namespace Beef.Test.NUnit
                 {
                     if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
                     {
-                        if (!exceptionMessage.Contains("\r\n") && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                        if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
                             return;
                     }
 
@@ -55,8 +58,11 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException>(string exceptionMessage, Func<Task> funcAsync)
         {
-            Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
-            Check.NotNull(funcAsync, nameof(funcAsync));
+            if (exceptionMessage == null)
+                throw new ArgumentNullException(nameof(exceptionMessage));
+
+            if (funcAsync == null)
+                throw new ArgumentNullException(nameof(funcAsync));
 
             try
             {
@@ -69,7 +75,7 @@ namespace Beef.Test.NUnit
                 {
                     if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
                     {
-                        if (!exceptionMessage.Contains("\r\n") && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                        if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
                             return;
                     }
 
@@ -80,7 +86,7 @@ namespace Beef.Test.NUnit
                 {
                     if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
                     {
-                        if (!exceptionMessage.Contains("\r\n") && aex.InnerException.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                        if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && aex.InnerException.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
                             return;
                     }
 
@@ -102,8 +108,11 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException, TResult>(string exceptionMessage, Func<TResult> func) where TException : Exception
         {
-            Check.NotEmpty(exceptionMessage, nameof(exceptionMessage));
-            Check.NotNull(func, nameof(func));
+            if (exceptionMessage == null)
+                throw new ArgumentNullException(nameof(exceptionMessage));
+
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
 
             try
             {
@@ -116,7 +125,7 @@ namespace Beef.Test.NUnit
                 {
                     if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
                     {
-                        if (!exceptionMessage.Contains("\r\n") && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                        if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
                             return;
                     }
 

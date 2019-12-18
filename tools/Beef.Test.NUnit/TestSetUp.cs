@@ -182,12 +182,14 @@ namespace Beef.Test.NUnit
                                 Assert.Fail("This RegisterSetUp function failed to execute successfully.");
                         }
                     }
+#pragma warning disable CA1031 // Do not catch general exception types; be-design, catches them all!
                     catch (Exception ex)
                     {
                         ShouldContinueRunningTests = false;
                         Logger.Default.Exception(ex, $"This RegisterSetUp function failed to execute successfully: {ex.Message}");
                         Assert.Fail($"This RegisterSetUp function failed to execute successfully: {ex.Message}");
                     }
+#pragma warning restore CA1031
                     finally
                     {
                         _registeredSetUpInvoked = true;

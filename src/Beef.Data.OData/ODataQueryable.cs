@@ -17,7 +17,9 @@ namespace Beef.Data.OData
     /// Represents an <b>OData LINQ</b> query.
     /// </summary>
     /// <typeparam name="T">The <see cref="Type"/> to query.</typeparam>
+#pragma warning disable CA1710 // Identifiers should have correct suffix; by-design, is an "Queryable".
     public class ODataQueryable<T> : QueryableBase<T>
+#pragma warning restore CA1710
     {
         /// <summary>
         /// Creates a new <see cref="ODataQueryExecutor"/>.
@@ -46,6 +48,9 @@ namespace Beef.Data.OData
         /// <param name="expression">The <see cref="Expression"/>.</param>
         public ODataQueryable(IQueryProvider provider, Expression expression) : base(provider, expression)
         {
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+
             QueryExecutor = (ODataQueryExecutor)((DefaultQueryProvider)provider).Executor;
         }
 

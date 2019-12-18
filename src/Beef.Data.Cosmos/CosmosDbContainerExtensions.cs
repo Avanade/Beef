@@ -27,6 +27,9 @@ namespace Beef.Data.Cosmos
         /// <remarks>Each item is added individually and is not transactional.</remarks>
         public static async Task ImportBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where TModel : class, new()
         {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
             if (items == null)
                 return;
 
@@ -49,6 +52,9 @@ namespace Beef.Data.Cosmos
         /// <remarks>Each item is added individually and is not transactional.</remarks>
         public static async Task ImportValueBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where TModel : class, new()
         {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
             if (items == null)
                 return;
 
@@ -75,6 +81,9 @@ namespace Beef.Data.Cosmos
         /// <remarks>Each item is added individually and is not transactional.</remarks>
         public static async Task ImportBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string name = null, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where TModel : class, new()
         {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
             using (var rs = GetResourceStream<TResource>(Check.NotEmpty(yamlResourceName, nameof(yamlResourceName))))
             {
                 var yc = Beef.Yaml.YamlConverter.ReadYaml(rs);
@@ -96,6 +105,9 @@ namespace Beef.Data.Cosmos
         /// <remarks>Each item is added individually and is not transactional.</remarks>
         public static async Task ImportValueBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string name = null, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null) where TModel : class, new()
         {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
             using (var rs = GetResourceStream<TResource>(Check.NotEmpty(yamlResourceName, nameof(yamlResourceName))))
             {
                 var yc = Beef.Yaml.YamlConverter.ReadYaml(rs);
@@ -108,8 +120,11 @@ namespace Beef.Data.Cosmos
         /// </summary>
         private static System.IO.Stream GetResourceStream<TResource>(string yamlResourceName)
         {
+            if (string.IsNullOrEmpty(yamlResourceName))
+                throw new ArgumentNullException(nameof(yamlResourceName));
+
             var ass = typeof(TResource).Assembly;
-            var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($"Cosmos.{Check.NotNull(yamlResourceName, nameof(yamlResourceName))}"));
+            var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($"Cosmos.{Check.NotNull(yamlResourceName, nameof(yamlResourceName))}", StringComparison.InvariantCultureIgnoreCase));
             if (rn == null || rn.Count() != 1)
                 throw new ArgumentException($"A single Resource with name ending in 'Cosmos.{yamlResourceName}' not found in Assembly '{ass.FullName}'.", nameof(yamlResourceName));
 
@@ -130,7 +145,11 @@ namespace Beef.Data.Cosmos
         /// can co-exist within the same collection.</remarks>
         public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, IReferenceDataProvider refData, string yamlResourceName, PartitionKey? partitionKey = null, ItemRequestOptions itemRequestOptions = null)
         {
-            Check.NotNull(refData, nameof(refData));
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
+            if (refData == null)
+                throw new ArgumentNullException(nameof(refData));
 
             using (var rs = GetResourceStream<TResource>(yamlResourceName))
             {
@@ -138,7 +157,7 @@ namespace Beef.Data.Cosmos
                 var yt = typeof(Beef.Yaml.YamlConverter);
                 var ct = typeof(Container);
                 var emi = typeof(CosmosDbContainerExtensions)
-                    .GetMethods().Where(x => x.Name == nameof(CosmosDbContainerExtensions.ImportValueBatchAsync) && x.GetGenericArguments().Count() == 1).Single();
+                    .GetMethods().Where(x => x.Name == nameof(CosmosDbContainerExtensions.ImportValueBatchAsync) && x.GetGenericArguments().Length == 1).Single();
 
                 foreach (var rdt in refData.GetAllTypes())
                 {

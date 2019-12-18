@@ -23,7 +23,7 @@ namespace Beef.Data.EntityFrameworkCore
         IEntityMapper Mapper { get; }
 
         /// <summary>
-        /// Indicates that the underlying <see cref="DbContext"/> <see cref="T:DbContext.SaveChanges"/> is to be performed automatically.
+        /// Indicates that the underlying <see cref="DbContext"/> <see cref="Microsoft.EntityFrameworkCore.DbContext.SaveChanges()"/> is to be performed automatically.
         /// </summary>
         bool SaveChanges { get; }
 
@@ -94,7 +94,7 @@ namespace Beef.Data.EntityFrameworkCore
         public PagingResult Paging { get; private set; }
 
         /// <summary>
-        /// Indicates that the underlying <see cref="DbContext"/> <see cref="T:DbContext.SaveChanges"/> is to be performed automatically (defauls to <c>true</c>);
+        /// Indicates that the underlying <see cref="DbContext"/> <see cref="Microsoft.EntityFrameworkCore.DbContext.SaveChanges()"/> is to be performed automatically (defauls to <c>true</c>);
         /// </summary>
         public bool SaveChanges { get; set; } = true;
 

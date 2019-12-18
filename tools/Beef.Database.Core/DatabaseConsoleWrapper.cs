@@ -69,15 +69,17 @@ namespace Beef.Database.Core
             Company = Check.NotEmpty(company, nameof(company));
             AppName = Check.NotEmpty(appName, nameof(appName));
             OutDir = Check.NotEmpty(outDir, nameof(outDir));
+            if (assemblies == null)
+                assemblies = Array.Empty<Assembly>();
 
             if (useBeefDbo)
             {
                 var a = new List<Assembly> { typeof(DatabaseConsoleWrapper).Assembly };
                 a.AddRange(assemblies);
-                Assemblies = a.ToArray();
+                Assemblies.AddRange(a);
             }
             else
-                Assemblies = assemblies;
+                Assemblies.AddRange(assemblies);
 
             OverrideConnectionString();
         }
@@ -100,7 +102,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Gets the assemblies containing the embedded resources.
         /// </summary>
-        public Assembly[] Assemblies { get; private set; }
+        public List<Assembly> Assemblies { get; private set; } = new List<Assembly>();
 
         /// <summary>
         /// Gets the company name.
@@ -124,43 +126,44 @@ namespace Beef.Database.Core
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
         public int Run(string[] args)
         {
-            var app = new CommandLineApplication(false)
+            using (var app = new CommandLineApplication(false)
             {
                 Name = "beef.database.core",
                 Description = "Business Entity Execution Framework (Beef) Database Tooling."
-            };
-
-            var cmd = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            var cs = app.Option("-cs|--connectionString", "Override the database connection string.", CommandOptionType.SingleValue);
-            var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
-            var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
-            var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
-
-            app.OnExecute(() =>
+            })
             {
-                var sb = new StringBuilder();
-                if (eo.HasValue())
-                    sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null, null, Assembly.GetEntryAssembly().FullName));
-                else
-                    Assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null, null, a.FullName)));
+                var cmd = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
+                var cs = app.Option("-cs|--connectionString", "Override the database connection string.", CommandOptionType.SingleValue);
+                var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
+                var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
+                var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
 
-                var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value, cs.Value() ?? ConnectionString, sb.ToString());
-                if (ct.HasValue())
-                    rargs = rargs + GetTableSchemaParams("Create", ct.Value());
-                else if (at.HasValue())
-                    rargs = rargs + GetTableSchemaParams("Alter", at.Value());
+                app.OnExecute(() =>
+                {
+                    var sb = new StringBuilder();
+                    if (eo.HasValue())
+                        sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null, null, Assembly.GetEntryAssembly().FullName));
+                    else
+                        Assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null, null, a.FullName)));
 
-                DatabaseConsole.Create().Run(rargs);
-            });
+                    var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value, cs.Value() ?? ConnectionString, sb.ToString());
+                    if (ct.HasValue())
+                        rargs += GetTableSchemaParams("Create", ct.Value());
+                    else if (at.HasValue())
+                        rargs += GetTableSchemaParams("Alter", at.Value());
 
-            try
-            {
-                return app.Execute(args);
-            }
-            catch (CommandParsingException cpex)
-            {
-                Console.WriteLine(cpex.Message);
-                return -1;
+                    DatabaseConsole.Create().Run(rargs);
+                });
+
+                try
+                {
+                    return app.Execute(args);
+                }
+                catch (CommandParsingException cpex)
+                {
+                    Console.WriteLine(cpex.Message);
+                    return -1;
+                }
             }
         }
 

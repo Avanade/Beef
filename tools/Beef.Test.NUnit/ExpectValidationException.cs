@@ -82,8 +82,11 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static void Throws(Func<Task> func, MessageItemCollection messages)
         {
-            Check.NotNull(func, nameof(func));
-            Check.NotNull(messages, nameof(messages));
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (messages == null)
+                throw new ArgumentNullException(nameof(messages));
 
             try
             {
@@ -112,6 +115,12 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static Task ThrowsAsync(Func<Task> func, params string[] messages)
         {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (messages == null)
+                throw new ArgumentNullException(nameof(messages));
+
             var mic = new MessageItemCollection();
             foreach (var text in messages)
             {
@@ -131,8 +140,11 @@ namespace Beef.Test.NUnit
         [System.Diagnostics.DebuggerStepThrough]
         public static async Task ThrowsAsync(Func<Task> func, MessageItemCollection messages)
         {
-            Check.NotNull(func, nameof(func));
-            Check.NotNull(messages, nameof(messages));
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (messages == null)
+                throw new ArgumentNullException(nameof(messages));
 
             try
             {
@@ -159,7 +171,9 @@ namespace Beef.Test.NUnit
         /// <param name="vex">The validation exception.</param>
         static public void CompareExpectedVsActual(MessageItemCollection expectedMessages, ValidationException vex)
         {
-            Check.NotNull(vex, nameof(vex));
+            if (vex == null)
+                throw new ArgumentNullException(nameof(vex));
+
             CompareExpectedVsActual(expectedMessages, vex.Messages);
         }
 

@@ -249,7 +249,7 @@ namespace Beef.Data.OData
         /// <param name="value">The source value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination value equivalent.</returns>
-        object IODataPropertyMapper.GetDestValue(object value, OperationTypes operationType)
+        public object GetDestValue(object value, OperationTypes operationType)
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));

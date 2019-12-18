@@ -10,6 +10,35 @@ using System.Reflection;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
+    /// Provides access to the common <b>CosmosDb/DocumentDb</b> mapper capabilities.
+    /// </summary>
+    public static class CosmosDbMapper
+    {
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{T, TModel}"/> automatically mapping the properties where they share the same name.
+        /// </summary>
+        /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
+        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+        public static CosmosDbMapper<T, TModel> CreateAuto<T, TModel>(params string[] ignoreSrceProperties)
+            where T : class, new()
+            where TModel : class, new()
+        {
+            return new CosmosDbMapper<T, TModel>(true, ignoreSrceProperties);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{T, TModel}"/> where properties are added manually.
+        /// </summary>
+        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+        public static CosmosDbMapper<T, TModel> Create<T, TModel>()
+            where T : class, new()
+            where TModel : class, new()
+        {
+            return new CosmosDbMapper<T, TModel>(false);
+        }
+    }
+
+    /// <summary>
     /// Provides entity mapping capabilities to and from the <b>CosmosDb/DocumentDb</b> model.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
@@ -23,7 +52,10 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
         /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
+        [Obsolete("Please use CosmosDbMapper.Create<T, TModel>(ignoreSrceProperties) instead.")]
         public new static CosmosDbMapper<T, TModel> CreateAuto(params string[] ignoreSrceProperties)
+#pragma warning restore CA1000
         {
             return new CosmosDbMapper<T, TModel>(true, ignoreSrceProperties);
         }
@@ -32,7 +64,10 @@ namespace Beef.Data.Cosmos
         /// Creates an <see cref="EntityMapper{T, TModel}"/> where properties are added manually.
         /// </summary>
         /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
+        [Obsolete("Please use CosmosDbMapper.Create<T, TModel>(ignoreSrceProperties) instead.")]
         public new static CosmosDbMapper<T, TModel> Create()
+#pragma warning restore CA1000
         {
             return new CosmosDbMapper<T, TModel>(false);
         }
@@ -50,7 +85,7 @@ namespace Beef.Data.Cosmos
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
         public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions requestOptions = null)
         {
             return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, requestOptions);
@@ -165,7 +200,9 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the current instance of the mapper.
         /// </summary>
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         public static TMapper Default
+#pragma warning restore CA1000 
         {
             get
             {

@@ -96,7 +96,7 @@ namespace Beef.CodeGen
 
             foreach (var ass in new List<Assembly>(assemblies) { typeof(ResourceManager).Assembly })
             {
-                var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{resourceType}.{name}")).FirstOrDefault();
+                var rn = ass.GetManifestResourceNames().Where(x => x.EndsWith($".{resourceType}.{name}", StringComparison.InvariantCulture)).FirstOrDefault();
                 if (rn != null)
                 {
                     var ri = ass.GetManifestResourceInfo(rn);

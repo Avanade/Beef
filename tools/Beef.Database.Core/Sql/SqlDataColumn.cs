@@ -34,13 +34,13 @@ namespace Beef.Database.Core.Sql
                 return "NULL";
 
             if (Value is string)
-                return $"'{((string)Value).Replace("'", "''")}'";
+                return $"'{((string)Value).Replace("'", "''", StringComparison.Ordinal)}'";
             else if (Value is bool)
                 return ((bool)Value) ? "1" : "0";
             else if (Value is Guid)
                 return $"'{Value}'";
             else if (Value is DateTime)
-                return $"'{((DateTime)Value).ToString(SqlDataUpdater.DateTimeFormat)}'";
+                return $"'{((DateTime)Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture)}'";
             else
                 return Value.ToString();
         }

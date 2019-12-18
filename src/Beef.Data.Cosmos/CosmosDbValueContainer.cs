@@ -24,8 +24,8 @@ namespace Beef.Data.Cosmos
         /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         public CosmosDbValueContainer(CosmosDbBase cosmosDb, CosmosDbArgs<T, TModel> dbArgs)
         {
-            CosmosDb = Check.NotNull(cosmosDb, nameof(cosmosDb));
-            DbArgs = Check.NotNull(dbArgs, nameof(dbArgs));
+            CosmosDb = cosmosDb ?? throw new ArgumentNullException(nameof(cosmosDb));
+            DbArgs = dbArgs ?? throw new ArgumentNullException(nameof(dbArgs));
             Container = cosmosDb.CosmosContainer(DbArgs.ContainerId);
         }
 
@@ -185,7 +185,7 @@ namespace Beef.Data.Cosmos
                 // Where supporting etag then use IfMatch for concurreny.
                 var ro = CosmosDb.GetItemRequestOptions(DbArgs);
                 if (ro.IfMatchEtag == null && value is IETag etag)
-                    ro.IfMatchEtag = etag.ETag.StartsWith("\"") ? etag.ETag : "\"" + etag.ETag + "\"";
+                    ro.IfMatchEtag = etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) ? etag.ETag : "\"" + etag.ETag + "\"";
 
                 string key = DbArgs.GetCosmosKey(value);
                 CosmosDbBase.PrepareEntityForUpdate(value);

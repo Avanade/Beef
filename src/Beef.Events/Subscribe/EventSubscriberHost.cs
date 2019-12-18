@@ -44,9 +44,11 @@ namespace Beef.Events.Subscribe
         protected async Task ReceiveAsync(string subject, string action, Func<IEventSubscriber, EventData> getEventData)
         {
             Check.NotEmpty(subject, nameof(subject));
+            if (getEventData == null)
+                throw new ArgumentNullException(nameof(getEventData));
 
             // Match a subscriber to the subject + template supplied.
-            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Length == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
+            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
             var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
             if (subscriber == null)
                 return;
@@ -80,8 +82,16 @@ namespace Beef.Events.Subscribe
         /// <param name="event">The <see cref="EventData"/>.</param>
         /// <returns>The <see cref="ExecutionContext"/>.</returns>
         /// <remarks>When overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.</remarks>
+#pragma warning disable CA1716 // Identifiers should not match keywords; by-design, is the best name.
         protected virtual ExecutionContext CreateExecutionContext(IEventSubscriber subscriber, EventData @event)
+#pragma warning restore CA1716 
         {
+            if (subscriber == null)
+                throw new ArgumentNullException(nameof(subscriber));
+
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
             return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username : SystemUsername, TenantId = @event.TenantId };
         }
 

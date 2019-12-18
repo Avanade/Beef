@@ -143,7 +143,7 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <param name="args">The <see cref="PoisonMessageCreatePersistenceArgs"/>.</param>
         public PoisonMessagePersistence(PoisonMessageCreatePersistenceArgs args)
         {
-            _args = args;
+            _args = args ?? throw new ArgumentNullException(nameof(args));
             _storagePartitionKey = $"{_args.Options.EventHubPath}-{_args.Options.EventHubName}";
             _storageRowKey = $"{_args.Context.ConsumerGroupName}-{_args.Context.PartitionId}";
 
@@ -170,6 +170,12 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <remarks>A <see cref="PoisonMessage"/> will be written to Azure table storage.</remarks>
         public async Task SetAsync(EventHubs.EventData @event, Exception exception)
         {
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
+            if (exception == null)
+                throw new ArgumentNullException(nameof(exception));
+
             var msg = new PoisonMessage(_storagePartitionKey, _storageRowKey)
             {
                 Offset = @event.SystemProperties.Offset,
@@ -198,6 +204,9 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <remarks>The corresponding <see cref="PoisonMessage"/> will be removed/deleted from Azure table storage.</remarks>
         public async Task RemoveAsync(EventHubs.EventData @event, PoisonMessageAction action)
         {
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
             var msg = await GetPoisonMessageAsync();
             if (msg == null)
                 return;
@@ -206,7 +215,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             if (action == PoisonMessageAction.PoisonSkip)
             {
                 msg.SkippedTimeUtc = DateTime.UtcNow;
-                msg.RowKey = msg.SkippedTimeUtc.Value.ToString("o") + "-" + msg.RowKey;
+                msg.RowKey = msg.SkippedTimeUtc.Value.ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + msg.RowKey;
                 await _skippedTable.ExecuteAsync(TableOperation.InsertOrReplace(msg));
             }
 
@@ -223,6 +232,9 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <see cref="PoisonMessageAction.PoisonSkip"/> will be returned; otherwise, <see cref="PoisonMessageAction.PoisonRetry"/>.</remarks>
         public async Task<PoisonMessageAction> CheckAsync(EventHubs.EventData @event)
         {
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
             var msg = await GetPoisonMessageAsync();
             if (msg == null)
                 return PoisonMessageAction.NotPoison;

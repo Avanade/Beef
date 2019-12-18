@@ -36,7 +36,8 @@ namespace Beef.Events
         /// <returns>The <see cref="Beef.Events.EventData"/>.</returns>
         public static Beef.Events.EventData ToBeefEventData(this EventHubs.EventData eventData)
         {
-            Beef.Check.NotNull(eventData, nameof(eventData));
+            if (eventData == null)
+                throw new ArgumentNullException(nameof(eventData));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData>(body);
@@ -50,7 +51,8 @@ namespace Beef.Events
         /// <returns>The <see cref="Beef.Events.EventData{T}"/>.</returns>
         public static Beef.Events.EventData<T> ToBeefEventData<T>(this EventHubs.EventData eventData)
         {
-            Beef.Check.NotNull(eventData, nameof(eventData));
+            if (eventData == null)
+                throw new ArgumentNullException(nameof(eventData));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData<T>>(body);
@@ -64,7 +66,9 @@ namespace Beef.Events
         /// <returns>The <see cref="Beef.Events.EventData{T}"/>.</returns>
         public static Beef.Events.EventData ToBeefEventData(this EventHubs.EventData eventData, Type valueType)
         {
-            Beef.Check.NotNull(eventData, nameof(eventData));
+            if (eventData == null)
+                throw new ArgumentNullException(nameof(eventData));
+
             Beef.Check.NotNull(valueType, nameof(valueType));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
@@ -78,7 +82,9 @@ namespace Beef.Events
         /// <returns>The <see cref="Beef.Events.EventData"/>.</returns>
         public static EventHubs.EventData ToEventHubsEventData(this Beef.Events.EventData eventData)
         {
-            Beef.Check.NotNull(eventData, nameof(eventData));
+            if (eventData == null)
+                throw new ArgumentNullException(nameof(eventData));
+
             if (string.IsNullOrEmpty(eventData.Subject))
                 throw new ArgumentException("Subject property is required to be set.", nameof(eventData));
 
@@ -100,7 +106,8 @@ namespace Beef.Events
         /// <returns>The values of the following properties: <see cref="SubjectPropertyName"/>, <see cref="ActionPropertyName"/> and <see cref="TenantIdPropertyName"/>.</returns>
         public static (string subject, string action, Guid? tenantId) GetBeefMetadata(this EventHubs.EventData eventData)
         {
-            Beef.Check.NotNull(eventData, nameof(eventData));
+            if (eventData == null)
+                throw new ArgumentNullException(nameof(eventData));
 
             if (!eventData.Properties.TryGetValue(SubjectPropertyName, out var subject) || string.IsNullOrEmpty((string)subject))
                 throw new ArgumentException($"EventData does not contain required property '{SubjectPropertyName}'.");

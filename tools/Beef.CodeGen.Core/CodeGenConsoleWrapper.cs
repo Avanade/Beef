@@ -2,6 +2,7 @@
 
 using McMaster.Extensions.CommandLineUtils;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Beef.CodeGen
@@ -110,7 +111,7 @@ namespace Beef.CodeGen
             AppName = Check.NotEmpty(appName, nameof(appName));
             ApiName = Check.NotEmpty(apiName, nameof(apiName));
             OutDir = Check.NotEmpty(outDir, nameof(outDir));
-            Assemblies = assemblies;
+            Assemblies = new List<Assembly>(assemblies ?? Array.Empty<Assembly>());
         }
 
         /// <summary>
@@ -136,7 +137,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the list of additional assemblies to probe for resources.
         /// </summary>
-        public Assembly[] Assemblies { get; private set; }
+        public List<Assembly> Assemblies { get; private set; }
 
         /// <summary>
         /// Indicates whether <see cref="CommandType.Entity"/> is supported (defaults to <c>true</c>).

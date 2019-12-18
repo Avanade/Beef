@@ -25,6 +25,9 @@ namespace Beef.CodeGen.Entities
         /// <param name="skipSqlSpecific">Indicates whether to skip the Microsoft SQL Server specific metadata queries.</param>
         public static List<Table> LoadTablesAndColumns(DatabaseBase db, string refDataSchema = null, bool autoSecurity = false, bool skipSqlSpecific = false)
         {
+            if (db == null)
+                throw new ArgumentNullException(nameof(db));
+
             var tables = new List<Table>();
             Table table = null;
 
@@ -130,7 +133,7 @@ namespace Beef.CodeGen.Entities
             // Auto-determine reference data relationships even where no foreign key defined.
             foreach (var t in tables)
             {
-                foreach (var col in t.Columns.Where(x => !x.IsForeignRefData && x.Name.Length > 2 && x.Name.EndsWith("Id")))
+                foreach (var col in t.Columns.Where(x => !x.IsForeignRefData && x.Name.Length > 2 && x.Name.EndsWith("Id", StringComparison.InvariantCulture)))
                 {
                     var rt = tables.Where(x => x.Name != t.Name && x.Name == col.Name.Substring(0, col.Name.Length - 2) && x.Schema == refDataSchema).SingleOrDefault();
                     if (rt != null)
@@ -156,7 +159,9 @@ namespace Beef.CodeGen.Entities
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name).Split(' ').Select(x => x.Substring(0, 1).ToLower().ToCharArray()[0]).ToArray());
+#pragma warning disable CA1308 // Normalize strings to uppercase; by-design, a lowercase is required.
+            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name).Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
+#pragma warning restore CA1308 
         }
 
         /// <summary>
@@ -252,7 +257,7 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the <see cref="Column"/> list.
         /// </summary>
-        public List<Column> Columns { get; set; } = new List<Column>();
+        public List<Column> Columns { get; private set; } = new List<Column>();
 
         /// <summary>
         /// Creates (and adds) the <see cref="Table"/> element for code generation.
@@ -260,6 +265,9 @@ namespace Beef.CodeGen.Entities
         /// <param name="xml">The <see cref="XElement"/> to add to.</param>
         public void CreateXml(XElement xml)
         {
+            if (xml == null)
+                throw new ArgumentNullException(nameof(xml));
+
             var xt = new XElement("Table",
                 new XAttribute("Name", Name),
                 new XAttribute("Schema", Schema),
@@ -313,7 +321,9 @@ namespace Beef.CodeGen.Entities
     /// <summary>
     /// Represents the <see cref="Table"/> database mapper.
     /// </summary>
+#pragma warning disable CA1812 // Apparently never instantiated; by-design - it is!
     internal class TableMapper : DatabaseMapper<Table, TableMapper>
+#pragma warning restore CA1812
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TableMapper"/> class.

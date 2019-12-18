@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.Entities;
 using Beef.Data.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,6 +20,9 @@ namespace Beef.Database.Core.Sql
         /// <param name="name">The table name.</param>
         public SqlDataTable(string schema, string name)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
             if (name.StartsWith('$'))
             {
                 IsMerge = true;
@@ -75,6 +79,9 @@ namespace Beef.Database.Core.Sql
         /// <param name="row">The row.</param>
         public void AddRow(SqlDataRow row)
         {
+            if (row == null)
+                throw new ArgumentNullException(nameof(row));
+
             foreach (var c in row.Columns.Where(x => x.Value != null))
             {
                 AddColumn(c.Value.Name);

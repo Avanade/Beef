@@ -18,6 +18,21 @@ namespace Beef.CodeGen
     public class CodeGenExecutorArgs
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="CodeGenExecutorArgs"/> class.
+        /// </summary>
+        /// <param name="assemblies">The <see cref="Assemblies"/>.</param>
+        /// <param name="parameters">The <see cref="Parameters"/>.</param>
+        public CodeGenExecutorArgs(IEnumerable<Assembly> assemblies = null, Dictionary<string, string> parameters = null)
+        {
+            if (assemblies != null)
+                Assemblies.AddRange(assemblies);
+
+            if (parameters != null)
+                Parameters = parameters;
+        }
+
+
+        /// <summary>
         /// Gets or sets the configuration <see cref="FileInfo"/> (data source).
         /// </summary>
         public FileInfo ConfigFile { get; set; }
@@ -40,12 +55,12 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets or sets the assemblies that should be probed to find the embedded resources.
         /// </summary>
-        public List<Assembly> Assemblies { get; set; }
+        public List<Assembly> Assemblies { get; private set; } = new List<Assembly>();
 
         /// <summary>
         /// Gets or sets dictionary of parameter name/value pairs.
         /// </summary>
-        public Dictionary<string, string> Parameters { get; set; }
+        public Dictionary<string, string> Parameters { get; private set; } = new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -53,7 +68,7 @@ namespace Beef.CodeGen
     /// </summary>
     public class CodeGenExecutor : ExecutorBase
     {
-        private CodeGenExecutorArgs _args;
+        private readonly CodeGenExecutorArgs _args;
         private int CreatedCount;
         private int UpdatedCount;
         private int NotChangedCount;
@@ -79,7 +94,7 @@ namespace Beef.CodeGen
                 if (xmlScript.Name != "Script")
                     throw new CodeGenException("The Script XML file must have a root element named 'Script'.");
 
-                if (xmlScript.Elements("Generate").Count() == 0)
+                if (!xmlScript.Elements("Generate").Any())
                     throw new CodeGenException("The Script XML file must have at least a single 'Generate' element.");
 
                 // Create the code generator instance.
@@ -124,14 +139,14 @@ namespace Beef.CodeGen
                     {
                         var fi = new FileInfo(Path.Combine(_args.TemplatePath.FullName, template));
                         if (!fi.Exists)
-                            throw new CodeGenException(string.Format("The Template XML file '{0}' does not exist.", fi.FullName));
+                            throw new CodeGenException($"The Template XML file '{fi.FullName}' does not exist.");
 
                         xmlTemplate = XElement.Load(fi.FullName);
                     }
                     else
                     {
                         xmlTemplate = ResourceManager.GetTemplateContentXml(template, _args.Assemblies.ToArray()) ??
-                            throw new CodeGenException(string.Format("The Template XML resource '{0}' does not exist.", template));
+                            throw new CodeGenException($"The Template XML resource '{template}' does not exist.");
                     }
 
                     // Execute the code generation itself.
@@ -159,11 +174,11 @@ namespace Beef.CodeGen
             var dir = outputDir;
             foreach (var p in _args.Parameters)
             {
-                dir = dir.Replace("{{" + p.Key + "}}", p.Value);
+                dir = dir.Replace("{{" + p.Key + "}}", p.Value, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            if (dir.Contains("{{") || dir.Contains("}}"))
-                throw new CodeGenException(string.Format("Unhandled substitution characters have been found in the Script OutDir {0}.", dir));
+            if (dir.Contains("{{", StringComparison.InvariantCultureIgnoreCase) || dir.Contains("}}", StringComparison.InvariantCultureIgnoreCase))
+                throw new CodeGenException($"Unhandled substitution characters have been found in the Script OutDir {dir}.");
 
             return dir;
         }
@@ -214,7 +229,7 @@ namespace Beef.CodeGen
                     return; 
 
                 var prevContent = File.ReadAllText(fi.FullName);
-                if (string.Compare(e.Content, prevContent) == 0)
+                if (string.Compare(e.Content, prevContent, StringComparison.InvariantCultureIgnoreCase) == 0)
                 {
                     NotChangedCount++;
                     return;

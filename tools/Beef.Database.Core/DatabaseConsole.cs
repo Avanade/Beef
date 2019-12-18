@@ -25,7 +25,6 @@ namespace Beef.Database.Core
     {
         private readonly CommandArgument<DatabaseExecutorCommand> _commandArg;
         private readonly CommandArgument _connectionStringArg;
-        private readonly CommandOption _scriptAssembliesOpt;
         private readonly List<Assembly> _scriptAssemblies = new List<Assembly>();
         private readonly CommandOption _configOpt;
         private readonly CommandOption _scriptOpt;
@@ -55,9 +54,9 @@ namespace Beef.Database.Core
 
             App.HelpOption(true);
 
-            _commandArg = (CommandArgument<DatabaseExecutorCommand>)App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
+            _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
             _connectionStringArg = App.Argument("connectionString", "Database connection string.").IsRequired();
-            _scriptAssembliesOpt = App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
+            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
 
             _configOpt = App.Option("-c|--config", "CodeGeneration configuration XML file.", CommandOptionType.SingleValue)
@@ -75,14 +74,14 @@ namespace Beef.Database.Core
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
 
-            App.OnValidate((ctx) => OnValidate(ctx));
+            App.OnValidate((ctx) => OnValidate());
             App.OnExecute(() => RunRunAwayAsync());
         }
 
         /// <summary>
         /// Performs addition validations.
         /// </summary>
-        private ValidationResult OnValidate(ValidationContext ctx)
+        private ValidationResult OnValidate()
         {
             if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen))
             {
@@ -106,7 +105,7 @@ namespace Beef.Database.Core
         public int Run(string args = null)
         {
             if (string.IsNullOrEmpty(args))
-                return Run(new string[0]);
+                return Run(Array.Empty<string>());
 
             // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
             var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
@@ -144,25 +143,26 @@ namespace Beef.Database.Core
         /// </summary>
         private async Task<int> RunRunAwayAsync() /* Inspired by https://www.youtube.com/watch?v=ikMiQZF-mAY */
         {
-            var args = new CodeGenExecutorArgs
+            var args = new CodeGenExecutorArgs(_scriptAssemblies, CreateParamDict(_paramsOpt))
             {
                 ConfigFile = new FileInfo(_configOpt.Value()),
                 ScriptFile = new FileInfo(_scriptOpt.Value()),
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
-                OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
-                Parameters = CodeGenConsole.CreateParamDict(_paramsOpt),
-                Assemblies = _scriptAssemblies
+                OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory)
             };
 
             WriteHeader(args);
 
-            var em = ExecutionManager.Create(() => new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value, _scriptAssemblies.ToArray(), args));
-            var sw = Stopwatch.StartNew();
+            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value, _scriptAssemblies.ToArray(), args)))
+            {
+                var sw = Stopwatch.StartNew();
 
-            await em.RunAsync();
+                await em.RunAsync();
 
-            sw.Stop();
-            WriteFooter(sw);
+                sw.Stop();
+                WriteFooter(sw);
+            }
+
             return 0;
         }
 

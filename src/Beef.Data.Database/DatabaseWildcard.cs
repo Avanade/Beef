@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -47,7 +48,7 @@ namespace Beef.Data.Database
             Wildcard = wildcard ?? Wildcard.Default ?? Wildcard.MultiAll;
             MultiWildcard = multiWildcard;
             SingleWildcard = singleWildcard;
-            CharactersToEscape = charactersToEscape ?? DefaultCharactersToEscape;
+            CharactersToEscape = new List<char>(charactersToEscape ?? DefaultCharactersToEscape);
             EscapeFormat = escapeFormat ?? DefaultEscapeFormat;
 
             if (MultiWildcard != char.MinValue && SingleWildcard != char.MinValue && MultiWildcard == SingleWildcard)
@@ -59,7 +60,7 @@ namespace Beef.Data.Database
             if (Wildcard.Supported.HasFlag(WildcardSelection.SingleWildcard) && singleWildcard == char.MinValue)
                 throw new ArgumentException("A Wildcard that supports SingleWildcard must also define the database SingleWildcard character.");
 
-            if (CharactersToEscape != null && CharactersToEscape.Length > 0 && string.IsNullOrEmpty(EscapeFormat))
+            if (CharactersToEscape != null && CharactersToEscape.Count > 0 && string.IsNullOrEmpty(EscapeFormat))
                 throw new InvalidOperationException("The EscapeFormat must be provided where CharactersToEscape have been defined.");
         }
 
@@ -81,7 +82,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets or sets the list of characters that are to be escaped.
         /// </summary>
-        public char[] CharactersToEscape { get; private set; }
+        public List<char> CharactersToEscape { get; private set; }
 
         /// <summary>
         /// Gets or sets the escaping format when one of the <see cref="CharactersToEscape"/> is found.
@@ -110,7 +111,7 @@ namespace Beef.Data.Database
                 else if (wr.Selection.HasFlag(WildcardSelection.SingleWildcard) && c == Wildcard.SingleWildcardCharacter)
                     sb.Append(SingleWildcard);
                 else if (CharactersToEscape != null && CharactersToEscape.Contains(c))
-                    sb.Append(string.Format(EscapeFormat, c));
+                    sb.Append(string.Format(System.Globalization.CultureInfo.InvariantCulture, EscapeFormat, c));
                 else
                     sb.Append(c);
             }

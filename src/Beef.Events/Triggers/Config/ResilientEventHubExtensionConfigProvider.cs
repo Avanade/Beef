@@ -15,9 +15,11 @@ namespace Beef.Events.Triggers.Config
     /// Represents the "resilient event hubs" extension configuration provider.
     /// </summary>
     [Extension("ResilientEventHubs")]
+#pragma warning disable CA1812 // Apparently never instatiated; by-design, it is actually!
     internal class ResilientEventHubExtensionConfigProvider : IExtensionConfigProvider
+#pragma warning restore CA1812 
     {
-        public IConfiguration _config;
+        private readonly IConfiguration _config;
         private readonly IOptions<ResilientEventHubOptions> _options;
         private readonly ILoggerFactory _loggerFactory;
         private readonly INameResolver _nameResolver;

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+- *Enhanced:* New `MultiSetSingleArgs` and `MultiSetCollArgs` abstract classes added to enable simplier custom implementations. These are now used by the existing generic implementations.
+- *Fixed:* Introduced FxCop Analysis to `Beef.Data.Database`; this version represents the remediation based on the results.
+
 ## v2.1.6
 - *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
 

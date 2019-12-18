@@ -2,6 +2,7 @@
 
 using Beef.Net.Http;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,7 +40,7 @@ namespace Beef.Data.OData
         /// <returns>The <see cref="Task"/>.</returns>
         static internal async Task ParseResponseAsync(ODataBatchResponse batchResponse)
         {
-            if (!DetermineContentTypeBoundary(batchResponse.BatchResponseMessage, out string boundary))
+            if (!DetermineContentTypeBoundary(batchResponse.BatchResponseMessage, out string _))
                 throw new InvalidOperationException("Batch response must have a Content-Type of 'multipart/mixed' with a corresponding 'boundary' specified.");
 
             using (var rs = await batchResponse.BatchResponseMessage.Content.ReadAsStreamAsync())
@@ -79,9 +80,9 @@ namespace Beef.Data.OData
                 foreach (var v in hv.Split(new char[] { ';', ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     var kv = v.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (string.Compare(kv[0], "multipart/mixed") == 0 && kv.Length == 1)
+                    if (string.Compare(kv[0], "multipart/mixed", StringComparison.InvariantCulture) == 0 && kv.Length == 1)
                         multipartMixed = true;
-                    else if (string.Compare(kv[0], "boundary") == 0 && kv.Length == 2)
+                    else if (string.Compare(kv[0], "boundary", StringComparison.InvariantCulture) == 0 && kv.Length == 2)
                         boundary = kv[1];
                 }
             }
@@ -109,12 +110,12 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the resultant <see cref="ODataBatchItem"/> array.
         /// </summary>
-        public ODataBatchItem[] Items { get => BatchManager.Items.ToArray(); }
+        public List<ODataBatchItem> Items { get => BatchManager.Items; }
 
         /// <summary>
         /// Gets the resultant <see cref="ODataBatchItem"/> array where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <c>false</c>.
         /// </summary>
-        public ODataBatchItem[] ItemsInError { get => BatchManager.Items.Where(x => !x.IsSuccessStatusCode).ToArray(); }
+        public List<ODataBatchItem> ItemsInError { get => BatchManager.Items.Where(x => !x.IsSuccessStatusCode).ToList(); }
 
         /// <summary>
         /// Indicates whether any of the responses within the batch have an error (where the underlying <see cref="ODataBatchItem.IsSuccessStatusCode"/> is <c>false</c>). 

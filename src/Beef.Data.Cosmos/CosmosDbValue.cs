@@ -83,7 +83,7 @@ namespace Beef.Data.Cosmos
                         break;
 
                     case IIntIdentifier iii:
-                        Id = iii.Id.ToString();
+                        Id = iii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture);
                         break;
 
                     case IGuidIdentifier igi:
@@ -116,7 +116,7 @@ namespace Beef.Data.Cosmos
                     break;
 
                 case IIntIdentifier iii:
-                    iii.Id = int.Parse(Id);
+                    iii.Id = int.Parse(Id, System.Globalization.CultureInfo.InvariantCulture);
                     break;
 
                 case IGuidIdentifier igi:

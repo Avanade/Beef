@@ -123,7 +123,7 @@ namespace Beef.Demo.Business.Data
 
         public partial class EfMapper
         {
-            private EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper<Address, EfModel.Person>.CreateAuto();
+            private EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper.CreateAuto<Address, EfModel.Person>();
 
             partial void EfMapperCtor()
             {

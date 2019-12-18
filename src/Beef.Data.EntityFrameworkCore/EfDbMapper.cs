@@ -10,6 +10,35 @@ using System.Reflection;
 namespace Beef.Data.EntityFrameworkCore
 {
     /// <summary>
+    /// Provides access to the common entity framework mapper capabilities.
+    /// </summary>
+    public static class EfDbMapper
+    {
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{T, TModel}"/> automatically mapping the properties where they share the same name.
+        /// </summary>
+        /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
+        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+        public static EfDbMapper<T, TModel> CreateAuto<T, TModel>(params string[] ignoreSrceProperties)
+            where T : class, new()
+            where TModel : class, new()
+        {
+            return new EfDbMapper<T, TModel>(true, ignoreSrceProperties);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="EntityMapper{T, TModel}"/> where properties are added manually.
+        /// </summary>
+        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+        public static EfDbMapper<T, TModel> Create<T, TModel>()
+            where T : class, new()
+            where TModel : class, new()
+        {
+            return new EfDbMapper<T, TModel>(false);
+        }
+    }
+
+    /// <summary>
     /// Provides entity mapping capabilities to and from the <see cref="EfDbBase{TDbContext}">entity framework</see> model.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
@@ -23,7 +52,10 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
         /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
+        [Obsolete("Please use EfDbMapper.Create<T, TModel>(ignoreSrceProperties) instead.")]
         public new static EfDbMapper<T, TModel> CreateAuto(params string[] ignoreSrceProperties)
+#pragma warning restore CA1000
         {
             return new EfDbMapper<T, TModel>(true, ignoreSrceProperties);
         }
@@ -32,7 +64,10 @@ namespace Beef.Data.EntityFrameworkCore
         /// Creates an <see cref="EntityMapper{T, TModel}"/> where properties are added manually.
         /// </summary>
         /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
+#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
+        [Obsolete("Please use EfDbMapper.Create<T, TModel>() instead.")]
         public new static EfDbMapper<T, TModel> Create()
+#pragma warning restore CA1000
         {
             return new EfDbMapper<T, TModel>(false);
         }
@@ -145,7 +180,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Gets the current instance of the mapper.
         /// </summary>
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         public static TMapper Default
+#pragma warning restore CA1000 
         {
             get
             {

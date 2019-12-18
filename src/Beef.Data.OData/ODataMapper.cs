@@ -35,6 +35,7 @@ namespace Beef.Data.OData
         /// <returns>The query string.</returns>
         string GetODataFieldNamesQuery();
 
+#pragma warning disable CA1055 // Uri return values should not be strings; by-design, is ok.
         /// <summary>
         /// Gets the unique key formatted for a URL.
         /// </summary>
@@ -48,6 +49,7 @@ namespace Beef.Data.OData
         /// <param name="value">The entity value.</param>
         /// <returns>The formatted unique key.</returns>
         string GetKeyUrl(object value);
+#pragma warning restore CA1055
 
         /// <summary>
         /// Creates a source entity mapping values from the <see cref="JToken"/>.
@@ -89,20 +91,27 @@ namespace Beef.Data.OData
         JToken MapToOData(TSrce value, OperationTypes operationType);
     }
 
+
     /// <summary>
-    /// Provides the <b>ODataMap</b> entity mapping capabilities.
+    /// Provides access to the common <b>OData</b> mapper capabilities.
+    /// </summary>
+    public static class ODataMapper
+    {
+        /// <summary>
+        /// Gets or sets the <b>OData</b> <see cref="IETag.ETag"/> property name.
+        /// </summary>
+        public static string ODataETagPropertyName { get; set; } = "@odata.etag";
+    }
+
+    /// <summary>
+    /// Provides the <b>OData</b> entity mapping capabilities.
     /// </summary>
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     public class ODataMapper<TSrce> : EntitySrceMapper<TSrce>, IODataMapper<TSrce>
         where TSrce : class
     {
-        /// <summary>
-        /// Gets or sets the <b>OData</b> <see cref="IETag.ETag"/> property name.
-        /// </summary>
-        public static string ODataETagPropertyName = "@odata.etag";
-
         private readonly bool _hasDefaultCtor = true;
-        private string[] _orderedProperties;
+        private readonly string[] _orderedProperties;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="ODataMapper{TSrce}"/> class.
@@ -112,14 +121,14 @@ namespace Beef.Data.OData
         {
             ODataEntityName = string.IsNullOrEmpty(odataEntityName) ? throw new ArgumentNullException(nameof(odataEntityName)) : odataEntityName;
             if (typeof(IETag).IsAssignableFrom(typeof(TSrce)))
-                Property(x => ((IETag)x).ETag, ODataETagPropertyName).MapSrceToDestWhen((v) => false);
+                Property(x => ((IETag)x).ETag, ODataMapper.ODataETagPropertyName).MapSrceToDestWhen((v) => false);
 
             _hasDefaultCtor = SrceType.GetConstructor(Type.EmptyTypes) != null;
             if (!_hasDefaultCtor)
             {
                 // This is required to support the likes of compiler generated Types when using LINQ queries.
                 _orderedProperties = SrceType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x => x.Name).ToArray();
-                if (SrceType.GetConstructors().Where(x => x.GetParameters().Length == _orderedProperties.Length).Count() == 0)
+                if (!SrceType.GetConstructors().Where(x => x.GetParameters().Length == _orderedProperties.Length).Any())
                     throw new MapperException($"Type {SrceType.Name} does not have default constructor, or a constructor that accepts all properties; unable to determine constructor.");
             }
         }
@@ -274,12 +283,14 @@ namespace Beef.Data.OData
             return MapToOData((TSrce)value, operationType);
         }
 
+#pragma warning disable CA1055 // Uri return values should not be strings; by-design, is ok.
         /// <summary>
         /// Gets the unique key formatted for a URL from an entity <paramref name="value"/>.
         /// </summary>
         /// <param name="value">The entity value.</param>
         /// <returns>The formatted unique key.</returns>
         public string GetKeyUrl(TSrce value)
+
         {
             var keys = new List<IComparable>();
             foreach (IODataPropertyMapper<TSrce> map in UniqueKey)
@@ -339,6 +350,7 @@ namespace Beef.Data.OData
             sb.Append(")");
             return sb.ToString();
         }
+#pragma warning restore CA1055
 
         /// <summary>
         /// Formats the key value.
@@ -370,7 +382,7 @@ namespace Beef.Data.OData
         /// <returns>The formatted field list.</returns>
         public string[] GetODataFieldNames()
         {
-            return Mappings.Select(x => x.DestPropertyName).Where(x => x != ODataETagPropertyName).ToArray();
+            return Mappings.Select(x => x.DestPropertyName).Where(x => x != ODataMapper.ODataETagPropertyName).ToArray();
         }
 
         /// <summary>
@@ -379,7 +391,7 @@ namespace Beef.Data.OData
         /// <returns>The query string.</returns>
         public string GetODataFieldNamesQuery()
         {
-            var q = string.Join(",", Mappings.Select(x => x.DestPropertyName).Where(x => x != ODataETagPropertyName));
+            var q = string.Join(",", Mappings.Select(x => x.DestPropertyName).Where(x => x != ODataMapper.ODataETagPropertyName));
             return string.IsNullOrEmpty(q) ? null : q;
         }
     }
@@ -399,17 +411,19 @@ namespace Beef.Data.OData
         /// Initialises a new instance of the <see cref="ODataMapper{TSrce}"/> class.
         /// </summary>
         /// <param name="odataEntityName">The <b>OData</b> entity name as represented within the URL.</param>
-        public ODataMapper(string odataEntityName) : base(odataEntityName) { }
+        protected ODataMapper(string odataEntityName) : base(odataEntityName) { }
 
         /// <summary>
         /// Gets the current instance of the mapper.
         /// </summary>
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         public static TMapper Default
+#pragma warning restore CA1000 
         {
             get
             {
                 if (_default == null)
-                    throw new MapperException("An instance of this Mapper cannot be referenced as it is still being constructed; beware that you may have a circular reference within the constructor.");
+                    throw new InvalidOperationException("An instance of this Mapper cannot be referenced as it is still being constructed; beware that you may have a circular reference within the constructor.");
 
                 return _default;
             }

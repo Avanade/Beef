@@ -27,6 +27,9 @@ namespace Beef.Data.Cosmos
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected override void WrapInvoke(object caller, Action action, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
             try
             {
                 action();
@@ -58,6 +61,9 @@ namespace Beef.Data.Cosmos
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected async override Task WrapInvokeAsync(object caller, Func<Task> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             try
             {
                 await func();
@@ -95,6 +101,9 @@ namespace Beef.Data.Cosmos
         /// <returns>The result.</returns>
         protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             try
             {
                 return func();
@@ -128,6 +137,9 @@ namespace Beef.Data.Cosmos
         /// <returns>The result.</returns>
         protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             try
             {
                 return await func();

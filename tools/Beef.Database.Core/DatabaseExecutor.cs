@@ -4,14 +4,13 @@ using Beef.CodeGen;
 using Beef.Data.Database;
 using Beef.Database.Core.Sql;
 using Beef.Diagnostics;
-using Beef.Entities;
 using Beef.Executors;
 using DbUp;
 using DbUp.Engine;
 using DbUp.Engine.Output;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -90,7 +89,10 @@ namespace Beef.Database.Core
         /// <returns>The return code; zero equals success.</returns>
         public static int Run(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs codeGenArgs = null)
         {
-            return HandleRunResult(ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, codeGenArgs)).Run());
+            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, codeGenArgs)))
+            {
+                return HandleRunResult(em.Run());
+            }
         }
 
         /// <summary>
@@ -102,7 +104,10 @@ namespace Beef.Database.Core
         /// <returns>The return code; zero equals success.</returns>
         public static int Run(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
         {
-            return HandleRunResult(ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, null)).Run());
+            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, null)))
+            {
+                return HandleRunResult(em.Run());
+            }
         }
 
         /// <summary>
@@ -267,7 +272,7 @@ namespace Beef.Database.Core
         /// </summary>
         private bool ScriptsNamespaceFilter(string name)
         {
-            return _namespaces.Any(x => name.StartsWith(x + $".{MigrationsNamespace}."));
+            return _namespaces.Any(x => name.StartsWith(x + $".{MigrationsNamespace}.", StringComparison.InvariantCulture));
         }
 
         /// <summary>
@@ -324,7 +329,7 @@ namespace Beef.Database.Core
                 foreach (var name in ass.GetManifestResourceNames())
                 {
                     // Filter on suffix on: '.sql'.
-                    if (!_namespaces.Any(x => name.StartsWith(x + $".{SchemaNamespace}.") && name.EndsWith(".sql")))
+                    if (!_namespaces.Any(x => name.StartsWith(x + $".{SchemaNamespace}.", StringComparison.InvariantCulture) && name.EndsWith(".sql", StringComparison.InvariantCulture)))
                         continue;
 
                     // Filter out any picked up from file system probe above.
@@ -387,7 +392,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Replace the special characters to convert filename to resource name.
         /// </summary>
-        private string RenameFileToResourceNameReplace(string text)
+        private static string RenameFileToResourceNameReplace(string text)
         {
             return text.Replace(' ', '_').Replace('-', '_').Replace('\\', '.').Replace('/', '.');
         }
@@ -395,7 +400,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Wraps the SQL statement(s) and reports success or failure.
         /// </summary>
-        private bool ExecuteSqlStatement(Action action, string text)
+        private static bool ExecuteSqlStatement(Action action, string text)
         {
             try
             {
@@ -403,9 +408,9 @@ namespace Beef.Database.Core
                 action();
                 return true;
             }
-            catch (SqlException sex)
+            catch (DbException dex)
             {
-                Logger.Default.Error($"Execution failed with: {sex.Message}");
+                Logger.Default.Error($"Execution failed with: {dex.Message}");
                 return false;
             }
         }
@@ -437,7 +442,7 @@ namespace Beef.Database.Core
             {
                 foreach (var name in ass.GetManifestResourceNames())
                 {
-                    if (!_namespaces.Any(x => name.StartsWith(x + $".{DataNamespace}.") && name.EndsWith(".yaml")))
+                    if (!_namespaces.Any(x => name.StartsWith(x + $".{DataNamespace}.", StringComparison.InvariantCulture) && name.EndsWith(".yaml", StringComparison.InvariantCulture)))
                         continue;
 
                     Logger.Default.Info($"Parsing and executing: {name}");
@@ -462,27 +467,32 @@ namespace Beef.Database.Core
             _codeGenArgs.Parameters.TryGetValue("ScriptNew", out var action);
             var di = new DirectoryInfo(Environment.CurrentDirectory);
             var fi = string.IsNullOrEmpty(action)
-                ? new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{DateTime.Now.ToString("yyyyMMdd-HHmmss")}-comment-text.sql"))
-                : new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, 
-                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss")}-{action.ToLowerInvariant()}-{(_codeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema : "schema")}-{(_codeGenArgs.Parameters.TryGetValue("Table", out var table) ? table : "table")}.sql"));
+                ? new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-comment-text.sql"))
+                : new FileInfo(Path.Combine(di.FullName, MigrationsNamespace,
+#pragma warning disable CA1308 // Normalize strings to uppercase; by-design as lowercase is desired.
+                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-{action.ToLowerInvariant()}-{(_codeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema : "schema")}-{(_codeGenArgs.Parameters.TryGetValue("Table", out var table) ? table : "table")}.sql"));
+#pragma warning restore CA1308 
 
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 
-            var cg = CodeGenerator.Create(System.Xml.Linq.XElement.Load(new StringReader("<CodeGeneration />")));
-            cg.CopyParameters(_codeGenArgs.Parameters);
-            cg.CodeGenerated += (s, e) => 
+            using (var sr = (new StringReader("<CodeGeneration />")))
             {
-                File.WriteAllText(fi.FullName, e.Content);
-            };
+                var cg = CodeGenerator.Create(System.Xml.Linq.XElement.Load(sr));
+                cg.CopyParameters(_codeGenArgs.Parameters);
+                cg.CodeGenerated += (s, e) =>
+                {
+                    File.WriteAllText(fi.FullName, e.Content);
+                };
 
-            using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.ScriptNew_sql.xml"))
-            {
-                cg.Generate(System.Xml.Linq.XElement.Load(st));
+                using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.ScriptNew_sql.xml"))
+                {
+                    cg.Generate(System.Xml.Linq.XElement.Load(st));
+                }
+
+                Logger.Default.Info($"Script file created: {fi.FullName}");
+                return true;
             }
-
-            Logger.Default.Info($"Script file created: {fi.FullName}");
-            return true;
         }
     }
 }

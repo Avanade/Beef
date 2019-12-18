@@ -79,7 +79,7 @@ namespace Beef.Events.Triggers.Bindings
                     throw new InvalidOperationException($"Unable to bind as the value is not a 'ResilientEventHubInfo' Type; is Type {value.GetType()}.");
             }
 
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "ResilientEventHubTrigger", DateTime.Now.ToString() } };
+            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "ResilientEventHubTrigger", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture) } };
             return Task.FromResult((ITriggerData)new TriggerData(valueProvider, bindingData));
         }
 
@@ -141,7 +141,7 @@ namespace Beef.Events.Triggers.Bindings
             /// </summary>
             public string ToInvokeString()
             {
-                return DateTime.Now.ToString("o");
+                return DateTime.Now.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Collections.Generic;
 
 namespace Beef.CodeGen.Loaders
@@ -20,6 +21,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadBeforeChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             if (config.Attributes.ContainsKey("Property"))
                 UpdateConfigFromProperty(config, config.Attributes["Property"]);
 
@@ -29,11 +33,11 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("LayerPassing", "All");
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
-                config.AttributeAdd("Text", string.Format("{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
             else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]))
                 config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             else
-                config.AttributeAdd("Text", string.Format("{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
         }
@@ -53,9 +57,12 @@ namespace Beef.CodeGen.Loaders
         /// <param name="propertyName">The <b>Property</b> name.</param>
         public static void UpdateConfigFromProperty(CodeGenConfig config, string propertyName)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             List<CodeGenConfig> propConfig = CodeGenConfig.FindConfigList(config, "Property");
             if (propConfig == null)
-                throw new CodeGenException(string.Format("Attribute value references Property '{0}' that does not exist for Entity.", propertyName));
+                throw new CodeGenException($"Attribute value references Property '{propertyName}' that does not exist for Entity.");
 
             CodeGenConfig itemConfig = null;
             foreach (CodeGenConfig p in propConfig)
@@ -65,7 +72,7 @@ namespace Beef.CodeGen.Loaders
             }
 
             if (itemConfig == null)
-                throw new CodeGenException(string.Format("Attribute value references Property '{0}' that does not exist for Entity.", propertyName));
+                throw new CodeGenException($"Attribute value references Property '{propertyName}' that does not exist for Entity.");
 
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("Text", itemConfig.Attributes["Text"]);

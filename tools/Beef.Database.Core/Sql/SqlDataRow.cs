@@ -46,6 +46,9 @@ namespace Beef.Database.Core.Sql
         /// <param name="column">The <see cref="SqlDataColumn"/>.</param>
         public void AddColumn(SqlDataColumn column)
         {
+            if (column == null)
+                throw new ArgumentNullException(nameof(column));
+
             var col = Table.DbTable.Columns.Where(c => c.Name == column.Name).SingleOrDefault();
             if (col == null)
             {
@@ -54,7 +57,7 @@ namespace Beef.Database.Core.Sql
                 if (col == null || !col.IsForeignRefData)
                     throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' does not have a column named '{column.Name}'.");
 
-                column.Name = column.Name + "Id";
+                column.Name += "Id";
             }
 
             if (!Columns.TryAdd(column.Name, column))
@@ -66,21 +69,21 @@ namespace Beef.Database.Core.Sql
             string str = null;
             try
             {
-                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat) : column.Value.ToString();
+                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString();
                 switch (col.DotNetType)
                 {
                     case "string": column.Value = str; break;
-                    case "decimal": column.Value = decimal.Parse(str); break;
-                    case "DateTime": column.Value = DateTime.Parse(str); break;
+                    case "decimal": column.Value = decimal.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "DateTime": column.Value = DateTime.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
                     case "bool": column.Value = bool.Parse(str); break;
-                    case "DateTimeOffset": column.Value = DateTimeOffset.Parse(str); break;
-                    case "double": column.Value = double.Parse(str); break;
-                    case "int": column.Value = int.Parse(str); break;
-                    case "long": column.Value = long.Parse(str); break;
-                    case "short": column.Value = short.Parse(str); break;
-                    case "byte": column.Value = byte.Parse(str); break;
-                    case "float": column.Value = float.Parse(str); break;
-                    case "TimeSpan": column.Value = TimeSpan.Parse(str); break;
+                    case "DateTimeOffset": column.Value = DateTimeOffset.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "double": column.Value = double.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "int": column.Value = int.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "long": column.Value = long.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "short": column.Value = short.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "byte": column.Value = byte.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "float": column.Value = float.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
+                    case "TimeSpan": column.Value = TimeSpan.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;
 
                     case "Guid":
                         if (int.TryParse(str, out int a))

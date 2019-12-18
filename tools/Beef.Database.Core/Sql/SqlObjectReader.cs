@@ -20,7 +20,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the list of supported object types and their application order.
         /// </summary>
-        public readonly List<Tuple<string, int>> SupportedObjectTypes = new List<Tuple<string, int>>()
+        private readonly List<Tuple<string, int>> SupportedObjectTypes = new List<Tuple<string, int>>()
         {
             new Tuple<string, int>("TYPE", 1),
             new Tuple<string, int>("FUNCTION", 2),
@@ -32,7 +32,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Represents the token characteristics.
         /// </summary>
-        public class Token
+        internal class Token
         {
             /// <summary>
             /// Gets or sets the line.
@@ -57,7 +57,10 @@ namespace Beef.Database.Core.Sql
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
         public static SqlObjectReader Read(string sql)
         {
-            return Read(new StringReader(sql));
+            using (var sr = new StringReader(sql))
+            {
+                return Read(sr);
+            }
         }
 
         /// <summary>
@@ -67,7 +70,10 @@ namespace Beef.Database.Core.Sql
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
         public static SqlObjectReader Read(Stream s)
         {
-            return Read(new StreamReader(s));
+            using (var sr = new StreamReader(s))
+            {
+                return Read(sr);
+            }
         }
 
         /// <summary>
@@ -92,7 +98,7 @@ namespace Beef.Database.Core.Sql
                 return;
 
             Type = SqlObjectType.Value;
-            Order = SupportedObjectTypes.Where(x => String.Compare(x.Item1, Type, true) == 0).Select(x => x.Item2).Single();
+            Order = SupportedObjectTypes.Where(x => string.Compare(x.Item1, Type, StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Item2).Single();
 
             var parts = SqlObjectName.Value.Split('.');
             if (parts.Length == 1)
@@ -124,7 +130,7 @@ namespace Beef.Database.Core.Sql
                     continue;
 
                 // Remove comments.
-                var ci = txt.IndexOf("--");
+                var ci = txt.IndexOf("--", StringComparison.InvariantCulture);
                 if (ci >= 0)
                     txt = txt.Substring(0, ci - 1).TrimEnd();
 
@@ -132,7 +138,7 @@ namespace Beef.Database.Core.Sql
                 var col = 0;
                 for (; col < txt.Length; col++)
                 {
-                    if (Char.IsWhiteSpace(txt[col]))
+                    if (char.IsWhiteSpace(txt[col]))
                     {
                         if (token != null)
                         {
@@ -175,7 +181,7 @@ namespace Beef.Database.Core.Sql
         {
             if (SqlStatement == null)
                 return "The SQL statement could not be determined; expecting a `CREATE` statement.";
-            else if (string.Compare(SqlStatement.Value, "create", true) != 0)
+            else if (string.Compare(SqlStatement.Value, "create", StringComparison.InvariantCultureIgnoreCase) != 0)
                 return $"The SQL statement must be a `CREATE`; found '{SqlStatement.Value}'.";
 
             if (SqlObjectType == null)
@@ -197,7 +203,7 @@ namespace Beef.Database.Core.Sql
             if (SqlObjectType == null)
                 return -1;
 
-            return SupportedObjectTypes.Where(x => String.Compare(x.Item1, SqlObjectType.Value, true) == 0).Select(x => x.Item2).SingleOrDefault();
+            return SupportedObjectTypes.Where(x => string.Compare(x.Item1, SqlObjectType.Value, StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Item2).SingleOrDefault();
         }
 
         /// <summary>

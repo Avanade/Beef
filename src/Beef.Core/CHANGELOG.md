@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.26
+- *Enhanced*: `EntityMapper` and `EntitySrceMapper` support new `GetBySrceProperty` and `GetByDestProperty` (as applicable) methods that enable using a property expression versus a string.
+
 ## v2.1.25
 - *Fixed:* Compile error from Visual Studio v16.4.1 corrected.
 

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Beef.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Beef.Mapper
 {
@@ -93,6 +95,21 @@ namespace Beef.Mapper
         public IPropertySrceMapper<TSrce> GetBySrcePropertyName(string name)
         {
             return _srceMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property expression.
+        /// </summary>
+        /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
+        /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
+        /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
+        public IPropertySrceMapper<TSrce> GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
+        {
+            if (srcePropertyExpression == null)
+                throw new ArgumentNullException(nameof(srcePropertyExpression));
+
+            var spe = PropertyExpression.Create(srcePropertyExpression);
+            return GetBySrcePropertyName(spe.Name);
         }
 
         /// <summary>

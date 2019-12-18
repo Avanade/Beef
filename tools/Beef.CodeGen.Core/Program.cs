@@ -6,7 +6,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Provides the console capabilities.
     /// </summary>
-    public class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point.

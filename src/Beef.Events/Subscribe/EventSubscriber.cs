@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Subscribe
@@ -18,7 +19,7 @@ namespace Beef.Events.Subscribe
         protected EventSubscriberBase(string subjectTemplate, params string[] actions)
         {
             SubjectTemplate = Check.NotEmpty(subjectTemplate, nameof(subjectTemplate));
-            Actions = actions;
+            Actions = new List<string>(actions);
         }
 
         /// <summary>
@@ -29,7 +30,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
         /// </summary>
-        public string[] Actions { get; private set; }
+        public List<string> Actions { get; private set; }
 
         /// <summary>
         /// Determines the <see cref="Subscribe.RunAsUser"/>; defaults to <see cref="RunAsUser.Originating"/>.
@@ -64,7 +65,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
         /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
-        public EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
+        protected EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
 
         /// <summary>
         /// Gets the value <see cref="Type"/>; always <c>null</c> as there will not be one.
@@ -90,7 +91,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
         /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
-        public EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
+        protected EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
 
         /// <summary>
         /// Gets the value <see cref="Type"/>.

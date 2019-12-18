@@ -12,7 +12,7 @@ namespace Beef.Test.NUnit
     /// Provides a means to manage a group of test executions such that as soon as one fails the others within the dependency group will not execute as a success dependency is required. 
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class DependencyGroupAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
+    public sealed class DependencyGroupAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
     {
         private static readonly KeyOnlyDictionary<string> _badGroups = new KeyOnlyDictionary<string>();
 
@@ -60,7 +60,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// The test command for the <see cref="DependencyGroupAttribute"/>.
         /// </summary>
-        public class DependencyGroupCommand : DelegatingTestCommand
+        internal class DependencyGroupCommand : DelegatingTestCommand
         {
             private readonly string _group;
 
@@ -85,6 +85,7 @@ namespace Beef.Test.NUnit
                 {
                     context.CurrentResult = this.innerCommand.Execute(context);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, want to catch anything and everything.
                 catch (Exception exception)
                 {
                     Exception ex = exception;
@@ -96,6 +97,7 @@ namespace Beef.Test.NUnit
                     context.CurrentResult.RecordException(ex);
                     _badGroups.Add(_group);
                 }
+#pragma warning restore CA1031 
 
                 return context.CurrentResult;
             }

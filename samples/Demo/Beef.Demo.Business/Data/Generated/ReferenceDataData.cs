@@ -74,16 +74,14 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.EyeColor"/> entity and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper = EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor>
-            .CreateAuto()
+        public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper = EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
             .HasProperty(s => s.Id, d => d.EyeColorId)
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.PowerSource"/> entity and Cosmos <see cref="RefDataNamespace.PowerSource"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper = CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>
-            .CreateAuto()
+        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>()
             .AddStandardProperties();
     }
 }

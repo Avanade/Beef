@@ -4,6 +4,7 @@ using Beef.Data.Database;
 using Beef.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,12 +17,16 @@ namespace Beef.Data.EntityFrameworkCore
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
     public abstract class EfDbBase<TDbContext> where TDbContext : DbContext, new()
     {
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for a <see cref="SqlException"/>.
         /// </summary>
         /// <param name="sex">The <see cref="SqlException"/>.</param>
         public static void ThrowTransformedSqlException(SqlException sex)
         {
+            if (sex == null)
+                throw new ArgumentNullException(nameof(sex));
+
             var msg = sex.Message?.TrimEnd();
             switch (sex.Number)
             {
@@ -49,7 +54,8 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Gets or sets the list of known <see cref="SqlException.Number"/> values for the <see cref="ThrowTransformedSqlException(SqlException)"/> method.
         /// </summary>
-        public static int[] SqlDuplicateErrorNumbers { get; set; } = new int[] { 2601, 2627 };
+        public static List<int> SqlDuplicateErrorNumbers { get; } = new List<int>(new int[] { 2601, 2627 });
+#pragma warning restore CA1000
 
         /// <summary>
         /// Indicates whether a pre-read is performed on an <see cref="UpdateAsync{T, TModel}(EfDbArgs{T, TModel}, T)"/> to confirm existence and throw a corresponding
@@ -101,7 +107,7 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
             }
 
-            using (var db = new EfDbContextManager(this, getArgs))
+            using (var db = new EfDbContextManager(getArgs))
             {
                 return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
@@ -134,7 +140,7 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
 
-            using (var db = new EfDbContextManager(this, saveArgs))
+            using (var db = new EfDbContextManager(saveArgs))
             {
                 return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
@@ -173,7 +179,7 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
             
-            using (var db = new EfDbContextManager(this, saveArgs))
+            using (var db = new EfDbContextManager(saveArgs))
             {
                 return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
@@ -224,7 +230,7 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
             }
 
-            using (var db = new EfDbContextManager(this, saveArgs))
+            using (var db = new EfDbContextManager(saveArgs))
             {
                 await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
@@ -284,9 +290,8 @@ namespace Beef.Data.EntityFrameworkCore
             /// <summary>
             /// Initialize a new instance of the <see cref="EfDbContextManager"/> class.
             /// </summary>
-            /// <param name="database">The database.</param>
             /// <param name="args">The <see cref="IEfDbArgs"/>.</param>
-            public EfDbContextManager(EfDbBase<TDbContext> database, IEfDbArgs args)
+            public EfDbContextManager(IEfDbArgs args)
             {
                 if (args != null && args.DbContext != null)
                     DbContext = (TDbContext)args.DbContext;

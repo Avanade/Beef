@@ -182,7 +182,7 @@ namespace Beef.Data.OData
         public async Task<ODataBatchItem> ExecuteAsync(ODataArgs exeArgs, string pathAndQuery, JObject json)
         {
             var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery, json));
-            obi.GetValueFunc = async () => await OData.ProcessExecuteResponseAsync(obi.ResponseMessage, exeArgs);
+            obi.GetValueFunc = async () => await ODataBase.ProcessExecuteResponseAsync(obi.ResponseMessage, exeArgs);
             return obi;
         }
 

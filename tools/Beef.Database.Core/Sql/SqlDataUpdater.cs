@@ -19,7 +19,7 @@ namespace Beef.Database.Core.Sql
     public class SqlDataUpdater
     {
         internal static readonly DateTime DateTimeNow = DateTime.Now;
-        internal static readonly string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
+        internal const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
 
         private readonly JObject _json;
 
@@ -66,7 +66,10 @@ namespace Beef.Database.Core.Sql
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
         public static SqlDataUpdater ReadYaml(string yaml)
         {
-            return ReadYaml(new StringReader(yaml));
+            using (var sr = new StringReader(yaml))
+            {
+                return ReadYaml(sr);
+            }
         }
 
         /// <summary>
@@ -76,7 +79,10 @@ namespace Beef.Database.Core.Sql
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
         public static SqlDataUpdater ReadYaml(Stream s)
         {
-            return ReadYaml(new StreamReader(s));
+            using (var sr = new StreamReader(s))
+            {
+                return ReadYaml(sr);
+            }
         }
 
         /// <summary>
@@ -183,20 +189,20 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the child objects.
         /// </summary>
-        private IEnumerable<JObject> GetChildObjects(JToken j)
+        private static IEnumerable<JObject> GetChildObjects(JToken j)
         {
             foreach (var jc in j.Children<JArray>())
             {
                 return jc.Children<JObject>();
             }
 
-            return new JObject[0];
+            return Array.Empty<JObject>();
         }
 
         /// <summary>
         /// Gets the column value.
         /// </summary>
-        private object GetColumnValue(JToken j)
+        private static object GetColumnValue(JToken j)
         {
             switch (j.Type)
             {
@@ -265,6 +271,9 @@ namespace Beef.Database.Core.Sql
         /// <param name="codeGen">The code generation action to execute.</param>
         public void GenerateSql(Action<CodeGeneratorEventArgs> codeGen)
         {
+            if (codeGen == null)
+                throw new ArgumentNullException(nameof(codeGen));
+
             var cg = CodeGenerator.Create(CreateXml());
             cg.CodeGenerated += (o, e) => codeGen(e);
             cg.Generate(XElement.Load(typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.xml")));
