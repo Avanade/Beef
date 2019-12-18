@@ -13,7 +13,9 @@ namespace Beef.Test.NUnit
     /// Sets up the <see cref="ExecutionContext"/> for the likes of an <see cref="AgentTester"/> test execution, as well as performing a <see cref="Factory.ResetLocal"/>.
     /// </summary>
     [DebuggerStepThrough()]
+#pragma warning disable CA1813 // Avoid unsealed attributes; by-design, needs to be inherited from.
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
+#pragma warning restore CA1813
     {
         private readonly string _username;
         private readonly bool _needsSetUp;
@@ -60,7 +62,7 @@ namespace Beef.Test.NUnit
         /// The test command for the <see cref="TestSetUpAttribute"/>.
         /// </summary>
         [DebuggerStepThrough()]
-        public class ExecutionContextCommand : DelegatingTestCommand
+        internal class ExecutionContextCommand : DelegatingTestCommand
         {
             private readonly string _username;
             private readonly bool _needsSetUp;
@@ -98,6 +100,7 @@ namespace Beef.Test.NUnit
 
                     context.CurrentResult = this.innerCommand.Execute(context);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, need to catch them all.
                 catch (Exception exception)
                 {
                     Exception ex = exception;
@@ -112,6 +115,7 @@ namespace Beef.Test.NUnit
 
                     context.CurrentResult.RecordException(ex);
                 }
+#pragma warning restore CA1031
                 finally
                 {
                     ExecutionContext.Reset(false);

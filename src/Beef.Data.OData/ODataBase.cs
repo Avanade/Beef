@@ -21,12 +21,15 @@ namespace Beef.Data.OData
     /// Extends <see cref="ODataBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities for <b>OData</b>.
     /// </summary>
     /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
+#pragma warning disable CA1724 // Namespace conflict; by-design, is a generic so will not clash.
     public abstract class OData<TDefault> : ODataBase where TDefault : OData<TDefault>
+#pragma warning restore CA1724
     {
         private static readonly object _lock = new object();
         private static TDefault _default;
         private static Func<TDefault> _create;
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
         /// Registers the <see cref="Default"/> <see cref="ODataBase"/> instance.
         /// </summary>
@@ -65,12 +68,15 @@ namespace Beef.Data.OData
                 }
             }
         }
+#pragma warning restore CA1000
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OData{TDefault}"/> class.
         /// </summary>
         /// <param name="baseUri">The base URI string.</param>
-        public OData(string baseUri) : base(baseUri) { }
+#pragma warning disable CA1054 // Uri parameters should not be strings; by-design, is ok.
+        protected OData(string baseUri) : base(baseUri) { }
+#pragma warning restore CA1054
     }
 
     /// <summary>
@@ -85,6 +91,7 @@ namespace Beef.Data.OData
         public static void ThrowTransformedHttpRequestException(HttpRequestException hrex)
         {
             // TODO: Add exception logic.
+            throw new NotImplementedException(null, hrex);
         }
 
         /// <summary>
@@ -133,11 +140,12 @@ namespace Beef.Data.OData
             return t.Result;
         }
 
+#pragma warning disable CA1054, CA1056 // Uri parameters should not be strings; by-design, is ok.
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataBase"/> class.
         /// </summary>
         /// <param name="baseUri">The base URI string.</param>
-        public ODataBase(string baseUri)
+        protected ODataBase(string baseUri)
         {
             BaseUri = !string.IsNullOrEmpty(baseUri) ? baseUri : throw new ArgumentNullException(nameof(baseUri));
             HttpClient = new HttpClient { BaseAddress = new Uri(baseUri) };
@@ -151,6 +159,7 @@ namespace Beef.Data.OData
         /// Gets the base URI string.
         /// </summary>
         public string BaseUri { get; private set; }
+#pragma warning restore CA1054, CA1056
 
         /// <summary>
         /// Gets the <see cref="System.Net.Http.HttpClient"/>.
@@ -263,7 +272,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Determines the HTTP Method to use.
         /// </summary>
-        private string DetermineHttpMethod(string fallbackMethod, HttpMethod configuredMethod = null, IODataArgs odmArgs = null)
+        private static string DetermineHttpMethod(string fallbackMethod, HttpMethod configuredMethod = null, IODataArgs odmArgs = null)
         {
             var m = odmArgs?.OverrideHttpMethod?.Method;
             if (m != null)
@@ -279,7 +288,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Sets the IF-MATCH condition for the eTag.
         /// </summary>
-        private void SetIfMatchCondition(HttpRequestMessage request, ODataArgs args, object value)
+        private static void SetIfMatchCondition(HttpRequestMessage request, ODataArgs args, object value)
         {
             if (value == null)
                 return;
@@ -287,8 +296,7 @@ namespace Beef.Data.OData
             switch (args.IfMatch)
             {
                 case ODataIfMatch.UpdateEtag:
-                    var etag = value as IETag;
-                    if (etag == null)
+                    if (!(value is IETag etag))
                         goto case ODataIfMatch.UpdateAny;
 
                     request.Headers.IfMatch.Add(new EntityTagHeaderValue(etag.ETag));
@@ -429,7 +437,7 @@ namespace Beef.Data.OData
             EnsureSuccessStatusCodeForResponse(response);
 
             var type = typeof(T);
-            IODataMapper mapper = null;
+            IODataMapper mapper;
             PropertyInfo pi = null; 
 
             switch (queryAggregator.SelectClause.Selector.NodeType)
@@ -454,7 +462,7 @@ namespace Beef.Data.OData
                 var json = await JObject.LoadAsync(jr).ConfigureAwait(false);
                 count = json.Value<int?>("@odata.count");
 
-                foreach (var jt in json.GetValue("value"))
+                foreach (var jt in json.GetValue("value", StringComparison.InvariantCulture))
                 {
                     var obj = mapper.MapFromOData(jt, Mapper.OperationTypes.Get);
                     if (pi == null)
@@ -705,9 +713,12 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<TRes> ExecuteAsync<TRes>(ODataArgs exeArgs, string pathAndQuery)
         {
+            if (exeArgs == null)
+                throw new ArgumentNullException(nameof(exeArgs));
+
             var json = await ExecuteAsync(exeArgs, pathAndQuery, null);
             if (json == null)
-                return default(TRes);
+                return default;
 
             return (TRes)exeArgs.Mapper.MapFromOData(json, Mapper.OperationTypes.Any);
         }
@@ -725,7 +736,7 @@ namespace Beef.Data.OData
         {
             await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildExecuteRequestAsync<TReq>(exeArgs, pathAndQuery, value);
+                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value);
                 OnCreatingRequest(request);
                 var response = await SendRequestAsync(request);
                 exeArgs.ResponseMessage = response;
@@ -747,7 +758,7 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildExecuteRequestAsync<TReq>(exeArgs, pathAndQuery, value);
+                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value);
                 OnCreatingRequest(request);
                 var response = await SendRequestAsync(request);
                 exeArgs.ResponseMessage = response;
@@ -812,7 +823,7 @@ namespace Beef.Data.OData
             if (exeArgs == null)
                 throw new ArgumentNullException(nameof(exeArgs));
 
-            var request = CreateRequestMessage(exeArgs, DetermineHttpMethod("POST", CreateHttpMethod, exeArgs), exeArgs.Mapper.ODataEntityName, null);
+            var request = CreateRequestMessage(exeArgs, DetermineHttpMethod("POST", CreateHttpMethod, exeArgs), exeArgs.Mapper.ODataEntityName, pathAndQuery);
             request.Headers.IfMatch.Add(EntityTagHeaderValue.Any);
 
             if (value != null)
@@ -836,7 +847,7 @@ namespace Beef.Data.OData
         /// <param name="exeArgs">The <see cref="ODataArgs"/>.</param>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
         /// <returns>The resulting <see cref="JObject"/>.</returns>
-        internal async Task<JObject> ProcessExecuteResponseAsync(HttpResponseMessage response, ODataArgs exeArgs)
+        internal static async Task<JObject> ProcessExecuteResponseAsync(HttpResponseMessage response, ODataArgs exeArgs)
         {
             if (response.StatusCode == HttpStatusCode.NotFound && exeArgs.NullOnNotFoundResponse)
                 return null;
@@ -867,7 +878,7 @@ namespace Beef.Data.OData
         internal async Task<TRes> ProcessExecuteResponseAsync<TRes>(HttpResponseMessage response, ODataArgs exeArgs)
         {
             if (response.StatusCode == HttpStatusCode.NotFound && exeArgs.NullOnNotFoundResponse)
-                return default(TRes);
+                return default;
 
             EnsureSuccessStatusCodeForResponse(response);
 
@@ -882,7 +893,7 @@ namespace Beef.Data.OData
                 }
             }
             else
-                return default(TRes);
+                return default;
         }
 
         /// <summary>

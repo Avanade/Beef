@@ -11,11 +11,15 @@ namespace Beef.Data.Database
     /// Extends <see cref="DatabaseBase"/> adding <see cref="Register"/>, <see cref="Default"/>, <see cref="OnConnectionOpen(DbConnection)"/> and <see cref="SetSqlSessionContext(DbConnection)"/> capabilities.
     /// </summary>
     /// <typeparam name="TDefault">The <see cref="DatabaseBase"/> <see cref="Type"/>.</typeparam>
+#pragma warning disable CA1724 // Type name conflicts with namespace; by-design, is ok as it is a generic type.
     public abstract class Database<TDefault> : DatabaseBase where TDefault : Database<TDefault>
+#pragma warning restore CA1724
     {
         private static readonly object _lock = new object();
         private static TDefault _default;
         private static Func<TDefault> _create;
+
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
 
         /// <summary>
         /// Registers (creates) the <see cref="Default"/> <see cref="DatabaseBase"/> instance; as well as registering with the <see cref="DataContextScope"/> for connection management
@@ -67,12 +71,14 @@ namespace Beef.Data.Database
             }
         }
 
+#pragma warning restore CA1000
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Database{T}"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider (e.g. System.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        public Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        protected Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
 
         /// <summary>
         /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
@@ -89,11 +95,16 @@ namespace Beef.Data.Database
         /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
         public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null)
         {
+            if (dbConnection == null)
+                throw new ArgumentNullException(nameof(dbConnection));
+
             if (string.IsNullOrEmpty(SessionContextStoredProcedure))
                 throw new InvalidOperationException("The SessionContextStoredProcedure property must have a value.");
 
             var cmd = dbConnection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, is a stored procedure command type.
             cmd.CommandText = SessionContextStoredProcedure;
+#pragma warning restore CA2100
             cmd.CommandType = CommandType.StoredProcedure;
 
             var p = cmd.CreateParameter();

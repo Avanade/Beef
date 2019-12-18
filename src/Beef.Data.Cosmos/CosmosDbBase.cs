@@ -20,6 +20,7 @@ namespace Beef.Data.Cosmos
         private static TDefault _default;
         private static Func<TDefault> _create;
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
         /// Registers the <see cref="Default"/> <see cref="CosmosDbBase"/> instance.
         /// </summary>
@@ -58,6 +59,7 @@ namespace Beef.Data.Cosmos
                 }
             }
         }
+#pragma warning restore CA1000
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDb{TDefault}"/> class.
@@ -86,6 +88,9 @@ namespace Beef.Data.Cosmos
         /// <param name="cex">The <see cref="HttpRequestException"/>.</param>
         public static void ThrowTransformedDocumentClientException(CosmosException cex)
         {
+            if (cex == null)
+                throw new ArgumentNullException(nameof(cex));
+
             switch (cex.StatusCode)
             {
                 case System.Net.HttpStatusCode.NotFound:
@@ -107,7 +112,7 @@ namespace Beef.Data.Cosmos
         public static void ReformatValueETag(object value)
         {
             if (value is IETag etag && etag.ETag != null)
-                etag.ETag = (etag.ETag.StartsWith("\"") && etag.ETag.EndsWith("\"")) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
+                etag.ETag = (etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) && etag.ETag.EndsWith("\"", StringComparison.InvariantCultureIgnoreCase)) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
         }
 
         /// <summary>
@@ -172,12 +177,12 @@ namespace Beef.Data.Cosmos
         }
 
         /// <summary>
-        /// Gets the underlying <see cref="T:CosmosClient"/>.
+        /// Gets the underlying <see cref="Microsoft.Azure.Cosmos.CosmosClient"/>.
         /// </summary>
         public CosmosClient Client { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:Database"/>.
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.Database"/>.
         /// </summary>
         public Database Database { get; private set; }
 
@@ -221,6 +226,9 @@ namespace Beef.Data.Cosmos
         /// <returns>The replaced/created <see cref="Container"/>.</returns>
         public async Task<Container> ReplaceOrCreateContainerAsync(ContainerProperties containerProperties, int? throughput = 400)
         {
+            if (containerProperties == null)
+                throw new ArgumentNullException(nameof(containerProperties));
+
             var container = CosmosContainer(containerProperties.Id);
 
             // Remove existing container if it already exists.
@@ -254,7 +262,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Updates the <paramref name="requestOptions"/> using the <see cref="Action"/> set with <see cref="RequestOptions(Action{RequestOptions})"/>.
         /// </summary>
-        /// <param name="requestOptions">The <see cref="T:RequestOptions"/>.</param>
+        /// <param name="requestOptions">The <see cref="Microsoft.Azure.Cosmos.RequestOptions"/>.</param>
         public void UpdateRequestOptions(RequestOptions requestOptions)
         {
             Check.NotNull(requestOptions, nameof(requestOptions));
@@ -292,7 +300,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Updates the <paramref name="requestOptions"/> using the <see cref="Action"/> set with <see cref="QueryRequestOptions(Action{QueryRequestOptions})"/>.
         /// </summary>
-        /// <param name="requestOptions">The <see cref="T:QueryRequestOptions"/>.</param>
+        /// <param name="requestOptions">The <see cref="Microsoft.Azure.Cosmos.QueryRequestOptions"/>.</param>
         public void UpdateQueryRequestOptions(QueryRequestOptions requestOptions)
         {
             Check.NotNull(requestOptions, nameof(requestOptions));

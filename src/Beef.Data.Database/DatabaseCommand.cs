@@ -29,7 +29,9 @@ namespace Beef.Data.Database
 
             Database = database ?? throw new ArgumentNullException(nameof(database));
             DbCommand = Database.Provider.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, trusts that the consumer has validated the command text where applicable.
             DbCommand.CommandText = commandText;
+#pragma warning restore CA2100 
             DbCommand.CommandType = commandType;
             Parameters = new DatabaseParameters(this);
         }
@@ -522,7 +524,7 @@ namespace Beef.Data.Database
 
             return DbDataReaderWrapper(dr =>
             {
-                T item = default(T);
+                T item = default;
                 int i = 0;
 
                 while (dr.Read())
@@ -552,8 +554,7 @@ namespace Beef.Data.Database
         /// <param name="databaseRecord">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
         public void SelectQuery(Action<DatabaseRecord> databaseRecord)
         {
-            if (databaseRecord == null)
-                throw new ArgumentNullException("databaseRecord");
+            Check.NotNull(databaseRecord, nameof(databaseRecord));
 
             DbDataReaderWrapper(dr =>
             {
@@ -711,7 +712,7 @@ namespace Beef.Data.Database
         public void SelectQuery<TColl, TItem>(TColl coll, Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>
         {
             if (coll == null)
-                throw new ArgumentNullException("coll");
+                throw new ArgumentNullException(nameof(coll));
 
             if (mapFromDb == null)
                 throw new ArgumentNullException(nameof(mapFromDb));
@@ -781,7 +782,7 @@ namespace Beef.Data.Database
         public void SelectQueryMultiSet(params Action<DatabaseRecord>[] datasetRecord)
         {
             if (datasetRecord == null)
-                throw new ArgumentNullException("datasetRecord");
+                throw new ArgumentNullException(nameof(datasetRecord));
 
             DbDataReaderWrapper(dr =>
             {
@@ -789,7 +790,7 @@ namespace Beef.Data.Database
                 do
                 {
                     if (index >= datasetRecord.Length)
-                        throw new InvalidOperationException(string.Format("SelectQueryMultiSet has returned more record sets than expected ({0}).", datasetRecord.Length));
+                        throw new InvalidOperationException($"SelectQueryMultiSet has returned more record sets than expected ({datasetRecord.Length}).");
 
                     if (datasetRecord[index] != null)
                     {
@@ -803,7 +804,7 @@ namespace Beef.Data.Database
                 } while (dr.NextResult());
 
                 if (index < datasetRecord.Length)
-                    throw new InvalidOperationException(string.Format("SelectQueryMultiSet has returned less ({0}) record sets than expected ({1}).", index, datasetRecord.Length));
+                    throw new InvalidOperationException($"SelectQueryMultiSet has returned less ({index}) record sets than expected ({datasetRecord.Length}).");
 
                 return (object)null;
             });
@@ -841,7 +842,7 @@ namespace Beef.Data.Database
                 do
                 {
                     if (index >= multiSetArgs.Length)
-                        throw new InvalidOperationException(string.Format("SelectQueryMultiSet has returned more record sets than expected ({0}).", multiSetArgs.Length));
+                        throw new InvalidOperationException($"SelectQueryMultiSet has returned more record sets than expected ({multiSetArgs.Length}).");
 
                     if (multiSetArgs[index] != null)
                     {
@@ -869,7 +870,7 @@ namespace Beef.Data.Database
                 } while (dr.NextResult());
 
                 if (index < multiSetArgs.Length)
-                    throw new InvalidOperationException(string.Format("SelectQueryMultiSet has returned less ({0}) record sets than expected ({1}).", index, multiSetArgs.Length));
+                    throw new InvalidOperationException($"SelectQueryMultiSet has returned less ({index}) record sets than expected ({multiSetArgs.Length}).");
 
                 return (object)null;
             });
@@ -935,7 +936,7 @@ namespace Beef.Data.Database
             return DbCommandWrapper(behaviour =>
             {
                 var result = DbCommand.ExecuteScalar();
-                var value = result is DBNull ? default(T) : (T)result;
+                var value = result is DBNull ? default : (T)result;
                 action?.Invoke(DbCommand.Parameters);
                 return value;
             });

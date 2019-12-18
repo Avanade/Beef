@@ -80,7 +80,8 @@ namespace Beef.Test.NUnit
         /// <param name="expectedEvents">The <see cref="ExpectedEvent"/> list.</param>
         public static void ArePublished(List<ExpectedEvent> expectedEvents)
         {
-            Check.NotNull(expectedEvents, nameof(expectedEvents));
+            if (expectedEvents == null)
+                throw new ArgumentNullException(nameof(expectedEvents));
 
             var actualEvents = GetEvents();
             if (actualEvents.Length != expectedEvents.Count)
@@ -144,6 +145,6 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets or sets the members to ignore for the <see cref="EventData.GetValue"/> comparison.
         /// </summary>
-        public List<string> MembersToIgnore { get; set; }
+        public List<string> MembersToIgnore { get; private set; } = new List<string>();
     }
 }

@@ -3,6 +3,7 @@
 using Beef.CodeGen.Entities;
 using Beef.Data.Database;
 using Beef.Diagnostics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -39,6 +40,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadBeforeChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             if (_tables == null)
                 LoadDatabase(config.Root.GetAttributeValue<string>("ConnectionString") ?? throw new CodeGenException("Config.ConnectionString has not been specified."), config.Root.GetAttributeValue<string>("RefDatabaseSchema"));
 
@@ -59,6 +63,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadAfterChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             var schema = config.GetAttributeValue<string>("Schema");
             var name = config.GetAttributeValue<string>("Name");
             var table = _tables.Where(x => x.Name == name && x.Schema == schema).SingleOrDefault();

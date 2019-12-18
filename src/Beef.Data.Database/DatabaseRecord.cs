@@ -19,7 +19,7 @@ namespace Beef.Data.Database
         public DatabaseRecord(DatabaseCommand dataCommand, IDataRecord dataRecord)
         {
             DatabaseCommand = dataCommand ?? throw new ArgumentNullException(nameof(dataCommand));
-            DataRecord = dataRecord ?? throw new ArgumentNullException(nameof(DataRecord));
+            DataRecord = dataRecord ?? throw new ArgumentNullException(nameof(dataRecord));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Beef.Data.Database
                 dbVal = DateTime.SpecifyKind((DateTime)dbVal, DatabaseCommand.Database.DefaultDateTimeKind);
 
             if (dbVal is DBNull)
-                return default(T);
+                return default;
 
             Type nt = Nullable.GetUnderlyingType(typeof(T));
             if (nt == null)
@@ -94,14 +94,14 @@ namespace Beef.Data.Database
                 if (typeof(T).IsEnum)
                     return (T)Enum.ToObject(typeof(T), dbVal);
                 else
-                    return (T)Convert.ChangeType(dbVal, typeof(T));
+                    return (T)Convert.ChangeType(dbVal, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
             }
             else
             {
                 if (typeof(T).IsEnum)
                     return (T)Enum.ToObject(nt, dbVal);
                 else
-                    return (T)Convert.ChangeType(dbVal, nt);
+                    return (T)Convert.ChangeType(dbVal, nt, System.Globalization.CultureInfo.InvariantCulture);
             }
         }
 
@@ -168,12 +168,12 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Gets the <see cref="DatabaseRecordFields"/> for the <see cref="DatabaseRecord"/>.
+        /// Gets the <see cref="DatabaseRecordFieldCollection"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        /// <returns>The <see cref="DatabaseRecordFields"/>.</returns>
-        public DatabaseRecordFields GetFields()
+        /// <returns>The <see cref="DatabaseRecordFieldCollection"/>.</returns>
+        public DatabaseRecordFieldCollection GetFields()
         {
-            return new DatabaseRecordFields(this);
+            return new DatabaseRecordFieldCollection(this);
         }
     }
 }

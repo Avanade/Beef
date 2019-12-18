@@ -28,6 +28,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>.\bin\debug\Beef.AspNetCore.WebApi.xml</DocumentationFile>
     <NoWarn>1701;1702;CA1303;CA2007</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>

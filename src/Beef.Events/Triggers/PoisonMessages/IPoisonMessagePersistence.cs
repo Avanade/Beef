@@ -12,6 +12,7 @@ namespace Beef.Events.Triggers.PoisonMessages
     /// </summary>
     public interface IPoisonMessagePersistence
     {
+#pragma warning disable CA1716 // Identifiers should not match keywords; by-design, best name.
         /// <summary>
         /// A <i>potential</i> poisoned <see cref="EventData"/> has been identified and needs to be orchestrated. <i>Note:</i> only a single event per <c>ConsumerGroup/PartitionId</c> can be set to this state.
         /// </summary>
@@ -32,5 +33,6 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <param name="event">The <see cref="EventData"/>.</param>
         /// <returns>The resulting <see cref="PoisonMessageAction"/>.</returns>
         Task<PoisonMessageAction> CheckAsync(EventHubs.EventData @event);
+#pragma warning restore CA1716
     }
 }

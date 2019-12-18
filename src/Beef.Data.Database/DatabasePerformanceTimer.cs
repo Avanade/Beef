@@ -13,7 +13,7 @@ namespace Beef.Data.Database
     public class DatabasePerformanceTimer : PerformanceTimer
     {
         static private Action<DatabaseCommand, Stopwatch> _action;
-        private DatabaseCommand _databaseCommand;
+        private readonly DatabaseCommand _databaseCommand;
  
         /// <summary>
         /// Sets the action to be performed when the underlying timer is <see cref="PerformanceTimer.Stop">stopped</see>.
@@ -21,10 +21,7 @@ namespace Beef.Data.Database
         /// <param name="action">The action that is called when the timer is stopped.</param>
         public static void OnTimerStopped(Action<DatabaseCommand, Stopwatch> action)
         {
-            if (action == null)
-                throw new ArgumentNullException("action");
-
-            _action = action;
+            _action = Check.NotNull(action, nameof(action));
         }
 
         /// <summary>
@@ -32,10 +29,7 @@ namespace Beef.Data.Database
         /// </summary>
         public DatabasePerformanceTimer(DatabaseCommand databaseCommand)
         {
-            if (databaseCommand == null)
-                throw new ArgumentNullException("databaseCommand");
-
-            _databaseCommand = databaseCommand;
+            _databaseCommand = Check.NotNull(databaseCommand, nameof(databaseCommand));
         }
 
         /// <summary>
@@ -44,9 +38,7 @@ namespace Beef.Data.Database
         protected override void OnStopped()
         {
             base.OnStopped();
-
-            if (_action != null)
-                _action(_databaseCommand, base.Stopwatch);
+            _action?.Invoke(_databaseCommand, base.Stopwatch);
         }
     }
 }

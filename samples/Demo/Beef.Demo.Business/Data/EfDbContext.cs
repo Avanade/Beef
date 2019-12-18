@@ -15,7 +15,7 @@ namespace Beef.Demo.Business.Data
         {
             base.OnConfiguring(optionsBuilder);
 
-            // Uses the DB connection management from the database project - ensures DB connection pooling and required DB session context setting.
+            // Uses the DB connection management from the Database class - ensures DB connection management and required DB session context setting.
             if (!optionsBuilder.IsConfigured)
                 optionsBuilder.UseSqlServer(Beef.Demo.Business.Data.Database.Default.CreateConnection());
         }

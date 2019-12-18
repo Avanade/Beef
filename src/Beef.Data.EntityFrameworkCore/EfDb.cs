@@ -14,8 +14,9 @@ namespace Beef.Data.EntityFrameworkCore
     /// <typeparam name="TDefault">The <see cref="EfDbBase{TDbContext}"/> <see cref="Type"/>.</typeparam>
     public abstract class EfDb<TDbContext, TDefault> : EfDbBase<TDbContext> where TDefault : EfDb<TDbContext, TDefault> where TDbContext : DbContext, new()
     {
-        private static Lazy<TDefault> _default = new Lazy<TDefault>(true);
+        private static readonly Lazy<TDefault> _default = new Lazy<TDefault>(true);
 
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
         /// Gets the current default <see cref="EfDbBase{TDbContext}"/> instance.
         /// </summary>
@@ -44,7 +45,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="action">The <see cref="Action"/> to invoke when there is a valid <paramref name="with"/> value.</param>
         public static void With<T>(T with, Action action)
         {
-            if (Comparer<T>.Default.Compare(with, default(T)) != 0 && Comparer<T>.Default.Compare((T)with, default(T)) != 0)
+            if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
             {
                 if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
                     return;
@@ -52,5 +53,6 @@ namespace Beef.Data.EntityFrameworkCore
                 action?.Invoke();
             }
         }
+#pragma warning restore CA1000
     }
 }

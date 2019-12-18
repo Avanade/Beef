@@ -20,7 +20,7 @@ namespace Beef.Mapper
         Type SrcePropertyType { get; }
 
         /// <summary>
-        /// Gets the destination property name;
+        /// Gets the destination property name.
         /// </summary>
         string DestPropertyName { get; }
 

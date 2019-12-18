@@ -400,7 +400,9 @@ namespace Beef.Test.NUnit
         /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
         protected void SetExpectEvent<T>(bool useReturnedValue, string template, string action, T eventValue, params string[] membersToIgnore)
         {
-            _expectedPublished.Add((new ExpectedEvent { EventData = new EventData<T> { Subject = template, Action = action, Value = eventValue }, MembersToIgnore = membersToIgnore.ToList() }, useReturnedValue));
+            var ee = new ExpectedEvent { EventData = new EventData<T> { Subject = template, Action = action, Value = eventValue } };
+            ee.MembersToIgnore.AddRange(membersToIgnore);
+            _expectedPublished.Add((ee, useReturnedValue));
         }
 
         /// <summary>
@@ -418,7 +420,8 @@ namespace Beef.Test.NUnit
         /// <param name="sw">The <see cref="Stopwatch"/> used to measure <see cref="WebApiServiceAgentBase"/> invocation.</param>
         protected void ResultCheck(WebApiAgentResult result, Stopwatch sw)
         {
-            Check.NotNull(result, nameof(result));
+            if (result == null)
+                throw new ArgumentNullException(nameof(result));
 
             // Log to output.
             Logger.Default.Info("");
@@ -466,7 +469,7 @@ namespace Beef.Test.NUnit
             Logger.Default.Info("");
             Logger.Default.Info($"RESPONSE >");
             Logger.Default.Info($"HttpStatusCode: {result.StatusCode} ({(int)result.StatusCode})");
-            Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString())}");
+            Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
 
             var hdrs = result.Response?.Headers?.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             Logger.Default.Info($"Headers: {(hdrs == null || !hdrs.Any() ? "none" : "")}");

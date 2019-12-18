@@ -25,6 +25,9 @@ namespace Beef.Data.Database
         /// <param name="sex">The <see cref="SqlException"/>.</param>
         public static void ThrowTransformedSqlException(SqlException sex)
         {
+            if (sex == null)
+                throw new ArgumentNullException(nameof(sex));
+
             var msg = sex.Message?.TrimEnd();
             if (string.IsNullOrEmpty(msg))
                 msg = null;
@@ -57,20 +60,20 @@ namespace Beef.Data.Database
         /// </summary>
         /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors
         /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
-        public static int[] SqlDuplicateErrorNumbers { get; set; } = new int[] { 2601, 2627 };
+        public static List<int> SqlDuplicateErrorNumbers { get; } = new List<int>(new int[] { 2601, 2627 });
 
         /// <summary>
         /// Gets or sets the list of known <see cref="SqlException.Number"/> values that are considered transient; candidates for a retry. 
         /// </summary>
         /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors 
         /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
-        public static int[] SqlTransientErrorNumbers { get; set; } = new int[] 
+        public static List<int> SqlTransientErrorNumbers { get; } = new List<int>(new int[] 
         {
             -1, -2, 701, 1204, 1205, 1222, 8645, 8651, 30053, // https://stackoverflow.com/questions/4821668/what-is-good-c-sharp-coding-style-for-catching-sqlexception-and-retrying
             10928, 10929, 10053, 10054, 10060, 40540, 40143, 233, 64, // https://github.com/Azure/elastic-db-tools/blob/master/Src/ElasticScale.Client/ElasticScale.Common/TransientFaultHandling/Implementation/SqlDatabaseTransientErrorDetectionStrategy.cs
             4060, 40197, 40501, 40613, 49918, 49919, 49920, 4221, // https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages
             1222, 1421, 1807, 3928, 5030, 7604, 8628, 8654, 17197, 17830, 17889, 18486 // https://github.com/marinoscar/CommonHelpers/blob/master/SqlErrorCodes.cs
-        };
+        });
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseBase"/> class for a <paramref name="connectionString"/> and <paramref name="provider"/>.
@@ -236,9 +239,12 @@ namespace Beef.Data.Database
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
+            if (saveArgs == null)
+                throw new ArgumentNullException(nameof(saveArgs));
+
             var cmd = StoredProcedure(saveArgs.StoredProcedure);
             saveArgs.Mapper.GetKeyParams(cmd.Parameters, OperationTypes.Update, value);
-            cmd.Params<T>(value, saveArgs.Mapper.MapToDb, OperationTypes.Update);
+            cmd.Params(value, saveArgs.Mapper.MapToDb, OperationTypes.Update);
 
             if (saveArgs.Refresh)
             {
@@ -259,6 +265,9 @@ namespace Beef.Data.Database
         /// <param name="keys">The key values.</param>
         public void Delete<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new()
         {
+            if (saveArgs == null)
+                throw new ArgumentNullException(nameof(saveArgs));
+
             StoredProcedure(saveArgs.StoredProcedure).Params((p) => saveArgs.Mapper.GetKeyParams(p, OperationTypes.Delete, keys)).NonQuery();
         }
 
@@ -274,7 +283,7 @@ namespace Beef.Data.Database
         /// <param name="additionalDatasetRecords">The additional dataset record delegates where additional datasets are returned.</param>
         /// <param name="confirmItemIsToBeAdded">The action to confirm whether the item is to be added (defaults to <c>true</c>).</param>
         public void GetRefData<TColl, TItem>(TColl coll, string storedProcedure, string idColumnName = null,
-            Action<DatabaseRecord, TItem, DatabaseRecordFields> additionalProperties = null,
+            Action<DatabaseRecord, TItem, DatabaseRecordFieldCollection> additionalProperties = null,
             Action<DatabaseRecord>[] additionalDatasetRecords = null,
             Func<DatabaseRecord, TItem, bool> confirmItemIsToBeAdded = null)
                 where TColl : ReferenceDataCollectionBase<TItem>
@@ -282,7 +291,7 @@ namespace Beef.Data.Database
         {
             Check.NotNull(coll, nameof(coll));
 
-            DatabaseRecordFields fields = null;
+            DatabaseRecordFieldCollection fields = null;
             var idCol = idColumnName ?? DatabaseRefDataColumns.IdColumnName;
             var isInt = ReferenceDataBase.GetIdTypeCode(typeof(TItem)) == ReferenceDataIdTypeCode.Int32;
 

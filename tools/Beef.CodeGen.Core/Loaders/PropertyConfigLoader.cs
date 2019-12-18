@@ -21,14 +21,17 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadBeforeChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             config.AttributeAdd("Type", "string");
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
-                config.AttributeAdd("Text", string.Format("{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
             else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]))
                 config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             else
-                config.AttributeAdd("Text", string.Format("{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Subscribe
@@ -18,7 +19,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
         /// </summary>
-        string[] Actions { get; }
+        List<string> Actions { get; }
 
         /// <summary>
         /// Gets the <see cref="RunAsUser"/> option.

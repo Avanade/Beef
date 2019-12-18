@@ -12,6 +12,20 @@ namespace Beef.Core.UnitTest.Mapper
     [TestFixture]
     public class EntityMapperTest
     {
+        [Test]
+        public void GetByProperty()
+        {
+            var r = EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Street, d => d.StreetX);
+
+            Assert.IsNotNull(r.GetBySrceProperty(s => s.Street));
+            Assert.IsNull(r.GetBySrceProperty(s => s.Name));
+
+            Assert.IsNotNull(r.GetByDestProperty(d => d.StreetX));
+            Assert.IsNull(r.GetByDestProperty(d => d.Codes));
+        }
+
+
         #region MapToDest
 
         [Test]

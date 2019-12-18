@@ -17,12 +17,15 @@ namespace Beef.CodeGen.Entities
         /// <param name="dbType">The database type.</param>
         public static bool TypeIsString(string dbType)
         {
-            switch (dbType.ToLower())
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
             {
-                case "nchar":
-                case "char":
-                case "nvarchar":
-                case "varchar":
+                case "NCHAR":
+                case "CHAR":
+                case "NVARCHAR":
+                case "VARCHAR":
                     return true;
 
                 default:
@@ -36,12 +39,15 @@ namespace Beef.CodeGen.Entities
         /// <param name="dbType">The database type.</param>
         public static bool TypeIsDecimal(string dbType)
         {
-            switch (dbType.ToLower())
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
             {
-                case "decimal":
-                case "money":
-                case "numeric":
-                case "smallmoney":
+                case "DECIMAL":
+                case "MONEY":
+                case "NUMERIC":
+                case "SMALLMONEY":
                     return true;
 
                 default:
@@ -55,11 +61,14 @@ namespace Beef.CodeGen.Entities
         /// <param name="dbType">The database type.</param>
         public static bool TypeIsDateTime(string dbType)
         {
-            switch (dbType.ToLower())
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
             {
-                case "date":
-                case "datetime":
-                case "datetime2":
+                case "DATE":
+                case "DATETIME":
+                case "DATETIME2":
                     return true;
 
                 default:
@@ -73,11 +82,14 @@ namespace Beef.CodeGen.Entities
         /// <param name="dbType">The database type.</param>
         public static bool TypeIsInteger(string dbType)
         {
-            switch (dbType.ToLower())
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
             {
-                case "int":
-                case "bigint":
-                case "smallint":
+                case "INT":
+                case "BIGINT":
+                case "SMALLINT":
                     return true;
 
                 default:
@@ -104,21 +116,21 @@ namespace Beef.CodeGen.Entities
             else if (TypeIsDateTime(dbType))
                 return "DateTime";
 
-            switch (dbType.ToLower())
+            switch (dbType.ToUpperInvariant())
             {
-                case "rowversion":
-                case "timestamp":
-                case "varbinary": return "byte[]";
-                case "bit": return "bool";
-                case "datetimeoffset": return "DateTimeOffset";
-                case "float": return "double";
-                case "int": return "int";
-                case "bigint": return "long";
-                case "smallint": return "short";
-                case "tinyint": return "byte";
-                case "real": return "float";
-                case "time": return "TimeSpan";
-                case "uniqueidentifier": return "Guid";
+                case "ROWVERSION":
+                case "TIMESTAMP":
+                case "VARBINARY": return "byte[]";
+                case "BIT": return "bool";
+                case "DATETIMEOFFSET": return "DateTimeOffset";
+                case "FLOAT": return "double";
+                case "INT": return "int";
+                case "BIGINT": return "long";
+                case "SMALLINT": return "short";
+                case "TINYINT": return "byte";
+                case "REAL": return "float";
+                case "TIME": return "TimeSpan";
+                case "UNIQUEIDENTIFIER": return "Guid";
 
                 default:
                     throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined.");
@@ -132,22 +144,22 @@ namespace Beef.CodeGen.Entities
         /// <returns>The .NET <see cref="System.Type"/> name.</returns>
         public static Type GetDotNetType(string dbType)
         {
-            switch (GetDotNetTypeName(dbType))
+            switch (GetDotNetTypeName(dbType).ToUpperInvariant())
             {
-                case "string": return typeof(string);
-                case "decimal": return typeof(decimal);
-                case "DateTime": return typeof(DateTime);
-                case "byte[]": return typeof(byte[]);
-                case "bool": return typeof(bool);
-                case "DateTimeOffset": return typeof(DateTimeOffset);
-                case "double": return typeof(double);
-                case "int": return typeof(int);
-                case "long": return typeof(long);
-                case "short": return typeof(short);
-                case "byte": return typeof(byte);
-                case "float": return typeof(float);
-                case "TimeSpan": return typeof(TimeSpan);
-                case "Guid": return typeof(Guid);
+                case "STRING": return typeof(string);
+                case "DECIMAL": return typeof(decimal);
+                case "DATETIME": return typeof(DateTime);
+                case "BYTE[]": return typeof(byte[]);
+                case "BOOL": return typeof(bool);
+                case "DATETIMEOFFSET": return typeof(DateTimeOffset);
+                case "DOUBLE": return typeof(double);
+                case "INT": return typeof(int);
+                case "LONG": return typeof(long);
+                case "SHORT": return typeof(short);
+                case "BYTE": return typeof(byte);
+                case "FLOAT": return typeof(float);
+                case "TIMESPAN": return typeof(TimeSpan);
+                case "GUID": return typeof(Guid);
 
                 default:
                     throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined.");
@@ -253,6 +265,9 @@ namespace Beef.CodeGen.Entities
         /// <param name="xml">The <see cref="XElement"/> to add to.</param>
         public void CreateXml(XElement xml)
         {
+            if (xml == null)
+                throw new ArgumentNullException(nameof(xml));
+
             var xc = new XElement("Column",
                 new XAttribute("Name", Name),
                 new XAttribute("Type", Type),
@@ -306,7 +321,9 @@ namespace Beef.CodeGen.Entities
     /// <summary>
     /// Represents the <see cref="Column"/> database mapper.
     /// </summary>
+#pragma warning disable CA1812 // Apparently never instantiated; by-design - it is!
     internal class ColumnMapper : DatabaseMapper<Column, ColumnMapper>
+#pragma warning restore CA1812
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ColumnMapper"/> class.
@@ -315,7 +332,7 @@ namespace Beef.CodeGen.Entities
         {
             Property(x => x.Name, "COLUMN_NAME");
             Property(x => x.Type, "DATA_TYPE");
-            Property(x => x.IsNullable).MapFromDb((dr, c, ot) => dr.GetValue<string>("IS_NULLABLE").ToUpper() == "YES");
+            Property(x => x.IsNullable).MapFromDb((dr, c, ot) => dr.GetValue<string>("IS_NULLABLE").ToUpperInvariant() == "YES");
             Property(x => x.Length, "CHARACTER_MAXIMUM_LENGTH");
             Property(x => x.Precision).MapFromDb((dr, c, ot) => dr.GetValue<int?>("NUMERIC_PRECISION") ?? dr.GetValue<int?>("DATETIME_PRECISION"));
             Property(x => x.Scale, "NUMERIC_SCALE");

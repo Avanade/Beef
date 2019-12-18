@@ -22,101 +22,6 @@ namespace Beef.CodeGen
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
     public class CodeGenConsole
     {
-        #region InternalClasses
-
-        /// <summary>
-        /// Validates either existence of file or embedded resource.
-        /// </summary>
-        public class FileResourceValidator : IOptionValidator
-        {
-            /// <summary>
-            /// Performs the validation.
-            /// </summary>
-            /// <param name="option">The <see cref="CommandOption"/>.</param>
-            /// <param name="context">The <see cref="ValidationContext"/>.</param>
-            /// <returns>The <see cref="ValidationResult"/>.</returns>
-            public ValidationResult GetValidationResult(CommandOption option, ValidationContext context)
-            {
-                if (option.Value() != null && !File.Exists(option.Value()) && ResourceManager.GetScriptContent(option.Value()) == null)
-                    return new ValidationResult($"The file or embedded resource '{option.Value()}' does not exist.");
-
-                return ValidationResult.Success;
-            }
-        }
-
-        /// <summary>
-        /// Validate the Params to ensure format is correct and values are not duplicated.
-        /// </summary>
-        public class ParamsValidator : IOptionValidator
-        {
-            /// <summary>
-            /// Performs the validation.
-            /// </summary>
-            /// <param name="option">The <see cref="CommandOption"/>.</param>
-            /// <param name="context">The <see cref="ValidationContext"/>.</param>
-            /// <returns>The <see cref="ValidationResult"/>.</returns>
-            public ValidationResult GetValidationResult(CommandOption option, ValidationContext context)
-            {
-                var pd = new Dictionary<string, string>();
-
-                foreach (var p in option.Values)
-                {
-                    string[] parts = CreateKeyValueParts(p);
-                    if (parts.Length != 2)
-                        return new ValidationResult($"The parameter '{p}' is not valid; must be formatted as Name=value.");
-
-                    if (pd.ContainsKey(parts[0]))
-                        return new ValidationResult($"The parameter '{p}' is not valid; name has been specified more than once.");
-
-                    pd.Add(parts[0], parts[1]);
-                }
-
-                return ValidationResult.Success;
-            }
-        }
-
-        /// <summary>
-        /// Validates the assembly name(s).
-        /// </summary>
-        public class AssemblyValidator : IOptionValidator
-        {
-            /// <summary>
-            /// Initilizes a new instance of the <see cref="AssemblyValidator"/> class.
-            /// </summary>
-            /// <param name="assemblies">The assemblies list to update.</param>
-            public AssemblyValidator(List<Assembly> assemblies) => Assemblies = assemblies;
-
-            /// <summary>
-            /// Gets the list of assemblies.
-            /// </summary>
-            public List<Assembly> Assemblies { get; private set; }
-
-            /// <summary>
-            /// Performs the validation.
-            /// </summary>
-            /// <param name="option">The <see cref="CommandOption"/>.</param>
-            /// <param name="context">The <see cref="ValidationContext"/>.</param>
-            /// <returns>The <see cref="ValidationResult"/>.</returns>
-            public ValidationResult GetValidationResult(CommandOption option, ValidationContext context)
-            {
-                foreach (var name in option.Values)
-                {
-                    try
-                    {
-                        Assemblies.Add(Assembly.Load(name));
-                    }
-                    catch (Exception ex)
-                    {
-                        return new ValidationResult($"The specified assembly '{name}' is invalid: {ex.Message}");
-                    }
-                }
-
-                return ValidationResult.Success;
-            }
-        }
-
-        #endregion
-
         private readonly CommandArgument _configArg;
         private readonly CommandOption _scriptOpt;
         private readonly CommandOption _templateOpt;
@@ -190,7 +95,7 @@ namespace Beef.CodeGen
         public int Run(string args = null)
         {
             if (string.IsNullOrEmpty(args))
-                return Run(new string[0]);
+                return Run(Array.Empty<string>());
 
             // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
             var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
@@ -228,25 +133,25 @@ namespace Beef.CodeGen
         /// </summary>
         private async Task<int> RunRunAwayAsync() /* Inspired by https://www.youtube.com/watch?v=ikMiQZF-mAY */
         {
-            var args = new CodeGenExecutorArgs
+            var args = new CodeGenExecutorArgs(_assembliesOpt.HasValue() ? ((AssemblyValidator)_assembliesOpt.Validators.First()).Assemblies : _assemblies, CreateParamDict(_paramsOpt))
             {
                 ConfigFile = new FileInfo(_configArg.Value),
                 ScriptFile = new FileInfo(_scriptOpt.Value()),
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
-                Assemblies = _assembliesOpt.HasValue() ? ((AssemblyValidator)_assembliesOpt.Validators.First()).Assemblies : _assemblies,
-                Parameters = CreateParamDict(_paramsOpt)
             };
 
             WriteHeader(args);
 
-            var em = ExecutionManager.Create(() => new CodeGenExecutor(args));
-            var sw = Stopwatch.StartNew();
-            
-            await em.RunAsync();
+            using (var em = ExecutionManager.Create(() => new CodeGenExecutor(args)))
+            {
+                var sw = Stopwatch.StartNew();
 
-            sw.Stop();
-            WriteFooter(sw);
+                await em.RunAsync();
+
+                sw.Stop();
+                WriteFooter(sw);
+            }
             return 0;
         }
         
@@ -309,6 +214,9 @@ namespace Beef.CodeGen
         /// </summary>
         public static Dictionary<string, string> CreateParamDict(CommandOption cmdOpt)
         {
+            if (cmdOpt == null)
+                throw new ArgumentNullException(nameof(cmdOpt));
+
             var pd = new Dictionary<string, string>();
             foreach (var p in cmdOpt.Values)
             {
@@ -322,11 +230,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Creates Key=Value parts.
         /// </summary>
-        private static string[] CreateKeyValueParts(string text)
+        internal static string[] CreateKeyValueParts(string text)
         {
-            var pos = text.IndexOf("=");
+            var pos = text.IndexOf("=", StringComparison.InvariantCultureIgnoreCase);
             if (pos < 0)
-                return new string[0];
+                return Array.Empty<string>();
 
             return new string[] { text.Substring(0, pos), text.Substring(pos + 1) };
         }
@@ -334,7 +242,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Writes the header information.
         /// </summary>
-        private void WriteHeader(CodeGenExecutorArgs args) //DirectoryInfo outputDir, Dictionary<string, string> paramDict)
+        private void WriteHeader(CodeGenExecutorArgs args)
         {
             Logger.Default.Info(App.Description);
             Logger.Default.Info(null);
@@ -349,6 +257,9 @@ namespace Beef.CodeGen
         /// <param name="paramsOnly">Indicates whether to log on the parameters collection only.</param>
         public static void LogCodeGenExecutionArgs(CodeGenExecutorArgs args, bool paramsOnly = false)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             if (!paramsOnly)
             {
                 Logger.Default.Info($"  Config = {args.ConfigFile?.Name}");

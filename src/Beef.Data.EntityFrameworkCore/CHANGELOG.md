@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.6
+- *Fixed:* Introduced FxCop Analysis to `Beef.Data.EntityFrameworkCore`; this version represents the remediation based on the results.
+
 ## v2.1.5
 - *Fixed:* Introduced FxCop Analysis to `Beef.Core`; this version represents the remediation based on the results.
 

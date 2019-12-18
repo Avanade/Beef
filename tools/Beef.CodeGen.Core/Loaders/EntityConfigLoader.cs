@@ -37,6 +37,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadBeforeChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
@@ -56,6 +59,9 @@ namespace Beef.CodeGen.Loaders
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         public void LoadAfterChildren(CodeGenConfig config)
         {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
             var autoGet = config.GetAttributeValue<bool>("Get");
             var autoGetAll = config.GetAttributeValue<bool>("GetAll");
             var autoCreate = config.GetAttributeValue<bool>("Create");

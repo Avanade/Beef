@@ -663,6 +663,21 @@ namespace Beef.Mapper
         }
 
         /// <summary>
+        /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property expression.
+        /// </summary>
+        /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
+        /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
+        /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
+        public IPropertyMapper<TSrce, TDest> GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
+        {
+            if (srcePropertyExpression == null)
+                throw new ArgumentNullException(nameof(srcePropertyExpression));
+
+            var spe = PropertyExpression.Create(srcePropertyExpression);
+            return GetBySrcePropertyName(spe.Name);
+        }
+
+        /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by destination property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
@@ -673,6 +688,21 @@ namespace Beef.Mapper
                 return null;
 
             return _destMappings[name];
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by destination property name.
+        /// </summary>
+        /// <typeparam name="TDestProperty">The source property <see cref="Type"/>.</typeparam>
+        /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
+        /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
+        public IPropertyMapper<TSrce, TDest> GetByDestProperty<TDestProperty>(Expression<Func<TDest, TDestProperty>> destPropertyExpression)
+        {
+            if (destPropertyExpression == null)
+                throw new ArgumentNullException(nameof(destPropertyExpression));
+
+            var dpe = PropertyExpression.Create(destPropertyExpression);
+            return GetByDestPropertyName(dpe.Name);
         }
 
         /// <summary>

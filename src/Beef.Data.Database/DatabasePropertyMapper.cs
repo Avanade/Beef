@@ -244,7 +244,7 @@ namespace Beef.Data.Database
                 return;
             }
 
-            TSrceProperty val = default(TSrceProperty);
+            TSrceProperty val = default;
             if (Mapper != null)
             {
                 var em = (IDatabaseMapper)Mapper;
@@ -256,7 +256,7 @@ namespace Beef.Data.Database
                 if (!dr.IsDBNull(index))
                 {
                     if (Converter != null)
-                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType));
+                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType, System.Globalization.CultureInfo.InvariantCulture));
                     else
                         val = dr.GetValue<TSrceProperty>(index);
                 }
@@ -273,6 +273,9 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         public void SetDestValue(TSrce value, DatabaseParameters parameters, OperationTypes operationType)
         {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
             if (!OperationTypes.HasFlag(operationType))
                 return;
 

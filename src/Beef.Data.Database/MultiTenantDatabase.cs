@@ -18,8 +18,10 @@ namespace Beef.Data.Database
     {
         private static readonly object _lock = new object();
 
-        private static Dictionary<Guid, TDefault> _tenantDBs = new Dictionary<Guid, TDefault>();
+        private static readonly Dictionary<Guid, TDefault> _tenantDBs = new Dictionary<Guid, TDefault>();
         private static Func<Guid, TDefault> _create;
+
+#pragma warning disable CA1000 // Do not declare static members on generic types; by-design - is ok.
 
         /// <summary>
         /// Registers (creates) the <see cref="Default"/> <see cref="DatabaseBase"/> instance; as well as registering with the <see cref="DataContextScope"/> for connection management
@@ -92,12 +94,14 @@ namespace Beef.Data.Database
             }
         }
 
+#pragma warning restore CA1000
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiTenantDatabase{T}"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider (e.g. System.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        public MultiTenantDatabase(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        protected MultiTenantDatabase(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
 
         /// <summary>
         /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
@@ -115,11 +119,16 @@ namespace Beef.Data.Database
         /// <remarks>Where both the <paramref name="username"/> and <paramref name="timestamp"/> are <c>null</c> the stored procedure will not be invoked.</remarks>
         public void SetSqlSessionContext(DbConnection dbConnection, Guid tenantId, string username, DateTime? timestamp)
         {
+            if (dbConnection == null)
+                throw new ArgumentNullException(nameof(dbConnection));
+
             if (string.IsNullOrEmpty(SessionContextStoredProcedure))
                 throw new InvalidOperationException("The SessionContextStoredProcedure property must have a value.");
 
             var cmd = dbConnection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, should be set to a valid/safe value.
             cmd.CommandText = SessionContextStoredProcedure;
+#pragma warning restore CA2100
             cmd.CommandType = CommandType.StoredProcedure;
 
             var p = cmd.CreateParameter();

@@ -8,13 +8,13 @@ namespace Beef.Data.Database
     /// <summary>
     /// Represents the collection of <see cref="DatabaseRecord"/> <see cref="DatabaseRecordField">fields</see> returned.
     /// </summary>
-    public class DatabaseRecordFields : KeyedCollection<string, DatabaseRecordField>
+    public class DatabaseRecordFieldCollection : KeyedCollection<string, DatabaseRecordField>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DatabaseRecordFields"/> class determining all the fields from the <see cref="DatabaseRecord"/>.
+        /// Initializes a new instance of the <see cref="DatabaseRecordFieldCollection"/> class determining all the fields from the <see cref="DatabaseRecord"/>.
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        public DatabaseRecordFields(DatabaseRecord dr)
+        public DatabaseRecordFieldCollection(DatabaseRecord dr)
         {
             if (dr == null)
                 throw new ArgumentNullException(nameof(dr));
@@ -32,6 +32,9 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="DatabaseRecordField"/> <see cref="DatabaseRecordField.Name"/>.</returns>
         protected override string GetKeyForItem(DatabaseRecordField item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             return item.Name;
         }
     }

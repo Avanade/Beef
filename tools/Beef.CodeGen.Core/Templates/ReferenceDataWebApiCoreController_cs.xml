@@ -105,7 +105,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case var s when string.Compare(s, ReferenceData.Property_{{Entity.Name}}, true) == 0: coll.Add(new ReferenceDataMultiItem(ReferenceData.Property_{{Entity.Name}}, ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value, includeInactive: inactive))); break;
+    <![CDATA[                        case var s when string.Compare(s, ReferenceData.Property_{{Entity.Name}}, StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(ReferenceData.Property_{{Entity.Name}}, ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value, includeInactive: inactive))); break;
 ]]>
   </Entity>
   <![CDATA[                    }

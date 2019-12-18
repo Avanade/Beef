@@ -71,6 +71,9 @@ namespace Beef.Events.Triggers.Listener
         /// </summary>
         public Task OpenAsync(PartitionContext context)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
             _logger.LogInformation($"Processor starting. {GetPartitionContextLogInfo(context)}");
 
             // Configure the retry policy for use.
@@ -129,6 +132,9 @@ namespace Beef.Events.Triggers.Listener
         /// </summary>
         public async Task CloseAsync(PartitionContext context, CloseReason reason)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
             _logger.LogInformation($"Processor stopping. {GetPartitionContextLogInfo(context)}");
 
             // Make sure the last successful execution was checkpointed before finishing up.
@@ -140,6 +146,12 @@ namespace Beef.Events.Triggers.Listener
         /// </summary>
         public Task ProcessErrorAsync(PartitionContext context, Exception exception)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (exception == null)
+                throw new ArgumentNullException(nameof(exception));
+
             // For EventProcessorHost these exceptions can happen as part of normal partition balancing across instances, so we want to trace them, but not treat them as errors.
             if (exception is EventHubs.ReceiverDisconnectedException || exception is LeaseLostException)
                 _logger.LogInformation($"'{exception.GetType().Name}' was thrown; this exception type is typically a result of Event Hub processor rebalancing and can be safely ignored {GetPartitionContextLogInfo(context)}: {exception.Message}");
@@ -156,6 +168,12 @@ namespace Beef.Events.Triggers.Listener
         /// </summary>
         public async Task ProcessEventsAsync(PartitionContext context, IEnumerable<EventHubs.EventData> events)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (events == null)
+                throw new ArgumentNullException(nameof(events));
+
             // Note that checkpointing is only performed where an error occurs, and at the end of processing all events, to minimise chattiness to storage. 
             try
             {
@@ -190,7 +208,7 @@ namespace Beef.Events.Triggers.Listener
             catch (TaskCanceledException) { throw; } // Expected; carry on.
             catch (EventHubs.ReceiverDisconnectedException) { throw; } // Expected; carry on.
             catch (LeaseLostException) { throw; } // Expected; carry on.
-            catch (Exception ex)
+            catch (Exception ex) // Catch all, log, and carry on.
             {
                 _logger.LogCritical(ex, $"Unexpected/unhandled exception occured during processing {GetPartitionContextLogInfo(context)}: {ex.Message}");
                 throw;

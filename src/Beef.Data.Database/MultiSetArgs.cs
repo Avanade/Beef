@@ -58,10 +58,63 @@ namespace Beef.Data.Database
     }
 
     /// <summary>
+    /// Provides the base <b>Database</b> multi-set arguments when expecting a single item/record only.
+    /// </summary>
+    public abstract class MultiSetSingleArgs : IMultiSetArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiSetSingleArgs"/> class.
+        /// </summary>
+        /// <param name="isMandatory">Indicates whether the value is mandatory; defaults to <c>true</c>.</param>
+        /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
+        protected MultiSetSingleArgs(bool isMandatory = true, bool stopOnNull = false)
+        {
+            IsMandatory = isMandatory;
+            StopOnNull = stopOnNull;
+        }
+
+        /// <summary>
+        /// Indicates whether the value is mandatory; i.e. a corresponding record must be read.
+        /// </summary>
+        public bool IsMandatory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
+        /// </summary>
+        public OperationTypes OperationType { get; set; } = OperationTypes.Get;
+
+        /// <summary>
+        /// Gets or sets the minimum number of rows allowed.
+        /// </summary>
+        public int MinRows => IsMandatory ? 1 : 0;
+
+        /// <summary>
+        /// Gets or sets the maximum number of rows allowed.
+        /// </summary>
+        public int? MaxRows => 1;
+
+        /// <summary>
+        /// Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).
+        /// </summary>
+        public bool StopOnNull { get; set; }
+
+        /// <summary>
+        /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
+        /// </summary>
+        /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
+        public abstract void DatasetRecord(DatabaseRecord dr);
+
+        /// <summary>
+        /// Invokes the corresponding result function.
+        /// </summary>
+        public virtual void InvokeResult() { }
+    }
+
+    /// <summary>
     /// Provides the <b>Database</b> multi-set arguments when expecting a single item/record only.
     /// </summary>
     /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
-    public class MultiSetSingleArgs<TItem> : IMultiSetArgs<TItem>
+    public class MultiSetSingleArgs<TItem> : MultiSetSingleArgs, IMultiSetArgs<TItem>
         where TItem : class, new()
     {
         private TItem _value;
@@ -75,11 +128,10 @@ namespace Beef.Data.Database
         /// <param name="isMandatory">Indicates whether the value is mandatory; defaults to <c>true</c>.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
         public MultiSetSingleArgs(DatabaseMapper<TItem> mapper, Action<TItem> result, bool isMandatory = true, bool stopOnNull = false)
+            : base(isMandatory, stopOnNull)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             _result = Check.NotNull(result, nameof(result));
-            IsMandatory = isMandatory;
-            StopOnNull = stopOnNull;
         }
 
         /// <summary>
@@ -88,35 +140,10 @@ namespace Beef.Data.Database
         public DatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
-        /// Indicates whether the value is mandatory; i.e. a corresponding record must be read.
-        /// </summary>
-        public bool IsMandatory { get; set; }
-
-        /// <summary>
-        /// Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).
-        /// </summary>
-        public bool StopOnNull { get; set; }
-
-        /// <summary>
-        /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
-        /// </summary>
-        public OperationTypes OperationType { get; set; } = OperationTypes.Get;
-
-        /// <summary>
-        /// Gets the minimum number of rows allowed.
-        /// </summary>
-        int IMultiSetArgs.MinRows => IsMandatory ? 1 : 0;
-
-        /// <summary>
-        /// Gets the maximum number of rows allowed.
-        /// </summary>
-        int? IMultiSetArgs.MaxRows => 1;
-
-        /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        void IMultiSetArgs.DatasetRecord(DatabaseRecord dr)
+        public override void DatasetRecord(DatabaseRecord dr)
         {
             _value = Mapper.MapFromDb(dr, OperationType);
         }
@@ -124,7 +151,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Invokes the corresponding result function.
         /// </summary>
-        void IMultiSetArgs.InvokeResult()
+        public override void InvokeResult()
         {
             if (_value != null)
                 _result(_value);
@@ -132,39 +159,23 @@ namespace Beef.Data.Database
     }
 
     /// <summary>
-    /// Provides the <b>Database</b> multi-set arguments when expecting a collection of items/records.
+    /// Provides the base <b>Database</b> multi-set arguments when expecting a collection of items/records.
     /// </summary>
-    /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
-    /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
-    public class MultiSetCollArgs<TColl, TItem> : IMultiSetArgs<TItem>
-        where TItem : class, new()
-        where TColl : ICollection<TItem>, new()
+    public abstract class MultiSetCollArgs : IMultiSetArgs
     {
-        private TColl _coll;
-        private readonly Action<TColl> _result;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiSetCollArgs{TColl, TItem}"/> class.
+        /// Initializes a new instance of the <see cref="MultiSetCollArgs"/> class.
         /// </summary>
-        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
-        /// <param name="result">The action that will be invoked with the result of the set.</param>
         /// <param name="minRows">The minimum number of rows allowed.</param>
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetCollArgs(DatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
+        protected MultiSetCollArgs(int minRows = 0, int? maxRows = null, bool stopOnNull = false)
         {
-            Mapper = Check.NotNull(mapper, nameof(mapper));
-            _result = Check.NotNull(result, nameof(result));
             Check.IsTrue(!maxRows.HasValue || minRows <= maxRows.Value, nameof(maxRows), "Max Rows is less than Min Rows.");
             MinRows = minRows;
             MaxRows = maxRows;
             StopOnNull = stopOnNull;
         }
-
-        /// <summary>
-        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
-        /// </summary>
-        public DatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
         /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
@@ -190,7 +201,51 @@ namespace Beef.Data.Database
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        void IMultiSetArgs.DatasetRecord(DatabaseRecord dr)
+        public abstract void DatasetRecord(DatabaseRecord dr);
+
+        /// <summary>
+        /// Invokes the corresponding result function.
+        /// </summary>
+        public virtual void InvokeResult() { }
+    }
+
+    /// <summary>
+    /// Provides the <b>Database</b> multi-set arguments when expecting a collection of items/records.
+    /// </summary>
+    /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
+    public class MultiSetCollArgs<TColl, TItem> : MultiSetCollArgs, IMultiSetArgs<TItem>
+        where TItem : class, new()
+        where TColl : ICollection<TItem>, new()
+    {
+        private TColl _coll;
+        private readonly Action<TColl> _result;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiSetCollArgs{TColl, TItem}"/> class.
+        /// </summary>
+        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
+        /// <param name="result">The action that will be invoked with the result of the set.</param>
+        /// <param name="minRows">The minimum number of rows allowed.</param>
+        /// <param name="maxRows">The maximum number of rows allowed.</param>
+        /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
+        public MultiSetCollArgs(DatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
+            : base(minRows, maxRows, stopOnNull)
+        {
+            Mapper = Check.NotNull(mapper, nameof(mapper));
+            _result = Check.NotNull(result, nameof(result));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
+        /// </summary>
+        public DatabaseMapper<TItem> Mapper { get; private set; }
+
+        /// <summary>
+        /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
+        /// </summary>
+        /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
+        public override void DatasetRecord(DatabaseRecord dr)
         {
             if (_coll == null)
                 _coll = new TColl();
@@ -201,7 +256,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Invokes the corresponding result function.
         /// </summary>
-        void IMultiSetArgs.InvokeResult()
+        public override void InvokeResult()
         {
             if (_coll != null)
                 _result(_coll);
@@ -213,7 +268,7 @@ namespace Beef.Data.Database
     /// </summary>
     /// <typeparam name="TSid">The <b>Serialization Identifier</b> (SID) <see cref="Type"/>; supports only: <see cref="String"/>, <see cref="Int32"/> and <see cref="Guid"/>.</typeparam>
     /// <typeparam name="TItem">The <see cref="ReferenceDataBase"/> item <see cref="Type"/>.</typeparam>
-    public class MultiSetCollReferenceDataSidArgs<TItem, TSid> : IMultiSetArgs
+    public class MultiSetCollReferenceDataSidArgs<TItem, TSid> : MultiSetCollArgs, IMultiSetArgs
         where TItem : ReferenceDataBase, new()
     {
         private readonly string _columnName;
@@ -230,43 +285,23 @@ namespace Beef.Data.Database
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
         public MultiSetCollReferenceDataSidArgs(string columnName, Action<IEnumerable<TItem>> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
+            : base(minRows, maxRows, stopOnNull)
         {
             _columnName = Check.NotEmpty(columnName, nameof(columnName));
             _result = Check.NotNull(result, nameof(result));
-            Check.IsTrue(!maxRows.HasValue || minRows <= maxRows.Value, nameof(maxRows), "Max Rows is less than Min Rows.");
-            MinRows = minRows;
-            MaxRows = maxRows;
-            StopOnNull = stopOnNull;
 
             _idTypeCode = ReferenceDataBase.GetIdTypeCode(typeof(TItem));
         }
 
         /// <summary>
-        /// Gets or sets the minimum number of rows allowed.
-        /// </summary>
-        public int MinRows { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of rows allowed.
-        /// </summary>
-        public int? MaxRows { get; private set; }
-
-        /// <summary>
-        /// Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).
-        /// </summary>
-        public bool StopOnNull { get; set; }
-
-        /// <summary>
-        /// Gets or sets the single <see cref="Mapper.OperationTypes"/> being performed to enable selection.
-        /// </summary>
-        public OperationTypes OperationType { get; set; } = OperationTypes.Get;
-
-        /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
         /// </summary>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
-        void IMultiSetArgs.DatasetRecord(DatabaseRecord dr)
+        public override void DatasetRecord(DatabaseRecord dr)
         {
+            if (dr == null)
+                throw new ArgumentNullException(nameof(dr));
+
             if (_coll == null)
                 _coll = new List<TItem>();
 
@@ -285,7 +320,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Invokes the corresponding result function.
         /// </summary>
-        void IMultiSetArgs.InvokeResult()
+        public override void InvokeResult()
         {
             if (_coll != null)
                 _result(_coll);

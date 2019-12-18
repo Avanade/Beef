@@ -44,7 +44,7 @@ namespace Beef.Data.EntityFrameworkCore
         {
             EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
             {
-                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(_db, QueryArgs))
+                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs))
                 {
                     var dbSet = db.DbContext.Set<TModel>();
                     execute((_query == null) ? dbSet : _query(dbSet));
@@ -59,7 +59,7 @@ namespace Beef.Data.EntityFrameworkCore
         {
             return EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
             {
-                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(_db, QueryArgs))
+                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs))
                 {
                     var dbSet = db.DbContext.Set<TModel>();
                     return execute((_query == null) ? dbSet : _query(dbSet));

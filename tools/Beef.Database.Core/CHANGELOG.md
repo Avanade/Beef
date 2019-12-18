@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.7
+- *Fixed:* Introduced FxCop Analysis to `Beef.Database.Core`; this version represents the remediation based on the results.
+
 ## v2.1.6
 - *Fixed:* Database merge statements updated to include `AND EXISTS (...)` for a `WHEN MATCHED` to avoid updates where column data has not changed.
 

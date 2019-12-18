@@ -72,16 +72,16 @@ namespace Beef.Demo.Business.Data.EfModel
             {
                 entity.ToTable("EyeColor", "Ref");
                 entity.HasKey("EyeColorId");
-                entity.Property("EyeColorId").HasColumnType("UNIQUEIDENTIFIER");
-                entity.Property("Code").HasColumnType("NVARCHAR(50)");
-                entity.Property("Text").HasColumnType("NVARCHAR(250)");
-                entity.Property("IsActive").HasColumnType("BIT");
-                entity.Property("SortOrder").HasColumnType("INT");
-                entity.Property("RowVersion").HasColumnType("TIMESTAMP").IsRowVersion();
-                entity.Property("CreatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
-                entity.Property("CreatedDate").HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
-                entity.Property("UpdatedBy").HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
-                entity.Property("UpdatedDate").HasColumnType("DATETIME2").ValueGeneratedOnAdd();
+                entity.Property(p => p.EyeColorId).HasColumnType("UNIQUEIDENTIFIER");
+                entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");
+                entity.Property(p => p.Text).HasColumnType("NVARCHAR(250)");
+                entity.Property(p => p.IsActive).HasColumnType("BIT");
+                entity.Property(p => p.SortOrder).HasColumnType("INT");
+                entity.Property(p => p.RowVersion).HasColumnType("TIMESTAMP").IsRowVersion();
+                entity.Property(p => p.CreatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnUpdate();
+                entity.Property(p => p.CreatedDate).HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
+                entity.Property(p => p.UpdatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
+                entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
             });
         }
     }

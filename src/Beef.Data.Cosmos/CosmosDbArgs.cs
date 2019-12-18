@@ -25,7 +25,7 @@ namespace Beef.Data.Cosmos
         string ContainerId { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:PartitionKey"/>.
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.PartitionKey"/>.
         /// </summary>
         PartitionKey PartitionKey { get; }
 
@@ -45,12 +45,12 @@ namespace Beef.Data.Cosmos
         bool SetIdentifierOnCreate { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:RequestOptions"/>.
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.RequestOptions"/>.
         /// </summary>
         ItemRequestOptions ItemRequestOptions { get; }
 
         /// <summary>
-        /// Gets the <see cref="T:QueryRequestOptions"/>.
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.QueryRequestOptions"/>.
         /// </summary>
         QueryRequestOptions QueryRequestOptions { get; }
     }
@@ -68,7 +68,7 @@ namespace Beef.Data.Cosmos
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="T:ItemRequestOptions"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
         public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
@@ -121,7 +121,7 @@ namespace Beef.Data.Cosmos
         public string ContainerId { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:PartitionKey"/>.
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.PartitionKey"/>.
         /// </summary>
         public PartitionKey PartitionKey { get; private set; }
 
@@ -131,12 +131,12 @@ namespace Beef.Data.Cosmos
         public PagingResult Paging { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:ItemRequestOptions"/> used for <b>Get</b>, <b>Create</b>, <b>Update</b>, and <b>Delete</b> (<seealso cref="QueryRequestOptions"/>).
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/> used for <b>Get</b>, <b>Create</b>, <b>Update</b>, and <b>Delete</b> (<seealso cref="QueryRequestOptions"/>).
         /// </summary>
         public ItemRequestOptions ItemRequestOptions { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="T:QueryRequestOptions"/> used for <b>Query</b> (<seealso cref="ItemRequestOptions"/>).
+        /// Gets the <see cref="Microsoft.Azure.Cosmos.QueryRequestOptions"/> used for <b>Query</b> (<seealso cref="ItemRequestOptions"/>).
         /// </summary>
         public QueryRequestOptions QueryRequestOptions { get; private set; }
 

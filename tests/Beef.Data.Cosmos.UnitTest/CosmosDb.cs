@@ -12,9 +12,9 @@ namespace Beef.Data.Cosmos.UnitTest
     {
         public CosmosDb() : base(new AzCosmos.CosmosClient("https://localhost:8081", "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="), "Beef.UnitTest", true)
         {
-            Persons1 = new CosmosDbContainer<Person1, Person1>(this, CosmosDbMapper<Person1, Person1>.CreateAuto().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons1"));
-            Persons2 = new CosmosDbContainer<Person2, Person2>(this, CosmosDbMapper<Person2, Person2>.CreateAuto().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons2"));
-            Persons3 = new CosmosDbValueContainer<Person3, Person3>(this, CosmosDbMapper<Person3, Person3>.CreateAuto().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons3"));
+            Persons1 = new CosmosDbContainer<Person1, Person1>(this, CosmosDbMapper.CreateAuto<Person1, Person1>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons1"));
+            Persons2 = new CosmosDbContainer<Person2, Person2>(this, CosmosDbMapper.CreateAuto<Person2, Person2>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons2"));
+            Persons3 = new CosmosDbValueContainer<Person3, Person3>(this, CosmosDbMapper.CreateAuto<Person3, Person3>().HasProperty(s => s.Id, d => d.Id, p => p.SetUniqueKey()).CreateArgs("Persons3"));
         }
 
         public async Task SetUp()
@@ -50,7 +50,7 @@ namespace Beef.Data.Cosmos.UnitTest
             await c3.ImportValueBatchAsync<CosmosDb, Person3>("Data.yaml");
 
             // Add other random "type" to Person3.
-            var c = new CosmosDbValueContainer<Person1, Person1>(this, CosmosDbMapper<Person1, Person1>.CreateAuto().CreateArgs("Persons3"));
+            var c = new CosmosDbValueContainer<Person1, Person1>(this, CosmosDbMapper.CreateAuto<Person1, Person1>().CreateArgs("Persons3"));
             await c.Container.ImportValueBatchAsync(new Person1[] { new Person1 { Id = 100.ToGuid(), Name = "Greg" } });
 
             // Load the reference data.

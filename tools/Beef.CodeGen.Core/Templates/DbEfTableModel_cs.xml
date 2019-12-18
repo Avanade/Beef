@@ -73,7 +73,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data.EfModel
     <![CDATA[);
 ]]>
     <Column>
-      <![CDATA[                entity.Property("{{Column.Name}}").HasColumnType("{{Column.Type:ToUpperCase}}]]>
+      <![CDATA[                entity.Property(p => p.{{Column.Name}}).HasColumnType("{{Column.Type:ToUpperCase}}]]>
       <If Condition="Column.Type == 'nvarchar' or Column.Type == 'varchar' or Column.Type == 'nchar' or Column.Type == 'char'">
         <If Condition="Column.Length > 0">
           <Then><![CDATA[({{Column.Length}})]]></Then>

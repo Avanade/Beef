@@ -15,9 +15,9 @@ namespace Beef.Data.OData.Linq
     /// </summary>
     internal class ODataQueryExpressionTreeVisitor : ThrowingExpressionVisitor
     {
-        private ODataArgs _args;
-        private StringBuilder _text = new StringBuilder();
-        private Stack<BinaryExpression> _binaryStack = new Stack<BinaryExpression>();
+        private readonly ODataArgs _args;
+        private readonly StringBuilder _text = new StringBuilder();
+        private readonly Stack<BinaryExpression> _binaryStack = new Stack<BinaryExpression>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryExpressionTreeVisitor"/> class.
@@ -175,7 +175,7 @@ namespace Beef.Data.OData.Linq
             else if (expression.Type == typeof(string))
                 _text.Append($"'{expression.Value}'");
             else if (expression.Type == typeof(DateTime) || expression.Type == typeof(DateTime?))
-                _text.Append(((DateTime)expression.Value).ToString("o"));
+                _text.Append(((DateTime)expression.Value).ToString("o", System.Globalization.CultureInfo.InvariantCulture));
             else if (expression.Type == typeof(Guid) || expression.Type == typeof(Guid?))
                 _text.Append($"guid'{expression.Value}'");
             else if (expression.Type.IsSubclassOf(typeof(ReferenceDataBase)))
@@ -214,7 +214,9 @@ namespace Beef.Data.OData.Linq
         /// <returns>The <see cref="Expression"/>.</returns>
         protected override Expression VisitMethodCall(MethodCallExpression expression)
         {
-            var name = expression.Method.Name.ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase; by-design, require lowercase and is safe to do so.
+            var name = expression.Method.Name.ToLowerInvariant();
+#pragma warning restore CA1308
             switch (name)
             {
                 case "toupper":
