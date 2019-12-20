@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.26
+- *Fixed:* `ISNULL` for `IsDeleted` in OrgUnit permission check for Get and Update stored procedures.
+
 ## v2.1.25
 - *Fixed:* Reference Data Controller code-gen now uses `StringComparison.InvariantCultureIgnoreCase` for the string comparison.
 - *Fixed:* Entity Framework model code-gen uses property expressions versus property names as strings. 
