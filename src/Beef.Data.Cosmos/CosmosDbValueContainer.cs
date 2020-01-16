@@ -113,11 +113,11 @@ namespace Beef.Data.Cosmos
         {
             var key = DbArgs.GetCosmosKey(keys);
 
-            return await CosmosDbInvoker.Default.InvokeAsync<T>(this, async () =>
+            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
             {
                 try
                 {
-                    var val = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                    var val = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
 
                     // Check that the TypeName is the same.
                     if (val?.Resource == null || val.Resource.Type != _typeName)
@@ -138,7 +138,7 @@ namespace Beef.Data.Cosmos
 
                     throw;
                 }
-            }, CosmosDb);
+            }, CosmosDb).ConfigureAwait(false);
         }
 
         #endregion
@@ -154,7 +154,7 @@ namespace Beef.Data.Cosmos
         {
             Check.NotNull(value, nameof(value));
 
-            return await CosmosDbInvoker.Default.InvokeAsync<T>(this, async () =>
+            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
             {
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
@@ -162,9 +162,9 @@ namespace Beef.Data.Cosmos
                 CheckAuthorized(cvm);
                 ((ICosmosDbValue)cvm).PrepareBefore();
 
-                var resp = await Container.CreateItemAsync(cvm, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs));
+                var resp = await Container.CreateItemAsync(cvm, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
                 return GetResponseValue(resp);
-            }, CosmosDb);
+            }, CosmosDb).ConfigureAwait(false);
         }
 
         #endregion
@@ -180,7 +180,7 @@ namespace Beef.Data.Cosmos
         {
             Check.NotNull(value, nameof(value));
 
-            return await CosmosDbInvoker.Default.InvokeAsync<T>(this, async () =>
+            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
             {
                 // Where supporting etag then use IfMatch for concurreny.
                 var ro = CosmosDb.GetItemRequestOptions(DbArgs);
@@ -191,7 +191,7 @@ namespace Beef.Data.Cosmos
                 CosmosDbBase.PrepareEntityForUpdate(value);
 
                 // Must read existing to update and to make sure we are updating for the correct Type; don't just trust the key.
-                var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro);
+                var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
                 if (resp?.Resource == null || resp.Resource.Type != _typeName)
                     throw new NotFoundException();
 
@@ -200,10 +200,10 @@ namespace Beef.Data.Cosmos
                 DbArgs.Mapper.MapToDest(value, resp.Resource.Value, Mapper.OperationTypes.Update);
                 ((ICosmosDbValue)resp.Resource).PrepareBefore();
 
-                resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro);
+                resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
                 return GetResponseValue(resp);
 
-            }, CosmosDb);
+            }, CosmosDb).ConfigureAwait(false);
         }
 
         #endregion
@@ -225,14 +225,14 @@ namespace Beef.Data.Cosmos
                 {
                     // Must read existing to delete and to make sure we are deleting for the correct Type; don't just trust the key.
                     var ro = CosmosDb.GetItemRequestOptions(DbArgs);
-                    var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro);
+                    var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
                     if (resp?.Resource == null || resp.Resource.Type != _typeName)
                         return;
 
                     CheckAuthorized(resp.Resource);
                     ro.SessionToken = resp.Headers?.Session;
 
-                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, ro);
+                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
                 }
                 catch (CosmosException cex)
                 {
@@ -241,7 +241,7 @@ namespace Beef.Data.Cosmos
 
                     throw;
                 }
-            }, CosmosDb);
+            }, CosmosDb).ConfigureAwait(false);
         }
 
         #endregion

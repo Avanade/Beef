@@ -234,7 +234,7 @@ namespace Beef.Data.Cosmos
             // Remove existing container if it already exists.
             try
             {
-                await container.DeleteContainerAsync();
+                await container.DeleteContainerAsync().ConfigureAwait(false);
             }
             catch (CosmosException cex)
             {
@@ -243,7 +243,7 @@ namespace Beef.Data.Cosmos
             }
 
             // Create the container as specified.
-            return await Database.CreateContainerIfNotExistsAsync(containerProperties, throughput);
+            return await Database.CreateContainerIfNotExistsAsync(containerProperties, throughput).ConfigureAwait(false);
         }
 
         #region RequestOptions

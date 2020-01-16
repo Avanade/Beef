@@ -66,7 +66,7 @@ namespace Beef.Data.Cosmos
 
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
             }
             catch (CosmosException cex)
             {
@@ -142,7 +142,7 @@ namespace Beef.Data.Cosmos
 
             try
             {
-                return await func();
+                return await func().ConfigureAwait(false);
             }
             catch (CosmosException cex)
             {
