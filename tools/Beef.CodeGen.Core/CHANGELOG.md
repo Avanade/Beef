@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.27
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/. Templates also updated to ensure code-generated output complies. 
+
 ## v2.1.26
 - *Fixed:* `ISNULL` for `IsDeleted` in OrgUnit permission check for Get and Update stored procedures.
 

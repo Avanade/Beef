@@ -483,7 +483,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
               <![CDATA[paging]]>
             </If>
-            <![CDATA[);
+            <![CDATA[).ConfigureAwait(false);
 
                 MultiValidator.Create()]]>
             <Set Name="System.NewLine" Value="false" />
@@ -552,7 +552,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             </If>
             <![CDATA[paging]]>
           </If>
-          <![CDATA[);
+          <![CDATA[).ConfigureAwait(false);
 ]]>
         </If>
         <![CDATA[                ]]>
@@ -600,7 +600,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
               <![CDATA[paging]]>
             </If>
-            <![CDATA[);
+            <![CDATA[).ConfigureAwait(false);
 ]]>
           </Then>
           <Else>
@@ -627,7 +627,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
               <![CDATA[paging]]>
             </If>
-            <![CDATA[);
+            <![CDATA[).ConfigureAwait(false);
                 if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
             <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <![CDATA[__result]]>
@@ -667,7 +667,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
               <![CDATA[paging]]>
             </If>
-            <![CDATA[);
+            <![CDATA[).ConfigureAwait(false);
 ]]>
           </Else>
         </If>

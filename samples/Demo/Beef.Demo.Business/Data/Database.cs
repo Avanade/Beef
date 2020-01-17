@@ -19,9 +19,6 @@ namespace Beef.Demo.Business.Data
         /// Set the SQL Session Context when the connection is opened.
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        public override void OnConnectionOpen(DbConnection dbConnection)
-        {
-            SetSqlSessionContext(dbConnection);
-        }
+        public override void OnConnectionOpen(DbConnection dbConnection) => SetSqlSessionContext(dbConnection);
     }
 }

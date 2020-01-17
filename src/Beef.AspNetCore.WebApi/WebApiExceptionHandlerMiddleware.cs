@@ -51,7 +51,7 @@ namespace Beef.AspNetCore.WebApi
         {
             try
             {
-                await _next(context);
+                await _next(context).ConfigureAwait(false);
             }
 #pragma warning disable CA1031 // Do not catch general exception types; by-design, is intended to catch *any* unhandled exception.
             catch (Exception ex)
@@ -64,7 +64,7 @@ namespace Beef.AspNetCore.WebApi
                     Beef.Diagnostics.Logger.Default.Exception(ex, UnhandledExceptionMessage);
                 }
 
-                await ar.ExecuteResultAsync(ac);
+                await ar.ExecuteResultAsync(ac).ConfigureAwait(false);
             }
 #pragma warning restore CA1031
         }

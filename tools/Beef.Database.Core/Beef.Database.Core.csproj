@@ -5,13 +5,13 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>2.1.7</Version>
+    <Version>2.1.8</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
-    <AssemblyVersion>2.1.7</AssemblyVersion>
-    <FileVersion>2.1.7</FileVersion>
+    <AssemblyVersion>2.1.8</AssemblyVersion>
+    <FileVersion>2.1.8</FileVersion>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
@@ -31,7 +31,7 @@
     <DocumentationFile>.\bin\debug\Beef.Database.Core.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <NoWarn>1701;1702;CA1303;CA2007</NoWarn>
+    <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

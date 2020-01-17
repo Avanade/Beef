@@ -43,7 +43,7 @@ namespace Beef.Events.Subscribe
 
             var (subject, action, _) = @event.GetBeefMetadata();
 
-            await ReceiveAsync(subject, action, (subscriber) => subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType));
+            await ReceiveAsync(subject, action, (subscriber) => subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType)).ConfigureAwait(false);
         }
     }
 }

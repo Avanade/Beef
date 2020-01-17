@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.6
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+
 ## v2.1.5
 - *Fixed:* Introduced FxCop Analysis to `Beef.Data.OData`; this version represents the remediation based on the results.
 

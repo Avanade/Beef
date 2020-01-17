@@ -38,11 +38,11 @@ namespace Beef.Demo.Business.Data
         private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
             // This is an example (illustrative) of executing an Agent from an API - this should be used for cross-domain calls only; otherwise, use database (performance).
-            var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId);
+            var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
             if (pf.Value == null)
                 throw new ValidationException($"Person from does not exist.");
 
-            var pt = await new Common.Agents.PersonAgent().GetAsync(personToId);
+            var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
             if (pt.Value == null)
                 throw new ValidationException($"Person from does not exist.");
 
@@ -123,11 +123,11 @@ namespace Beef.Demo.Business.Data
 
         public partial class EfMapper
         {
-            private EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper.CreateAuto<Address, EfModel.Person>();
+            private readonly EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper.CreateAuto<Address, EfModel.Person>();
 
             partial void EfMapperCtor()
             {
-                this.SrceProperty(s => s.Address).SetMapper(_addressMapper);
+                SrceProperty(s => s.Address).SetMapper(_addressMapper);
             }
         }
     }

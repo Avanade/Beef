@@ -107,7 +107,7 @@ namespace Beef.Data.OData
             if (!CanGetValue)
                 throw new InvalidOperationException("A value cannot be returned from the ResponseMessage; see CanGetValue property.");
 
-            return await GetValueFunc();
+            return await GetValueFunc().ConfigureAwait(false);
         }
     }
 }

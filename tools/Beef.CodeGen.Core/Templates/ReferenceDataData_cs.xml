@@ -151,13 +151,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <If Condition="Property.DataConverter != null or Property.RefDataType != null">
                 <![CDATA[)]]>
               </If>
-              <![CDATA[;
+              <![CDATA[.ConfigureAwait(false);
 ]]>
             </Property>
             <![CDATA[                }]]>
           </If>
           <![CDATA[);
-                await Task.Delay(0);
+                await Task.CompletedTask;
             }]]>
           <Set Name="Config.NewLine" Value="true" />
         </Case>
@@ -172,7 +172,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[{ {{System.CosmosName}}.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask; }]]>
         </Case>
         <Default>
-          <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll)]]>
+          <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)]]>
         </Default>
       </Switch>
       <![CDATA[, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);

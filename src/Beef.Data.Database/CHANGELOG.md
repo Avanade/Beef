@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.8
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+- *Added:* A new `SqlRetryDatabaseInvoker` is provided for usage with a Microsoft SQL Server to perform a retry (exponential back-off) where a known transient error is encountered.
+
 ## v2.1.7
 - *Enhanced:* New `MultiSetSingleArgs` and `MultiSetCollArgs` abstract classes added to enable simplier custom implementations. These are now used by the existing generic implementations.
 - *Fixed:* Introduced FxCop Analysis to `Beef.Data.Database`; this version represents the remediation based on the results.

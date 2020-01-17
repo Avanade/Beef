@@ -13,7 +13,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         [Test]
         public void TryFormat()
         {
-            var dc = new DateTimeConverter { FormatString = "d", FormatProvider = CultureInfo.CreateSpecificCulture("en-AU").DateTimeFormat };
+            var dc = new DateTimeConverter { FormatString = "d", FormatProvider = CultureInfo.CreateSpecificCulture("en-NZ").DateTimeFormat };
             string str = null; 
             Assert.IsTrue(dc.TryFormat(new DateTime(2010, 01, 05), out str));
             Assert.AreEqual("5/01/2010", str);
@@ -27,7 +27,7 @@ namespace Beef.Core.UnitTest.FlatFile.Converters
         [Test]
         public void TryFormat_ITextValueConverter()
         {
-            var dcx = new DateTimeConverter { FormatString = "d", FormatProvider = CultureInfo.CreateSpecificCulture("en-AU").DateTimeFormat };
+            var dcx = new DateTimeConverter { FormatString = "d", FormatProvider = CultureInfo.CreateSpecificCulture("en-NZ").DateTimeFormat };
             var dc = (ITextValueConverter)dcx;
             string str = null;
             Assert.IsTrue(dc.TryFormat(new DateTime(2010, 01, 05), out str));

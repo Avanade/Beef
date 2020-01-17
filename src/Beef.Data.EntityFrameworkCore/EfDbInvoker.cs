@@ -84,7 +84,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
             }
             catch (SqlException sex)
             {
@@ -194,7 +194,7 @@ namespace Beef.Data.EntityFrameworkCore
 
             try
             {
-                return await func();
+                return await func().ConfigureAwait(false);
             }
             catch (SqlException sex)
             {

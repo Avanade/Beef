@@ -19,7 +19,7 @@ namespace Beef.Executors
         {
             try
             {
-                await OnRunAsync(args);
+                await OnRunAsync(args).ConfigureAwait(false);
                 OnPerRunType(args);
             }
             catch (Exception ex)

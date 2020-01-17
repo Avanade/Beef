@@ -111,8 +111,8 @@ namespace Beef.Data.EntityFrameworkCore
             {
                 return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
-                    return await FindAsync(db, getArgs, efKeys);
-                }, this);
+                    return await FindAsync(db, getArgs, efKeys).ConfigureAwait(false);
+                }, this).ConfigureAwait(false);
             }
         }
 
@@ -148,10 +148,10 @@ namespace Beef.Data.EntityFrameworkCore
                     db.DbContext.Add(model);
 
                     if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true);
+                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
                     return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
-                }, this);
+                }, this).ConfigureAwait(false);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Beef.Data.EntityFrameworkCore
                             efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified);
                         }
 
-                        var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys);
+                        var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                         if (em == null)
                             throw new NotFoundException();
 
@@ -206,10 +206,10 @@ namespace Beef.Data.EntityFrameworkCore
                     db.DbContext.Update(model);
 
                     if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true);
+                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
                     return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
-                }, this);
+                }, this).ConfigureAwait(false);
             }
         }
 
@@ -235,15 +235,15 @@ namespace Beef.Data.EntityFrameworkCore
                 await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
                 {
                     // A pre-read is required to get the row version for concurrency.
-                    var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys);
+                    var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                     if (em == null)
                         return;
 
                     db.DbContext.Remove(em);
 
                     if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true);
-                }, this);
+                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                }, this).ConfigureAwait(false);
             }
         }
 
@@ -276,7 +276,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
         {
-            var model = await db.DbContext.FindAsync<TModel>(keys);
+            var model = await db.DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
             return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
         }
 

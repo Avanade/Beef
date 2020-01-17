@@ -24,10 +24,10 @@ namespace Beef.Demo.Business.Data
             var batch = DynamicsAx.Default.CreateBatch();
             foreach (var v in values)
             {
-                await batch.UpdateAsync(ODataMapper.Default.CreateArgs(ODataIfMatch.Upsert), v);
+                await batch.UpdateAsync(ODataMapper.Default.CreateArgs(ODataIfMatch.Upsert), v).ConfigureAwait(false);
             }
 
-            var resp = await batch.SendAsync();
+            var resp = await batch.SendAsync().ConfigureAwait(false);
             resp.EnsureBatchSuccessStatusCode();
         }
     }

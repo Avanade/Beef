@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>2.1.7</AssemblyVersion>
-    <FileVersion>2.1.7</FileVersion>
-    <Version>2.1.7</Version>
+    <AssemblyVersion>2.1.8</AssemblyVersion>
+    <FileVersion>2.1.8</FileVersion>
+    <Version>2.1.8</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -28,7 +28,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <DocumentationFile>.\bin\debug\Beef.Data.Database.xml</DocumentationFile>
-    <NoWarn>1701;1702;CA1303;CA2007</NoWarn>
+    <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +36,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Polly" Version="7.1.1" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
   </ItemGroup>

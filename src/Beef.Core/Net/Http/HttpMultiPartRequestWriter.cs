@@ -48,30 +48,30 @@ namespace Beef.Net.Http
                 if (_isChangeSet)
                 {
                     _changeSetId = Guid.NewGuid();
-                    await _writer.WriteLineAsync($"--batch_{_batchId.ToString()}");
-                    await _writer.WriteLineAsync($"Content-Type: multipart/mixed; boundary=changeset_{_changeSetId}");
-                    await _writer.WriteLineAsync();
+                    await _writer.WriteLineAsync($"--batch_{_batchId.ToString()}").ConfigureAwait(false);
+                    await _writer.WriteLineAsync($"Content-Type: multipart/mixed; boundary=changeset_{_changeSetId}").ConfigureAwait(false);
+                    await _writer.WriteLineAsync().ConfigureAwait(false);
                 }
             }
 
             if (_isChangeSet)
-                await _writer.WriteLineAsync($"--changeset_{_changeSetId}");
+                await _writer.WriteLineAsync($"--changeset_{_changeSetId}").ConfigureAwait(false);
             else
-                await _writer.WriteLineAsync($"--batch_{_batchId}");
+                await _writer.WriteLineAsync($"--batch_{_batchId}").ConfigureAwait(false);
 
-            await _writer.WriteLineAsync("Content-Type: application/http");
-            await _writer.WriteLineAsync("Content-Transfer-Encoding: binary");
+            await _writer.WriteLineAsync("Content-Type: application/http").ConfigureAwait(false);
+            await _writer.WriteLineAsync("Content-Transfer-Encoding: binary").ConfigureAwait(false);
             if (_isChangeSet)
-                await _writer.WriteLineAsync($"Content-ID: {_changeSetCount++}");
+                await _writer.WriteLineAsync($"Content-ID: {_changeSetCount++}").ConfigureAwait(false);
 
-            await _writer.WriteLineAsync();
-            await _writer.WriteLineAsync($"{request.Method.Method} {request.RequestUri.ToString()} HTTP/1.1");
+            await _writer.WriteLineAsync().ConfigureAwait(false);
+            await _writer.WriteLineAsync($"{request.Method.Method} {request.RequestUri.ToString()} HTTP/1.1").ConfigureAwait(false);
 
             foreach (var h in request.Headers)
             {
                 foreach (var v in h.Value)
                 {
-                    await _writer.WriteLineAsync($"{h.Key}: {v}");
+                    await _writer.WriteLineAsync($"{h.Key}: {v}").ConfigureAwait(false);
                 }
             }
 
@@ -81,16 +81,16 @@ namespace Beef.Net.Http
                 {
                     foreach (var v in h.Value)
                     {
-                        await _writer.WriteLineAsync($"{h.Key}: {v}");
+                        await _writer.WriteLineAsync($"{h.Key}: {v}").ConfigureAwait(false);
                     }
                 }
 
-                await _writer.WriteLineAsync();
-                await _writer.WriteLineAsync(await request.Content.ReadAsStringAsync());
-                await _writer.WriteLineAsync();
+                await _writer.WriteLineAsync().ConfigureAwait(false);
+                await _writer.WriteLineAsync(await request.Content.ReadAsStringAsync().ConfigureAwait(false)).ConfigureAwait(false);
+                await _writer.WriteLineAsync().ConfigureAwait(false);
             }
 
-            await _writer.WriteLineAsync();
+            await _writer.WriteLineAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -103,9 +103,9 @@ namespace Beef.Net.Http
             {
                 _isClosed = true;
                 if (_isChangeSet)
-                    await _writer.WriteLineAsync($"--changeset_{_changeSetId}--");
+                    await _writer.WriteLineAsync($"--changeset_{_changeSetId}--").ConfigureAwait(false);
 
-                await _writer.WriteLineAsync($"--batch_{_batchId}--");
+                await _writer.WriteLineAsync($"--batch_{_batchId}--").ConfigureAwait(false);
             }
         }
 

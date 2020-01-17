@@ -697,7 +697,7 @@ namespace Beef.Test.NUnit
 
             _beforeAction?.Invoke(this);
             var sw = Stopwatch.StartNew();
-            WebApiAgentResult result = await func(GetRunArgs());
+            WebApiAgentResult result = await func(GetRunArgs()).ConfigureAwait(false);
             sw.Stop();
             ResultCheck(result, sw);
             PublishedEventsCheck();
@@ -995,7 +995,7 @@ namespace Beef.Test.NUnit
 
             // Execute the function.
             var sw = Stopwatch.StartNew();
-            WebApiAgentResult<TValue> result = await func(GetRunArgs());
+            WebApiAgentResult<TValue> result = await func(GetRunArgs()).ConfigureAwait(false);
             sw.Stop();
 
             // Check expectations.

@@ -213,7 +213,7 @@ namespace Beef.Events
             {
                 foreach (var pf in _publishFuncs)
                 {
-                    await pf(data);
+                    await pf(data).ConfigureAwait(false);
                 }
             }
             else

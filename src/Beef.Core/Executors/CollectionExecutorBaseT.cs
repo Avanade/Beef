@@ -25,7 +25,7 @@ namespace Beef.Executors
         {
             try
             {
-                var coll = await OnRunCollectionAsync(args);
+                var coll = await OnRunCollectionAsync(args).ConfigureAwait(false);
                 OnPerRunType(args);
                 return coll;
             }

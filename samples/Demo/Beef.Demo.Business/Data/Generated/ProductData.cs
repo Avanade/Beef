@@ -49,9 +49,9 @@ namespace Beef.Demo.Business.Data
             {
                 Product __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs);
-                __result = await TestOData.Default.GetAsync<Product>(__dataArgs, id);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
+                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
+                __result = await TestOData.Default.GetAsync<Product>(__dataArgs, id).ConfigureAwait(false);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
         }
@@ -68,11 +68,11 @@ namespace Beef.Demo.Business.Data
             {
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
+                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
                 __result.Result = await TestOData.Default.SelectQueryAsync<ProductCollection, Product>(__dataArgs,
-                    q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs));
+                    q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).ConfigureAwait(false);
 
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
         }

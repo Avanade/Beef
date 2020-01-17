@@ -42,9 +42,9 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue<Product>(__key, out Product __val))
                     return __val;
 
-                var __result = await Factory.Create<IProductData>().GetAsync(id);
+                var __result = await Factory.Create<IProductData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet<Product>(__key, __result);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }      
@@ -59,8 +59,8 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
-                var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging);
+                var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }      

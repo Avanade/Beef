@@ -67,7 +67,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             var csa = CloudStorageAccount.Parse(connectionString ?? throw new ArgumentNullException(nameof(connectionString)));
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(DefaultTableName);
-            await t.CreateIfNotExistsAsync();
+            await t.CreateIfNotExistsAsync().ConfigureAwait(false);
             return t;
         }
 
@@ -81,7 +81,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             var csa = CloudStorageAccount.Parse(connectionString ?? throw new ArgumentNullException(nameof(connectionString)));
             var tc = csa.CreateCloudTableClient();
             var t = tc.GetTableReference(DefaultSkippedTableName);
-            await t.CreateIfNotExistsAsync();
+            await t.CreateIfNotExistsAsync().ConfigureAwait(false);
             return t;
         }
 
@@ -95,7 +95,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             if (table == null)
                 throw new ArgumentNullException(nameof(table));
 
-            var r = await table.ExecuteQuerySegmentedAsync(new TableQuery<PoisonMessage>(), null);
+            var r = await table.ExecuteQuerySegmentedAsync(new TableQuery<PoisonMessage>(), null).ConfigureAwait(false);
             return r.Results;
         }
 
@@ -113,11 +113,11 @@ namespace Beef.Events.Triggers.PoisonMessages
 
             while (true)
             {
-                var tr = await table.ExecuteAsync(TableOperation.Retrieve<PoisonMessage>(partitionKey, rowKey));
+                var tr = await table.ExecuteAsync(TableOperation.Retrieve<PoisonMessage>(partitionKey, rowKey)).ConfigureAwait(false);
                 if (tr.Result != null && tr.Result is PoisonMessage msg && !msg.SkipMessage)
                 {
                     msg.SkipMessage = true;
-                    var r = await table.ExecuteAsync(TableOperation.Replace(msg));
+                    var r = await table.ExecuteAsync(TableOperation.Replace(msg)).ConfigureAwait(false);
                     switch ((HttpStatusCode)(r.HttpStatusCode))
                     {
                         case HttpStatusCode.PreconditionFailed:
@@ -158,7 +158,7 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// </summary>
         private async Task<PoisonMessage> GetPoisonMessageAsync()
         {
-            var tr = await _poisonTable.ExecuteAsync(TableOperation.Retrieve<PoisonMessage>(_storagePartitionKey, _storageRowKey));
+            var tr = await _poisonTable.ExecuteAsync(TableOperation.Retrieve<PoisonMessage>(_storagePartitionKey, _storageRowKey)).ConfigureAwait(false);
             return (PoisonMessage)tr.Result;
         }
 
@@ -188,7 +188,7 @@ namespace Beef.Events.Triggers.PoisonMessages
                 Exception = Substring(exception.ToString())
             };
 
-            await _poisonTable.ExecuteAsync(TableOperation.InsertOrReplace(msg));
+            await _poisonTable.ExecuteAsync(TableOperation.InsertOrReplace(msg)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            var msg = await GetPoisonMessageAsync();
+            var msg = await GetPoisonMessageAsync().ConfigureAwait(false);
             if (msg == null)
                 return;
 
@@ -216,11 +216,11 @@ namespace Beef.Events.Triggers.PoisonMessages
             {
                 msg.SkippedTimeUtc = DateTime.UtcNow;
                 msg.RowKey = msg.SkippedTimeUtc.Value.ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + msg.RowKey;
-                await _skippedTable.ExecuteAsync(TableOperation.InsertOrReplace(msg));
+                await _skippedTable.ExecuteAsync(TableOperation.InsertOrReplace(msg)).ConfigureAwait(false);
             }
 
             // Remove.
-            await _poisonTable.ExecuteAsync(TableOperation.Delete(new PoisonMessage(_storagePartitionKey, _storageRowKey) { ETag = "*" }));
+            await _poisonTable.ExecuteAsync(TableOperation.Delete(new PoisonMessage(_storagePartitionKey, _storageRowKey) { ETag = "*" })).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            var msg = await GetPoisonMessageAsync();
+            var msg = await GetPoisonMessageAsync().ConfigureAwait(false);
             if (msg == null)
                 return PoisonMessageAction.NotPoison;
 
@@ -243,7 +243,7 @@ namespace Beef.Events.Triggers.PoisonMessages
             {
                 // Warn if event exists with different offset - this means things are slightly out of whack!
                 _args.Logger.LogWarning($"EventData (Seq#: '{@event.SystemProperties.SequenceNumber}') being processed is out of sync with persisted Poison Message (Seq#: '{msg.SequenceNumber}'); EventData assumed correct and Poison Message deleted.");
-                await RemoveAsync(@event, PoisonMessageAction.Undetermined);
+                await RemoveAsync(@event, PoisonMessageAction.Undetermined).ConfigureAwait(false);
             }
 
             if (msg.SkipMessage)

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.27
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+
 ## v2.1.26
 - *Enhanced*: `EntityMapper` and `EntitySrceMapper` support new `GetBySrceProperty` and `GetByDestProperty` (as applicable) methods that enable using a property expression versus a string.
 

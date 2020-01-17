@@ -45,7 +45,7 @@ namespace Beef.Events.Triggers.Listener
         /// </summary>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _host.RegisterEventProcessorFactoryAsync(this, _options.EventProcessorOptions);
+            await _host.RegisterEventProcessorFactoryAsync(this, _options.EventProcessorOptions).ConfigureAwait(false);
             _started = true;
         }
 
@@ -60,7 +60,7 @@ namespace Beef.Events.Triggers.Listener
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             if (_started)
-                await _host.UnregisterEventProcessorAsync();
+                await _host.UnregisterEventProcessorAsync().ConfigureAwait(false);
 
             _started = false;
         }

@@ -32,7 +32,7 @@ namespace Beef.Demo.Business.Data
                 Database.Default.GetRefData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
                 {
                 });
-                await Task.Delay(0);
+                await Task.CompletedTask;
             }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
 
             return __coll;
@@ -67,7 +67,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
         {
             var __coll = new RefDataNamespace.CompanyCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => await this.CompanyGetAll_OnImplementation(__coll), BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => await this.CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false), BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
             return __coll;
         }
 

@@ -17,7 +17,7 @@ namespace Beef.Demo.Business
                 Key = id
             };
 
-            await Event.PublishAsync(e);
+            await Event.PublishAsync(e).ConfigureAwait(false);
         }
     }
 }

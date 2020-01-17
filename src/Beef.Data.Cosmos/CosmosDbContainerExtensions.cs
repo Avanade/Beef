@@ -36,7 +36,7 @@ namespace Beef.Data.Cosmos
             foreach (var item in items)
             {
                 CosmosDbBase.PrepareEntityForCreate(item, false);
-                await container.CreateItemAsync(item, partitionKey ?? PartitionKey.None, itemRequestOptions);
+                await container.CreateItemAsync(item, partitionKey ?? PartitionKey.None, itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Beef.Data.Cosmos
                 var cdv = new CosmosDbValue<TModel>(item);
                 CosmosDbBase.PrepareEntityForCreate(cdv.Value, false);
                 ((ICosmosDbValue)cdv).PrepareBefore();
-                await container.CreateItemAsync(cdv, partitionKey ?? PartitionKey.None, itemRequestOptions);
+                await container.CreateItemAsync(cdv, partitionKey ?? PartitionKey.None, itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -87,7 +87,7 @@ namespace Beef.Data.Cosmos
             using (var rs = GetResourceStream<TResource>(Check.NotEmpty(yamlResourceName, nameof(yamlResourceName))))
             {
                 var yc = Beef.Yaml.YamlConverter.ReadYaml(rs);
-                await ImportBatchAsync(container, yc.Convert<TModel>(name ?? typeof(TModel).Name), partitionKey, itemRequestOptions);
+                await ImportBatchAsync(container, yc.Convert<TModel>(name ?? typeof(TModel).Name), partitionKey, itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -111,7 +111,7 @@ namespace Beef.Data.Cosmos
             using (var rs = GetResourceStream<TResource>(Check.NotEmpty(yamlResourceName, nameof(yamlResourceName))))
             {
                 var yc = Beef.Yaml.YamlConverter.ReadYaml(rs);
-                await ImportValueBatchAsync(container, yc.Convert<TModel>(name ?? typeof(TModel).Name), partitionKey, itemRequestOptions);
+                await ImportValueBatchAsync(container, yc.Convert<TModel>(name ?? typeof(TModel).Name), partitionKey, itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -163,7 +163,7 @@ namespace Beef.Data.Cosmos
                 {
                     var vals = (System.Collections.IEnumerable)yt.GetMethod("Convert").MakeGenericMethod(rdt).Invoke(yc, new object[] { rdt.Name, true, true, true, null });
                     if (vals != null)
-                        await (Task)emi.MakeGenericMethod(rdt).Invoke(null, new object[] { container, vals, partitionKey ?? PartitionKey.None, itemRequestOptions });
+                        await ((Task)emi.MakeGenericMethod(rdt).Invoke(null, new object[] { container, vals, partitionKey ?? PartitionKey.None, itemRequestOptions })).ConfigureAwait(false);
                 }
             }
         }

@@ -114,7 +114,7 @@ namespace Beef.Executors
                 Trace(() => Logger.Default.Trace($"Executor '{InstanceId}' of Type '{GetType().Name}' started."));
                 _stopwatch = Stopwatch.StartNew();
                 State = ExecutionState.Started;
-                if (!(await RunWrapperAsync(ExceptionHandling.Stop, async () => await StartedAsync(), this, false)).WasSuccessful)
+                if (!(await RunWrapperAsync(ExceptionHandling.Stop, async () => await StartedAsync().ConfigureAwait(false), this, false).ConfigureAwait(false)).WasSuccessful)
                     return;
 
                 if (State != ExecutionState.Started)
@@ -149,7 +149,7 @@ namespace Beef.Executors
                         _stack.Push(ecd);
                     }
 
-                    await func();
+                    await func().ConfigureAwait(false);
                     result.WasSuccessful = true;
                 }
                 catch (ExecutorStopException esex)
@@ -190,7 +190,7 @@ namespace Beef.Executors
                         StopAsync(); // Not awaited by design!
                 }
 #pragma warning restore CS4014
-            });
+            }).ConfigureAwait(false);
 
             return result;
         }
@@ -229,7 +229,7 @@ namespace Beef.Executors
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea), ea).Wait();
+                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
                     });
 
                     return Task.FromResult(plr.IsCompleted);
@@ -246,7 +246,7 @@ namespace Beef.Executors
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index++, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea), ea).Wait();
+                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
                     }
 
                     return Task.FromResult(true);
@@ -315,11 +315,11 @@ namespace Beef.Executors
                 if (_stack.Count < 1)
                     break;
 
-                await Task.Delay(ExecutionManager.ProcessWaitIntervalMilliseconds);
+                await Task.Delay(ExecutionManager.ProcessWaitIntervalMilliseconds).ConfigureAwait(false);
             }
 
             // Run the OnStoppedAsync work.
-            var rwr = await RunWrapperAsync(ExceptionHandling.Continue, async () => await StoppedAsync(), this, false);
+            var rwr = await RunWrapperAsync(ExceptionHandling.Continue, async () => await StoppedAsync().ConfigureAwait(false), this, false).ConfigureAwait(false);
             if (!rwr.WasSuccessful && Result != ExecutorResult.Unsuccessful)
             {
                 Result = ExecutorResult.Unsuccessful;

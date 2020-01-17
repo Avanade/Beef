@@ -41,6 +41,7 @@ namespace Beef.Demo.Api
 
             // Register the database.
             Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
+            Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
 
             // Register the DocumentDb/CosmosDb client.
             CosmosDb.Register(() =>

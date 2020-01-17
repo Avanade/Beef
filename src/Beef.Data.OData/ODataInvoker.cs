@@ -69,7 +69,7 @@ namespace Beef.Data.OData
 
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
             }
             catch (HttpRequestException hrex)
             {
@@ -151,7 +151,7 @@ namespace Beef.Data.OData
 
             try
             {
-                return await func();
+                return await func().ConfigureAwait(false);
             }
             catch (HttpRequestException hrex)
             {
