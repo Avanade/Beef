@@ -362,7 +362,7 @@ namespace Beef.Data.OData
         {
             var coll = new TColl();
 
-            await SelectQueryAsync(queryArgs, coll, query);
+            await SelectQueryAsync(queryArgs, coll, query).ConfigureAwait(false);
 
             return coll;
         }
@@ -404,12 +404,12 @@ namespace Beef.Data.OData
         {
             await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildQueryRequestAsync(queryArgs, queryAggregator.ToString());
+                var request = await BuildQueryRequestAsync(queryArgs, queryAggregator.ToString()).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 queryArgs.ResponseMessage = response;
-                await ProcessQueryResponse(response, queryArgs, queryAggregator, coll);
-            }, this);
+                await ProcessQueryResponse(response, queryArgs, queryAggregator, coll).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -491,12 +491,12 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildGetRequestAsync(SetUpArgs<T>(getArgs), keys);
+                var request = await BuildGetRequestAsync(SetUpArgs<T>(getArgs), keys).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 getArgs.ResponseMessage = response;
-                return await ProcessGetResponseAsync<T>(response, getArgs);
-            }, this);
+                return await ProcessGetResponseAsync<T>(response, getArgs).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace Beef.Data.OData
                 throw new ArgumentNullException(nameof(keys));
 
             string q = $"{args.Mapper.GetKeyUrl(keys)}?{args.GetODataQuery()}";
-            return await Task.FromResult(CreateRequestMessage(args, DetermineHttpMethod("GET", GetHttpMethod, args), args.Mapper.ODataEntityName, q));
+            return await Task.FromResult(CreateRequestMessage(args, DetermineHttpMethod("GET", GetHttpMethod, args), args.Mapper.ODataEntityName, q)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -555,13 +555,13 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildCreateRequestAsync<T>(SetUpArgs<T>(saveArgs), value);
+                var request = await BuildCreateRequestAsync(SetUpArgs<T>(saveArgs), value).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 saveArgs.ResponseMessage = response;
                 EnsureSuccessStatusCodeForResponse(response);
                 return value;
-            }, this);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace Beef.Data.OData
             using (var ms = new StringWriter())
             using (var jw = new JsonTextWriter(ms) { AutoCompleteOnClose = true })
             {
-                await json.WriteToAsync(jw);
+                await json.WriteToAsync(jw).ConfigureAwait(false);
                 request.Content = new StringContent(ms.ToString(), null, "application/json");
             }
 
@@ -609,13 +609,13 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildUpdateRequestAsync<T>(SetUpArgs<T>(saveArgs), value);
+                var request = await BuildUpdateRequestAsync(SetUpArgs<T>(saveArgs), value).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 saveArgs.ResponseMessage = response;
                 EnsureSuccessStatusCodeForResponse(response);
                 return value;
-            }, this);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -641,7 +641,7 @@ namespace Beef.Data.OData
             using (var ms = new StringWriter())
             using (var jw = new JsonTextWriter(ms) { Formatting = Formatting.None })
             {
-                await json.WriteToAsync(jw);
+                await json.WriteToAsync(jw).ConfigureAwait(false);
                 request.Content = new StringContent(ms.ToString(), null, "application/json");
             }
 
@@ -662,12 +662,12 @@ namespace Beef.Data.OData
         {
             await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildDeleteRequestAsync(SetUpArgs<T>(saveArgs), keys);
+                var request = await BuildDeleteRequestAsync(SetUpArgs<T>(saveArgs), keys).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 saveArgs.ResponseMessage = response;
                 EnsureSuccessStatusCodeForResponse(response);
-            }, this);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -684,7 +684,7 @@ namespace Beef.Data.OData
             if (keys == null || keys.Length == 0)
                 throw new ArgumentNullException(nameof(keys));
 
-            return await Task.FromResult(CreateRequestMessage(saveArgs, DetermineHttpMethod("DELETE", DeleteHttpMethod, saveArgs), saveArgs.Mapper.ODataEntityName, saveArgs.Mapper.GetKeyUrl(keys)));
+            return await Task.FromResult(CreateRequestMessage(saveArgs, DetermineHttpMethod("DELETE", DeleteHttpMethod, saveArgs), saveArgs.Mapper.ODataEntityName, saveArgs.Mapper.GetKeyUrl(keys))).ConfigureAwait(false);
         }
 
         #endregion
@@ -700,7 +700,7 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task ExecuteAsync(ODataArgs exeArgs, string pathAndQuery)
         {
-            await ExecuteAsync(exeArgs, pathAndQuery, null);
+            await ExecuteAsync(exeArgs, pathAndQuery, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -716,7 +716,7 @@ namespace Beef.Data.OData
             if (exeArgs == null)
                 throw new ArgumentNullException(nameof(exeArgs));
 
-            var json = await ExecuteAsync(exeArgs, pathAndQuery, null);
+            var json = await ExecuteAsync(exeArgs, pathAndQuery, null).ConfigureAwait(false);
             if (json == null)
                 return default;
 
@@ -736,12 +736,12 @@ namespace Beef.Data.OData
         {
             await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value);
+                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 exeArgs.ResponseMessage = response;
                 EnsureSuccessStatusCodeForResponse(response);
-            }, this);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -758,12 +758,12 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value);
+                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, value).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 exeArgs.ResponseMessage = response;
-                return await ProcessExecuteResponseAsync<TRes>(response, exeArgs);
-            }, this);
+                return await ProcessExecuteResponseAsync<TRes>(response, exeArgs).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -778,12 +778,12 @@ namespace Beef.Data.OData
         {
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, json);
+                var request = await BuildExecuteRequestAsync(exeArgs, pathAndQuery, json).ConfigureAwait(false);
                 OnCreatingRequest(request);
-                var response = await SendRequestAsync(request);
+                var response = await SendRequestAsync(request).ConfigureAwait(false);
                 exeArgs.ResponseMessage = response;
-                return await ProcessExecuteResponseAsync(response, exeArgs);
-            }, this);
+                return await ProcessExecuteResponseAsync(response, exeArgs).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -806,7 +806,7 @@ namespace Beef.Data.OData
             if (json != null)
                 request.Content = new StringContent(json.ToString(), null, "application/json");
 
-            return await Task.FromResult(request);
+            return await Task.FromResult(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -833,7 +833,7 @@ namespace Beef.Data.OData
                 using (var ms = new StringWriter())
                 using (var jw = new JsonTextWriter(ms) { AutoCompleteOnClose = true })
                 {
-                    await json.WriteToAsync(jw);
+                    await json.WriteToAsync(jw).ConfigureAwait(false);
                     request.Content = new StringContent(ms.ToString(), null, "application/json");
                 }
             }
@@ -856,11 +856,11 @@ namespace Beef.Data.OData
 
             if (response.Content?.Headers?.ContentLength != null && response.Content?.Headers?.ContentLength.Value > 0)
             {
-                using (var s = await response.Content.ReadAsStreamAsync())
+                using (var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                 using (var sr = new StreamReader(s))
                 using (var jr = new JsonTextReader(sr))
                 {
-                    var json = await JObject.LoadAsync(jr);
+                    var json = await JObject.LoadAsync(jr).ConfigureAwait(false);
                     return json;
                 }
             }
@@ -884,7 +884,7 @@ namespace Beef.Data.OData
 
             if (response.Content?.Headers?.ContentLength != null && response.Content?.Headers?.ContentLength.Value > 0)
             {
-                using (var s = await response.Content.ReadAsStreamAsync())
+                using (var s = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                 using (var sr = new StreamReader(s))
                 using (var jr = new JsonTextReader(sr))
                 {

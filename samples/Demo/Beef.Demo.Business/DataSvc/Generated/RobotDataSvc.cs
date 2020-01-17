@@ -45,9 +45,9 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue<Robot>(__key, out Robot __val))
                     return __val;
 
-                var __result = await Factory.Create<IRobotData>().GetAsync(id);
+                var __result = await Factory.Create<IRobotData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet<Robot>(__key, __result);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }      
@@ -61,10 +61,10 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().CreateAsync(value);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id));
+                var __result = await Factory.Create<IRobotData>().CreateAsync(value).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Create", new KeyValuePair<string, object>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet<Robot>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }      
@@ -78,10 +78,10 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().UpdateAsync(value);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id));
+                var __result = await Factory.Create<IRobotData>().UpdateAsync(value).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Update", new KeyValuePair<string, object>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet<Robot>(__result?.UniqueKey ?? UniqueKey.Empty, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }      
@@ -94,10 +94,10 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                await Factory.Create<IRobotData>().DeleteAsync(id);
-                await Beef.Events.Event.PublishAsync("Demo.Robot.{id}", "Delete", new KeyValuePair<string, object>("id", id));
+                await Factory.Create<IRobotData>().DeleteAsync(id).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync("Demo.Robot.{id}", "Delete", new KeyValuePair<string, object>("id", id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id);
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
         }      
 
@@ -111,8 +111,8 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().GetByArgsAsync(args, paging);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging);
+                var __result = await Factory.Create<IRobotData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }      

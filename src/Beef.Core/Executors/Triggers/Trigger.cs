@@ -172,7 +172,7 @@ namespace Beef.Executors.Triggers
                 throw new InvalidOperationException($"Trigger '{InstanceId}' Status is invalid; must have a value of Running.");
 
             Trace(() => Logger.Default.Trace($"Trigger '{InstanceId}' triggering Executor to run."));
-            Task.Run(async () => await OnRunAsync?.Invoke(new TriggerEventArgs { Args = args, CompletionCallback = completionCallback })).Wait();
+            Task.Run(async () => await (OnRunAsync?.Invoke(new TriggerEventArgs { Args = args, CompletionCallback = completionCallback })).ConfigureAwait(false)).Wait();
         }
 
         /// <summary>

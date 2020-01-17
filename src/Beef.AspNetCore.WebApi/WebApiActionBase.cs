@@ -310,10 +310,10 @@ namespace Beef.AspNetCore.WebApi
             try
             {
                 ExecutionContext.Current.OperationType = OperationType;
-                await func();
+                await func().ConfigureAwait(false);
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
-                await CreateResult(context, StatusCode).ExecuteResultAsync(context);
+                await CreateResult(context, StatusCode).ExecuteResultAsync(context).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -321,7 +321,7 @@ namespace Beef.AspNetCore.WebApi
                 if (ai == null)
                     throw;
 
-                await ai.ExecuteResultAsync(context);
+                await ai.ExecuteResultAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -350,7 +350,7 @@ namespace Beef.AspNetCore.WebApi
             {
                 ExecutionContext.Current.OperationType = OperationType;
 
-                TResult result = await func();
+                TResult result = await func().ConfigureAwait(false);
                 var (json, etag) = CreateJsonResultAndETag(context, result);
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
@@ -358,13 +358,13 @@ namespace Beef.AspNetCore.WebApi
 
                 if (result != null && IfNoneMatchETags != null && !IsIfNoneMatchModified(etag))
                 {
-                    await CreateResult(context, HttpStatusCode.NotModified).ExecuteResultAsync(context);
+                    await CreateResult(context, HttpStatusCode.NotModified).ExecuteResultAsync(context).ConfigureAwait(false);
                     return;
                 }
 
-                await (result == null ?
+                await ((result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context));
+                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -372,7 +372,7 @@ namespace Beef.AspNetCore.WebApi
                 if (ai == null)
                     throw;
 
-                await ai.ExecuteResultAsync(context);
+                await ai.ExecuteResultAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -554,7 +554,7 @@ namespace Beef.AspNetCore.WebApi
                 try
                 {
                     ExecutionContext.Current.OperationType = OperationType;
-                    TResult result = await _func();
+                    TResult result = await _func().ConfigureAwait(false);
 
                     var (json, etag) = CreateJsonResultAndETag(context, result?.Result);
 
@@ -564,13 +564,13 @@ namespace Beef.AspNetCore.WebApi
 
                     if (result?.Result != null && IfNoneMatchETags != null && !IsIfNoneMatchModified(etag))
                     {
-                        await CreateResult(context, HttpStatusCode.NotModified).ExecuteResultAsync(context);
+                        await CreateResult(context, HttpStatusCode.NotModified).ExecuteResultAsync(context).ConfigureAwait(false);
                         return;
                     }
 
-                    await ((result == null || result.Result == null) ?
+                    await (((result == null || result.Result == null) ?
                         (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                        CreateResult(context, StatusCode, json).ExecuteResultAsync(context));
+                        CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
                 }
                 catch (Exception ex)
                 {
@@ -578,11 +578,11 @@ namespace Beef.AspNetCore.WebApi
                     if (ai == null)
                         throw;
 
-                    await ai.ExecuteResultAsync(context);
+                    await ai.ExecuteResultAsync(context).ConfigureAwait(false);
                     return;
                 }
 
-            }, memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
+            }, memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber).ConfigureAwait(false);
         }
     }
 
@@ -899,12 +899,12 @@ namespace Beef.AspNetCore.WebApi
             try
             {
                 // Validate the patch option and json.
-                var (option, patch) = await PatchValidationAsync(context);
+                var (option, patch) = await PatchValidationAsync(context).ConfigureAwait(false);
                 if (option == WebApiPatchOption.NotSpecified)
                     return;
 
                 // Get the existing value; make sure it exists and matches the supplied etag.
-                var (success, value) = await GetCurrentValueAsync(context);
+                var (success, value) = await GetCurrentValueAsync(context).ConfigureAwait(false);
                 if (!success)
                     return;
 
@@ -914,12 +914,12 @@ namespace Beef.AspNetCore.WebApi
 
                 if (option == WebApiPatchOption.JsonPatch)
                 {
-                    if (!await UpdateUsingJsonPatchAsync(context, value, patch))
+                    if (!await UpdateUsingJsonPatchAsync(context, value, patch).ConfigureAwait(false))
                         return;
                 }
                 else
                 {
-                    switch (await UpdateUsingMergePatchAsync(context, value))
+                    switch (await UpdateUsingMergePatchAsync(context, value).ConfigureAwait(false))
                     {
                         case JsonEntityMergeResult.Error: return;
                         case JsonEntityMergeResult.SuccessNoChanges: performUpdate = false; break;
@@ -932,11 +932,11 @@ namespace Beef.AspNetCore.WebApi
                     if (currETag != null)
                         (value as IETag).ETag = currETag;
 
-                    await func(value);
+                    await func(value).ConfigureAwait(false);
                 }
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
-                await CreateResult(context, StatusCode).ExecuteResultAsync(context);
+                await CreateResult(context, StatusCode).ExecuteResultAsync(context).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -944,7 +944,7 @@ namespace Beef.AspNetCore.WebApi
                 if (ai == null)
                     throw;
 
-                await ai.ExecuteResultAsync(context);
+                await ai.ExecuteResultAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -959,12 +959,12 @@ namespace Beef.AspNetCore.WebApi
             try
             {
                 // Validate the patch option and json.
-                var (option, patch) = await PatchValidationAsync(context);
+                var (option, patch) = await PatchValidationAsync(context).ConfigureAwait(false);
                 if (option == WebApiPatchOption.NotSpecified)
                     return;
 
                 // Get the existing value; make sure it exists and matches the supplied etag.
-                var (success, value) = await GetCurrentValueAsync(context);
+                var (success, value) = await GetCurrentValueAsync(context).ConfigureAwait(false);
                 if (!success)
                     return;
 
@@ -974,12 +974,12 @@ namespace Beef.AspNetCore.WebApi
 
                 if (option == WebApiPatchOption.JsonPatch)
                 {
-                    if (! await UpdateUsingJsonPatchAsync(context, value, patch))
+                    if (! await UpdateUsingJsonPatchAsync(context, value, patch).ConfigureAwait(false))
                         return;
                 }
                 else
                 {
-                    switch (await UpdateUsingMergePatchAsync(context, value))
+                    switch (await UpdateUsingMergePatchAsync(context, value).ConfigureAwait(false))
                     {
                         case JsonEntityMergeResult.Error: return;
                         case JsonEntityMergeResult.SuccessNoChanges: performUpdate = false; break;
@@ -993,7 +993,7 @@ namespace Beef.AspNetCore.WebApi
                     if (currETag != null)
                         (value as IETag).ETag = currETag;
 
-                    result = await func(value);
+                    result = await func(value).ConfigureAwait(false);
                 }
 
                 var (json, etag) = CreateJsonResultAndETag(context, result);
@@ -1002,9 +1002,9 @@ namespace Beef.AspNetCore.WebApi
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
                 WebApiControllerHelper.SetETag(context.HttpContext.Response, etag);
 
-                await (result == null ?
+                await ((result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context));
+                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -1012,7 +1012,7 @@ namespace Beef.AspNetCore.WebApi
                 if (ai == null)
                     throw;
 
-                await ai.ExecuteResultAsync(context);
+                await ai.ExecuteResultAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -1031,13 +1031,13 @@ namespace Beef.AspNetCore.WebApi
                 }
                 catch (JsonSerializationException jsex)
                 {
-                    await CreateResultFromException(context, new ValidationException(jsex.Message)).ExecuteResultAsync(context);
+                    await CreateResultFromException(context, new ValidationException(jsex.Message)).ExecuteResultAsync(context).ConfigureAwait(false);
                     return (WebApiPatchOption.NotSpecified, null);
                 }
 
                 if (patch.Operations.Count == 0)
                 {
-                    await CreateResultFromException(context, new ValidationException("The JSON patch document requires one or more operations to be considered valid.")).ExecuteResultAsync(context);
+                    await CreateResultFromException(context, new ValidationException("The JSON patch document requires one or more operations to be considered valid.")).ExecuteResultAsync(context).ConfigureAwait(false);
                     return (WebApiPatchOption.NotSpecified, null);
                 }
 
@@ -1050,7 +1050,7 @@ namespace Beef.AspNetCore.WebApi
             }
             else
             {
-                await new ObjectResult("Unsupported Content-Type for a PATCH; support JSON-Patch: 'application/json-patch+json' or, JSON-Merge: `application/merge-patch+json` or `application/json`.") { StatusCode = (int)HttpStatusCode.UnsupportedMediaType }.ExecuteResultAsync(context);
+                await new ObjectResult("Unsupported Content-Type for a PATCH; support JSON-Patch: 'application/json-patch+json' or, JSON-Merge: `application/merge-patch+json` or `application/json`.") { StatusCode = (int)HttpStatusCode.UnsupportedMediaType }.ExecuteResultAsync(context).ConfigureAwait(false);
                 return (WebApiPatchOption.NotSpecified, null);
             }
         }
@@ -1061,10 +1061,10 @@ namespace Beef.AspNetCore.WebApi
         private async Task<(bool success, T value)> GetCurrentValueAsync(ActionContext context)
         {
             // Get the existing value.
-            var value = await _getFunc();
+            var value = await _getFunc().ConfigureAwait(false);
             if (value == null)
             {
-                await CreateResultFromException(context, new NotFoundException()).ExecuteResultAsync(context);
+                await CreateResultFromException(context, new NotFoundException()).ExecuteResultAsync(context).ConfigureAwait(false);
                 return (false, value);
             }
 
@@ -1073,13 +1073,13 @@ namespace Beef.AspNetCore.WebApi
             {
                 if (IfMatchETags == null || IfMatchETags.Count == 0)
                 {
-                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag).")).ExecuteResultAsync(context);
+                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag).")).ExecuteResultAsync(context).ConfigureAwait(false);
                     return (false, default(T));
                 }
 
                 if (IsIfMatchModified(et.ETag))
                 {
-                    await CreateResultFromException(context, new ConcurrencyException()).ExecuteResultAsync(context);
+                    await CreateResultFromException(context, new ConcurrencyException()).ExecuteResultAsync(context).ConfigureAwait(false);
                     return (false, value);
                 }
             }
@@ -1097,7 +1097,7 @@ namespace Beef.AspNetCore.WebApi
             if (msgs.Count == 0)
                 return true;
 
-            await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context);
+            await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context).ConfigureAwait(false);
             return false;
         }
 
@@ -1113,7 +1113,7 @@ namespace Beef.AspNetCore.WebApi
             });
 
             if (mr == JsonEntityMergeResult.Error)
-                await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context);
+                await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context).ConfigureAwait(false);
 
             return mr;
         }

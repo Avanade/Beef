@@ -157,7 +157,7 @@ namespace Beef.Database.Core
             {
                 var sw = Stopwatch.StartNew();
 
-                await em.RunAsync();
+                await em.RunAsync().ConfigureAwait(false);
 
                 sw.Stop();
                 WriteFooter(sw);

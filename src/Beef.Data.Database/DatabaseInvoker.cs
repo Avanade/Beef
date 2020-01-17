@@ -69,7 +69,7 @@ namespace Beef.Data.Database
 
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
             }
             catch (SqlException sex)
             {
@@ -151,7 +151,7 @@ namespace Beef.Data.Database
 
             try
             {
-                return await func();
+                return await func().ConfigureAwait(false);
             }
             catch (SqlException sex)
             {

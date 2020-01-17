@@ -358,7 +358,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           </If>
           <![CDATA[paging]]>
         </If>
-        <![CDATA[);
+        <![CDATA[).ConfigureAwait(false);
 ]]>
         <Set Name="System.EventPublish" Value="true" />
         <If Condition="Config.EventPublish != null">
@@ -453,7 +453,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
               </ForEachList>
             </Else>
           </If>
-          <![CDATA[);
+          <![CDATA[).ConfigureAwait(false);
 ]]>
         </If>
         <If Condition="Entity.DataSvcCaching == null or Entity.DataSvcCaching == true">
@@ -541,7 +541,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           </If>
           <![CDATA[paging]]>
         </If>
-        <![CDATA[);
+        <![CDATA[).ConfigureAwait(false);
 ]]>
         <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'GetColl'">
           <![CDATA[                return __result;

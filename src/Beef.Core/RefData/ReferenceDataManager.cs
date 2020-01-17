@@ -140,7 +140,7 @@ namespace Beef.RefData
                 tasks[i++] = provider.PrefetchAsync(names);
             }
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }

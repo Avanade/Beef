@@ -148,7 +148,7 @@ namespace Beef.Test.NUnit
 
             try
             {
-                await func();
+                await func().ConfigureAwait(false);
                 Assert.Fail("A ValidationException is expected.");
             }
             catch (AggregateException aex)

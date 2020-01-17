@@ -594,7 +594,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             <Parameter Condition="Parameter.LayerPassing == 'All'">
               <![CDATA[{{Parameter.ArgumentName}}, ]]>
             </Parameter>
-            <![CDATA[__dataArgs);
+            <![CDATA[__dataArgs).ConfigureAwait(false);
                 ]]>
 
             <If Condition="System.AutoImplement == 'Database'">
@@ -672,7 +672,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
@@ -681,12 +681,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
-                <![CDATA[, __dataArgs));
+                <![CDATA[, __dataArgs)).ConfigureAwait(false);
 
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[__result = await {{System.ODataName}}.Default.{{Operation.OperationType}}Async<{{Entity.EntityName}}>(__dataArgs, value);
+                <![CDATA[__result = await {{System.ODataName}}.Default.{{Operation.OperationType}}Async<{{Entity.EntityName}}>(__dataArgs, value).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
@@ -706,7 +706,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
             </If>
@@ -733,7 +733,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
@@ -749,7 +749,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                 <![CDATA[__result = await {{System.CosmosName}}.Default.]]>
                 <If Condition="System.DataCosmosValueContainer == true"><![CDATA[Value]]></If>
-                <![CDATA[Container(__dataArgs).{{Operation.OperationType}}Async(value);
+                <![CDATA[Container(__dataArgs).{{Operation.OperationType}}Async(value).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
@@ -771,7 +771,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
             </If>
@@ -795,7 +795,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
@@ -807,7 +807,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[__result = await {{System.EntityFrameworkName}}.Default.{{Operation.OperationType}}Async(__dataArgs, value);
+                <![CDATA[__result = await {{System.EntityFrameworkName}}.Default.{{Operation.OperationType}}Async(__dataArgs, value).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
@@ -827,7 +827,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
             </If>
@@ -841,7 +841,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
               <![CDATA[{{Parameter.ArgumentName}}]]>
             </Parameter>
-            <![CDATA[);
+            <![CDATA[).ConfigureAwait(false);
 ]]>
             <If Condition="Operation.OperationType != 'Delete'">
               <![CDATA[                return __result;

@@ -45,9 +45,17 @@ namespace Beef.Demo.Test
 
             pr.FirstName = pr.FirstName + "X";
 
-            AgentTester.Create<PersonAgent, Person>()
-                .ExpectStatusCode(HttpStatusCode.OK)
+            var r = AgentTester.Create<PersonAgent, Person>()
                 .Run((a) => a.Agent.UpdateAsync(pr, 1.ToGuid()));
+
+            Assert.NotNull(r);
+            if (r.IsSuccess) // i.e. HttpStatusCode.OK
+                return;
+
+            if (r.StatusCode == HttpStatusCode.PreconditionFailed)
+                Assert.Inconclusive("PreconditionFailed - attempted to update under a concurrency situation; this is an expected outcome.");
+            else
+                Assert.Fail($"Unexpected status code: {r.StatusCode}");
         }
 
         [Test, Parallelizable, TestSetUp]

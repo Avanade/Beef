@@ -70,7 +70,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(id);
-                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id, company);
+                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
@@ -78,9 +78,9 @@ namespace Beef.Demo.Business
                     .Additional((__mv) => _getOnValidate?.Invoke(__mv, id, company))
                     .Run().ThrowOnError();
 
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, company);
-                var __result = await CustomerGroupDataSvc.GetAsync(id, company);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id, company);
+                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, company).ConfigureAwait(false);
+                var __result = await CustomerGroupDataSvc.GetAsync(id, company).ConfigureAwait(false);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id, company).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });
@@ -98,16 +98,16 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 EntityBase.CleanUp(args);
-                if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging);
+                if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(args.Validate(nameof(args)).Entity(CustomerGroupArgsValidator.Default))
                     .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging);
-                var __result = await CustomerGroupDataSvc.GetByArgsAsync(args, paging);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging);
+                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
+                var __result = await CustomerGroupDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });
@@ -126,7 +126,7 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 if (value != null) { value.Company = company; }
                 EntityBase.CleanUp(value);
-                if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value, company);
+                if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Mandatory().Entity(CustomerGroupValidator.Default))
@@ -134,9 +134,9 @@ namespace Beef.Demo.Business
                     .Additional((__mv) => _createOnValidate?.Invoke(__mv, value, company))
                     .Run().ThrowOnError();
 
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, company);
-                var __result = await CustomerGroupDataSvc.CreateAsync(value);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result, company);
+                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, company).ConfigureAwait(false);
+                var __result = await CustomerGroupDataSvc.CreateAsync(value).ConfigureAwait(false);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result, company).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });
@@ -156,7 +156,7 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 if (value != null) { value.Id = id; value.Company = company; }
                 EntityBase.CleanUp(value, id);
-                if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id, company);
+                if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Mandatory().Entity(CustomerGroupValidator.Default))
@@ -164,9 +164,9 @@ namespace Beef.Demo.Business
                     .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id, company))
                     .Run().ThrowOnError();
 
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id, company);
-                var __result = await CustomerGroupDataSvc.UpdateAsync(value);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id, company);
+                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id, company).ConfigureAwait(false);
+                var __result = await CustomerGroupDataSvc.UpdateAsync(value).ConfigureAwait(false);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id, company).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });
@@ -184,7 +184,7 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (value != null) { value?.ForEach(__item => __item.Company = company); }
                 EntityBase.CleanUp(value);
-                if (_updateBatchOnPreValidateAsync != null) await _updateBatchOnPreValidateAsync(value, company);
+                if (_updateBatchOnPreValidateAsync != null) await _updateBatchOnPreValidateAsync(value, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Mandatory().Collection(minCount: 1, maxCount:1, item: new Beef.Validation.Rules.CollectionRuleItem<CustomerGroup>(CustomerGroupValidator.Default)))
@@ -192,9 +192,9 @@ namespace Beef.Demo.Business
                     .Additional((__mv) => _updateBatchOnValidate?.Invoke(__mv, value, company))
                     .Run().ThrowOnError();
 
-                if (_updateBatchOnBeforeAsync != null) await _updateBatchOnBeforeAsync(value, company);
-                await CustomerGroupDataSvc.UpdateBatchAsync(value);
-                if (_updateBatchOnAfterAsync != null) await _updateBatchOnAfterAsync(value, company);
+                if (_updateBatchOnBeforeAsync != null) await _updateBatchOnBeforeAsync(value, company).ConfigureAwait(false);
+                await CustomerGroupDataSvc.UpdateBatchAsync(value).ConfigureAwait(false);
+                if (_updateBatchOnAfterAsync != null) await _updateBatchOnAfterAsync(value, company).ConfigureAwait(false);
             });
         }
 
@@ -209,7 +209,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 EntityBase.CleanUp(id);
-                if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id, company);
+                if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
@@ -217,9 +217,9 @@ namespace Beef.Demo.Business
                     .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id, company))
                     .Run().ThrowOnError();
 
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, company);
-                await CustomerGroupDataSvc.DeleteAsync(id, company);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id, company);
+                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, company).ConfigureAwait(false);
+                await CustomerGroupDataSvc.DeleteAsync(id, company).ConfigureAwait(false);
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id, company).ConfigureAwait(false);
             });
         }
     }

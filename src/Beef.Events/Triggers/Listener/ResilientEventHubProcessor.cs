@@ -82,6 +82,9 @@ namespace Beef.Events.Triggers.Listener
                 .WaitAndRetryForeverAsync(
                     (count, ctx) =>
                     {
+                        if (OverrideRetryTimespan.HasValue)
+                            return OverrideRetryTimespan.Value;
+
                         if (count > 16) // 2^16 is 65,536 which is the biggest allowed within our 1 day (86,400s) constraint therefore no need to calculate.
                             return _options.MaxRetryTimespan;
                         else
@@ -100,7 +103,7 @@ namespace Beef.Events.Triggers.Listener
                         {
                             case var val when val == _options.LogPoisonMessageAfterRetryCount:
                                 // Set the poison message now that we have (possibly) attempted enough times that it may not be transient in nature and some needs to be alerted.
-                                await _poisonOrchestrator.SetAsync(_currEventData, dr.Result.Exception);
+                                await _poisonOrchestrator.SetAsync(_currEventData, dr.Result.Exception).ConfigureAwait(false);
                                 _currPoisonAction = PoisonMessageAction.PoisonRetry;
                                 _logger.LogError(dr.Result.Exception, msg);
                                 break;
@@ -138,7 +141,7 @@ namespace Beef.Events.Triggers.Listener
             _logger.LogInformation($"Processor stopping. {GetPartitionContextLogInfo(context)}");
 
             // Make sure the last successful execution was checkpointed before finishing up.
-            await CheckpointAsync(context, _lastEventData);
+            await CheckpointAsync(context, _lastEventData).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -194,7 +197,7 @@ namespace Beef.Events.Triggers.Listener
 
                     // Cancellation token passed into polly, as well as the function, as either may need to cancel on request.
                     _currEventData = array[i];
-                    await _policyAsync.ExecuteAsync(async (ct) => await ExecuteCurrentEvent(context, ct), context.CancellationToken);
+                    await _policyAsync.ExecuteAsync(async (ct) => await ExecuteCurrentEvent(context, ct).ConfigureAwait(false), context.CancellationToken).ConfigureAwait(false);
 
                     // Remember, remember the 5th of November (https://www.youtube.com/watch?v=LF1951pENdk) and the last event data that was successful.
                     _lastEventData = _currEventData;
@@ -202,7 +205,7 @@ namespace Beef.Events.Triggers.Listener
                 }
 
                 // Array complete (or cancelled), so checkpoint on the last.
-                await CheckpointAsync(context, _lastEventData);
+                await CheckpointAsync(context, _lastEventData).ConfigureAwait(false);
                 _logger.LogInformation($"Batch of '{array.Length}' event(s) completed {GetPartitionContextLogInfo(context)}.");
             }
             catch (TaskCanceledException) { throw; } // Expected; carry on.
@@ -231,10 +234,10 @@ namespace Beef.Events.Triggers.Listener
             // Where the poison action state is unknown or retry then check to see what the current state is; if skip, then bypass current.
             if (_currPoisonAction == PoisonMessageAction.Undetermined || _currPoisonAction == PoisonMessageAction.PoisonRetry)
             {
-                _currPoisonAction = await _poisonOrchestrator.CheckAsync(_currEventData);
+                _currPoisonAction = await _poisonOrchestrator.CheckAsync(_currEventData).ConfigureAwait(false);
                 if (_currPoisonAction == PoisonMessageAction.PoisonSkip)
                 {
-                    await _poisonOrchestrator.RemoveAsync(_currEventData, PoisonMessageAction.PoisonSkip);
+                    await _poisonOrchestrator.RemoveAsync(_currEventData, PoisonMessageAction.PoisonSkip).ConfigureAwait(false);
                     _logger.LogWarning($"EventData that was previously identified as Poison is being skipped (not processed) {GetEventDataLogInfo(context, _currEventData)}.");
                     _currPoisonAction = PoisonMessageAction.NotPoison;
                     return new FunctionResult(true);
@@ -245,19 +248,19 @@ namespace Beef.Events.Triggers.Listener
 
             // Execute the function (maybe again if previously failed).
             var data = new TriggeredFunctionData { TriggerValue = new ResilientEventHubData { EventData = _currEventData } };
-            var fr = await _executor.TryExecuteAsync(data, ct);
+            var fr = await _executor.TryExecuteAsync(data, ct).ConfigureAwait(false);
 
             // Where we have a failure then checkpoint the last so we will at least restart back at this point.
             if (fr.Succeeded)
             {
                 if (_currPoisonAction != PoisonMessageAction.NotPoison)
                 {
-                    await _poisonOrchestrator.RemoveAsync(_currEventData, PoisonMessageAction.NotPoison);
+                    await _poisonOrchestrator.RemoveAsync(_currEventData, PoisonMessageAction.NotPoison).ConfigureAwait(false);
                     _currPoisonAction = PoisonMessageAction.NotPoison;
                 }
             }
             else
-                await CheckpointAsync(context, _lastEventData);
+                await CheckpointAsync(context, _lastEventData).ConfigureAwait(false);
 
             return fr;
         }
@@ -280,9 +283,9 @@ namespace Beef.Events.Triggers.Listener
             _lastEventData = null;
 
             if (Checkpointer == null)
-                await context.CheckpointAsync(_lastCheckpoint);
+                await context.CheckpointAsync(_lastCheckpoint).ConfigureAwait(false);
             else
-                await Checkpointer(context, @event);
+                await Checkpointer(context, @event).ConfigureAwait(false);
         }
     }
 }

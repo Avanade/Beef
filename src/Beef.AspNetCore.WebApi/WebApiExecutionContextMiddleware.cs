@@ -57,7 +57,7 @@ namespace Beef.AspNetCore.WebApi
         {
             ExecutionContext.Reset(true);
             UpdateAction.Invoke(context, ExecutionContext.Current);
-            await _next(context);
+            await _next(context).ConfigureAwait(false);
         }
     }
 }

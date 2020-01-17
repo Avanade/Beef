@@ -56,7 +56,7 @@ namespace Beef.Data.OData.Linq
         public IEnumerable<T> ExecuteCollection<T>(QueryModel queryModel, int? pagingTakeOverride)
         {
             var coll = new List<T>();
-            Task.Run(async () => await OData.Query(QueryArgs, GetQueryAggregator(queryModel, pagingTakeOverride), coll)).Wait();
+            Task.Run(async () => await OData.Query(QueryArgs, GetQueryAggregator(queryModel, pagingTakeOverride), coll).ConfigureAwait(false)).Wait();
             return coll;
         }
 

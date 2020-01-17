@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.13
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+
 ## v2.1.12
 - *Fixed:* Compile error from Visual Studio v16.4.1 corrected.
 

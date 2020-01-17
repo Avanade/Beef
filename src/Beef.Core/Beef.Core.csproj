@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Beef</RootNamespace>
-    <AssemblyVersion>2.1.26</AssemblyVersion>
-    <FileVersion>2.1.26</FileVersion>
-    <Version>2.1.26</Version>
+    <AssemblyVersion>2.1.27</AssemblyVersion>
+    <FileVersion>2.1.27</FileVersion>
+    <Version>2.1.27</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
@@ -32,7 +32,7 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <DocumentationFile>.\bin\debug\Beef.Core.xml</DocumentationFile>
-    <NoWarn>1701;1702;CA1303;CA2007</NoWarn>
+    <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\"/>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   
 </Project>

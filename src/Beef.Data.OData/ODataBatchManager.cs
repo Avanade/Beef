@@ -76,11 +76,11 @@ namespace Beef.Data.OData
             }
 
             var qa = q.QueryExecutor.GetQueryAggregator(q.Expression, null);
-            var obi = AddRequest(await OData.BuildQueryRequestAsync(queryArgs, qa.ToString()));
+            var obi = AddRequest(await OData.BuildQueryRequestAsync(queryArgs, qa.ToString()).ConfigureAwait(false));
             obi.GetValueFunc = async () =>
             {
                 var coll = new TColl();
-                await OData.ProcessQueryResponse<T>(obi.ResponseMessage, queryArgs, qa, coll);
+                await OData.ProcessQueryResponse(obi.ResponseMessage, queryArgs, qa, coll).ConfigureAwait(false);
                 return coll;
             };
 
@@ -106,11 +106,11 @@ namespace Beef.Data.OData
 
             var qa = q.QueryExecutor.GetQueryAggregator(q.Expression, null);
             var queryArgs = q.QueryExecutor.QueryArgs;
-            var obi = AddRequest(await OData.BuildQueryRequestAsync(queryArgs, q.GetODataQuery(null)));
+            var obi = AddRequest(await OData.BuildQueryRequestAsync(queryArgs, q.GetODataQuery(null)).ConfigureAwait(false));
             obi.GetValueFunc = async () =>
             {
                 var coll = new List<T>();
-                await OData.ProcessQueryResponse(obi.ResponseMessage, queryArgs, qa, coll);
+                await OData.ProcessQueryResponse(obi.ResponseMessage, queryArgs, qa, coll).ConfigureAwait(false);
                 return coll;
             };
 
@@ -130,8 +130,8 @@ namespace Beef.Data.OData
         /// <returns>The <see cref="ODataBatchItem"/>.</returns>
         public async Task<ODataBatchItem> GetAsync<T>(ODataArgs getArgs, params IComparable[] keys) where T : class, new()
         {
-            var obi = AddRequest(await OData.BuildGetRequestAsync(OData.SetUpArgs<T>(getArgs), keys));
-            obi.GetValueFunc = async () => await OData.ProcessGetResponseAsync<T>(obi.ResponseMessage, getArgs);
+            var obi = AddRequest(await OData.BuildGetRequestAsync(OData.SetUpArgs<T>(getArgs), keys).ConfigureAwait(false));
+            obi.GetValueFunc = async () => await OData.ProcessGetResponseAsync<T>(obi.ResponseMessage, getArgs).ConfigureAwait(false);
             return obi;
         }
 
@@ -144,7 +144,7 @@ namespace Beef.Data.OData
         /// <returns>The <see cref="ODataBatchItem"/>.</returns>
         public async Task<ODataBatchItem> CreateAsync<T>(ODataArgs saveArgs, T value) where T : class, new()
         {
-            return AddRequest(await OData.BuildCreateRequestAsync(OData.SetUpArgs<T>(saveArgs), value));
+            return AddRequest(await OData.BuildCreateRequestAsync(OData.SetUpArgs<T>(saveArgs), value).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Beef.Data.OData
         /// <returns>The <see cref="ODataBatchItem"/>.</returns>
         public async Task<ODataBatchItem> UpdateAsync<T>(ODataArgs saveArgs, T value) where T : class, new()
         {
-            return AddRequest(await OData.BuildUpdateRequestAsync(OData.SetUpArgs<T>(saveArgs), value));
+            return AddRequest(await OData.BuildUpdateRequestAsync(OData.SetUpArgs<T>(saveArgs), value).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Beef.Data.OData
         /// <returns>The <see cref="ODataBatchItem"/>.</returns>
         public async Task<ODataBatchItem> DeleteAsync<T>(ODataArgs saveArgs, params IComparable[] keys) where T : class, new()
         {
-            return AddRequest(await OData.BuildDeleteRequestAsync(OData.SetUpArgs<T>(saveArgs), keys));
+            return AddRequest(await OData.BuildDeleteRequestAsync(OData.SetUpArgs<T>(saveArgs), keys).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -181,8 +181,8 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<ODataBatchItem> ExecuteAsync(ODataArgs exeArgs, string pathAndQuery, JObject json)
         {
-            var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery, json));
-            obi.GetValueFunc = async () => await ODataBase.ProcessExecuteResponseAsync(obi.ResponseMessage, exeArgs);
+            var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery, json).ConfigureAwait(false));
+            obi.GetValueFunc = async () => await ODataBase.ProcessExecuteResponseAsync(obi.ResponseMessage, exeArgs).ConfigureAwait(false);
             return obi;
         }
 
@@ -195,7 +195,7 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<ODataBatchItem> ExecuteAsync(ODataArgs exeArgs, string pathAndQuery)
         {
-            return AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery));
+            return AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -208,8 +208,8 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<ODataBatchItem> ExecuteAsync<TRes>(ODataArgs exeArgs, string pathAndQuery)
         {
-            var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery));
-            obi.GetValueFunc = async () => await OData.ProcessExecuteResponseAsync<TRes>(obi.ResponseMessage, exeArgs);
+            var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery).ConfigureAwait(false));
+            obi.GetValueFunc = async () => await OData.ProcessExecuteResponseAsync<TRes>(obi.ResponseMessage, exeArgs).ConfigureAwait(false);
             return obi;
         }
 
@@ -223,7 +223,7 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<ODataBatchItem> ExecuteAsync<TReq>(ODataArgs exeArgs, string pathAndQuery, TReq value)
         {
-            return AddRequest(await OData.BuildExecuteRequestAsync<TReq>(exeArgs, pathAndQuery, value));
+            return AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery, value).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -236,8 +236,8 @@ namespace Beef.Data.OData
         /// <remarks>The <see cref="HttpMethod"/> defaults to a <see cref="HttpMethod.Post"/>. This is overridden using the <see cref="ODataArgs.OverrideHttpMethod"/>.</remarks>
         public async Task<ODataBatchItem> ExecuteAsync<TReq, TRes>(ODataArgs exeArgs, string pathAndQuery, TReq value)
         {
-            var obi = AddRequest(await OData.BuildExecuteRequestAsync<TReq>(exeArgs, pathAndQuery, value));
-            obi.GetValueFunc = async () => await OData.ProcessExecuteResponseAsync<TRes>(obi.ResponseMessage, exeArgs);
+            var obi = AddRequest(await OData.BuildExecuteRequestAsync(exeArgs, pathAndQuery, value).ConfigureAwait(false));
+            obi.GetValueFunc = async () => await OData.ProcessExecuteResponseAsync<TRes>(obi.ResponseMessage, exeArgs).ConfigureAwait(false);
             return obi;
         }
 
@@ -286,11 +286,11 @@ namespace Beef.Data.OData
             return await ODataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var request = OData.CreateRequestMessage(new ODataArgs(), "POST", null, "$batch");
-                request.Content = await CreateContentAsync();
-                var resp = await ODataBatchResponse.CreateAsync(this, await OData.SendRequestAsync(request));
+                request.Content = await CreateContentAsync().ConfigureAwait(false);
+                var resp = await ODataBatchResponse.CreateAsync(this, await OData.SendRequestAsync(request).ConfigureAwait(false)).ConfigureAwait(false);
                 State = ODataBatchState.Sent;
                 return resp;
-            }, OData);
+            }, OData).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -305,11 +305,11 @@ namespace Beef.Data.OData
             {
                 foreach (var item in Items)
                 {
-                    await mw.WriteAsync(item.RequestMessage);
+                    await mw.WriteAsync(item.RequestMessage).ConfigureAwait(false);
                 }
 
                 // Terminate the batch.
-                await mw.CloseAsync();
+                await mw.CloseAsync().ConfigureAwait(false);
             }
 
             // Create the batch content.

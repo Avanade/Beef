@@ -87,7 +87,7 @@ namespace Beef.Business
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                await func();
+                await func().ConfigureAwait(false);
 
                 if (txn != null)
                     txn.Complete();
@@ -191,7 +191,7 @@ namespace Beef.Business
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
-                var result = await func();
+                var result = await func().ConfigureAwait(false);
 
                 if (txn != null)
                     txn.Complete();

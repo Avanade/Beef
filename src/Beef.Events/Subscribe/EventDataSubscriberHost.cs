@@ -55,7 +55,7 @@ namespace Beef.Events.Subscribe
 
             foreach (var @event in events)
             {
-                await ReceiveAsync(@event.Subject, @event.Action, (_) => @event);
+                await ReceiveAsync(@event.Subject, @event.Action, (_) => @event).ConfigureAwait(false);
             }
         }
     }

@@ -60,7 +60,7 @@ namespace Beef.Events.Subscribe
             {
                 ExecutionContext.Reset(false);
                 ExecutionContext.SetCurrent(BindLogger(CreateExecutionContext(subscriber, @event)));
-                await subscriber.ReceiveAsync(@event);
+                await subscriber.ReceiveAsync(@event).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

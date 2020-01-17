@@ -64,9 +64,9 @@ namespace Beef.Demo.Business.Data
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, company, __dataArgs);
-                __result = await DynamicsAx.Default.GetAsync<CustomerGroup>(__dataArgs, id, ExternalCodeConverter<RefDataNamespace.Company>.Default.ConvertToDest(company));
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id, company);
+                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, company, __dataArgs).ConfigureAwait(false);
+                __result = await DynamicsAx.Default.GetAsync<CustomerGroup>(__dataArgs, id, ExternalCodeConverter<RefDataNamespace.Company>.Default.ConvertToDest(company)).ConfigureAwait(false);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id, company).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
         }
@@ -83,11 +83,11 @@ namespace Beef.Demo.Business.Data
             {
                 CustomerGroupCollectionResult __result = new CustomerGroupCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging);
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs);
+                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
                 __result.Result = await DynamicsAx.Default.SelectQueryAsync<CustomerGroupCollection, CustomerGroup>(__dataArgs,
-                    q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs));
+                    q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).ConfigureAwait(false);
 
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args);
+                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
         }
@@ -106,9 +106,9 @@ namespace Beef.Demo.Business.Data
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs);
-                __result = await DynamicsAx.Default.CreateAsync<CustomerGroup>(__dataArgs, value);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
+                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
+                __result = await DynamicsAx.Default.CreateAsync<CustomerGroup>(__dataArgs, value).ConfigureAwait(false);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
         }
@@ -127,9 +127,9 @@ namespace Beef.Demo.Business.Data
             {
                 CustomerGroup __result = null;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs);
-                __result = await DynamicsAx.Default.UpdateAsync<CustomerGroup>(__dataArgs, value);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
+                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
+                __result = await DynamicsAx.Default.UpdateAsync<CustomerGroup>(__dataArgs, value).ConfigureAwait(false);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
         }
@@ -154,9 +154,9 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, company, __dataArgs);
-                await DynamicsAx.Default.DeleteAsync<CustomerGroup>(__dataArgs, id, ExternalCodeConverter<RefDataNamespace.Company>.Default.ConvertToDest(company));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id, company);
+                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, company, __dataArgs).ConfigureAwait(false);
+                await DynamicsAx.Default.DeleteAsync<CustomerGroup>(__dataArgs, id, ExternalCodeConverter<RefDataNamespace.Company>.Default.ConvertToDest(company)).ConfigureAwait(false);
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id, company).ConfigureAwait(false);
             }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
         }
 

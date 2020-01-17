@@ -28,7 +28,7 @@ namespace Beef.Data.OData
         {
             var obr = new ODataBatchResponse() { BatchManager = batchManager, BatchResponseMessage = batchResponseMessage };
             if (obr.BatchResponseMessage.IsSuccessStatusCode)
-                await ParseResponseAsync(obr);
+                await ParseResponseAsync(obr).ConfigureAwait(false);
 
             return obr;
         }
@@ -43,14 +43,14 @@ namespace Beef.Data.OData
             if (!DetermineContentTypeBoundary(batchResponse.BatchResponseMessage, out string _))
                 throw new InvalidOperationException("Batch response must have a Content-Type of 'multipart/mixed' with a corresponding 'boundary' specified.");
 
-            using (var rs = await batchResponse.BatchResponseMessage.Content.ReadAsStreamAsync())
+            using (var rs = await batchResponse.BatchResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false))
             using (var sr = new StreamReader(rs))
             using (var mr = new HttpMultiPartResponseReader(sr))
             {
                 int i = 0;
                 HttpResponseMessage response = null;
 
-                while ((response = await mr.ReadNextAsync()) != null)
+                while ((response = await mr.ReadNextAsync().ConfigureAwait(false)) != null)
                 {
                     if (i > batchResponse.BatchManager.Items.Count)
                         break;

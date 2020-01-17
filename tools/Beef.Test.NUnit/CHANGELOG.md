@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.18
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+
 ## v2.1.17
 - *Fixed:* The `AgentTester.ExpectEvent` will now validate the event value where specified. Also, all expected events will now need to be specified, in the order that they are raised.
 

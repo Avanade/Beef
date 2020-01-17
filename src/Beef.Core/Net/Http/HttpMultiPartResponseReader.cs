@@ -50,7 +50,7 @@ namespace Beef.Net.Http
                 _isFirstRead = false;
 
                 // Must start at a boundary.
-                if ((await ReadNextLineAsync()) != MultiPartReadState.StartOfBatch)
+                if ((await ReadNextLineAsync().ConfigureAwait(false)) != MultiPartReadState.StartOfBatch)
                     throw new InvalidOperationException("The multipart response part must begin with a valid '--batchresponse_' boundary.");
             }
 
@@ -61,7 +61,7 @@ namespace Beef.Net.Http
                 return null;
 
             Start:
-            var multiPart = await ReadNextPartAsync();
+            var multiPart = await ReadNextPartAsync().ConfigureAwait(false);
 
             CheckState:
             switch (_state)
@@ -94,7 +94,7 @@ namespace Beef.Net.Http
                         throw new InvalidOperationException("The end of a changeset boundary is unexpected; response is malformed.");
 
                     _isInChangeSet = false;
-                    await ReadNextLineAsync(true);
+                    await ReadNextLineAsync(true).ConfigureAwait(false);
                     goto CheckState;
 
                 case MultiPartReadState.EndOfBatch:
@@ -102,7 +102,7 @@ namespace Beef.Net.Http
                         throw new InvalidOperationException("The end of a batch boundary is unexpected; response is malformed.");
 
                     _isInBatch = false;
-                    await ReadNextLineAsync(true);
+                    await ReadNextLineAsync(true).ConfigureAwait(false);
                     goto CheckState;
 
                 case MultiPartReadState.EndOfStream:
@@ -124,7 +124,7 @@ namespace Beef.Net.Http
             var multiPart = new MultiPart();
 
             // Response headers.
-            while (CheckValidReadStates(await ReadNextLineAsync(), true, DataOrEmptyStates) == MultiPartReadState.Data)
+            while (CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, DataOrEmptyStates) == MultiPartReadState.Data)
             {
                 if (!TryParseHeader(_line, out KeyValuePair<string, string[]> header))
                     throw new InvalidOperationException("The multipart response header is malformed.");
@@ -149,20 +149,20 @@ namespace Beef.Net.Http
                     if (isInvalidMultiPart)
                         throw new InvalidOperationException("The multipart response has a Content-Type of multipart/mixed with an unexpected boundary.");
 
-                    await ReadNextLineAsync(true);
+                    await ReadNextLineAsync(true).ConfigureAwait(false);
                     return multiPart;
                 }
             }
 
             // Response status.
-            CheckValidReadStates(await ReadNextLineAsync(), true, MultiPartReadState.Data);
+            CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, MultiPartReadState.Data);
             if (!TryParseStatusCode(_line, out HttpStatusCode statusCode))
                 throw new InvalidOperationException("Unexpected HTTP status code; response is malformed.");
 
             multiPart.StatusCode = statusCode;
 
             // Content headers.
-            while (CheckValidReadStates(await ReadNextLineAsync(), true, DataOrEmptyStates) == MultiPartReadState.Data)
+            while (CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, DataOrEmptyStates) == MultiPartReadState.Data)
             {
                 if (!TryParseHeader(_line, out KeyValuePair<string, string[]> header))
                     throw new InvalidOperationException("The multipart response header is malformed.");
@@ -171,14 +171,14 @@ namespace Beef.Net.Http
             }
 
             // Content.
-            while (CheckValidReadStates(await ReadNextLineAsync(), false, MultiPartReadState.EndOfStream) == MultiPartReadState.Data)
+            while (CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), false, MultiPartReadState.EndOfStream) == MultiPartReadState.Data)
             {
                 multiPart.Content.AppendLine(_line);
             }
 
             // Move to non-empty state.
             if (_state == MultiPartReadState.Empty)
-                await ReadNextLineAsync(true);
+                await ReadNextLineAsync(true).ConfigureAwait(false);
 
             multiPart.IsResponseMessage = true;
             return multiPart;
@@ -189,7 +189,7 @@ namespace Beef.Net.Http
         /// </summary>
         private async Task<MultiPartReadState> ReadNextLineAsync(bool ignoreEmpty = false)
         {
-            return _state = await ReadNextLineInternalAsync(ignoreEmpty);
+            return _state = await ReadNextLineInternalAsync(ignoreEmpty).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace Beef.Net.Http
         {
             while (true)
             {
-                _line = await _reader.ReadLineAsync();
+                _line = await _reader.ReadLineAsync().ConfigureAwait(false);
                 if (_line == null)
                     return MultiPartReadState.EndOfStream;
                 else if (_line.Length == 0)

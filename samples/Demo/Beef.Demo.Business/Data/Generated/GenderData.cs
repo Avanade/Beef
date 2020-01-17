@@ -52,9 +52,9 @@ namespace Beef.Demo.Business.Data
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs);
+                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
                 __result = Database.Default.Get(__dataArgs, id);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id);
+                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
         }
@@ -73,9 +73,9 @@ namespace Beef.Demo.Business.Data
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs);
+                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
                 __result = Database.Default.Create(__dataArgs, value);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
         }
@@ -94,9 +94,9 @@ namespace Beef.Demo.Business.Data
             {
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs);
+                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
                 __result = Database.Default.Update(__dataArgs, value);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
         }

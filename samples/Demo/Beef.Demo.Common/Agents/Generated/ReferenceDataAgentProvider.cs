@@ -134,7 +134,7 @@ namespace Beef.Demo.Common.Agents
             if (getNames.Count == 0)
                 return;
                         
-            var result = await _agent.GetNamedAsync(getNames.ToArray());
+            var result = await _agent.GetNamedAsync(getNames.ToArray()).ConfigureAwait(false);
             foreach (var rdj in JObject.Parse("{ \"content\":" + result.Content + "}")["content"].Children())
             {
                 switch (rdj["name"].Value<string>())

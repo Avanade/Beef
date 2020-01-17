@@ -3,7 +3,7 @@
 Represents the **NuGet** versions.
 
 ## v2.1.10
-- *Enhacement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
+- *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
 
 ## v2.1.9
 - *Fixed:* Introduced FxCop Analysis to `Beef.Data.Cosmos`; this version represents the remediation based on the results.

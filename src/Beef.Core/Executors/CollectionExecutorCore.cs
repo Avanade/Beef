@@ -50,7 +50,7 @@ namespace Beef.Executors
         {
             try
             {
-                await OnItemRunAsync(args);
+                await OnItemRunAsync(args).ConfigureAwait(false);
                 OnPerRunType(args);
             }
             catch (Exception ex)
@@ -79,7 +79,7 @@ namespace Beef.Executors
         {
             try
             {
-                await OnCompletionRunAsync(args);
+                await OnCompletionRunAsync(args).ConfigureAwait(false);
                 OnPerRunType(args);
             }
             catch (Exception ex)
