@@ -8,7 +8,7 @@ BEGIN
 	DECLARE @Username nvarchar(50)
     IF @Override IS NULL
 	BEGIN
-		SET @Username = CONVERT(nvarchar, SESSION_CONTEXT(N'Username'));
+		SET @Username = CONVERT(nvarchar(50), SESSION_CONTEXT(N'Username'));
 		IF @Username IS NULL
 		BEGIN
 			SET @Username = SYSTEM_USER
