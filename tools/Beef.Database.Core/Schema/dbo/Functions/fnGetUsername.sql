@@ -1,14 +1,14 @@
 ﻿CREATE FUNCTION [dbo].[fnGetUsername]
 (
-	@Override as nvarchar(50) = null
+	@Override AS NVARCHAR(1024) = null
 )
-RETURNS nvarchar(50)
+RETURNS NVARCHAR(1024)
 AS
 BEGIN
-	DECLARE @Username nvarchar(50)
+	DECLARE @Username NVARCHAR(1024)
     IF @Override IS NULL
 	BEGIN
-		SET @Username = CONVERT(nvarchar(50), SESSION_CONTEXT(N'Username'));
+		SET @Username = CONVERT(NVARCHAR(1024), SESSION_CONTEXT(N'Username'));
 		IF @Username IS NULL
 		BEGIN
 			SET @Username = SYSTEM_USER
@@ -21,4 +21,3 @@ BEGIN
 
 	RETURN @Username
 END
-
