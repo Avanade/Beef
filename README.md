@@ -158,7 +158,7 @@ The following are references to additional documentation (these are all accessib
 ### Code-generation
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
-- [Template structure](./docs/Template-Structure.md)
+- [Template structure](./docs/Template-structure.md)
 - Entity-driven:
   - [CodeGeneration element](./docs/Entity-CodeGeneration-element.md)
   - [Entity element](./docs/Entity-Entity-element.md)

@@ -191,7 +191,7 @@ namespace Beef.Executors
                 var exe = executor as CollectionExecutorBase<TColl, TItem>;
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
-                    await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs(exe)).ConfigureAwait(false)))).ConfigureAwait(false);
+                    await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs(exe)).ConfigureAwait(false)).ConfigureAwait(false))).ConfigureAwait(false);
                 }, exe).ConfigureAwait(false);
             });
         }
@@ -227,7 +227,7 @@ namespace Beef.Executors
                 exe.ExecutorArgs = ((TriggerEventArgs)args).Args;
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
-                    await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs<TArgs>(exe)).ConfigureAwait(false)))).ConfigureAwait(false);
+                    await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs<TArgs>(exe)).ConfigureAwait(false)).ConfigureAwait(false))).ConfigureAwait(false);
                 }, exe).ConfigureAwait(false);
             });
         }

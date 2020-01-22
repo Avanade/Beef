@@ -30,7 +30,11 @@ These are critical to the naming of the solution and its underlying projects. On
 Before the `Beef.Template.Solution` template can be used it must be installed from [NuGet](https://www.nuget.org/packages/Beef.Template.Solution/). The `dotnet new -i` command is used to perform this:
 
 ```
+-- Use the latest published from NuGet...
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
+
+-- Or alternatively, point to a local folder...
+dotnet new -i beef.template.solution --nuget-source C:\source\repos\Avanade\Beef\nuget-publish
 ```
 
 <br/>

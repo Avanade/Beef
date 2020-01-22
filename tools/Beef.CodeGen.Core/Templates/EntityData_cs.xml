@@ -17,6 +17,7 @@
       <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="${{Entity.Name}}&lt;T&gt;" />
       <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
       <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}CollectionResult" Otherwise="${{Entity.Name}}CollectionResult&lt;T&gt;" />
+      <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="${{Entity.EntityName}}" />
       <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" Otherwise="false" />
       <Set Name="System.UsesOData" Condition="Entity.AutoImplement == 'OData'" Value="true" Otherwise="false" />
       <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" Otherwise="false" />
@@ -1131,7 +1132,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
       </If>
       <If Condition="System.UsesCosmos == true and Entity.DataCosmosCustomMapper == false">
-        <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="${{Entity.EntityName}}" />
         <![CDATA[
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Cosmos {{Entity.CosmosEntity:ToSeeComments}} property mapping.

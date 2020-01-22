@@ -175,10 +175,10 @@ namespace Beef.AspNetCore.WebApi
 
             var dict = new Dictionary<string, KeyValuePair<string, StringValues>>();
 #pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
-            if (controller.HttpContext.Request.Query.Count() == 0)
+            if (!controller.HttpContext.Request.Query.Any())
 #pragma warning restore CA1062
             {
-                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. api/v1/demo/ref?entity=codeX,codeY&entity2=codeZ&entity3");
+                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
                 return dict.Values;
             }
 
