@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Beef.Demo.Business.DataSvc
 {
@@ -12,6 +13,11 @@ namespace Beef.Demo.Business.DataSvc
         private static async Task MarkOnAfterAsync()
         {
             await Beef.Events.Event.PublishAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
+        }
+
+        private static Task<int> DataSvcCustomOnImplementationAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

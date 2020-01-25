@@ -608,9 +608,18 @@ namespace Beef.WebApi
                 }
             }
 
-            // Where additional url query string is supplied then add.
-            if (!string.IsNullOrEmpty(requestOptions?.UrlQueryString))
-                fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString.Substring(1) : requestOptions.UrlQueryString);
+            // Add any optional query string arguments.
+            if (requestOptions != null)
+            {
+                if (requestOptions.IncludeFields.Any())
+                    fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + WebApiRequestOptions.IncludeFieldsQueryStringName + "=" + Uri.EscapeDataString(string.Join(",", requestOptions.IncludeFields.Where(x => !string.IsNullOrEmpty(x))));
+
+                if (requestOptions.ExcludeFields.Any())
+                    fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + WebApiRequestOptions.ExcludeFieldsQueryStringName + "=" + Uri.EscapeDataString(string.Join(",", requestOptions.ExcludeFields.Where(x => !string.IsNullOrEmpty(x))));
+
+                if (!string.IsNullOrEmpty(requestOptions.UrlQueryString))
+                    fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString.Substring(1) : requestOptions.UrlQueryString);
+            }
 
             return new Uri(fullUrl.Replace(" ", "%20"));
         }

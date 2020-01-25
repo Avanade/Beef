@@ -288,12 +288,11 @@ namespace Beef.Demo.Test
         public void C120_GetAll_PagingAndFieldFiltering()
         {
             var pa = PagingArgs.CreateSkipAndTake(1, 2);
-            pa.IncludeFields.Add("lastName");
-            pa.IncludeFields.Add("firstName");
+            var ro = new WebApiRequestOptions().Include("lastName", "firstName");
 
             var pcr = AgentTester.Create<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetAllAsync(pa));
+                .Run((a) => a.Agent.GetAllAsync(pa, ro));
 
             // Check only 2 are returned in the sorted order.
             Assert.AreEqual(2, pcr?.Value?.Result?.Count);

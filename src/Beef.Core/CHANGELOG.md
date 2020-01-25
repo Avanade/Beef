@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.28
+- *Fixed:* Decoupled (removed) the `IncludeFields` and `ExcludeFields` from the `PagingArgs` are these relate to any request not those that just include paging; these now exist as properties on the `WebApiRequestOptions`. Apologies, if used this will result in a breaking change.
+
 ## v2.1.27
 - *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
 

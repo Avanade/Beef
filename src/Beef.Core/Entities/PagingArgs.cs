@@ -1,14 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Collections.Generic;
 
 namespace Beef.Entities
 {
     /// <summary>
     /// Represents either position-based paging being (<see cref="Page"/> and <see cref="Size"/>), or <see cref="Skip"/> and <see cref="Take"/>. The <see cref="DefaultTake"/> 
     /// and <see cref="MaxTake"/> (and <see cref="DefaultIsGetCount"/>) are system-wide settings to encourage page-size consistency, as well as limit the maximum value possible. 
-    /// Selection of <see cref="IncludeFields"/> and <see cref="ExcludeFields"/> is also supported to limit the data payload where serializing.
     /// </summary>
     public class PagingArgs
     {
@@ -108,8 +106,6 @@ namespace Beef.Entities
             Take = pagingArgs.Take;
             Page = pagingArgs.Page;
             IsGetCount = pagingArgs.IsGetCount;
-            IncludeFields = pagingArgs.IncludeFields;
-            ExcludeFields = pagingArgs.ExcludeFields;
         }
 
         /// <summary>
@@ -162,15 +158,5 @@ namespace Beef.Entities
         /// Indicates whether to get the total count (see <see cref="PagingResult.TotalCount"/>) when performing the underlying query (defaults to <c>false</c>).
         /// </summary>
         public bool IsGetCount { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the list of <b>included</b> fields (JSON property names) to limit serialization data payload.
-        /// </summary>
-        public List<string> IncludeFields { get; } = new List<string>();
-
-        /// <summary>
-        /// Gets or sets the list of <b>excluded</b> fields (JSON property names) to limit serialization data payload.
-        /// </summary>
-        public List<string> ExcludeFields { get; } = new List<string>();
     }
 }

@@ -5,13 +5,13 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>2.1.8</Version>
+    <Version>2.1.9</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Business Entity Execution Framework (Beef) SQL Server Database tool.</Description>
-    <AssemblyVersion>2.1.8</AssemblyVersion>
-    <FileVersion>2.1.8</FileVersion>
+    <AssemblyVersion>2.1.9</AssemblyVersion>
+    <FileVersion>2.1.9</FileVersion>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
@@ -82,7 +82,7 @@
   <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="4.2.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -35,12 +35,12 @@ namespace Beef.AspNetCore.WebApi
         public static IEnumerable<string> PagingArgsCountQueryStringNames { get; set; } = new string[] { "$count", "$totalCount" };
 
         /// <summary>
-        /// Gets or sets the list of possible <see cref="PagingArgs.IncludeFields"/> query string names.
+        /// Gets or sets the list of possible "include field" query string names.
         /// </summary>
         public static IEnumerable<string> IncludeFieldsQueryStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
 
         /// <summary>
-        /// Gets or sets the list of possible <see cref="PagingArgs.ExcludeFields"/> query string names.
+        /// Gets or sets the list of possible "exclude field" query string names.
         /// </summary>
         public static IEnumerable<string> ExcludeFieldsQueryStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
 
@@ -85,20 +85,33 @@ namespace Beef.AspNetCore.WebApi
                     pa = (skip.HasValue) ? PagingArgs.CreateSkipAndTake(skip.Value, take) : PagingArgs.CreatePageAndSize(page.Value, take);
 
                 pa.IsGetCount = ParseBoolValue(GetNamedQueryString(controller, PagingArgsCountQueryStringNames));
-
-                var fields = GetNamedQueryString(controller, IncludeFieldsQueryStringNames);
-                if (!string.IsNullOrEmpty(fields))
-                    pa.IncludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
-
-                fields = GetNamedQueryString(controller, ExcludeFieldsQueryStringNames);
-                if (!string.IsNullOrEmpty(fields))
-                    pa.ExcludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
             }
 
             if (ExecutionContext.HasCurrent && ExecutionContext.Current.PagingArgs == null)
                 ExecutionContext.Current.PagingArgs = pa;
 
             return pa;
+        }
+
+        /// <summary>
+        /// Gets the other known request options.
+        /// </summary>
+        /// <param name="controller">The <see cref="ControllerBase"/> that has the request url.</param>
+        /// <returns>The other known request options.</returns>
+        internal static (List<string> includeFields, List<string> excludeFields) GetOtherRequestOptions(this ControllerBase controller)
+        {
+            var includeFields = new List<string>();
+            var excludeFields = new List<string>();
+
+            var fields = GetNamedQueryString(controller, IncludeFieldsQueryStringNames);
+            if (!string.IsNullOrEmpty(fields))
+                includeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
+
+            fields = GetNamedQueryString(controller, ExcludeFieldsQueryStringNames);
+            if (!string.IsNullOrEmpty(fields))
+                excludeFields.AddRange(fields.Split(',', StringSplitOptions.RemoveEmptyEntries));
+
+            return (includeFields, excludeFields);
         }
 
         /// <summary>
@@ -175,10 +188,10 @@ namespace Beef.AspNetCore.WebApi
 
             var dict = new Dictionary<string, KeyValuePair<string, StringValues>>();
 #pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
-            if (controller.HttpContext.Request.Query.Count() == 0)
+            if (!controller.HttpContext.Request.Query.Any())
 #pragma warning restore CA1062
             {
-                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. api/v1/demo/ref?entity=codeX,codeY&entity2=codeZ&entity3");
+                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
                 return dict.Values;
             }
 

@@ -303,16 +303,6 @@ namespace Beef.WebApi
         public static string PagingArgsCountQueryStringName { get; set; } = "$count";
 
         /// <summary>
-        /// Gets or sets the <see cref="PagingArgs.IncludeFields"/> query string name.
-        /// </summary>
-        public static string IncludeFieldsQueryStringName { get; set; } = "$fields";
-
-        /// <summary>
-        /// Gets or sets the <see cref="PagingArgs.ExcludeFields"/> query string name.
-        /// </summary>
-        public static string ExcludeFieldsQueryStringName { get; set; } = "$excludeFields";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPagingArgsArg"/> class.
         /// </summary>
         /// <param name="name">The argument <see cref="WebApiArg.Name"/>.</param>
@@ -351,12 +341,6 @@ namespace Beef.WebApi
 
             if (Value.IsGetCount)
                 UriAppend(sb, UriFormat(PagingArgsCountQueryStringName, "true"));
-
-            if (Value.IncludeFields != null && Value.IncludeFields.Count > 0 && Value.IncludeFields.Any(x => !string.IsNullOrEmpty(x)))
-                UriAppend(sb, UriFormat(IncludeFieldsQueryStringName, string.Join(",", Value.IncludeFields.Where(x => !string.IsNullOrEmpty(x)))));
-
-            if (Value.ExcludeFields != null && Value.ExcludeFields.Count > 0 && Value.ExcludeFields.Any(x => !string.IsNullOrEmpty(x)))
-                UriAppend(sb, UriFormat(ExcludeFieldsQueryStringName, string.Join(",", Value.ExcludeFields.Where(x => !string.IsNullOrEmpty(x)))));
 
             return sb.ToString();
         }

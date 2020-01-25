@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Beef.Core" Version="2.1.22" />
+    <PackageReference Include="Beef.Core" Version="2.1.28" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Agents\" />

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.9
+- *Fixed:* `fnGetUsername` updated to support usernames as `nvarchar(1024)` to enable any reasonable username size to be supported. This is the same as what is currently supported by `spSetSessionContext`.
+
 ## v2.1.8
 - *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
 

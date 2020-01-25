@@ -243,6 +243,19 @@ namespace Beef.Demo.Business.DataSvc
         }      
 
         /// <summary>
+        /// Validate a DataSvc Custom generation.
+        /// </summary>
+        /// <returns>A resultant <see cref="int"/>.</returns>
+        public static Task<int> DataSvcCustomAsync()
+        {
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            {
+                var __result = await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
+                return __result;
+            });
+        }      
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
