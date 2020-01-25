@@ -110,6 +110,12 @@ namespace Beef.Demo.Business
         Task AddAsync(Person person);
 
         /// <summary>
+        /// Validate a DataSvc Custom generation.
+        /// </summary>
+        /// <returns>A resultant <see cref="int"/>.</returns>
+        Task<int> DataSvcCustomAsync();
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>

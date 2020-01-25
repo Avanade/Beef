@@ -144,7 +144,24 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B250_GetByArgs_Empty()
+        public void B250_GetByArgs_IncludeFields()
+        {
+            var paging = Beef.Entities.PagingArgs.CreateSkipAndTake(0);
+
+            var r = AgentTester.Create<PersonAgent, PersonCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(new PersonArgs { GendersSids = new List<string> { "F" } }, requestOptions: new WebApiRequestOptions().Include("firstname", "lastname")));
+
+            Assert.IsNotNull(r.Value);
+            Assert.IsNotNull(r.Value.Result);
+            Assert.AreEqual(2, r.Value.Result.Count);
+            Assert.AreEqual(new string[] { "Browne", "Jones" }, r.Value.Result.Select(x => x.LastName).ToArray());
+
+            Assert.AreEqual("[{\"firstName\":\"Rachael\",\"lastName\":\"Browne\"},{\"firstName\":\"Wendy\",\"lastName\":\"Jones\"}]", r.Content);
+        }
+
+        [Test, TestSetUp]
+        public void B260_GetByArgs_Empty()
         {
             var v = AgentTester.Create<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)

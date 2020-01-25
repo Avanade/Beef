@@ -502,47 +502,49 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
           </If>
         </If>
-        <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
-        <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <![CDATA[__result]]>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[__result]]>
-        </If>
-        <Parameter Condition="Parameter.LayerPassing == 'All'">
-          <If Condition="System.Index == 0">
-            <Then>
-              <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[, ]]>
-              </If>
-              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                <![CDATA[, ]]>
-              </If>
-            </Then>
-            <Else>
-              <![CDATA[, ]]>
-            </Else>
+        <If Condition="Operation.DataSvcCustom == false">
+          <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
+          <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+            <![CDATA[__result]]>
           </If>
-          <![CDATA[{{Parameter.ArgumentName}}]]>
-        </Parameter>
-        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-          <If Condition="Operation.ParameterCount > 0">
-            <Then>
-              <![CDATA[, ]]>
-            </Then>
-            <Else>
-              <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
-                <![CDATA[, ]]>
-              </If>
-              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                <![CDATA[, ]]>
-              </If>
-            </Else>
+          <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+            <![CDATA[__result]]>
           </If>
-          <![CDATA[paging]]>
-        </If>
-        <![CDATA[).ConfigureAwait(false);
+          <Parameter Condition="Parameter.LayerPassing == 'All'">
+            <If Condition="System.Index == 0">
+              <Then>
+                <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                  <![CDATA[, ]]>
+                </If>
+                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                  <![CDATA[, ]]>
+                </If>
+              </Then>
+              <Else>
+                <![CDATA[, ]]>
+              </Else>
+            </If>
+            <![CDATA[{{Parameter.ArgumentName}}]]>
+          </Parameter>
+          <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+            <If Condition="Operation.ParameterCount > 0">
+              <Then>
+                <![CDATA[, ]]>
+              </Then>
+              <Else>
+                <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
+                  <![CDATA[, ]]>
+                </If>
+                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                  <![CDATA[, ]]>
+                </If>
+              </Else>
+            </If>
+            <![CDATA[paging]]>
+          </If>
+          <![CDATA[).ConfigureAwait(false);
 ]]>
+        </If>
         <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'GetColl'">
           <![CDATA[                return __result;
 ]]>

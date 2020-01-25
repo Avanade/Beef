@@ -79,6 +79,9 @@ namespace Beef.Demo.Business
         private readonly Func<PersonDetail, Guid, Task> _updateDetailOnBeforeAsync;
         private readonly Func<PersonDetail, Guid, Task> _updateDetailOnAfterAsync;
 
+        private readonly Func<Task> _dataSvcCustomOnBeforeAsync;
+        private readonly Func<int, Task> _dataSvcCustomOnAfterAsync;
+
         private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnPreValidateAsync;
         private readonly Action<MultiValidator, PersonArgs, PagingArgs> _getByArgsWithEfOnValidate;
         private readonly Func<PersonArgs, PagingArgs, Task> _getByArgsWithEfOnBeforeAsync;
@@ -405,6 +408,23 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await AddOnImplementationAsync(person).ConfigureAwait(false);
+            });
+        }
+
+        /// <summary>
+        /// Validate a DataSvc Custom generation.
+        /// </summary>
+        /// <returns>A resultant <see cref="int"/>.</returns>
+        public Task<int> DataSvcCustomAsync()
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
+                var __result = await PersonDataSvc.DataSvcCustomAsync().ConfigureAwait(false);
+                if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
+                Cleaner.Clean(__result);
+                return __result;
             });
         }
 

@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v2.1.28
 - *Fixed:* Code-gen of the data access for `Cosmos` will default the `CosmosEntity` attribute where not specified.
+- *Fixed:* Code-gen for a custom `DataSvc` was incorrectly outputting an `OnAfterAsync` method invocation; see https://github.com/Avanade/Beef/issues/15.
 
 ## v2.1.27
 - *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/. Templates also updated to ensure code-generated output complies. 

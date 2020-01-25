@@ -188,6 +188,11 @@ namespace Beef.AspNetCore.WebApi
             PagingArgs = WebApiQueryString.CreatePagingArgs(Controller);
             ExecutionContext.Current.PagingArgs = PagingArgs;
 
+            // Get the other request options.
+            var (include, exclude) = WebApiQueryString.GetOtherRequestOptions(Controller);
+            IncludeFields.AddRange(include);
+            ExcludeFields.AddRange(exclude);
+
             // Add to the ExecutionContext in case we need access to the originating request at any stage.
             ExecutionContext.Current.Properties.Add(ExecutionContextPropertyKey, this);
         }
@@ -241,6 +246,16 @@ namespace Beef.AspNetCore.WebApi
         /// Gets the <see cref="Entities.PagingArgs"/> for the request.
         /// </summary>
         public PagingArgs PagingArgs { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the list of <b>included</b> fields (JSON property names) to limit the serialized data payload (url query string: "$fields=x,y,z").
+        /// </summary>
+        public List<string> IncludeFields { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets or sets the list of <b>excluded</b> fields (JSON property names) to limit the serialized data payload (url query string: "$excludefields=x,y,z").
+        /// </summary>
+        public List<string> ExcludeFields { get; } = new List<string>();
 
         /// <summary>
         /// Gets the <see cref="FromBodyAttribute"/> value.
@@ -401,7 +416,7 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var json = JsonPropertyFilter.Apply(result, PagingArgs.IncludeFields, PagingArgs.ExcludeFields);
+            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields);
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
                 return (json, ExecutionContext.Current.ETag);

@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using System;
-
 namespace Beef.Entities
 {
     /// <summary>
@@ -24,8 +22,6 @@ namespace Beef.Entities
             Page = pagingArgs.Page;
             IsGetCount = pagingArgs.IsGetCount;
             TotalCount = (totalCount.HasValue && totalCount.Value < 0) ? null : totalCount;
-            IncludeFields.AddRange(pagingArgs.IncludeFields);
-            ExcludeFields.AddRange(pagingArgs.ExcludeFields);
         }
 
         /// <summary>
