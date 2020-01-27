@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.29
+- *Fixed:* Code-gen of corresponding reference data text (`xxxText`) was being incorrectly output where the property supported multiple values (`RefDataList="true"`).
+
 ## v2.1.28
 - *Fixed:* Code-gen of the data access for `Cosmos` will default the `CosmosEntity` attribute where not specified.
 - *Fixed:* Code-gen for a custom `DataSvc` was incorrectly outputting an `OnAfterAsync` method invocation; see https://github.com/Avanade/Beef/issues/15.

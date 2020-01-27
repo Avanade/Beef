@@ -617,6 +617,12 @@ namespace Beef.WebApi
                 if (requestOptions.ExcludeFields.Any())
                     fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + WebApiRequestOptions.ExcludeFieldsQueryStringName + "=" + Uri.EscapeDataString(string.Join(",", requestOptions.ExcludeFields.Where(x => !string.IsNullOrEmpty(x))));
 
+                if (requestOptions.IncludeRefDataText)
+                    fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + WebApiRequestOptions.IncludeRefDataTextQueryStringName + "=true";
+
+                if (requestOptions.IncludeInactive)
+                    fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + WebApiRequestOptions.IncludeInactiveQueryStringName + "=true";
+
                 if (!string.IsNullOrEmpty(requestOptions.UrlQueryString))
                     fullUrl = fullUrl + (fullUrl.Contains("?") ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString.Substring(1) : requestOptions.UrlQueryString);
             }

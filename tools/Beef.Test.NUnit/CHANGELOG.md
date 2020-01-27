@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.20
+- *Added:* `AgentTester.DefaultExpectNoEvents` added to effectively default `ExpectNoEvent` forcing tests to explicitly define all expected events.
+
+## v2.1.19
+- *Enhancement:* FxCop version upgrade; new NuGet package released in error as there was no change to runtime funcationality.
+
 ## v2.1.18
 - *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
 

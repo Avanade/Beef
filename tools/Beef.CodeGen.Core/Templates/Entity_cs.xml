@@ -206,7 +206,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         </If>
         <![CDATA[;
 ]]>
-        <If Condition="Property.RefDataType != null and Property.IgnoreSerialization == false">
+        <If Condition="Property.RefDataType != null and Property.RefDataList == false and Property.IgnoreSerialization == false">
           <Set Name="System.RefDataText" Condition="Config.RefDataText == true" Value="true" Otherwise="false" />
           <If Condition="Entity.RefDataText != null">
             <Set Name="System.RefDataText" Value="Entity.RefDataText" />
@@ -316,7 +316,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
           <If Condition="Property.RefDataText != null">
             <Set Name="System.RefDataText" Value="Entity.RefDataText" />
           </If>
-          <If Condition="System.RefDataText == true">
+          <If Condition="System.RefDataText == true and Property.RefDataList == false">
             <![CDATA[
         /// <summary>
         /// Gets the corresponding {{Property.Name:ToSeeComments}} text (read-only where selected).

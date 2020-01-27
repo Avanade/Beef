@@ -40,6 +40,7 @@ namespace Company.AppName.Test
             });
 
             AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "AppName_");
+            AgentTester.DefaultExpectNoEvents = true;
         }
 #endif
 #if (implement_cosmos)

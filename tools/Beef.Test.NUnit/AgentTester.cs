@@ -57,6 +57,11 @@ namespace Beef.Test.NUnit
         /// </summary>
         public static readonly string ConcurrencyErrorETag = "ZZZZZZZZZZZZ";
 
+        /// <summary>
+        /// Indicates whether to verify that no events were published as the default behaviour (see <see cref="AgentTester{TAgent}.ExpectNoEvents"/> and <see cref="AgentTester{TAgent, TValue}.ExpectNoEvents"/>).
+        /// </summary>
+        public static bool DefaultExpectNoEvents { get; set; }
+
         #region StartupTestServer
 
         /// <summary>
@@ -314,6 +319,9 @@ namespace Beef.Test.NUnit
 
             Args = args;
             Username = ExecutionContext.Current.Username;
+
+            if (DefaultExpectNoEvents)
+                SetExpectNoEvents();
         }
 
         /// <summary>
@@ -560,8 +568,7 @@ namespace Beef.Test.NUnit
 
                 ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());
             }
-
-            if (_expectedNonePublished)
+            else if (_expectedNonePublished)
                 ExpectEvent.NonePublished();
         }
     }

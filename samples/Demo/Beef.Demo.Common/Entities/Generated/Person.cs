@@ -81,7 +81,9 @@ namespace Beef.Demo.Common.Entities
         private string _lastName;
         private string _uniqueCode;
         private string _genderSid;
+        private string _genderText;
         private string _eyeColorSid;
+        private string _eyeColorText;
         private DateTime _birthday;
         private Address _address;
         private string _eTag;
@@ -147,6 +149,12 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
+        /// Gets the corresponding <see cref="Gender"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("genderText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string GenderText { get => _genderText ?? GetRefDataText(() => Gender); set => _genderText = value; }
+
+        /// <summary>
         /// Gets or sets the Gender (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -167,6 +175,12 @@ namespace Beef.Demo.Common.Entities
             get { return _eyeColorSid; }
             set { SetValue(ref _eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_EyeColor); }
         }
+
+        /// <summary>
+        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("eyeColorText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string EyeColorText { get => _eyeColorText ?? GetRefDataText(() => EyeColor); set => _eyeColorText = value; }
 
         /// <summary>
         /// Gets or sets the Eye Color (see <see cref="RefDataNamespace.EyeColor"/>).

@@ -53,6 +53,7 @@ namespace Beef.Demo.Common.Entities
 
         private string _id;
         private string _companySid;
+        private string _companyText;
         private string _description;
         private bool _isSalesTaxIncludedInPrice;
         private string _taxGroup;
@@ -82,6 +83,12 @@ namespace Beef.Demo.Common.Entities
             get { return _companySid; }
             set { SetValue(ref _companySid, value, true, StringTrim.End, StringTransform.EmptyToNull, Property_Company); }
         }
+
+        /// <summary>
+        /// Gets the corresponding <see cref="Company"/> text (read-only where selected).
+        /// </summary>
+        [JsonProperty("companyText", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string CompanyText { get => _companyText ?? GetRefDataText(() => Company); set => _companyText = value; }
 
         /// <summary>
         /// Gets or sets the Company (see <see cref="RefDataNamespace.Company"/>).
