@@ -109,3 +109,10 @@ dotnet run all
 ``` 
 
 For more information see: [data-generation](../../tools/Beef.Database.Core/README.md).
+
+<br/>
+
+## Samples
+
+See the following for example end-to-end usage:
+- [Cosmos sample](../../docs/Sample-Cosmos-GettingStarted.md)

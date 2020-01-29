@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.11
+- *Enhancement:* Update the sample to include a `POST` operation including corresponding tests.
+
 ## v2.1.10
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 

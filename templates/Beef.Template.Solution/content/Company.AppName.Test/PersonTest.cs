@@ -291,10 +291,81 @@ namespace Company.AppName.Test
 
         #endregion
 
+        #region Patch
+
+        [Test, TestSetUp]
+        public void E110_Patch_NotFound()
+        {
+            // Get an existing value.
+            var v = AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetAsync(2.ToGuid())).Value;
+
+            // Try patching with an invalid identifier.
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .ExpectErrorType(ErrorType.NotFoundError)
+                .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void E120_Patch_Concurrency()
+        {
+            // Get an existing value.
+            var id = 2.ToGuid();
+            var v = AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetAsync(id)).Value;
+
+            // Try updating the value with an invalid eTag (if-match).
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .ExpectErrorType(ErrorType.ConcurrencyError)
+                .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", id, new WebApiRequestOptions { ETag = AgentTester.ConcurrencyErrorETag }));
+
+            // Try updating the value with an eTag header (json payload eTag is ignored).
+            v.ETag = AgentTester.ConcurrencyErrorETag;
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .ExpectErrorType(ErrorType.ConcurrencyError)
+                .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch, "{{ \"lastName\": \"Smithers\", \"etag\": {AgentTester.ConcurrencyErrorETag} }}", id));
+        }
+
+        [Test, TestSetUp]
+        public void E130_Patch()
+        {
+            // Get an existing value.
+            var id = 2.ToGuid();
+            var v = AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetAsync(id)).Value;
+
+            // Make some changes to the data.
+            v.LastName = "Smithers";
+
+            // Update the value.
+            v = AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectChangeLogUpdated()
+                .ExpectETag(v.ETag)
+                .ExpectUniqueKey()
+                .ExpectValue((t) => v)
+                .ExpectEvent($"Bar.Person.{id}", "Update")
+                .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value;
+
+            // Check the value was updated properly.
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue((t) => v)
+                .Run((a) => a.Agent.GetAsync(id));
+        }
+
+        #endregion
+
         #region Delete
 
         [Test, TestSetUp]
-        public void E110_Delete()
+        public void F110_Delete()
         {
             // Check value exists.
             var id = 4.ToGuid();
@@ -305,7 +376,7 @@ namespace Company.AppName.Test
             // Delete value.
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"AppName.Person.{id}", "Delete")
+                .ExpectEvent($"Bar.Person.{id}", "Delete")
                 .Run((a) => a.Agent.DeleteAsync(id));
 
             // Check value no longer exists.
