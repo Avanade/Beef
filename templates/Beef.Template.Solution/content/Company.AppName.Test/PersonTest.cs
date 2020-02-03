@@ -385,9 +385,10 @@ namespace Company.AppName.Test
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run((a) => a.Agent.GetAsync(id));
 
-            // Delete again (should still be successful). 
+            // Delete again (should still be successful as a Delete is idempotent). 
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
+                .ExpectEvent($"Bar.Person.{id}", "Delete")
                 .Run((a) => a.Agent.DeleteAsync(id));
         }
 

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v2.1.12
+- *Fixed:* The database project had an incorrect reference to `Beef.Database.Core`. The **Delete** test now correctly checks for the `Delete` event as it is considered idempotent.
+
 ## v2.1.11
 - *Enhancement:* Update the sample to include a `POST` operation including corresponding tests.
 
