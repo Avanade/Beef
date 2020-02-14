@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -29,11 +30,11 @@ namespace Beef.CodeGen
         /// Creates the root and children configuration from the XML.
         /// </summary>
         /// <param name="codeGenerator">The <see cref="CodeGenerator"/>.</param>
-        internal static void Create(CodeGenerator codeGenerator)
+        internal static async Task CreateAsync(CodeGenerator codeGenerator)
         {
             codeGenerator.Root = new CodeGenConfig(codeGenerator.ConfigXml.Name.LocalName, null);
 
-            Load(codeGenerator, codeGenerator.Root, codeGenerator.ConfigXml, codeGenerator.Parameters);
+            await LoadAsync(codeGenerator, codeGenerator.Root, codeGenerator.ConfigXml, codeGenerator.Parameters).ConfigureAwait(false);
 
             UpdateCountAndIndex(codeGenerator.Root);
         }
@@ -41,7 +42,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Loads from an <see cref="XElement"/>.
         /// </summary>
-        private static void Load(CodeGenerator codeGen, CodeGenConfig config, XElement xml, Dictionary<string, string> parameters = null)
+        private static async Task LoadAsync(CodeGenerator codeGen, CodeGenConfig config, XElement xml, Dictionary<string, string> parameters = null)
         {
             // Add a SysId with a GUID for global uniqueness.
             config.AttributeAdd("SysId", Guid.NewGuid().ToString());
@@ -62,7 +63,7 @@ namespace Beef.CodeGen
 
             // Before children load.
             if (codeGen.Loaders.ContainsKey(config.Name))
-                codeGen.Loaders[config.Name].LoadBeforeChildren(config);
+                await codeGen.Loaders[config.Name].LoadBeforeChildrenAsync(config).ConfigureAwait(false);
 
             // Load the children.
             foreach (XElement xmlChild in xml.Nodes().Where(x => x.NodeType == XmlNodeType.Element || x.NodeType == XmlNodeType.CDATA))
@@ -77,7 +78,7 @@ namespace Beef.CodeGen
                     continue;
 
                 CodeGenConfig child = new CodeGenConfig(xmlChild.Name.LocalName, config);
-                Load(codeGen, child, xmlChild);
+                await LoadAsync(codeGen, child, xmlChild).ConfigureAwait(false);
 
                 if (!config.Children.ContainsKey(child.Name))
                     config.Children.Add(child.Name, new List<CodeGenConfig>());
@@ -87,7 +88,7 @@ namespace Beef.CodeGen
 
             // After children load.
             if (codeGen.Loaders.ContainsKey(config.Name))
-                codeGen.Loaders[config.Name].LoadAfterChildren(config);
+                await codeGen.Loaders[config.Name].LoadAfterChildrenAsync(config).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -272,7 +273,6 @@ namespace Beef.CodeGen
         /// Gets the parent <see cref="CodeGenConfig"/>.
         /// </summary>
         public CodeGenConfig Parent { get; }
-
 
         /// <summary>
         /// Gets the root <see cref="CodeGenConfig"/>.

@@ -53,7 +53,7 @@ namespace Beef.Demo.Business.Data
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Get(__dataArgs, id);
+                __result = await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
@@ -74,7 +74,7 @@ namespace Beef.Demo.Business.Data
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Create(__dataArgs, value);
+                __result = await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
@@ -95,7 +95,7 @@ namespace Beef.Demo.Business.Data
                 Gender __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Update(__dataArgs, value);
+                __result = await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });

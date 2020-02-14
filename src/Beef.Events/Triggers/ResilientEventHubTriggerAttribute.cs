@@ -28,11 +28,11 @@ namespace Beef.Events.Triggers
         /// <summary>
         /// Gets or sets connection string (defaults to "EventHubConnectionString").
         /// </summary>
-        public string Connection { get; set; } = "EventHubConnectionString";
+        public string? Connection { get; set; } = "EventHubConnectionString";
 
         /// <summary>
         /// Get or sets the optional name of the consumer group (defauts to "$Default" where not specified).
         /// </summary>
-        public string ConsumerGroup { get; set; }
+        public string? ConsumerGroup { get; set; }
     }
 }

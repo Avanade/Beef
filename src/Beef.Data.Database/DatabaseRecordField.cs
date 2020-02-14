@@ -21,7 +21,7 @@ namespace Beef.Data.Database
 
             for (int i = 0; i < dr.DataRecord.FieldCount; i++)
             {
-                Add(new DatabaseRecordField { Name = dr.DataRecord.GetName(i), Index = i });
+                Add(new DatabaseRecordField(dr.DataRecord.GetName(i), i));
             }
         }
 
@@ -45,13 +45,24 @@ namespace Beef.Data.Database
     public class DatabaseRecordField
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseRecordField"/> class.
+        /// </summary>
+        /// <param name="name">The field name.</param>
+        /// <param name="index">The field index.</param>
+        public DatabaseRecordField(string name, int index)
+        {
+            Name = Check.NotEmpty(name, nameof(name));
+            Index = index;
+        }
+
+        /// <summary>
         /// Gets or sets the field name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets or sets the field index.
         /// </summary>
-        public int Index { get; set; }
+        public int Index { get; private set; }
     }
 }

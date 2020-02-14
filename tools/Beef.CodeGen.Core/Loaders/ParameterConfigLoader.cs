@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Loaders
 {
@@ -19,7 +20,7 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
@@ -40,14 +41,8 @@ namespace Beef.CodeGen.Loaders
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
-        }
 
-        /// <summary>
-        /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
-        /// </summary>
-        /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
-        {
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -64,7 +59,7 @@ namespace Beef.CodeGen.Loaders
             if (propConfig == null)
                 throw new CodeGenException($"Attribute value references Property '{propertyName}' that does not exist for Entity.");
 
-            CodeGenConfig itemConfig = null;
+            CodeGenConfig? itemConfig = null;
             foreach (CodeGenConfig p in propConfig)
             {
                 if (p.Attributes["Name"] == propertyName)

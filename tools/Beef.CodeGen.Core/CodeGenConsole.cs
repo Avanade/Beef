@@ -72,13 +72,13 @@ namespace Beef.CodeGen
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
 
-            App.OnExecute(() =>
+            App.OnExecuteAsync(async (_) =>
             {
                 // Check the Execution script file or embedded resource names.
-                if (!File.Exists(_scriptOpt.Value()) && ResourceManager.GetScriptContent(_scriptOpt.Value()) == null)
+                if (!File.Exists(_scriptOpt.Value()) && await ResourceManager.GetScriptContentAsync(_scriptOpt.Value()!).ConfigureAwait(false) == null)
                     throw new InvalidOperationException($"The file or embedded resource '{_scriptOpt.Value()}' does not exist.");
 
-                return RunRunAwayAsync();
+                return await RunRunAwayAsync().ConfigureAwait(false);
             });
         }
     
@@ -92,10 +92,10 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public int Run(string args = null)
+        public Task<int> RunAsync(string? args = null)
         {
             if (string.IsNullOrEmpty(args))
-                return Run(Array.Empty<string>());
+                return RunAsync(Array.Empty<string>());
 
             // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
             var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
@@ -105,7 +105,7 @@ namespace Beef.CodeGen
                                  ? m.Groups[2].Value
                                  : m.Groups[4].Value, @"""""", @"""")).ToArray();
 
-            return Run(array);
+            return RunAsync(array);
         }
 
         /// <summary>
@@ -113,13 +113,13 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public int Run(string[] args)
+        public async Task<int> RunAsync(string[] args)
         {
             SetupExecutionContext();
 
             try
             {
-                return App.Execute(args);
+                return await App.ExecuteAsync(args).ConfigureAwait(false);
             }
             catch (CommandParsingException cpex)
             {
@@ -196,7 +196,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string text = null, ConsoleColor? foregroundColor = null)
+        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
         {
             if (string.IsNullOrEmpty(text))
                 Console.WriteLine();
@@ -218,9 +218,9 @@ namespace Beef.CodeGen
                 throw new ArgumentNullException(nameof(cmdOpt));
 
             var pd = new Dictionary<string, string>();
-            foreach (var p in cmdOpt.Values)
+            foreach (var p in cmdOpt.Values.Where(x => !string.IsNullOrEmpty(x)))
             {
-                string[] parts = CreateKeyValueParts(p);
+                string[] parts = CreateKeyValueParts(p!);
                 pd.Add(parts[0], parts[1]);
             }
 
@@ -263,7 +263,11 @@ namespace Beef.CodeGen
             if (!paramsOnly)
             {
                 Logger.Default.Info($"  Config = {args.ConfigFile?.Name}");
-                Logger.Default.Info($"  Script = {(args.ScriptFile.Exists ? args.ScriptFile?.FullName : args.ScriptFile?.Name)}");
+                if (args.ScriptFile == null)
+                    Logger.Default.Info("  Script = (none)");
+                else
+                    Logger.Default.Info($"  Script = {(args.ScriptFile.Exists ? args.ScriptFile?.FullName : args.ScriptFile?.Name)}");
+
                 Logger.Default.Info($"  Template = {args.TemplatePath?.FullName}");
                 Logger.Default.Info($"  Output = {args.OutputPath?.FullName}");
             }

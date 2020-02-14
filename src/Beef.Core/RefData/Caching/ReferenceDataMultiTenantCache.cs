@@ -106,8 +106,8 @@ namespace Beef.RefData.Caching
                 coll = new TColl();
             else
             {
-                var t = _loader.Load(this, _loadCollection);
-                t.Wait();
+                var t = _loader.LoadAsync(this, _loadCollection);
+                t.GetAwaiter().GetResult();
                 if (t.Result != null)
                 {
                     foreach (var item in t.Result)
@@ -182,7 +182,7 @@ namespace Beef.RefData.Caching
         {
             lock (_keyLock.Lock(tenantId))
             {
-                _dict.TryRemove(tenantId, out CacheValue<TColl> cv);
+                _dict.TryRemove(tenantId, out _);
                 _keyLock.Remove(tenantId);
             }
         }

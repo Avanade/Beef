@@ -2,8 +2,8 @@
   "profiles": {
     "Beef.Demo.Database": {
       "commandName": "Project",
-      "commandLineArgs": "scriptnew -alter Work",
-      "workingDirectory": "C:\\Users\\eric.sibly\\Innersource\\Repos\\Beef\\Demo\\Beef.Demo.Database"
+      "commandLineArgs": "all",
+      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Demo\\Beef.Demo.Database"
     }
   }
 }

@@ -17,7 +17,7 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TException">The <see cref="Exception"/> <see cref="Type"/>.</typeparam>
         /// <param name="exceptionMessage">The expected exception message; "*" indicates any.</param>
         /// <param name="action">The action to execute.</param>
-        [System.Diagnostics.DebuggerStepThrough]
+        //[System.Diagnostics.DebuggerStepThrough]
         public static void Throws<TException>(string exceptionMessage, Action action) where TException : Exception
         {
             if (exceptionMessage == null)
@@ -35,13 +35,13 @@ namespace Beef.Test.NUnit
             {
                 if (ex.GetType() == typeof(TException))
                 {
-                    if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
-                    {
-                        if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
-                            return;
-                    }
+                    //if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
+                    //{
+                    //    if (!exceptionMessage.Contains("\r\n", StringComparison.InvariantCulture) && ex.Message.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)[0] == exceptionMessage)
+                    //        return;
+                    //}
 
-                    if (exceptionMessage == "*" || ex.Message == exceptionMessage)
+                    if (exceptionMessage == "*" || ex.Message.StartsWith(exceptionMessage, StringComparison.InvariantCulture))
                         return;
                 }
 
@@ -82,7 +82,7 @@ namespace Beef.Test.NUnit
                     if (exceptionMessage == "*" || ex.Message == exceptionMessage)
                         return;
                 }
-                else if (ex is AggregateException aex && aex.InnerException.GetType() == typeof(TException))
+                else if (ex is AggregateException aex && aex.InnerException!.GetType() == typeof(TException))
                 {
                     if (typeof(TException) == typeof(ArgumentException) || typeof(TException) == typeof(ArgumentNullException))
                     {

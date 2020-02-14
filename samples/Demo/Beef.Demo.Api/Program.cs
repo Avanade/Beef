@@ -18,7 +18,7 @@ namespace Beef.Demo.Api
                .UseStartup<Startup>()
                .Build();
 
-        private static void ConfigBuilder(IConfigurationBuilder configurationBuilder, IHostingEnvironment hostingEnvironment) =>
+        private static void ConfigBuilder(IConfigurationBuilder configurationBuilder, IWebHostEnvironment hostingEnvironment) =>
             configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.json", true, false)
                 .AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
                 .AddJsonFile("appsettings.json", true, true)

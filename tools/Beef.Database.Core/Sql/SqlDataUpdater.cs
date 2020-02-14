@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using YamlDotNet.Serialization;
 
@@ -28,10 +29,10 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="db">The <see cref="DatabaseBase"/>.</param>
         /// <param name="refDataSchema">The reference data schema.</param>
-        public static void RegisterDatabase(DatabaseBase db, string refDataSchema)
+        public static async Task RegisterDatabaseAsync(DatabaseBase db, string refDataSchema)
         {
             if (DbTables == null)
-                DbTables = Table.LoadTablesAndColumns(db, refDataSchema);
+                DbTables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
 
             RefDataSchema = refDataSchema;
         }
@@ -52,12 +53,12 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the reference data schema.
         /// </summary>
-        public static string RefDataSchema { get; private set; }
+        public static string? RefDataSchema { get; private set; }
 
         /// <summary>
         /// Gets the registered database tables.
         /// </summary>
-        public static List<Table> DbTables { get; private set; }
+        public static List<Table>? DbTables { get; private set; }
 
         /// <summary>
         /// Reads and parses the YAML <see cref="string"/>.
@@ -66,10 +67,8 @@ namespace Beef.Database.Core.Sql
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
         public static SqlDataUpdater ReadYaml(string yaml)
         {
-            using (var sr = new StringReader(yaml))
-            {
-                return ReadYaml(sr);
-            }
+            using var sr = new StringReader(yaml);
+            return ReadYaml(sr);
         }
 
         /// <summary>
@@ -79,10 +78,8 @@ namespace Beef.Database.Core.Sql
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
         public static SqlDataUpdater ReadYaml(Stream s)
         {
-            using (var sr = new StreamReader(s))
-            {
-                return ReadYaml(sr);
-            }
+            using var sr = new StreamReader(s);
+            return ReadYaml(sr);
         }
 
         /// <summary>
@@ -92,7 +89,7 @@ namespace Beef.Database.Core.Sql
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
         public static SqlDataUpdater ReadYaml(TextReader tr)
         {
-            var yaml = new DeserializerBuilder().Build().Deserialize(tr);
+            var yaml = new DeserializerBuilder().Build().Deserialize(tr)!;
             var json = new SerializerBuilder().JsonCompatible().Build().Serialize(yaml);
             return ReadJson(json);
         }
@@ -154,10 +151,13 @@ namespace Beef.Database.Core.Sql
                                     foreach (var jc in jro.Children<JProperty>())
                                     {
                                         var col = sdt.IsRefData ? DatabaseRefDataColumns.CodeColumnName : sdt.DbTable.Columns.Where(x => x.IsPrimaryKey).Select(x => x.Name).SingleOrDefault();
-                                        row.AddColumn(col, GetColumnValue(jc.Name));
-                                        foreach (var jcv in jc.Values().Where(j => j.Type == JTokenType.Property).Cast<JProperty>())
+                                        if (!string.IsNullOrEmpty(col))
                                         {
-                                            row.AddColumn(jcv.Name, GetColumnValue(jcv.Value));
+                                            row.AddColumn(col, GetColumnValue(jc.Name));
+                                            foreach (var jcv in jc.Values().Where(j => j.Type == JTokenType.Property).Cast<JProperty>())
+                                            {
+                                                row.AddColumn(jcv.Name, GetColumnValue(jcv.Value));
+                                            }
                                         }
                                     }
                                 }
@@ -202,20 +202,20 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the column value.
         /// </summary>
-        private static object GetColumnValue(JToken j)
+        private static object? GetColumnValue(JToken j)
         {
-            switch (j.Type)
+            return j.Type switch
             {
-                case JTokenType.Boolean: return j.Value<bool>();
-                case JTokenType.Date: return j.Value<DateTime>();
-                case JTokenType.Float: return j.Value<float>();
-                case JTokenType.Guid: return j.Value<Guid>();
-                case JTokenType.Integer: return j.Value<int>();
-                case JTokenType.TimeSpan: return j.Value<TimeSpan>();
-                case JTokenType.Uri: return j.Value<String>();
-                case JTokenType.String: return j.Value<String>();
-                default: return null;
-            }
+                JTokenType.Boolean => j.Value<bool>(),
+                JTokenType.Date => j.Value<DateTime>(),
+                JTokenType.Float => j.Value<float>(),
+                JTokenType.Guid => j.Value<Guid>(),
+                JTokenType.Integer => j.Value<int>(),
+                JTokenType.TimeSpan => j.Value<TimeSpan>(),
+                JTokenType.Uri => j.Value<String>(),
+                JTokenType.String => j.Value<String>(),
+                _ => null,
+            };
         }
 
         /// <summary>
@@ -269,14 +269,14 @@ namespace Beef.Database.Core.Sql
         /// Generates the SQL.
         /// </summary>
         /// <param name="codeGen">The code generation action to execute.</param>
-        public void GenerateSql(Action<CodeGeneratorEventArgs> codeGen)
+        public async Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
         {
             if (codeGen == null)
                 throw new ArgumentNullException(nameof(codeGen));
 
             var cg = CodeGenerator.Create(CreateXml());
             cg.CodeGenerated += (o, e) => codeGen(e);
-            cg.Generate(XElement.Load(typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.xml")));
+            await cg.GenerateAsync(XElement.Load(typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.xml"))).ConfigureAwait(false);
         }
     }
 }

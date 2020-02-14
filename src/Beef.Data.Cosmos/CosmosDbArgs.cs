@@ -32,7 +32,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the <see cref="PagingResult"/>.
         /// </summary>
-        PagingResult Paging { get; }
+        PagingResult? Paging { get; }
 
         /// <summary>
         /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
@@ -47,12 +47,12 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.RequestOptions"/>.
         /// </summary>
-        ItemRequestOptions ItemRequestOptions { get; }
+        ItemRequestOptions? ItemRequestOptions { get; }
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.QueryRequestOptions"/>.
         /// </summary>
-        QueryRequestOptions QueryRequestOptions { get; }
+        QueryRequestOptions? QueryRequestOptions { get; }
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
-        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, ItemRequestOptions requestOptions = null)
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, ItemRequestOptions? requestOptions = null)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
@@ -85,7 +85,7 @@ namespace Beef.Data.Cosmos
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
-        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions requestOptions = null) 
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingArgs paging, QueryRequestOptions? requestOptions = null) 
             : this(mapper, containerId, partitionKey, new PagingResult(Check.NotNull(paging, (nameof(paging)))), requestOptions) { }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Beef.Data.Cosmos
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
-        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions requestOptions = null)
+        public CosmosDbArgs(IEntityMapper<T, TModel> mapper, string containerId, PartitionKey partitionKey, PagingResult paging, QueryRequestOptions? requestOptions = null)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
             ContainerId = Check.NotEmpty(containerId, nameof(containerId));
@@ -128,17 +128,17 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the <see cref="PagingResult"/> (where paging is required for a <b>query</b>).
         /// </summary>
-        public PagingResult Paging { get; private set; }
+        public PagingResult Paging { get; private set; } = default!;
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/> used for <b>Get</b>, <b>Create</b>, <b>Update</b>, and <b>Delete</b> (<seealso cref="QueryRequestOptions"/>).
         /// </summary>
-        public ItemRequestOptions ItemRequestOptions { get; private set; }
+        public ItemRequestOptions? ItemRequestOptions { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.QueryRequestOptions"/> used for <b>Query</b> (<seealso cref="ItemRequestOptions"/>).
         /// </summary>
-        public QueryRequestOptions QueryRequestOptions { get; private set; }
+        public QueryRequestOptions? QueryRequestOptions { get; private set; }
 
         /// <summary>
         /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/> on <b>Get</b>.
@@ -167,7 +167,12 @@ namespace Beef.Data.Cosmos
             if (keys.Length != Mapper.UniqueKey.Count)
                 throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Count}'.", nameof(keys));
 
-            return Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified).ToString();
+            var k = Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified).ToString();
+
+            if (string.IsNullOrEmpty(k))
+                throw new InvalidOperationException("A key (non null) was unable to be derived from the value.");
+
+            return k;
         }
 
         /// <summary>
@@ -181,7 +186,12 @@ namespace Beef.Data.Cosmos
                 throw new NotSupportedException("Only a single key value is currently supported.");
 
             var v = Mapper.UniqueKey[0].GetSrceValue(value, OperationTypes.Unspecified);
-            return Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified).ToString();
+            var k = Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified).ToString();
+
+            if (string.IsNullOrEmpty(k))
+                throw new InvalidOperationException("A key (non null) was unable to be derived from the value.");
+
+            return k;
         }
 
         /// <summary>
@@ -196,6 +206,6 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the authorisation filter (see <see cref="SetAuthorizedFilter"/>).
         /// </summary>
-        internal Func<IQueryable, IQueryable> AuthorizationFilter { get; set; }
+        internal Func<IQueryable, IQueryable>? AuthorizationFilter { get; set; }
     }
 }

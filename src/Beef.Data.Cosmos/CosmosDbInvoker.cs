@@ -25,7 +25,7 @@ namespace Beef.Data.Cosmos
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override void WrapInvoke(object caller, Action action, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override void WrapInvoke(object caller, Action action, CosmosDbBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
@@ -59,7 +59,7 @@ namespace Beef.Data.Cosmos
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, CosmosDbBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
@@ -99,7 +99,7 @@ namespace Beef.Data.Cosmos
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, CosmosDbBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (func == null)
                 throw new ArgumentNullException(nameof(func));
@@ -135,7 +135,7 @@ namespace Beef.Data.Cosmos
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, CosmosDbBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, CosmosDbBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (func == null)
                 throw new ArgumentNullException(nameof(func));

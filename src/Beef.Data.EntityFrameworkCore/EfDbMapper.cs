@@ -117,7 +117,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
         /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public new EfDbMapper<T, TModel> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<T, TSrceProperty>> srcePropertyExpression, Expression<Func<TModel, TDestProperty>> destPropertyExpression, Action<PropertyMapper<T, TSrceProperty, TModel, TDestProperty>> property = null)
+        public new EfDbMapper<T, TModel> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<T, TSrceProperty>> srcePropertyExpression, Expression<Func<TModel, TDestProperty>> destPropertyExpression, Action<PropertyMapper<T, TSrceProperty, TModel, TDestProperty>>? property = null)
         {
             base.HasProperty(srcePropertyExpression, destPropertyExpression, property);
             return this;
@@ -139,12 +139,12 @@ namespace Beef.Data.EntityFrameworkCore
                     var sex = Expression.Lambda(Expression.Property(spe, nameof(IETag.ETag)), spe);
                     var dpe = Expression.Parameter(DestType, "x");
                     var dex = Expression.Lambda(Expression.Property(dpe, Database.DatabaseColumns.RowVersionName), dpe);
-                    var pmap = (IPropertyMapper<T, TModel>)typeof(EntityMapper<T, TModel>)
+                    var pmap = (IPropertyMapper<T, TModel>?)typeof(EntityMapper<T, TModel>)
                         .GetMethod("PropertySrceAndDest", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(new Type[] { typeof(string), typeof(byte[]) })
+                        ?.MakeGenericMethod(new Type[] { typeof(string), typeof(byte[]) })
                         .Invoke(this, new object[] { sex, dex });
 
-                    pmap.SetConverter(StringToBase64Converter.Default);
+                    pmap?.SetConverter(StringToBase64Converter.Default);
                 }
             }
 
@@ -152,12 +152,12 @@ namespace Beef.Data.EntityFrameworkCore
             {
                 var spe = Expression.Parameter(SrceType, "x");
                 var sex = Expression.Lambda(Expression.Property(spe, nameof(IChangeLog.ChangeLog)), spe);
-                var pmap = (IPropertyMapper<T, TModel>)typeof(EntityMapper<T, TModel>)
+                var pmap = (IPropertyMapper<T, TModel>?)typeof(EntityMapper<T, TModel>)
                     .GetMethod("SrceProperty")
-                    .MakeGenericMethod(new Type[] { typeof(ChangeLog) })
+                    ?.MakeGenericMethod(new Type[] { typeof(ChangeLog) })
                     .Invoke(this, new object[] { sex });
 
-                pmap.SetMapper(new ChangeLogMapper<TModel>());
+                pmap?.SetMapper(new ChangeLogMapper<TModel>());
             }
 
             return this;

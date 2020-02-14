@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Loaders
 {
@@ -35,7 +36,7 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
@@ -51,13 +52,15 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("Namespace", config.Root.GetAttributeValue<string>("Namespace"));
             config.AttributeAdd("FileName", config.Attributes["Name"]);
             config.AttributeAdd("EntityScope", "Common");
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
+        public async Task LoadAfterChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
@@ -125,7 +128,7 @@ namespace Beef.CodeGen.Loaders
                 o.AttributeAdd("OperationType", "Delete");
                 o.AttributeAdd("UniqueKey", "true");
                 o.AttributeAdd("WebApiRoute", webApiRoute);
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
 
             if (autoPatch)
@@ -135,7 +138,7 @@ namespace Beef.CodeGen.Loaders
                 o.AttributeAdd("OperationType", "Patch");
                 o.AttributeAdd("UniqueKey", "true");
                 o.AttributeAdd("WebApiRoute", webApiRoute);
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
 
             if (autoUpdate)
@@ -149,7 +152,7 @@ namespace Beef.CodeGen.Loaders
                 if (refDataType != null)
                     o.AttributeAdd("ValidatorFluent", $"Entity(new ReferenceDataValidator<{config.GetAttributeValue<string>("Name")}>())");
 
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
 
             if (autoCreate)
@@ -163,7 +166,7 @@ namespace Beef.CodeGen.Loaders
                 if (refDataType != null)
                     o.AttributeAdd("ValidatorFluent", $"Entity(new ReferenceDataValidator<{config.GetAttributeValue<string>("Name")}>())");
 
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
 
             if (autoGet)
@@ -173,7 +176,7 @@ namespace Beef.CodeGen.Loaders
                 o.AttributeAdd("OperationType", "Get");
                 o.AttributeAdd("UniqueKey", "true");
                 o.AttributeAdd("WebApiRoute", webApiRoute);
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
 
             if (autoGetAll)
@@ -182,18 +185,18 @@ namespace Beef.CodeGen.Loaders
                 o.AttributeAdd("Name", "GetAll");
                 o.AttributeAdd("OperationType", "GetColl");
                 o.AttributeAdd("WebApiRoute", "");
-                opsConfig.Insert(0, ApplyOperationLoader(o));
+                opsConfig.Insert(0, await ApplyOperationLoaderAsync(o).ConfigureAwait(false));
             }
         }
 
         /// <summary>
         /// Applies the Operation Loader.
         /// </summary>
-        private CodeGenConfig ApplyOperationLoader(CodeGenConfig config)
+        private async Task<CodeGenConfig> ApplyOperationLoaderAsync(CodeGenConfig config)
         {
-            var opl = new OperationConfigLoader();
-            opl.LoadBeforeChildren(config);
-            opl.LoadAfterChildren(config);
+            var opl = new OperationConfigLoader() as ICodeGenConfigLoader;
+            await opl.LoadBeforeChildrenAsync(config).ConfigureAwait(false);
+            await opl.LoadAfterChildrenAsync(config).ConfigureAwait(false);
             return config;
         }
 

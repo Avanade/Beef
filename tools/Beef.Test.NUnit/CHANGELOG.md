@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Core 3.1.
+
 ## v2.1.20
 - *Added:* `AgentTester.DefaultExpectNoEvents` added to effectively default `ExpectNoEvent` forcing tests to explicitly define all expected events.
 

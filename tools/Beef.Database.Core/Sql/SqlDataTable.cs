@@ -82,9 +82,9 @@ namespace Beef.Database.Core.Sql
             if (row == null)
                 throw new ArgumentNullException(nameof(row));
 
-            foreach (var c in row.Columns.Where(x => x.Value != null))
+            foreach (var c in row.Columns.Where(x => x.Value != null && !string.IsNullOrEmpty(x.Value.Name)))
             {
-                AddColumn(c.Value.Name);
+                AddColumn(c.Value.Name!);
             }
 
             Rows.Add(row);

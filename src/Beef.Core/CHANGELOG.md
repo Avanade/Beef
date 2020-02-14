@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
+- *Enhanced:* The `BusinessInvokerBase` when beginning a transaction will now pass `TransactionScopeAsyncFlowOption.Enabled` to ensure that the database transaction will flow asynchronously.
+- *Removed:* The `PerformanceTimer` and `WebApiPerformanceTimer` have been removed. Using other tools such as AppInsights provides this insight.
+- *Enhanced:* Code-generation now executes asynchronously; previous synchronous operations have been removed and replaced with `xxxAsync` versions.
+
 ## v2.1.28
 - *Fixed:* Decoupled (removed) the `IncludeFields` and `ExcludeFields` from the `PagingArgs` are these relate to any request not those that just include paging; these now exist as properties on the `WebApiRequestOptions`. Apologies, if used this will result in a breaking change.
 

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
+- *Enhancement:* Tool updated to execute asynchoronously. Both `DatabaseConsole` and `DatabaseConsoleWrapper` have breaking change; `Run` has been removed, replaced with `RunAsync`.
+
 ## v2.1.9
 - *Fixed:* `fnGetUsername` updated to support usernames as `nvarchar(1024)` to enable any reasonable username size to be supported. This is the same as what is currently supported by `spSetSessionContext`.
 

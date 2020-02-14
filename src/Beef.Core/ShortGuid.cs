@@ -43,7 +43,7 @@ namespace Beef
 
             try
             {
-                _guid = new Guid(Convert.FromBase64String(g.Replace("_", "/").Replace("-", "+") + "=="));
+                _guid = new Guid(Convert.FromBase64String(g.Replace("_", "/", StringComparison.InvariantCulture).Replace("-", "+", StringComparison.InvariantCulture) + "=="));
             }
             catch (FormatException fe)
             {
@@ -205,7 +205,7 @@ namespace Beef
         /// <returns>The Base64 encoded <see cref="Guid"/> <see cref="string"/>.</returns>
         public override string ToString()
         {
-            return Convert.ToBase64String(_guid.ToByteArray()).Substring(0, 22).Replace("/", "_").Replace("+", "-");
+            return Convert.ToBase64String(_guid.ToByteArray()).Substring(0, 22).Replace("/", "_", StringComparison.InvariantCulture).Replace("+", "-", StringComparison.InvariantCulture);
         }
     }
 }

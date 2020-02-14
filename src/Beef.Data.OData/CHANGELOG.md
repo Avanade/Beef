@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
+
 ## v2.1.6
 - *Enhancement:* Sprinkled `Task.ConfigureAwait(false)` as per https://devblogs.microsoft.com/dotnet/configureawait-faq/.
 

@@ -393,7 +393,7 @@ namespace Beef.Executors
         /// <returns>The <see cref="ExecutionManager"/>.</returns>
         public ExecutionManager Run()
         {
-            RunAsync().Wait();
+            RunAsync().GetAwaiter().GetResult();
             return this;
         }
 

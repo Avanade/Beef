@@ -22,7 +22,7 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        protected EventSubscriberHost(EventSubscriberHostArgs args = null) => Args = Check.NotNull(args, nameof(args));
+        protected EventSubscriberHost(EventSubscriberHostArgs? args = null) => Args = Check.NotNull(args, nameof(args))!;
 
         /// <summary>
         /// Gets the <see cref="EventSubscriberHostArgs"/>.
@@ -49,7 +49,7 @@ namespace Beef.Events.Subscribe
 
             // Match a subscriber to the subject + template supplied.
             var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
-            var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
+            var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber?)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
             if (subscriber == null)
                 return;
 

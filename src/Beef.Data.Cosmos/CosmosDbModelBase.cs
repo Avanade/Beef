@@ -14,13 +14,13 @@ namespace Beef.Data.Cosmos
         /// Gets or sets the <see cref="IStringIdentifier"/>.
         /// </summary>
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IETag"/>.
         /// </summary>
         [JsonProperty("_etag")]
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the time-to-live (https://docs.microsoft.com/en-us/azure/cosmos-db/time-to-live).

@@ -107,7 +107,7 @@ namespace Beef.Demo.Business.Data
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonCreate]");
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Create(__dataArgs, value);
+                __result = await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
@@ -123,7 +123,7 @@ namespace Beef.Demo.Business.Data
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonDelete]");
                 if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                Database.Default.Delete(__dataArgs, id);
+                await Database.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
         }
@@ -140,7 +140,7 @@ namespace Beef.Demo.Business.Data
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGet]");
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Get(__dataArgs, id);
+                __result = await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
@@ -161,7 +161,7 @@ namespace Beef.Demo.Business.Data
                 Person __result = null;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonUpdate]");
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = Database.Default.Update(__dataArgs, value);
+                __result = await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
@@ -179,7 +179,7 @@ namespace Beef.Demo.Business.Data
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetAll]", __result.Paging);
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(__dataArgs).ConfigureAwait(false);
-                __result.Result = Database.Default.Query(__dataArgs, p => _getAllOnQuery?.Invoke(p, __dataArgs)).SelectQuery<PersonCollection>();
+                __result.Result = await Database.Default.Query(__dataArgs, p => _getAllOnQuery?.Invoke(p, __dataArgs)).SelectQueryAsync<PersonCollection>().ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getAllOnException });
@@ -196,7 +196,7 @@ namespace Beef.Demo.Business.Data
                 PersonCollectionResult __result = new PersonCollectionResult();
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetAll]");
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync(__dataArgs).ConfigureAwait(false);
-                __result.Result = Database.Default.Query(__dataArgs, p => _getAll2OnQuery?.Invoke(p, __dataArgs)).SelectQuery<PersonCollection>();
+                __result.Result = await Database.Default.Query(__dataArgs, p => _getAll2OnQuery?.Invoke(p, __dataArgs)).SelectQueryAsync<PersonCollection>().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getAll2OnException });
@@ -215,7 +215,7 @@ namespace Beef.Demo.Business.Data
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonGetByArgs]", __result.Paging);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = Database.Default.Query(__dataArgs, p => _getByArgsOnQuery?.Invoke(p, args, __dataArgs)).SelectQuery<PersonCollection>();
+                __result.Result = await Database.Default.Query(__dataArgs, p => _getByArgsOnQuery?.Invoke(p, args, __dataArgs)).SelectQueryAsync<PersonCollection>().ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });

@@ -86,7 +86,7 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null)
         {
             return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, requestOptions);
         }
@@ -99,7 +99,7 @@ namespace Beef.Data.Cosmos
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey, QueryRequestOptions requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey, QueryRequestOptions? requestOptions = null)
         {
             return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, paging, requestOptions);
         }
@@ -112,7 +112,7 @@ namespace Beef.Data.Cosmos
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
         {
             return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, paging, requestOptions);
         }
@@ -126,7 +126,7 @@ namespace Beef.Data.Cosmos
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
         /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public new CosmosDbMapper<T, TModel> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<T, TSrceProperty>> srcePropertyExpression, Expression<Func<TModel, TDestProperty>> destPropertyExpression, Action<PropertyMapper<T, TSrceProperty, TModel, TDestProperty>> property = null)
+        public new CosmosDbMapper<T, TModel> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<T, TSrceProperty>> srcePropertyExpression, Expression<Func<TModel, TDestProperty>> destPropertyExpression, Action<PropertyMapper<T, TSrceProperty, TModel, TDestProperty>>? property = null)
         {
             base.HasProperty(srcePropertyExpression, destPropertyExpression, property);
             return this;
@@ -150,7 +150,7 @@ namespace Beef.Data.Cosmos
                     var dex = Expression.Lambda(Expression.Property(dpe, nameof(IETag.ETag)), dpe);
                     typeof(EntityMapper<T, TModel>)
                         .GetMethod("PropertySrceAndDest", BindingFlags.NonPublic | BindingFlags.Instance)
-                        .MakeGenericMethod(new Type[] { typeof(string), typeof(string) })
+                        ?.MakeGenericMethod(new Type[] { typeof(string), typeof(string) })
                         .Invoke(this, new object[] { sex, dex });
                 }
             }
@@ -161,23 +161,23 @@ namespace Beef.Data.Cosmos
                 var sex = Expression.Lambda(Expression.Property(spe, nameof(IChangeLog.ChangeLog)), spe);
                 var dpe = Expression.Parameter(DestType, "x");
                 var dex = Expression.Lambda(Expression.Property(dpe, nameof(IChangeLog.ChangeLog)), dpe);
-                var pmap = (IPropertyMapper<T, TModel>)typeof(EntityMapper<T, TModel>)
+                var pmap = (IPropertyMapper<T, TModel>?)typeof(EntityMapper<T, TModel>)
                     .GetMethod("PropertySrceAndDest", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .MakeGenericMethod(new Type[] { typeof(ChangeLog), typeof(ChangeLog) })
+                    ?.MakeGenericMethod(new Type[] { typeof(ChangeLog), typeof(ChangeLog) })
                     .Invoke(this, new object[] { sex, dex });
 
-                pmap.SetMapper(new ChangeLogMapper());
+                pmap?.SetMapper(new ChangeLogMapper());
             }
             else if (typeof(IChangeLog).IsAssignableFrom(typeof(T)) && GetBySrcePropertyName(nameof(IChangeLog.ChangeLog)) == null)
             {
                 var spe = Expression.Parameter(SrceType, "x");
                 var sex = Expression.Lambda(Expression.Property(spe, nameof(IChangeLog.ChangeLog)), spe);
-                var pmap = (IPropertyMapper<T, TModel>)typeof(EntityMapper<T, TModel>)
+                var pmap = (IPropertyMapper<T, TModel>?)typeof(EntityMapper<T, TModel>)
                     .GetMethod("SrceProperty")
-                    .MakeGenericMethod(new Type[] { typeof(ChangeLog) })
+                    ?.MakeGenericMethod(new Type[] { typeof(ChangeLog) })
                     .Invoke(this, new object[] { sex });
 
-                pmap.SetMapper(new ChangeLogMapper<TModel>());
+                pmap?.SetMapper(new ChangeLogMapper<TModel>());
             }
 
             return this;

@@ -168,7 +168,7 @@ namespace Beef
             if (CharactersNotAllowed != null && CharactersNotAllowed.Count > 0 && text.IndexOfAny(CharactersNotAllowed.ToArray()) >= 0)
                 wr.Selection |= WildcardSelection.InvalidCharacter;
 
-            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter) >= 0;
+            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter, StringComparison.InvariantCulture) >= 0;
             var hasTxt = false;
 
             for (int i = 0; i < text.Length; i++)
@@ -302,10 +302,10 @@ namespace Beef
         {
             var s = Text;
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                s = s.Replace(new string(Wildcard.MultiWildcard, 1), string.Empty);
+                s = s.Replace(new string(Wildcard.MultiWildcard, 1), string.Empty, StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                s = s.Replace(new string(Wildcard.SingleWildcard, 1), string.Empty);
+                s = s.Replace(new string(Wildcard.SingleWildcard, 1), string.Empty, StringComparison.InvariantCulture);
 
             return s;
         }
@@ -336,10 +336,10 @@ namespace Beef
 
             var p = Regex.Escape(Text);
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                p = p.Replace("\\*", ".*");
+                p = p.Replace("\\*", ".*", StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                p = p.Replace("\\?", ".");
+                p = p.Replace("\\?", ".", StringComparison.InvariantCulture);
 
             return CreateRegex($"^{p}$", ignoreCase);
         }
@@ -366,10 +366,10 @@ namespace Beef
 
             var p = Regex.Escape(Text);
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                p = p.Replace("\\*", ".*");
+                p = p.Replace("\\*", ".*", StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                p = p.Replace("\\?", ".");
+                p = p.Replace("\\?", ".", StringComparison.InvariantCulture);
 
             return $"^{p}$";
         }

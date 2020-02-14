@@ -49,7 +49,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="resp">The response value.</param>
         /// <returns>The entity value.</returns>
-        internal T GetResponseValue(Response<CosmosDbValue<TModel>> resp)
+        internal T? GetResponseValue(Response<CosmosDbValue<TModel>> resp)
         {
             if (resp?.Resource == null)
                 return default;
@@ -66,7 +66,7 @@ namespace Beef.Data.Cosmos
         {
             CosmosDbBase.ReformatValueETag(model);
             ((ICosmosDbValue)model).PrepareAfter();
-            return DbArgs.Mapper.MapToSrce(model.Value, Mapper.OperationTypes.Get);
+            return DbArgs.Mapper.MapToSrce(model.Value!, Mapper.OperationTypes.Get);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbValueQuery{T, TModel}"/>.</returns>
-        public CosmosDbValueQuery<T, TModel> Query(Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> query = null)
+        public CosmosDbValueQuery<T, TModel> Query(Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null)
         {
             return new CosmosDbValueQuery<T, TModel>(this, query);
         }
@@ -197,7 +197,7 @@ namespace Beef.Data.Cosmos
 
                 CheckAuthorized(resp.Resource);
                 ro.SessionToken = resp.Headers?.Session;
-                DbArgs.Mapper.MapToDest(value, resp.Resource.Value, Mapper.OperationTypes.Update);
+                DbArgs.Mapper.MapToDest(value, resp.Resource.Value!, Mapper.OperationTypes.Update);
                 ((ICosmosDbValue)resp.Resource).PrepareBefore();
 
                 resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro).ConfigureAwait(false);

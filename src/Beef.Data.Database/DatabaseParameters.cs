@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Web;
 
 namespace Beef.Data.Database
@@ -63,7 +63,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
-        public DbParameter AddParameter(string name, object value, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter AddParameter(string name, object? value, ParameterDirection direction = ParameterDirection.Input)
         {
             var p = DatabaseCommand.Database.Provider.CreateParameter();
             p.ParameterName = Check.NotEmpty(name, nameof(name));
@@ -82,7 +82,7 @@ namespace Beef.Data.Database
         /// <param name="dbType">The parameter <see cref="DbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
-        public DbParameter AddParameter(string name, object value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter AddParameter(string name, object? value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
             var p = DatabaseCommand.Database.Provider.CreateParameter();
             p.ParameterName = Check.NotEmpty(name, nameof(name));
@@ -102,10 +102,10 @@ namespace Beef.Data.Database
         /// <param name="sqlDbType">The parameter <see cref="SqlDbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DbParameter AddParameter(string name, object value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        public DbParameter AddParameter(string name, object? value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
-            var p = (System.Data.SqlClient.SqlParameter)DatabaseCommand.Database.Provider.CreateParameter();
+            var p = (Microsoft.Data.SqlClient.SqlParameter)DatabaseCommand.Database.Provider.CreateParameter();
             p.ParameterName = Check.NotEmpty(name, nameof(name));
             p.SqlDbType = sqlDbType;
             p.Direction = direction;
@@ -142,7 +142,7 @@ namespace Beef.Data.Database
         /// <param name="size">The maximum size (in bytes).</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public SqlParameter AddParameter(string name, SqlDbType sqlDbType, int size = 0, ParameterDirection direction = ParameterDirection.Input)
         {
             var p = (SqlParameter)DatabaseCommand.Database.Provider.CreateParameter();
@@ -178,8 +178,14 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
             if (when)
-                AddParameter(name, Check.NotNull(value, nameof(value)).Invoke(), direction);
+                AddParameter(name, value(), direction);
 
             return this;
         }
@@ -195,7 +201,7 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
-            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default) != 0, name, value, direction);
+            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, direction);
         }
 
         /// <summary>
@@ -224,11 +230,14 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
             if (when)
-                AddParameter(name, value.Invoke(), dbType, direction);
+                AddParameter(name, value(), dbType, direction);
 
             return this;
         }
@@ -245,7 +254,7 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
-            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default) != 0, name, value, dbType, direction);
+            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, dbType, direction);
         }
 
         /// <summary>
@@ -256,7 +265,7 @@ namespace Beef.Data.Database
         /// <param name="sqlDbType">The parameter <see cref="SqlDbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseParameters Param(string name, object value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
             AddParameter(name, value, sqlDbType, direction);
@@ -273,14 +282,17 @@ namespace Beef.Data.Database
         /// <param name="sqlDbType">The parameter <see cref="SqlDbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseParameters ParamWhen<T>(bool when, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
             if (when)
-                AddParameter(name, value.Invoke(), sqlDbType, direction);
+                AddParameter(name, value(), sqlDbType, direction);
 
             return this;
         }
@@ -295,10 +307,10 @@ namespace Beef.Data.Database
         /// <param name="sqlDbType">The parameter <see cref="SqlDbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
-            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default) != 0, name, value, sqlDbType, direction);
+            return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, sqlDbType, direction);
         }
 
         /// <summary>
@@ -337,7 +349,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters Param(IDatabasePropertyMapper propertyMapper, object value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters Param(IDatabasePropertyMapper propertyMapper, object? value, ParameterDirection direction = ParameterDirection.Input)
         {
             if (propertyMapper == null)
                 throw new ArgumentNullException(nameof(propertyMapper));
@@ -363,11 +375,14 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         public DatabaseParameters ParamWhen<T>(bool when, IDatabasePropertyMapper propertyMapper, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (propertyMapper == null)
+                throw new ArgumentNullException(nameof(propertyMapper));
+
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
             if (when)
-                Param(propertyMapper, value.Invoke(), direction);
+                Param(propertyMapper, value(), direction);
 
             return this;
         }
@@ -381,9 +396,9 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value; where not specified the <paramref name="with"/> vaue will be used.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWith<T>(T with, IDatabasePropertyMapper propertyMapper, Func<T> value = null, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWith<T>(T with, IDatabasePropertyMapper propertyMapper, Func<T>? value = null, ParameterDirection direction = ParameterDirection.Input)
         {
-            return ParamWhen(Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare((T)with, default) != 0, propertyMapper, value ?? (() => with), direction);
+            return ParamWhen(Comparer<T>.Default.Compare(with, default!) != 0 && Comparer<T>.Default.Compare((T)with, default!) != 0, propertyMapper, value ?? (() => with), direction);
         }
 
         /// <summary>
@@ -394,8 +409,11 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value; where not specified the <paramref name="with"/> vaue will be used.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWithWildcard(string with, string name, Func<string> value = null, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWithWildcard(string with, string name, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
             return ParamWith(with, name, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)), direction);
         }
 
@@ -407,8 +425,11 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value; where not specified the <paramref name="with"/> vaue will be used.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWithWildcard(string with, IDatabasePropertyMapper propertyMapper, Func<string> value = null, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWithWildcard(string with, IDatabasePropertyMapper propertyMapper, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
         {
+            if (propertyMapper == null)
+                throw new ArgumentNullException(nameof(propertyMapper));
+
             return ParamWith(with, propertyMapper, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)), direction);
         }
 
@@ -453,7 +474,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/> where added; otherwise, <c>null</c>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter AddRowVersionParameter<T>(string name, T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DbParameter? AddRowVersionParameter<T>(string name, T value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             if (value is IETag etag)
                 return AddRowVersionParameter(name, etag.ETag, direction);
@@ -469,7 +490,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/> where added; otherwise, <c>null</c>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter AddRowVersionParameter<T>(T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DbParameter? AddRowVersionParameter<T>(T value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             return AddRowVersionParameter("@" + DatabaseColumns.RowVersionName, value, direction);
         }
@@ -580,13 +601,13 @@ namespace Beef.Data.Database
             var list = new List<DbParameter>();
             if (addCreatedParams)
             {
-                list.Add(AddParameter("@" + DatabaseColumns.CreatedByName, (string)changeLog?.CreatedBy, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.CreatedByName, (string)changeLog?.CreatedBy!, direction));
                 list.Add(AddParameter("@" + DatabaseColumns.CreatedDateName, (DateTime?)changeLog?.CreatedDate, direction));
             }
 
             if (addUpdatedParams)
             {
-                list.Add(AddParameter("@" + DatabaseColumns.UpdatedByName, (string)changeLog?.UpdatedBy, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.UpdatedByName, (string)changeLog?.UpdatedBy!, direction));
                 list.Add(AddParameter("@" + DatabaseColumns.UpdatedDateName, (DateTime?)changeLog?.UpdatedDate, direction));
             }
 
@@ -606,8 +627,10 @@ namespace Beef.Data.Database
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
         public DbParameter[] AddChangeLogParameters<T>(T value, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
-            var changeLog = value as IChangeLog;
-            return AddChangeLogParameters(changeLog?.ChangeLog, addCreatedParams, addUpdatedParams, direction);
+            if (!(value is IChangeLog changeLog))
+                return Array.Empty<DbParameter>();
+
+            return AddChangeLogParameters(changeLog.ChangeLog, addCreatedParams, addUpdatedParams, direction);
         }
 
         /// <summary>
@@ -732,8 +755,14 @@ namespace Beef.Data.Database
         /// <remarks>This specifically implies that the <see cref="SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseParameters TableValuedParamWhen(bool when, string name, Func<TableValuedParameter> tvp)
         {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            if (tvp == null)
+                throw new ArgumentNullException(nameof(tvp));
+
             if (when)
-                TableValuedParam(name, tvp?.Invoke());
+                TableValuedParam(name, tvp());
 
             return this;
         }

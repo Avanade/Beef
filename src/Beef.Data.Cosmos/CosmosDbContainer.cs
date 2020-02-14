@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Data.Cosmos.Internal;
 using Beef.Entities;
-using Beef.RefData;
 using Microsoft.Azure.Cosmos;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,7 +70,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="resp">The response value.</param>
         /// <returns>The entity value.</returns>
-        internal T GetResponseValue(Response<TModel> resp)
+        internal T? GetResponseValue(Response<TModel> resp)
         {
             if (resp?.Resource == null)
                 return default;
@@ -108,7 +105,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="query">The function to perform additional query execution.</param>
         /// <returns>The <see cref="CosmosDbQuery{T, TModel}"/>.</returns>
-        public CosmosDbQuery<T, TModel> Query(Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        public CosmosDbQuery<T, TModel> Query(Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             return new CosmosDbQuery<T, TModel>(this, query);
         }
@@ -198,7 +195,7 @@ namespace Beef.Data.Cosmos
                 if (ro.IfMatchEtag == null && value is IETag etag)
                     ro.IfMatchEtag = etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) ? etag.ETag : "\"" + etag.ETag + "\"";
 
-                string key = DbArgs.GetCosmosKey(value);
+                string? key = DbArgs.GetCosmosKey(value);
                 CosmosDbBase.PrepareEntityForUpdate(value);
                     
                 // Must read existing to update.

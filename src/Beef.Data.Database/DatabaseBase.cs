@@ -2,12 +2,12 @@
 
 using Beef.Mapper;
 using Beef.RefData;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.Data.Database
 {
@@ -17,7 +17,7 @@ namespace Beef.Data.Database
     /// <remarks>Provides automatic database connection management by leveraging the <see cref="DataContextScope"/>.</remarks>
     public abstract class DatabaseBase
     {
-        private DbConnection _connection;
+        private DbConnection? _connection;
 
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for the <see cref="SqlException"/> known list.
@@ -79,17 +79,12 @@ namespace Beef.Data.Database
         /// Initializes a new instance of the <see cref="DatabaseBase"/> class for a <paramref name="connectionString"/> and <paramref name="provider"/>.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <param name="provider">The optional data provider (e.g. System.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        protected DatabaseBase(string connectionString, DbProviderFactory provider = null)
+        /// <param name="provider">The optional data provider (e.g. Microsoft.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
+        protected DatabaseBase(string connectionString, DbProviderFactory? provider = null)
         {
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
         }
-
-        /// <summary>
-        /// Gets the name of the connection string settings as defined in the application configuration.
-        /// </summary>
-        public string ConnectionName { get; private set; }
 
         /// <summary>
         /// Gets the database connection string.
@@ -122,7 +117,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="connection">The <see cref="DbConnection"/> (where <c>null</c> it will create automatically bypassing the <see cref="DataContextScope"/>).</param>
         /// <returns>A <see cref="DbConnection"/>.</returns>
-        public DbConnection SetBypassDataContextScopeDbConnection(DbConnection connection = null)
+        public DbConnection SetBypassDataContextScopeDbConnection(DbConnection? connection = null)
         {
             _connection = connection ?? CreateConnection(false);
             return _connection;
@@ -175,7 +170,7 @@ namespace Beef.Data.Database
         /// <param name="queryArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="queryParams">The query <see cref="DatabaseParameters"/> delegate.</param>
         /// <returns>A <see cref="DatabaseQuery{T}"/>.</returns>
-        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters> queryParams = null) where T : class, new()
+        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new()
         {
             return new DatabaseQuery<T>(this, queryArgs, queryParams);
         }
@@ -187,12 +182,12 @@ namespace Beef.Data.Database
         /// <param name="getArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public T Get<T>(DatabaseArgs<T> getArgs, params IComparable[] keys) where T : class, new()
+        public Task<T> GetAsync<T>(DatabaseArgs<T> getArgs, params IComparable[] keys) where T : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));
 
-            return StoredProcedure(getArgs.StoredProcedure).Params((p) => getArgs.Mapper.GetKeyParams(p, OperationTypes.Get, keys)).SelectFirstOrDefault<T>(getArgs.Mapper);
+            return StoredProcedure(getArgs.StoredProcedure).Params((p) => getArgs.Mapper.GetKeyParams(p, OperationTypes.Get, keys)).SelectFirstOrDefaultAsync<T>(getArgs.Mapper);
         }
 
         /// <summary>
@@ -203,7 +198,7 @@ namespace Beef.Data.Database
         /// <param name="value">The value to insert.</param>
         /// <returns>The value (reselected where specified).</returns>
         /// <remarks>Automatically invokes <see cref="DatabaseParameters.AddChangeLogParameters(Entities.ChangeLog, bool, bool, ParameterDirection)"/>.</remarks>
-        public T Create<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new()
+        public async Task<T> CreateAsync<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -218,11 +213,11 @@ namespace Beef.Data.Database
             if (saveArgs.Refresh)
             {
                 cmd.Param("@" + DatabaseColumns.ReselectRecordName, true);
-                return cmd.SelectFirstOrDefault<T>(saveArgs.Mapper) ?? throw new NotFoundException();
+                return await cmd.SelectFirstOrDefaultAsync(saveArgs.Mapper).ConfigureAwait(false) ?? throw new NotFoundException();
             }
 
             // NOTE: without refresh, fields like IDs and RowVersion are not automatically updated.
-            cmd.NonQuery();
+            await cmd.NonQueryAsync().ConfigureAwait(false);
             return value;
         }
 
@@ -234,7 +229,7 @@ namespace Beef.Data.Database
         /// <param name="value">The value to update.</param>
         /// <returns>The value (reselected where specified).</returns>
         /// <remarks>Automatically invokes <see cref="DatabaseParameters.AddRowVersionParameter{T}(T, ParameterDirection)"/> and <see cref="DatabaseParameters.AddChangeLogParameters{T}(T, bool, bool, ParameterDirection)"/>.</remarks>
-        public T Update<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new()
+        public async Task<T> UpdateAsync<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new()
         {
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -249,11 +244,11 @@ namespace Beef.Data.Database
             if (saveArgs.Refresh)
             {
                 cmd.Param("@" + DatabaseColumns.ReselectRecordName, true);
-                return cmd.SelectFirstOrDefault<T>(saveArgs.Mapper) ?? throw new NotFoundException();
+                return await cmd.SelectFirstOrDefaultAsync(saveArgs.Mapper).ConfigureAwait(false) ?? throw new NotFoundException();
             }
 
             // NOTE: without refresh, fields like IDs and RowVersion are not automatically updated.
-            cmd.NonQuery();
+            await cmd.NonQueryAsync().ConfigureAwait(false);
             return value;
         }
 
@@ -263,12 +258,12 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
-        public void Delete<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new()
+        public Task DeleteAsync<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
 
-            StoredProcedure(saveArgs.StoredProcedure).Params((p) => saveArgs.Mapper.GetKeyParams(p, OperationTypes.Delete, keys)).NonQuery();
+            return StoredProcedure(saveArgs.StoredProcedure).Params((p) => saveArgs.Mapper.GetKeyParams(p, OperationTypes.Delete, keys)).NonQueryAsync();
         }
 
         /// <summary>
@@ -282,16 +277,16 @@ namespace Beef.Data.Database
         /// <param name="additionalProperties">The additional properties action that enables non-standard properties to be updated from the <see cref="DatabaseRecord"/>.</param>
         /// <param name="additionalDatasetRecords">The additional dataset record delegates where additional datasets are returned.</param>
         /// <param name="confirmItemIsToBeAdded">The action to confirm whether the item is to be added (defaults to <c>true</c>).</param>
-        public void GetRefData<TColl, TItem>(TColl coll, string storedProcedure, string idColumnName = null,
-            Action<DatabaseRecord, TItem, DatabaseRecordFieldCollection> additionalProperties = null,
-            Action<DatabaseRecord>[] additionalDatasetRecords = null,
-            Func<DatabaseRecord, TItem, bool> confirmItemIsToBeAdded = null)
+        public async Task GetRefDataAsync<TColl, TItem>(TColl coll, string storedProcedure, string? idColumnName = null,
+            Action<DatabaseRecord, TItem, DatabaseRecordFieldCollection>? additionalProperties = null,
+            Action<DatabaseRecord>[]? additionalDatasetRecords = null,
+            Func<DatabaseRecord, TItem, bool>? confirmItemIsToBeAdded = null)
                 where TColl : ReferenceDataCollectionBase<TItem>
                 where TItem : ReferenceDataBase, new()
         {
             Check.NotNull(coll, nameof(coll));
 
-            DatabaseRecordFieldCollection fields = null;
+            DatabaseRecordFieldCollection? fields = null;
             var idCol = idColumnName ?? DatabaseRefDataColumns.IdColumnName;
             var isInt = ReferenceDataBase.GetIdTypeCode(typeof(TItem)) == ReferenceDataIdTypeCode.Int32;
 
@@ -340,7 +335,7 @@ namespace Beef.Data.Database
             if (additionalDatasetRecords != null && additionalDatasetRecords.Length > 0)
                 list.AddRange(additionalDatasetRecords);
 
-            StoredProcedure(storedProcedure).SelectQueryMultiSet(list.ToArray());
+            await StoredProcedure(storedProcedure).SelectQueryMultiSetAsync(list.ToArray()).ConfigureAwait(false);
         }
     }
 }

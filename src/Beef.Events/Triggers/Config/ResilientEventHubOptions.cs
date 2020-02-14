@@ -42,22 +42,22 @@ namespace Beef.Events.Triggers.Config
         /// <summary>
         /// Gets or sets the event hub endpoint path.
         /// </summary>
-        public string EventHubPath { get; set; }
+        public string? EventHubPath { get; set; }
 
         /// <summary>
         /// Gets or set the event hub name.
         /// </summary>
-        public string EventHubName { get; set; }
+        public string? EventHubName { get; set; }
 
         /// <summary>
         /// Gets or sets the function name.
         /// </summary>
-        public string FunctionName { get; set; }
+        public string? FunctionName { get; set; }
 
         /// <summary>
         /// Gets or sets the runtime function type information: namespace.class.method.
         /// </summary>
-        public string FunctionType { get; set; }
+        public string? FunctionType { get; set; }
 
         /// <summary>
         /// Adds the named event hub with the specified credentials.

@@ -117,7 +117,7 @@ namespace Beef.Data.Database
     public class MultiSetSingleArgs<TItem> : MultiSetSingleArgs, IMultiSetArgs<TItem>
         where TItem : class, new()
     {
-        private TItem _value;
+        private TItem? _value;
         private readonly Action<TItem> _result;
 
         /// <summary>
@@ -216,9 +216,9 @@ namespace Beef.Data.Database
     /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
     public class MultiSetCollArgs<TColl, TItem> : MultiSetCollArgs, IMultiSetArgs<TItem>
         where TItem : class, new()
-        where TColl : ICollection<TItem>, new()
+        where TColl : class, ICollection<TItem>, new()
     {
-        private TColl _coll;
+        private TColl? _coll;
         private readonly Action<TColl> _result;
 
         /// <summary>
@@ -247,10 +247,15 @@ namespace Beef.Data.Database
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
         public override void DatasetRecord(DatabaseRecord dr)
         {
+            if (dr == null)
+                throw new ArgumentNullException(nameof(dr));
+
             if (_coll == null)
                 _coll = new TColl();
 
-            _coll.Add(Mapper.MapFromDb(dr, OperationType));
+            var item = Mapper.MapFromDb(dr, OperationType);
+            if (item != null)
+                _coll.Add(item);
         }
 
         /// <summary>
@@ -272,7 +277,7 @@ namespace Beef.Data.Database
         where TItem : ReferenceDataBase, new()
     {
         private readonly string _columnName;
-        private List<TItem> _coll;
+        private List<TItem>? _coll;
         private readonly Action<IEnumerable<TItem>> _result;
         private readonly ReferenceDataIdTypeCode _idTypeCode;
 

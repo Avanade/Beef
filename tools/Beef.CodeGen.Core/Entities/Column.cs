@@ -107,7 +107,7 @@ namespace Beef.CodeGen.Entities
             // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-data-type-mappings
 
             if (string.IsNullOrEmpty(dbType))
-                return null;
+                throw new ArgumentNullException(nameof(dbType));
 
             if (TypeIsString(dbType))
                 return "string";
@@ -144,37 +144,35 @@ namespace Beef.CodeGen.Entities
         /// <returns>The .NET <see cref="System.Type"/> name.</returns>
         public static Type GetDotNetType(string dbType)
         {
-            switch (GetDotNetTypeName(dbType).ToUpperInvariant())
+            return (GetDotNetTypeName(dbType).ToUpperInvariant()) switch
             {
-                case "STRING": return typeof(string);
-                case "DECIMAL": return typeof(decimal);
-                case "DATETIME": return typeof(DateTime);
-                case "BYTE[]": return typeof(byte[]);
-                case "BOOL": return typeof(bool);
-                case "DATETIMEOFFSET": return typeof(DateTimeOffset);
-                case "DOUBLE": return typeof(double);
-                case "INT": return typeof(int);
-                case "LONG": return typeof(long);
-                case "SHORT": return typeof(short);
-                case "BYTE": return typeof(byte);
-                case "FLOAT": return typeof(float);
-                case "TIMESPAN": return typeof(TimeSpan);
-                case "GUID": return typeof(Guid);
-
-                default:
-                    throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined.");
-            }
+                "STRING" => typeof(string),
+                "DECIMAL" => typeof(decimal),
+                "DATETIME" => typeof(DateTime),
+                "BYTE[]" => typeof(byte[]),
+                "BOOL" => typeof(bool),
+                "DATETIMEOFFSET" => typeof(DateTimeOffset),
+                "DOUBLE" => typeof(double),
+                "INT" => typeof(int),
+                "LONG" => typeof(long),
+                "SHORT" => typeof(short),
+                "BYTE" => typeof(byte),
+                "FLOAT" => typeof(float),
+                "TIMESPAN" => typeof(TimeSpan),
+                "GUID" => typeof(Guid),
+                _ => throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined."),
+            };
         }
 
         /// <summary>
         /// Gets the column name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets the SQL Server data type.
         /// </summary>
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         /// <summary>
         /// Indicates whether the column is nullable.
@@ -219,7 +217,7 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the default value.
         /// </summary>
-        public string DefaultValue { get; set; }
+        public string? DefaultValue { get; set; }
 
         /// <summary>
         /// Indicates whether the column is the primary key.
@@ -234,17 +232,17 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the foreign key table.
         /// </summary>
-        public string ForeignTable { get; set; }
+        public string? ForeignTable { get; set; }
 
         /// <summary>
         /// Gets or sets the foreign key schema.
         /// </summary>
-        public string ForeignSchema { get; set; }
+        public string? ForeignSchema { get; set; }
 
         /// <summary>
         /// Gets or sets the foreign key column name.
         /// </summary>
-        public string ForeignColumn { get; set; }
+        public string? ForeignColumn { get; set; }
 
         /// <summary>
         /// Indicates whether the foreign key is references a reference data table/entity.
@@ -256,7 +254,7 @@ namespace Beef.CodeGen.Entities
         /// </summary>
         public string DotNetType
         {
-            get => GetDotNetTypeName(Type);
+            get => string.IsNullOrEmpty(Type) ? "string" : GetDotNetTypeName(Type);
         }
 
         /// <summary>

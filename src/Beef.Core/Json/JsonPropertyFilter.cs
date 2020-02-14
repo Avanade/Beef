@@ -179,11 +179,11 @@ namespace Beef.Json
 
             while (true)
             {
-                var li = txt.IndexOf('[');
+                var li = txt.IndexOf('[', StringComparison.InvariantCulture);
                 if (li < 0)
                     break;
 
-                var ri = txt.IndexOf(']');
+                var ri = txt.IndexOf(']', StringComparison.InvariantCulture);
                 if (ri < 0 || ri < li)
                     break;
 

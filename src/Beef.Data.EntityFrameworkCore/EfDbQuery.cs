@@ -17,7 +17,7 @@ namespace Beef.Data.EntityFrameworkCore
     public class EfDbQuery<T, TModel, TDbContext> where T : class, new() where TModel : class, new() where TDbContext : DbContext, new()
     {
         private readonly EfDbBase<TDbContext> _db;
-        private readonly Func<IQueryable<TModel>, IQueryable<TModel>> _query;
+        private readonly Func<IQueryable<TModel>, IQueryable<TModel>>? _query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EfDbQuery{T, TModel, TDbContext}"/> class.
@@ -25,7 +25,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="db">The <see cref="DbSet{TModel}"/>.</param>
         /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
-        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
             QueryArgs = queryArgs ?? throw new ArgumentNullException(nameof(queryArgs));
@@ -70,7 +70,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Sets the paging from the <see cref="PagingArgs"/>.
         /// </summary>
-        private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs paging)
+        private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs? paging)
         {
             var q = query;
             if (paging != null && paging.Skip > 0)

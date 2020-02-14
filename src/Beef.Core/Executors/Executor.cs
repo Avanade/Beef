@@ -229,7 +229,7 @@ namespace Beef.Executors
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
+                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).GetAwaiter().GetResult();
                     });
 
                     return Task.FromResult(plr.IsCompleted);
@@ -246,7 +246,7 @@ namespace Beef.Executors
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index++, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
+                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).GetAwaiter().GetResult();
                     }
 
                     return Task.FromResult(true);

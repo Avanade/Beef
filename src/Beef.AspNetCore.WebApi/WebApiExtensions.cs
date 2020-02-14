@@ -17,7 +17,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
         /// <param name="updateAction">The optional <see cref="Action{HttpContext, ExecutionContext}"/>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Action<HttpContext, ExecutionContext> updateAction = null)
+        public static IApplicationBuilder UseExecutionContext(this IApplicationBuilder builder, Action<HttpContext, ExecutionContext>? updateAction = null)
         {
             return builder.UseMiddleware<WebApiExecutionContextMiddleware>(updateAction ?? WebApiExecutionContextMiddleware.DefaultUpdateAction);
         }

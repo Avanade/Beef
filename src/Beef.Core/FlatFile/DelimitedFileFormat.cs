@@ -101,7 +101,6 @@ namespace Beef.FlatFile
         /// <returns>The record identifier where applicable; otherwise, <c>null</c>.</returns>
         protected override string ReadRecordIdentifier(FileRecord record)
         {
-            char c = Char.MinValue;
             var sb = new StringBuilder(256);
             var cols = new List<string>();
             bool isQualified = false;
@@ -109,7 +108,7 @@ namespace Beef.FlatFile
             // Iterate and split the record data into multiple columns.
             for (int i = 0; i < Check.NotNull(record, nameof(record)).LineData.Length; i++)
             {
-                c = record.LineData[i];
+                char c = record.LineData[i];
                 if (c == Delimiter)
                 {
                     // Where not qualified it is the end of the column.
@@ -297,7 +296,7 @@ namespace Beef.FlatFile
 
             // Check if the column content contains the delimiter and handle accordingly.
             var qualify = fcr.PropertyTypeCode == TypeCode.String && TextQualifier != NoCharacter && !TextQualifierOnlyWithDelimiterOnWrite;
-            if (str.IndexOf(Delimiter) >= 0)
+            if (str.IndexOf(Delimiter, StringComparison.InvariantCulture) >= 0)
             {
                 if (TextQualifier == NoCharacter)
                 {
@@ -311,11 +310,11 @@ namespace Beef.FlatFile
             // Double qualify a qualifier inside of the text.
             if (TextQualifier != NoCharacter)
             {
-                if (!qualify && str.IndexOf(TextQualifier) >= 0)
+                if (!qualify && str.IndexOf(TextQualifier, StringComparison.InvariantCulture) >= 0)
                     qualify = true;
 
                 if (qualify)
-                    str = str.Replace(TextQualifier.ToString(System.Globalization.CultureInfo.InvariantCulture), new string(TextQualifier, 2));
+                    str = str.Replace(TextQualifier.ToString(System.Globalization.CultureInfo.InvariantCulture), new string(TextQualifier, 2), StringComparison.InvariantCulture);
             }
 
             if (qualify)

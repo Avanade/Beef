@@ -57,7 +57,7 @@ namespace Beef.Events
                 if (kvp.Key == null)
                     throw new ArgumentException($"Template references key '{str}' that has not been provided.", nameof(keyValuePairs));
 
-                subject = subject.Replace(str, kvp.Value.ToString());
+                subject = subject.Replace(str, kvp.Value.ToString(), StringComparison.InvariantCulture);
             }
         }
 
@@ -218,9 +218,9 @@ namespace Beef.Events
             }
             else
             {
-                Parallel.ForEach(_publishFuncs, (pf) =>
+                Parallel.ForEach(_publishFuncs, async (pf) =>
                 {
-                    pf(data).Wait();
+                    await pf(data).ConfigureAwait(false);
                 });
             }
         }

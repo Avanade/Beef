@@ -42,8 +42,8 @@ namespace Beef.Data.Database
         /// <param name="singleWildcard">The database single wildcard character.</param>
         /// <param name="charactersToEscape">The list of characters that are to be escaped (defaults to <see cref="DefaultCharactersToEscape"/>).</param>
         /// <param name="escapeFormat">The escaping format string when one of the <see cref="CharactersToEscape"/> is found (defaults to <see cref="DefaultEscapeFormat"/>).</param>
-        public DatabaseWildcard(Wildcard wildcard = null, char multiWildcard = MultiWildcardCharacter, char singleWildcard = SingleWildcardCharacter,
-            char[] charactersToEscape = null, string escapeFormat = null)
+        public DatabaseWildcard(Wildcard? wildcard = null, char multiWildcard = MultiWildcardCharacter, char singleWildcard = SingleWildcardCharacter,
+            char[]? charactersToEscape = null, string? escapeFormat = null)
         {
             Wildcard = wildcard ?? Wildcard.Default ?? Wildcard.MultiAll;
             MultiWildcard = multiWildcard;

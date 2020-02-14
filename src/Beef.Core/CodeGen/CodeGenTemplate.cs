@@ -413,7 +413,7 @@ namespace Beef.CodeGen
                     if (!(rVal is string srVal))
                         throw new CodeGenException("RVal is not string; required for a 'contains' condition.");
 
-                    return slVal.Contains(srVal);
+                    return slVal.Contains(srVal, StringComparison.InvariantCulture);
             }
 
             return null;
@@ -658,7 +658,7 @@ namespace Beef.CodeGen
                 string fName = temp.Substring(start + 2, end - start - 2);
                 var fValue = GetConfigValue(fName, config);
 
-                temp = temp.Replace(fullName, fValue ?? "");
+                temp = temp.Replace(fullName, fValue ?? "", StringComparison.InvariantCulture);
             }
         }
 

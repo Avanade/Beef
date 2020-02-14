@@ -36,7 +36,7 @@ namespace Beef.Business
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -83,7 +83,7 @@ namespace Beef.Business
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -136,7 +136,7 @@ namespace Beef.Business
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -187,7 +187,7 @@ namespace Beef.Business
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 

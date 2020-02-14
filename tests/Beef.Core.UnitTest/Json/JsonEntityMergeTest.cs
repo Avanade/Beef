@@ -273,7 +273,7 @@ namespace Beef.Core.UnitTest.Json
             Assert.IsNotNull(mi);
             Assert.AreEqual(MessageType.Error, mi.Type);
             Assert.AreEqual("isValid", mi.Property);
-            Assert.AreEqual("The JSON token is malformed: String was not recognized as a valid Boolean.", mi.Text);
+            Assert.AreEqual("The JSON token is malformed: String 'xxx' was not recognized as a valid Boolean.", mi.Text);
         }
 
         [Test]

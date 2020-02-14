@@ -6,6 +6,7 @@ using Beef.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Beef.CodeGen.Loaders
@@ -15,7 +16,7 @@ namespace Beef.CodeGen.Loaders
     /// </summary>
     public class TableConfigLoader : ICodeGenConfigLoader, ICodeGenConfigGetLoaders
     {
-        private List<Table> _tables;
+        private List<Table>? _tables;
 
         /// <summary>
         /// Gets the corresponding loaders.
@@ -38,13 +39,13 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public async Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
             if (_tables == null)
-                LoadDatabase(config.Root.GetAttributeValue<string>("ConnectionString") ?? throw new CodeGenException("Config.ConnectionString has not been specified."), config.Root.GetAttributeValue<string>("RefDatabaseSchema"));
+                await LoadDatabaseAsync(config.Root.GetAttributeValue<string>("ConnectionString") ?? throw new CodeGenException("Config.ConnectionString has not been specified."), config.Root.GetAttributeValue<string>("RefDatabaseSchema")).ConfigureAwait(false);
 
             var name = config.GetAttributeValue<string>("Name") ?? throw new CodeGenException("Table has no Name attribute specified.");
             config.AttributeAdd("Schema", "dbo");
@@ -61,7 +62,7 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
+        public Task LoadAfterChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
@@ -102,7 +103,7 @@ namespace Beef.CodeGen.Loaders
 
             // Stop if no quick configs.
             if (!autoGet && !autoGetAll && !autoCreate && !autoUpdate && !autoUpsert && !autoDelete && !autoMerge)
-                return;
+                return Task.CompletedTask;
 
             // Where no stored procedures already defined, need to add in the placeholder.
             if (spsConfig == null)
@@ -184,6 +185,8 @@ namespace Beef.CodeGen.Loaders
                 sp.AttributeAdd("Type", "Get");
                 spsConfig.Insert(0, sp);
             }
+
+            return Task.CompletedTask;
         }
 
         private void AddTableColumns(CodeGenConfig config, Table table)
@@ -196,6 +199,9 @@ namespace Beef.CodeGen.Loaders
             var colList = new List<CodeGenConfig>();
             foreach (var col in table.Columns)
             {
+                if (string.IsNullOrEmpty(col.Name))
+                    continue;
+
                 if (eci.Count > 0 && !eci.Contains(col.Name))
                     continue;
 
@@ -244,20 +250,20 @@ namespace Beef.CodeGen.Loaders
             }
         }
 
-        private void LoadDatabase(string connString, string refDataSchema)
+        private async Task LoadDatabaseAsync(string connString, string refDataSchema)
         {
             Logger.Default.Info($"   Querying database: {connString}");
 
             var db = new SqlServerDb(connString);
             using (db.SetBypassDataContextScopeDbConnection())
             {
-                _tables = Table.LoadTablesAndColumns(db, refDataSchema, false, false);
+                _tables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema, false, false).ConfigureAwait(false);
             }
         }
 
         private class SqlServerDb : DatabaseBase
         {
-            public SqlServerDb(string connectionString) : base(connectionString, System.Data.SqlClient.SqlClientFactory.Instance) { }
+            public SqlServerDb(string connectionString) : base(connectionString, Microsoft.Data.SqlClient.SqlClientFactory.Instance) { }
         }
     }
 }

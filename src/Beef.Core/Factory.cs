@@ -273,7 +273,7 @@ namespace Beef
         /// <returns>The <see cref="Type"/> qualified name.</returns>
         private static string MakeTypeName(Type type, string className)
         {
-            return type.AssemblyQualifiedName.Replace(type.FullName, type.Namespace + "." + className);
+            return type.AssemblyQualifiedName.Replace(type.FullName, type.Namespace + "." + className, StringComparison.InvariantCulture);
         }
     }
 }

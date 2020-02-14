@@ -29,10 +29,9 @@ namespace Beef.Demo.Business.Data
             var __coll = new RefDataNamespace.GenderCollection();
             await DataInvoker.Default.InvokeAsync(this, async () => 
             {
-                Database.Default.GetRefData<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
+                await Database.Default.GetRefDataAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
                 {
                 });
-                await Task.CompletedTask;
             }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
 
             return __coll;

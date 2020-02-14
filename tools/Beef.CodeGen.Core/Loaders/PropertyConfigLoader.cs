@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Loaders
 {
@@ -19,7 +20,7 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
@@ -41,6 +42,8 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("DisplayName", GenerateDisplayName(config));
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -59,14 +62,6 @@ namespace Beef.CodeGen.Loaders
             var parts2 = new string[parts.Length - 1];
             Array.Copy(parts, parts2, parts.Length - 1);
             return string.Join(" ", parts2);
-        }
-
-        /// <summary>
-        /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
-        /// </summary>
-        /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
-        {
         }
     }
 }

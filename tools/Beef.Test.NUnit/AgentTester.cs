@@ -31,14 +31,14 @@ namespace Beef.Test.NUnit
     public abstract class AgentTester
     {
         private static readonly object _lock = new object();
-        private static TestServer _testServer;
-        private static IConfiguration _configuration;
-        private static Action<HttpRequestMessage> _beforeRequest;
+        private static TestServer? _testServer;
+        private static IConfiguration? _configuration;
+        private static Action<HttpRequestMessage>? _beforeRequest;
 
         private HttpStatusCode? _expectedStatusCode;
         private ErrorType? _expectedErrorType;
-        private string _expectedErrorMessage;
-        private MessageItemCollection _expectedMessages;
+        private string? _expectedErrorMessage;
+        private MessageItemCollection? _expectedMessages;
         private readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
         private bool _expectedNonePublished;
 
@@ -72,7 +72,7 @@ namespace Beef.Test.NUnit
         /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
         /// <param name="environmentVariablesPrefix">Override the environment variables prexfix.</param>
         /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string environmentVariablesPrefix = null, Action<IWebHostBuilder> webHostBuilderAction = null) where TStartup : class
+        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string? environmentVariablesPrefix = null, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
         {
             var cb = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -94,7 +94,7 @@ namespace Beef.Test.NUnit
         /// <param name = "config" > The <see cref="IConfiguration"/>.</param> 
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<IWebHostBuilder> webHostBuilderAction = null) where TStartup : class
+        public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
         {
             lock (_lock)
             {
@@ -109,7 +109,7 @@ namespace Beef.Test.NUnit
                 whb.UseStartup<TStartup>();
 
                 _configuration = config;
-                _testServer = new TestServer(whb);
+                _testServer = new TestServer(whb) { PreserveExecutionContext = true };
             }
         }
 
@@ -221,7 +221,7 @@ namespace Beef.Test.NUnit
         /// <param name="beforeRequest">The before request action.</param>
         public static void RegisterBeforeRequest(Action<HttpRequestMessage> beforeRequest)
         {
-            _beforeRequest = beforeRequest;
+            _beforeRequest = beforeRequest ?? throw new ArgumentNullException(nameof(beforeRequest));
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Beef.Test.NUnit
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
-        public static AgentTester<TAgent> Create<TAgent>(string username = null, object args = null) where TAgent : class
+        public static AgentTester<TAgent> Create<TAgent>(string? username = null, object? args = null) where TAgent : class
         {
             return new AgentTester<TAgent>(username, args);
         }
@@ -257,7 +257,7 @@ namespace Beef.Test.NUnit
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
-        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string username = null, object args = null) where TAgent : class
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string? username = null, object? args = null) where TAgent : class
         {
             return new AgentTester<TAgent, TValue>(username, args);
         }
@@ -269,7 +269,7 @@ namespace Beef.Test.NUnit
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
-        public static AgentTester<TAgent> Create<TAgent>(object userIdentifier, object args = null) where TAgent : class
+        public static AgentTester<TAgent> Create<TAgent>(object? userIdentifier, object? args = null) where TAgent : class
         {
             return new AgentTester<TAgent>(UsernameConverter?.Invoke(userIdentifier), args);
         }
@@ -282,7 +282,7 @@ namespace Beef.Test.NUnit
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
-        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(object userIdentifier, object args = null) where TAgent : class
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : class
         {
             return new AgentTester<TAgent, TValue>(UsernameConverter?.Invoke(userIdentifier), args);
         }
@@ -291,13 +291,13 @@ namespace Beef.Test.NUnit
         /// Gets or sets the username converter function for when a non-string identifier is specified.
         /// </summary>
         /// <remarks>The <c>object</c> value is the user identifier.</remarks>
-        public static Func<object, string> UsernameConverter { get; set; } = (x) => x?.ToString();
+        public static Func<object?, string> UsernameConverter { get; set; } = (x) => x?.ToString()!;
 
         /// <summary>
         /// Gets or sets the function for creating the <see cref="ExecutionContext"/> where there is no current instance.
         /// </summary>
         /// <remarks>The <c>string</c> is the <see cref="Username"/> and the <c>object</c> is the optional <see cref="Args"/>.</remarks>
-        public static Func<string, object, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username };
+        public static Func<string?, object?, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username };
 
         #endregion
 
@@ -306,7 +306,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>; otherwise, create using <see cref="CreateExecutionContext"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        protected AgentTester(string username = null, object args = null)
+        protected AgentTester(string? username = null, object? args = null)
         {
             TestSetUp.InvokeRegisteredSetUp();
             ExpectEvent.SetUp();
@@ -332,7 +332,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets the optional argument.
         /// </summary>
-        public object Args { get; private set; }
+        public object? Args { get; private set; }
 
         /// <summary>
         /// Expect a response with the specified <see cref="HttpStatusCode"/>.
@@ -348,7 +348,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="errorType">The expected <see cref="ErrorType"/>.</param>
         /// <param name="errorMessage">The expected error message text; where not specified the error message text will not be checked.</param>
-        protected void SetExpectErrorType(ErrorType errorType, string errorMessage = null)
+        protected void SetExpectErrorType(ErrorType errorType, string? errorMessage = null)
         {
             _expectedErrorType = errorType;
             _expectedErrorMessage = errorMessage;
@@ -393,7 +393,7 @@ namespace Beef.Test.NUnit
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
         protected void SetExpectEvent(string template, string action)
         {
-            _expectedPublished.Add((new ExpectedEvent { EventData = new EventData { Subject = template, Action = action } }, false));
+            _expectedPublished.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
         }
 
         /// <summary>
@@ -408,7 +408,7 @@ namespace Beef.Test.NUnit
         /// <param name="membersToIgnore">The members to ignore from the <paramref name="eventValue"/> comparison.</param>
         protected void SetExpectEvent<T>(bool useReturnedValue, string template, string action, T eventValue, params string[] membersToIgnore)
         {
-            var ee = new ExpectedEvent { EventData = new EventData<T> { Subject = template, Action = action, Value = eventValue } };
+            var ee = new ExpectedEvent(new EventData<T> { Subject = template, Action = action, Value = eventValue });
             ee.MembersToIgnore.AddRange(membersToIgnore);
             _expectedPublished.Add((ee, useReturnedValue));
         }
@@ -459,7 +459,7 @@ namespace Beef.Test.NUnit
                 }
             }
 
-            JToken json = null;
+            JToken? json = null;
             if (result.Request.Content != null)
             {
                 try
@@ -471,7 +471,7 @@ namespace Beef.Test.NUnit
 #pragma warning restore CA1031
 
                 Logger.Default.Info($"Content [{result.Request.Content?.Headers?.ContentType?.MediaType}]:");
-                Logger.Default.Info(json == null ? result.Request.Content.ToString() : json.ToString());
+                Logger.Default.Info(json == null ? result.Request.Content?.ToString() : json.ToString());
             }
 
             Logger.Default.Info("");
@@ -557,7 +557,7 @@ namespace Beef.Test.NUnit
         /// Check the published events to make sure they are valid.
         /// </summary>
         /// <param name="eventNeedingValueUpdateAction">Action that will be called where the value needs to be updated.</param>
-        protected void PublishedEventsCheck(Action<ExpectedEvent> eventNeedingValueUpdateAction = null)
+        protected void PublishedEventsCheck(Action<ExpectedEvent>? eventNeedingValueUpdateAction = null)
         {
             if (_expectedPublished.Count > 0)
             {
@@ -579,15 +579,15 @@ namespace Beef.Test.NUnit
     [DebuggerStepThrough()]
     public class AgentTester<TAgent> : AgentTester where TAgent : class
     {
-        private Action<AgentTester<TAgent>> _beforeAction;
-        private Action<AgentTester<TAgent>, WebApiAgentResult> _afterAction;
+        private Action<AgentTester<TAgent>>? _beforeAction;
+        private Action<AgentTester<TAgent>, WebApiAgentResult>? _afterAction;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTester{TAgent}"/> class with a username.
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        public AgentTester(string username = null, object args = null) : base(username, args) { }
+        public AgentTester(string? username = null, object? args = null) : base(username, args) { }
 
         /// <summary>
         /// An action to perform <b>before</b> the <see cref="Run(Func{AgentTesterRunArgs{TAgent}, Task{WebApiAgentResult}})"/> or <see cref="RunAsync(Func{AgentTesterRunArgs{TAgent}, Task{WebApiAgentResult}})"/>.
@@ -628,7 +628,7 @@ namespace Beef.Test.NUnit
         /// <param name="errorType">The expected <see cref="ErrorType"/>.</param>
         /// <param name="errorMessage">The expected error message text; where not specified the error message will not be checked.</param>
         /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
-        public AgentTester<TAgent> ExpectErrorType(ErrorType errorType, string errorMessage = null)
+        public AgentTester<TAgent> ExpectErrorType(ErrorType errorType, string? errorMessage = null)
         {
             SetExpectErrorType(errorType, errorMessage);
             return this;
@@ -716,7 +716,7 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent> { Tester = this, Client = TestServer.CreateClient(), BeforeRequest = BeforeRequest };
+        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent>(TestServer.CreateClient(), BeforeRequest, this);
     }
 
     /// <summary>
@@ -728,18 +728,18 @@ namespace Beef.Test.NUnit
     public class AgentTester<TAgent, TValue> : AgentTester where TAgent : class
     {
         private readonly ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();
-        private Action<AgentTester<TAgent, TValue>> _beforeAction;
-        private Action<AgentTester<TAgent, TValue>, WebApiAgentResult<TValue>> _afterAction;
+        private Action<AgentTester<TAgent, TValue>>? _beforeAction;
+        private Action<AgentTester<TAgent, TValue>, WebApiAgentResult<TValue>>? _afterAction;
         private bool _isExpectNullValue;
-        private Func<AgentTester<TAgent, TValue>, TValue> _expectValueFunc;
+        private Func<AgentTester<TAgent, TValue>, TValue>? _expectValueFunc;
         private bool _isExpectCreatedBy;
-        private string _changeLogCreatedBy;
+        private string? _changeLogCreatedBy;
         private DateTime? _changeLogCreatedDate;
         private bool _isExpectUpdatedBy;
-        private string _changeLogUpdatedBy;
+        private string? _changeLogUpdatedBy;
         private DateTime? _changeLogUpdatedDate;
         private bool _isExpectedETag;
-        private string _previousETag;
+        private string? _previousETag;
         private bool _isExpectedUniqueKey;
 
         /// <summary>
@@ -747,7 +747,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="username">The username.</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        public AgentTester(string username = null, object args = null) : base(username, args) { }
+        public AgentTester(string? username = null, object? args = null) : base(username, args) { }
 
         /// <summary>
         /// An action to perform <b>before</b> the <see cref="Run(Func{AgentTesterRunArgs{TAgent, TValue}, Task{WebApiAgentResult{TValue}}})"/> or <see cref="RunAsync(Func{AgentTesterRunArgs{TAgent, TValue}, Task{WebApiAgentResult{TValue}}})"/>.
@@ -788,7 +788,7 @@ namespace Beef.Test.NUnit
         /// <param name="errorType">The expected <see cref="ErrorType"/>.</param>
         /// <param name="errorMessage">The expected error message text; where not specified the error message will not be checked.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
-        public AgentTester<TAgent, TValue> ExpectErrorType(ErrorType errorType, string errorMessage = null)
+        public AgentTester<TAgent, TValue> ExpectErrorType(ErrorType errorType, string? errorMessage = null)
         {
             SetExpectErrorType(errorType, errorMessage);
             return this;
@@ -858,7 +858,7 @@ namespace Beef.Test.NUnit
         /// <param name="createdby">The specific <see cref="ChangeLog.CreatedBy"/> value where specified; otherwise, indicates to check for user running the test (see <see cref="AgentTester.Username"/>).</param>
         /// <param name="createdDateGreaterThan">The <see cref="DateTime"/> in which the <see cref="ChangeLog.CreatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
-        public AgentTester<TAgent, TValue> ExpectChangeLogCreated(string createdby = null, DateTime? createdDateGreaterThan = null)
+        public AgentTester<TAgent, TValue> ExpectChangeLogCreated(string? createdby = null, DateTime? createdDateGreaterThan = null)
         {
             Check.IsTrue(typeof(TValue).GetInterface(typeof(IChangeLog).Name) != null, "TValue must implement the interface IChangeLog.");
 
@@ -875,7 +875,7 @@ namespace Beef.Test.NUnit
         /// <param name="updatedby">The specific <see cref="ChangeLog.UpdatedBy"/> value where specified; otherwise, indicates to check for user runing the test (see <see cref="AgentTester.Username"/>).</param>
         /// <param name="updatedDateGreaterThan">The <see cref="TimeSpan"/> in which the <see cref="ChangeLog.UpdatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
-        public AgentTester<TAgent, TValue> ExpectChangeLogUpdated(string updatedby = null, DateTime? updatedDateGreaterThan = null)
+        public AgentTester<TAgent, TValue> ExpectChangeLogUpdated(string? updatedby = null, DateTime? updatedDateGreaterThan = null)
         {
             Check.IsTrue(typeof(TValue).GetInterface(typeof(IChangeLog).Name) != null, "TValue must implement the interface IChangeLog.");
 
@@ -904,7 +904,7 @@ namespace Beef.Test.NUnit
         /// <param name="previousETag">The previous <b>ETag</b> value; expect a value that is different.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         /// <remarks>Must be non-null and different from the request (where applicable).</remarks>
-        public AgentTester<TAgent, TValue> ExpectETag(string previousETag = null)
+        public AgentTester<TAgent, TValue> ExpectETag(string? previousETag = null)
         {
             Check.IsTrue(typeof(TValue).GetInterface(typeof(IETag).Name) != null, "TValue must implement the interface IETag.");
 
@@ -965,7 +965,7 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
         public AgentTester<TAgent, TValue> ExpectEventWithValue(string template, string action)
         {
-            SetExpectEvent<TValue>(true, template, action, default);
+            SetExpectEvent<TValue>(true, template, action, default!);
             return this;
         }
 
@@ -1014,32 +1014,32 @@ namespace Beef.Test.NUnit
             if (_isExpectNullValue && result.HasValue)
                 Assert.Fail($"Expected null response value; the following content was returned: '{result.Content}'.");
 
-            if (_expectValueFunc != null && !result.HasValue)
+            if ((_isExpectCreatedBy || _isExpectUpdatedBy || _isExpectedETag || _isExpectedUniqueKey ||  _expectValueFunc != null) && !result.HasValue)
                 Assert.Fail($"Expected non-null response content; no response returned.");
 
             if (_isExpectCreatedBy)
             {
                 var cl = result.Value as IChangeLog;
-                if (cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.CreatedBy))
-                    Assert.Fail("Expected IChangeLog.UpdatedBy to have a non-null value.");
+                if (cl == null || cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.CreatedBy))
+                    Assert.Fail("Expected IChangeLog.CreatedBy to have a non-null value.");
                 else if (_changeLogCreatedBy != cl.ChangeLog.CreatedBy)
-                    Assert.Fail($"Expected IChangeLog.UpdatedBy '{_changeLogCreatedBy}'; actual '{cl.ChangeLog.CreatedBy}'.");
+                    Assert.Fail($"Expected IChangeLog.CreatedBy '{_changeLogCreatedBy}'; actual '{cl.ChangeLog.CreatedBy}'.");
 
-                if (!cl.ChangeLog.CreatedDate.HasValue)
-                    Assert.Fail("Expected IChangeLog.UpdatedDate to have a non-null value.");
+                if (!cl!.ChangeLog!.CreatedDate.HasValue)
+                    Assert.Fail("Expected IChangeLog.CreatedDate to have a non-null value.");
                 else if (cl.ChangeLog.CreatedDate.Value < _changeLogCreatedDate)
-                    Assert.Fail($"Expected IChangeLog.UpdatedDate actual '{cl.ChangeLog.CreatedDate.Value}' to be greater than expected '{_changeLogCreatedDate}'.");
+                    Assert.Fail($"Expected IChangeLog.CreatedDate actual '{cl.ChangeLog.CreatedDate.Value}' to be greater than expected '{_changeLogCreatedDate}'.");
             }
 
             if (_isExpectUpdatedBy)
             {
                 var cl = result.Value as IChangeLog;
-                if (cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.UpdatedBy))
+                if (cl == null || cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.UpdatedBy))
                     Assert.Fail("Expected IChangeLog.UpdatedBy to have a non-null value.");
                 else if (_changeLogUpdatedBy != cl.ChangeLog.UpdatedBy)
                     Assert.Fail($"Expected IChangeLog.UpdatedBy '{_changeLogUpdatedBy}'; actual was '{cl.ChangeLog.UpdatedBy}'.");
 
-                if (!cl.ChangeLog.UpdatedDate.HasValue)
+                if (!cl!.ChangeLog!.UpdatedDate.HasValue)
                     Assert.Fail("Expected IChangeLog.UpdatedDate to have a non-null value.");
                 else if (cl.ChangeLog.UpdatedDate.Value < _changeLogUpdatedDate)
                     Assert.Fail($"Expected IChangeLog.UpdatedDate actual '{cl.ChangeLog.UpdatedDate.Value}' to be greater than expected '{_changeLogUpdatedDate}'.");
@@ -1048,17 +1048,16 @@ namespace Beef.Test.NUnit
             if (_isExpectedETag)
             {
                 var et = result.Value as IETag;
-                if (et.ETag == null)
+                if (et == null || et.ETag == null)
                     Assert.Fail("Expected IETag.ETag to have a non-null value.");
 
-                if (!string.IsNullOrEmpty(_previousETag) && _previousETag == et.ETag)
+                if (!string.IsNullOrEmpty(_previousETag) && _previousETag == et!.ETag)
                     Assert.Fail("Expected IETag.ETag value is the same as previous.");
             }
 
             if (_isExpectedUniqueKey)
             {
-                uk = result.Value as IUniqueKey;
-                if (uk.UniqueKey.Args.Any(x => x == null))
+                if (!(result.Value is IUniqueKey uk2) || uk2.UniqueKey == null || uk2.UniqueKey.Args == null || uk2.UniqueKey.Args.Any(x => x == null))
                     Assert.Fail("Expected IUniqueKey.Args array to have no null values.");
             }
 
@@ -1091,6 +1090,6 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue> { Tester = this, Client = TestServer.CreateClient(), BeforeRequest = BeforeRequest };
+        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue>(TestServer.CreateClient(), BeforeRequest, this);
     }
 }

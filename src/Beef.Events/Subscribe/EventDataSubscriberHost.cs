@@ -16,7 +16,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
         /// <returns>The <see cref="EventDataSubscriberHost"/>.</returns>
-        public static EventDataSubscriberHost Create(EventSubscriberHostArgs args = null) => new EventDataSubscriberHost(args);
+        public static EventDataSubscriberHost Create(EventSubscriberHostArgs? args = null) => new EventDataSubscriberHost(args);
 
         /// <summary>
         /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="logger"/>.
@@ -29,7 +29,7 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        private EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        private EventDataSubscriberHost(EventSubscriberHostArgs? args) : base(args) { }
 
         /// <summary>
         /// Indicates that multiple messages (<see cref="EventData"/>) can be processed.

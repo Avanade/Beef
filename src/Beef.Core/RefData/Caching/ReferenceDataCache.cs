@@ -79,21 +79,7 @@ namespace Beef.RefData.Caching
             if (_loadCollection == null)
                 coll = new TColl();
             else
-            {
-                var t = _loader.Load(this, _loadCollection);
-                t.Wait();
-                if (t.Result != null)
-                {
-                    foreach (var item in t.Result)
-                    {
-                        item.MakeReadOnly();
-                    }
-
-                    coll = t.Result;
-                }
-                else
-                    coll = new TColl();
-            }
+                coll = _loader.LoadAsync(this, _loadCollection).GetAwaiter().GetResult() ?? new TColl();
 
             coll.GenerateETag();
             return coll;

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Data.SqlClient;
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace Beef.Data.Database
 {
@@ -16,8 +16,8 @@ namespace Beef.Data.Database
 #pragma warning restore CA1724
     {
         private static readonly object _lock = new object();
-        private static TDefault _default;
-        private static Func<TDefault> _create;
+        private static TDefault? _default;
+        private static Func<TDefault>? _create;
 
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
 
@@ -77,8 +77,8 @@ namespace Beef.Data.Database
         /// Initializes a new instance of the <see cref="Database{T}"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <param name="provider">The optional data provider (e.g. System.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        protected Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        /// <param name="provider">The optional data provider (e.g. Microsoft.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
+        protected Database(string connectionString, DbProviderFactory? provider = null) : base(connectionString, provider) { }
 
         /// <summary>
         /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
@@ -91,7 +91,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="username">The username.</param>
-        /// <param name="timestamp">The timestamp <see cref="DateTime"/>.</param>
+        /// <param name="timestamp">The timestamp <see cref="DateTime"/> (where <c>null</c> the value will default to <see cref="DateTime.Now"/>).</param>
         /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
         public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null)
         {
@@ -114,7 +114,7 @@ namespace Beef.Data.Database
 
             p = cmd.CreateParameter();
             p.ParameterName = "@" + DatabaseColumns.SessionContextTimestamp;
-            p.Value = timestamp;
+            p.Value = timestamp ?? DateTime.Now;
             cmd.Parameters.Add(p);
 
             if (tenantId.HasValue)

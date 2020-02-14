@@ -4,6 +4,7 @@ using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen
 {
@@ -181,9 +182,9 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public int Run(string[] args)
+        public async Task<int> RunAsync(string[] args)
         {
-            var app = new CommandLineApplication(false)
+            using var app = new CommandLineApplication(false)
             {
                 Name = "beef.codegen",
                 Description = "Business Entity Execution Framework (Beef) Code Generator."
@@ -198,34 +199,36 @@ namespace Beef.CodeGen
             var refDataFileName = RefDataFileNameTemplate;
             var dataModelFileName = DataModelFileNameTemplate;
 
-            app.OnExecute(() =>
+            app.OnExecuteAsync(async (_) =>
             {
-                var ct = Enum.Parse<CommandType>(cmd.Value, true);
+                var ct = cmd.Value == null ? CommandType.All : Enum.Parse<CommandType>(cmd.Value, true);
                 if (cx.HasValue())
                 {
                     if (ct == CommandType.All)
                         throw new CommandParsingException(app, "Command 'All' is not compatible with --xml; the command must be more specific when using a configuration XML file.");
 
-                    entityFileName = databaseFileName = refDataFileName = dataModelFileName = cx.Value();
+                    entityFileName = databaseFileName = refDataFileName = dataModelFileName = cx.Value()!;
                 }
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(databaseFileName + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "")));
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(databaseFileName + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : ""))).ConfigureAwait(false);
 
-                if (IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(refDataFileName + " " + RefDataCommandLineTemplate)));
+                if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(refDataFileName + " " + RefDataCommandLineTemplate))).ConfigureAwait(false);
 
-                if (IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(entityFileName + " " + EntityCommandLineTemplate)));
+                if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(entityFileName + " " + EntityCommandLineTemplate))).ConfigureAwait(false);
 
-                if (IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = CodeGenConsole.Create().Run(AppendAssemblies(ReplaceMoustache(dataModelFileName + " " + DataModelCommandLineTemplate)));
+                if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(dataModelFileName + " " + DataModelCommandLineTemplate))).ConfigureAwait(false);
+
+                return rc;
             });
 
             try
             {
-                return app.Execute(args);
+                return await app.ExecuteAsync(args).ConfigureAwait(false);
             }
             catch (CommandParsingException cpex)
             {

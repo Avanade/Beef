@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Beef.CodeGen
@@ -29,7 +30,7 @@ namespace Beef.CodeGen
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (option.Value() != null && !File.Exists(option.Value()) && ResourceManager.GetScriptContent(option.Value()) == null)
+            if (option.Value() != null && !File.Exists(option.Value()) && ResourceManager.GetScriptContentAsync(option.Value()!).GetAwaiter().GetResult() == null)
                 return new ValidationResult($"The file or embedded resource '{option.Value()}' does not exist.");
 
             return ValidationResult.Success;
@@ -57,9 +58,9 @@ namespace Beef.CodeGen
 
             var pd = new Dictionary<string, string>();
 
-            foreach (var p in option.Values)
+            foreach (var p in option.Values.Where(x => !string.IsNullOrEmpty(x)))
             {
-                string[] parts = CodeGenConsole.CreateKeyValueParts(p);
+                string[] parts = CodeGenConsole.CreateKeyValueParts(p!);
                 if (parts.Length != 2)
                     return new ValidationResult($"The parameter '{p}' is not valid; must be formatted as Name=value.");
 
@@ -103,11 +104,11 @@ namespace Beef.CodeGen
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            foreach (var name in option.Values)
+            foreach (var name in option.Values.Where(x => !string.IsNullOrEmpty(x)))
             {
                 try
                 {
-                    Assemblies.Add(Assembly.Load(name));
+                    Assemblies.Add(Assembly.Load(name!));
                 }
 #pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception ex)

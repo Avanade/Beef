@@ -82,7 +82,7 @@ namespace Beef.AspNetCore.WebApi
                 if (skip == null && page == null)
                     pa = (take.HasValue) ? PagingArgs.CreateSkipAndTake(0, take) : new PagingArgs();
                 else
-                    pa = (skip.HasValue) ? PagingArgs.CreateSkipAndTake(skip.Value, take) : PagingArgs.CreatePageAndSize(page.Value, take);
+                    pa = (skip.HasValue) ? PagingArgs.CreateSkipAndTake(skip.Value, take) : PagingArgs.CreatePageAndSize(page == null ? 0 : page.Value, take);
 
                 pa.IsGetCount = ParseBoolValue(GetNamedQueryString(controller, PagingArgsCountQueryStringNames));
             }
@@ -117,7 +117,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the value for the named query string.
         /// </summary>
-        private static string GetNamedQueryString(ControllerBase controller, IEnumerable<string> names)
+        private static string? GetNamedQueryString(ControllerBase controller, IEnumerable<string> names)
         {
             var q = controller.HttpContext.Request.Query.Where(x => names.Contains(x.Key, StringComparer.InvariantCultureIgnoreCase)).ToArray();
             return (q.Length != 1 || q[0].Value.Count != 1) ? null : q[0].Value[0];
@@ -126,7 +126,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Parses the value as a <see cref="long"/>.
         /// </summary>
-        private static long? ParseLongValue(string value)
+        private static long? ParseLongValue(string? value)
         {
             if (value == null)
                 return null;
@@ -140,7 +140,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Parses the value as a <see cref="bool"/>.
         /// </summary>
-        private static bool ParseBoolValue(string value)
+        private static bool ParseBoolValue(string? value)
         {
             if (value == null)
                 return false;

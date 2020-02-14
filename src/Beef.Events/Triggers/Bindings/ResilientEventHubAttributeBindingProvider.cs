@@ -43,12 +43,12 @@ namespace Beef.Events.Triggers.Bindings
         /// </summary>
         /// <param name="context">The <see cref="TriggerBindingProviderContext"/>.</param>
         /// <returns></returns>
-        public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
+        public Task<ITriggerBinding?> TryCreateAsync(TriggerBindingProviderContext context)
         {
             // Get the required attribuite.
             var att = context.Parameter.GetCustomAttribute<ResilientEventHubTriggerAttribute>(false);
             if (att == null)
-                return Task.FromResult<ITriggerBinding>(null);
+                return Task.FromResult<ITriggerBinding?>(null);
 
             // Resolve the attribute parameters.
             var resolvedEventHubName = _nameResolver.ResolveWholeString(att.EventHubName);
@@ -68,7 +68,7 @@ namespace Beef.Events.Triggers.Bindings
             var host = _options.Value.GetEventProcessorHost(_config, resolvedEventHubName, resolvedConsumerGroup);
 
             // Create and return the binding.
-            return Task.FromResult<ITriggerBinding>(new ResilientEventHubBinding(host, context.Parameter, _options.Value, _config, _logger));
+            return Task.FromResult<ITriggerBinding?>(new ResilientEventHubBinding(host, context.Parameter, _options.Value, _config, _logger));
         }
     }
 }

@@ -182,7 +182,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="expectedMessages">The expected messages.</param>
         /// <param name="actualMessages">The actual messages.</param>
-        static public void CompareExpectedVsActual(MessageItemCollection expectedMessages, MessageItemCollection actualMessages)
+        static public void CompareExpectedVsActual(MessageItemCollection? expectedMessages, MessageItemCollection? actualMessages)
         {
             var exp = (from e in expectedMessages ?? new MessageItemCollection()
                        where !actualMessages.Any(a => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))

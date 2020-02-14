@@ -602,7 +602,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <Set Name="System.DatabaseName" Condition="Entity.DatabaseName != null" Value="Entity.DatabaseName" Otherwise="Config.DatabaseName" />
               <Set Name="System.DatabaseName" Condition="System.DatabaseName == null" Value="'Database'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <![CDATA[__result = {{System.DatabaseName}}.Default.Get(__dataArgs]]>
+                <![CDATA[__result = await {{System.DatabaseName}}.Default.GetAsync(__dataArgs]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="Parameter.DataConverter == null">
                     <Then><![CDATA[, {{Parameter.ArgumentName}}]]></Then>
@@ -615,28 +615,28 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result.Result = {{System.DatabaseName}}.Default.Query(__dataArgs, p => {{Operation.PrivateName}}OnQuery?.Invoke(p]]>
+                <![CDATA[__result.Result = await {{System.DatabaseName}}.Default.Query(__dataArgs, p => {{Operation.PrivateName}}OnQuery?.Invoke(p]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
-                <![CDATA[, __dataArgs)).SelectQuery<]]>
+                <![CDATA[, __dataArgs)).SelectQueryAsync<]]>
                 <If Condition="Operation.ReturnType == 'void'">
                   <Then><![CDATA[{{Entity.EntityCollectionName}}]]></Then>
                   <Else><![CDATA[{{Operation.ReturnType}}Collection]]></Else>
                 </If>
-                <![CDATA[>();
+                <![CDATA[>().ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[__result = {{System.DatabaseName}}.Default.{{Operation.OperationType}}(__dataArgs, value);
+                <![CDATA[__result = await {{System.DatabaseName}}.Default.{{Operation.OperationType}}Async(__dataArgs, value).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <![CDATA[{{System.DatabaseName}}.Default.Delete(__dataArgs]]>
+                <![CDATA[await {{System.DatabaseName}}.Default.DeleteAsync(__dataArgs]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="Parameter.DataConverter == null">
                     <Then><![CDATA[, {{Parameter.ArgumentName}}]]></Then>
@@ -649,7 +649,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                     </Else>
                   </If>
                 </Parameter>
-                <![CDATA[);
+                <![CDATA[).ConfigureAwait(false);
 ]]>
               </If>
             </If>

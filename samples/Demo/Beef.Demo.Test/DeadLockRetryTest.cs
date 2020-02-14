@@ -28,16 +28,16 @@ namespace Beef.Demo.Test
             var p1 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(1.ToGuid())).Value;
             var p2 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(2.ToGuid())).Value;
 
-            var task1 = Task.Run(() =>
+            var task1 = Task.Run(async () =>
             {
-                Beef.Demo.Business.Data.Database.Default.SqlStatement(
+                await Beef.Demo.Business.Data.Database.Default.SqlStatement(
                     @"begin transaction
 select * from Demo.WorkHistory with (tablock, holdlock)
 waitfor delay '00:00:02'
 select * from Demo.Person with (tablock, holdlock)
 waitfor delay '00:00:04'
 commit transaction"
-                    ).NonQuery();
+                    ).NonQueryAsync();
             });
 
             var task2 = Task.Run(() =>

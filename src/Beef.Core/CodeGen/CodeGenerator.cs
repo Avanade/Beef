@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -100,7 +101,7 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
             return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s.Substring(1); // Make sure the first character is always upper case.
         }
 
@@ -115,9 +116,9 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
-            return s.Replace(" ", "_").ToLowerInvariant(); // Replace space with _ and make lowercase.
+            return s.Replace(" ", "_", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
 #pragma warning restore CA1308 
         }
 
@@ -132,9 +133,9 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag"); // Special case where we will put back together.
+            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
-            return s.Replace(" ", "-").ToLowerInvariant(); // Replace space with _ and make lowercase.
+            return s.Replace(" ", "-", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
 #pragma warning restore CA1308 
         }
 
@@ -148,8 +149,8 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            var s = text.Replace("<", "{");
-            s = s.Replace(">", "}");
+            var s = text.Replace("<", "{", StringComparison.InvariantCulture);
+            s = s.Replace(">", "}", StringComparison.InvariantCulture);
             return s;
         }
 
@@ -178,7 +179,7 @@ namespace Beef.CodeGen
                 string sub = s.Substring(start, end - start + 2);
                 string mid = ReplaceGenericsBracketWithCommentsBracket(sub.Substring(2, sub.Length - 4));
 
-                s = s.Replace(sub, string.Format(CultureInfo.InvariantCulture, "<see cref=\"{0}\"/>", mid));
+                s = s.Replace(sub, string.Format(CultureInfo.InvariantCulture, "<see cref=\"{0}\"/>", mid), StringComparison.InvariantCulture);
             }
 
             return s;
@@ -289,22 +290,20 @@ namespace Beef.CodeGen
         /// Generates the output.
         /// </summary>
         /// <param name="xmlTemplate">The template <see cref="XElement"/>.</param>
-        public void Generate(XElement xmlTemplate)
+        public async Task GenerateAsync(XElement xmlTemplate)
         {
             if (xmlTemplate == null)
                 throw new ArgumentNullException(nameof(xmlTemplate));
 
             // Ready the 'System' configuration.
-            this.System = new CodeGenConfig(SystemConfigName, null);
-            this.System.AttributeAdd("Index", "0");
+            System = new CodeGenConfig(SystemConfigName, null);
+            System.AttributeAdd("Index", "0");
 
             // Creates the root configuration.
-            CodeGenConfig.Create(this);
+            await CodeGenConfig.CreateAsync(this).ConfigureAwait(false);
 
-            using (var t = new CodeGenTemplate(this, xmlTemplate))
-            {
-                t.Execute();
-            }
+            using var t = new CodeGenTemplate(this, xmlTemplate);
+            t.Execute();
         }
 
         /// <summary>

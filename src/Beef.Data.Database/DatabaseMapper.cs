@@ -53,7 +53,7 @@ namespace Beef.Data.Database
         /// <returns>An object instance populated from the <see cref="DatabaseParameters"/>.</returns>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
-        object MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data);
+        object? MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ namespace Beef.Data.Database
         /// <returns>A <typeparamref name="TSrce"/> instance populated from the <see cref="DatabaseParameters"/>.</returns>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
-        new TSrce MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data);
+        new TSrce? MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data);
     }
 
     /// <summary>
@@ -120,10 +120,10 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
-        /// <param name="columnName">The database column name.</param>
+        /// <param name="columnName">The database column name (will default where not specified).</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         /// <returns>The <see cref="DatabasePropertyMapper{TEntity, TProperty}"/>.</returns>
-        public DatabasePropertyMapper<TSrce, TSrceProperty> Property<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string columnName = null, OperationTypes operationTypes = OperationTypes.Any)
+        public DatabasePropertyMapper<TSrce, TSrceProperty> Property<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? columnName = null, OperationTypes operationTypes = OperationTypes.Any)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -138,11 +138,11 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
-        /// <param name="columnName">The database column name.</param>
+        /// <param name="columnName">The database column name (will default where not specified).</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
         /// <param name="property">An <see cref="Action"/> enabling access to the created <see cref="DatabasePropertyMapper{TSrce, TSrceProperty}"/>.</param>
         /// <returns>The <see cref="DatabaseMapper{TEntity}"/>.</returns>
-        public DatabaseMapper<TSrce> HasProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string columnName = null, OperationTypes operationTypes = OperationTypes.Any, Action<DatabasePropertyMapper<TSrce, TSrceProperty>> property = null)
+        public DatabaseMapper<TSrce> HasProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? columnName = null, OperationTypes operationTypes = OperationTypes.Any, Action<DatabasePropertyMapper<TSrce, TSrceProperty>>? property = null)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -201,7 +201,7 @@ namespace Beef.Data.Database
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
-        public void MapToDb(TSrce value, DatabaseParameters parameters, OperationTypes operationType = OperationTypes.Unspecified, object data = null)
+        public void MapToDb(TSrce value, DatabaseParameters parameters, OperationTypes operationType = OperationTypes.Unspecified, object? data = null)
         {
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
@@ -234,7 +234,7 @@ namespace Beef.Data.Database
         /// <param name="parameters">The <see cref="DatabaseParameters"/>.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
-        protected virtual void OnMapToDb(TSrce value, DatabaseParameters parameters, OperationTypes operationType, object data) { }
+        protected virtual void OnMapToDb(TSrce value, DatabaseParameters parameters, OperationTypes operationType, object? data) { }
 
         /// <summary>
         /// Creates a source entity mapping values from the <see cref="DatabaseParameters"/>.
@@ -243,7 +243,7 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
         /// <returns>A <typeparamref name="TSrce"/> instance populated from the <see cref="DatabaseParameters"/>.</returns>
-        public TSrce MapFromDb(DatabaseRecord dr, OperationTypes operationType = OperationTypes.Unspecified, object data = null)
+        public TSrce? MapFromDb(DatabaseRecord dr, OperationTypes operationType = OperationTypes.Unspecified, object? data = null)
         {
             if (dr == null)
                 throw new ArgumentNullException(nameof(dr));
@@ -271,7 +271,7 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
         /// <returns>An object instance populated from the <see cref="DatabaseParameters"/>.</returns>
-        object IDatabaseMapper.MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data)
+        object? IDatabaseMapper.MapFromDb(DatabaseRecord dr, OperationTypes operationType, object data)
         {
             return MapFromDb(dr, operationType, data);
         }
@@ -284,7 +284,7 @@ namespace Beef.Data.Database
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <param name="data">An optional (additional) data object.</param>
         /// <returns>The entity value.</returns>
-        protected virtual TSrce OnMapFromDb(TSrce value, DatabaseRecord dr, OperationTypes operationType, object data)
+        protected virtual TSrce OnMapFromDb(TSrce value, DatabaseRecord dr, OperationTypes operationType, object? data)
         {
             return value;
         }
@@ -439,7 +439,7 @@ namespace Beef.Data.Database
                 var pmap = (DatabasePropertyMapper<TSrce, ChangeLog>)typeof(DatabaseMapper<TSrce>)
                     .GetMethod("Property")
                     .MakeGenericMethod(new Type[] { typeof(ChangeLog) })
-                    .Invoke(this, new object[] { sex, null, OperationTypes.Get });
+                    .Invoke(this, new object[] { sex, null!, OperationTypes.Get });
 
                 pmap.SetMapper(DatabaseChangeLogMapper.Default);
             }
@@ -491,32 +491,30 @@ namespace Beef.Data.Database
         /// <returns>The Table-Valued Parameter.</returns>
         public TableValuedParameter CreateTableValuedParameter(string typeName, IEnumerable<TSrce> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            foreach (var pm in this.Mappings)
             {
-                foreach (var pm in this.Mappings)
-                {
-                    dt.Columns.Add(pm.DestPropertyName, pm.Converter == null ? pm.SrcePropertyType : pm.Converter.DestUnderlyingType);
-                }
-
-                if (list != null)
-                {
-                    foreach (var val in list)
-                    {
-                        var dr = dt.NewRow();
-                        foreach (var pm in this.Mappings)
-                        {
-                            if (pm.Converter == null)
-                                dr[pm.DestPropertyName] = pm.GetSrceValue(val, OperationTypes.Update);
-                            else
-                                dr[pm.DestPropertyName] = pm.Converter.ConvertToDest(pm.GetSrceValue(val, OperationTypes.Update));
-                        }
-
-                        dt.Rows.Add(dr);
-                    }
-                }
-
-                return new TableValuedParameter(Check.NotEmpty(typeName, nameof(typeName)), dt);
+                dt.Columns.Add(pm.DestPropertyName, pm.Converter == null ? pm.SrcePropertyType : pm.Converter.DestUnderlyingType);
             }
+
+            if (list != null)
+            {
+                foreach (var val in list)
+                {
+                    var dr = dt.NewRow();
+                    foreach (var pm in this.Mappings)
+                    {
+                        if (pm.Converter == null)
+                            dr[pm.DestPropertyName] = pm.GetSrceValue(val, OperationTypes.Update);
+                        else
+                            dr[pm.DestPropertyName] = pm.Converter.ConvertToDest(pm.GetSrceValue(val, OperationTypes.Update));
+                    }
+
+                    dt.Rows.Add(dr);
+                }
+            }
+
+            return new TableValuedParameter(Check.NotEmpty(typeName, nameof(typeName)), dt);
         }
 
         /// <summary>

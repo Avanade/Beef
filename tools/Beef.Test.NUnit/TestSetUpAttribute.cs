@@ -19,7 +19,7 @@ namespace Beef.Test.NUnit
     {
         private readonly string _username;
         private readonly bool _needsSetUp;
-        private readonly object _args;
+        private readonly object? _args;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSetUpAttribute"/> class for a <paramref name="username"/>.
@@ -27,7 +27,7 @@ namespace Beef.Test.NUnit
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="AgentTester.DefaultUsername"/>).</param>
         /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext"/> function).</param>
         /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
-        public TestSetUpAttribute(string username = null, object args = null, bool needsSetUp = true) : base(username ?? AgentTester.DefaultUsername)
+        public TestSetUpAttribute(string? username = null, object? args = null, bool needsSetUp = true) : base(username ?? AgentTester.DefaultUsername)
         {
             _username = username ?? AgentTester.DefaultUsername;
             _needsSetUp = needsSetUp;
@@ -40,7 +40,7 @@ namespace Beef.Test.NUnit
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext"/> function).</param>
         /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked for the test.</param>
-        public TestSetUpAttribute(object userIdentifier, object args = null, bool needsSetUp = true) : base(AgentTester.UsernameConverter(userIdentifier) ?? AgentTester.DefaultUsername)
+        public TestSetUpAttribute(object? userIdentifier, object? args = null, bool needsSetUp = true) : base(AgentTester.UsernameConverter(userIdentifier) ?? AgentTester.DefaultUsername)
         {
             _username = AgentTester.UsernameConverter(userIdentifier) ?? AgentTester.DefaultUsername;
             _needsSetUp = needsSetUp;
@@ -64,9 +64,9 @@ namespace Beef.Test.NUnit
         [DebuggerStepThrough()]
         internal class ExecutionContextCommand : DelegatingTestCommand
         {
-            private readonly string _username;
+            private readonly string? _username;
             private readonly bool _needsSetUp;
-            private readonly object _args;
+            private readonly object? _args;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="ExecutionContextCommand"/> class.
@@ -75,7 +75,7 @@ namespace Beef.Test.NUnit
             /// <param name="username">The username.</param>
             /// <param name="needsSetUp">Indicates whether the registered set up is required to be invoked.</param>
             /// <param name="args">Optional args.</param>
-            public ExecutionContextCommand(TestCommand innerCommand, string username = null, bool needsSetUp = true, object args = null) : base(innerCommand)
+            public ExecutionContextCommand(TestCommand innerCommand, string? username = null, bool needsSetUp = true, object? args = null) : base(innerCommand)
             {
                 _username = username;
                 _needsSetUp = needsSetUp;
@@ -105,10 +105,10 @@ namespace Beef.Test.NUnit
                 {
                     Exception ex = exception;
                     if (ex is AggregateException aex && aex.InnerExceptions.Count == 1)
-                        ex = aex.InnerException;
+                        ex = aex.InnerException!;
 
                     if (ex is NUnitException nex && nex.InnerException is AggregateException aex2)
-                        ex = aex2.InnerException;
+                        ex = aex2.InnerException!;
 
                     if (context.CurrentResult == null)
                         context.CurrentResult = context.CurrentTest.MakeTestResult();

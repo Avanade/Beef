@@ -12,12 +12,12 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets or sets the column name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the column value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// Indicates whether to use a foreign key query for the identifier.
@@ -28,7 +28,7 @@ namespace Beef.Database.Core.Sql
         /// Gets the value formatted for use in a SQL statement.
         /// </summary>
         /// <returns>The value formatted for use in a SQL statement.</returns>
-        public string ToSqlValue()
+        public string? ToSqlValue()
         {
             if (Value == null)
                 return "NULL";

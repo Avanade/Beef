@@ -57,7 +57,7 @@ namespace Beef.Events.Publish
         /// </summary>
         /// <param name="events">The events that will be published.</param>
         /// <returns>The partition key where determined; otherwise, <c>null</c> for round-robin allocation.</returns>
-        protected virtual string GetPartitionKey(EventData[] events)
+        protected virtual string? GetPartitionKey(EventData[] events)
         {
             if (events == null)
                 throw new ArgumentNullException(nameof(events));
@@ -75,7 +75,7 @@ namespace Beef.Events.Publish
         /// <param name="events">The events that will be published.</param>
         /// <param name="partitionKey">The partition key (<see cref="GetPartitionKey(EventData[])"/>).</param>
         /// <param name="exception">The unhandled <see cref="Exception"/>.</param>
-        protected virtual void OnException(EventData[] events, string partitionKey, Exception exception)
+        protected virtual void OnException(EventData[] events, string? partitionKey, Exception exception)
         {
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));

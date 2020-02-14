@@ -34,7 +34,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the value <see cref="Type"/> if any.
         /// </summary>
-        Type ValueType { get; }
+        Type? ValueType { get; }
 
         /// <summary>
         /// Receive and process the subscribed <see cref="EventData"/>.

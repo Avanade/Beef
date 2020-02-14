@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
+- *Enhancement:* Tool updated to execute asynchoronously. Both `CodeGenConsole` and `CodeGenConsoleWrapper` have breaking change; `Run` ihas been removed, replaced with `RunAsync`.
+- *Enhancement:* The templates where database access is performed have been updated to leverage the new asynchronous methods. All preivous synchronous access has been removed.
+
 ## v2.1.29
 - *Fixed:* Code-gen of corresponding reference data text (`xxxText`) was being incorrectly output where the property supported multiple values (`RefDataList="true"`).
 

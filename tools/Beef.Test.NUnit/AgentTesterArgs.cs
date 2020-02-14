@@ -12,19 +12,30 @@ namespace Beef.Test.NUnit
     public abstract class AgentTesterRunArgsBase<TAgent> where TAgent : class
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AgentTesterRunArgsBase{TAgent}"/> class.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        /// <param name="beforeRequest">The action to run before the request is made.</param>
+        internal AgentTesterRunArgsBase(HttpClient client, Action<HttpRequestMessage> beforeRequest)
+        {
+            Client = client;
+            BeforeRequest = beforeRequest;
+        }
+
+        /// <summary>
         /// Gets the <see cref="HttpClient"/>.
         /// </summary>
-        public HttpClient Client { get; internal set; }
+        public HttpClient Client { get; }
 
         /// <summary>
         /// Gets the action to run before the request is made.
         /// </summary>
-        public Action<HttpRequestMessage> BeforeRequest { get; internal set; }
+        public Action<HttpRequestMessage> BeforeRequest { get; }
 
         /// <summary>
         /// Gets (creates) the <b>Agent</b> instance.
         /// </summary>
-        public TAgent Agent => (TAgent)Activator.CreateInstance(typeof(TAgent), Client, BeforeRequest);
+        public TAgent Agent => (TAgent)Activator.CreateInstance(typeof(TAgent), Client, BeforeRequest)!;
     }
 
     /// <summary>
@@ -34,9 +45,17 @@ namespace Beef.Test.NUnit
     public class AgentTesterRunArgs<TAgent> : AgentTesterRunArgsBase<TAgent> where TAgent : class
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AgentTesterRunArgs{TAgent}"/> class.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        /// <param name="beforeRequest">The action to run before the request is made.</param>
+        /// <param name="tester">The executing <see cref="AgentTester"/>.</param>
+        internal AgentTesterRunArgs(HttpClient client, Action<HttpRequestMessage> beforeRequest, AgentTester<TAgent> tester) : base(client, beforeRequest) => Tester = tester;
+
+        /// <summary>
         /// Gets the executing <see cref="AgentTester"/>.
         /// </summary>
-        public AgentTester<TAgent> Tester { get; internal set; }
+        public AgentTester<TAgent> Tester { get; }
     }
 
     /// <summary>
@@ -47,8 +66,16 @@ namespace Beef.Test.NUnit
     public class AgentTesterRunArgs<TAgent, TValue> : AgentTesterRunArgsBase<TAgent> where TAgent : class
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AgentTesterRunArgs{TAgent, TValue}"/> class.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        /// <param name="beforeRequest">The action to run before the request is made.</param>
+        /// <param name="tester">The executing <see cref="AgentTester"/>.</param>
+        internal AgentTesterRunArgs(HttpClient client, Action<HttpRequestMessage> beforeRequest, AgentTester<TAgent, TValue> tester) : base(client, beforeRequest) => Tester = tester;
+
+        /// <summary>
         /// Gets the executing <see cref="AgentTester"/>.
         /// </summary>
-        public AgentTester<TAgent, TValue> Tester { get; internal set; }
+        public AgentTester<TAgent, TValue> Tester { get; }
     }
 }
