@@ -1,4 +1,6 @@
-﻿using Beef.Entities;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Entities;
 using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
@@ -26,7 +28,7 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination value.</returns>
-        object MapToDest(object sourceEntity, OperationTypes operationType);
+        object? MapToDest(object sourceEntity, OperationTypes operationType);
 
         /// <summary>
         /// Maps the source to the destination updating an existing object.
@@ -42,29 +44,31 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source value.</returns>
-        object MapToSrce(object destinationEntity, OperationTypes operationType);
+        object? MapToSrce(object destinationEntity, OperationTypes operationType);
     }
 
     /// <summary>
-    /// Enables the base base two-entity (source and destination) mapping capabilities.
+    /// Enables the base two-entity (source and destination) mapping capabilities.
     /// </summary>
     /// <typeparam name="TSrce">The source entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDest">The destination entity <see cref="Type"/>.</typeparam>
-    public interface IEntityMapper<TSrce, TDest> : IEntityMapper
+    public interface IEntityMapper<TSrce, TDest> : IEntityMapper 
+        where TSrce : class 
+        where TDest : class
     {
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        new IPropertyMapper<TSrce, TDest> GetBySrcePropertyName(string name);
+        new IPropertyMapper<TSrce, TDest>? GetBySrcePropertyName(string name);
 
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by destination property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        new IPropertyMapper<TSrce, TDest> GetByDestPropertyName(string name);
+        new IPropertyMapper<TSrce, TDest>? GetByDestPropertyName(string name);
 
         /// <summary>
         /// Maps the source to the destination.
@@ -72,7 +76,7 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination value.</returns>
-        TDest MapToDest(TSrce sourceEntity, OperationTypes operationType);
+        TDest? MapToDest(TSrce sourceEntity, OperationTypes operationType);
 
         /// <summary>
         /// Maps the source to the destination updating an existing object.
@@ -88,7 +92,7 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source value.</returns>
-        TSrce MapToSrce(TDest destinationEntity, OperationTypes operationType);
+        TSrce? MapToSrce(TDest destinationEntity, OperationTypes operationType);
 
         /// <summary>
         /// Gets the <see cref="IPropertyMapper{TSrce, TDest}"/> mappings.
@@ -142,7 +146,7 @@ namespace Beef.Mapper
         private readonly List<IPropertyMapper<TSrce, TDest>> _mappings = new List<IPropertyMapper<TSrce, TDest>>();
         private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _srceMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
         private readonly Dictionary<string, IPropertyMapper<TSrce, TDest>> _destMappings = new Dictionary<string, IPropertyMapper<TSrce, TDest>>();
-        private IPropertyMapper<TSrce, TDest>[] _uniqueKey;
+        private IPropertyMapper<TSrce, TDest>[]? _uniqueKey;
 
         /// <summary>
         /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> automatically mapping the properties where they share the same name.
@@ -240,7 +244,7 @@ namespace Beef.Mapper
                     if (!typeof(IPropertyMapperConverter).IsAssignableFrom(mpa.ConverterType))
                         throw new MapperException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with ConverterType set to '{mpa.ConverterType.Name}' which does not implement 'IPropertyMapperConverter'.");
 
-                    IPropertyMapperConverter pmc = null;
+                    IPropertyMapperConverter? pmc = null;
                     var pdef = mpa.ConverterType.GetProperty("Default", BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Static);
                     if (pdef == null)
                     {
@@ -259,7 +263,7 @@ namespace Beef.Mapper
                 // Apply auto-map Property attribute MapperType configuration for complex types.
                 if (pmap.IsSrceComplexType)
                 {
-                    IEntityMapperBase em = null;
+                    IEntityMapperBase? em = null;
                     if (mpa.MapperType != null)
                     {
                         if (!typeof(IEntityMapperBase).IsAssignableFrom(mpa.MapperType))
@@ -268,7 +272,7 @@ namespace Beef.Mapper
                         var mdef = mpa.MapperType.GetProperty("Default", BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Static);
                         if (mdef == null)
                         {
-                            if (mpa.ConverterType.GetConstructor(Type.EmptyTypes) == null)
+                            if (mpa.ConverterType == null || mpa.ConverterType.GetConstructor(Type.EmptyTypes) == null)
                                 throw new MapperException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with MapperType set to '{mpa.MapperType.Name}' does not have a static 'Default' property or default constructor.");
 
                             em = (IEntityMapperBase)Activator.CreateInstance(mpa.MapperType);
@@ -286,7 +290,7 @@ namespace Beef.Mapper
                         pmap.SetMapper(em);
                 }
                 else if (mpa.MapperType != null)
-                    throw new MapperException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with MapperType set to '{mpa.ConverterType.Name}' although the property is not a complex type.");
+                    throw new MapperException($"Type '{SrceType.Name}' Property '{sp.Name}' has 'MapperPropertyAttribute' with MapperType set to '{mpa.ConverterType!.Name}' although the property is not a complex type.");
             }
         }
 
@@ -340,8 +344,10 @@ namespace Beef.Mapper
                     pmap.SetUniqueKey(p.IsUniqueKeyAutoGeneratedOnCreate);
 
                 pmap.SetOperationTypes(p.OperationTypes);
-                pmap.SetConverter(p.Converter);
-                pmap.SetMapper(p.Mapper);
+                if (p.Converter != null)
+                    pmap.SetConverter(p.Converter);
+                else if (p.Mapper != null)
+                    pmap.SetMapper(p.Mapper);
             }
         }
 
@@ -385,7 +391,7 @@ namespace Beef.Mapper
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the destination entity property.</param>
         /// <param name="propertyAction">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public virtual EntityMapper<TSrce, TDest> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression, Action<PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>> propertyAction = null)
+        public virtual EntityMapper<TSrce, TDest> HasProperty<TSrceProperty, TDestProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Expression<Func<TDest, TDestProperty>> destPropertyExpression, Action<PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty>>? propertyAction = null)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -437,7 +443,7 @@ namespace Beef.Mapper
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <param name="propertyAction">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        public virtual EntityMapper<TSrce, TDest> HasSrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Action<PropertySrceMapper<TSrce, TSrceProperty, TDest>> propertyAction = null)
+        public virtual EntityMapper<TSrce, TDest> HasSrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Action<PropertySrceMapper<TSrce, TSrceProperty, TDest>>? propertyAction = null)
             where TSrceProperty : class
         {
             if (srcePropertyExpression == null)
@@ -497,9 +503,10 @@ namespace Beef.Mapper
                 return this;
 
             _srceMappings.Remove(p.SrcePropertyName);
-            _destMappings.Remove(p.DestPropertyName);
-            _mappings.Remove(p);
+            if (p.DestPropertyName != null)
+                _destMappings.Remove(p.DestPropertyName);
 
+            _mappings.Remove(p);
             return this;
         }
 
@@ -533,9 +540,9 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination value.</returns>
-        object IEntityMapper.MapToDest(object sourceEntity, OperationTypes operationType)
+        object? IEntityMapper.MapToDest(object? sourceEntity, OperationTypes operationType)
         {
-            return MapToDest((TSrce)sourceEntity, operationType);
+            return MapToDest((TSrce)sourceEntity!, operationType);
         }
 
         /// <summary>
@@ -544,12 +551,12 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination entity.</returns>
-        public TDest MapToDest(TSrce sourceEntity, OperationTypes operationType = OperationTypes.Unspecified)
+        public TDest? MapToDest(TSrce sourceEntity, OperationTypes operationType = OperationTypes.Unspecified)
         {
             if (sourceEntity == null)
-                return null;
+                return default!;
 
-            var dest = new TDest();
+            TDest? dest = new TDest();
 
             foreach (var map in Mappings)
             {
@@ -594,7 +601,7 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination entity.</returns>
-        protected virtual TDest OnMapToDest(TSrce sourceEntity, TDest destinationEntity, OperationTypes operationType)
+        protected virtual TDest? OnMapToDest(TSrce sourceEntity, TDest destinationEntity, OperationTypes operationType)
         {
             return destinationEntity;
         }
@@ -605,9 +612,9 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source value.</returns>
-        object IEntityMapper.MapToSrce(object destinationEntity, OperationTypes operationType)
+        object? IEntityMapper.MapToSrce(object? destinationEntity, OperationTypes operationType)
         {
-            return MapToSrce((TDest)destinationEntity, operationType);
+            return MapToSrce((TDest)destinationEntity!, operationType);
         }
 
         /// <summary>
@@ -616,12 +623,12 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source entity.</returns>
-        public TSrce MapToSrce(TDest destinationEntity, OperationTypes operationType = OperationTypes.Unspecified)
+        public TSrce? MapToSrce(TDest destinationEntity, OperationTypes operationType = OperationTypes.Unspecified)
         {
             if (destinationEntity == null)
-                return null;
+                return default!;
 
-            var srce = new TSrce();
+            TSrce? srce = new TSrce();
 
             foreach (var map in Mappings)
             {
@@ -631,8 +638,8 @@ namespace Beef.Mapper
 
             srce = OnMapToSrce(destinationEntity, srce, operationType);
 
-            if (srce != null && MapToSrceNullWhenIsInitial && srce is ICleanUp ic && ic.IsInitial)
-                return null;
+            if (srce != default && MapToSrceNullWhenIsInitial && srce is ICleanUp ic && ic.IsInitial)
+                return default!;
 
             return srce;
         }
@@ -644,7 +651,7 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source entity.</returns>
-        protected virtual TSrce OnMapToSrce(TDest destinationEntity, TSrce sourceEntity, OperationTypes operationType)
+        protected virtual TSrce? OnMapToSrce(TDest destinationEntity, TSrce sourceEntity, OperationTypes operationType)
         {
             return sourceEntity;
         }
@@ -654,7 +661,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertyMapper<TSrce, TDest> GetBySrcePropertyName(string name)
+        public IPropertyMapper<TSrce, TDest>? GetBySrcePropertyName(string name)
         {
             if (!_srceMappings.ContainsKey(name))
                 return null;
@@ -668,7 +675,7 @@ namespace Beef.Mapper
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertyMapper<TSrce, TDest> GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
+        public IPropertyMapper<TSrce, TDest>? GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -682,7 +689,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertyMapper<TSrce, TDest> GetByDestPropertyName(string name)
+        public IPropertyMapper<TSrce, TDest>? GetByDestPropertyName(string name)
         {
             if (!_destMappings.ContainsKey(name))
                 return null;
@@ -696,7 +703,7 @@ namespace Beef.Mapper
         /// <typeparam name="TDestProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="destPropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertyMapper<TSrce, TDest> GetByDestProperty<TDestProperty>(Expression<Func<TDest, TDestProperty>> destPropertyExpression)
+        public IPropertyMapper<TSrce, TDest>? GetByDestProperty<TDestProperty>(Expression<Func<TDest, TDestProperty>> destPropertyExpression)
         {
             if (destPropertyExpression == null)
                 throw new ArgumentNullException(nameof(destPropertyExpression));
@@ -710,7 +717,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase IEntityMapperBase.GetBySrcePropertyName(string name)
+        IPropertyMapperBase? IEntityMapperBase.GetBySrcePropertyName(string name)
         {
             return GetBySrcePropertyName(name);
         }
@@ -720,7 +727,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase IEntityMapperBase.GetByDestPropertyName(string name)
+        IPropertyMapperBase? IEntityMapperBase.GetByDestPropertyName(string name)
         {
             return GetByDestPropertyName(name);
         }

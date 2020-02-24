@@ -9,36 +9,26 @@ namespace Beef.Entities
     /// </summary>
     public class BeforePropertyChangedEventArgs : PropertyChangedEventArgs
     {
-        private readonly object _newValue;
-        private bool _cancel;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BeforePropertyChangedEventArgs"/> class.
         /// </summary>
         /// <param name="propertyName">The property name.</param>
         /// <param name="newValue">The new value.</param>
-        public BeforePropertyChangedEventArgs(string propertyName, object newValue)
+        public BeforePropertyChangedEventArgs(string propertyName, object? newValue)
             : base(propertyName)
         {
-            _newValue = newValue;
+            NewValue = newValue;
         }
 
         /// <summary>
         /// Gets the <b>new</b> value.
         /// </summary>
-        public object NewValue
-        {
-            get { return _newValue; }
-        }
+        public object? NewValue { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the event should be canceled.
         /// </summary>
-        public bool Cancel
-        {
-            get { return _cancel; }
-            set { _cancel = value; }
-        }
+        public bool Cancel { get; set; }
     }
 
     /// <summary>

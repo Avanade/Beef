@@ -32,7 +32,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the <see cref="JsonPropertyAttribute"/> where declared (see <see cref="HasJsonPropertyAttribute"/>);
         /// </summary>
-        JsonPropertyAttribute JsonPropertyAttribute { get; }
+        JsonPropertyAttribute? JsonPropertyAttribute { get; }
 
         /// <summary>
         /// Indicates whether the property has the <see cref="JsonPropertyAttribute"/> declared.
@@ -44,7 +44,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity value.</param>
         /// <returns>The corresponding property value.</returns>
-        object GetValue(object entity);
+        object? GetValue(object entity);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ namespace Beef.Reflection
         private static readonly Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>> _expressions = new Dictionary<ExpressionKey, PropertyExpression<TEntity, TProperty>>();
         private static readonly object _lock = new object();
 
-        private Func<TEntity, TProperty> _func;
+        private readonly Func<TEntity, TProperty> _func;
 
         /// <summary>
         /// Gets the property name from the property expression.
@@ -158,30 +158,29 @@ namespace Beef.Reflection
             if (!me.Member.DeclaringType.GetTypeInfo().IsAssignableFrom(typeof(TEntity).GetTypeInfo()))
                 throw new InvalidOperationException("Expression results in a Member for a different Entity class.");
 
-            var pe = new PropertyExpression<TEntity, TProperty>() { Name = me.Member.Name };
+            string name = me.Member.Name;
 
             // Either get the friendly text from a corresponding DisplayTextAttribute or split the PascalCase member name into friendlier sentence case text.
             DisplayAttribute ca = me.Member.GetCustomAttribute<DisplayAttribute>(true);
-            pe.Text = ca == null ? Beef.CodeGen.CodeGenerator.ToSentenceCase(pe.Name) : ca.Name;
 
             // Get the JSON property name.
             JsonPropertyAttribute jpa = me.Member.GetCustomAttribute<JsonPropertyAttribute>(true);
             if (jpa == null && probeForJsonRefDataSidProperties)
             {
                 // Probe corresponding Sid or Sids properties for value (using the standardised naming convention).
-                var pi = me.Member.DeclaringType.GetProperty($"{pe.Name}Sid");
+                var pi = me.Member.DeclaringType.GetProperty($"{name}Sid");
                 if (pi == null)
-                    pi = me.Member.DeclaringType.GetProperty($"{pe.Name}Sids");
+                    pi = me.Member.DeclaringType.GetProperty($"{name}Sids");
 
                 if (pi != null)
                     jpa = pi.GetCustomAttribute<JsonPropertyAttribute>(true);
             }
 
-            pe.JsonPropertyAttribute = jpa;
-            pe.JsonName = jpa == null ? pe.Name : jpa.PropertyName;
-
-            // Compile the expression.
-            pe._func = propertyExpression.Compile();
+            // Create expression (with compilation also).
+            var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca == null ? Beef.CodeGen.CodeGenerator.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
+            {
+                JsonPropertyAttribute = jpa
+            };
 
             // Recheck cache and use/update accordingly.
             lock (_lock)
@@ -193,6 +192,17 @@ namespace Beef.Reflection
             }
 
             return pe;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyExpression"/> class.
+        /// </summary>
+        private PropertyExpression(string name, string jsonName, string text, Func<TEntity, TProperty> func)
+        {
+            Name = Check.NotEmpty(name, nameof(name));
+            JsonName = Check.NotEmpty(jsonName, nameof(jsonName));
+            Text = Check.NotEmpty(text, nameof(text));
+            _func = Check.NotNull(func, nameof(func));
         }
 
         /// <summary>
@@ -213,7 +223,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the <see cref="JsonPropertyAttribute"/> where declared (see <see cref="HasJsonPropertyAttribute"/>);
         /// </summary>
-        public JsonPropertyAttribute JsonPropertyAttribute { get; private set; }
+        public JsonPropertyAttribute? JsonPropertyAttribute { get; private set; }
 
         /// <summary>
         /// Indicates whether the property has the <see cref="JsonPropertyAttribute"/> declared.
@@ -225,7 +235,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity value.</param>
         /// <returns>The corresponding property value.</returns>
-        object IPropertyExpression.GetValue(object entity)
+        object? IPropertyExpression.GetValue(object entity)
         {
             return GetValue((TEntity)entity);
         }
@@ -238,7 +248,7 @@ namespace Beef.Reflection
         public TProperty GetValue(TEntity entity)
         {
             if (entity == null)
-                return default;
+                return default!;
             else
                 return _func.Invoke(entity);
         }

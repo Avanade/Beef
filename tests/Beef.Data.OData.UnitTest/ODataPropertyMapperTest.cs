@@ -143,9 +143,6 @@ namespace Beef.Data.OData.UnitTest
             pm.SetMapper(new ODataMapper<Address>("Address"));
             Assert.IsNotNull(pm.Mapper);
 
-            pm.SetMapper(null);
-            Assert.IsNull(pm.Mapper);
-
             ExpectException.Throws<MapperException>("The PropertyMapper SrceType 'Address' has an ItemType of 'Address' which must be the same as the underlying EntityMapper SrceType 'Person'.",
                 () => pm.SetMapper(new EntityMapper<Person, Address>()));
         }
@@ -158,9 +155,6 @@ namespace Beef.Data.OData.UnitTest
 
             pm.SetMapper(new ODataMapper<Address>("Address"));
             Assert.IsNotNull(pm.Mapper);
-
-            pm.SetMapper(null);
-            Assert.IsNull(pm.Mapper);
 
             ExpectException.Throws<ArgumentException>("Mapper must be instance of IODataMapper.", () => pm.SetMapper(new EntityMapper<Person, Address>()));
 

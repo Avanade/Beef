@@ -16,7 +16,7 @@ namespace Beef.Yaml
     /// </summary>
     public class YamlConverter
     {
-        private readonly JArray _json;
+        private readonly JArray? _json;
 
         /// <summary>
         /// Gets or sets the default <see cref="ChangeLog.CreatedDate"/> value.
@@ -35,10 +35,8 @@ namespace Beef.Yaml
         /// <returns>The <see cref="YamlConverter"/>.</returns>
         public static YamlConverter ReadYaml(string yaml)
         {
-            using (var sr = new StringReader(yaml))
-            {
-                return ReadYaml(sr);
-            }
+            using var sr = new StringReader(yaml);
+            return ReadYaml(sr);
         }
 
         /// <summary>
@@ -48,10 +46,8 @@ namespace Beef.Yaml
         /// <returns>The <see cref="YamlConverter"/>.</returns>
         public static YamlConverter ReadYaml(Stream s)
         {
-            using (var sr = new StreamReader(s))
-            {
-                return ReadYaml(sr);
-            }
+            using var sr = new StreamReader(s);
+            return ReadYaml(sr);
         }
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace Beef.Yaml
         public static YamlConverter ReadYaml(TextReader tr)
         {
             var yaml = new DeserializerBuilder().Build().Deserialize(tr);
-            var json = new SerializerBuilder().JsonCompatible().Build().Serialize(yaml);
+            var json = new SerializerBuilder().JsonCompatible().Build().Serialize(yaml!);
             return ReadJson(json);
         }
 
@@ -82,7 +78,7 @@ namespace Beef.Yaml
         /// <param name="json">The <see cref="JObject"/> configuration.</param>
         private YamlConverter(JObject json)
         {
-            _json = json.Children().FirstOrDefault()?.Children().OfType<JArray>().FirstOrDefault();
+            _json = Check.NotNull(json, nameof(json)).Children().FirstOrDefault()?.Children().OfType<JArray>().FirstOrDefault();
         }
 
         /// <summary>
@@ -94,13 +90,13 @@ namespace Beef.Yaml
         /// <param name="initializeReferenceData">Indicates where to set the </param>
         /// <param name="itemAction">An action to allow further updating to each item.</param>
         /// <returns>The corresponding collection.</returns>
-        public IEnumerable<T> Convert<T>(string name, bool replaceAllShorthandGuids = true, bool initializeCreatedChangeLog = true, bool initializeReferenceData = true, Action<JObject, int, T> itemAction = null) where T : class, new()
+        public IEnumerable<T> Convert<T>(string name, bool replaceAllShorthandGuids = true, bool initializeCreatedChangeLog = true, bool initializeReferenceData = true, Action<JObject, int, T?>? itemAction = null) where T : class, new()
         {
             Check.NotEmpty(name, nameof(name));
 
             var json = _json?.Children().OfType<JObject>()?.Children().OfType<JProperty>().Where(x => x.Name == name)?.FirstOrDefault()?.Value;
             if (json == null || json.Type != JTokenType.Array)
-                return default;
+                return default!;
 
             if (replaceAllShorthandGuids)
                 ReplaceAllShorthandGuids(json);
@@ -123,7 +119,7 @@ namespace Beef.Yaml
 
                 itemAction?.Invoke(j, list.Count, val);
 
-                list.Add(val);
+                list.Add(val!);
             }
 
             return list.AsEnumerable();

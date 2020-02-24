@@ -20,7 +20,7 @@ namespace Beef
         /// <param name="keyAndOrText">The key and/or text.</param>
         /// <param name="fallbackText">The fallback text to be used when the <paramref name="keyAndOrText"/> is not found by the <see cref="TextProvider"/>.</param>
         /// <remarks>At least one of the arguments must be specified.</remarks>
-        public LText(string keyAndOrText, string fallbackText = null)
+        public LText(string? keyAndOrText, string? fallbackText = null)
         {
             if (string.IsNullOrEmpty(keyAndOrText) && string.IsNullOrEmpty(fallbackText))
                 throw new ArgumentException("At least one of the arguments must be specified.");
@@ -34,7 +34,7 @@ namespace Beef
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="fallbackText">The fallback text to be used when not found by the <see cref="TextProvider"/>.</param>
-        public LText(int key, string fallbackText = null)
+        public LText(int key, string? fallbackText = null)
         {
             KeyAndOrText = key <= 0 ? throw new ArgumentException("Key must be a positive integer.", nameof(key)) : key.ToString(IntKeyFormat, System.Globalization.CultureInfo.InvariantCulture);
             FallbackText = fallbackText;
@@ -43,12 +43,12 @@ namespace Beef
         /// <summary>
         /// Gets the key and/or text (where the key is not found, it will used as the text; unless a <see cref="FallbackText"/> is specified.
         /// </summary>
-        public string KeyAndOrText { get; private set; }
+        public string? KeyAndOrText { get; private set; }
 
         /// <summary>
         /// Gets or sets the optional fallback text to be used when the <see cref="KeyAndOrText"/> is not found by the <see cref="TextProvider"/> (where not specified that <see cref="KeyAndOrText"/> becomes the fallback text).
         /// </summary>
-        public string FallbackText { get; set; }
+        public string? FallbackText { get; set; }
 
         /// <summary>
         /// Returns the <see cref="LText"/> as a <see cref="string"/> (see <see cref="TextProvider"/> <see cref="TextProvider.Current"/> <see cref="TextProvider.GetText(LText)"/>).
@@ -71,7 +71,7 @@ namespace Beef
 
 #pragma warning disable CA2225 // Operator overloads have named alternates; by-design and valid.
         /// <summary>
-        /// An implicit cast from a text <see cref="string"/> to an <see cref="LText"/> value updating the <see cref="LText.KeyAndOrText"/>.
+        /// An implicit cast from a text <see cref="string"/> to an <see cref="LText"/> value updating the <see cref="KeyAndOrText"/>.
         /// </summary>
         /// <param name="keyAndOrText">The key and/or text.</param>
         public static implicit operator LText(string keyAndOrText)

@@ -14,7 +14,7 @@ namespace Beef.CodeGen
     /// </summary>
     public class CodeGenerator
     {
-        private static Func<string, string> _pluralizer;
+        private static Func<string, string>? _pluralizer;
 
         /// <summary>
         /// The <see cref="Regex"/> expression pattern for split strings into words.
@@ -40,7 +40,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The pluralized text.</returns>
-        public static string ToPlural(string text)
+        public static string? ToPlural(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -56,7 +56,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToCamelCase(string text)
+        public static string? ToCamelCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -69,7 +69,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToPrivateCase(string text)
+        public static string? ToPrivateCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -82,7 +82,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToPascalCase(string text)
+        public static string? ToPascalCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -95,7 +95,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToSentenceCase(string text)
+        public static string? ToSentenceCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -110,7 +110,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToSnakeCase(string text)
+        public static string? ToSnakeCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -127,7 +127,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToKebabCase(string text)
+        public static string? ToKebabCase(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -144,7 +144,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        private static string ReplaceGenericsBracketWithCommentsBracket(string text)
+        private static string? ReplaceGenericsBracketWithCommentsBracket(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -159,7 +159,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToComments(string text)
+        public static string? ToComments(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -177,7 +177,7 @@ namespace Beef.CodeGen
                     throw new CodeGenException("Start and End {{ }} parameter mismatch.", text);
 
                 string sub = s.Substring(start, end - start + 2);
-                string mid = ReplaceGenericsBracketWithCommentsBracket(sub.Substring(2, sub.Length - 4));
+                string? mid = ReplaceGenericsBracketWithCommentsBracket(sub[2..^2]);
 
                 s = s.Replace(sub, string.Format(CultureInfo.InvariantCulture, "<see cref=\"{0}\"/>", mid), StringComparison.InvariantCulture);
             }
@@ -190,7 +190,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The converted text.</returns>
-        public static string ToSeeComments(string text)
+        public static string? ToSeeComments(string? text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
@@ -204,16 +204,13 @@ namespace Beef.CodeGen
         /// <param name="configXml">The configuration <see cref="XElement"/>.</param>
         /// <param name="loaders">The <see cref="ICodeGenConfigLoader"/> dictionary.</param>
         /// <returns>A <see cref="CodeGenerator"/>.</returns>
-        public static CodeGenerator Create(XElement configXml, IEnumerable<ICodeGenConfigLoader> loaders = null)
+        public static CodeGenerator Create(XElement configXml, IEnumerable<ICodeGenConfigLoader>? loaders = null)
         {
             if (configXml == null)
                 throw new ArgumentNullException(nameof(configXml));
 
             // Create the code generator.
-            var cg = new CodeGenerator()
-            {
-                ConfigXml = configXml
-            };
+            var cg = new CodeGenerator(configXml);
 
             // Load the Loaders making sure it does not contain 'System'.
             if (loaders != null)
@@ -236,17 +233,17 @@ namespace Beef.CodeGen
         /// <summary>
         /// Private constructor.
         /// </summary>
-        private CodeGenerator() { }
+        private CodeGenerator(XElement configXml) => ConfigXml = configXml;
 
         /// <summary>
         /// Gets or sets the <b>root</b> (top-most) <see cref="CodeGenConfig"/>.
         /// </summary>
-        internal CodeGenConfig Root { get; set; }
+        internal CodeGenConfig? Root { get; set; }
 
         /// <summary>
         /// Gets the <b>System</b> <see cref="CodeGenConfig"/>.
         /// </summary>
-        internal CodeGenConfig System { get; private set; }
+        internal CodeGenConfig System { get; private set; } = new CodeGenConfig(SystemConfigName, null);
 
         /// <summary>
         /// Gets the configuration <see cref="XElement"/>.
@@ -317,7 +314,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Occurs when a output has been successfully generated.
         /// </summary>
-        public event EventHandler<CodeGeneratorEventArgs> CodeGenerated;
+        public event EventHandler<CodeGeneratorEventArgs>? CodeGenerated;
     }
 
     /// <summary>
@@ -328,17 +325,17 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the generated directory name.
         /// </summary>
-        public string OutputGenDirName { get; internal set; }
+        public string? OutputGenDirName { get; internal set; }
 
         /// <summary>
         /// Gets the optional directory name.
         /// </summary>
-        public string OutputDirName { get; internal set; }
+        public string? OutputDirName { get; internal set; }
 
         /// <summary>
         /// Gets the generated file name.
         /// </summary>
-        public string OutputFileName { get; internal set; }
+        public string? OutputFileName { get; internal set; }
 
         /// <summary>
         /// Indicates whether the file is only output when new; i.e. does not already exist.
@@ -348,6 +345,6 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the generated output content.
         /// </summary>
-        public string Content { get; internal set; }
+        public string? Content { get; internal set; }
     }
 }

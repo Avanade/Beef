@@ -416,7 +416,7 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields);
+            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields)!;
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
                 return (json, ExecutionContext.Current.ETag);
@@ -813,7 +813,7 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiPatch<T> : WebApiActionBase where T : class
     {
         private readonly JToken _value;
-        private readonly Func<Task<T>> _getFunc;
+        private readonly Func<Task<T?>> _getFunc;
         private readonly Func<T, Task>? _updateFuncNoResult;
         private readonly Func<T, Task<T>>? _updateFuncWithResult;
 
@@ -830,7 +830,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T>> getFunc, Func<T, Task> updateFuncNoResult, OperationType operationType = OperationType.Unspecified,
+        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task> updateFuncNoResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
             [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
@@ -853,7 +853,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
+        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
             [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)

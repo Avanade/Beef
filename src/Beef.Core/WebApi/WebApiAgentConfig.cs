@@ -15,7 +15,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Gets or sets the <see cref="WebApiServiceAgentConfigItem"/> array.
         /// </summary>
-        public List<WebApiServiceAgentConfigItem> ServiceAgents { get; set; }
+        public List<WebApiServiceAgentConfigItem>? ServiceAgents { get; set; }
 #pragma warning restore CA2227
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="beforeRequestOverride">An <see cref="Action{HttpRequestMessage, ServiceAgentConfigItem}"/> to invoke before the <see cref="HttpRequestMessage"/> is
         /// sent (overriding the default behaviour).</param>
-        public void RegisterAll(Action<HttpRequestMessage, WebApiServiceAgentConfigItem> beforeRequestOverride = null)
+        public void RegisterAll(Action<HttpRequestMessage, WebApiServiceAgentConfigItem>? beforeRequestOverride = null)
         {
             if (ServiceAgents != null)
             {
@@ -40,18 +40,18 @@ namespace Beef.WebApi
     /// </summary>
     public class WebApiServiceAgentConfigItem
     {
-        private Action<HttpRequestMessage, WebApiServiceAgentConfigItem> _beforeRequestOverride;
+        private Action<HttpRequestMessage, WebApiServiceAgentConfigItem>? _beforeRequestOverride;
 
         /// <summary>
         /// Gets or sets the namespace required for the <see cref="WebApiServiceAgentManager"/>.
         /// </summary>
-        public string Namespace { get; set; }
+        public string? Namespace { get; set; }
 
 #pragma warning disable CA1056 // Uri properties should not be strings; by-design, comes from configuration string.
         /// <summary>
         /// Gets or sets the base URL endpoint.
         /// </summary>
-        public string BaseUrl { get; set; }
+        public string? BaseUrl { get; set; }
 #pragma warning restore CA1056
 
         /// <summary>
@@ -59,8 +59,11 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="beforeRequestOverride">An <see cref="Action{HttpRequestMessage, ServiceAgentConfigItem}"/> to invoke before the <see cref="HttpRequestMessage"/> is
         ///  sent (overriding the default behaviour).</param>
-        public void Register(Action<HttpRequestMessage, WebApiServiceAgentConfigItem> beforeRequestOverride = null)
+        public void Register(Action<HttpRequestMessage, WebApiServiceAgentConfigItem>? beforeRequestOverride = null)
         {
+            if (string.IsNullOrEmpty(Namespace))
+                throw new InvalidOperationException("Namespace must not be null.");
+
             _beforeRequestOverride = beforeRequestOverride;
             if (_beforeRequestOverride == null)
                 WebApiServiceAgentManager.Register(Namespace, new Uri(BaseUrl), null);
@@ -73,7 +76,7 @@ namespace Beef.WebApi
         /// </summary>
         private void BeforeHttpRequestOverride(HttpRequestMessage requestMessage)
         {
-            _beforeRequestOverride(requestMessage, this);
+            _beforeRequestOverride?.Invoke(requestMessage, this);
         }
     }
 }

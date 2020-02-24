@@ -1,4 +1,6 @@
-﻿using Beef.Mapper.Converters;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace Beef.Mapper
     /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
     public abstract class PropertyMapperCustomBase<TSrce, TSrceProperty> : IPropertySrceMapper<TSrce>
     {
-        private Func<TSrce, bool> _mapSrceToDestWhen;
+        private Func<TSrce, bool>? _mapSrceToDestWhen;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMapperCustomBase{TEntity, TProperty}"/> class.
@@ -22,10 +24,10 @@ namespace Beef.Mapper
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="destPropertyName">The name of the destination property (defaults to <see cref="SrcePropertyName"/> where null).</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
-        protected PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string destPropertyName, OperationTypes operationTypes = OperationTypes.Any)
+        protected PropertyMapperCustomBase(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? destPropertyName = null, OperationTypes operationTypes = OperationTypes.Any)
         {
             SrcePropertyExpression = PropertyExpression.Create(srcePropertyExpression ?? throw new ArgumentNullException(nameof(srcePropertyExpression)));
-            SrcePropertyInfo = TypeReflector.GetPropertyInfo(typeof(TSrce), SrcePropertyName);
+            SrcePropertyInfo = TypeReflector.GetPropertyInfo(typeof(TSrce), SrcePropertyName) ?? throw new ArgumentException($"Property '{SrcePropertyName}' does not exist for Type.", nameof(destPropertyName));
             DestPropertyName = string.IsNullOrEmpty(destPropertyName) ? SrcePropertyExpression.Name : destPropertyName;
             OperationTypes = operationTypes;
 
@@ -41,7 +43,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
-        public ComplexTypeReflector SrceComplexTypeReflector { get; private set; }
+        public ComplexTypeReflector? SrceComplexTypeReflector { get; private set; }
 
         /// <summary>
         /// Indicates whether the property is a complex type or complex type collection (see <see cref="SrceComplexTypeReflector"/>).
@@ -66,7 +68,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the destination property <see cref="Type"/>.
         /// </summary>
-        public virtual Type DestPropertyType => null;
+        public virtual Type DestPropertyType { get => throw new InvalidOperationException("DestPropertyType has not been implemented."); }
 
         /// <summary>
         /// Gets the destination property name.
@@ -110,7 +112,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets or sets the <see cref="IPropertyMapperConverter"/> (used where a specific source and destination type conversion is required).
         /// </summary>
-        public IPropertyMapperConverter Converter { get; private set; }
+        public IPropertyMapperConverter? Converter { get; private set; }
 
         /// <summary>
         /// Sets the <see cref="Converter"/>.
@@ -118,10 +120,13 @@ namespace Beef.Mapper
         /// <param name="converter">The <see cref="IPropertyMapperConverter"/>.</param>
         void IPropertyMapperBase.SetConverter(IPropertyMapperConverter converter)
         {
-            if (Mapper != null && converter != null)
+            if (converter == null)
+                throw new ArgumentNullException(nameof(converter));
+
+            if (Mapper != null)
                 throw new MapperException("The Mapper and Converter cannot be both set; only one is permissible.");
 
-            if (converter != null && converter.SrceType != typeof(TSrceProperty))
+            if (converter.SrceType != typeof(TSrceProperty))
                 throw new MapperException($"The PropertyMapper SrceType '{typeof(TSrceProperty).Name}' and Converter SrceType '{converter.SrceType.Name}' must match.");
 
             Converter = converter;
@@ -146,7 +151,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="IEntityMapperBase"/> to map complex types.
         /// </summary>
-        public IEntityMapperBase Mapper { get; private set; }
+        public IEntityMapperBase? Mapper { get; private set; }
 
         /// <summary>
         /// Sets the <see cref="IEntityMapperBase"/> to map complex types.
@@ -166,17 +171,17 @@ namespace Beef.Mapper
         /// <remarks>The <see cref="Mapper"/> and <see cref="Converter"/> are mutually exclusive.</remarks>
         public PropertyMapperCustomBase<TSrce, TSrceProperty> SetMapper(IEntityMapperBase mapper)
         {
-            if (Converter != null && mapper != null)
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            if (Converter != null)
                 throw new MapperException("The Mapper and Converter cannot be both set; only one is permissible.");
 
-            if (mapper != null)
-            {
-                if (!IsSrceComplexType)
-                    throw new MapperException($"The PropertyMapper SrceType '{typeof(TSrceProperty).Name}' must be a complex type to set a Mapper.");
+            if (!IsSrceComplexType)
+                throw new MapperException($"The PropertyMapper SrceType '{typeof(TSrceProperty).Name}' must be a complex type to set a Mapper.");
 
-                if (mapper.SrceType != SrceComplexTypeReflector.ItemType)
-                    throw new MapperException($"The PropertyMapper SrceType '{typeof(TSrceProperty).Name}' has an ItemType of '{SrceComplexTypeReflector.ItemType.Name}' which must be the same as the underlying EntityMapper SrceType '{mapper.SrceType.Name}'.");
-            }
+            if (mapper.SrceType != SrceComplexTypeReflector!.ItemType)
+                throw new MapperException($"The PropertyMapper SrceType '{typeof(TSrceProperty).Name}' has an ItemType of '{SrceComplexTypeReflector.ItemType.Name}' which must be the same as the underlying EntityMapper SrceType '{mapper.SrceType.Name}'.");
 
             Mapper = mapper;
             return this;
@@ -236,7 +241,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default;
+                return default!;
         }
 
         /// <summary>
@@ -257,7 +262,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        object IPropertySrceMapper<TSrce>.GetSrceValue(TSrce entity, OperationTypes operationType)
+        object? IPropertySrceMapper<TSrce>.GetSrceValue(TSrce entity, OperationTypes operationType)
         {
             return GetSrceValue(entity, operationType);
         }
@@ -268,9 +273,9 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IPropertySrceMapper<TSrce>.SetSrceValue(TSrce entity, object value, OperationTypes operationType)
+        void IPropertySrceMapper<TSrce>.SetSrceValue(TSrce entity, object? value, OperationTypes operationType)
         {
-            SetSrceValue(entity, (TSrceProperty)value, operationType);
+            SetSrceValue(entity, (TSrceProperty)value!, operationType);
         }
     }
 }

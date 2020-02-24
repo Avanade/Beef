@@ -17,7 +17,7 @@ namespace Beef.Executors
         /// </summary>
         /// <param name="stopExecutionManager">Indicates whether all executions should be stopped via the <see cref="ExecutionManager"/> or just the executing instance (default).</param>
         /// <param name="stopException">The underlying stop <see cref="Exception"/> (optional).</param>
-        internal ExecutorStopException(bool stopExecutionManager = false, Exception stopException = null)
+        internal ExecutorStopException(bool stopExecutionManager = false, Exception? stopException = null)
             : base("The ExecutorStopException is for internal use only: do NOT catch and swallow this exception as it is used internally to manage a Stop.", stopException)
         {
             StopExecutionManager = stopExecutionManager;

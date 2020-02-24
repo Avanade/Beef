@@ -414,7 +414,7 @@ namespace Beef.Data.Database
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return ParamWith(with, name, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)), direction);
+            return ParamWith(with, name, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)!), direction);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace Beef.Data.Database
             if (propertyMapper == null)
                 throw new ArgumentNullException(nameof(propertyMapper));
 
-            return ParamWith(with, propertyMapper, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)), direction);
+            return ParamWith(with, propertyMapper, value ?? (() => DatabaseCommand.Database.Wildcard.Replace(with)!), direction);
         }
 
         #endregion
@@ -445,7 +445,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="Convert.FromBase64String(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter AddRowVersionParameter(string name, string value, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter AddRowVersionParameter(string name, string? value, ParameterDirection direction = ParameterDirection.Input)
         {
             if (value == null)
                 return AddParameter(name, DbType.Byte, 8, direction);
@@ -460,7 +460,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter AddRowVersionParameter(string value, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter AddRowVersionParameter(string? value, ParameterDirection direction = ParameterDirection.Input)
         {
             return AddRowVersionParameter("@" + DatabaseColumns.RowVersionName, value, direction);
         }
@@ -593,7 +593,7 @@ namespace Beef.Data.Database
         /// <returns>An <see cref="DbParameter"/> array for those that were added.</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.CreatedByName"/>, <see cref="DatabaseColumns.CreatedDateName"/>,
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
-        public DbParameter[] AddChangeLogParameters(ChangeLog changeLog, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter[] AddChangeLogParameters(ChangeLog? changeLog, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input)
         {
             if (changeLog == null)
                 return Array.Empty<DbParameter>();
@@ -601,14 +601,14 @@ namespace Beef.Data.Database
             var list = new List<DbParameter>();
             if (addCreatedParams)
             {
-                list.Add(AddParameter("@" + DatabaseColumns.CreatedByName, (string)changeLog?.CreatedBy!, direction));
-                list.Add(AddParameter("@" + DatabaseColumns.CreatedDateName, (DateTime?)changeLog?.CreatedDate, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.CreatedByName, changeLog?.CreatedBy!, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.CreatedDateName, changeLog?.CreatedDate, direction));
             }
 
             if (addUpdatedParams)
             {
-                list.Add(AddParameter("@" + DatabaseColumns.UpdatedByName, (string)changeLog?.UpdatedBy!, direction));
-                list.Add(AddParameter("@" + DatabaseColumns.UpdatedDateName, (DateTime?)changeLog?.UpdatedDate, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.UpdatedByName, changeLog?.UpdatedBy!, direction));
+                list.Add(AddParameter("@" + DatabaseColumns.UpdatedDateName, changeLog?.UpdatedDate, direction));
             }
 
             return list.ToArray();

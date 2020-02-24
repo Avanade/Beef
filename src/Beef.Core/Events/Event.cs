@@ -33,11 +33,11 @@ namespace Beef.Events
         /// <param name="template">The subject template.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>The corresponding subject.</returns>
-        public static string CreateSubjectFromTemplate(string template, params KeyValuePair<string, object>[] keyValuePairs)
+        public static string CreateSubjectFromTemplate(string template, params KeyValuePair<string, object?>[] keyValuePairs)
         {
             int start = -1;
             int end = -1;
-            var subject = Check.NotEmpty(template, nameof(template)); ;
+            var subject = Check.NotEmpty(template, nameof(template));
 
             while (true)
             {
@@ -57,7 +57,7 @@ namespace Beef.Events
                 if (kvp.Key == null)
                     throw new ArgumentException($"Template references key '{str}' that has not been provided.", nameof(keyValuePairs));
 
-                subject = subject.Replace(str, kvp.Value.ToString(), StringComparison.InvariantCulture);
+                subject = subject.Replace(str, kvp.Value?.ToString(), StringComparison.InvariantCulture);
             }
         }
 
@@ -78,9 +78,9 @@ namespace Beef.Events
         /// <param name="template">The template.</param>
         /// <param name="subject">The subject.</param>
         /// <returns><c>true</c> where there is a match; otherwise, <c>false</c></returns>
-        public static bool Match(string template, string subject)
+        public static bool Match(string? template, string? subject)
         {
-            return Match(SplitSubjectIntoParts(template), SplitSubjectIntoParts(subject));
+            return Match(template == null ? Array.Empty<string>() : SplitSubjectIntoParts(template), subject == null ? Array.Empty<string>() : SplitSubjectIntoParts(subject));
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Beef.Events
             }
 
             // Where longer make sure last is a wildcard.
-            if (subjectParts.Length > templateParts.Length && templateParts[templateParts.Length - 1] != TemplateWildcard)
+            if (subjectParts.Length > templateParts.Length && templateParts[^1] != TemplateWildcard)
                 return false;
             else
                 return true;
@@ -138,11 +138,11 @@ namespace Beef.Events
         /// <summary>
         /// Publishes an <see cref="EventData"/> instance using a <see cref="EventData.Subject"/> <paramref name="template"/>.
         /// </summary>
-        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object}[])"/>).</param>
+        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object?}[])"/>).</param>
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>he <see cref="Task"/>.</returns>
-        public static Task PublishAsync(string template, string action, params KeyValuePair<string, object>[] keyValuePairs)
+        public static Task PublishAsync(string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;
@@ -155,11 +155,11 @@ namespace Beef.Events
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The event value.</param>
-        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object}[])"/>).</param>
+        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object?}[])"/>).</param>
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>he <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object>[] keyValuePairs)
+        public static Task PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;
@@ -175,7 +175,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string subject, string action = null)
+        public static Task PublishAsync<T>(T value, string subject, string? action = null)
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;
@@ -189,7 +189,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public static Task PublishAsync(string subject, string action = null)
+        public static Task PublishAsync(string subject, string? action = null)
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;

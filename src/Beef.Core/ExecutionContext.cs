@@ -13,24 +13,25 @@ namespace Beef
     /// <summary>
     /// Represents a thread-bound (request) execution context.
     /// </summary>
-    /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments. By default uses <see cref="AsyncLocal{T}"/>,
-    /// although this can be overridden (see <see cref="Register(Func{ExecutionContext}, Func{ExecutionContext}, Action{ExecutionContext})"/>).</remarks>
+    /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments. By default uses <see cref="AsyncLocal{T}"/>;
+    /// although, this can be overridden (see <see cref="Register(Func{ExecutionContext}, Func{ExecutionContext}, Action{ExecutionContext})"/>).</remarks>
     public class ExecutionContext : IETag
     {
         private static readonly object _masterLock = new object();
         private static Func<ExecutionContext> _create = () => new ExecutionContext();
-        private static readonly AsyncLocal<ExecutionContext> _asyncLocal = new AsyncLocal<ExecutionContext>();
-        private static Func<ExecutionContext> _get = () => _asyncLocal.Value;
-        private static Action<ExecutionContext> _set = (ec) => _asyncLocal.Value = ec;
-        private string _username;
+        private static readonly AsyncLocal<ExecutionContext?> _asyncLocal = new AsyncLocal<ExecutionContext?>();
+        private static Func<ExecutionContext?> _get = () => _asyncLocal.Value;
+        private static Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
+
+        private string? _username;
         private Guid? _tenantId;
-        private string _partitionKey;
-        private string _correlationId;
-        private string _sessionCorrelationId;
+        private string? _partitionKey;
+        private string? _correlationId;
+        private string? _sessionCorrelationId;
         private DateTime _timestamp = DateTime.Now;
         private bool _timestampChanged;
-        private PagingArgs _pagingArgs;
-        private KeyOnlyDictionary<string> _roles;
+        private PagingArgs? _pagingArgs;
+        private KeyOnlyDictionary<string>? _roles;
         private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
         private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
         private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
@@ -115,7 +116,7 @@ namespace Beef
         /// <param name="create">The <see cref="ExecutionContext"/> creation function.</param>
         /// <param name="get">The <see cref="ExecutionContext"/> get function.</param>
         /// <param name="set">The <see cref="ExecutionContext"/> set function.</param>
-        public static void Register(Func<ExecutionContext> create, Func<ExecutionContext> get, Action<ExecutionContext> set)
+        public static void Register(Func<ExecutionContext> create, Func<ExecutionContext?> get, Action<ExecutionContext?> set)
         {
             lock (_masterLock)
             {
@@ -151,12 +152,12 @@ namespace Beef
         /// <summary>
         /// Gets or sets the current <see cref="Beef.DataContextScope"/>.
         /// </summary>
-        internal DataContextScope DataContextScope { get; set; }
+        internal DataContextScope? DataContextScope { get; set; }
 
         /// <summary>
         /// Gets or sets the current <see cref="Beef.Diagnostics.Logger"/>.
         /// </summary>
-        internal Logger Logger { get; set; }
+        internal Logger? Logger { get; set; }
 
         /// <summary>
         /// Registers the <see cref="ExecutionContext"/> <see cref="Logger"/> instance (accessible via <see cref="Logger"/> <see cref="Logger.Default"/>).
@@ -193,7 +194,7 @@ namespace Beef
                 if (_username != null && value != _username)
                     throw new ArgumentException(ImmutableText);
 
-                _username = value;
+                _username = Check.NotEmpty(value, nameof(value));
             }
         }
 
@@ -216,7 +217,7 @@ namespace Beef
         /// <summary>
         /// Gets or sets the parition key. This value is immutable.
         /// </summary>
-        public string PartitionKey
+        public string? PartitionKey
         {
             get { return _partitionKey; }
 
@@ -232,7 +233,7 @@ namespace Beef
         /// <summary>
         /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable.
         /// </summary>
-        public string CorrelationId
+        public string? CorrelationId
         {
             get { return _correlationId; }
 
@@ -248,7 +249,7 @@ namespace Beef
         /// <summary>
         /// Gets or sets the session correlation identifier (a unique identifier assigned to the session). This value is immutable.
         /// </summary>
-        public string SessionCorrelationId
+        public string? SessionCorrelationId
         {
             get { return _sessionCorrelationId; }
 
@@ -281,7 +282,7 @@ namespace Beef
         /// <summary>
         /// Gets or sets the <see cref="PagingArgs"/>. This value is immutable.
         /// </summary>
-        public PagingArgs PagingArgs
+        public PagingArgs? PagingArgs
         {
             get { return _pagingArgs; }
 
@@ -297,7 +298,7 @@ namespace Beef
         /// <summary>
         /// Gets or sets the <b>result</b> entity tag (where value does not support <see cref="IETag"/>).
         /// </summary>
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="MessageItemCollection"/> to be passed back to the originating consumer.
@@ -332,7 +333,7 @@ namespace Beef
                 return true;
             }
 
-            value = default;
+            value = default!;
             return false;
         }
 
@@ -344,7 +345,7 @@ namespace Beef
         /// <param name="value">The value to set.</param>
         public void CacheSet<T>(UniqueKey key, T value)
         {
-            _caching.Value.AddOrUpdate(new Tuple<Type, UniqueKey>(typeof(T), key), value, (x, y) => value);
+            _caching.Value.AddOrUpdate(new Tuple<Type, UniqueKey>(typeof(T), key), value!, (x, y) => value!);
         }
 
         /// <summary>
@@ -406,7 +407,7 @@ namespace Beef
         /// </summary>
         public IEnumerable<string> GetRoles()
         {
-            return _roles?.Select(x => x.Key).ToArray();
+            return _roles == null ? Array.Empty<string>() : _roles.Select(x => x.Key).ToArray();
         }
 
         /// <summary>

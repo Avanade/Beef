@@ -86,7 +86,7 @@ namespace Beef.Data.Cosmos
         internal T GetValue(TModel model)
         {
             CosmosDbBase.ReformatValueETag(model);
-            return DbArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
+            return DbArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)!;
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="ICosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
-        public async Task<T> GetAsync(params IComparable[] keys)
+        public async Task<T?> GetAsync(params IComparable[] keys)
         {
             var key = DbArgs.GetCosmosKey(keys);
 
@@ -168,7 +168,7 @@ namespace Beef.Data.Cosmos
             {
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
-                CheckAuthorized(model);
+                CheckAuthorized(model!);
 
                 var resp = await Container.CreateItemAsync(model, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
                 return GetResponseValue(resp);
@@ -192,7 +192,7 @@ namespace Beef.Data.Cosmos
             {
                 // Where supporting etag then use IfMatch for concurreny.
                 var ro = CosmosDb.GetItemRequestOptions(DbArgs);
-                if (ro.IfMatchEtag == null && value is IETag etag)
+                if (ro.IfMatchEtag == null && value is IETag etag && etag.ETag != null)
                     ro.IfMatchEtag = etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) ? etag.ETag : "\"" + etag.ETag + "\"";
 
                 string? key = DbArgs.GetCosmosKey(value);

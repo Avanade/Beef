@@ -27,22 +27,33 @@ namespace Beef.RefData
         /// </summary>
         private struct RefDataKey : IComparable
         {
-            public object Id;
-            public string Code;
-
-            public RefDataKey(object id, string code)
+            public object? Id;
+            public string? Code;
+            
+            /// <summary>
+            /// Initialize new.
+            /// </summary>
+            public RefDataKey(object? id, string? code)
             {
                 Id = id;
                 Code = code;
             }
 
+            /// <summary>
+            /// Compare to another.
+            /// </summary>
             public int CompareTo(object obj)
             {
-                int res = Comparer<object>.Default.Compare(Id, ((RefDataKey)obj).Id);
-                if (res != 0)
-                    return res;
+                if (Check.NotNull(obj, nameof(obj)) is RefDataKey rdk)
+                {
+                    int res = Comparer<object?>.Default.Compare(Id, rdk.Id);
+                    if (res != 0)
+                        return res;
 
-                return Comparer<object>.Default.Compare(Code, ((RefDataKey)obj).Code);
+                    return Comparer<string?>.Default.Compare(Code, rdk.Code);
+                }
+                else
+                    throw new InvalidOperationException("Object must be of type RefDataKey.");
             }
         }
 
@@ -53,23 +64,23 @@ namespace Beef.RefData
 
         private RefDataKey _key = new RefDataKey(null, null);
         private bool _hasIdBeenUpdated = false;
-        private string _text;
-        private string _description;
+        private string? _text;
+        private string? _description;
         private int _sortOrder;
         private bool _isActive = true;
         private bool _isInvalid = false;
         private DateTime? _startDate;
         private DateTime? _endDate;
-        private string _etag;
-        private ChangeLog _changeLog;
-        private Dictionary<string, IComparable> _mappings;
+        private string? _etag;
+        private ChangeLog? _changeLog;
+        private Dictionary<string, IComparable>? _mappings;
 
         /// <summary>
         /// Validates the identifier (see <see cref="Id"/>) <see cref="Type"/>.
         /// </summary>
         /// <param name="idTypeCode">The expected <see cref="ReferenceDataIdTypeCode"/>.</param>
         /// <param name="id">The identifier to validate.</param>
-        public static void ValidateId(ReferenceDataIdTypeCode idTypeCode, object id)
+        public static void ValidateId(ReferenceDataIdTypeCode idTypeCode, object? id)
         {
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
@@ -138,7 +149,7 @@ namespace Beef.RefData
         /// </summary>
         /// <remarks>Once set this value cannot be updated (it becomes immutable). See <see cref="ReferenceDataIdTypeCode"/> for supported <see cref="Type"/> code options.</remarks>
         [Display(Name = "Identifier")]
-        public object Id
+        public object? Id
         {
             get { return _key.Id; }
 
@@ -147,7 +158,7 @@ namespace Beef.RefData
                 ValidateId(IdTypeCode, value);
 
                 // Exit where they are the same.
-                if (Comparer<object>.Default.Compare(value, _key.Id) == 0)
+                if (Comparer<object?>.Default.Compare(value, _key.Id) == 0)
                     return;
 
                 // Where original not the same as unspecified then it has been changed previously.
@@ -156,7 +167,7 @@ namespace Beef.RefData
 
                 _hasIdBeenUpdated = true;
                 _key.Id = value;
-                OnPropertyChanged(Property_Id);
+                OnPropertyChanged(nameof(Id));
             }
         }
 
@@ -165,7 +176,7 @@ namespace Beef.RefData
         /// </summary>
         /// <remarks>Once set this value cannot be updated (it becomes immutable).</remarks>
         [JsonProperty("code")]
-        public string Code
+        public string? Code
         {
             get { return _key.Code; }
 
@@ -180,7 +191,7 @@ namespace Beef.RefData
                     throw new InvalidOperationException("Code cannot be changed once already set to a value.");
 
                 _key.Code = value?.TrimEnd();
-                OnPropertyChanged(Property_Code);
+                OnPropertyChanged(nameof(Code));
             }
         }
 
@@ -188,20 +199,20 @@ namespace Beef.RefData
         /// Gets or sets the text.
         /// </summary>
         [JsonProperty("text")]
-        public string Text
+        public string? Text
         {
-            get { return _text; }
-            set { SetValue(ref _text, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Text); }
+            get => _text;
+            set => SetValue(ref _text!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Text));
         }
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
-        public string Description
+        public string? Description
         {
-            get { return _description; }
-            set { SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_Description); }
+            get => _description;
+            set => SetValue(ref _description!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description));
         }
 
         /// <summary>
@@ -210,8 +221,8 @@ namespace Beef.RefData
         [JsonProperty("sortOrder", NullValueHandling = NullValueHandling.Ignore)]
         public int SortOrder
         {
-            get { return _sortOrder; }
-            set { SetValue<int>(ref _sortOrder, value, false, false, Property_SortOrder); }
+            get => _sortOrder;
+            set => SetValue(ref _sortOrder, value, false, false, nameof(SortOrder));
         }
 
         /// <summary>
@@ -221,8 +232,8 @@ namespace Beef.RefData
         [JsonProperty("isActive")]
         public bool IsActive
         {
-            get { return _isActive; }
-            set { SetValue<bool>(ref _isActive, value, false, false, Property_IsActive); }
+            get => _isActive;
+            set => SetValue(ref _isActive, value, false, false, nameof(IsActive));
         }
 
         /// <summary>
@@ -231,8 +242,8 @@ namespace Beef.RefData
         [JsonProperty("startDate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? StartDate
         {
-            get { return _startDate; }
-            set { SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, Property_StartDate); }
+            get => _startDate;
+            set => SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, nameof(StartDate));
         }
 
         /// <summary>
@@ -241,28 +252,28 @@ namespace Beef.RefData
         [JsonProperty("endDate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? EndDate
         {
-            get { return _endDate; }
-            set { SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, Property_EndDate); }
+            get => _endDate;
+            set => SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, nameof(EndDate));
         }
 
         /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
         [JsonProperty("etag", NullValueHandling = NullValueHandling.Ignore)]
-        public string ETag
+        public string? ETag
         {
-            get { return _etag; }
-            set { SetValue(ref _etag, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_ETag); }
+            get => _etag;
+            set => SetValue(ref _etag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag));
         }
 
         /// <summary>
         /// Gets or sets the <see cref="Beef.Entities.ChangeLog"/>.
         /// </summary>
         [JsonProperty("changeLog", NullValueHandling = NullValueHandling.Ignore)]
-        public ChangeLog ChangeLog
+        public ChangeLog? ChangeLog
         {
-            get { return _changeLog; }
-            set { SetValue<ChangeLog>(ref _changeLog, value, false, true, Property_ChangeLog); }
+            get => _changeLog;
+            set => SetValue(ref _changeLog!, value, false, true, nameof(ChangeLog));
         }
 
         /// <summary>
@@ -312,10 +323,7 @@ namespace Beef.RefData
         /// <summary>
         /// Overrides the standard <see cref="IsValid"/> check and flags the <see cref="ReferenceDataBase"/> as <b>Invalid</b>.
         /// </summary>
-        public void SetInvalid()
-        {
-            _isInvalid = true;
-        }
+        public void SetInvalid() => _isInvalid = true;
 
         /// <summary>
         /// Sets the mapping <paramref name="value"/> for the specified <paramref name="name"/>.
@@ -326,7 +334,7 @@ namespace Beef.RefData
         /// <remarks>A <paramref name="value"/> with the default value will not be set; assumed in this case that no mapping exists.</remarks>
         protected internal void SetMapping<T>(string name, T value) where T : IComparable
         {
-            if (Comparer<T>.Default.Compare(value, default) == 0)
+            if (Comparer<T>.Default.Compare(value, default!) == 0)
                 return;
 
             if (Mappings.ContainsKey(name))
@@ -344,7 +352,7 @@ namespace Beef.RefData
         public T GetMapping<T>(string name) where T : IComparable
         {
             if (!HasMappings || !Mappings.TryGetValue(name, out IComparable value))
-                return default;
+                return default!;
 
             return (T)value;
         }
@@ -358,7 +366,7 @@ namespace Beef.RefData
         /// <returns><c>true</c> indicates that the name exists; otherwise, <c>false</c>.</returns>
         public bool TryGetMapping<T>(string name, out T value) where T : IComparable
         {
-            IComparable val = default(T);
+            IComparable val = default(T)!;
             value = (T)val;
             if (!HasMappings || !Mappings.TryGetValue(name, out val))
                 return false;
@@ -383,8 +391,8 @@ namespace Beef.RefData
             T val;
             if (rd != null)
             {
-                val = (T)rd.GetById(id);
-                if (val != null)
+                val = (T)rd.GetById(id)!;
+                if (val != default!)
                     return val;
             }
 
@@ -405,8 +413,8 @@ namespace Beef.RefData
             T val;
             if (rd != null)
             {
-                val = (T)rd.GetById(id);
-                if (val != null)
+                val = (T)rd.GetById(id)!;
+                if (val != default!)
                     return val;
             }
 
@@ -421,17 +429,17 @@ namespace Beef.RefData
         /// <param name="code">The <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The corresponding <see cref="ReferenceDataBase"/>.</returns>
         /// <remarks>Where the item (<see cref="ReferenceDataBase"/>) is not found it will be created and <see cref="ReferenceDataBase.SetInvalid"/> will be invoked.</remarks>
-        public static T ConvertFromCode<T>(string code) where T : ReferenceDataBase, new()
+        public static T ConvertFromCode<T>(string? code) where T : ReferenceDataBase, new()
         {
             if (code == null)
-                return null;
+                return default!;
 
             IReferenceDataCollection rd = ReferenceDataManager.Current[typeof(T)];
             T val;
             if (rd != null)
             {
-                val = (T)rd.GetByCode(code);
-                if (val != null)
+                val = (T)rd.GetByCode(code)!;
+                if (val != default!)
                     return val;
             }
 
@@ -453,8 +461,8 @@ namespace Beef.RefData
             T val;
             if (rd != null)
             {
-                val = (T)rd.GetByMappingValue(name, value);
-                if (val != null)
+                val = (T)rd.GetByMappingValue(name, value)!;
+                if (val != default!)
                     return val;
             }
 
@@ -469,7 +477,7 @@ namespace Beef.RefData
         /// <param name="obj">The <see cref="ReferenceDataBase"/> to compare with.</param>
         /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
         /// <remarks>Both the <see cref="Id"/> and <see cref="Code"/> must have the same values to be considered equal.</remarks>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             // A null is not equal.
             if (obj == null)
@@ -497,7 +505,7 @@ namespace Beef.RefData
         /// <param name="a">A <see cref="ReferenceDataBase"/>.</param>
         /// <param name="b">B <see cref="ReferenceDataBase"/>.</param>
         /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
-        public static bool operator ==(ReferenceDataBase a, ReferenceDataBase b)
+        public static bool operator ==(ReferenceDataBase? a, ReferenceDataBase? b)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(a, b))
@@ -527,8 +535,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Id"/> value; where <c>null</c> then <b>zero</b> will be returned.</returns>
-        public static implicit operator int(ReferenceDataBase value)
-
+        public static implicit operator int(ReferenceDataBase? value)
         {
             if (value == null)
                 return 0;
@@ -541,7 +548,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Id"/> value.</returns>
-        public static implicit operator int?(ReferenceDataBase value)
+        public static implicit operator int?(ReferenceDataBase? value)
         {
             if (value == null)
                 return null;
@@ -554,7 +561,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Id"/> value; where <c>null</c> then <see cref="Guid.Empty"/> will be returned.</returns>
-        public static implicit operator Guid(ReferenceDataBase value)
+        public static implicit operator Guid(ReferenceDataBase? value)
         {
             if (value == null)
                 return Guid.Empty;
@@ -567,7 +574,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Id"/> value.</returns>
-        public static implicit operator Guid?(ReferenceDataBase value)
+        public static implicit operator Guid?(ReferenceDataBase? value)
         {
             if (value == null)
                 return null;
@@ -581,7 +588,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="value">The <see cref="ReferenceDataBase"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase.Code"/> value; where <c>null</c> then a <c>null</c> will be returned.</returns>
-        public static implicit operator string(ReferenceDataBase value)
+        public static implicit operator string?(ReferenceDataBase? value)
         {
             if (value == null)
                 return null;
@@ -640,9 +647,9 @@ namespace Beef.RefData
         public override void CleanUp()
         {
             base.CleanUp();
-            Text = Cleaner.Clean<string>(_text);
-            Description = Cleaner.Clean<string>(_description);
-            IsActive = Cleaner.Clean<bool>(_isActive);
+            Text = Cleaner.Clean(_text);
+            Description = Cleaner.Clean(_description);
+            IsActive = Cleaner.Clean(_isActive);
             StartDate = Cleaner.Clean(_startDate, DateTimeTransform.DateOnly);
             EndDate = Cleaner.Clean(_endDate, DateTimeTransform.DateOnly);
         }
@@ -680,29 +687,20 @@ namespace Beef.RefData
         ///     <description>The <see cref="Text"/>.</description>
         ///   </item>
         /// </list></para></remarks>
-        public virtual string StringFormat
-        {
-            get { return "{2}"; }
-        }
+        public virtual string StringFormat => "{2}";
 
         /// <summary>
         /// Returns a string representation using the default <see cref="StringFormat"/>.
         /// </summary>
         /// <returns>The appropriately formatted string.</returns>
-        public override string ToString()
-        {
-            return ToString(StringFormat);
-        }
+        public override string ToString() => ToString(StringFormat);
 
         /// <summary>
         /// Returns a string representation using the specified <paramref name="stringFormat"/>.
         /// </summary>
         /// <param name="stringFormat">A specified string format.</param>
         /// <returns>The appropriately formatted string.</returns>
-        public string ToString(string stringFormat)
-        {
-            return string.Format(System.Globalization.CultureInfo.InvariantCulture, stringFormat, Id, Code, Text);
-        }
+        public string ToString(string stringFormat) => string.Format(System.Globalization.CultureInfo.InvariantCulture, stringFormat, Id, Code, Text);
 
         #endregion
 
@@ -797,7 +795,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="provider">An <see cref="IFormatProvider"/>.</param>
         /// <returns>The <see cref="Code"/>.</returns>
-        string IConvertible.ToString(IFormatProvider provider) => Code;
+        string IConvertible.ToString(IFormatProvider provider) => Code!;
 
         /// <summary>
         /// Converts the value to an <see cref="object"/> of the specified <see cref="Type"/> that has an equivalent value.
@@ -808,7 +806,7 @@ namespace Beef.RefData
         object IConvertible.ToType(Type conversionType, IFormatProvider provider)
         {
             if (conversionType == typeof(string))
-                return Code;
+                return Code!;
 
             throw new InvalidCastException();
         }
@@ -835,67 +833,6 @@ namespace Beef.RefData
         ulong IConvertible.ToUInt64(IFormatProvider provider) => throw new InvalidCastException();
 
 #pragma warning restore CA1033
-
-        #endregion
-
-        #region PropertyNames
-
-#pragma warning disable CA1707 // Identifiers should not contain underscores; by-design, new introduced convention.
-        /// <summary>
-        /// Represents the <see cref="Id"/> property name.
-        /// </summary>
-        public const string Property_Id = "Id";
-
-        /// <summary>
-        /// Represents the <see cref="Code"/> property name.
-        /// </summary>
-        public const string Property_Code = "Code";
-
-        /// <summary>
-        /// Represents the <see cref="Text"/> property name.
-        /// </summary>
-        public const string Property_Text = "Text";
-
-        /// <summary>
-        /// Represents the <see cref="Description"/> property name.
-        /// </summary>
-        public const string Property_Description = "Description";
-
-        /// <summary>
-        /// Represents the <see cref="SortOrder"/> property name.
-        /// </summary>
-        public const string Property_SortOrder = "SortOrder";
-
-        /// <summary>
-        /// Represents the <see cref="IsActive"/> property name.
-        /// </summary>
-        public const string Property_IsActive = "IsActive";
-
-        /// <summary>
-        /// Represents the <see cref="IsValid"/> property name.
-        /// </summary>
-        public const string Property_IsValid = "IsValid";
-
-        /// <summary>
-        /// Represents the <see cref="StartDate"/> property name.
-        /// </summary>
-        public const string Property_StartDate = "StartDate";
-
-        /// <summary>
-        /// Represents the <see cref="EndDate"/> property name.
-        /// </summary>
-        public const string Property_EndDate = "EndDate";
-
-        /// <summary>
-        /// Represents the <see cref="ETag"/> property name.
-        /// </summary>
-        public const string Property_ETag = "ETag";
-
-        /// <summary>
-        /// Represents the <see cref="ChangeLog"/> property name.
-        /// </summary>
-        public const string Property_ChangeLog = "ChangeLog";
-#pragma warning restore CA1707
 
         #endregion
     }

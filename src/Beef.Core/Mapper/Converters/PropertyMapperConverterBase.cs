@@ -30,7 +30,7 @@ namespace Beef.Mapper.Converters
         /// <param name="loadCache">The function that is responsible for loading the collection (expects an enumerable <see cref="Tuple{TKey1, TKey2}"/>).</param>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to the class <see cref="Type"/> name.</param>
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
-        protected PropertyMapperConverterBase(Func<object, IEnumerable<Tuple<TSrceProperty, TDestProperty>>> loadCache, string policyKey = null, object data = null)
+        protected PropertyMapperConverterBase(Func<object?, IEnumerable<Tuple<TSrceProperty, TDestProperty>>> loadCache, string? policyKey = null, object? data = null)
             : base(loadCache, policyKey, data)
         { }
 
@@ -79,9 +79,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object IPropertyMapperConverter.ConvertToDest(object value)
+        object? IPropertyMapperConverter.ConvertToDest(object? value)
         {
-            return ConvertToDest((TSrceProperty)value);
+            return ConvertToDest((TSrceProperty)value!);
         }
 
         /// <summary>
@@ -89,9 +89,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object IPropertyMapperConverter.ConvertToSrce(object value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value)
         {
-            return ConvertToSrce((TDestProperty)value);
+            return ConvertToSrce((TDestProperty)value!);
         }
     }
 }

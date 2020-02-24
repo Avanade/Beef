@@ -58,7 +58,7 @@ namespace Beef.Mapper.Converters
         /// <returns>The source value.</returns>
         public TSrceProperty ConvertToSrce(int value)
         {
-            return (TSrceProperty)ReferenceDataManager.Current[typeof(TSrceProperty)].GetById(value);
+            return (TSrceProperty)ReferenceDataManager.Current[typeof(TSrceProperty)].GetById(value)!;
         }
 
         /// <summary>
@@ -66,9 +66,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object IPropertyMapperConverter.ConvertToDest(object value)
+        object? IPropertyMapperConverter.ConvertToDest(object? value)
         {
-            return ConvertToDest((TSrceProperty)value);
+            return ConvertToDest((TSrceProperty)value!);
         }
 
         /// <summary>
@@ -76,9 +76,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object IPropertyMapperConverter.ConvertToSrce(object value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value)
         {
-            return ConvertToSrce((int)value);
+            return ConvertToSrce((int)value!);
         }
     }
 }

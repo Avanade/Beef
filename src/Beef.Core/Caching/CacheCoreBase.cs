@@ -10,7 +10,7 @@ namespace Beef.Caching
     /// </summary>
     public abstract class CacheCoreBase : ICacheCore
     {
-        private readonly ICachePolicy _policy;
+        private readonly ICachePolicy? _policy;
         private bool _disposed;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Beef.Caching
         /// </summary>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="doNotRegister">Indicates that the automatic <see cref="CachePolicyManager.Register"/> should not occur (inheriting class must perform).</param>
-        protected CacheCoreBase(string policyKey = null, bool doNotRegister = false)
+        protected CacheCoreBase(string? policyKey = null, bool doNotRegister = false)
         {
             PolicyKey = string.IsNullOrEmpty(policyKey) ? Guid.NewGuid().ToString() : policyKey;
             if (!doNotRegister)
@@ -37,6 +37,7 @@ namespace Beef.Caching
         protected CacheCoreBase(ICachePolicy policy)
         {
             _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+            PolicyKey = $"{Guid.NewGuid().ToString()}__NOT_USED__";
         }
 
         /// <summary>

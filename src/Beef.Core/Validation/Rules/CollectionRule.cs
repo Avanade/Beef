@@ -18,7 +18,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator"/>.
         /// </summary>
-        IValidator Validator { get; }
+        IValidator? Validator { get; }
 
         /// <summary>
         /// Gets the item <see cref="Type"/>.
@@ -40,14 +40,14 @@ namespace Beef.Validation.Rules
     public sealed class CollectionRuleItem<TItemEntity> : ICollectionRuleItem where TItemEntity : class
     {
         private bool _duplicateCheck = false;
-        private IPropertyExpression _propertyExpression;
-        private LText _duplicateText = null;
+        private IPropertyExpression? _propertyExpression;
+        private LText? _duplicateText = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class.
         /// </summary>
         /// <param name="validator">The corresponding item <see cref="Validator{TItemEntity}"/>.</param>
-        public CollectionRuleItem(Validator<TItemEntity> validator = null)
+        public CollectionRuleItem(Validator<TItemEntity>? validator = null)
         {
             Validator = validator;
         }
@@ -55,12 +55,12 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets the corresponding item <see cref="IValidator"/>.
         /// </summary>
-        IValidator ICollectionRuleItem.Validator => Validator;
+        IValidator? ICollectionRuleItem.Validator => Validator;
 
         /// <summary>
         /// Gets or sets the corresponding item <see cref="Validator{TItemEntity}"/>.
         /// </summary>
-        public Validator<TItemEntity> Validator { get; private set; }
+        public Validator<TItemEntity>? Validator { get; private set; }
 
         /// <summary>
         /// Gets the item <see cref="Type"/>.
@@ -72,7 +72,7 @@ namespace Beef.Validation.Rules
         /// </summary>
         /// <param name="duplicateText">The duplicate text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself where possible).</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/> instance to support chaining/fluent.</returns>
-        public CollectionRuleItem<TItemEntity> UniqueKeyDuplicateCheck(LText duplicateText = null)
+        public CollectionRuleItem<TItemEntity> UniqueKeyDuplicateCheck(LText? duplicateText = null)
         {
             if (_duplicateCheck)
                 throw new InvalidOperationException("A DuplicateCheck or UniqueKeyDuplicateCheck can only be specified once.");
@@ -112,7 +112,7 @@ namespace Beef.Validation.Rules
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the item property that is being duplicate checked.</param>
         /// <param name="duplicateText">The duplicate text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself where possible).</param>
         /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/> instance to support chaining/fluent.</returns>
-        public CollectionRuleItem<TItemEntity> DuplicateCheck<TItemProperty>(Expression<Func<TItemEntity, TItemProperty>> propertyExpression, LText duplicateText = null)
+        public CollectionRuleItem<TItemEntity> DuplicateCheck<TItemProperty>(Expression<Func<TItemEntity, TItemProperty>> propertyExpression, LText? duplicateText = null)
         {
             if (_duplicateCheck)
                 throw new InvalidOperationException("A DuplicateCheck or UniqueKeyDuplicateCheck can only be specified once.");
@@ -146,15 +146,15 @@ namespace Beef.Validation.Rules
 
             if (_propertyExpression == null)
             {
-                var dict = new Dictionary<UniqueKey, object>(new UniqueKeyComparer());
-                foreach (var item in items.Cast<IUniqueKey>())
+                var dict = new Dictionary<UniqueKey, object?>(new UniqueKeyComparer());
+                foreach (var item in items.Where(x => x != null).Cast<IUniqueKey>())
                 {
                     if (dict.ContainsKey(item.UniqueKey))
                     {
                         if (item.UniqueKey.Args.Length == 1)
-                            context.CreateErrorMessage(ValidatorStrings.DuplicateValueFormat, _duplicateText, item.UniqueKey.Args[0]);
+                            context.CreateErrorMessage(ValidatorStrings.DuplicateValueFormat, _duplicateText!, item.UniqueKey.Args[0]);
                         else
-                            context.CreateErrorMessage(ValidatorStrings.DuplicateValue2Format, _duplicateText);
+                            context.CreateErrorMessage(ValidatorStrings.DuplicateValue2Format, _duplicateText!);
 
                         return;
                     }
@@ -164,13 +164,13 @@ namespace Beef.Validation.Rules
             }
             else
             {
-                var dict = new Dictionary<object, object>();
+                var dict = new Dictionary<object?, object?>();
                 foreach (var item in items)
                 {
                     var val = _propertyExpression.GetValue(item);
                     if (dict.ContainsKey(_propertyExpression.GetValue(item)))
                     {
-                        context.CreateErrorMessage(ValidatorStrings.DuplicateValueFormat, _duplicateText, val);
+                        context.CreateErrorMessage(ValidatorStrings.DuplicateValueFormat, _duplicateText!, val!);
                         return;
                     }
 
@@ -187,10 +187,10 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The collection property <see cref="Type"/>.</typeparam>
     public class CollectionRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty>
         where TEntity : class
-        where TProperty : IEnumerable
+        where TProperty : IEnumerable?
     {
-        private ICollectionRuleItem _item;
         private readonly Type _itemType;
+        private ICollectionRuleItem? _item;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionRule{TEntity, TProperty}"/> class.
@@ -213,7 +213,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets or sets the collection item validation configuration.
         /// </summary>
-        public ICollectionRuleItem Item
+        public ICollectionRuleItem? Item
         {
             get => _item;
 

@@ -297,7 +297,7 @@ namespace Beef.Test.NUnit
         /// Gets or sets the function for creating the <see cref="ExecutionContext"/> where there is no current instance.
         /// </summary>
         /// <remarks>The <c>string</c> is the <see cref="Username"/> and the <c>object</c> is the optional <see cref="Args"/>.</remarks>
-        public static Func<string?, object?, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username };
+        public static Func<string?, object?, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username ?? ExecutionContext.EnvironmentUsername };
 
         #endregion
 

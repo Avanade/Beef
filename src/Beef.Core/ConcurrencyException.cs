@@ -19,7 +19,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="ConcurrencyException"/> class.
         /// </summary>
         public ConcurrencyException()
-            : this(null)
+            : this(null!)
         {
         }
 
@@ -27,7 +27,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="ConcurrencyException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ConcurrencyException(string message)
+        public ConcurrencyException(string? message)
             : base(message ?? new LText("Beef.ConcurrencyException"))
         {
         }
@@ -37,7 +37,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public ConcurrencyException(string message, Exception innerException)
+        public ConcurrencyException(string? message, Exception innerException)
             : base(message ?? new LText("Beef.ConcurrencyException"), innerException)
         {
         }

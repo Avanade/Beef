@@ -32,7 +32,7 @@ namespace Beef
                 if (!errorOnDuplicate && ContainsKey(key))
                     return;
 
-                Add(key, null);
+                Add(key, null!);
             }
         }
 

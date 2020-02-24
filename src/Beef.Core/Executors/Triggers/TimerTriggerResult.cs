@@ -23,8 +23,17 @@ namespace Beef.Executors.Triggers
     public class TimerTriggerResult<TArgs> : TimerTriggerResult
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TimerTriggerResult{TArgs}"/> class.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        public TimerTriggerResult(TArgs args)
+        {
+            Args = args;
+        }
+
+        /// <summary>
         /// Get or sets the arguments.
         /// </summary>
-        public TArgs Args { get; set; }
+        public TArgs Args { get; private set; }
     }
 }

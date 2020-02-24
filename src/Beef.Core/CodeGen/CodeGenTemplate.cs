@@ -19,11 +19,10 @@ namespace Beef.CodeGen
     {
         private readonly CodeGenerator _codeGenerator;
         private readonly XElement _xmlTemplate;
-        private XNode _xmlCurrent;
-        private TextWriter _tw;
-        private StringBuilder _sb;
-
-        private CodeGeneratorEventArgs _eventArgs;
+        private XNode? _xmlCurrent;
+        private TextWriter? _tw;
+        private StringBuilder? _sb;
+        private CodeGeneratorEventArgs? _eventArgs;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenTemplate"/> class.
@@ -45,10 +44,10 @@ namespace Beef.CodeGen
         public void Execute()
         {
             // Get the generated directory name.
-            _eventArgs = new CodeGeneratorEventArgs { OutputGenDirName = CodeGenConfig.GetXmlVal<string>(_xmlTemplate, "OutputGenDirName", null, false) };
+            _eventArgs = new CodeGeneratorEventArgs { OutputGenDirName = CodeGenConfig.GetXmlVal<string>(_xmlTemplate, "OutputGenDirName", null!, false) };
 
             // Invoke the XML.
-            ExecuteXml(_xmlTemplate, _codeGenerator.Root);
+            ExecuteXml(_xmlTemplate, _codeGenerator.Root!);
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Beef.CodeGen
                         if (_tw == null)
                             OpenOutputWriter(config);
 
-                        _tw.Write(TemplateReplace(((XCData)xml).Value, config));
+                        _tw!.Write(TemplateReplace(((XCData)xml).Value, config));
                         break;
 
                     case XmlNodeType.Comment:
@@ -112,16 +111,16 @@ namespace Beef.CodeGen
                                 throw new CodeGenException($"Unexpected XML Element '{xmlE.Name.LocalName}' encountered.");
 
                             default:
-                                List<CodeGenConfig> configList;
+                                List<CodeGenConfig>? configList;
 
                                 if (xmlE.Attribute("FullSearch") != null && xmlE.Attribute("FullSearch").Value.ToUpperInvariant() == "TRUE")
-                                    configList = CodeGenConfig.FindConfigAll(_codeGenerator.Root, xmlE.Name.LocalName);
+                                    configList = CodeGenConfig.FindConfigAll(_codeGenerator.Root!, xmlE.Name.LocalName);
                                 else
                                     configList = CodeGenConfig.FindConfigList(config, xmlE.Name.LocalName);
 
                                 if (configList != null)
                                 {
-                                    string prevIndex = _codeGenerator.System.Attributes["Index"];
+                                    string prevIndex = _codeGenerator.System.Attributes["Index"]!;
                                     int index = 0;
                                     foreach (CodeGenConfig item in configList)
                                     {
@@ -157,7 +156,7 @@ namespace Beef.CodeGen
         private bool GetOutputFileName(XElement xml, CodeGenConfig config)
         {
             // Check if a file name has been specified.
-            string fileName = CodeGenConfig.GetXmlVal<string>(xml, "OutputFileName", null, false);
+            string fileName = CodeGenConfig.GetXmlVal<string>(xml, "OutputFileName", null!, false);
             if (fileName == null)
                 return false;
 
@@ -165,16 +164,16 @@ namespace Beef.CodeGen
             if (fileName.Length == 0)
                 throw new CodeGenException("'OutputFileName' attribute has no value; this must be specified.");
 
-            if (_eventArgs.OutputFileName != null)
+            if (_eventArgs!.OutputFileName != null)
                 throw new CodeGenException("'OutputFileName' attribute unexpected; only one output file can be open at one time.");
 
-            string dirName = CodeGenConfig.GetXmlVal<string>(xml, "OutputDirName", null, false);
+            string dirName = CodeGenConfig.GetXmlVal<string>(xml, "OutputDirName", null!, false);
             if (dirName != null && dirName.Length > 0)
-                _eventArgs.OutputDirName = TemplateReplace(dirName, config);
+                _eventArgs!.OutputDirName = TemplateReplace(dirName, config);
 
-            _eventArgs.OutputFileName = TemplateReplace(fileName, config);
+            _eventArgs!.OutputFileName = TemplateReplace(fileName, config);
 
-            string isOutputNewOnly = CodeGenConfig.GetXmlVal<string>(xml, "IsOutputNewOnly", null, false);
+            string isOutputNewOnly = CodeGenConfig.GetXmlVal<string>(xml, "IsOutputNewOnly", null!, false);
             if (!string.IsNullOrEmpty(isOutputNewOnly))
             {
                 var val = GetValue(isOutputNewOnly, config);
@@ -191,7 +190,7 @@ namespace Beef.CodeGen
         /// </summary>
         private void OpenOutputWriter(CodeGenConfig config)
         {
-            if (_eventArgs.OutputFileName == null)
+            if (_eventArgs!.OutputFileName == null)
                 throw new CodeGenException("Can not write CDATA as a preceeding 'OutputFileName' attribute has not been specified.");
 
             // Create the string writer.
@@ -218,13 +217,13 @@ namespace Beef.CodeGen
                 _tw = null;
 
                 // Raise the code generated event.
-                _eventArgs.Content = Regex.Replace(_sb.ToString(), "(?<!\r)\n", "\r\n");
+                _eventArgs!.Content = Regex.Replace(_sb!.ToString(), "(?<!\r)\n", "\r\n");
                 _codeGenerator.RaiseCodeGenerated(_eventArgs);
             }
 
             // Initialize for a potential subsequent file.
             _sb = null;
-            _eventArgs = new CodeGeneratorEventArgs { OutputGenDirName = _eventArgs.OutputGenDirName };
+            _eventArgs = new CodeGeneratorEventArgs { OutputGenDirName = _eventArgs!.OutputGenDirName };
         }
 
         /// <summary>
@@ -266,7 +265,7 @@ namespace Beef.CodeGen
         /// </summary>
         private bool ExecuteIfCondition(XElement xmlCon, CodeGenConfig config)
         {
-            string condition = CodeGenConfig.GetXmlVal<string>(xmlCon, "Condition", null, false);
+            string condition = CodeGenConfig.GetXmlVal<string>(xmlCon, "Condition", null!, false);
             if (string.IsNullOrEmpty(condition))
                 return true;
 
@@ -340,7 +339,7 @@ namespace Beef.CodeGen
             if (stmt.Count != 1 && stmt.Count != 3)
                 return null;
 
-            object lVal = GetValue(stmt[0], config);
+            object? lVal = GetValue(stmt[0], config);
             if (stmt.Count == 1)
             {
                 if (lVal is bool)
@@ -361,7 +360,7 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(stmt[2]))
                 return null;
 
-            object rVal = GetValue(stmt[2], config);
+            object? rVal = GetValue(stmt[2], config);
 
             if (lVal == null && rVal is bool)
                 lVal = false;
@@ -422,7 +421,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the value from a string.
         /// </summary>
-        private object GetValue(string value, CodeGenConfig config)
+        private object? GetValue(string? value, CodeGenConfig config)
         {
             if (value == null)
                 return null;
@@ -445,7 +444,7 @@ namespace Beef.CodeGen
 
             // Check for a string constant.
             if (value.Length > 1 && value.StartsWith("'", StringComparison.InvariantCultureIgnoreCase) && value.EndsWith("'", StringComparison.InvariantCultureIgnoreCase))
-                return TemplateReplace(value.Substring(1, value.Length - 2), config);
+                return TemplateReplace(value[1..^1], config);
 
             // Check and see if it is a number constant.
             if (decimal.TryParse(value, out decimal fVal))
@@ -469,7 +468,7 @@ namespace Beef.CodeGen
 
             foreach (var cXml in xml.Elements("Case"))
             {
-                string rval = cXml.Attribute("Value")?.Value;
+                string? rval = cXml.Attribute("Value")?.Value;
                 if (string.IsNullOrEmpty(rval))
                     throw new CodeGenException("Case element has no 'Value' attribute specified.", xml.ToString());
 
@@ -495,12 +494,12 @@ namespace Beef.CodeGen
         /// </summary>
         private void ExecuteSet(XElement xml, CodeGenConfig config)
         {
-            string name = xml.Attribute("Name")?.Value;
+            string? name = xml.Attribute("Name")?.Value;
             if (string.IsNullOrEmpty(name))
                 throw new CodeGenException("Set element has no 'Name' attribute specified.", xml.ToString());
 
             if (ExecuteIfCondition(xml, config))
-                SetConfigValue(name, config, xml.Attribute("Value")?.Value);
+                SetConfigValue(name, config, xml.Attribute("Value")?.Value!);
             else
             {
                 var otherwise = xml.Attribute("Otherwise")?.Value;
@@ -512,7 +511,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Transforms the value.
         /// </summary>
-        private string Transform(string transform, string value)
+        private string? Transform(string? transform, string? value)
         {
             if (string.IsNullOrEmpty(transform) || string.IsNullOrEmpty(value))
                 return value;
@@ -533,7 +532,7 @@ namespace Beef.CodeGen
                 "TOPLURAL" => CodeGenerator.ToPlural(value),
                 "TOCOMMENTS" => CodeGenerator.ToComments(value),
                 "TOSEECOMMENTS" => CodeGenerator.ToSeeComments(value),
-                _ => throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent.ToString()),
+                _ => throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent?.ToString()),
             };
         }
 
@@ -542,11 +541,11 @@ namespace Beef.CodeGen
         /// </summary>
         private void ExecuteIncrement(XElement xml, CodeGenConfig config)
         {
-            string name = xml.Attribute("Name")?.Value;
+            string? name = xml.Attribute("Name")?.Value;
             if (string.IsNullOrEmpty(name))
                 throw new CodeGenException("Increment element has no 'Name' attribute specified.", xml.ToString());
 
-            object lval = GetValue(name, config);
+            object? lval = GetValue(name, config);
             decimal dlval = 0m;
             if (lval != null)
             {
@@ -560,7 +559,7 @@ namespace Beef.CodeGen
             decimal drval = 1m;
             if (!string.IsNullOrEmpty(value))
             {
-                object rval = GetValue(value, config);
+                object? rval = GetValue(value, config);
                 if (rval != null)
                 {
                     if (rval is decimal)
@@ -582,11 +581,11 @@ namespace Beef.CodeGen
         /// </summary>
         private void ExecuteForEachListList(XElement xml, CodeGenConfig config)
         {
-            string name = xml.Attribute("Name")?.Value;
+            string? name = xml.Attribute("Name")?.Value;
             if (string.IsNullOrEmpty(name))
                 throw new CodeGenException("ForEachList element has no 'Name' attribute specified.", xml.ToString());
 
-            object val = GetValue(name, config);
+            object? val = GetValue(name, config);
             if (val == null)
                 return;
 
@@ -597,8 +596,8 @@ namespace Beef.CodeGen
 
             if (list != null && list.Length > 0)
             {
-                _codeGenerator.System.Attributes.TryGetValue("Value", out string prevValue);
-                _codeGenerator.System.Attributes.TryGetValue("Index", out string prevIndex);
+                _codeGenerator.System.Attributes.TryGetValue("Value", out string? prevValue);
+                _codeGenerator.System.Attributes.TryGetValue("Index", out string? prevIndex);
                 int index = 0;
                 foreach (var item in list)
                 {
@@ -621,7 +620,7 @@ namespace Beef.CodeGen
         /// </summary>
         private void ExecuteException(XElement xml, CodeGenConfig config)
         {
-            string message = xml.Attribute("Message")?.Value;
+            string? message = xml.Attribute("Message")?.Value;
             if (string.IsNullOrEmpty(message))
                 throw new CodeGenException("Exception element has no 'Message' attribute specified.", xml.ToString());
 
@@ -634,9 +633,9 @@ namespace Beef.CodeGen
         /// <summary>
         /// Replaces a "{{name}}" with the appropriate config value.
         /// </summary>
-        private string TemplateReplace(string value, CodeGenConfig config)
+        private string? TemplateReplace(string? value, CodeGenConfig config)
         {
-            string temp = value;
+            string? temp = value;
             int start;
             int end;
 
@@ -652,7 +651,7 @@ namespace Beef.CodeGen
                     return temp;
 
                 if (start < 0 || end < 0 || end < start)
-                    throw new CodeGenException("Start and End {{ }} parameter mismatch.", _xmlCurrent.ToString());
+                    throw new CodeGenException("Start and End {{ }} parameter mismatch.", _xmlCurrent?.ToString());
 
                 string fullName = temp.Substring(start, end - start + 2);
                 string fName = temp.Substring(start + 2, end - start - 2);
@@ -665,7 +664,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the config value for a specified parameter.
         /// </summary>
-        private string GetConfigValue(string name, CodeGenConfig config)
+        private string? GetConfigValue(string name, CodeGenConfig config)
         {
             if (name.StartsWith("$", StringComparison.InvariantCultureIgnoreCase))
                 return TemplateReplace(name.Substring(1), config);
@@ -686,11 +685,11 @@ namespace Beef.CodeGen
         /// <summary>
         /// Sets the config value for a specified parameter.
         /// </summary>
-        private void SetConfigValue(string name, CodeGenConfig config, string value)
+        private void SetConfigValue(string name, CodeGenConfig config, string? value)
         {
             CodeGenConfig val = GetConfig(name, config, out string propertyName);
             var oval = GetValue(value, config);
-            string sval = (oval == null) ? null : ((oval is bool) ? ((bool)oval ? "true" : "false") : oval.ToString());
+            string? sval = (oval == null) ? null : ((oval is bool) ? ((bool)oval ? "true" : "false") : oval.ToString());
             val.AttributeUpdate(propertyName, TemplateReplace(sval, config));
         }
 
@@ -701,16 +700,16 @@ namespace Beef.CodeGen
         {
             string[] parts = name.Split('.');
             if (parts.Length != 2)
-                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent.ToString());
+                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent?.ToString());
 
-            CodeGenConfig val;
+            CodeGenConfig? val;
             if (parts[0] == "System")
                 val = _codeGenerator.System;
             else
                 val = CodeGenConfig.FindConfig(config, parts[0]);
 
             if (val == null)
-                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent.ToString());
+                throw new CodeGenException($"Parameter '{name}' is invalid.", _xmlCurrent?.ToString());
 
             propertyName = parts[1];
             return val;

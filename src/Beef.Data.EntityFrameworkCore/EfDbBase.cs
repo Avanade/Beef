@@ -95,7 +95,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task<T?> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));
@@ -104,7 +104,7 @@ namespace Beef.Data.EntityFrameworkCore
             var efKeys = new object[keys.Length];
             for (int i = 0; i < getArgs.Mapper.UniqueKey.Count; i++)
             {
-                efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
+                efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
             using var db = new EfDbContextManager(getArgs);
@@ -141,7 +141,7 @@ namespace Beef.Data.EntityFrameworkCore
             using var db = new EfDbContextManager(saveArgs);
             return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
             {
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
+                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
                 db.DbContext.Add(model);
 
                 if (saveArgs.SaveChanges)
@@ -185,7 +185,7 @@ namespace Beef.Data.EntityFrameworkCore
                     for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
                     {
                         var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
-                        efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified);
+                        efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
                     }
 
                     var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
@@ -197,7 +197,7 @@ namespace Beef.Data.EntityFrameworkCore
                     db.DbContext.ChangeTracker.AcceptAllChanges();
                 }
 
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update);
+                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
                 db.DbContext.Update(model);
 
                 if (saveArgs.SaveChanges)
@@ -221,7 +221,7 @@ namespace Beef.Data.EntityFrameworkCore
             var efKeys = new object[keys.Length];
             for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
             {
-                efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
+                efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
             using var db = new EfDbContextManager(saveArgs);
@@ -269,7 +269,10 @@ namespace Beef.Data.EntityFrameworkCore
         private async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
         {
             var model = await db.DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
-            return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
+            if (model == default)
+                return default!;
+            else
+                return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value.");
         }
 
         /// <summary>

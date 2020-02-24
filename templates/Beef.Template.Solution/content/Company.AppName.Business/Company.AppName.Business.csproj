@@ -1,16 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <!--#if (implement_database || implement_entityframework) -->
-    <PackageReference Include="Beef.Data.Database" Version="2.1.8" />
+    <PackageReference Include="Beef.Data.Database" Version="3.1.1" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
-    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="2.1.7" />
+    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="3.1.1" />
     <!--#endif -->
     <!--#if (implement_cosmos) -->
-    <PackageReference Include="Beef.Data.Cosmos" Version="2.1.10" />
+    <PackageReference Include="Beef.Data.Cosmos" Version="3.1.1" />
     <!--#endif -->
   </ItemGroup>
   <ItemGroup>

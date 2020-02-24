@@ -25,8 +25,8 @@ namespace Company.AppName.Business.Data
 #if (implement_database)
         private void GetByArgsOnQuery(DatabaseParameters p, PersonArgs args, IDatabaseArgs dbArgs)
         {
-            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[Person.Property_FirstName])
-             .ParamWithWildcard(args?.LastName, DbMapper.Default[Person.Property_LastName])
+            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
+             .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
              .TableValuedParamWith(args?.Genders, "GenderCodes", () => TableValuedParameter.Create(args.Genders.ToCodeList()));
         }
 #endif

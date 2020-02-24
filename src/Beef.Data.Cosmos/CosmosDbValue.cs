@@ -105,7 +105,7 @@ namespace Beef.Data.Cosmos
             switch (Value)
             {
                 case IStringIdentifier isi:
-                    isi.Id = Id;
+                    isi.Id = Id!;
                     break;
 
                 case IIntIdentifier iii:

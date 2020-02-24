@@ -61,7 +61,7 @@ namespace Beef.Data.Database
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public Task<T> SelectSingleOrDefaultAsync()
+        public Task<T?> SelectSingleOrDefaultAsync()
         {
             return Command.SelectSingleOrDefaultAsync(QueryArgs.Mapper);
         }
@@ -79,7 +79,7 @@ namespace Beef.Data.Database
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public Task<T> SelectFirstOrDefaultAsync() 
+        public Task<T?> SelectFirstOrDefaultAsync() 
         {
             return Command.SelectFirstOrDefaultAsync(QueryArgs.Mapper);
         }

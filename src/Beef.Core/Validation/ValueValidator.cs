@@ -16,7 +16,7 @@ namespace Beef.Validation
         /// </summary>
         /// <param name="entity">The parent entity value.</param>
         /// <param name="value">The value.</param>
-        internal ValidationValue(object entity, T value)
+        internal ValidationValue(object? entity, T value)
         {
             Entity = entity;
             Value = value;
@@ -25,7 +25,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets or sets the entity value.
         /// </summary>
-        public object Entity { get; }
+        public object? Entity { get; }
 
         /// <summary>
         /// Gets or sets the entity property value.
@@ -45,11 +45,9 @@ namespace Beef.Validation
         /// <param name="value">The value to validate.</param>
         /// <param name="name">The value name (defaults to <see cref="Validator.ValueNameDefault"/>).</param>
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
-        public ValueValidator(T value, string name = null, LText text = null)
+        public ValueValidator(T value, string? name = null, LText? text = null) : base(string.IsNullOrEmpty(name) ? Validator.ValueNameDefault : name, text)
         {
             ValidationValue = new ValidationValue<T>(null, value);
-            Name = string.IsNullOrEmpty(name) ? Validator.ValueNameDefault : name;
-            Text = text ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(Name);
         }
 
         /// <summary>
@@ -69,7 +67,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
         public override ValueValidatorResult<ValidationValue<T>, T> Run(bool throwOnError = false)
         {
-            var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(null, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
+            var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(null!, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
             Invoke(ctx);
             var res = new ValueValidatorResult<ValidationValue<T>, T>(ctx);
             if (throwOnError)
@@ -108,7 +106,7 @@ namespace Beef.Validation
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
         public override ValueValidatorResult<TEntity, TProperty> Run(bool throwOnError = false)
         {
-            var ctx = new PropertyContext<TEntity, TProperty>(new ValidationContext<TEntity>(null, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
+            var ctx = new PropertyContext<TEntity, TProperty>(new ValidationContext<TEntity>(null!, new ValidationArgs()), Value, this.Name, this.JsonName, this.Text);
             Invoke(ctx);
             var res = new ValueValidatorResult<TEntity, TProperty>(ctx);
             if (throwOnError)

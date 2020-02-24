@@ -42,7 +42,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="binder">The action that binds the logger to an underlying logging capability.</param>
         /// <remarks>The global logger can only be set once; further requests will be ignored.</remarks>
-        public static void RegisterGlobal(Action<LoggerArgs> binder = null)
+        public static void RegisterGlobal(Action<LoggerArgs> binder)
         {
             if (!_overriddenGlobalLogger)
             {
@@ -61,7 +61,7 @@ namespace Beef.Diagnostics
         /// Initializes a new instance of the <see cref="Logger"/> class.
         /// </summary>
         /// <param name="binder">The action that binds the logger to an underlying logging capability.</param>
-        internal Logger(Action<LoggerArgs> binder = null)
+        internal Logger(Action<LoggerArgs> binder = null!)
         {
             _binder = binder;
         }
@@ -72,7 +72,7 @@ namespace Beef.Diagnostics
         /// <param name="data">Additional contextual data.</param>
         /// <param name="type">The <see cref="LogMessageType"/>.</param>
         /// <param name="text">The message text.</param>
-        private void Write(object data, LogMessageType type, string text)
+        private void Write(object? data, LogMessageType type, string? text)
         {
             if (IsEnabled(type) && _binder != null)
                 _binder.Invoke(new LoggerArgs(this, data, type, text));
@@ -86,7 +86,7 @@ namespace Beef.Diagnostics
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <remarks>Use this instead of performing compositing prior as this will defer this expensive operation for when it is acutally required.</remarks>
-        private void Write(object data, LogMessageType type, string format, params object[] values)
+        private void Write(object? data, LogMessageType type, string format, params object[] values)
         {
             if (string.IsNullOrEmpty(format))
                 throw new ArgumentNullException(nameof(format));
@@ -103,7 +103,7 @@ namespace Beef.Diagnostics
         /// <param name="type">The <see cref="LogMessageType"/> (defaults to <see cref="Logger.ExceptionLogMessageType"/>).</param>
         /// <param name="format">The message text; or composite format string where <paramref name="values"/> provided.</param>
         /// <param name="values">The values that form part of the message text.</param>
-        private void Write(Exception exception, object data, LogMessageType type, string format, params object[] values)
+        private void Write(Exception exception, object? data, LogMessageType type, string format, params object[] values)
         {
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
@@ -126,7 +126,7 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Critical"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Critical(string text) { Write(null, LogMessageType.Critical, text); }
+        public void Critical(string? text) { Write(null, LogMessageType.Critical, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Critical"/> log message using a composite format string.
@@ -140,7 +140,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Critical2(object data, string text) { Write(data, LogMessageType.Critical, text); }
+        public void Critical2(object data, string? text) { Write(data, LogMessageType.Critical, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Critical"/> log message using a composite format string.
@@ -154,14 +154,14 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="System.Exception"/> log message.
         /// </summary>
         /// <param name="exception">The <see cref="System.Exception"/></param>
-        public void Exception(Exception exception) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, exception?.Message); }
+        public void Exception(Exception exception) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, exception.Message); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message with a specified <paramref name="text"/>.
         /// </summary>
         /// <param name="exception">The <see cref="System.Exception"/></param>
         /// <param name="text">The message text.</param>
-        public void Exception(Exception exception, string text) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, text); }
+        public void Exception(Exception exception, string? text) { Write(Check.NotNull(exception, nameof(exception)), null, ExceptionLogMessageType, text!); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message using a composite format string.
@@ -176,7 +176,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="exception">The <see cref="System.Exception"/></param>
-        public void Exception2(object data, Exception exception) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, exception?.Message); }
+        public void Exception2(object data, Exception exception) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, exception.Message); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message with a specified <paramref name="text"/>.
@@ -184,7 +184,7 @@ namespace Beef.Diagnostics
         /// <param name="data">Additional contextual data.</param>
         /// <param name="exception">The <see cref="System.Exception"/></param>
         /// <param name="text">The message text.</param>
-        public void Exception2(object data, Exception exception, string text) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, text); }
+        public void Exception2(object data, Exception exception, string? text) { Write(Check.NotNull(exception, nameof(exception)), data, ExceptionLogMessageType, text!); }
 
         /// <summary>
         /// Writes an <see cref="System.Exception"/> log message using a composite format string.
@@ -199,7 +199,7 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Error"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Error(string text) { Write(null, LogMessageType.Error, text); }
+        public void Error(string? text) { Write(null, LogMessageType.Error, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Error"/> log message using a composite format string.
@@ -213,7 +213,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Error2(object data, string text) { Write(data, LogMessageType.Error, text); }
+        public void Error2(object data, string? text) { Write(data, LogMessageType.Error, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Error"/> log message using a composite format string.
@@ -227,7 +227,7 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Warning"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Warning(string text) { Write(null, LogMessageType.Warning, text); }
+        public void Warning(string? text) { Write(null, LogMessageType.Warning, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Warning"/> log message using a composite format string.
@@ -241,7 +241,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Warning2(object data, string text) { Write(data, LogMessageType.Warning, text); }
+        public void Warning2(object data, string? text) { Write(data, LogMessageType.Warning, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Warning"/> log message using a composite format string.
@@ -255,7 +255,7 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Info"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Info(string text) { Write(null, LogMessageType.Info, text); }
+        public void Info(string? text) { Write(null, LogMessageType.Info, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Info"/> log message using a composite format string.
@@ -269,7 +269,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Info2(object data, string text) { Write(data, LogMessageType.Info, text); }
+        public void Info2(object data, string? text) { Write(data, LogMessageType.Info, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Info"/> log message using a composite format string.
@@ -283,7 +283,7 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Debug"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Debug(string text) { Write(null, LogMessageType.Debug, text); }
+        public void Debug(string? text) { Write(null, LogMessageType.Debug, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Debug"/> log message using a composite format string.
@@ -297,7 +297,7 @@ namespace Beef.Diagnostics
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Debug2(object data, string text) { Write(data, LogMessageType.Debug, text); }
+        public void Debug2(object data, string? text) { Write(data, LogMessageType.Debug, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Debug"/> log message using a composite format string.
@@ -311,21 +311,21 @@ namespace Beef.Diagnostics
         /// Writes an <see cref="LogMessageType.Trace"/> log message.
         /// </summary>
         /// <param name="text">The message text.</param>
-        public void Trace(string text) { Write(null, LogMessageType.Trace, text); }
+        public void Trace(string? text) { Write(null, LogMessageType.Trace, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Trace"/> log message using a composite format string.
         /// </summary>
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
-        public void Trace(string format, params object[] values) { Write(null, LogMessageType.Trace, format, values); }
+        public void Trace(string format, params object[] values) { Write(null!, LogMessageType.Trace, format, values); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Trace"/> log message.
         /// </summary>
         /// <param name="data">Additional contextual data.</param>
         /// <param name="text">The message text.</param>
-        public void Trace2(object data, string text) { Write(data, LogMessageType.Trace, text); }
+        public void Trace2(object data, string? text) { Write(data, LogMessageType.Trace, text); }
 
         /// <summary>
         /// Writes an <see cref="LogMessageType.Trace"/> log message using a composite format string.
@@ -353,7 +353,7 @@ namespace Beef.Diagnostics
         /// <param name="data">Additional contextual data.</param>
         /// <param name="type">The <see cref="LogMessageType"/>.</param>
         /// <param name="text">The message text.</param>
-        public LoggerArgs(Logger logger, object data, LogMessageType type, string text)
+        public LoggerArgs(Logger logger, object? data, LogMessageType type, string? text)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Data = data;
@@ -369,12 +369,12 @@ namespace Beef.Diagnostics
         /// <param name="type">The <see cref="LogMessageType"/>.</param>
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
-        public LoggerArgs(Logger logger, object data, LogMessageType type, string format, params object[] values)
+        public LoggerArgs(Logger logger, object? data, LogMessageType type, string format, params object[] values)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Data = data;
             Type = type;
-            Format = format;
+            Format = Check.NotEmpty(format, nameof(format));
             Values = new ReadOnlyCollection<object>(values);
             IsCompositeFormat = true;
         }
@@ -392,17 +392,17 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Gets the message text.
         /// </summary>
-        public string Text { get; private set; }
+        public string? Text { get; private set; }
 
         /// <summary>
         /// Gets the message composite format.
         /// </summary>
-        public string Format { get; private set; }
+        public string? Format { get; private set; }
 
         /// <summary>
         /// Gets the composite format values.
         /// </summary>
-        public IReadOnlyList<object> Values { get; private set; }
+        public IReadOnlyList<object>? Values { get; private set; }
 
         /// <summary>
         /// Indicates whether the composite <see cref="Format"/> and <see cref="Values"/> were specified; or simply the <see cref="Text"/>.
@@ -412,7 +412,7 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Gets the <see cref="Exception"/>.
         /// </summary>
-        public Exception Exception { get; internal set; }
+        public Exception? Exception { get; internal set; }
 
         /// <summary>
         /// Indicates whether the result of an <see cref="Exception"/>.
@@ -422,16 +422,16 @@ namespace Beef.Diagnostics
         /// <summary>
         /// Gets the additional contextual data.
         /// </summary>
-        public object Data { get; }
+        public object? Data { get; }
 
         /// <summary>
         /// Returns the final (composited) output <see cref="string"/> representation (includes <see cref="Exception"/> content if <see cref="IsException"/>).
         /// </summary>
         /// <returns>The output <see cref="string"/>.</returns>
-        public override string ToString()
+        public override string? ToString()
         {
             var str = (IsCompositeFormat) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Format, Values.ToArray()) : Text;
-            return IsException ? $"{str} Exception: {Exception.ToString()}" : str;
+            return IsException ? $"{str} Exception: {Exception!.ToString()}" : str;
         }
 
         /// <summary>

@@ -19,6 +19,7 @@
     <Title>Business Entity Execution Framework (Beef) OData framework.</Title>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef data odata</PackageTags>
+    <!--<Nullable>enable</Nullable>-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

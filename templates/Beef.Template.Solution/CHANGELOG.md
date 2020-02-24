@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the projects to .NET Core 3.1 and amended for any other _Beef_ required changes.
+- *Added:* Introduced nullable reference types: https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/
+
 ## v2.1.12
 - *Fixed:* The database project had an incorrect reference to `Beef.Database.Core`. The **Delete** test now correctly checks for the `Delete` event as it is considered idempotent.
 

@@ -41,7 +41,7 @@ namespace Beef.Events.Subscribe
         /// <param name="action">The event action.</param>
         /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        protected async Task ReceiveAsync(string subject, string action, Func<IEventSubscriber, EventData> getEventData)
+        protected async Task ReceiveAsync(string subject, string? action, Func<IEventSubscriber, EventData> getEventData)
         {
             Check.NotEmpty(subject, nameof(subject));
             if (getEventData == null)
@@ -92,7 +92,7 @@ namespace Beef.Events.Subscribe
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username : SystemUsername, TenantId = @event.TenantId };
+            return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username ?? SystemUsername : SystemUsername, TenantId = @event.TenantId };
         }
 
         /// <summary>

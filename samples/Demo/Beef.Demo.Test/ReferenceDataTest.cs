@@ -48,7 +48,7 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Create<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetNamedAsync(new string[] { ReferenceData.Property_Gender, ReferenceData.Property_Company }));
+                .Run((a) => a.Agent.GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
 
             Assert.NotNull(r.Content);
 
@@ -60,7 +60,7 @@ namespace Beef.Demo.Test
                 .Run((a) => new ReferenceDataAgent(a.Client, (x) =>
                 {
                     x.Headers.Add("If-None-Match", etags.First());
-                }).GetNamedAsync(new string[] { ReferenceData.Property_Gender, ReferenceData.Property_Company }));
+                }).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
         }
 
         [Test, Parallelizable]
@@ -71,7 +71,7 @@ namespace Beef.Demo.Test
                 .Run((a) => new ReferenceDataAgent(a.Client, (x) =>
                 {
                     x.Headers.Add("If-None-Match", new string[] { "\"ABC\"", "\"DEF\"" });
-                }).GetNamedAsync(new string[] { ReferenceData.Property_Gender, ReferenceData.Property_Company }));
+                }).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
 
             Assert.NotNull(r.Content);
             Assert.AreEqual(2, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());

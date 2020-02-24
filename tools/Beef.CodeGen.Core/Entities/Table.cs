@@ -161,7 +161,7 @@ namespace Beef.CodeGen.Entities
                 throw new ArgumentNullException(nameof(name));
 
 #pragma warning disable CA1308 // Normalize strings to uppercase; by-design, a lowercase is required.
-            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name).Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
+            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
 #pragma warning restore CA1308 
         }
 

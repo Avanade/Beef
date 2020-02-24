@@ -16,7 +16,7 @@ namespace Beef.Validation.Rules
         where TEntity : class
     {
         private readonly PropertyExpression<TEntity, TCompareProperty> _compareTo;
-        private readonly LText _compareToText;
+        private readonly LText? _compareToText;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompareValueRule{TEntity, TProperty}"/> class specifying the compare to property.
@@ -24,7 +24,7 @@ namespace Beef.Validation.Rules
         /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
         /// <param name="compareToPropertyExpression">The <see cref="Expression"/> to reference the compare to entity property.</param>
         /// <param name="compareToText">The compare to text <see cref="LText"/> to be passed for the error message (default is to derive the text from the property itself).</param>
-        public ComparePropertyRule(CompareOperator compareOperator, Expression<Func<TEntity, TCompareProperty>> compareToPropertyExpression, LText compareToText = null) : base(compareOperator)
+        public ComparePropertyRule(CompareOperator compareOperator, Expression<Func<TEntity, TCompareProperty>> compareToPropertyExpression, LText? compareToText = null) : base(compareOperator)
         {
             Beef.Check.NotNull(compareToPropertyExpression, nameof(compareToPropertyExpression));
             _compareTo = PropertyExpression.Create(compareToPropertyExpression, true);
@@ -38,22 +38,20 @@ namespace Beef.Validation.Rules
         public override void Validate(PropertyContext<TEntity, TProperty> context)
         {
             // Do not validate where the compare to property has an error.
-            Beef.Check.NotNull(context, nameof(context));
-            if (context.Parent.HasError(_compareTo))
+            var ctx = Beef.Check.NotNull(context, nameof(context));
+            if (ctx.Parent.HasError(_compareTo))
                 return;
 
             // Convert type and compare values.
             try
             {
-                var compareToValue = (TProperty)(object)_compareTo.GetValue(context.Parent.Value);
-#pragma warning disable CA1062 // Validate arguments of public methods; by-design, null check already performed.
-                if (!Compare(context.Value, compareToValue))
+                var compareToValue = (TProperty)(object)_compareTo.GetValue(context.Parent.Value)!;
+                if (!Compare(ctx.Value!, compareToValue))
                     CreateErrorMessage(context, _compareToText ?? _compareTo.Text);
-#pragma warning restore CA1062 
             }
             catch (InvalidCastException icex)
             {
-                throw new InvalidCastException($"Property '{_compareTo.Name}' and '{context.Name}' are incompatible: {icex.Message}", icex);
+                throw new InvalidCastException($"Property '{_compareTo.Name}' and '{ctx.Name}' are incompatible: {icex.Message}", icex);
             }
         }
     }

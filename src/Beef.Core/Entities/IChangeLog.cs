@@ -10,6 +10,6 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the <see cref="Entities.ChangeLog"/>.
         /// </summary>
-        ChangeLog ChangeLog { get; set; }
+        ChangeLog? ChangeLog { get; set; }
     }
 }

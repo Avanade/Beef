@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Company.AppName.Business;
 using Company.AppName.Business.Data;
@@ -69,15 +70,16 @@ namespace Company.AppName.Api
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            // Add services; note Beef requires NewtonsoftJson.
+            services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();
             services.AddHttpClient();
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Company.AppName API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Company.AppName API", Version = "v1" });
 
-                var xmlName = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                var xmlName = $"{Assembly.GetEntryAssembly()!.GetName().Name}.xml";
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
@@ -112,8 +114,12 @@ namespace Company.AppName.Api
             // Add execution context set up to the pipeline.
             app.UseExecutionContext();
 
-            // Add mvc to the pipeline to support the api's themselves.
-            app.UseMvc();
+            // Use controllers.
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

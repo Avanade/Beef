@@ -19,7 +19,7 @@ namespace Beef.Reflection
         /// Initializes an instance of the <see cref="EntityReflectorArgs"/> class with an optional <paramref name="cache"/>.
         /// </summary>
         /// <param name="cache">The <b>cache</b> <see cref="ConcurrentDictionary{Type, IEntityReflector}"/> to use versus instantiating each <see cref="IEntityReflector"/> per use.</param>
-        public EntityReflectorArgs(ConcurrentDictionary<Type, IEntityReflector> cache = null)
+        public EntityReflectorArgs(ConcurrentDictionary<Type, IEntityReflector>? cache = null)
         {
             Cache = cache ?? new ConcurrentDictionary<Type, IEntityReflector>();
         }
@@ -32,7 +32,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets or sets the action to invoke to perform additional logic when reflecting/building the <b>entity</b> <see cref="Type"/>.
         /// </summary>
-        public Action<IEntityReflector> EntityBuilder { get; set; } = null;
+        public Action<IEntityReflector>? EntityBuilder { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to automatically populate the entity properties using the optional <see cref="PropertyBuilder"/> (defaults to <c>true</c>).
@@ -48,7 +48,7 @@ namespace Beef.Reflection
         /// Gets or sets the function to invoke to perform additional logic when reflecting/building the <b>property</b> <see cref="Type"/>; the result determines whether the
         /// property should be included (<c>true</c>) or not (<c>false</c>) within the underlying properties collection.
         /// </summary>
-        public Func<IPropertyReflector, bool> PropertyBuilder { get; set; } = null;
+        public Func<IPropertyReflector, bool>? PropertyBuilder { get; set; } = null;
 
         /// <summary>
         /// Defines the <see cref="StringComparer"/> for finding the property/JSON names (defaults to <see cref="StringComparer.Ordinal"/>).
@@ -109,7 +109,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets or sets the optional tag for storing a single value.
         /// </summary>
-        object Tag { get; set; }
+        object? Tag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="Dictionary{TKey, TValue}"/> for storing additional data.
@@ -145,7 +145,7 @@ namespace Beef.Reflection
         /// Initializes a new instance of the <see cref="EntityReflector{TEntity}"/> class.
         /// </summary>
         /// <param name="args">The <see cref="EntityReflectorArgs"/>.</param>
-        public EntityReflector(EntityReflectorArgs args = null)
+        public EntityReflector(EntityReflectorArgs? args = null)
         {
             Args = args ?? new EntityReflectorArgs();
             _properties = new Dictionary<string, IPropertyReflector<TEntity>>(Args.NameComparer ?? StringComparer.Ordinal);
@@ -181,7 +181,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets or sets the optional tag for storing a single value.
         /// </summary>
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="Dictionary{TKey, TValue}"/> for storing additional data.
@@ -279,7 +279,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets or sets the optional tag for storing a single value.
         /// </summary>
-        object Tag { get; set; }
+        object? Tag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="Dictionary{TKey, TValue}"/> for storing additional data.
@@ -294,7 +294,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsComplexType"/>).
         /// </summary>
-        ComplexTypeReflector ComplexTypeReflector { get; }
+        ComplexTypeReflector? ComplexTypeReflector { get; }
 
         /// <summary>
         /// Indicates whether the property is a complex type or complex type collection (see <see cref="ComplexTypeReflector"/>).
@@ -330,20 +330,20 @@ namespace Beef.Reflection
         /// Gets the <see cref="IEntityReflector"/> for the property; will return <c>null</c> where <see cref="PropertyType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
-        IEntityReflector GetEntityReflector();
+        IEntityReflector? GetEntityReflector();
 
         /// <summary>
         /// Gets the <see cref="IEntityReflector"/> for the collection item property; will return <c>null</c> where <see cref="ComplexTypeReflector.ItemType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
-        IEntityReflector GetItemEntityReflector();
+        IEntityReflector? GetItemEntityReflector();
 
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        object GetJTokenValue(JToken jtoken);
+        object? GetJTokenValue(JToken jtoken);
 
         /// <summary>
         /// Sets the property value from a <see cref="JToken"/>.
@@ -359,20 +359,20 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool SetValue(object entity, object value);
+        bool SetValue(object entity, object? value);
 
         /// <summary>
         /// Creates a new instance (value) and sets the property value.
         /// </summary>
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        (bool changed, object value) NewValue(object entity);
+        (bool changed, object? value) NewValue(object entity);
 
         /// <summary>
         /// Creates a new instance (value).
         /// </summary>
         /// <returns>The value.</returns>
-        object NewValue();
+        object? NewValue();
     }
 
     /// <summary>
@@ -402,7 +402,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        (bool changed, object value) NewValue(TEntity entity);
+        (bool changed, object? value) NewValue(TEntity entity);
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ namespace Beef.Reflection
         {
             Args = args ?? throw new ArgumentNullException(nameof(args));
             PropertyExpression = Reflection.PropertyExpression.Create(propertyExpression ?? throw new ArgumentNullException(nameof(propertyExpression)));
-            PropertyInfo = TypeReflector.GetPropertyInfo(typeof(TEntity), PropertyName);
+            PropertyInfo = TypeReflector.GetPropertyInfo(typeof(TEntity), PropertyName) ?? throw new ArgumentException($"Propery '{PropertyName}' does not exist for Type.", nameof(propertyExpression));
 
             if (PropertyInfo.PropertyType.IsClass && PropertyInfo.PropertyType != typeof(string))
                 ComplexTypeReflector = ComplexTypeReflector.Create(PropertyInfo);
@@ -437,7 +437,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets or sets the optional tag for storing a single value.
         /// </summary>
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         /// <summary>
         /// Gets the <see cref="Dictionary{TKey, TValue}"/> for storing additional data.
@@ -457,7 +457,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsComplexType"/>).
         /// </summary>
-        public ComplexTypeReflector ComplexTypeReflector { get; private set; }
+        public ComplexTypeReflector? ComplexTypeReflector { get; private set; }
 
         /// <summary>
         /// Indicates whether the property is a complex type or complex type collection (see <see cref="ComplexTypeReflector"/>).
@@ -493,9 +493,9 @@ namespace Beef.Reflection
         /// Gets the <see cref="IEntityReflector"/> for the property; will return <c>null</c> where <see cref="PropertyType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
-        public IEntityReflector GetEntityReflector()
+        public IEntityReflector? GetEntityReflector()
         {
-            if (!IsComplexType || ComplexTypeReflector.ComplexTypeCode != ComplexTypeCode.Object)
+            if (!IsComplexType || ComplexTypeReflector!.ComplexTypeCode != ComplexTypeCode.Object)
                 return null;
 
             return Args.GetReflector(PropertyType);
@@ -505,9 +505,9 @@ namespace Beef.Reflection
         /// Gets the <see cref="IEntityReflector"/> for the collection item property; will return <c>null</c> where <see cref="ComplexTypeReflector.ItemType"/> is not a class.
         /// </summary>
         /// <returns>An <see cref="IEntityReflector"/>.</returns>
-        public IEntityReflector GetItemEntityReflector()
+        public IEntityReflector? GetItemEntityReflector()
         {
-            if (!IsComplexType || ComplexTypeReflector.ComplexTypeCode == ComplexTypeCode.Object)
+            if (!IsComplexType || ComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.Object)
                 return null;
 
             if (!ComplexTypeReflector.ItemType.IsClass && ComplexTypeReflector.ItemType == typeof(string))
@@ -522,7 +522,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
-        object IPropertyReflector.GetJTokenValue(JToken jtoken)
+        object? IPropertyReflector.GetJTokenValue(JToken jtoken)
 #pragma warning restore CA1033 
         {
             return GetJTokenValue(jtoken);
@@ -568,9 +568,9 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool IPropertyReflector.SetValue(object entity, object value)
+        bool IPropertyReflector.SetValue(object entity, object? value)
         {
-            return SetValue((TEntity)entity, (TProperty)value);
+            return SetValue((TEntity)entity, (TProperty)value!);
         }
 
         /// <summary>
@@ -579,9 +579,9 @@ namespace Beef.Reflection
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        bool IPropertyReflector<TEntity>.SetValue(TEntity entity, object value)
+        bool IPropertyReflector<TEntity>.SetValue(TEntity entity, object? value)
         {
-            return SetValue(entity, (TProperty)value);
+            return SetValue(entity, (TProperty)value!);
         }
 
         /// <summary>
@@ -605,7 +605,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        (bool changed, object value) IPropertyReflector.NewValue(object entity)
+        (bool changed, object? value) IPropertyReflector.NewValue(object entity)
         {
             return NewValue((TEntity)entity);
         }
@@ -615,7 +615,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="entity">The entity whose value is to be set.</param>
         /// <returns><c>true</c> where the value was changed; otherwise, <c>false</c> (i.e. same value).</returns>
-        public (bool changed, object value) NewValue(TEntity entity)
+        public (bool changed, object? value) NewValue(TEntity entity)
         {
             var val = NewValue();
             return (SetValue(entity, val), val);
@@ -625,7 +625,7 @@ namespace Beef.Reflection
         /// Creates a new instance.
         /// </summary>
         /// <returns>The value.</returns>
-        object IPropertyReflector.NewValue()
+        object? IPropertyReflector.NewValue()
         {
             return NewValue();
         }

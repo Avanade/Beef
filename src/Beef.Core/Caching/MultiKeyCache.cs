@@ -23,7 +23,7 @@ namespace Beef.Caching
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="createCache">The function that creates the cache for the specified <typeparamref name="TKey"/> that should also use the passed <see cref="ICachePolicy"/>.</param>
         /// <param name="doNotRegister">Indicates that the automatic <see cref="CachePolicyManager.Register"/> should not occur (inheriting class must perform).</param>
-        public MultiKeyCache(Func<TKey, ICachePolicy, TCache> createCache, string policyKey = null, bool doNotRegister = false) : base(policyKey, doNotRegister: true)
+        public MultiKeyCache(Func<TKey, ICachePolicy, TCache> createCache, string? policyKey = null, bool doNotRegister = false) : base(policyKey, doNotRegister: true)
         {
             _createCache = Check.NotNull(createCache, nameof(createCache));
 
@@ -45,12 +45,12 @@ namespace Beef.Caching
         public TCache GetCache(TKey key)
         {
             // Check if it exists; if so then return.
-            if (_dict.TryGetValue(key, out TCache cache) && !cache.GetPolicy().HasExpired())
+            if (_dict.TryGetValue(key, out TCache cache) && !cache.GetPolicy()!.HasExpired())
                 return cache;
 
             lock (_keyLock.Lock(key))
             {
-                if (_dict.TryGetValue(key, out cache) && !cache.GetPolicy().HasExpired())
+                if (_dict.TryGetValue(key, out cache) && !cache.GetPolicy()!.HasExpired())
                     return cache;
 
                 var policy = (ICachePolicy)GetPolicy().Clone();
@@ -82,7 +82,7 @@ namespace Beef.Caching
         /// <returns><c>true</c> if the tenant exists; otherwise, <c>false</c>.</returns>
         public bool Contains(TKey key)
         {
-            return _dict.TryGetValue(key, out TCache cache) && !cache.GetPolicy().HasExpired();
+            return _dict.TryGetValue(key, out TCache cache) && !cache.GetPolicy()!.HasExpired();
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Beef.Caching
         /// <param name="ignoreExpiry"><c>true</c> indicates to flush immediately; otherwise, <c>false</c> to only flush when the <see cref="ICachePolicy"/> is <see cref="ICachePolicy.IsExpired"/> (default).</param>
         protected override void OnFlushCache(bool ignoreExpiry)
         {
-            foreach (var cv in _dict.Where(x => ignoreExpiry || x.Value.GetPolicy().IsExpired).ToArray())
+            foreach (var cv in _dict.Where(x => ignoreExpiry || x.Value.GetPolicy()!.IsExpired).ToArray())
             {
                 Remove(cv.Key);
             }

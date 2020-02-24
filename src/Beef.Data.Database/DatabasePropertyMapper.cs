@@ -92,9 +92,6 @@ namespace Beef.Data.Database
         public DatabasePropertyMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? destColumnName = null, OperationTypes operationTypes = OperationTypes.Any) 
             : base(srcePropertyExpression, destColumnName, operationTypes)
         {
-            if (string.IsNullOrEmpty(destColumnName))
-                DestPropertyName = SrcePropertyName;
-
             DestParameterName = "@" + DestPropertyName;
         }
 
@@ -256,7 +253,7 @@ namespace Beef.Data.Database
                 if (!dr.IsDBNull(index))
                 {
                     if (Converter != null)
-                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType, System.Globalization.CultureInfo.InvariantCulture));
+                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType, System.Globalization.CultureInfo.InvariantCulture))!;
                     else
                         val = dr.GetValue<TSrceProperty>(index);
                 }

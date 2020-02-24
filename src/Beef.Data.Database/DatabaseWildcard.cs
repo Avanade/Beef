@@ -3,7 +3,6 @@
 using Beef.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Beef.Data.Database
@@ -95,7 +94,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="text">The wildcard text.</param>
         /// <returns>The SQL LIKE wildcard.</returns>
-        public string Replace(string text)
+        public string? Replace(string? text)
         {
             var wc = Wildcard ?? Wildcard.Default ?? Wildcard.MultiAll;
             var wr = wc.Parse(text).ThrowOnError();
@@ -104,7 +103,7 @@ namespace Beef.Data.Database
                 return new string(MultiWildcard, 1);
 
             var sb = new StringBuilder();
-            foreach (var c in wr.Text)
+            foreach (var c in wr.Text!)
             {
                 if (wr.Selection.HasFlag(WildcardSelection.MultiWildcard) && c == Wildcard.MultiWildcardCharacter)
                     sb.Append(MultiWildcard);

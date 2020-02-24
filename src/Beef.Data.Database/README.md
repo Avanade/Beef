@@ -191,12 +191,12 @@ The following demonstrates the usage:
 ``` csharp
 // Delete a record using a NonQuery.
 Database.Default.StoredProcedure("[Demo].[spPersonDelete]")
-    .Param(DbMapper.Default.GetParamName(PersonDetail.Property_Id), id)
+    .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
     .NonQuery();
 
 // Select with MultiSet.
 Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
-    .Param(DbMapper.Default.GetParamName(PersonDetail.Property_Id), id)
+    .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
     .SelectQueryMultiSet(
         new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
         new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));

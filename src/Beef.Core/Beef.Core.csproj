@@ -17,6 +17,7 @@
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -24,6 +25,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef framework entity validation referencedata caching</PackageTags>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -49,5 +51,5 @@
   <ItemGroup>
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>
-  
+ 
 </Project>

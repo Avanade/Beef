@@ -101,7 +101,7 @@ namespace Beef.RefData.Caching
         /// </summary>
 		private TColl GetCollectionInternal()
         {
-            TColl coll = null;
+            TColl coll;
             if (_loadCollection == null)
                 coll = new TColl();
             else

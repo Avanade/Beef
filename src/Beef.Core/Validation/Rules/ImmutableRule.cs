@@ -5,14 +5,14 @@ using System;
 namespace Beef.Validation.Rules
 {
     /// <summary>
-    /// Provides validation where the rule predicate <b>must</b> return <c>true</c> to be considered valid.
+    /// Provides validation where the immutable rule predicate <b>must</b> return <c>true</c> to be considered valid.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class ImmutableRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private readonly Predicate<TEntity> _predicate;
-        private readonly Func<bool> _immutable;
+        private readonly Predicate<TEntity>? _predicate;
+        private readonly Func<bool>? _immutable;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImmutableRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.
@@ -47,7 +47,7 @@ namespace Beef.Validation.Rules
             }
             else
             {
-                if (!_immutable.Invoke())
+                if (!_immutable!.Invoke())
                     context.CreateErrorMessage(ErrorText ?? ValidatorStrings.ImmutableFormat);
             }
         }

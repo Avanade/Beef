@@ -20,8 +20,8 @@ namespace Beef.Demo.Business.Data
 
         private void GetByArgsOnQuery(DatabaseParameters p, PersonArgs args, IDatabaseArgs dbArgs)
         {
-            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[Person.Property_FirstName])
-             .ParamWithWildcard(args?.LastName, DbMapper.Default[Person.Property_LastName])
+            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
+             .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
              .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
         }
 
@@ -67,8 +67,8 @@ namespace Beef.Demo.Business.Data
             await Database.Default.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
                 .Params(p =>
                 {
-                    p.ParamWithWildcard(args?.FirstName, DbMapper.Default[Person.Property_FirstName])
-                     .ParamWithWildcard(args?.LastName, DbMapper.Default[Person.Property_LastName])
+                    p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
+                     .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
                      .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
                 })
                 .SelectQueryMultiSetAsync(pdcr.Paging,
@@ -96,7 +96,7 @@ namespace Beef.Demo.Business.Data
             PersonDetail pd = null;
 
             await Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
-                .Param(DbMapper.Default.GetParamName(PersonDetail.Property_Id), id)
+                .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
                 .SelectQueryMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));

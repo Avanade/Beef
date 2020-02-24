@@ -34,14 +34,27 @@ namespace Beef.Validation
         private readonly List<IPropertyRuleClause<TEntity>> _clauses = new List<IPropertyRuleClause<TEntity>>();
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyRuleBase{TEntity, TProperty}"/> class.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="Beef.CodeGen.CodeGenerator.ToSentenceCase(string)"/>).</param>
+        /// <param name="jsonName">The JSON property name (defaults to <paramref name="name"/>).</param>
+        protected PropertyRuleBase(string name, LText? text = null, string? jsonName = null)
+        {
+            Name = Check.NotEmpty(name, nameof(name));
+            Text = text ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(Name)!;
+            JsonName = string.IsNullOrEmpty(jsonName) ? Name : jsonName;
+        }
+
+        /// <summary>
         /// Gets the property name.
         /// </summary>
-        public string Name { get; protected set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets the JSON property name.
         /// </summary>
-        public string JsonName { get; protected set; }
+        public string JsonName { get; private set; }
 
         /// <summary>
         /// Gets or sets the friendly text name used in validation messages.
@@ -142,7 +155,7 @@ namespace Beef.Validation
         /// <returns>The <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public PropertyRuleBase<TEntity, TProperty> WhenHasValue()
         {
-            return WhenValue((TProperty pv) => Comparer<TProperty>.Default.Compare(pv, default(TProperty)) != 0);
+            return WhenValue((TProperty pv) => Comparer<TProperty>.Default.Compare(pv, default!) != 0);
         }
 
         /// <summary>
@@ -222,12 +235,14 @@ namespace Beef.Validation
         /// Initializes a new instance of the <see cref="PropertyRule{TEntity, TProperty}"/> class.
         /// </summary>
         /// <param name="propertyExpression">The <see cref="LambdaExpression"/> to reference the entity property.</param>
-        public PropertyRule(Expression<Func<TEntity, TProperty>> propertyExpression)
+        public PropertyRule(Expression<Func<TEntity, TProperty>> propertyExpression) : this(PropertyExpression.Create(propertyExpression, true)) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyRule{TEntity, TProperty}"/> class.
+        /// </summary>
+        private PropertyRule(PropertyExpression<TEntity, TProperty> propertyExpression) : base(propertyExpression.Name, propertyExpression.Text, propertyExpression.JsonName) 
         {
-            _property = PropertyExpression.Create(propertyExpression, true);
-            Name = _property.Name;
-            JsonName = _property.JsonName;
-            Text = _property.Text;
+            _property = propertyExpression;
         }
 
         /// <summary>

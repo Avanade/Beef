@@ -9,7 +9,7 @@ namespace Beef.Mapper.Converters
     /// <summary>
     /// Represents an <see cref="JObject"/> to JSON <see cref="string"/> converter.
     /// </summary>
-    public class JObjectToJsonConverter : Singleton<JObjectToJsonConverter>, IPropertyMapperConverter<JObject, string>
+    public class JObjectToJsonConverter : Singleton<JObjectToJsonConverter>, IPropertyMapperConverter<JObject, string?>
     {
         /// <summary>
         /// Gets the source value <see cref="Type"/>.
@@ -36,7 +36,7 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public string ConvertToDest(JObject value)
+        public string? ConvertToDest(JObject value)
         {
             if (value == null)
                 return null;
@@ -49,9 +49,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public JObject ConvertToSrce(string value)
+        public JObject ConvertToSrce(string? value)
         {
-            return String.IsNullOrEmpty(value) ? default(JObject) : JObject.Parse(value);
+            return string.IsNullOrEmpty(value) ? default! : JObject.Parse(value);
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public object ConvertToDest(object value)
+        object? IPropertyMapperConverter.ConvertToDest(object? value)
         {
-            return ConvertToDest((JObject)value);
+            return ConvertToDest((JObject)value!);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public object ConvertToSrce(object value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value)
         {
-            return ConvertToSrce((string)value);
+            return ConvertToSrce((string?)value);
         }
     }
 }

@@ -25,11 +25,14 @@ namespace Beef.CodeGen.Loaders
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Property element must have a Name property.");
+
             config.AttributeAdd("Type", "string");
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
-            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]))
+            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]!))
                 config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             else
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
@@ -43,6 +46,8 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("DisplayName", GenerateDisplayName(config));
 
+            config.AttributeAdd("Nullable", CodeGenConfig.IgnoreNullableTypes.Contains(config.Attributes["Type"]!) ? "false" : "true");
+
             return Task.CompletedTask;
         }
 
@@ -51,7 +56,7 @@ namespace Beef.CodeGen.Loaders
         /// </summary>
         private string GenerateDisplayName(CodeGenConfig config)
         {
-            var dn = CodeGenerator.ToSentenceCase(config.Attributes["Name"]);
+            var dn = CodeGenerator.ToSentenceCase(config.Attributes["Name"])!;
             var parts = dn.Split(' ');
             if (parts.Length == 1)
                 return (parts[0] == "Id") ? "Identifier" : dn;

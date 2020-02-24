@@ -182,7 +182,7 @@ namespace Company.AppName.Test
             Assert.AreEqual(2, r.Value.Result.Count);
             Assert.AreEqual(new string[] { "Browne", "Jones" }, r.Value.Result.Select(x => x.LastName).ToArray());
 
-            Assert.AreEqual(2, Newtonsoft.Json.Linq.JArray.Parse(r.Content).Descendants().OfType<Newtonsoft.Json.Linq.JProperty>().Where(p => p.Name == "genderText").Count());
+            Assert.AreEqual(2, Newtonsoft.Json.Linq.JArray.Parse(r.Content!).Descendants().OfType<Newtonsoft.Json.Linq.JProperty>().Where(p => p.Name == "genderText").Count());
         }
 
         #endregion

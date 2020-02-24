@@ -11,6 +11,6 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the <see cref="PagingResult"/>.
         /// </summary>
-        PagingResult Paging { get; set; }
+        PagingResult? Paging { get; set; }
     }
 }

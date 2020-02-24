@@ -17,13 +17,13 @@ namespace Beef.Entities
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="Type"/>.</typeparam>
     public abstract class EntityBaseKeyedCollection<TKey, TEntity> : KeyedCollection<TKey, TEntity>, IEntityBaseCollection, INotifyCollectionChanged where TEntity : EntityBase
     {
-        private object _editCopy;
-        private readonly Func<TEntity, TKey> _getKeyForItem;
+        private object? _editCopy;
+        private readonly Func<TEntity, TKey>? _getKeyForItem;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseKeyedCollection{TKey, TEntity}" /> class.
         /// </summary>
-        protected EntityBaseKeyedCollection(Func<TEntity, TKey> getKeyForItem = null)
+        protected EntityBaseKeyedCollection(Func<TEntity, TKey>? getKeyForItem = null)
             : base()
         {
             _getKeyForItem = getKeyForItem;
@@ -211,7 +211,7 @@ namespace Beef.Entities
         /// <summary>
         /// Occurs when an item is added, removed, changed, moved, or the entire list is refreshed.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <summary>
         /// Begins an edit on an collection.
@@ -277,7 +277,7 @@ namespace Beef.Entities
         /// <summary>
         /// Lists the properties (names of) that have been changed (note that this property is not JSON serialized). <i>Note:</i> always returns <c>null</c> as properties are not tracked for a collection.
         /// </summary>
-        public StringCollection ChangeTracking => null;
+        public StringCollection? ChangeTracking => null;
 
         /// <summary>
         /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.

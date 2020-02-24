@@ -47,7 +47,10 @@ namespace Beef.CodeGen.Loaders
             if (_tables == null)
                 await LoadDatabaseAsync(config.Root.GetAttributeValue<string>("ConnectionString") ?? throw new CodeGenException("Config.ConnectionString has not been specified."), config.Root.GetAttributeValue<string>("RefDatabaseSchema")).ConfigureAwait(false);
 
-            var name = config.GetAttributeValue<string>("Name") ?? throw new CodeGenException("Table has no Name attribute specified.");
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Table element must have a Name property.");
+
+            var name = config.GetAttributeValue<string>("Name")!;
             config.AttributeAdd("Schema", "dbo");
             var schema = config.GetAttributeValue<string>("Schema");
             var table = _tables.Where(x => x.Name == name && x.Schema == schema).SingleOrDefault();

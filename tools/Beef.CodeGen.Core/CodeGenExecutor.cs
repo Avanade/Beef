@@ -143,7 +143,7 @@ namespace Beef.CodeGen
                     CreatedCount = 0;
                     UpdatedCount = 0;
                     NotChangedCount = 0;
-                    Logger.Default.Info("  Template: {0}", template);
+                    Logger.Default.Info("  Template: {0}", template!);
 
                     XElement xmlTemplate;
                     if (_args.TemplatePath != null)
@@ -232,7 +232,7 @@ namespace Beef.CodeGen
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var fi = new FileInfo(Path.Combine(dir, e.OutputFileName));
+            var fi = new FileInfo(Path.Combine(dir, e.OutputFileName!));
             if (fi.Exists)
             {
                 if (e.IsOutputNewOnly)

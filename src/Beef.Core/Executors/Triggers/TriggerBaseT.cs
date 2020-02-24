@@ -16,7 +16,7 @@ namespace Beef.Executors.Triggers
         /// <param name="args">The arguments.</param>
         /// <param name="completionCallback">An optional callback for post <see cref="Executor"/> <b>Run</b> notification/processing.</param>
 
-        protected void Run(TArgs args, Action completionCallback = null)
+        protected void Run(TArgs args, Action? completionCallback = null)
         {
             Run(this, args, completionCallback);
         }

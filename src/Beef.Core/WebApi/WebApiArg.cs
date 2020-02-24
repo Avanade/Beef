@@ -86,14 +86,14 @@ namespace Beef.WebApi
         /// Returns the name and value formatted (see <see cref="QueryStringFormat"/>) for a URL query string.
         /// </summary>
         /// <returns>The URL string.</returns>
-        public abstract string ToUrlQueryString();
+        public abstract string? ToUrlQueryString();
 #pragma warning restore CA1055
 
         /// <summary>
         /// Gets the underlying value.
         /// </summary>
         /// <returns>The underlying value.</returns>
-        public abstract object GetValue();
+        public abstract object? GetValue();
     }
 
     /// <summary>
@@ -125,32 +125,32 @@ namespace Beef.WebApi
         /// </summary>
         public override bool IsDefault
         {
-            get { return Comparer<T>.Default.Compare(Value, default) == 0; }
+            get { return Comparer<T>.Default.Compare(Value, default!) == 0; }
         }
 
         /// <summary>
         /// Gets the underlying value.
         /// </summary>
         /// <returns>The underlying value.</returns>
-        public override object GetValue() => Value;
+        public override object? GetValue() => Value;
 
         /// <summary>
         /// Returns a string representation of just the <see cref="Value"/> itself.
         /// </summary>
         /// <returns>The string value.</returns>
-        public override string ToString()
+        public override string? ToString()
         {
             if (Value is ReferenceDataBase rd)
                 return rd.Code;
             else
-                return Value.ToString();
+                return Value?.ToString();
         }
 
         /// <summary>
         /// Returns the name and value formatted (see <see cref="WebApiArg.QueryStringFormat"/>) for a URL query string.
         /// </summary>
         /// <returns>The URL string.</returns>
-        public override string ToUrlQueryString()
+        public override string? ToUrlQueryString()
         {
             if (IsDefault)
                 return null;
@@ -167,19 +167,22 @@ namespace Beef.WebApi
                 return sb.Length == 0 ? null : sb.ToString();
             }
 
-            return CreateNameValue(base.Name, Value, ArgType == WebApiArgType.FromUriUseProperties || ArgType == WebApiArgType.FromUriUsePropertiesAndPrefix);
+            return CreateNameValue(Name, Value, ArgType == WebApiArgType.FromUriUseProperties || ArgType == WebApiArgType.FromUriUsePropertiesAndPrefix);
         }
 
         /// <summary>
         /// Create the URL name and value pair.
         /// </summary>
-        private string CreateNameValue(string name, object value, bool isClassAllowed)
+        private string CreateNameValue(string name, object? value, bool isClassAllowed)
         {
+            if (value == null)
+                return UriFormat(name, null);
+
             if (value is string)
                 return UriFormat(name, (string)value);
 
             if (value is DateTime)
-                return UriFormat(name, (((DateTime)value).ToString("o", System.Globalization.CultureInfo.InvariantCulture)));
+                return UriFormat(name, ((DateTime)value).ToString("o", System.Globalization.CultureInfo.InvariantCulture));
 
             TypeInfo ti = value.GetType().GetTypeInfo();
             if (ti.IsEnum || ti.IsValueType)
@@ -204,7 +207,7 @@ namespace Beef.WebApi
                         continue;
 
                     // Define name, and out strings directly.
-                    string pName = ArgType == WebApiArgType.FromUriUseProperties ? jpa.PropertyName : name + "." + jpa.PropertyName;
+                    string pName = ArgType == WebApiArgType.FromUriUseProperties ? jpa.PropertyName! : name + "." + jpa.PropertyName;
                     if (pVal is string)
                     {
                         UriAppend(sb, UriFormat(pName, (string)pVal));
@@ -260,10 +263,14 @@ namespace Beef.WebApi
         /// Formats the name+value URI.
         /// </summary>
 #pragma warning disable CA1055 // Uri parameters should not be strings; by-design as only part-of.
-        protected string UriFormat(string name, string value)
+        protected string UriFormat(string name, string? value)
 #pragma warning restore CA1055 
         {
-            return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, name, Uri.EscapeDataString(value));
+            Check.NotNull(name, nameof(name));
+            if (value == null)
+                return Uri.EscapeDataString(name);
+            else
+                return string.Format(System.Globalization.CultureInfo.InvariantCulture, QueryStringFormat, Uri.EscapeDataString(name), Uri.EscapeDataString(value));
         }
 
         /// <summary>
@@ -275,7 +282,7 @@ namespace Beef.WebApi
     /// <summary>
     /// Represents a <see cref="PagingArgs"/> <see cref="WebApiArg"/> argument.
     /// </summary>
-    public class WebApiPagingArgsArg : WebApiArg<PagingArgs>
+    public class WebApiPagingArgsArg : WebApiArg<PagingArgs?>
     {
         /// <summary>
         /// Gets or sets the <see cref="PagingArgs.Page"/> query string name.
@@ -307,16 +314,14 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="name">The argument <see cref="WebApiArg.Name"/>.</param>
         /// <param name="value">The argument <see cref="WebApiArg{PagingArgs}.Value"/>.</param>
-        public WebApiPagingArgsArg(string name, PagingArgs value)
-            : base(name, value)
-        {
-        }
+        public WebApiPagingArgsArg(string name, PagingArgs? value)
+            : base(name, value) { }
 
         /// <summary>
         /// Returns a string that represents the name and value formatted for a URL.
         /// </summary>
         /// <returns>The URL string format.</returns>
-        public override string ToUrlQueryString()
+        public override string? ToUrlQueryString()
         {
             if (Value == null)
                 return null;

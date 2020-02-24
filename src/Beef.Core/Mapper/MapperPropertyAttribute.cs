@@ -1,4 +1,6 @@
-﻿using Beef.Mapper.Converters;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Mapper.Converters;
 using System;
 
 namespace Beef.Mapper
@@ -10,9 +12,15 @@ namespace Beef.Mapper
     public class MapperPropertyAttribute : Attribute
     {
         /// <summary>
-        /// Gets or sets the property name.
+        /// Initializes a new instance of the <see cref="MapperPropertyAttribute"/> class.
         /// </summary>
-        public string Name { get; set; }
+        /// <param name="name">The property name.</param>
+        public MapperPropertyAttribute(string name) => Name = Check.NotEmpty(name, nameof(name));
+
+        /// <summary>
+        /// Gets the property name.
+        /// </summary>
+        public string Name { get; private set; }
 
         /// <summary>
         /// Indicates whether the property forms part of the unique (primary) key. 
@@ -27,12 +35,12 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets or set the <see cref="IPropertyMapperConverter"/> <see cref="Type"/>.
         /// </summary>
-        public Type ConverterType { get; set; }
+        public Type? ConverterType { get; set; }
 
         /// <summary>
         /// Gets or set the <see cref="IEntityMapperBase"/> <see cref="Type"/> for the complex property type.
         /// </summary>
-        public Type MapperType { get; set; }
+        public Type? MapperType { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).

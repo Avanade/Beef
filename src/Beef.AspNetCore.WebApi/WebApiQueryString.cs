@@ -191,7 +191,7 @@ namespace Beef.AspNetCore.WebApi
             if (!controller.HttpContext.Request.Query.Any())
 #pragma warning restore CA1062
             {
-                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
+                ExecutionContext.Current.Messages.AddInfo("A query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
                 return dict.Values;
             }
 

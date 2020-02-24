@@ -18,7 +18,7 @@ namespace Beef.Caching.Policy
         private static readonly object _lock = new object();
         private static readonly ConcurrentDictionary<string, ICachePolicy> _policies = new ConcurrentDictionary<string, ICachePolicy>();
         private static readonly ConcurrentDictionary<string, ICacheCore> _registered = new ConcurrentDictionary<string, ICacheCore>();
-        private static Timer _timer;
+        private static Timer? _timer;
         private static readonly Random _random = new Random();
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Beef.Caching.Policy
         /// <param name="cache">The <see cref="ICacheCore"/> to register.</param>
         /// <param name="overridePolicyKey">The policy key override (defaults to <see cref="ICacheCore.PolicyKey"/>).</param>
         /// <remarks>All <see cref="CacheCoreBase"/> instances are automatically registered.</remarks>
-        public static void Register(ICacheCore cache, string overridePolicyKey = null)
+        public static void Register(ICacheCore cache, string? overridePolicyKey = null)
         {
             if (cache == null)
                 throw new ArgumentNullException(nameof(cache));

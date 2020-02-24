@@ -10,44 +10,44 @@ namespace Beef.Data.Database
     public static class DatabaseRefDataColumns
     {
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.Id"/> database column name (defaults to <see cref="ReferenceDataBase.Property_Id"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.Id"/> database column name (defaults to <see cref="ReferenceDataBase.Id"/>).
         /// </summary>
-        public static string IdColumnName { get; set; } = ReferenceDataBase.Property_Id;
+        public static string IdColumnName { get; set; } = nameof(ReferenceDataBase.Id);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.Code"/> database column name (defaults to <see cref="ReferenceDataBase.Property_Code"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.Code"/> database column name (defaults to <see cref="ReferenceDataBase.Code"/>).
         /// </summary>
-        public static string CodeColumnName { get; set; } = ReferenceDataBase.Property_Code;
+        public static string CodeColumnName { get; set; } = nameof(ReferenceDataBase.Code);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.Text"/> database column name (defaults to <see cref="ReferenceDataBase.Property_Text"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.Text"/> database column name (defaults to <see cref="ReferenceDataBase.Text"/>).
         /// </summary>
-        public static string TextColumnName { get; set; } = ReferenceDataBase.Property_Text;
+        public static string TextColumnName { get; set; } = nameof(ReferenceDataBase.Text);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.Description"/> database column name (defaults to <see cref="ReferenceDataBase.Property_Description"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.Description"/> database column name (defaults to <see cref="ReferenceDataBase.Description"/>).
         /// </summary>
-        public static string DescriptionColumnName { get; set; } = ReferenceDataBase.Property_Description;
+        public static string DescriptionColumnName { get; set; } = nameof(ReferenceDataBase.Description);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.SortOrder"/> database column name (defaults to <see cref="ReferenceDataBase.Property_SortOrder"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.SortOrder"/> database column name (defaults to <see cref="ReferenceDataBase.SortOrder"/>).
         /// </summary>
-        public static string SortOrderColumnName { get; set; } = ReferenceDataBase.Property_SortOrder;
+        public static string SortOrderColumnName { get; set; } = nameof(ReferenceDataBase.SortOrder);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.IsActive"/> database column name (defaults to <see cref="ReferenceDataBase.Property_IsActive"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.IsActive"/> database column name (defaults to <see cref="ReferenceDataBase.IsActive"/>).
         /// </summary>
-        public static string IsActiveColumnName { get; set; } = ReferenceDataBase.Property_IsActive;
+        public static string IsActiveColumnName { get; set; } = nameof(ReferenceDataBase.IsActive);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.StartDate"/> database column name (defaults to <see cref="ReferenceDataBase.Property_StartDate"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.StartDate"/> database column name (defaults to <see cref="ReferenceDataBase.StartDate"/>).
         /// </summary>
-        public static string StartDateColumnName { get; set; } = ReferenceDataBase.Property_StartDate;
+        public static string StartDateColumnName { get; set; } = nameof(ReferenceDataBase.StartDate);
 
         /// <summary>
-        /// Gets or sets the <see cref="ReferenceDataBase.EndDate"/> database column name (defaults to <see cref="ReferenceDataBase.Property_EndDate"/>).
+        /// Gets or sets the <see cref="ReferenceDataBase.EndDate"/> database column name (defaults to <see cref="ReferenceDataBase.EndDate"/>).
         /// </summary>
-        public static string EndDateColumnName { get; set; } = ReferenceDataBase.Property_EndDate;
+        public static string EndDateColumnName { get; set; } = nameof(ReferenceDataBase.EndDate);
 
         /// <summary>
         /// Gets or sets the <see cref="ReferenceDataBase.ETag"/> database column name (defaults to "RowVersion").

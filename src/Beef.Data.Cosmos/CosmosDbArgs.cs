@@ -167,7 +167,7 @@ namespace Beef.Data.Cosmos
             if (keys.Length != Mapper.UniqueKey.Count)
                 throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Count}'.", nameof(keys));
 
-            var k = Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified).ToString();
+            var k = (Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified) ?? string.Empty).ToString();
 
             if (string.IsNullOrEmpty(k))
                 throw new InvalidOperationException("A key (non null) was unable to be derived from the value.");
@@ -186,7 +186,8 @@ namespace Beef.Data.Cosmos
                 throw new NotSupportedException("Only a single key value is currently supported.");
 
             var v = Mapper.UniqueKey[0].GetSrceValue(value, OperationTypes.Unspecified);
-            var k = Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified).ToString();
+            var kv = Mapper.UniqueKey[0].ConvertToDestValue(v, OperationTypes.Unspecified);
+            var k = kv?.ToString();
 
             if (string.IsNullOrEmpty(k))
                 throw new InvalidOperationException("A key (non null) was unable to be derived from the value.");

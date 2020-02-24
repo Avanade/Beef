@@ -12,7 +12,7 @@ namespace Beef.Entities
     /// </summary>
     public abstract class EntityBase : EntityBasicBase, IEditableObject, ICloneable, ICopyFrom, ICleanUp, IUniqueKey, IChangeTrackingLogging
     {
-        private object _editCopy;
+        private object? _editCopy;
 
         #region Static
 
@@ -21,14 +21,14 @@ namespace Beef.Entities
         /// </summary>
         /// <param name="values">List of values to <see cref="ICleanUp.CleanUp"/>.</param>
         /// <remarks>Only cleans up values that implement <see cref="ICleanUp"/>; otherwise, they will remain unchanged.</remarks>
-        public static void CleanUp(params object[] values)
+        public static void CleanUp(params object?[] values)
         {
             if (values == null)
                 return;
 
-            foreach (object o in values)
+            foreach (object? o in values)
             {
-                if (o is ICleanUp value)
+                if (o != null && o is ICleanUp value)
                     value.CleanUp();
             }
         }
@@ -79,10 +79,10 @@ namespace Beef.Entities
         /// <remarks>A <see cref="ICopyFrom.CopyFrom(object)"/> will be attempted first where supported, then a <see cref="ICloneable.Clone"/>; otherwise, a <see cref="InvalidOperationException"/> will be thrown.
         /// <i>Note:</i> <see cref="ICopyFrom"/> is not supported for collections.</remarks>
         /// <exception cref="InvalidOperationException">Thrown where neither <see cref="ICopyFrom"/>) or <see cref="ICloneable"/> are supported.</exception>
-        protected static T CopyOrClone<T>(T from, T to) where T : class
+        protected static T? CopyOrClone<T>(T? from, T? to) where T : class
         {
-            if (from == null)
-                return null;
+            if (from == default)
+                return default!;
 
             if (to == default && from is ICloneable c)
                 return (T)c.Clone();
@@ -157,9 +157,7 @@ namespace Beef.Entities
         /// <summary>
         /// Performs a clean-up of the <see cref="EntityBase"/> resetting property values as appropriate to ensure a basic level of data consistency.
         /// </summary>
-        public virtual void CleanUp()
-        {
-        }
+        public virtual void CleanUp() { }
 
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
@@ -173,18 +171,12 @@ namespace Beef.Entities
         /// <summary>
         /// Indicates whether the <see cref="Object"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
-        public virtual bool HasUniqueKey
-        {
-            get { return false; }
-        }
+        public virtual bool HasUniqueKey => false;
 
         /// <summary>
         /// Gets the <see cref="UniqueKey"/>.
         /// </summary>
-        public virtual UniqueKey UniqueKey
-        {
-            get { return UniqueKey.Empty; }
-        }
+        public virtual UniqueKey UniqueKey => UniqueKey.Empty;
 
 #pragma warning disable CA1819 // Properties should not return arrays; by-design, acceptable usage for DTO's and is OK as changes cannot have a side-effect.
         /// <summary>
@@ -222,7 +214,7 @@ namespace Beef.Entities
         /// Lists the properties (names of) that have been changed (note that this property is not JSON serialized).
         /// </summary>
         [JsonIgnore()]
-        public StringCollection ChangeTracking { get; private set; }
+        public StringCollection? ChangeTracking { get; private set; }
 
         /// <summary>
         /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.

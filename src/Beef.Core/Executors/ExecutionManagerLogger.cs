@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
-using Beef.FlatFile;
 using System;
 
 namespace Beef.Executors
@@ -10,7 +9,7 @@ namespace Beef.Executors
     /// Provides a standardised implementation of a <see cref="ExecutionManager"/> logger; designed for attaching the <see cref="LogExecutionRun"/> to the
     /// <see cref="ExecutionManager.PerRunType"/> action. Intercepts the <see cref="IExecutorArgs"/> and writes applicable log message when an <see cref="IExecutorBaseArgs.Exception"/>
     /// is not <c>null</c>. This will not log where there is no <b>exception</b>. The <see cref="IExecutorArgs"/> is passed as the logging <b>data</b> (passed in the
-    /// <see cref="Logger"/> shortcut methods ending in <b>2</b>); except when from a <see cref="FileReaderBase"/> then a corresponding <see cref="FileReaderLoggerData"/> will be used.
+    /// <see cref="Logger"/> shortcut methods ending in <b>2</b>).
     /// </summary>
     public class ExecutionManagerLogger
     {
@@ -66,12 +65,7 @@ namespace Beef.Executors
 
                 case ExecutorRunType.ItemRun:
                     if (args.Exception != null)
-                    {
-                        if (args is ExecutorItemRunArgs<FileOperationResult> irargs)
-                            Logger.Default.Exception2(new FileReaderLoggerData(irargs.Item), args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
-                        else
-                            Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
-                    }
+                        Logger.Default.Exception2(args, args.Exception, string.Format(System.Globalization.CultureInfo.InvariantCulture, UnexpectedItemRunExceptionMessage ?? "{0}", args.Exception.Message));
 
                     break;
 

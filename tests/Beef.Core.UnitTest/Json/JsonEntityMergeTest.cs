@@ -638,14 +638,14 @@ namespace Beef.Core.UnitTest.Json
         [Test]
         public void Merge_XtremeLoadTest_1000()
         {
+            var text = "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, "
+                    + "\"values\": [ 1, 2, 4], \"sub\": { \"code\": \"abc\", \"text\": \"xyz\" }, \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, null, { } ], "
+                    + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }";
+
             for (int i = 0; i < 1000; i++)
             {
                 var td = new TestData { Values = new int[] { 1, 2, 3 }, Keys = new List<KeyData> { new KeyData { Code = "abc", Text = "def" } } };
-                JsonEntityMerge.Merge<TestData>(JObject.Parse(
-                    "{ \"id\": \"13512759-4f50-e911-b35c-bc83850db74d\", \"name\": \"Barry\", \"isValid\": true, \"date\": \"2018-12-31\", \"count\": \"12\", \"amount\": 132.58, "
-                    + "\"values\": [ 1, 2, 4], \"sub\": { \"code\": \"abc\", \"text\": \"xyz\" }, \"nokeys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, null, { } ], "
-                    + "\"keys\": [ { \"code\": \"abc\", \"text\": \"xyz\" }, { }, null ] }"),
-                    td);
+                JsonEntityMerge.Merge<TestData>(JObject.Parse(text), td);
             }
         }
 

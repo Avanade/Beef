@@ -34,7 +34,7 @@ namespace Beef.Executors.Triggers
 
         private readonly object _lock = new object();
         private readonly TimerTriggerResult _triggerResult = new TimerTriggerResult { IsExecutorRunEnabled = true };
-        private Timer _timer;
+        private Timer? _timer;
         private long _iterations = 0;
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Beef.Executors.Triggers
         /// </summary>
         protected override void OnStopped()
         {
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer?.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         /// <summary>

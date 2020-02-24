@@ -13,9 +13,7 @@ using NUnit.Framework;
 #if (implement_database || implement_entityframework)
 using System.Reflection;
 #endif
-#if (implement_cosmos)
 using System.Threading.Tasks;
-#endif
 using Company.AppName.Api;
 #if (implement_cosmos)
 using Company.AppName.Common.Entities;
@@ -31,12 +29,12 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.RegisterSetUp((count, data) =>
+            TestSetUp.RegisterSetUp(async (count, _) =>
             {
-                return DatabaseExecutor.Run(
+                return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
                     AgentTester.Configuration["ConnectionStrings:Database"],
-                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) == 0;
+                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()).ConfigureAwait(false) == 0;
             });
 
             AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "AppName_");
@@ -50,7 +48,7 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.RegisterSetUp(async (count, data) =>
+            TestSetUp.RegisterSetUp(async (count, _) =>
             {
                 var config = AgentTester.Configuration.GetSection("CosmosDb");
                 _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
@@ -62,9 +60,9 @@ namespace Company.AppName.Test
                     {
                         Id = "Person",
                         PartitionKeyPath = "/_partitionKey"
-                    }, 400);
+                    }, 400).ConfigureAwait(false);
 
-                await rc.ImportBatchAsync<PersonTest, Person>("Person.yaml", "Person");
+                await rc.ImportBatchAsync<PersonTest, Person>("Person.yaml", "Person").ConfigureAwait(false);
 
                 var rdc = await _cosmosDb.ReplaceOrCreateContainerAsync(
                     new Cosmos.ContainerProperties
@@ -72,9 +70,9 @@ namespace Company.AppName.Test
                         Id = "RefData",
                         PartitionKeyPath = "/_partitionKey",
                         UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
-                    }, 400);
+                    }, 400).ConfigureAwait(false);
 
-                await rdc.ImportValueRefDataBatchAsync<PersonTest>(ReferenceData.Current, "RefData.yaml");
+                await rdc.ImportValueRefDataBatchAsync<PersonTest>(ReferenceData.Current, "RefData.yaml").ConfigureAwait(false);
 
                 return true;
             });

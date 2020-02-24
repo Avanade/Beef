@@ -26,7 +26,10 @@ namespace Beef.CodeGen.Loaders
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            CodeGenConfig entity = CodeGenConfig.FindConfig(config, "Entity");
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Operation element must have a Name property.");
+
+            CodeGenConfig entity = CodeGenConfig.FindConfig(config, "Entity") ?? throw new CodeGenException("Operation element must have an Entity element parent.");
 
             if (config.GetAttributeValue<bool>("UniqueKey"))
             {

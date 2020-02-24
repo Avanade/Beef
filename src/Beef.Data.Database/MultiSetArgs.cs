@@ -313,11 +313,11 @@ namespace Beef.Data.Database
             switch (_idTypeCode)
             {
                 case ReferenceDataIdTypeCode.Int32:
-                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<int>(_columnName)));
+                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<int>(_columnName))!);
                     break;
 
                 case ReferenceDataIdTypeCode.Guid:
-                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<Guid>(_columnName)));
+                    _coll.Add((TItem)ReferenceDataManager.Current[typeof(TItem)].GetById(dr.GetValue<Guid>(_columnName))!);
                     break;
             }
         }

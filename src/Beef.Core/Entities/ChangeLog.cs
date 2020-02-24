@@ -11,53 +11,10 @@ namespace Beef.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ChangeLog : EntityBase
     {
-        #region PropertyNames
-        #pragma warning disable CA1707 // Identifiers should not contain underscores
-
-        /// <summary>
-        /// Represents the <see cref="CreatedDate"/> property name.
-        /// </summary>
-        public const string Property_CreatedDate = "CreatedDate";
-
-        /// <summary>
-        /// Represents the <see cref="CreatedBy"/> property name.
-        /// </summary>
-        public const string Property_CreatedBy = "CreatedBy";
-
-        /// <summary>
-        /// Represents the <see cref="UpdatedDate"/> property name.
-        /// </summary>
-        public const string Property_UpdatedDate = "UpdatedDate";
-
-        /// <summary>
-        /// Represents the <see cref="UpdatedBy"/> property name.
-        /// </summary>
-        public const string Property_UpdatedBy = "UpdatedBy";
-
-        #pragma warning restore CA1707
-        #endregion
-
-        #region Privates
-
         private DateTime? _createdDate;
-        private string _createdBy;
+        private string? _createdBy;
         private DateTime? _updatedDate;
-        private string _updatedBy;
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ChangeLog"/> class.
-        /// </summary>
-        public ChangeLog()
-        {
-        }
-
-        #endregion
-
-        #region Properties
+        private string? _updatedBy;
 
         /// <summary>
         /// Gets or sets the Created <see cref="DateTime"/>.
@@ -65,18 +22,18 @@ namespace Beef.Entities
         [JsonProperty("createdDate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? CreatedDate
         {
-            get { return this._createdDate; }
-            set { SetValue(ref this._createdDate, value, false, DateTimeTransform.DateTimeLocal, Property_CreatedDate); }
+            get => _createdDate; 
+            set => SetValue(ref _createdDate, value, false, DateTimeTransform.DateTimeLocal, nameof(CreatedDate)); 
         }
 
         /// <summary>
         /// Gets or sets the Created username.
         /// </summary>
         [JsonProperty("createdBy", NullValueHandling = NullValueHandling.Ignore)]
-        public string CreatedBy
+        public string? CreatedBy
         {
-            get { return this._createdBy; }
-            set { SetValue(ref this._createdBy, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_CreatedBy); }
+            get => _createdBy;
+            set => SetValue(ref _createdBy!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(CreatedBy));
         }
 
         /// <summary>
@@ -85,21 +42,19 @@ namespace Beef.Entities
         [JsonProperty("updatedDate", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? UpdatedDate
         {
-            get { return this._updatedDate; }
-            set { SetValue(ref this._updatedDate, value, false, DateTimeTransform.DateTimeLocal, Property_UpdatedDate); }
+            get => _updatedDate;
+            set => SetValue(ref _updatedDate, value, false, DateTimeTransform.DateTimeLocal, nameof(UpdatedDate));
         }
 
         /// <summary>
         /// Gets or sets the Updated username.
         /// </summary>
         [JsonProperty("updatedBy", NullValueHandling = NullValueHandling.Ignore)]
-        public string UpdatedBy
+        public string? UpdatedBy
         {
-            get { return this._updatedBy; }
-            set { SetValue(ref this._updatedBy, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_UpdatedBy); }
+            get => _updatedBy;
+            set => SetValue(ref _updatedBy!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(UpdatedBy));
         }
-
-        #endregion
 
         #region ICopyFrom
 
@@ -112,10 +67,10 @@ namespace Beef.Entities
             var fval = ValidateCopyFromType<ChangeLog>(from);
 
             base.CopyFrom(fval);
-            this.CreatedDate = fval.CreatedDate;
-            this.CreatedBy = fval.CreatedBy;
-            this.UpdatedDate = fval.UpdatedDate;
-            this.UpdatedBy = fval.UpdatedBy;
+            CreatedDate = fval.CreatedDate;
+            CreatedBy = fval.CreatedBy;
+            UpdatedDate = fval.UpdatedDate;
+            UpdatedBy = fval.UpdatedBy;
         }
 
         #endregion
@@ -143,10 +98,10 @@ namespace Beef.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            this.CreatedDate = Cleaner.Clean(this.CreatedDate, DateTimeTransform.DateTimeLocal);
-            this.CreatedBy = Cleaner.Clean(this.CreatedBy, StringTrim.End, StringTransform.EmptyToNull);
-            this.UpdatedDate = Cleaner.Clean(this.UpdatedDate, DateTimeTransform.DateTimeLocal);
-            this.UpdatedBy = Cleaner.Clean(this.UpdatedBy, StringTrim.End, StringTransform.EmptyToNull);
+            CreatedDate = Cleaner.Clean(CreatedDate, DateTimeTransform.DateTimeLocal);
+            CreatedBy = Cleaner.Clean(CreatedBy, StringTrim.End, StringTransform.EmptyToNull);
+            UpdatedDate = Cleaner.Clean(UpdatedDate, DateTimeTransform.DateTimeLocal);
+            UpdatedBy = Cleaner.Clean(UpdatedBy, StringTrim.End, StringTransform.EmptyToNull);
         }
 
         /// <summary>

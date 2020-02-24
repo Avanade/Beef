@@ -20,7 +20,7 @@ namespace Beef.Net.Http
 
         private readonly TextReader _reader;
         private bool _isClosed = false;
-        private string _line = null;
+        private string? _line = null;
         private MultiPartReadState _state;
         private bool _isEndOfStream = false;
         private bool _isInBatch = true;
@@ -40,7 +40,7 @@ namespace Beef.Net.Http
         /// Reads the next <see cref="HttpResponseMessage"/> from the response stream.
         /// </summary>
         /// <returns>The <see cref="HttpResponseMessage"/> where found; otherwise, <c>null</c>.</returns>
-        public async Task<HttpResponseMessage> ReadNextAsync()
+        public async Task<HttpResponseMessage?> ReadNextAsync()
         {
             /* Note: Yes I know I used a couple of GOTOs - generally I am not a fan either (bad practice yada yada)!
              * - I debated it for a while but for the purposes of the logic here I am inclined to keep it as it simplified the code - YMMV. */
@@ -126,7 +126,7 @@ namespace Beef.Net.Http
             // Response headers.
             while (CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, DataOrEmptyStates) == MultiPartReadState.Data)
             {
-                if (!TryParseHeader(_line, out KeyValuePair<string, string[]> header))
+                if (!TryParseHeader(_line!, out KeyValuePair<string, string[]> header))
                     throw new InvalidOperationException("The multipart response header is malformed.");
 
                 multiPart.ResponseHeaders.Add(header.Key, header.Value);
@@ -156,7 +156,7 @@ namespace Beef.Net.Http
 
             // Response status.
             CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, MultiPartReadState.Data);
-            if (!TryParseStatusCode(_line, out HttpStatusCode statusCode))
+            if (!TryParseStatusCode(_line!, out HttpStatusCode statusCode))
                 throw new InvalidOperationException("Unexpected HTTP status code; response is malformed.");
 
             multiPart.StatusCode = statusCode;
@@ -164,7 +164,7 @@ namespace Beef.Net.Http
             // Content headers.
             while (CheckValidReadStates(await ReadNextLineAsync().ConfigureAwait(false), true, DataOrEmptyStates) == MultiPartReadState.Data)
             {
-                if (!TryParseHeader(_line, out KeyValuePair<string, string[]> header))
+                if (!TryParseHeader(_line!, out KeyValuePair<string, string[]> header))
                     throw new InvalidOperationException("The multipart response header is malformed.");
 
                 multiPart.ContentHeaders.Add(header.Key, header.Value);
@@ -248,7 +248,7 @@ namespace Beef.Net.Http
             var val = text.Substring(i + 2);
 
             if (string.IsNullOrEmpty(val))
-                header = new KeyValuePair<string, string[]>(key, null);
+                header = new KeyValuePair<string, string[]>(key, Array.Empty<string>());
             else
                 header = new KeyValuePair<string, string[]>(key, val.Split(new char[] { ';', ' ' }, StringSplitOptions.RemoveEmptyEntries));
 

@@ -18,7 +18,7 @@ namespace Beef.Entities
         /// <summary>
         /// Lists the properties that have had changes tracked.
         /// </summary>
-        StringCollection ChangeTracking { get; }
+        StringCollection? ChangeTracking { get; }
 
         /// <summary>
         /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.

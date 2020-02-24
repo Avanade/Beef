@@ -10,6 +10,6 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
-        string ETag { get; set; }
+        string? ETag { get; set; }
     }
 }

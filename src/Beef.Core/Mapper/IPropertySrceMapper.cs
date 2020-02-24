@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using System;
 
 namespace Beef.Mapper
 {
@@ -21,7 +23,7 @@ namespace Beef.Mapper
         /// <param name="entity">The source entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        object GetSrceValue(TSrce entity, OperationTypes operationType);
+        object? GetSrceValue(TSrce entity, OperationTypes operationType);
 
         /// <summary>
         /// Sets the source property value.
@@ -29,6 +31,6 @@ namespace Beef.Mapper
         /// <param name="entity">The source entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void SetSrceValue(TSrce entity, object value, OperationTypes operationType);
+        void SetSrceValue(TSrce entity, object? value, OperationTypes operationType);
     }
 }

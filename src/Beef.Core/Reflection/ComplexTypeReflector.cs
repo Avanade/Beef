@@ -41,7 +41,16 @@ namespace Beef.Reflection
     /// </summary>
     public class ComplexTypeReflector
     {
-        private MethodInfo _addMethod;
+        private MethodInfo? _addMethod;
+
+        /// <summary>
+        /// Private constructor.
+        /// </summary>
+        private ComplexTypeReflector(PropertyInfo propertyInfo, Type itemType)
+        {
+            PropertyInfo = Check.NotNull(propertyInfo, nameof(propertyInfo));
+            ItemType = Check.NotNull(itemType, nameof(itemType));
+        }
 
         /// <summary>
         /// Gets the <see cref="PropertyInfo"/>.
@@ -75,11 +84,7 @@ namespace Beef.Reflection
         /// <returns></returns>
         public static ComplexTypeReflector Create(PropertyInfo pi)
         {
-            var ctr = new ComplexTypeReflector
-            {
-                PropertyInfo = pi ?? throw new ArgumentNullException(nameof(pi)),
-                ItemType = pi.PropertyType
-            };
+            var ctr = new ComplexTypeReflector(pi ?? throw new ArgumentNullException(nameof(pi)), pi.PropertyType);
 
             if (pi.PropertyType == typeof(string) || pi.PropertyType.IsPrimitive || pi.PropertyType.IsValueType)
                 return ctr;
@@ -162,7 +167,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the underlying ICollection Type.
         /// </summary>
-        private static Type GetCollectionType(Type type)
+        private static Type? GetCollectionType(Type type)
         {
             var t = type.GetInterfaces().FirstOrDefault(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>));
             if (t == null)
@@ -174,7 +179,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the underlying IEnumerable Type.
         /// </summary>
-        private static Type GetEnumerableType(Type type)
+        private static Type? GetEnumerableType(Type type)
         {
             var t = type.GetInterfaces().FirstOrDefault(x => (x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)));
             if (t == null)
@@ -197,7 +202,7 @@ namespace Beef.Reflection
         /// <summary>
         /// Gets the underlying IEnumerable Type by inferring from the Add method.
         /// </summary>
-        private static (Type ItemType, MethodInfo AddMethod) GetEnumerableTypeFromAdd(Type type)
+        private static (Type? ItemType, MethodInfo? AddMethod) GetEnumerableTypeFromAdd(Type type)
         {
             var mi = type.GetMethod("Add");
             if (mi == null)
@@ -212,7 +217,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="objValue">The object whose property value will be set.</param>
         /// <param name="value">The property value(s) to set.</param>
-        public void SetValue(object objValue, IEnumerable value)
+        public void SetValue(object? objValue, IEnumerable? value)
         {
             if (objValue == null || value == null)
                 return;
@@ -242,7 +247,7 @@ namespace Beef.Reflection
         /// </summary>
         /// <param name="value">The property value(s) to set.</param>
         /// <returns>The property value.</returns>
-        public object CreateValue(object value)
+        public object? CreateValue(object value)
         {
             if (value == null)
                 return null;
@@ -260,7 +265,7 @@ namespace Beef.Reflection
 
                 case ComplexTypeCode.ICollection:
                     var c = Activator.CreateInstance(PropertyInfo.PropertyType);
-                    _addMethod.Invoke(c, new object[] { value });
+                    _addMethod!.Invoke(c, new object[] { value });
                     return c;
             }
 
@@ -274,9 +279,9 @@ namespace Beef.Reflection
         /// <returns>The property value.</returns>
         public object CreateValue(IEnumerable value)
         {
-            IList a = null;
-            Type aType = null;
-            object c = null;
+            IList? a = null;
+            Type? aType = null;
+            object? c = null;
 
             if (IsCollection)
             {
@@ -305,22 +310,22 @@ namespace Beef.Reflection
                     {
                         case ComplexTypeCode.Array:
                         case ComplexTypeCode.IEnumerable:
-                            a.Add(val);
+                            a!.Add(val);
                             break;
 
                         case ComplexTypeCode.ICollection:
-                            _addMethod.Invoke(c, new object[] { val });
+                            _addMethod!.Invoke(c, new object[] { val });
                             break;
                     }
                 }
             }
 
             if (a != null)
-                return aType.GetMethod("ToArray").Invoke(a, null);
+                return aType!.GetMethod("ToArray").Invoke(a, null);
             else if (c != null)
                 return c;
             else
-                return null;
+                return null!;
         }
 
         /// <summary>
@@ -338,7 +343,7 @@ namespace Beef.Reflection
         /// <param name="left">The left value.</param>
         /// <param name="right">The second value.</param>
         /// <returns><c>true</c> if the two source sequences are of equal length and their corresponding elements are equal according to the default equality comparer for their type; otherwise, <c>false</c>.</returns>
-        public bool CompareSequence(object left, object right)
+        public bool CompareSequence(object? left, object? right)
         {
             if (ComplexTypeCode == ComplexTypeCode.Object)
                 throw new InvalidOperationException("CompareSequence cannot be performed for a ComplexTypeCode.Object.");
@@ -355,8 +360,8 @@ namespace Beef.Reflection
             switch (ComplexTypeCode)
             {
                 case ComplexTypeCode.Array:
-                    var al = (Array)left;
-                    var ar = (Array)right;
+                    var al = (Array)left!;
+                    var ar = (Array)right!;
 #pragma warning disable CA1062 // Validate arguments of public methods; by-design, above logic will ensure they are not null.
                     if (al.Length != ar.Length)
                         return false;
@@ -365,8 +370,8 @@ namespace Beef.Reflection
                     break;
 
                 case ComplexTypeCode.ICollection:
-                    var cl = (ICollection)left;
-                    var cr = (ICollection)right;
+                    var cl = (ICollection)left!;
+                    var cr = (ICollection)right!;
                     if (cl.Count != cr.Count)
                         return false;
 
@@ -374,8 +379,8 @@ namespace Beef.Reflection
             }
 
             // Inspired by: https://referencesource.microsoft.com/#System.Core/System/Linq/Enumerable.cs,9bdd6ef7ba6a5615
-            var el = ((IEnumerable)left).GetEnumerator();
-            var er = ((IEnumerable)right).GetEnumerator();
+            var el = ((IEnumerable)left!).GetEnumerator();
+            var er = ((IEnumerable)right!).GetEnumerator();
             {
                 while (el.MoveNext())
                 {

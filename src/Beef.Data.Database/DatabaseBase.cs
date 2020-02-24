@@ -182,7 +182,7 @@ namespace Beef.Data.Database
         /// <param name="getArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public Task<T> GetAsync<T>(DatabaseArgs<T> getArgs, params IComparable[] keys) where T : class, new()
+        public Task<T?> GetAsync<T>(DatabaseArgs<T> getArgs, params IComparable[] keys) where T : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));

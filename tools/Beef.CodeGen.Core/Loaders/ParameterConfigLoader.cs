@@ -25,8 +25,11 @@ namespace Beef.CodeGen.Loaders
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Parameter element must have a Name property.");
+
             if (config.Attributes.ContainsKey("Property"))
-                UpdateConfigFromProperty(config, config.Attributes["Property"]);
+                UpdateConfigFromProperty(config, config.Attributes["Property"]!);
 
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
@@ -35,12 +38,14 @@ namespace Beef.CodeGen.Loaders
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
-            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]))
+            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]!))
                 config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             else
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
+
+            config.AttributeAdd("Nullable", CodeGenConfig.IgnoreNullableTypes.Contains(config.Attributes["Type"]!) ? "false" : "true");
 
             return Task.CompletedTask;
         }
@@ -55,7 +60,7 @@ namespace Beef.CodeGen.Loaders
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            List<CodeGenConfig> propConfig = CodeGenConfig.FindConfigList(config, "Property");
+            List<CodeGenConfig> propConfig = CodeGenConfig.FindConfigList(config, "Property") ?? throw new CodeGenException("Parameter element must have a Property element parent.");
             if (propConfig == null)
                 throw new CodeGenException($"Attribute value references Property '{propertyName}' that does not exist for Entity.");
 

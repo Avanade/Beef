@@ -87,10 +87,11 @@ namespace Beef.Database.Core
         /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
         /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
         /// <returns>The return code; zero equals success.</returns>
-        public static int Run(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
+        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
         {
             using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, codeGenArgs));
-            return HandleRunResult(em.Run());
+            await em.RunAsync().ConfigureAwait(false);
+            return HandleRunResult(em);
         }
 
         /// <summary>
@@ -100,10 +101,11 @@ namespace Beef.Database.Core
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
         /// <returns>The return code; zero equals success.</returns>
-        public static int Run(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
+        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
         {
             using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, null!));
-            return HandleRunResult(em.Run());
+            await em.RunAsync().ConfigureAwait(false);
+            return HandleRunResult(em);
         }
 
         /// <summary>
@@ -112,7 +114,7 @@ namespace Beef.Database.Core
         private static int HandleRunResult(ExecutionManager em)
         {
             if (em.HadExecutionException)
-                throw new InvalidOperationException($"Database executor failed with an unhandled exception: {em.ExecutionException.Message}", em.ExecutionException);
+                throw new InvalidOperationException($"Database executor failed with an unhandled exception: {em.ExecutionException!.Message}", em.ExecutionException);
 
             return em.LastExecutor == null ? -1 : em.LastExecutor.ReturnCode;
         }
@@ -447,7 +449,8 @@ namespace Beef.Database.Core
                     {
                         Logger.Default.Info($"Executing: {a.OutputFileName} ->");
                         Logger.Default.Info(a.Content);
-                        await _db.SqlStatement(a.Content).NonQueryAsync().ConfigureAwait(false);
+                        if (a.Content != null)
+                            await _db.SqlStatement(a.Content).NonQueryAsync().ConfigureAwait(false);
                     }).ConfigureAwait(false);
                 }
             }

@@ -17,7 +17,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the entity value.
         /// </summary>
-        object Value { get; }
+        object? Value { get; }
 
         /// <summary>
         /// Gets the <see cref="MessageItemCollection"/>.
@@ -32,12 +32,12 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the entity prefix used for fully qualified <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        string FullyQualifiedEntityName { get; }
+        string? FullyQualifiedEntityName { get; }
 
         /// <summary>
         /// Gets the entity prefix used for fully qualified JSON <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        string FullyQualifiedJsonEntityName { get; }
+        string? FullyQualifiedJsonEntityName { get; }
 
         /// <summary>
         /// Indicates whether to use the JSON name for the <see cref="MessageItem"/> <see cref="MessageItem.Property"/>; by default (<c>false</c>) uses the .NET name.
@@ -111,7 +111,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the entity value.
         /// </summary>
-        object IValidationContext.Value => Value;
+        object? IValidationContext.Value => Value;
 
         /// <summary>
         /// Gets the entity value.
@@ -121,17 +121,17 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the entity prefix used for fully qualified <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        public string FullyQualifiedEntityName { get; }
+        public string? FullyQualifiedEntityName { get; }
 
         /// <summary>
         /// Gets the entity prefix used for fully qualified JSON <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        public string FullyQualifiedJsonEntityName { get; }
+        public string? FullyQualifiedJsonEntityName { get; }
 
         /// <summary>
         /// Gets the optional name of a selected (specific) property to validate for the entity (<c>null</c> indicates to validate all).
         /// </summary>
-        public string SelectedPropertyName { get; }
+        public string? SelectedPropertyName { get; }
 
         /// <summary>
         /// Indicates whether to use the JSON name for the <see cref="MessageItem"/> <see cref="MessageItem.Property"/>; by default (<c>false</c>) uses the .NET name.
@@ -178,7 +178,7 @@ namespace Beef.Validation
         /// Merges a <see cref="MessageItemCollection"/> into this.
         /// </summary>
         /// <param name="messages">The <see cref="MessageItemCollection"/> to merge.</param>
-        public void MergeResult(MessageItemCollection messages)
+        public void MergeResult(MessageItemCollection? messages)
         {
             if (messages == null || messages.Count == 0)
                 return;
@@ -226,7 +226,7 @@ namespace Beef.Validation
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
         /// <param name="propertyExpression">The property expression.</param>
         /// <returns>The corresponding <see cref="MessageItem"/>; otherwise, <c>null</c>.</returns>
-        public MessageItem GetError<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
+        public MessageItem? GetError<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression)
         {
             if (_propertyErrors.TryGetValue(CreateFullyQualifiedName(propertyExpression), out MessageItem mi))
                 return null;
@@ -335,8 +335,8 @@ namespace Beef.Validation
         internal MessageItem AddMessage(string propertyName, string jsonPropertyName, MessageType type, LText text)
         {
             var mi = Messages.Add(CreateFullyQualifiedName(propertyName, jsonPropertyName), type, text);
-            if (type == MessageType.Error && !HasError(mi.Property))
-                _propertyErrors.Add(mi.Property, mi);
+            if (type == MessageType.Error && !HasError(mi.Property!))
+                _propertyErrors.Add(mi.Property!, mi);
 
             return mi;
         }
@@ -350,12 +350,12 @@ namespace Beef.Validation
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <returns>The <see cref="MessageItem"/>.</returns>
-        internal MessageItem AddMessage(string propertyName, string jsonPropertyName, MessageType type, LText format, params object[] values)
+        internal MessageItem AddMessage(string propertyName, string jsonPropertyName, MessageType type, LText format, params object?[] values)
         {
             Beef.Check.NotNull(propertyName, nameof(propertyName));
             var mi = Messages.Add(CreateFullyQualifiedName(propertyName, jsonPropertyName ?? propertyName), type, format, values);
-            if (type == MessageType.Error && !HasError(mi.Property))
-                _propertyErrors.Add(mi.Property, mi);
+            if (type == MessageType.Error && !HasError(mi.Property!))
+                _propertyErrors.Add(mi.Property!, mi);
 
             return mi;
         }
@@ -469,7 +469,7 @@ namespace Beef.Validation
         /// </summary>
         private object[] GetTextAndValue<TProperty>(PropertyExpression<TEntity, TProperty> propertyExpression)
         {
-            return new object[] { propertyExpression.Text, propertyExpression.GetValue(Value) };
+            return new object[] { propertyExpression.Text, propertyExpression.GetValue(Value)! };
         }
 
         /// <summary>
@@ -565,7 +565,7 @@ namespace Beef.Validation
             if (Config.ContainsKey(name))
                 return (T)Config[name];
 
-            return default(T);
+            return default!;
         }
 
         /// <summary>

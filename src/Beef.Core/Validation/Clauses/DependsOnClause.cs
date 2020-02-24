@@ -40,8 +40,8 @@ namespace Beef.Validation.Clauses
                 return false;
 
             // Check depends on value to continue.
-            object value = _dependsOn.GetValue((TEntity)context.Parent.Value);
-            return !(System.Collections.Comparer.Default.Compare(value, default(TProperty)) == 0);
+            object? value = _dependsOn.GetValue((TEntity)context.Parent.Value!);
+            return !(System.Collections.Comparer.Default.Compare(value, default(TProperty)!) == 0);
         }
     }
 }

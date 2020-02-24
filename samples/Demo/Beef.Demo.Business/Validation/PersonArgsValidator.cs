@@ -1,4 +1,6 @@
-﻿using Beef.Demo.Common.Entities;
+﻿#nullable enable
+
+using Beef.Demo.Common.Entities;
 using Beef.Validation;
 
 namespace Beef.Demo.Business.Validation
@@ -19,3 +21,5 @@ namespace Beef.Demo.Business.Validation
         }
     }
 }
+
+#nullable restore

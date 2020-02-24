@@ -13,7 +13,7 @@ namespace Beef.WebApi
     {
         private static readonly Dictionary<string, WebApiServiceAgentRegisteredData> _dict = new Dictionary<string, WebApiServiceAgentRegisteredData>();
         private static readonly object _lock = new object();
-        internal static Func<WebApiServiceAgentRegisteredData, HttpClient> _httpClientCreate;
+        internal static Func<WebApiServiceAgentRegisteredData, HttpClient>? _httpClientCreate;
 
         /// <summary>
         /// Register a <paramref name="httpClientCreate"/> function to create the <see cref="HttpClient"/> where not previously set.
@@ -21,7 +21,7 @@ namespace Beef.WebApi
         /// <param name="httpClientCreate">The function to create the <see cref="HttpClient"/>.</param>
         public static void RegisterHttpClientCreate(Func<WebApiServiceAgentRegisteredData, HttpClient> httpClientCreate)
         {
-            _httpClientCreate = httpClientCreate;
+            _httpClientCreate = Check.NotNull(httpClientCreate, nameof(httpClientCreate));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Beef.WebApi
         /// <param name="nameSpace">The namespace.</param>
         /// <param name="client">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public static void Register(string nameSpace, HttpClient client, Action<HttpRequestMessage> beforeRequest = null)
+        public static void Register(string nameSpace, HttpClient client, Action<HttpRequestMessage>? beforeRequest = null)
         {
             if (string.IsNullOrEmpty(nameSpace))
                 throw new ArgumentNullException(nameof(nameSpace));
@@ -40,7 +40,7 @@ namespace Beef.WebApi
 
             lock (_lock)
             {
-                _dict[nameSpace] = new WebApiServiceAgentRegisteredData { Client = client, BeforeRequest = beforeRequest };
+                _dict[nameSpace] = new WebApiServiceAgentRegisteredData(client) { BeforeRequest = beforeRequest };
             }
         }
 
@@ -50,7 +50,7 @@ namespace Beef.WebApi
         /// <param name="nameSpace">The namespace.</param>
         /// <param name="baseAddress">Gets or sets the base address of Uniform Resource Identifier (URI) of the Internet resource used when sending requests.</param>
         /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public static void Register(string nameSpace, Uri baseAddress, Action<HttpRequestMessage> beforeRequest = null)
+        public static void Register(string nameSpace, Uri baseAddress, Action<HttpRequestMessage>? beforeRequest = null)
         {
             if (string.IsNullOrEmpty(nameSpace))
                 throw new ArgumentNullException(nameof(nameSpace));
@@ -60,7 +60,7 @@ namespace Beef.WebApi
 
             lock (_lock)
             {
-                _dict[nameSpace] = new WebApiServiceAgentRegisteredData { BaseAddress = baseAddress, BeforeRequest = beforeRequest };
+                _dict[nameSpace] = new WebApiServiceAgentRegisteredData(baseAddress) { BeforeRequest = beforeRequest };
             }
         }
 
@@ -69,7 +69,7 @@ namespace Beef.WebApi
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> to derive the namespace for.</typeparam>
         /// <returns>The <see cref="WebApiServiceAgentRegisteredData"/> where found; otherwise, <c>null</c>.</returns>
-        public static WebApiServiceAgentRegisteredData Get<T>()
+        public static WebApiServiceAgentRegisteredData? Get<T>()
         {
             return Get(typeof(T).Namespace);
         }
@@ -79,7 +79,7 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="nameSpace">The namespace.</param>
         /// <returns>The <see cref="WebApiServiceAgentRegisteredData"/> where found; otherwise, <c>null</c>.</returns>
-        public static WebApiServiceAgentRegisteredData Get(string nameSpace)
+        public static WebApiServiceAgentRegisteredData? Get(string nameSpace)
         {
             if (_dict.TryGetValue(nameSpace, out WebApiServiceAgentRegisteredData rd))
                 return rd;
@@ -97,9 +97,27 @@ namespace Beef.WebApi
     {
         private static readonly Dictionary<Uri, HttpClient> _clientCache = new Dictionary<Uri, HttpClient>();
 
-        private HttpClient _client;
-        private Uri _baseAddress;
+        private HttpClient? _client;
+        private readonly Uri? _baseAddress;
         private readonly object _lock = new object();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebApiServiceAgentRegisteredData"/> class using the specified <paramref name="client"/>.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        public WebApiServiceAgentRegisteredData(HttpClient client)
+        {
+            _client = Check.NotNull(client, nameof(client));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebApiServiceAgentRegisteredData"/> class using the specified <paramref name="baseAddress"/> automatically creating the <see cref="Client"/>.
+        /// </summary>
+        /// <param name="baseAddress"></param>
+        public WebApiServiceAgentRegisteredData(Uri baseAddress)
+        {
+            _baseAddress = Check.NotNull(baseAddress, nameof(baseAddress));
+        }
 
         /// <summary>
         /// Gets the <see cref="HttpClient"/>.
@@ -128,8 +146,6 @@ namespace Beef.WebApi
                     return _client;
                 }
             }
-
-            internal set { _client = value ?? throw new ArgumentNullException(nameof(Client)); }
         }
 
         /// <summary>
@@ -137,13 +153,12 @@ namespace Beef.WebApi
         /// </summary>
         public Uri BaseAddress
         {
-            get { return _baseAddress ?? _client?.BaseAddress; }
-            internal set { _baseAddress = value ?? throw new ArgumentNullException(nameof(BaseAddress)); }
+            get { return _baseAddress ?? _client!.BaseAddress; }
         }
 
         /// <summary>
         /// Gets the <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).
         /// </summary>
-        public Action<HttpRequestMessage> BeforeRequest { get; internal set; }
+        public Action<HttpRequestMessage>? BeforeRequest { get; internal set; }
     }
 }

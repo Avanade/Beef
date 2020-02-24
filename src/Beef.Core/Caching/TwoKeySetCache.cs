@@ -14,8 +14,8 @@ namespace Beef.Caching
     /// <typeparam name="TKey2">The second key <see cref="Type"/> that is being cache managed.</typeparam>
     public class TwoKeySetCache<TKey1, TKey2> : CacheCoreBase
     {
-        private Dictionary<TKey1, TKey2> _dict1;
-        private Dictionary<TKey2, TKey1> _dict2;
+        private Dictionary<TKey1, TKey2>? _dict1;
+        private Dictionary<TKey2, TKey1>? _dict2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TwoKeySetCache{TColl, TItem}"/> class that automatically <see cref="CachePolicyManager.Register">registers</see> for centralised <see cref="CachePolicyManager.Flush"/> management.
@@ -23,7 +23,7 @@ namespace Beef.Caching
         /// <param name="loadCache">The function that is responsible for loading the collection (expects an enumerable <see cref="Tuple{TKey1, TKey2}"/>).</param>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
-        protected TwoKeySetCache(Func<object, IEnumerable<Tuple<TKey1, TKey2>>> loadCache = null, string policyKey = null, object data = null) : base(policyKey)
+        protected TwoKeySetCache(Func<object?, IEnumerable<Tuple<TKey1, TKey2>>>? loadCache = null, string? policyKey = null, object? data = null) : base(policyKey)
         {
             LoadCache = loadCache;
             Data = data;
@@ -35,7 +35,7 @@ namespace Beef.Caching
         /// <param name="policy">The <see cref="ICachePolicy"/>.</param>
         /// <param name="loadCache">The function that is responsible for loading the collection (expects an enumerable <see cref="Tuple{TKey1, TKey2}"/>).</param>
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
-        protected TwoKeySetCache(ICachePolicy policy, Func<object, IEnumerable<Tuple<TKey1, TKey2>>> loadCache = null, object data = null) : base(policy)
+        protected TwoKeySetCache(ICachePolicy policy, Func<object?, IEnumerable<Tuple<TKey1, TKey2>>>? loadCache = null, object? data = null) : base(policy)
         {
             LoadCache = loadCache;
             Data = data;
@@ -44,12 +44,12 @@ namespace Beef.Caching
         /// <summary>
         /// Gets or sets the function to load the cache.
         /// </summary>
-        private Func<object, IEnumerable<Tuple<TKey1, TKey2>>> LoadCache { get; set; }
+        private Func<object?, IEnumerable<Tuple<TKey1, TKey2>>>? LoadCache { get; set; }
 
         /// <summary>
         /// Gets or sets the optional data that will be passed into the <see cref="LoadCache"/> operation.
         /// </summary>
-        public object Data { get; set; }
+        public object? Data { get; set; }
 
         /// <summary>
         /// Gets the count of items in the cache (both expired and non-expired may co-exist until flushed).
@@ -84,7 +84,7 @@ namespace Beef.Caching
         protected Dictionary<TKey1, TKey2> GetCache1()
         {
             GetCache();
-            return _dict1;
+            return _dict1!;
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Beef.Caching
         protected Dictionary<TKey2, TKey1> GetCache2()
         {
             GetCache();
-            return _dict2;
+            return _dict2!;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Beef.Caching
         {
             var cache = GetCache1();
             if (!cache.ContainsKey(key1))
-                throw new ArgumentException($"Cache does not contain the specified key: {key1.ToString()}.");
+                throw new ArgumentException($"Cache does not contain the specified key: {key1?.ToString() ?? "null"}.");
 
             return cache[key1];
         }
@@ -147,7 +147,7 @@ namespace Beef.Caching
             var cache = GetCache1();
             if (!cache.ContainsKey(key1))
             {
-                key2 = default;
+                key2 = default!;
                 return false;
             }
 
@@ -174,7 +174,7 @@ namespace Beef.Caching
         {
             var cache = GetCache2();
             if (!cache.ContainsKey(key2))
-                throw new ArgumentException($"Cache does not contain the specified key: {key2.ToString()}.");
+                throw new ArgumentException($"Cache does not contain the specified key: {key2?.ToString() ?? "null"}.");
 
             return cache[key2];
         }
@@ -190,7 +190,7 @@ namespace Beef.Caching
             var cache = GetCache2();
             if (!cache.ContainsKey(key2))
             {
-                key1 = default;
+                key1 = default!;
                 return false;
             }
 

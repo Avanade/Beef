@@ -18,9 +18,10 @@ namespace Beef.Mapper.Converters
         /// <returns>The <paramref name="refData"/>.</returns>
         public static ReferenceDataBase CheckIsValid(Type refType, ReferenceDataBase refData)
         {
-            return !(refData != null && !refData.IsValid)
-                ? refData
-                : throw new InvalidOperationException($"The '{refType.Name}' ReferenceData instance is not valid and is unable to be converted.");
+            if (refData == null || refData.IsValid)
+                throw new InvalidOperationException($"The '{refType.Name}' ReferenceData instance is not valid and is unable to be converted.");
+
+            return refData;
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Beef.Mapper.Converters
         /// <param name="refData">The <see cref="ReferenceDataBase"/> value.</param>
         /// <param name="value">The value converting from.</param>
         /// <returns>The <paramref name="refData"/>.</returns>
-        public static ReferenceDataBase CheckConverted(Type refType, ReferenceDataBase refData, IComparable value)
+        public static ReferenceDataBase CheckConverted(Type refType, ReferenceDataBase? refData, IComparable value)
         {
             return refData ?? throw new InvalidOperationException($"The value '{value}' is unable to be converted to a valid '{refType.Name}' ReferenceData instance.");
         }

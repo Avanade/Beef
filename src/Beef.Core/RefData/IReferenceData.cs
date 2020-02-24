@@ -14,22 +14,22 @@ namespace Beef.RefData
         /// </summary>
         /// <remarks>Once set this value cannot be updated (it becomes immutable). The underlying <see cref="Type"/> for the <b>Id</b> is determined by the
         /// implementing class.</remarks>
-        object Id { get; set; }
+        object? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the code.
         /// </summary>
-        string Code { get; set; }
+        string? Code { get; set; }
 
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
-        string Text { get; set; }
+        string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
-        string Description { get; set; }
+        string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the sort order.
@@ -60,6 +60,6 @@ namespace Beef.RefData
         /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
-        string ETag { get; set; }
+        string? ETag { get; set; }
     }
 }

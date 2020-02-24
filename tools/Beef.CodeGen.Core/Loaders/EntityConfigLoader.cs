@@ -41,6 +41,9 @@ namespace Beef.CodeGen.Loaders
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Entity element must have a Name property.");
+
             config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));

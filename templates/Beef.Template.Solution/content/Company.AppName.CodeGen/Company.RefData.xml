@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" NullableRefTypes="true" MapperDefaultRefDataConverter="ReferenceDataCodeConverter" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!--#if (implement_database) -->
   <!-- The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="Database" DatabaseSchema="Ref" />

@@ -15,6 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -44,6 +45,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

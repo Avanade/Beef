@@ -37,7 +37,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Gets or sets the <see cref="MessageItemCollection"/>.
         /// </summary>
-        public MessageItemCollection Messages { get; set; }
+        public MessageItemCollection? Messages { get; set; }
 #pragma warning restore CA2227
 
         /// <summary>
@@ -53,12 +53,12 @@ namespace Beef.WebApi
         /// <summary>
         /// Gets or sets the error message for the corresponding <see cref="ErrorType"/>.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the response body content.
         /// </summary>
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         /// <summary>
         /// Indicates whether the request was successful (i.e. <see cref="Response"/> <see cref="HttpResponseMessage.IsSuccessStatusCode"/>.
@@ -96,7 +96,7 @@ namespace Beef.WebApi
                         throw new NotFoundException(ErrorMessage);
 
                     case Beef.ErrorType.ValidationError:
-                        throw new ValidationException(ErrorMessage, Messages);
+                        throw new ValidationException(ErrorMessage, Messages ?? new MessageItemCollection());
 
                     case Beef.ErrorType.DuplicateError:
                         throw new DuplicateException(ErrorMessage);
@@ -116,16 +116,16 @@ namespace Beef.WebApi
     public class WebApiAgentResult<T> : WebApiAgentResult
     {
         private bool _isValueSet = false;
-        private T _value = default;
+        private T _value = default!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiAgentResult{T}"/> class.
         /// </summary>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
         /// <param name="overrideValue">The value overridding the internal content deserialization.</param>
-        public WebApiAgentResult(HttpResponseMessage response, T overrideValue = default(T)) : base(response)
+        public WebApiAgentResult(HttpResponseMessage response, T overrideValue = default!) : base(response)
         {
-            if (Comparer<T>.Default.Compare(overrideValue, default(T)) != 0)
+            if (Comparer<T>.Default.Compare(overrideValue, default!) != 0)
             {
                 _value = overrideValue;
                 _isValueSet = true;
@@ -137,11 +137,8 @@ namespace Beef.WebApi
         /// </summary>
         /// <param name="result">The result containing the <see cref="WebApiAgentResult.Content"/> to deserialize.</param>
         /// <param name="overrideValue">The value overridding the internal content deserialization.</param>
-        public WebApiAgentResult(WebApiAgentResult result, T overrideValue = default(T)) : this(result?.Response, overrideValue)
+        public WebApiAgentResult(WebApiAgentResult result, T overrideValue = default!) : this(Check.NotNull(result, nameof(result)).Response, overrideValue)
         {
-            if (result == null)
-                throw new ArgumentNullException(nameof(result));
-
             Content = result.Content;
             Messages = result.Messages;
             ErrorType = result.ErrorType;

@@ -21,7 +21,16 @@ namespace Beef.CodeGen
         public static readonly List<string> SystemTypes = new List<string>
         {
             "void", "bool", "byte", "char", "decimal", "double", "float", "int", "long",
-            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "TimeSpan"
+            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "TimeSpan", "Guid"
+        };
+
+        /// <summary>
+        /// The list of system <see cref="Type"/> names that should not be nullable by default.
+        /// </summary>
+        public static readonly List<string> IgnoreNullableTypes = new List<string>
+        {
+            "bool", "byte", "char", "decimal", "double", "float", "int", "long",
+            "sbyte", "short", "unit", "ulong", "ushort", "DateTime", "TimeSpan", "Guid"
         };
 
         #region Static
@@ -42,7 +51,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Loads from an <see cref="XElement"/>.
         /// </summary>
-        private static async Task LoadAsync(CodeGenerator codeGen, CodeGenConfig config, XElement xml, Dictionary<string, string> parameters = null)
+        private static async Task LoadAsync(CodeGenerator codeGen, CodeGenConfig config, XElement xml, Dictionary<string, string>? parameters = null)
         {
             // Add a SysId with a GUID for global uniqueness.
             config.AttributeAdd("SysId", Guid.NewGuid().ToString());
@@ -168,7 +177,7 @@ namespace Beef.CodeGen
         /// <param name="config">The <see cref="CodeGenConfig"/> to start the search from.</param>
         /// <param name="name">The configuration element name to find.</param>
         /// <returns>The <see cref="CodeGenConfig"/> where found; otherwise, <c>null</c>.</returns>
-        public static CodeGenConfig FindConfig(CodeGenConfig config, string name)
+        public static CodeGenConfig? FindConfig(CodeGenConfig config, string name)
         {
             Check.NotNull(config, nameof(config));
             Check.NotNull(name, nameof(name));
@@ -188,7 +197,7 @@ namespace Beef.CodeGen
         /// <param name="config">The <see cref="CodeGenConfig"/> to start the search from.</param>
         /// <param name="name">The configuration element name to find.</param>
         /// <returns>The <see cref="CodeGenConfig"/> list where found; otherwise, <c>null</c>.</returns>
-        public static List<CodeGenConfig> FindConfigList(CodeGenConfig config, string name)
+        public static List<CodeGenConfig>? FindConfigList(CodeGenConfig config, string name)
         {
             Check.NotNull(config, nameof(config));
             Check.NotNull(name, nameof(name));
@@ -247,7 +256,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="name">The configuration element name.</param>
         /// <param name="parent">The parent <see cref="CodeGenConfig"/>.</param>
-        public CodeGenConfig(string name, CodeGenConfig parent)
+        public CodeGenConfig(string name, CodeGenConfig? parent)
         {
             if (string.IsNullOrEmpty(name))
                 throw new CodeGenException("Configuration element name is not specified.");
@@ -272,7 +281,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the parent <see cref="CodeGenConfig"/>.
         /// </summary>
-        public CodeGenConfig Parent { get; }
+        public CodeGenConfig? Parent { get; }
 
         /// <summary>
         /// Gets the root <see cref="CodeGenConfig"/>.
@@ -285,14 +294,14 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the corresponding attribute values.
         /// </summary>
-        public Dictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string?> Attributes { get; } = new Dictionary<string, string?>();
 
         /// <summary>
         /// Adds/Updates the name/value pair into the <see cref="Attributes"/> collection overridding any previous value.
         /// </summary>
         /// <param name="name">The attribute name.</param>
         /// <param name="value">The attribute value.</param>
-        public void AttributeUpdate(string name, string value)
+        public void AttributeUpdate(string name, string? value)
         {
             if (Attributes.ContainsKey(name))
                 Attributes[name] = value;
@@ -305,7 +314,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="name">The attribute name.</param>
         /// <param name="value">The attribute value.</param>
-        public void AttributeAdd(string name, string value)
+        public void AttributeAdd(string name, string? value)
         {
             if (!Attributes.ContainsKey(name))
                 Attributes.Add(name, value);
@@ -320,11 +329,11 @@ namespace Beef.CodeGen
         public T GetAttributeValue<T>(string name)
         {
             if (!Attributes.ContainsKey(name))
-                return default;
+                return default!;
 
-            string val = Attributes[name];
+            string? val = Attributes[name];
             if (string.IsNullOrEmpty(val))
-                return default;
+                return default!;
 
             return (T)Convert.ChangeType(val, typeof(T), CultureInfo.InvariantCulture);
         }
@@ -337,6 +346,6 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the inner CDATA value if applicable.
         /// </summary>
-        public string CDATA { get; set; } = null;
+        public string CDATA { get; set; } = null!;
     }
 }

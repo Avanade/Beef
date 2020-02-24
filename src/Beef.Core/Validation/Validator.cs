@@ -64,8 +64,8 @@ namespace Beef.Validation
     public class Validator<TEntity> : ValidatorBase<TEntity>
         where TEntity : class
     {
-        private RuleSet<TEntity> _currentRuleSet = null;
-        private Action<ValidationContext<TEntity>> _additional = null;
+        private RuleSet<TEntity>? _currentRuleSet;
+        private Action<ValidationContext<TEntity>>? _additional;
 
         /// <summary>
         /// Creates an <see cref="Validator{TEntity}"/>.
@@ -85,7 +85,7 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="ValidationContext{TEntity}"/>.</returns>
-        public override ValidationContext<TEntity> Validate(TEntity value, ValidationArgs args = null)
+        public override ValidationContext<TEntity> Validate(TEntity value, ValidationArgs? args = null)
         {
             var context = new ValidationContext<TEntity>(value, args ?? new ValidationArgs());
 
@@ -130,7 +130,7 @@ namespace Beef.Validation
         /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
         /// <param name="property">The action to act of the created <see cref="PropertyRule{TEntity, TProperty}"/>.</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
-        public Validator<TEntity> HasProperty<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, Action<PropertyRule<TEntity, TProperty>> property = null)
+        public Validator<TEntity> HasProperty<TProperty>(Expression<Func<TEntity, TProperty>> propertyExpression, Action<PropertyRule<TEntity, TProperty>>? property = null)
         {
             var p = Property(propertyExpression);
             property?.Invoke(p);
@@ -164,8 +164,7 @@ namespace Beef.Validation
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
         public Validator<TEntity> Additional(Action<ValidationContext<TEntity>> additional)
         {
-            if (additional == null)
-                return this;
+            Check.NotNull(additional, nameof(additional));
 
             if (_additional != null)
                 throw new InvalidOperationException("Additional can only be defined once for a Validator.");
@@ -247,7 +246,7 @@ namespace Beef.Validation
         {
             var p = PropertyExpression.Create(propertyExpression, true);
             throw new ValidationException(MessageItem.CreateErrorMessage(ValidationArgs.DefaultUseJsonNames ? p.JsonName : p.Name,
-                string.Format(System.Globalization.CultureInfo.CurrentCulture, format, new object[] { p.Text, propertyValue }.Concat(values).ToArray())));
+                string.Format(System.Globalization.CultureInfo.CurrentCulture, format, new object[] { p.Text, propertyValue! }.Concat(values).ToArray())));
         }
     }
 }

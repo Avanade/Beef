@@ -23,6 +23,9 @@ namespace Beef.Caching.Policy
 
             // Load the policies.
             var isDefaultSet = false;
+            if (config.Policies == null)
+                return;
+
             foreach (var pol in config.Policies)
             {
                 if (string.IsNullOrEmpty(pol.Name))
@@ -82,7 +85,7 @@ namespace Beef.Caching.Policy
                                 pt = pi.PropertyType.GetGenericArguments()[0];
 
                             var mi = pt.GetMethod("TryParse", new Type[] { typeof(string), pt.MakeByRefType() }) ?? throw new CachePolicyConfigException($"Policy '{config.Name}' Property '{prop.Name}' type must support TryParse.");
-                            var args = new object[] { prop.Value, null };
+                            var args = new object?[] { prop.Value, null };
                             if (!(bool)mi.Invoke(null, args))
                                 throw new CachePolicyConfigException($"Policy '{config.Name}' Property '{prop.Name}' value is not valid.");
 
@@ -117,7 +120,7 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets or sets the <see cref="CachePolicyConfigPolicy"/> array.
         /// </summary>
-        public IEnumerable<CachePolicyConfigPolicy> Policies { get; set; }
+        public IEnumerable<CachePolicyConfigPolicy>? Policies { get; set; }
     }
 
     /// <summary>
@@ -128,7 +131,7 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets or sets the policy name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Indicates whether the policy is the <see cref="CachePolicyManager.DefaultPolicy"/>.
@@ -138,17 +141,17 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets or sets the policy <see cref="Type"/> name.
         /// </summary>
-        public string Policy { get; set; }
+        public string? Policy { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CachePolicyConfigPolicyProperty"/> array.
         /// </summary>
-        public IEnumerable<CachePolicyConfigPolicyProperty> Properties { get; set; }
+        public IEnumerable<CachePolicyConfigPolicyProperty>? Properties { get; set; }
 
         /// <summary>
         /// Gets or sets the related cache policy names.
         /// </summary>
-        public IEnumerable<string> Caches { get; set; }
+        public IEnumerable<string>? Caches { get; set; }
     }
 
     /// <summary>
@@ -159,12 +162,12 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Gets or sets the property name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the property value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
     }
 
     /// <summary>

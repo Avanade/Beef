@@ -28,7 +28,7 @@ namespace Beef.Reflection
         /// <param name="type">The <see cref="Type"/> to reflect.</param>
         /// <param name="propertyName">The property name to find.</param>
         /// <returns>The corresponding <see cref="PropertyInfo"/> where found; otherwise, <c>null</c>.</returns>
-        public static PropertyInfo GetPropertyInfo(Type type, string propertyName)
+        public static PropertyInfo? GetPropertyInfo(Type type, string propertyName)
         {
             Check.NotNull(type, nameof(type));
             Check.NotEmpty(propertyName, nameof(propertyName));

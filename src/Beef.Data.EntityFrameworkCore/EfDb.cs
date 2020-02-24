@@ -27,7 +27,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         /// <param name="with">The value with which to verify.</param>
         /// <param name="action">The <see cref="Action"/> to invoke when there is a valid <paramref name="with"/> value; passed the database specific wildcard value.</param>
-        public static void WithWildcard(string with, Action<string> action)
+        public static void WithWildcard(string? with, Action<string> action)
         {
             if (with != null)
             {

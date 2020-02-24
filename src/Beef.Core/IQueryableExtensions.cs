@@ -118,7 +118,7 @@ namespace Beef
         public static IQueryable<TElement> WhereWith<TElement, T>(this IQueryable<TElement> query, T with, Expression<Func<TElement, bool>> predicate)
         {
             Check.NotNull(query, nameof(query));
-            if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
+            if (Comparer<T>.Default.Compare(with, default!) != 0 && Comparer<T>.Default.Compare(with, default!) != 0)
             {
                 if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
                     return query;
@@ -159,7 +159,7 @@ namespace Beef
             var s = wr.GetTextWithoutWildcards();
             if (ignoreCase)
             {
-                s = s.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+                s = s?.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
                 exp = Expression.Call(me, typeof(string).GetMethod("ToUpper", System.Type.EmptyTypes));
             }
 

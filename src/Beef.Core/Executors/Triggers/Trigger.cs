@@ -12,7 +12,7 @@ namespace Beef.Executors.Triggers
     public abstract class Trigger : IDisposable
     {
         private readonly object _lock = new object();
-        private ExecutionManager _executionManager;
+        private ExecutionManager? _executionManager;
         private bool _disposed;
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Beef.Executors.Triggers
         /// <summary>
         /// Gets the <see cref="System.Exception"/> that led to the <see cref="TriggerResult.Unsuccessful"/> <see cref="Result"/>.
         /// </summary>
-        public Exception Exception { get; private set; }
+        public Exception? Exception { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Trigger"/> instance identifier.
@@ -64,7 +64,7 @@ namespace Beef.Executors.Triggers
         /// <param name="action">The action.</param>
         public void Trace(Action action)
         {
-            _executionManager.Trace(action);
+            _executionManager?.Trace(action);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Beef.Executors.Triggers
         /// Stops the trigger. (results in <see cref="TriggerResult.Successful"/>).
         /// </summary>
         /// <param name="exception">The <see cref="TriggerResult.Unsuccessful"/> <see cref="Exception"/>; <c>null</c> indicates <see cref="TriggerResult.Successful"/> (default).</param>
-        protected void Stop(Exception exception = null)
+        protected void Stop(Exception? exception = null)
         {
             StopExecution(true, exception);
         }
@@ -110,7 +110,7 @@ namespace Beef.Executors.Triggers
         /// </summary>
         /// <param name="raiseOnStopExecution">Indicates whether to raise the <see cref="OnStopExecution"/> event.</param>
         /// <param name="exception">The <see cref="Exception"/> that led to the <see cref="TriggerResult.Unsuccessful"/>; <c>null</c> indicates <see cref="TriggerResult.Successful"/>.</param>
-        internal void StopExecution(bool raiseOnStopExecution, Exception exception = null)
+        internal void StopExecution(bool raiseOnStopExecution, Exception? exception = null)
         {
             if (State == TriggerState.Stopping || State == TriggerState.Stopped)
                 return;
@@ -150,7 +150,7 @@ namespace Beef.Executors.Triggers
         /// <summary>
         /// Occurs when the <see cref="Stop"/> is executed.
         /// </summary>
-        internal event EventHandler OnStopExecution;
+        internal event EventHandler? OnStopExecution;
 
         /// <summary>
         /// Represents an opportunity to perform shutdown/cleanup work after the underlying <see cref="Trigger"/> has stopped.
@@ -163,7 +163,7 @@ namespace Beef.Executors.Triggers
         /// <param name="sender">The sender.</param>
         /// <param name="args">The arguments.</param>
         /// <param name="completionCallback">An optional callback for post <see cref="Executor"/> <b>Run</b> notification/processing.</param>
-        internal void Run(object sender, object args, Action completionCallback)
+        internal void Run(object sender, object? args, Action? completionCallback)
         {
             Check.NotNull(sender, nameof(sender));
             if (State == TriggerState.Stopped || State == TriggerState.Stopping)
@@ -172,13 +172,14 @@ namespace Beef.Executors.Triggers
                 throw new InvalidOperationException($"Trigger '{InstanceId}' Status is invalid; must have a value of Running.");
 
             Trace(() => Logger.Default.Trace($"Trigger '{InstanceId}' triggering Executor to run."));
-            Task.Run(async () => await (OnRunAsync?.Invoke(new TriggerEventArgs { Args = args, CompletionCallback = completionCallback })).ConfigureAwait(false)).GetAwaiter().GetResult();
+            if (OnRunAsync != null)
+                Task.Run(async () => await (OnRunAsync.Invoke(new TriggerEventArgs(args, completionCallback))).ConfigureAwait(false)).GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Action to run when the trigger initiated a <b>Run</b>.
         /// </summary>
-        internal Func<TriggerEventArgs, Task> OnRunAsync { get; set; }
+        internal Func<TriggerEventArgs, Task>? OnRunAsync { get; set; }
 
         /// <summary>
         /// Release/dispose of all resources.

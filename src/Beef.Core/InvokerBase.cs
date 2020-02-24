@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-#nullable enable
-
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -140,5 +138,3 @@ namespace Beef
         #endregion
     }
 }
-
-#nullable restore
