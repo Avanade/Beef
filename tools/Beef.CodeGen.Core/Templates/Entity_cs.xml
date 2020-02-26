@@ -444,7 +444,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
                   <If Condition="Property.RefDataType != null">
                     <![CDATA[Sid]]>
                   </If>
-                  <If Condition="Property.Nullable == true"><![CDATA[!]]></If>
                   <If Condition="Property.AutoCreate == true">
                     <![CDATA[)]]>
                   </If>

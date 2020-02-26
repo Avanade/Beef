@@ -75,8 +75,8 @@ namespace Beef.Demo.Business
                 if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(id!.Validate(nameof(id)).Mandatory())
-                    .Add(company!.Validate(nameof(company)).Mandatory().IsValid())
+                    .Add(id.Validate(nameof(id)).Mandatory())
+                    .Add(company.Validate(nameof(company)).Mandatory().IsValid())
                     .Additional((__mv) => _getOnValidate?.Invoke(__mv, id, company))
                     .Run().ThrowOnError();
 
@@ -103,7 +103,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(args!.Validate(nameof(args)).Entity(CustomerGroupArgsValidator.Default))
+                    .Add(args.Validate(nameof(args)).Entity(CustomerGroupArgsValidator.Default))
                     .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
@@ -134,7 +134,7 @@ namespace Beef.Demo.Business
 
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(CustomerGroupValidator.Default))
-                    .Add(company!.Validate(nameof(company)).Mandatory().IsValid())
+                    .Add(company.Validate(nameof(company)).Mandatory().IsValid())
                     .Additional((__mv) => _createOnValidate?.Invoke(__mv, value, company))
                     .Run().ThrowOnError();
 
@@ -167,7 +167,7 @@ namespace Beef.Demo.Business
 
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(CustomerGroupValidator.Default))
-                    .Add(company!.Validate(nameof(company)).IsValid())
+                    .Add(company.Validate(nameof(company)).IsValid())
                     .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id, company))
                     .Run().ThrowOnError();
 
@@ -194,8 +194,8 @@ namespace Beef.Demo.Business
                 if (_updateBatchOnPreValidateAsync != null) await _updateBatchOnPreValidateAsync(value, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(value!.Validate(nameof(value)).Mandatory().Collection(minCount: 1, maxCount:1, item: new Beef.Validation.Rules.CollectionRuleItem<CustomerGroup>(CustomerGroupValidator.Default)))
-                    .Add(company!.Validate(nameof(company)).Mandatory().IsValid())
+                    .Add(value.Validate(nameof(value)).Mandatory().Collection(minCount: 1, maxCount:1, item: new Beef.Validation.Rules.CollectionRuleItem<CustomerGroup>(CustomerGroupValidator.Default)))
+                    .Add(company.Validate(nameof(company)).Mandatory().IsValid())
                     .Additional((__mv) => _updateBatchOnValidate?.Invoke(__mv, value, company))
                     .Run().ThrowOnError();
 
@@ -219,8 +219,8 @@ namespace Beef.Demo.Business
                 if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id, company).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(id!.Validate(nameof(id)).Mandatory())
-                    .Add(company!.Validate(nameof(company)).Mandatory().IsValid())
+                    .Add(id.Validate(nameof(id)).Mandatory())
+                    .Add(company.Validate(nameof(company)).Mandatory().IsValid())
                     .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id, company))
                     .Run().ThrowOnError();
 

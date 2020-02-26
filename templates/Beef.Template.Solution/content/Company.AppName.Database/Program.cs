@@ -15,7 +15,12 @@ namespace Company.AppName.Database
         /// <returns>The status code whereby zero indicates success.</returns>
         static Task<int> Main(string[] args)
         {
-            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName").RunAsync(args);
+#if (implement_database)
+            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: true).RunAsync(args);
+#endif
+#if (implement_entityframework)
+            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: false).RunAsync(args);
+#endif
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="First Name")]
         public string? FirstName
         {
-            get => _firstName!;
+            get => _firstName;
             set => SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(FirstName)); 
         }
 
@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Last Name")]
         public string? LastName
         {
-            get => _lastName!;
+            get => _lastName;
             set => SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(LastName)); 
         }
 

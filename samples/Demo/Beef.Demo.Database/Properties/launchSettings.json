@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.Demo.Database": {
       "commandName": "Project",
-      "commandLineArgs": "all",
+      "commandLineArgs": "drop --connectionString \"Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True\"",
       "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Demo\\Beef.Demo.Database"
     }
   }

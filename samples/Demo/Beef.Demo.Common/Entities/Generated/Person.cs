@@ -59,7 +59,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="First Name")]
         public string? FirstName
         {
-            get => _firstName!;
+            get => _firstName;
             set => SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(FirstName)); 
         }
 
@@ -70,7 +70,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Last Name")]
         public string? LastName
         {
-            get => _lastName!;
+            get => _lastName;
             set => SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(LastName)); 
         }
 
@@ -81,7 +81,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Unique Code")]
         public string? UniqueCode
         {
-            get => _uniqueCode!;
+            get => _uniqueCode;
             set => SetValue(ref _uniqueCode, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(UniqueCode)); 
         }
 
@@ -109,7 +109,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Gender")]
         public RefDataNamespace.Gender? Gender
         {
-            get => _genderSid!;
+            get => _genderSid;
             set => SetValue(ref _genderSid, value, false, false, nameof(Gender)); 
         }
 
@@ -137,7 +137,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public RefDataNamespace.EyeColor? EyeColor
         {
-            get => _eyeColorSid!;
+            get => _eyeColorSid;
             set => SetValue(ref _eyeColorSid, value, false, false, nameof(EyeColor)); 
         }
 
@@ -160,7 +160,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Address")]
         public Address? Address
         {
-            get => _address!;
+            get => _address;
             set => SetValue(ref _address, value, false, true, nameof(Address)); 
         }
 
@@ -171,7 +171,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="ETag")]
         public string? ETag
         {
-            get => _eTag!;
+            get => _eTag;
             set => SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag)); 
         }
 
@@ -182,7 +182,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Change Log")]
         public ChangeLog? ChangeLog
         {
-            get => _changeLog!;
+            get => _changeLog;
             set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog)); 
         }
 

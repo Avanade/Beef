@@ -269,7 +269,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(args!.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
+                    .Add(args.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
                     .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
@@ -296,7 +296,7 @@ namespace Beef.Demo.Business
                 if (_getDetailByArgsOnPreValidateAsync != null) await _getDetailByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(args!.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
+                    .Add(args.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
                     .Additional((__mv) => _getDetailByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
@@ -451,7 +451,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsWithEfOnPreValidateAsync != null) await _getByArgsWithEfOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(args!.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
+                    .Add(args.Validate(nameof(args)).Entity(PersonArgsValidator.Default))
                     .Additional((__mv) => _getByArgsWithEfOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 

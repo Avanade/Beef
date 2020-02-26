@@ -56,7 +56,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Model No")]
         public string? ModelNo
         {
-            get => _modelNo!;
+            get => _modelNo;
             set => SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ModelNo)); 
         }
 
@@ -67,7 +67,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Serial No")]
         public string? SerialNo
         {
-            get => _serialNo!;
+            get => _serialNo;
             set => SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SerialNo)); 
         }
 
@@ -95,7 +95,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Eye Color")]
         public RefDataNamespace.EyeColor? EyeColor
         {
-            get => _eyeColorSid!;
+            get => _eyeColorSid;
             set => SetValue(ref _eyeColorSid, value, false, false, nameof(EyeColor)); 
         }
 
@@ -123,7 +123,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Power Source")]
         public RefDataNamespace.PowerSource? PowerSource
         {
-            get => _powerSourceSid!;
+            get => _powerSourceSid;
             set => SetValue(ref _powerSourceSid, value, false, false, nameof(PowerSource)); 
         }
 
@@ -134,7 +134,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="ETag")]
         public string? ETag
         {
-            get => _eTag!;
+            get => _eTag;
             set => SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag)); 
         }
 
@@ -145,7 +145,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Change Log")]
         public ChangeLog? ChangeLog
         {
-            get => _changeLog!;
+            get => _changeLog;
             set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog)); 
         }
 

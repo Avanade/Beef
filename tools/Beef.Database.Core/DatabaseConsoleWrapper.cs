@@ -134,7 +134,7 @@ namespace Beef.Database.Core
             };
 
             var cmd = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            var cs = app.Option("-cs|--connectionString", "Override the database connection string.", CommandOptionType.SingleValue);
+            var cs = app.Option("-cs|--connectionstring", "Override the database connection string.", CommandOptionType.SingleValue);
             var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
             var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
             var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);

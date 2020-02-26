@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Name")]
         public string? Name
         {
-            get => _name!;
+            get => _name;
             set => SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Name)); 
         }
 
@@ -74,7 +74,7 @@ namespace Beef.Demo.Common.Entities
         [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime? EndDate
         {
-            get => _endDate!;
+            get => _endDate;
             set => SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, nameof(EndDate)); 
         }
 

@@ -139,7 +139,7 @@ namespace Beef
         /// <param name="ignoreCase">Indicates whether the comparison should ignore case (default) or not; will use <see cref="string.ToUpper()"/> when selected for comparisons.</param>
         /// <param name="checkForNull">Indicates whether a null check should also be performed before the comparion occurs (defaults to <c>true</c>).</param>
         /// <returns>The resulting (updated) query.</returns>
-        public static IQueryable<TElement> WhereWildcard<TElement>(this IQueryable<TElement> query, Expression<Func<TElement, string>> property, string text, bool ignoreCase = true, bool checkForNull = true)
+        public static IQueryable<TElement> WhereWildcard<TElement>(this IQueryable<TElement> query, Expression<Func<TElement, string?>> property, string? text, bool ignoreCase = true, bool checkForNull = true)
         {
             Check.NotNull(query, nameof(query));
             Check.NotNull(property, nameof(property));

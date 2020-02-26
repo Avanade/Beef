@@ -42,7 +42,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Identifier")]
         public string? Id
         {
-            get => _id!;
+            get => _id;
             set => SetValue(ref _id, value, true, StringTrim.End, StringTransform.EmptyToNull, nameof(Id)); 
         }
 
@@ -70,7 +70,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public RefDataNamespace.Company? Company
         {
-            get => _companySid!;
+            get => _companySid;
             set => SetValue(ref _companySid, value, true, false, nameof(Company)); 
         }
 
@@ -81,7 +81,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string? Description
         {
-            get => _description!;
+            get => _description;
             set => SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description)); 
         }
 
@@ -103,7 +103,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Tax Group")]
         public string? TaxGroup
         {
-            get => _taxGroup!;
+            get => _taxGroup;
             set => SetValue(ref _taxGroup, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(TaxGroup)); 
         }
 

@@ -199,7 +199,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWith<T>(object? with, string name, Func<T> value, ParameterDirection direction = ParameterDirection.Input)
         {
             return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, direction);
         }
@@ -212,7 +212,7 @@ namespace Beef.Data.Database
         /// <param name="dbType">The parameter <see cref="DbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters Param(string name, object value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters Param(string name, object? value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
             AddParameter(name, value, dbType, direction);
             return this;
@@ -252,7 +252,7 @@ namespace Beef.Data.Database
         /// <param name="dbType">The parameter <see cref="DbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWith<T>(object? with, string name, Func<T> value, DbType dbType, ParameterDirection direction = ParameterDirection.Input)
         {
             return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, dbType, direction);
         }
@@ -266,7 +266,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DatabaseParameters Param(string name, object value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters Param(string name, object? value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
             AddParameter(name, value, sqlDbType, direction);
             return this;
@@ -308,7 +308,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DatabaseParameters ParamWith<T>(object with, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWith<T>(object? with, string name, Func<T> value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
             return ParamWhen(with != null && Comparer<T>.Default.Compare((T)with, default!) != 0, name, value, sqlDbType, direction);
         }
@@ -409,7 +409,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value; where not specified the <paramref name="with"/> vaue will be used.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWithWildcard(string with, string name, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWithWildcard(string? with, string name, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -425,7 +425,7 @@ namespace Beef.Data.Database
         /// <param name="value">The parameter value; where not specified the <paramref name="with"/> vaue will be used.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
-        public DatabaseParameters ParamWithWildcard(string with, IDatabasePropertyMapper propertyMapper, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ParamWithWildcard(string? with, IDatabasePropertyMapper propertyMapper, Func<string>? value = null, ParameterDirection direction = ParameterDirection.Input)
         {
             if (propertyMapper == null)
                 throw new ArgumentNullException(nameof(propertyMapper));
@@ -474,9 +474,9 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/> where added; otherwise, <c>null</c>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter? AddRowVersionParameter<T>(string name, T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DbParameter? AddRowVersionParameter<T>(string name, T? value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
-            if (value is IETag etag)
+            if (value != null && value is IETag etag)
                 return AddRowVersionParameter(name, etag.ETag, direction);
 
             return null;
@@ -490,7 +490,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>A <see cref="DbParameter"/> where added; otherwise, <c>null</c>.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DbParameter? AddRowVersionParameter<T>(T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DbParameter? AddRowVersionParameter<T>(T? value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             return AddRowVersionParameter("@" + DatabaseColumns.RowVersionName, value, direction);
         }
@@ -503,7 +503,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DatabaseParameters RowVersionParam(string name, string value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters RowVersionParam(string name, string? value, ParameterDirection direction = ParameterDirection.Input)
         {
             AddRowVersionParameter(name, value, direction);
             return this;
@@ -516,7 +516,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DatabaseParameters RowVersionParam(string value, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters RowVersionParam(string? value, ParameterDirection direction = ParameterDirection.Input)
         {
             AddRowVersionParameter(value, direction);
             return this;
@@ -531,7 +531,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DatabaseParameters RowVersionParam<T>(string name, T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DatabaseParameters RowVersionParam<T>(string name, T? value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             AddRowVersionParameter(name, value, direction);
             return this;
@@ -545,7 +545,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted from an <see cref="HttpUtility.UrlDecode(string)">encoded</see> <see cref="string"/> value.</remarks>
-        public DatabaseParameters RowVersionParam<T>(T value, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DatabaseParameters RowVersionParam<T>(T? value, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             AddRowVersionParameter(value, direction);
             return this;
@@ -625,9 +625,9 @@ namespace Beef.Data.Database
         /// <returns>An <see cref="DbParameter"/> array for those that were added.</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.CreatedByName"/>, <see cref="DatabaseColumns.CreatedDateName"/>,
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
-        public DbParameter[] AddChangeLogParameters<T>(T value, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DbParameter[] AddChangeLogParameters<T>(T? value, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
-            if (!(value is IChangeLog changeLog))
+            if (value == null || !(value is IChangeLog changeLog))
                 return Array.Empty<DbParameter>();
 
             return AddChangeLogParameters(changeLog.ChangeLog, addCreatedParams, addUpdatedParams, direction);
@@ -643,7 +643,7 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.CreatedByName"/>, <see cref="DatabaseColumns.CreatedDateName"/>,
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
-        public DatabaseParameters ChangeLogParams(ChangeLog changeLog, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters ChangeLogParams(ChangeLog? changeLog, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input)
         {
             AddChangeLogParameters(changeLog, addCreatedParams, addUpdatedParams, direction);
             return this;
@@ -660,7 +660,7 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.CreatedByName"/>, <see cref="DatabaseColumns.CreatedDateName"/>,
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
-        public DatabaseParameters ChangeLogParams<T>(T value, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input) where T : class
+        public DatabaseParameters ChangeLogParams<T>(T? value, bool addCreatedParams = false, bool addUpdatedParams = false, ParameterDirection direction = ParameterDirection.Input) where T : class
         {
             AddChangeLogParameters<T>(value, addCreatedParams, addUpdatedParams, direction);
             return this;
@@ -677,7 +677,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>An <see cref="DbParameter"/> array for those that were added.</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.PagingSkipName"/> and <see cref="DatabaseColumns.PagingTakeName"/>.</remarks>
-        public DbParameter[] AddPagingParameters(PagingArgs paging, ParameterDirection direction = ParameterDirection.Input)
+        public DbParameter[] AddPagingParameters(PagingArgs? paging, ParameterDirection direction = ParameterDirection.Input)
         {
             if (paging == null)
                 return Array.Empty<DbParameter>();
@@ -700,7 +700,7 @@ namespace Beef.Data.Database
         /// <param name="direction">The <see cref="ParameterDirection"/> (defaults to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>Uses the following parameter names: <see cref="DatabaseColumns.PagingSkipName"/> and <see cref="DatabaseColumns.PagingTakeName"/>.</remarks>
-        public DatabaseParameters PagingParams(PagingArgs paging, ParameterDirection direction = ParameterDirection.Input)
+        public DatabaseParameters PagingParams(PagingArgs? paging, ParameterDirection direction = ParameterDirection.Input)
         {
             AddPagingParameters(paging, direction);
             return this;
@@ -775,7 +775,7 @@ namespace Beef.Data.Database
         /// <param name="tvp">The <see cref="TableValuedParameter"/>.</param>
         /// <returns>The current <see cref="DatabaseParameters"/> instance to support chaining (fluent interface).</returns>
         /// <remarks>This specifically implies that the <see cref="SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
-        public DatabaseParameters TableValuedParamWith(object with, string name, Func<TableValuedParameter> tvp)
+        public DatabaseParameters TableValuedParamWith(object? with, string name, Func<TableValuedParameter> tvp)
         {
             return TableValuedParamWhen(with != null, name, tvp);
         }

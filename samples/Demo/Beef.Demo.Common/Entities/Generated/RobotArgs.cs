@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Model No")]
         public string? ModelNo
         {
-            get => _modelNo!;
+            get => _modelNo;
             set => SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ModelNo)); 
         }
 
@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Serial No")]
         public string? SerialNo
         {
-            get => _serialNo!;
+            get => _serialNo;
             set => SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SerialNo)); 
         }
 

@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--#if (implement_database) -->
     <EmbeddedResource Include="Schema\**\*" />
+    <!--#endif -->
     <EmbeddedResource Include="Migrations\**\*" />
     <EmbeddedResource Include="Data\**\*" />
   </ItemGroup>

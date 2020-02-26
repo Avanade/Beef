@@ -48,7 +48,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="list">The list.</param>
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
-        public static TableValuedParameter Create(IEnumerable<string> list)
+        public static TableValuedParameter Create(IEnumerable<string?> list)
         {
             return Create(StringListTypeName, list);
         }
@@ -59,22 +59,20 @@ namespace Beef.Data.Database
         /// <param name="typeName">The SQL type name of the table-valued parameter.</param>
         /// <param name="list">The list.</param>
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
-        public static TableValuedParameter Create(string typeName, IEnumerable<string> list)
+        public static TableValuedParameter Create(string typeName, IEnumerable<string?> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            dt.Columns.Add(ListValueColumnName, typeof(string));
+
+            if (list != null)
             {
-                dt.Columns.Add(ListValueColumnName, typeof(string));
-
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        dt.Rows.Add(item);
-                    }
+                    dt.Rows.Add(item);
                 }
-
-                return new TableValuedParameter(typeName, dt);
             }
+
+            return new TableValuedParameter(typeName, dt);
         }
 
         /// <summary>
@@ -95,20 +93,18 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
         public static TableValuedParameter Create(string typeName, IEnumerable<int> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            dt.Columns.Add(ListValueColumnName, typeof(int));
+
+            if (list != null)
             {
-                dt.Columns.Add(ListValueColumnName, typeof(int));
-
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        dt.Rows.Add(item);
-                    }
+                    dt.Rows.Add(item);
                 }
-
-                return new TableValuedParameter(typeName, dt);
             }
+
+            return new TableValuedParameter(typeName, dt);
         }
 
         /// <summary>
@@ -129,20 +125,18 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
         public static TableValuedParameter Create(string typeName, IEnumerable<long> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            dt.Columns.Add(ListValueColumnName, typeof(long));
+
+            if (list != null)
             {
-                dt.Columns.Add(ListValueColumnName, typeof(long));
-
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        dt.Rows.Add(item);
-                    }
+                    dt.Rows.Add(item);
                 }
-
-                return new TableValuedParameter(typeName, dt);
             }
+
+            return new TableValuedParameter(typeName, dt);
         }
 
         /// <summary>
@@ -163,20 +157,18 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
         public static TableValuedParameter Create(string typeName, IEnumerable<Guid> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            dt.Columns.Add(ListValueColumnName, typeof(Guid));
+
+            if (list != null)
             {
-                dt.Columns.Add(ListValueColumnName, typeof(Guid));
-
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        dt.Rows.Add(item);
-                    }
+                    dt.Rows.Add(item);
                 }
-
-                return new TableValuedParameter(typeName, dt);
             }
+
+            return new TableValuedParameter(typeName, dt);
         }
 
         /// <summary>
@@ -197,20 +189,18 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="TableValuedParameter"/>.</returns>
         public static TableValuedParameter Create(string typeName, IEnumerable<DateTime> list)
         {
-            using (var dt = new DataTable())
+            using var dt = new DataTable();
+            dt.Columns.Add(ListValueColumnName, typeof(DateTime));
+
+            if (list != null)
             {
-                dt.Columns.Add(ListValueColumnName, typeof(DateTime));
-
-                if (list != null)
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        dt.Rows.Add(item);
-                    }
+                    dt.Rows.Add(item);
                 }
-
-                return new TableValuedParameter(typeName, dt);
             }
+
+            return new TableValuedParameter(typeName, dt);
         }
 
         #endregion

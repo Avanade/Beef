@@ -61,6 +61,8 @@ namespace Beef.Test.NUnit
                         ConsoleWriteLine(largs.ToString(), ConsoleColor.Cyan);
                         break;
                 }
+
+                TestContext.Progress.WriteLine(largs.ToString());
             });
         }
 

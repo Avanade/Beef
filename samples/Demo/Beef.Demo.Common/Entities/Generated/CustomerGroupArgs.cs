@@ -56,7 +56,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Company")]
         public RefDataNamespace.Company? Company
         {
-            get => _companySid!;
+            get => _companySid;
             set => SetValue(ref _companySid, value, false, false, nameof(Company)); 
         }
 
@@ -67,7 +67,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Description")]
         public string? Description
         {
-            get => _description!;
+            get => _description;
             set => SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description)); 
         }
 

@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Beef.Demo.Test
 {
-    [TestFixture, NonParallelizable]
+    [TestFixture, Parallelizable(ParallelScope.Children)]
     public class StartUpTest
     {
         [OneTimeSetUp]

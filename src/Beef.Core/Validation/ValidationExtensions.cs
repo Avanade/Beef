@@ -703,8 +703,8 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Entity<TEntity, TProperty, TValidator>(this PropertyRuleBase<TEntity, TProperty> rule, TValidator validator)
             where TEntity : class
-            where TProperty : class
-            where TValidator : Validator<TProperty>
+            where TProperty : class?
+            where TValidator : IValidator
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new EntityRule<TEntity, TProperty, TValidator>(validator));
         }

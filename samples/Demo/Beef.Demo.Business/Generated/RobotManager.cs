@@ -177,7 +177,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Add(args!.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
+                    .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
                     .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 

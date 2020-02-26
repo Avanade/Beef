@@ -55,7 +55,7 @@ namespace Beef.Database.Core
             App.HelpOption(true);
 
             _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _connectionStringArg = App.Argument("connectionString", "Database connection string.").IsRequired();
+            _connectionStringArg = App.Argument("connectionstring", "Database connection string.").IsRequired();
             App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
 

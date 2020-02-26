@@ -37,7 +37,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="History")]
         public WorkHistoryCollection? History
         {
-            get => _history!;
+            get => _history;
             set => SetValue(ref _history, value, false, true, nameof(History)); 
         }
 

@@ -13,7 +13,7 @@ namespace Company.AppName.Business.Data
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider.</param>
-        public Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        public Database(string connectionString, DbProviderFactory? provider = null) : base(connectionString, provider) { }
 
         /// <summary>
         /// Set the SQL Session Context when the connection is opened.

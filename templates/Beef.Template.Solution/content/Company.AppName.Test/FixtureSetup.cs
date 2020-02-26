@@ -43,7 +43,7 @@ namespace Company.AppName.Test
 #endif
 #if (implement_cosmos)
         private bool _removeAfterUse;
-        private CosmosDb _cosmosDb;
+        private CosmosDb? _cosmosDb;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -84,8 +84,8 @@ namespace Company.AppName.Test
         [OneTimeTearDown]
         public async Task OneTimeTearDown()
         {
-            if (_removeAfterUse)
-                await _cosmosDb.Database.DeleteAsync();
+            if (_cosmosDb != null && _removeAfterUse)
+                await _cosmosDb.Database.DeleteAsync().ConfigureAwait(false);
         }
 #endif
     }

@@ -38,7 +38,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="Street")]
         public string? Street
         {
-            get => _street!;
+            get => _street;
             set => SetValue(ref _street, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Street)); 
         }
 
@@ -49,7 +49,7 @@ namespace Beef.Demo.Common.Entities
         [Display(Name="City")]
         public string? City
         {
-            get => _city!;
+            get => _city;
             set => SetValue(ref _city, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(City)); 
         }
 

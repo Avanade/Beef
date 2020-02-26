@@ -348,10 +348,10 @@ namespace Beef.Data.Database
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by source property name (see <see cref="EntitySrceMapper{TSrce}.GetBySrcePropertyName"/>).
         /// </summary>
         /// <param name="sourcePropertyName">The source property name.</param>
-        /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IDatabasePropertyMapper<TSrce>? this[string sourcePropertyName]
+        /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, throws an <see cref="ArgumentException"/>.</returns>
+        public IDatabasePropertyMapper<TSrce> this[string sourcePropertyName]
         {
-            get { return (IDatabasePropertyMapper<TSrce>)GetBySrcePropertyName(sourcePropertyName)!; }
+            get { return (IDatabasePropertyMapper<TSrce>)(GetBySrcePropertyName(Check.NotEmpty(sourcePropertyName, nameof(sourcePropertyName))) ?? throw new ArgumentException($"Source property `{sourcePropertyName}` does not exist.", nameof(sourcePropertyName))); }
         }
 
         /// <summary>
