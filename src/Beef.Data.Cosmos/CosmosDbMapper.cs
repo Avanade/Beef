@@ -88,7 +88,7 @@ namespace Beef.Data.Cosmos
         /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
         public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, requestOptions);
+            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, requestOptions);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Beef.Data.Cosmos
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
         public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey, QueryRequestOptions? requestOptions = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, paging, requestOptions);
+            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Beef.Data.Cosmos
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
         public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey ?? PartitionKey.None, paging, requestOptions);
+            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
         }
 
         /// <summary>

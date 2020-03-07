@@ -74,7 +74,9 @@ namespace Beef.CodeGen.Loaders
             if (itemConfig == null)
                 throw new CodeGenException($"Attribute value references Property '{propertyName}' that does not exist for Entity.");
 
-            config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
+            config.AttributeAdd("ArgumentName", itemConfig.Attributes["ArgumentName"]);
+            config.AttributeAdd("PrivateName", itemConfig.Attributes["PrivateName"]);
+            config.AttributeAdd("JsonName", itemConfig.Attributes["JsonName"]);
             config.AttributeAdd("Text", itemConfig.Attributes["Text"]);
             config.AttributeAdd("Type", itemConfig.Attributes["Type"]);
             config.AttributeAdd("LayerPassing", "All");

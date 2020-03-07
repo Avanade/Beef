@@ -94,8 +94,20 @@ namespace Beef.Data.Cosmos
         /// </summary>
         private void CheckAuthorized(TModel model)
         {
-            if (model != default && DbArgs.AuthorizationFilter != null && !((IQueryable<TModel>)DbArgs.AuthorizationFilter(new TModel[] { model }.AsQueryable())).Any())
-                throw new AuthorizationException();
+            if (model != default)
+            {
+                if (DbArgs.AuthorizeFilter != null)
+                {
+                    if (!((IQueryable<TModel>)DbArgs.AuthorizeFilter(new TModel[] { model }.AsQueryable())).Any())
+                        throw new AuthorizationException();
+                }
+                else
+                {
+                    var filter = CosmosDb.GetAuthorizeFilter<TModel>(Container.Id);
+                    if (filter != null && !((IQueryable<TModel>)filter(new TModel[] { model }.AsQueryable())).Any())
+                        throw new AuthorizationException();
+                }
+            }
         }
 
         #region Query
@@ -129,7 +141,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c> (see <see cref="ICosmosDbArgs.NullOnNotFoundResponse"/>).</returns>
-        public async Task<T?> GetAsync(params IComparable[] keys)
+        public async Task<T?> GetAsync(params IComparable?[] keys)
         {
             var key = DbArgs.GetCosmosKey(keys);
 
@@ -137,7 +149,7 @@ namespace Beef.Data.Cosmos
             {
                 try
                 {
-                    var val = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
+                    var val = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey ?? PartitionKey.None, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
                     CheckAuthorized(val);
                     return GetResponseValue(val);
                 }
@@ -199,7 +211,7 @@ namespace Beef.Data.Cosmos
                 CosmosDbBase.PrepareEntityForUpdate(value);
                     
                 // Must read existing to update.
-                var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
+                var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey ?? PartitionKey.None, ro).ConfigureAwait(false);
                 CheckAuthorized(resp);
 
                 ro.SessionToken = resp.Headers?.Session;
@@ -218,7 +230,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync(params IComparable[] keys)
+        public async Task DeleteAsync(params IComparable?[] keys)
         {
             var key = DbArgs.GetCosmosKey(keys);
 
@@ -228,12 +240,12 @@ namespace Beef.Data.Cosmos
                 {
                     // Must read the existing to validate.
                     var ro = CosmosDb.GetItemRequestOptions(DbArgs);
-                    var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
+                    var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey ?? PartitionKey.None, ro).ConfigureAwait(false);
                     if (resp?.Resource == null)
                         return;
 
                     CheckAuthorized(resp.Resource);
-                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
+                    await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey ?? PartitionKey.None, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
                 }
                 catch (CosmosException cex)
                 {

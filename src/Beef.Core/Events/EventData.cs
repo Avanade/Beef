@@ -35,7 +35,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
-        public static EventData<T> Create<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
+        public static EventData<T> Create<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs) where T : class
         {
             return (EventData<T>)ApplySubjectTemplate(new EventData<T> { Value = Check.NotNull(value, nameof(value)) }, Check.NotEmpty(template, nameof(template)), action, keyValuePairs);
         }
@@ -71,7 +71,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create<T>(T value, string subject, string? action = null)
+        public static EventData Create<T>(T value, string subject, string? action = null) where T : class
         {
             Check.NotNull(value, nameof(value));
 

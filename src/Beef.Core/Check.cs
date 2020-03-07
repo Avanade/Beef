@@ -19,7 +19,7 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <returns>The value.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="value"/> is null.</exception>
-        public static T NotNull<T>(T value, string paramName, string? message = null)
+        public static T NotNull<T>(T? value, string paramName, string? message = null) where T : class
         {
             if (value == null)
                 throw new ArgumentNullException(paramName, message);

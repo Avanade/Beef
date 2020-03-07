@@ -60,7 +60,19 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Apply the authorization filter where configured.
         /// </summary>
-        private IQueryable<CosmosDbValue<TModel>> AuthorizationFilter(IQueryable<CosmosDbValue<TModel>> q) => QueryArgs.AuthorizationFilter == null ? q : (IQueryable<CosmosDbValue<TModel>>)QueryArgs.AuthorizationFilter(q);
+        private IQueryable<CosmosDbValue<TModel>> AuthorizationFilter(IQueryable<CosmosDbValue<TModel>> q)
+        {
+            if (QueryArgs.AuthorizeFilter != null)
+                return (IQueryable<CosmosDbValue<TModel>>)QueryArgs.AuthorizeFilter(q);
+            else
+            {
+                var filter = _container.CosmosDb.GetAuthorizeFilter<TModel>(_container.Container.Id);
+                if (filter != null)
+                    return (IQueryable<CosmosDbValue<TModel>>)filter(q);
+            }
+
+            return q;
+        }
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.

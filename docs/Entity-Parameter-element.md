@@ -62,7 +62,7 @@ The following represents the **Web API** attributes:
 
 Attribute | Description
 ---|---
-`WebApiFrom` | Specifies how the parameter will be declared. Options are: `FromUri` (passed as part of the URI), `FromBody` (passed as the content body), `FromUriUseProperties` (passed as individual parameters as defined within the specified entity - within the same XML configuration file), and `FromUriJsonBinder` (now obsolete). The default is `FromUri`.
+`WebApiFrom` | Specifies how the parameter will be declared. Options are: `FromQuery` (passed as part of the query string), `FromBody` (passed as the content body), `FromUriUseProperties` or `FromEntityProperties` (passed as individual parameters as defined within the specified entity - within the same XML configuration file), and `FromRoute` (passed as part of the route). The default is `FromQuery`.
 
 <br>
 

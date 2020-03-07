@@ -25,7 +25,7 @@ namespace Beef.Data.Cosmos
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional.</remarks>
-        public static async Task ImportBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, PartitionKey? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
+        public static async Task ImportBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, Func<TModel, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -36,7 +36,7 @@ namespace Beef.Data.Cosmos
             foreach (var item in items)
             {
                 CosmosDbBase.PrepareEntityForCreate(item, false);
-                await container.CreateItemAsync(item, partitionKey ?? PartitionKey.None, itemRequestOptions).ConfigureAwait(false);
+                await container.CreateItemAsync(item, partitionKey?.Invoke(item), itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Beef.Data.Cosmos
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional.</remarks>
-        public static async Task ImportValueBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, PartitionKey? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
+        public static async Task ImportValueBatchAsync<TModel>(this Container container, IEnumerable<TModel> items, Func<TModel, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -63,7 +63,7 @@ namespace Beef.Data.Cosmos
                 var cdv = new CosmosDbValue<TModel>(item);
                 CosmosDbBase.PrepareEntityForCreate(cdv.Value, false);
                 ((ICosmosDbValue)cdv).PrepareBefore();
-                await container.CreateItemAsync(cdv, partitionKey ?? PartitionKey.None, itemRequestOptions).ConfigureAwait(false);
+                await container.CreateItemAsync(cdv, partitionKey?.Invoke(item), itemRequestOptions).ConfigureAwait(false);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Beef.Data.Cosmos
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional.</remarks>
-        public static async Task ImportBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string? name = null, PartitionKey? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
+        public static async Task ImportBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string? name = null, Func<TModel, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -101,7 +101,7 @@ namespace Beef.Data.Cosmos
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional.</remarks>
-        public static async Task ImportValueBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string? name = null, PartitionKey? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
+        public static async Task ImportValueBatchAsync<TResource, TModel>(this Container container, string yamlResourceName, string? name = null, Func<TModel, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null) where TModel : class, new()
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -139,7 +139,7 @@ namespace Beef.Data.Cosmos
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional. Also, the data is created using a <see cref="CosmosDbValue{ReferenceDataBase}"/> so that multiple reference data types
         /// can co-exist within the same collection.</remarks>
-        public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, IReferenceDataProvider refData, string yamlResourceName, PartitionKey? partitionKey = null, ItemRequestOptions? itemRequestOptions = null)
+        public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, IReferenceDataProvider refData, string yamlResourceName, Func<ReferenceDataBase, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null)
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -162,7 +162,7 @@ namespace Beef.Data.Cosmos
                 var vals = (System.Collections.IEnumerable?)yt.GetMethod("Convert")?.MakeGenericMethod(rdt).Invoke(yc, new object[] { rdt.Name, true, true, true, null! });
                 if (vals != null)
                 {
-                    var r = emi.MakeGenericMethod(rdt).Invoke(null, new object[] { container, vals!, partitionKey ?? PartitionKey.None, itemRequestOptions! });
+                    var r = emi.MakeGenericMethod(rdt).Invoke(null, new object[] { container, vals!, partitionKey!, itemRequestOptions! });
                     if (r != null)
                         await ((Task)r).ConfigureAwait(false);
                 }

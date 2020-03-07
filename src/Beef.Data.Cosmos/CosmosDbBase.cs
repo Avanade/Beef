@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -79,6 +80,20 @@ namespace Beef.Data.Cosmos
     {
         private Action<RequestOptions>? _updateRequestOptionsAction;
         private Action<QueryRequestOptions>? _updateQueryRequestOptionsAction;
+        private readonly ConcurrentDictionary<Key, Func<IQueryable, IQueryable>> _filters = new ConcurrentDictionary<Key, Func<IQueryable, IQueryable>>();
+
+        private struct Key
+        {
+            public Key(Type modelType, string containerId)
+            {
+                ModelType = modelType;
+                ContainerId = containerId;
+            }
+
+            public Type ModelType { get; set; }
+
+            public string ContainerId { get; set; }
+        }
 
         #region Static
 
@@ -112,7 +127,7 @@ namespace Beef.Data.Cosmos
         public static void ReformatValueETag(object value)
         {
             if (value is IETag etag && etag.ETag != null)
-                etag.ETag = (etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) && etag.ETag.EndsWith("\"", StringComparison.InvariantCultureIgnoreCase)) ? etag.ETag.Substring(1, etag.ETag.Length - 2) : etag.ETag;
+                etag.ETag = (etag.ETag.StartsWith("\"", StringComparison.InvariantCultureIgnoreCase) && etag.ETag.EndsWith("\"", StringComparison.InvariantCultureIgnoreCase)) ? etag.ETag[1..^1] : etag.ETag;
         }
 
         /// <summary>
@@ -252,6 +267,47 @@ namespace Beef.Data.Cosmos
             return await Database.CreateContainerIfNotExistsAsync(containerProperties, throughput).ConfigureAwait(false);
         }
 
+        #region AuthorizeFilter
+
+        /// <summary>
+        /// Sets the filter for all operations performed on the <typeparamref name="TModel"/> for the specified <paramref name="containerId"/> to ensure authorisation is applied. Applies automatically 
+        /// to all queries, plus create, update, delete and get operations. Can be overridden for a specific instance using the <see cref="CosmosDbArgs{T, TModel}.SetAuthorizeFilter(Func{IQueryable, IQueryable})"/>.
+        /// </summary>
+        /// <typeparam name="TModel">The model <see cref="Type"/> persisted within the container.</typeparam>
+        /// <param name="containerId">The <see cref="Microsoft.Azure.Cosmos.Container"/> identifier.</param>
+        /// <param name="filter">The filter query.</param>
+        public void SetAuthorizeFilter<TModel>(string containerId, Func<IQueryable, IQueryable> filter)
+        {
+            if (!_filters.TryAdd(new Key(typeof(TModel), Check.NotEmpty(containerId, nameof(containerId))), Check.NotNull(filter, nameof(filter))))
+                throw new InvalidOperationException("A filter cannot be overridden; it must be removed (RemoveAuthorizeFilter) then set (SetAuthorizeFilter).");
+        }
+
+        /// <summary>
+        /// Gets the filter.
+        /// </summary>
+        /// <typeparam name="TModel">The model <see cref="Type"/> persisted within the container.</typeparam>
+        /// <param name="containerId">The <see cref="Microsoft.Azure.Cosmos.Container"/> identifier.</param>
+        /// <returns>The filter query where found; otherwise, <c>null</c>.</returns>
+        public Func<IQueryable, IQueryable>? GetAuthorizeFilter<TModel>(string containerId)
+        {
+            if (_filters.TryGetValue(new Key(typeof(TModel), Check.NotEmpty(containerId, nameof(containerId))), out var filter))
+                return filter;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Removes the specified filter.
+        /// </summary>
+        /// <typeparam name="TModel">The model <see cref="Type"/> persisted within the container.</typeparam>
+        /// <param name="containerId">The <see cref="Microsoft.Azure.Cosmos.Container"/> identifier.</param>
+        public void RemoveAuthorizeFilter<TModel>(string containerId)
+        {
+            _filters.TryRemove(new Key(typeof(TModel), Check.NotEmpty(containerId, nameof(containerId))), out _);
+        }
+
+        #endregion
+
         #region RequestOptions
 
         /// <summary>
@@ -319,9 +375,12 @@ namespace Beef.Data.Cosmos
         /// <typeparam name="T">The entiy <see cref="Type"/>.</typeparam>
         /// <typeparam name="TModel">The cosmos model <see cref="Type"/>.</typeparam>
         /// <param name="dbArgs">The <see cref="CosmosDbArgs{T, TModel}"/>.</param>
-        internal protected QueryRequestOptions GetQueryRequestOptions<T, TModel>(CosmosDbArgs<T, TModel>? dbArgs = null) where T : class, new() where TModel : class, new()
+        internal protected QueryRequestOptions GetQueryRequestOptions<T, TModel>(CosmosDbArgs<T, TModel> dbArgs) where T : class, new() where TModel : class, new()
         {
-            var ro = dbArgs != null && dbArgs.QueryRequestOptions != null ? dbArgs.QueryRequestOptions : new QueryRequestOptions() { MaxConcurrency = 2 };
+            if (dbArgs == null)
+                throw new ArgumentNullException(nameof(dbArgs));
+
+            var ro = dbArgs != null && dbArgs.QueryRequestOptions != null ? dbArgs.QueryRequestOptions : new QueryRequestOptions() { PartitionKey = dbArgs!.PartitionKey };
             UpdateQueryRequestOptions(ro);
             return ro;
         }

@@ -113,9 +113,9 @@
   </Entity>
 
   <Entity Name="RobotArgs" Text="{{Robot}} arguments" ExcludeAll="true">
-    <Property Name="ModelNo" Text="Model number" Type="string" />
-    <Property Name="SerialNo" Text="Unique serial number" Type="string" />
-    <Property Name="PowerSources" Type="RefDataNamespace.PowerSource" RefDataType="string" RefDataList="true" />
+    <Property Name="ModelNo" JsonName="model-no" Text="Model number" Type="string" />
+    <Property Name="SerialNo" JsonName="serial-no" Text="Unique serial number" Type="string" />
+    <Property Name="PowerSources" JsonName="power-sources" Type="RefDataNamespace.PowerSource" RefDataType="string" RefDataList="true" />
   </Entity>
 
   <!-- ODATA D365 -->

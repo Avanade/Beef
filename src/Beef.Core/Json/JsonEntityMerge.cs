@@ -174,7 +174,7 @@ namespace Beef.Json
         /// <param name="value">The value to merge into.</param>
         /// <param name="args">The <see cref="JsonEntityMergeArgs"/>.</param>
         /// <returns><c>true</c> indicates that a least one change was made to the value; otherwise, <c>false</c>.</returns>
-        public static JsonEntityMergeResult Merge<TEntity>(JToken json, TEntity value, JsonEntityMergeArgs? args = null)
+        public static JsonEntityMergeResult Merge<TEntity>(JToken json, TEntity value, JsonEntityMergeArgs? args = null) where TEntity : class
         {
             Check.NotNull(json, nameof(json));
             Check.NotNull(value, nameof(value));

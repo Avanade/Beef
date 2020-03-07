@@ -1,0 +1,10 @@
+Banking:
+  - Account:
+    - { id: 12345678, creationDate: 1985-03-18, displayName: Savings, nickname: Save, openStatus: OPEN, isOwned: true, maskedNumber: XXXXXX78, productCategory: TRANS_AND_SAVINGS_ACCOUNTS,
+        bsb: 020780, accountNumber: 12345678, balance: { currentBalance: 1030.50, availableBalance: 640.32 }, creditCard: { minPaymentAmount: 100, paymentDueAmount: 326.59, paymentDueDate: 2020-06-01 } }
+    - { id: 23456789, creationDate: 2012-11-14, displayName: Savings, nickname: Save, openStatus: OPEN, isOwned: true, maskedNumber: XXXXXX89, productCategory: TRANS_AND_SAVINGS_ACCOUNTS,
+        bsb: 020780, accountNumber: 23456789, balance: { currentBalance: 912.80, availableBalance: 912.80 } }
+    - { id: 34567890, creationDate: 2015-06-03, displayName: Credit Carn, nickname: Credit, openStatus: OPEN, isOwned: true, maskedNumber: XXXXXX90, productCategory: CRED_AND_CHRG_CARDS,
+        bsb: 020780, accountNumber: 34567890, balance: { currentBalance: -32.50, availableBalance: 0.00 } }
+    - { id: 45678901, creationDate: 1973-02-28, displayName: Loan, nickname: Loan, openStatus: Closed, isOwned: false, maskedNumber: XXXXXX01, productCategory: PERS_LOANS,
+        bsb: 020780, accountNumber: 34567890, balance: { currentBalance: 0.00, availableBalance: 0.00 } }

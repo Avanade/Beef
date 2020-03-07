@@ -31,6 +31,11 @@ namespace Beef
         public const char SpaceCharacter = ' ';
 
         /// <summary>
+        /// Gets the <see cref="WildcardSelection.None"/> and <see cref="WildcardSelection.Single"/> <see cref="Wildcard"/>; i.e does not directly support any wildcard characters.
+        /// </summary>
+        public static Wildcard None { get; } = new Wildcard(WildcardSelection.None | WildcardSelection.Equal);
+
+        /// <summary>
         /// Gets the <see cref="WildcardSelection.MultiBasic"/> <see cref="Wildcard"/> using only the <see cref="MultiWildcardCharacter"/>.
         /// </summary>
         public static Wildcard MultiBasic { get; } = new Wildcard(WildcardSelection.MultiBasic, MultiWildcardCharacter);

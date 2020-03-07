@@ -108,7 +108,7 @@ namespace Beef.Demo.Api.Controllers
         [Route("")]
         [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public IActionResult GetByArgs(string? modelNo = default, string? serialNo = default, List<string>? powerSources = default)
+        public IActionResult GetByArgs([FromQuery(Name = "model-no")] string? modelNo = default, [FromQuery(Name = "serial-no")] string? serialNo = default, [FromQuery(Name = "power-sources")] List<string>? powerSources = default)
         {
             var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo, PowerSourcesSids = powerSources };
             return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => Factory.Create<IRobotManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),

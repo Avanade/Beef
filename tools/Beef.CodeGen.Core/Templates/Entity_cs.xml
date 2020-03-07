@@ -242,7 +242,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
 ]]>
           </Else>
         </If>
-        <If Condition="Property.DisplayName != null">
+        <If Condition="Property.DisplayName != null and Entity.OmitEntityBase == false">
           <![CDATA[        [Display(Name="{{Property.DisplayName}}")]
 ]]>
         </If>
@@ -359,45 +359,47 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         <![CDATA[        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
 ]]>
       </If>
-      <If Condition="Property.DisplayName != null">
+      <If Condition="Property.DisplayName != null and Entity.OmitEntityBase == false">
         <![CDATA[        [Display(Name="{{Property.DisplayName}}")]
 ]]>
       </If>
-      <If Condition="Property.DataFormatString != null and Entity.OmitEntityBase == false">
-        <Then>
-          <![CDATA[        [DisplayFormat(DataFormatString = "{{Property.DataFormatString}}")]
+      <If Condition="Entity.OmitEntityBase == false">
+        <If Condition="Property.DataFormatString != null">
+          <Then>
+            <![CDATA[        [DisplayFormat(DataFormatString = "{{Property.DataFormatString}}")]
 ]]>
-        </Then>
-        <Else>
-          <If Condition="Property.Type == 'DateTime'">
-            <Then>
-              <If Condition="Property.DateTimeTransform == 'DateOnly'">
-                <Then>
-                  <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
+          </Then>
+          <Else>
+            <If Condition="Property.Type == 'DateTime'">
+              <Then>
+                <If Condition="Property.DateTimeTransform == 'DateOnly'">
+                  <Then>
+                    <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
 ]]>
-                </Then>
-                <Else>
-                  <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
+                  </Then>
+                  <Else>
+                    <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
 ]]>
-                </Else>
-              </If>
-            </Then>
-          </If>
-          <If Condition="Property.Type == 'DateTimeOffset'">
-            <Then>
-              <If Condition="Property.DateTimeTransform == 'DateOnly'">
-                <Then>
-                  <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
+                  </Else>
+                </If>
+              </Then>
+            </If>
+            <If Condition="Property.Type == 'DateTimeOffset'">
+              <Then>
+                <If Condition="Property.DateTimeTransform == 'DateOnly'">
+                  <Then>
+                    <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
 ]]>
-                </Then>
-                <Else>
-                  <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeOffsetFormat)]
+                  </Then>
+                  <Else>
+                    <![CDATA[        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeOffsetFormat)]
 ]]>
-                </Else>
-              </If>
-            </Then>
-          </If>
-        </Else>
+                  </Else>
+                </If>
+              </Then>
+            </If>
+          </Else>
+        </If>
       </If>
       <If Condition="Property.Annotation1 != null">
         <![CDATA[        {{Property.Annotation1}}

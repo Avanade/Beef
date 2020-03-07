@@ -135,7 +135,7 @@ Attribute | Description
 `CosmosName` | Specifies the .NET Cosmos DB wrapper instance name where `AutoImplement` is `Cosmos`. Defaults to `CodeGeneration.CosmosName` (`CosmosDb`).
 `CosmosEntity` | Specifies the corresponding Cosmos entity/model name. Defaults to `Name` (i.e. the same type).
 `CosmosContainerId` | Specifies the Cosmos ContainerId name where `AutoImplement` is `Cosmos`.
-`CosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'.
+`CosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'. Defaults to `PartitionKey.None` where not specified. Can also be overridden for a specific operation using `Operation.DataCosmosPartitionKey`.
 `DataCosmosValueContainer` | Indicates that the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer` (default).
 `DataCosmosMapperInheritsFrom` | Specifies the mapper that the generated Cosmos mapper inherits from.
 `DataCosmosCustomMapper` | Indicates that a custom Cosmos `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.

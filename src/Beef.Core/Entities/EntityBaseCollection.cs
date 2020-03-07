@@ -113,7 +113,6 @@ namespace Beef.Entities
         /// <returns>The first item where found; otherwise, <c>null</c>.</returns>
         public TEntity GetByUniqueKey(UniqueKey key)
         {
-            Check.NotNull(key, nameof(key));
             return Items.Where(x => x.HasUniqueKey && key.Equals(x.UniqueKey)).FirstOrDefault();
         }
 

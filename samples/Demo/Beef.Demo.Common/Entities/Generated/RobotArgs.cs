@@ -35,7 +35,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the Model number.
         /// </summary>
-        [JsonProperty("modelNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("model-no", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Model No")]
         public string? ModelNo
         {
@@ -46,7 +46,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the Unique serial number.
         /// </summary>
-        [JsonProperty("serialNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("serial-no", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Serial No")]
         public string? SerialNo
         {
@@ -57,7 +57,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="PowerSources"/> list using the underlying Serialization Identifier (SID).
         /// </summary>
-        [JsonProperty("powerSources", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("power-sources", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Power Sources")]
         public List<string>? PowerSourcesSids
         {

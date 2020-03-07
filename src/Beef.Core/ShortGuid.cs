@@ -57,7 +57,6 @@ namespace Beef
         /// <param name="g">The <see cref="Guid"/>.</param>
         public ShortGuid(Guid g)
         {
-            Check.NotNull(g, nameof(g));
             _guid = g;
         }
 
@@ -84,7 +83,6 @@ namespace Beef
         /// <returns>The corresponding <see cref="Guid"/>.</returns>
         public static implicit operator Guid(ShortGuid value)
         {
-            Check.NotNull(value, nameof(value));
             return value._guid;
         }
 
@@ -101,7 +99,6 @@ namespace Beef
         /// <returns>The corresponding Base64 encoded GUID <see cref="string"/>.</returns>
         public static implicit operator string(ShortGuid value)
         {
-            Check.NotNull(value, nameof(value));
             return value.ToString();
         }
 

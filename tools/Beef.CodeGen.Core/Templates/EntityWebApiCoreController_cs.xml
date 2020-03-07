@@ -152,12 +152,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
               <Entity FullSearch="true" Condition="Entity.Name == System.PropertyType">
                 <Set Name="System.MakeFromUriUseProperties" Value="true"/>
               </Entity>
-              <Set Name="Parameter.WebApiFrom" Condition="System.MakeFromUriUseProperties == true" Value="'FromUriUseProperties'"/>
+              <Set Name="Parameter.WebApiFrom" Condition="System.MakeFromUriUseProperties == true" Value="'FromEntityProperties'"/>
             </If>
           </Parameter>
 
           <Parameter>
-            <If Condition="Parameter.WebApiFrom == 'FromUriUseProperties'">
+            <If Condition="Parameter.WebApiFrom == 'FromUriUseProperties' or Parameter.WebApiFrom == 'FromEntityProperties'">
               <Then>
                 <Set Name="System.PropertyType" Value="Parameter.Type" />
                 <Entity FullSearch="true" Condition="Entity.Name == System.PropertyType">
@@ -459,13 +459,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 <![CDATA[, ]]>
               </Else>
             </If>
-            <If Condition="Parameter.WebApiFrom == 'FromUriUseProperties'">
+            <If Condition="Parameter.WebApiFrom == 'FromUriUseProperties' or Parameter.WebApiFrom == 'FromEntityProperties'">
               <Then>
                 <Set Name="System.PropertyType" Value="Parameter.Type" />
                 <Entity FullSearch="true" Condition="Entity.Name == System.PropertyType">
                   <Property>
                     <If Condition="System.NeedsComma == true">
                       <![CDATA[, ]]>
+                    </If>
+                    <If Condition="Property.JsonName != null and Property.JsonName != Property.ArgumentName">
+                      <![CDATA[[FromQuery(Name = "{{Property.JsonName}}")] ]]>
                     </If>
                     <If Condition="Property.RefDataType == null">
                       <Then>
@@ -493,11 +496,18 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 </Entity>
               </Then>
               <Else>
-                <If Condition="Parameter.WebApiFrom != null">
-                  <If Condition="Parameter.WebApiFrom == 'FromUriJsonBinder'">
-                    <Then><![CDATA[[ModelBinder(typeof(FromUriJsonBinder))] ]]></Then>
-                    <Else><![CDATA[[{{Parameter.WebApiFrom}}] ]]></Else>
-                  </If>
+                <If Condition="Parameter.WebApiFrom == null or Parameter.WebApiFrom == 'FromQuery'">
+                  <Then>
+                    <If Condition="Parameter.JsonName != null and Parameter.JsonName != Parameter.ArgumentName">
+                      <![CDATA[[FromQuery(Name = "{{Property.JsonName}}")] ]]>
+                    </If>
+                  </Then>
+                  <Else>
+                    <If Condition="Parameter.WebApiFrom == 'FromUriJsonBinder'">
+                      <Then><![CDATA[[ModelBinder(typeof(FromUriJsonBinder))] ]]></Then>
+                      <Else><![CDATA[[{{Parameter.WebApiFrom}}] ]]></Else>
+                    </If>
+                  </Else>
                 </If>
                 <If Condition="Parameter.RefDataType == null">
                   <Then><![CDATA[{{Parameter.Type}}]]></Then>
@@ -518,7 +528,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
           <![CDATA[)
         {
 ]]>
-          <Parameter Condition="Parameter.WebApiFrom == 'FromUriUseProperties'">
+          <Parameter Condition="Parameter.WebApiFrom == 'FromUriUseProperties' or Parameter.WebApiFrom == 'FromEntityProperties'">
             <![CDATA[            var {{Parameter.ArgumentName}} = new {{Parameter.Type}} { ]]>
             <Entity FullSearch="true" Condition="Entity.Name == System.PropertyType">
               <Property>

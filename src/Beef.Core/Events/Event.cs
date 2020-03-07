@@ -159,7 +159,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>he <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
+        public static Task PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs) where T : class
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;
@@ -175,7 +175,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string subject, string? action = null)
+        public static Task PublishAsync<T>(T value, string subject, string? action = null) where T : class
         {
             if (_publishFuncs.Count == 0)
                 return Task.CompletedTask;

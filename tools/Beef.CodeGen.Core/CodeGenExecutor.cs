@@ -239,7 +239,7 @@ namespace Beef.CodeGen
                     return; 
 
                 var prevContent = File.ReadAllText(fi.FullName);
-                if (string.Compare(e.Content, prevContent, StringComparison.InvariantCultureIgnoreCase) == 0)
+                if (string.Compare(e.Content, prevContent, StringComparison.InvariantCulture) == 0)
                 {
                     NotChangedCount++;
                     return;

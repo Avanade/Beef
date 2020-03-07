@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Template OutputGenDirName="Generated" >
+  <Set Name="Config.MapperDefaultRefDataConverter" Condition="Config.MapperDefaultRefDataConverter == null" Value="'ReferenceDataCodeConverter'" />
   <Entity>
     <Set Name="System.EntityName" Value="Entity.Name" />
     <Set Name="System.EntityExclude" Condition="Entity.ExcludeAll == true" Value="true" Otherwise="false" />
@@ -582,9 +583,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <If Condition="Operation.PagingArgs == true">
                 <![CDATA[, __result.Paging!]]>
               </If>
-              <If Condition="Entity.CosmosPartitionKey == null">
-                <Then><![CDATA[, PartitionKey.None]]></Then>
-                <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>
+              <If Condition="Operation.DataCosmosPartitionKey == null">
+                <Then>
+                  <If Condition="Entity.CosmosPartitionKey == null">
+                    <Then><![CDATA[, PartitionKey.None]]></Then>
+                    <Else><![CDATA[, new PartitionKey({{Entity.CosmosPartitionKey}})]]></Else>
+                  </If>
+                </Then>
+                <Else>
+                  <![CDATA[, new PartitionKey({{Operation.DataCosmosPartitionKey}})]]>
+                </Else>
               </If>
               <![CDATA[);
                 _onDataArgsCreate?.Invoke(__dataArgs);]]>

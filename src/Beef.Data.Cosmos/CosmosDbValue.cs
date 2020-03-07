@@ -19,7 +19,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the model value.
         /// </summary>
-        object? Value { get; }
+        object Value { get; }
 
         /// <summary>
         /// Prepares the object before sending to Cosmos.
@@ -39,21 +39,17 @@ namespace Beef.Data.Cosmos
     /// <remarks>The <see cref="CosmosDbModelBase.Id"/>, <see cref="Type"/> and <see cref="CosmosDbModelBase.ETag"/> are updated internally when interacting directly with <b>CosmosDB/DocumentDb</b>.</remarks>
     public sealed class CosmosDbValue<TModel> : CosmosDbModelBase, ICosmosDbValue where TModel : class, new()
     {
-        private TModel? _value;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbValue{TModel}"/> class.
-        /// </summary>
-        public CosmosDbValue() 
-        {
-            Type = typeof(TModel).Name;
-        }
+        private TModel _value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbValue{TModel}"/> class with a <paramref name="value"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        public CosmosDbValue(TModel value) : this() => Value = value;
+        public CosmosDbValue(TModel value)
+        {
+            Type = typeof(TModel).Name;
+            _value = Check.NotNull(value, nameof(value));
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> name.
@@ -65,12 +61,12 @@ namespace Beef.Data.Cosmos
         /// Gets or sets the value.
         /// </summary>
         [JsonProperty("value")]
-        public TModel? Value { get => _value; set => _value = Check.NotNull(value, nameof(Value)); }
+        public TModel Value { get => _value; set => _value = Check.NotNull(value, nameof(Value)); }
 
         /// <summary>
         /// Gets the value.
         /// </summary>
-        object? ICosmosDbValue.Value => _value;
+        object ICosmosDbValue.Value => _value;
 
         /// <summary>
         /// Prepares the object before sending to Cosmos.

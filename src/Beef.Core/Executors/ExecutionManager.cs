@@ -410,7 +410,6 @@ namespace Beef.Executors
         /// <returns>The <see cref="Task"/>.</returns>
         public Task RunAsync(CancellationToken cancellationToken)
         {
-            Check.NotNull(cancellationToken, nameof(cancellationToken));
             Check.IsFalse(cancellationToken.IsCancellationRequested, "CancellationToken must not be in a cancelled state.");
             _stopwatch = Stopwatch.StartNew();
 

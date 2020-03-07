@@ -17,42 +17,42 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Page"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsPageQueryStringNames { get; set; } = new string[] { "$page", "$pageNumber" };
+        public static List<string> PagingArgsPageQueryStringNames { get; } = new List<string>(new string[] { "$page", "$pageNumber" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Skip"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsSkipQueryStringNames { get; set; } = new string[] { "$skip" };
+        public static List<string> PagingArgsSkipQueryStringNames { get; } = new List<string>(new string[] { "$skip" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsTakeQueryStringNames { get; set; } = new string[] { "$take", "$top", "$size", "$pageSize" };
+        public static List<string> PagingArgsTakeQueryStringNames { get; } = new List<string>(new string[] { "$take", "$top", "$size", "$pageSize" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsCountQueryStringNames { get; set; } = new string[] { "$count", "$totalCount" };
+        public static List<string> PagingArgsCountQueryStringNames { get; } = new List<string>(new string[] { "$count", "$totalCount" });
 
         /// <summary>
         /// Gets or sets the list of possible "include field" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeFieldsQueryStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
+        public static List<string> IncludeFieldsQueryStringNames { get; } = new List<string>(new string[] { "$fields", "$includeFields", "$include" });
 
         /// <summary>
         /// Gets or sets the list of possible "exclude field" query string names.
         /// </summary>
-        public static IEnumerable<string> ExcludeFieldsQueryStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
+        public static List<string> ExcludeFieldsQueryStringNames { get; } = new List<string>(new string[] { "$excludeFields", "$exclude" });
 
         /// <summary>
         /// Gets or sets the list of possible "include inactive" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeInactiveQueryStringNames { get; set; } = new string[] { "$inactive", "$includeInactive" };
+        public static List<string> IncludeInactiveQueryStringNames { get; } = new List<string>(new string[] { "$inactive", "$includeInactive" });
 
         /// <summary>
         /// Gets or sets the list of possible reference data "include texts" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeRefDataTextQueryStringNames { get; set; } = new string[] { "$text", "$includeText" };
+        public static List<string> IncludeRefDataTextQueryStringNames { get; } = new List<string>(new string[] { "$text", "$includeText" });
 
         /// <summary>
         /// Creates the <see cref="PagingArgs"/> from the query string.
