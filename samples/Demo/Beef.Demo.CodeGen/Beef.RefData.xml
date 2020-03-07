@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/demo/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
-  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref" />
+  <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref">
+    <Property Name="AlternateName" Type="string" />
+  </Entity>
   <Entity Name="EyeColor" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/eyeColors" AutoImplement="EntityFramework" DatabaseSchema="Ref" EntityFrameworkEntity="EfModel.EyeColor" />
   <Entity Name="PowerSource" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/powerSources" AutoImplement="Cosmos" CosmosContainerId="RefData" />
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">

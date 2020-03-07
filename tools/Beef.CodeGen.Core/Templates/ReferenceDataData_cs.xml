@@ -151,7 +151,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <If Condition="Property.DataConverter != null or Property.RefDataType != null">
                 <![CDATA[)]]>
               </If>
-              <![CDATA[.ConfigureAwait(false);
+              <![CDATA[;
 ]]>
             </Property>
             <![CDATA[                }]]>
