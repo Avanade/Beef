@@ -118,6 +118,7 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Text);
                 Property(s => s.IsActive);
                 Property(s => s.SortOrder);
+                Property(s => s.AlternateName);
                 AddStandardProperties();
                 DbMapperCtor();
             }

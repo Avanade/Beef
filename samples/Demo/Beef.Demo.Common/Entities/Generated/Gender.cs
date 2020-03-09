@@ -22,6 +22,36 @@ namespace Beef.Demo.Common.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Gender : ReferenceDataBaseGuid
     {
+        #region PropertyNames
+      
+        /// <summary>
+        /// Represents the <see cref="AlternateName"/> property name.
+        /// </summary>
+        public const string Property_AlternateName = nameof(AlternateName);
+
+        #endregion
+
+        #region Privates
+
+        private string _alternateName;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the Alternate Name.
+        /// </summary>
+        [JsonProperty("alternateName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Alternate Name")]
+        public string AlternateName
+        {
+            get { return _alternateName; }
+            set { SetValue(ref _alternateName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_AlternateName); }
+        }
+
+        #endregion
+
         #region Operator
 
         /// <summary>
@@ -65,6 +95,7 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(Gender from)
         {
             CopyFrom((ReferenceDataBaseGuid)from);
+            AlternateName = from.AlternateName;
 
             OnAfterCopyFrom(from);
         }
@@ -94,6 +125,7 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
+            AlternateName = Cleaner.Clean(AlternateName, StringTrim.End, StringTransform.EmptyToNull);
 
             OnAfterCleanUp();
         }
@@ -109,7 +141,7 @@ namespace Beef.Demo.Common.Entities
                 if (!base.IsInitial)
                     return false;
 
-                return true;
+                return Cleaner.IsInitial(AlternateName);
             }
         }
 
