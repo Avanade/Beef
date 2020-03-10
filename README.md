@@ -131,13 +131,18 @@ The following samples are provided to guide usage:
 
 Sample | Description
 -|-
-[`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is also used to further test the key end-to-end capabilities enabled by _Beef_.
+[`Cdr.Banking`](./samples/Cdr.Banking) | A sample as an end-to-end solution to demonstrate _Beef_ being used to solve a real-world scenario. This demonstrates an implementation of the [CDR](https://consumerdatastandards.org.au/) [Banking](https://consumerdatastandardsaustralia.github.io/standards/#consumer-data-standards-banking-apis) APIs leveraging a Cosmos DB data source.
+[`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is primarily used to further test the key end-to-end capabilities enabled by _Beef_.
 
 <br/>
 
 ## Additional documentation
 
 The following are references to additional documentation (these are all accessible via links within this and other documentation):
+
+### Major versions
+
+- [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
 
 ### General
 
@@ -228,6 +233,7 @@ We understand there is more work to be performed in generating a higher level of
 <br/>
 
 ### Code reviews and checkins
+
 To help ensure that only the highest quality code makes its way into the project, please submit all your code changes to GitHub as PRs. This includes runtime code changes, unit test updates, and updates to the end-to-end demo.
 
 For example, sending a PR for just an update to a unit test might seem like a waste of time but the unit tests are just as important as the product code and as such, reviewing changes to them is also just as important. This also helps create visibility for your changes so that others can observe what is going on.

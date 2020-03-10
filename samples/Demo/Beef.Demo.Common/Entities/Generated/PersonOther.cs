@@ -24,35 +24,30 @@ namespace Beef.Demo.Common.Entities
         /// Gets or sets the <see cref="Person"/> identifier.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Identifier")]
         public Guid Id { get; set; }
 
         /// <summary>
         /// Gets or sets the First Name.
         /// </summary>
         [JsonProperty("firstName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="First Name")]
         public string? FirstName { get; set; }
 
         /// <summary>
         /// Gets or sets the Last Name.
         /// </summary>
         [JsonProperty("lastName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Last Name")]
         public string? LastName { get; set; }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="ETag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Change Log")]
         public ChangeLog? ChangeLog { get; set; }
     } 
 

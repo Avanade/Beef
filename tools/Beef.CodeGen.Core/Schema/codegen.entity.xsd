@@ -1090,7 +1090,7 @@
       </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">
         <xs:annotation>
-          <xs:documentation>Defines the layer (namespace) where the Validator's are defined (defaults to 'Common').</xs:documentation>
+          <xs:documentation>Defines the layer (namespace) where the Validator's are defined (defaults to 'Business').</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">

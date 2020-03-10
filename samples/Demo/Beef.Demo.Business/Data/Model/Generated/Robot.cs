@@ -24,49 +24,42 @@ namespace Beef.Demo.Business.Data.Model
         /// Gets or sets the Id.
         /// </summary>
         [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Identifier")]
         public Guid Id { get; set; }
 
         /// <summary>
         /// Gets or sets the Model No.
         /// </summary>
         [JsonProperty("modelNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Model No")]
         public string? ModelNo { get; set; }
 
         /// <summary>
         /// Gets or sets the Serial No.
         /// </summary>
         [JsonProperty("serialNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Serial No")]
         public string? SerialNo { get; set; }
 
         /// <summary>
         /// Gets or sets the Eye Color.
         /// </summary>
         [JsonProperty("eyeColor", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Eye Color")]
         public string? EyeColor { get; set; }
 
         /// <summary>
         /// Gets or sets the Power Source.
         /// </summary>
         [JsonProperty("powerSource", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Power Source")]
         public string? PowerSource { get; set; }
 
         /// <summary>
         /// Gets or sets the ETag.
         /// </summary>
         [JsonProperty("_etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="ETag")]
         public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Display(Name="Change Log")]
         public ChangeLog? ChangeLog { get; set; }
     } 
 

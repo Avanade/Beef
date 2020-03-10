@@ -25,9 +25,7 @@ namespace Cdr.Banking.Common.Entities
         #region Privates
 
         private string? _productCategorySid;
-        private string? _productCategoryText;
         private string? _openStatusSid;
-        private string? _openStatusText;
         private bool? _isOwned;
 
         #endregion
@@ -44,12 +42,6 @@ namespace Cdr.Banking.Common.Entities
             get => _productCategorySid;
             set => SetValue(ref _productCategorySid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ProductCategory));
         }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="ProductCategory"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("product-categoryText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? ProductCategoryText { get => _productCategoryText ?? GetRefDataText(() => ProductCategory); set => _productCategoryText = value; }
 
         /// <summary>
         /// Gets or sets the Product Category (see <see cref="RefDataNamespace.ProductCategory"/>).
@@ -72,12 +64,6 @@ namespace Cdr.Banking.Common.Entities
             get => _openStatusSid;
             set => SetValue(ref _openStatusSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(OpenStatus));
         }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="OpenStatus"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("open-statusText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? OpenStatusText { get => _openStatusText ?? GetRefDataText(() => OpenStatus); set => _openStatusText = value; }
 
         /// <summary>
         /// Gets or sets the Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).

@@ -83,6 +83,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AB0CF344-34E9-4F67-80F1-808F1687014B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cdr.Banking", "Cdr.Banking", "{FE16D130-B8FF-4AFA-BD5F-F45307B23256}"
@@ -103,6 +106,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cdr.Banking.Business", "samples\Cdr.Banking\Cdr.Banking.Business\Cdr.Banking.Business.csproj", "{0B3CA592-07FB-484B-A4B8-EE049C020BC3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cdr.Banking.Common", "samples\Cdr.Banking\Cdr.Banking.Common\Cdr.Banking.Common.csproj", "{87C924BC-AE3B-41CC-8E7B-85A91CFDE6C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beef.Template.Solution.UnitTest", "tests\Beef.Template.Solution.UnitTest\Beef.Template.Solution.UnitTest.csproj", "{44E5D241-D57C-4AE3-B9A4-277884A4E034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -222,6 +227,10 @@ Global
 		{87C924BC-AE3B-41CC-8E7B-85A91CFDE6C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87C924BC-AE3B-41CC-8E7B-85A91CFDE6C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87C924BC-AE3B-41CC-8E7B-85A91CFDE6C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44E5D241-D57C-4AE3-B9A4-277884A4E034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44E5D241-D57C-4AE3-B9A4-277884A4E034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44E5D241-D57C-4AE3-B9A4-277884A4E034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44E5D241-D57C-4AE3-B9A4-277884A4E034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -266,6 +275,7 @@ Global
 		{D4BB4991-4C21-4378-BE7D-5E00329AA75D} = {FE16D130-B8FF-4AFA-BD5F-F45307B23256}
 		{0B3CA592-07FB-484B-A4B8-EE049C020BC3} = {FE16D130-B8FF-4AFA-BD5F-F45307B23256}
 		{87C924BC-AE3B-41CC-8E7B-85A91CFDE6C1} = {FE16D130-B8FF-4AFA-BD5F-F45307B23256}
+		{44E5D241-D57C-4AE3-B9A4-277884A4E034} = {080D0002-C5F5-400A-9B85-65DEECAD61A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42D71086-61E6-4D31-B4B8-BFC8CC471428}

@@ -28,7 +28,6 @@ namespace Cdr.Banking.Common.Entities
         private string? _accountNumber;
         private string? _bundleName;
         private string? _specificAccountUTypeSid;
-        private string? _specificAccountUTypeText;
         private TermDepositAccount? _termDeposit;
         private CreditCardAccount? _creditCard;
 
@@ -79,12 +78,6 @@ namespace Cdr.Banking.Common.Entities
             get => _specificAccountUTypeSid;
             set => SetValue(ref _specificAccountUTypeSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SpecificAccountUType));
         }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="SpecificAccountUType"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("specificAccountUTypeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? SpecificAccountUTypeText { get => _specificAccountUTypeText ?? GetRefDataText(() => SpecificAccountUType); set => _specificAccountUTypeText = value; }
 
         /// <summary>
         /// Gets or sets the Specific Account U Type (see <see cref="RefDataNamespace.AccountUType"/>).

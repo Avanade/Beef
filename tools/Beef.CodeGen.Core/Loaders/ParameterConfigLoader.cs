@@ -76,9 +76,16 @@ namespace Beef.CodeGen.Loaders
 
             config.AttributeAdd("ArgumentName", itemConfig.Attributes["ArgumentName"]);
             config.AttributeAdd("PrivateName", itemConfig.Attributes["PrivateName"]);
-            config.AttributeAdd("JsonName", itemConfig.Attributes["JsonName"]);
-            config.AttributeAdd("Text", itemConfig.Attributes["Text"]);
-            config.AttributeAdd("Type", itemConfig.Attributes["Type"]);
+
+            if (itemConfig.Attributes.ContainsKey("JsonName"))
+                config.AttributeAdd("JsonName", itemConfig.Attributes["JsonName"]);
+
+            if (itemConfig.Attributes.ContainsKey("Text"))
+                config.AttributeAdd("Text", itemConfig.Attributes["Text"]);
+
+            if (itemConfig.Attributes.ContainsKey("Type"))
+                config.AttributeAdd("Type", itemConfig.Attributes["Type"]);
+
             config.AttributeAdd("LayerPassing", "All");
 
             if (itemConfig.Attributes.ContainsKey("Nullable"))

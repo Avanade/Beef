@@ -29,7 +29,6 @@ namespace Cdr.Banking.Common.Entities
         private decimal _maturityAmount;
         private string? _maturityCurrency;
         private string? _maturityInstructionsSid;
-        private string? _maturityInstructionsText;
 
         #endregion
 
@@ -91,12 +90,6 @@ namespace Cdr.Banking.Common.Entities
             get => _maturityInstructionsSid;
             set => SetValue(ref _maturityInstructionsSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MaturityInstructions));
         }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="MaturityInstructions"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("maturityInstructionsText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? MaturityInstructionsText { get => _maturityInstructionsText ?? GetRefDataText(() => MaturityInstructions); set => _maturityInstructionsText = value; }
 
         /// <summary>
         /// Gets or sets the Maturity Instructions (see <see cref="RefDataNamespace.MaturityInstructions"/>).

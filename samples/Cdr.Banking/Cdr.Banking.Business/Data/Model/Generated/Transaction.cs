@@ -69,12 +69,6 @@ namespace Cdr.Banking.Business.Data.Model
         public DateTime ExecutionDateTime { get; set; }
 
         /// <summary>
-        /// Gets or sets the Transaction Date Time.
-        /// </summary>
-        [JsonProperty("transactionDateTime", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public DateTime TransactionDateTime { get; set; }
-
-        /// <summary>
         /// Gets or sets the Amount.
         /// </summary>
         [JsonProperty("amount", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -121,6 +115,12 @@ namespace Cdr.Banking.Business.Data.Model
         /// </summary>
         [JsonProperty("apcaNumber", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? ApcaNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Transaction Date Time.
+        /// </summary>
+        [JsonProperty("transactionDateTime", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public DateTime TransactionDateTime { get; set; }
     } 
 }
 

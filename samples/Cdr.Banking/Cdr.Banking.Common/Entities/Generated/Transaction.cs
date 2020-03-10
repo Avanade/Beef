@@ -28,9 +28,7 @@ namespace Cdr.Banking.Common.Entities
         private string? _accountId;
         private bool _isDetailAvailable;
         private string? _typeSid;
-        private string? _typeText;
         private string? _statusSid;
-        private string? _statusText;
         private string? _description;
         private DateTime _postingDateTime;
         private DateTime _executionDateTime;
@@ -92,12 +90,6 @@ namespace Cdr.Banking.Common.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding <see cref="Type"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("typeText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? TypeText { get => _typeText ?? GetRefDataText(() => Type); set => _typeText = value; }
-
-        /// <summary>
         /// Gets or sets the Type (see <see cref="RefDataNamespace.TransactionType"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -118,12 +110,6 @@ namespace Cdr.Banking.Common.Entities
             get => _statusSid;
             set => SetValue(ref _statusSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Status));
         }
-
-        /// <summary>
-        /// Gets the corresponding <see cref="Status"/> text (read-only where selected).
-        /// </summary>
-        [JsonProperty("statusText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? StatusText { get => _statusText ?? GetRefDataText(() => Status); set => _statusText = value; }
 
         /// <summary>
         /// Gets or sets the Status (see <see cref="RefDataNamespace.TransactionStatus"/>).
