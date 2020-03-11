@@ -1,0 +1,8 @@
+﻿-- Migration Script
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Ref].[Gender]
+  ADD AlternateName NVARCHAR(50) NULL
+	
+COMMIT TRANSACTION

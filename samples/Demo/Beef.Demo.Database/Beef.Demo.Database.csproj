@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="Migrations\20190107-162633-create-demo-person-uniquecode-index.sql" />
     <None Remove="Migrations\20191023-081540-create-demo-person2.sql" />
+    <None Remove="Migrations\20200308-093308-alter-ref-gender.sql" />
   </ItemGroup>
 
   <ItemGroup>
