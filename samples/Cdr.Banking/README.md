@@ -37,6 +37,8 @@ Assumptions are as follows:
 
 For the purposes of this sample, [Azure Cosmos DB](https://azure.microsoft.com/en-us/services/cosmos-db/) has been chosen as the data store.
 
+As the operations are read-only, the data store would be (should be) optimised for these required read activitiies. In this instance the assumption is that the Cosmos DB store would be a near real-time replica from the _system of record_. There would be an on-going process to synchronise the Cosmos DB data with the latest infomation, using the likes of [event steaming](../../src/Beef.Events/README.md) for example.
+
 The following [Containers](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.container) will be used:
 - **`RefData`** - All Reference Data types and their corresponding items. No partitioning will be used, as there is limited benefit in partitioning per reference data type given the limited volume within, and the limited access given largely cached in memory.
 - **`Account`** - All Accounts, for all users. No partioning will be used. Accounts will need to be explicitly filtered per user request to ensure correct access.
@@ -396,3 +398,20 @@ PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
 
 </br>
 
+## Testing
+
+A reasonably thorough set of [intra-domain integration tests](../../tools/Beef.Test.NUnit/README.md) have been added to demonstrate usage, as well as validate that the selected CDR Banking operations function as described. For the most part the tests should be self-explanatory.
+
+- [`AccountTest.cs`](./Cdr.Banking.Test/AccountTest.cs)
+- [`TransactionTest.cs`](./Cdr.Banking.Test/TransactionTest.cs)
+
+Of note, within the [`FixtureSetup.cs`](./Cdr.Banking.Test/FixtureSetup.cs) the authorization header and paging configuration is set up.
+
+``` csharp
+// TODO: Passing the username as an http header for all requests; this would be replaced with OAuth integration, etc.
+AgentTester.RegisterBeforeRequest(r => r.Headers.Add("cdr-user", Beef.ExecutionContext.Current.Username));
+
+// Set "page" and "page-size" as the supported paging query string parameters as defined by the CDR specification.
+WebApiPagingArgsArg.PagingArgsPageQueryStringName = "page";
+WebApiPagingArgsArg.PagingArgsSizeQueryStringName = "page-size";
+```
