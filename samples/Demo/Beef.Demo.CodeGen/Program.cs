@@ -1,12 +1,13 @@
 ﻿using Beef.CodeGen;
+using System.Threading.Tasks;
 
 namespace Beef.Demo.CodeGen
 {
     class Program
     {
-        static int Main(string[] args)
+        static Task<int> Main(string[] args)
         {
-            return CodeGenConsoleWrapper.Create("Beef", "Demo").Supports(entity: true, refData: true, dataModel: true).Run(args);
+            return CodeGenConsoleWrapper.Create("Beef", "Demo").Supports(entity: true, refData: true, dataModel: true).RunAsync(args);
         }
     }
 }

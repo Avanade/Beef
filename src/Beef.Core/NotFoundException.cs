@@ -27,7 +27,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="NotFoundException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public NotFoundException(string message)
+        public NotFoundException(string? message)
             : base(message ?? new LText("Beef.NotFoundException"))
         {
         }
@@ -37,7 +37,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public NotFoundException(string message, Exception innerException)
+        public NotFoundException(string? message, Exception innerException)
             : base(message ?? new LText("Beef.NotFoundException"), innerException)
         {
         }

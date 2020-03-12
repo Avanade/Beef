@@ -19,7 +19,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> <see cref="Executor.ExecutorArgs"/> value.
         /// </summary>
-        object Value { get; }
+        object? Value { get; }
 
         /// <summary>
         /// Gets the <see cref="ExecutorRunType"/>.
@@ -29,7 +29,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="System.Exception"/> raised when invoking the <see cref="RunType"/>.
         /// </summary>
-        Exception Exception { get; }
+        Exception? Exception { get; }
 
         /// <summary>
         /// Indicates whether an <see cref="Exception"/> was raised when invoking the <see cref="RunType"/>.
@@ -55,7 +55,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object ItemData { get; }
+        object? ItemData { get; }
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -96,7 +96,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> <see cref="Executor.ExecutorArgs"/> value.
         /// </summary>
-        public object Value => Executor.ExecutorArgs;
+        public object? Value => Executor!.ExecutorArgs;
 
         /// <summary>
         /// Gets the <see cref="ExecutorRunType"/>.
@@ -106,7 +106,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="System.Exception"/> raised when invoking the <see cref="IExecutorBaseArgs.RunType"/>.
         /// </summary>
-        public Exception Exception { get; private set; }
+        public Exception? Exception { get; private set; }
 
         /// <summary>
         /// Indicates whether an <see cref="IExecutorBaseArgs.Exception"/> was raised when invoking the <see cref="IExecutorBaseArgs.RunType"/>.
@@ -145,7 +145,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -176,7 +176,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -199,7 +199,17 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> arguments value.
         /// </summary>
-        public new TArgs Value => (TArgs)((IExecutorArgs)this).Value;
+        public new TArgs Value
+        {
+            get
+            {
+                if (this is IExecutorArgs iea && iea.Value is TArgs v)
+                    return v;
+                else
+                    return default!;
+            }
+        }
+
 
         /// <summary>
         /// Gets the item index (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
@@ -209,7 +219,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -240,7 +250,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -263,7 +273,16 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> arguments value.
         /// </summary>
-        public new TArgs Value => (TArgs)((IExecutorArgs)this).Value;
+        public new TArgs Value
+        {
+            get
+            {
+                if (this is IExecutorArgs iea && iea.Value is TArgs v)
+                    return v;
+                else
+                    return default!;
+            }
+        }
 
         /// <summary>
         /// Gets the item index (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
@@ -273,7 +292,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -321,7 +340,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => Item;
+        object? IExecutorArgs.ItemData => Item;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).
@@ -361,7 +380,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the item data (only applicable when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.ItemRun"/>).
         /// </summary>
-        object IExecutorArgs.ItemData => null;
+        object? IExecutorArgs.ItemData => null;
 
         /// <summary>
         /// Indicates when the <see cref="ExecutorRunType"/> is <see cref="ExecutorRunType.CompletionRun"/> that all the items were completed (i.e. not stopped).

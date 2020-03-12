@@ -12,12 +12,12 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.RegisterSetUp((count, data) =>
+            TestSetUp.RegisterSetUp(async (count, data) =>
             {
-                return DatabaseExecutor.Run(
+                return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
                     AgentTester.Configuration["ConnectionStrings:BeefDemo"],
-                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) == 0;
+                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()).ConfigureAwait(false) == 0;
             });
 
             AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "Beef_");

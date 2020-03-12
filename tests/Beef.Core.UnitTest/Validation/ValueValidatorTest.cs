@@ -49,5 +49,16 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("CountA", r.Messages[0].Property);
         }
+
+        [Test]
+        public void Run_Will_Null()
+        {
+            string name = null;
+            var r = name.Validate().Mandatory().Run();
+            Assert.IsNotNull(r);
+            Assert.IsTrue(r.HasError);
+            Assert.AreEqual(1, r.Messages.Count);
+            Assert.AreEqual("Value is required.", r.Messages[0].Text);
+        }
     }
 }

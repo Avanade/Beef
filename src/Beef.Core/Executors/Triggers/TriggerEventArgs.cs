@@ -10,13 +10,24 @@ namespace Beef.Executors.Triggers
     internal class TriggerEventArgs : EventArgs
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TriggerEventArgs"/> class.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="completionCallback"></param>
+        internal TriggerEventArgs(object? args, Action? completionCallback)
+        {
+            Args = args;
+            CompletionCallback = completionCallback;
+        }
+
+        /// <summary>
         /// Gets or sets the arguments.
         /// </summary>
-        public object Args { get; set; }
+        public object? Args { get; private set; }
 
         /// <summary>
         /// Gets or sets optional callback for post <see cref="Executor"/> <b>Run</b> notification/processing.
         /// </summary>
-        internal Action CompletionCallback { get; set; }
+        internal Action? CompletionCallback { get; private set; }
     }
 }

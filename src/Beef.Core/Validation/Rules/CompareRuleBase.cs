@@ -60,27 +60,27 @@ namespace Beef.Validation.Rules
             switch (Operator)
             {
                 case CompareOperator.Equal:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareEqualFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareEqualFormat, (string)compareToText);
                     break;
 
                 case CompareOperator.NotEqual:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareNotEqualFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareNotEqualFormat, (string)compareToText);
                     break;
 
                 case CompareOperator.LessThan:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareLessThanFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareLessThanFormat, (string)compareToText);
                     break;
 
                 case CompareOperator.LessThanEqual:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareLessThanEqualFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareLessThanEqualFormat, (string)compareToText);
                     break;
 
                 case CompareOperator.GreaterThan:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareGreaterThanFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareGreaterThanFormat, (string)compareToText);
                     break;
 
                 case CompareOperator.GreaterThanEqual:
-                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareGreaterThanEqualFormat, (string)compareToText ?? null);
+                    context.CreateErrorMessage(ErrorText ?? ValidatorStrings.CompareGreaterThanEqualFormat, (string)compareToText);
                     break;
             }
         }

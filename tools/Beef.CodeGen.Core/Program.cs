@@ -1,5 +1,6 @@
-﻿using System;
-// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen
 {
@@ -13,9 +14,9 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="args">The console arguments.</param>
         /// <returns>A statuc code.</returns>
-        public static int Main(string[] args)
+        public static Task<int> Main(string[] args)
         {
-            return CodeGenConsole.Create().Run(args);
+            return CodeGenConsole.Create().RunAsync(args);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <summary>
         /// Gets or sets the offset of the data relative to the Event Hub partition stream.
         /// </summary>
-        public string Offset { get; set; }
+        public string? Offset { get; set; }
         
         /// <summary>
         /// Gets or sets the logical sequence number of the event within the partition stream of the Event Hub.
@@ -55,21 +55,21 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <summary>
         /// Gets or sets the runtime function type information: namespace.class.method.
         /// </summary>
-        public string FunctionType { get; set; }
+        public string? FunctionType { get; set; }
         
         /// <summary>
         /// Gets or sets the function name.
         /// </summary>
-        public string FunctionName { get; set; }
+        public string? FunctionName { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Microsoft.Azure.EventHubs.EventData.Body"/> content as a <see cref="string"/>.
         /// </summary>
-        public string Body { get; set; }
+        public string? Body { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Exception"/> as a <see cref="string"/>.
         /// </summary>
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
     }
 }

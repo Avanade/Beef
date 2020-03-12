@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using System;
 using System.Collections.Generic;
 
 namespace Beef.Mapper
@@ -23,13 +25,13 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase GetBySrcePropertyName(string name);
+        IPropertyMapperBase? GetBySrcePropertyName(string name);
 
         /// <summary>
         /// Gets the <see cref="IPropertyMapperBase"/> mapping by destination property name.
         /// </summary>
         /// <param name="name">The destination property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase GetByDestPropertyName(string name);
+        IPropertyMapperBase? GetByDestPropertyName(string name);
     }
 }

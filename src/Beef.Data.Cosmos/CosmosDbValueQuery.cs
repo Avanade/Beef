@@ -15,14 +15,14 @@ namespace Beef.Data.Cosmos
     public class CosmosDbValueQuery<T, TModel> : CosmosDbQueryBase where T : class, new() where TModel : class, new()
     {
         private readonly CosmosDbValueContainer<T, TModel> _container;
-        private readonly Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> _query;
+        private readonly Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? _query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbValueQuery{T, TModel}"/> class.
         /// </summary>
         /// <param name="container">The <see cref="CosmosDbValueContainer{T, TModel}"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
-        internal CosmosDbValueQuery(CosmosDbValueContainer<T, TModel> container, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>> query = null)
+        internal CosmosDbValueQuery(CosmosDbValueContainer<T, TModel> container, Func<IQueryable<CosmosDbValue<TModel>>, IQueryable<CosmosDbValue<TModel>>>? query = null)
         {
             _container = Check.NotNull(container, nameof(container));
             _query = query;
@@ -44,7 +44,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
         /// </summary>
-        private IQueryable<CosmosDbValue<TModel>> ExecuteQueryInternal(Action<IQueryable<CosmosDbValue<TModel>>> execute)
+        private IQueryable<CosmosDbValue<TModel>> ExecuteQueryInternal(Action<IQueryable<CosmosDbValue<TModel>>>? execute)
         {
             IQueryable<CosmosDbValue<TModel>> q =
                 _container.Container.GetItemLinqQueryable<CosmosDbValue<TModel>>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
@@ -60,7 +60,19 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Apply the authorization filter where configured.
         /// </summary>
-        private IQueryable<CosmosDbValue<TModel>> AuthorizationFilter(IQueryable<CosmosDbValue<TModel>> q) => QueryArgs.AuthorizationFilter == null ? q : (IQueryable<CosmosDbValue<TModel>>)QueryArgs.AuthorizationFilter(q);
+        private IQueryable<CosmosDbValue<TModel>> AuthorizationFilter(IQueryable<CosmosDbValue<TModel>> q)
+        {
+            if (QueryArgs.AuthorizeFilter != null)
+                return (IQueryable<CosmosDbValue<TModel>>)QueryArgs.AuthorizeFilter(q);
+            else
+            {
+                var filter = _container.CosmosDb.GetAuthorizeFilter<TModel>(_container.Container.Id);
+                if (filter != null)
+                    return (IQueryable<CosmosDbValue<TModel>>)filter(q);
+            }
+
+            return q;
+        }
 
         /// <summary>
         /// Manages the underlying query construction and lifetime.

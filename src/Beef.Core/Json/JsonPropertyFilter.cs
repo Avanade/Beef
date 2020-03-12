@@ -22,7 +22,7 @@ namespace Beef.Json
         /// <param name="exclude">The list of JSON property names to exclude.</param>
         /// <returns>The resulting <see cref="JToken"/>.</returns>
         /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
-        public static JToken Apply<T>(T value, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        public static JToken? Apply<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             if (value == null)
                 return null;
@@ -39,7 +39,7 @@ namespace Beef.Json
         /// <param name="json">The <see cref="JObject"/> value.</param>
         /// <param name="include">The list of JSON property names to include.</param>
         /// <param name="exclude">The list of JSON property names to exclude.</param>
-        public static void JsonApply(JToken json, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        public static void JsonApply(JToken json, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             Check.NotNull(json, nameof(json));
 
@@ -56,7 +56,7 @@ namespace Beef.Json
         /// <param name="include">The list of JSON property names to include.</param>
         /// <param name="exclude">The list of JSON property names to exclude.</param>
         /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
-        public static void JsonApply(JArray json, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        public static void JsonApply(JArray json, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             Check.NotNull(json, nameof(json));
 
@@ -79,7 +79,7 @@ namespace Beef.Json
         /// <param name="include">The list of JSON property names to include.</param>
         /// <param name="exclude">The list of JSON property names to exclude.</param>
         /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
-        public static void JsonApply(JObject json, IEnumerable<string> include = null, IEnumerable<string> exclude = null)
+        public static void JsonApply(JObject json, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             Check.NotNull(json, nameof(json));
 
@@ -95,21 +95,24 @@ namespace Beef.Json
         /// <summary>
         /// Expands the JSON property names by adding intermediary values within a specified hierarchical name.
         /// </summary>
-        private static string[] Expand(IEnumerable<string> names)
+        private static string[] Expand(IEnumerable<string>? names)
         {
             var sb = new StringBuilder();
             var kod = new KeyOnlyDictionary<string>();
-            foreach (var f in names)
+            if (names != null)
             {
-                sb.Clear();
-                var parts = f.Split('.');
-                for (int i = 0; i < parts.Length; i++)
+                foreach (var f in names)
                 {
-                    if (i > 0)
-                        sb.Append(".");
+                    sb.Clear();
+                    var parts = f.Split('.');
+                    for (int i = 0; i < parts.Length; i++)
+                    {
+                        if (i > 0)
+                            sb.Append(".");
 
-                    sb.Append(parts[i]);
-                    kod.Add(sb.ToString());
+                        sb.Append(parts[i]);
+                        kod.Add(sb.ToString());
+                    }
                 }
             }
 
@@ -119,7 +122,7 @@ namespace Beef.Json
         /// <summary>
         /// Filter the JSON properties by either including or excluding as specified.
         /// </summary>
-        private static void Filter(JToken json, bool isInclude, IEnumerable<string> names = null)
+        private static void Filter(JToken json, bool isInclude, IEnumerable<string>? names = null)
         {
             foreach (var jp in json.Children().ToArray())
             {
@@ -170,7 +173,7 @@ namespace Beef.Json
         /// <summary>
         /// Removes any indexing within a path; i.e. 'Array[0].Value' -> 'Array.Value'.
         /// </summary>
-        private static string RemoveIndexing(string path)
+        private static string? RemoveIndexing(string? path)
         {
             if (path == null)
                 return null;
@@ -179,11 +182,11 @@ namespace Beef.Json
 
             while (true)
             {
-                var li = txt.IndexOf('[');
+                var li = txt.IndexOf('[', StringComparison.InvariantCulture);
                 if (li < 0)
                     break;
 
-                var ri = txt.IndexOf(']');
+                var ri = txt.IndexOf(']', StringComparison.InvariantCulture);
                 if (ri < 0 || ri < li)
                     break;
 

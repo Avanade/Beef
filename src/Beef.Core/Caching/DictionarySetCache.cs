@@ -13,7 +13,7 @@ namespace Beef.Caching
     /// <typeparam name="TValue">The value <see cref="Type"/>.</typeparam>
     public class DictionarySetCache<TKey, TValue> : CacheCoreBase
     {
-        private Dictionary<TKey, TValue> _dict;
+        private Dictionary<TKey, TValue>? _dict;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DictionarySetCache{TColl, TItem}"/> class that automatically <see cref="CachePolicyManager.Register">registers</see> for centralised <see cref="CachePolicyManager.Flush"/> management.
@@ -21,7 +21,7 @@ namespace Beef.Caching
         /// <param name="loadCache">The function that is responsible for loading the cache (expects an enumerable <see cref="KeyValuePair{TKey, TValue}"/>).</param>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
-        public DictionarySetCache(Func<object, IEnumerable<KeyValuePair<TKey, TValue>>> loadCache = null, string policyKey = null, object data = null) : base(policyKey)
+        public DictionarySetCache(Func<object?, IEnumerable<KeyValuePair<TKey, TValue>>>? loadCache = null, string? policyKey = null, object? data = null) : base(policyKey)
         {
             LoadCache = loadCache;
             Data = data;
@@ -33,7 +33,7 @@ namespace Beef.Caching
         /// <param name="policy">The <see cref="ICachePolicy"/>.</param>
         /// <param name="loadCache">The function that is responsible for loading the cache (expects an enumerable <see cref="KeyValuePair{TKey, TValue}"/>).</param>
         /// <param name="data">The optional data that will be passed into the <paramref name="loadCache"/> operation.</param>
-        public DictionarySetCache(ICachePolicy policy, Func<object, IEnumerable<KeyValuePair<TKey, TValue>>> loadCache = null, object data = null) : base(policy)
+        public DictionarySetCache(ICachePolicy policy, Func<object?, IEnumerable<KeyValuePair<TKey, TValue>>>? loadCache = null, object? data = null) : base(policy)
         {
             LoadCache = loadCache;
             Data = data;
@@ -42,12 +42,12 @@ namespace Beef.Caching
         /// <summary>
         /// Gets or sets the function to load the cache.
         /// </summary>
-        private Func<object, IEnumerable<KeyValuePair<TKey, TValue>>> LoadCache { get; set; }
+        private Func<object?, IEnumerable<KeyValuePair<TKey, TValue>>>? LoadCache { get; set; }
 
         /// <summary>
         /// Gets or sets the optional data that will be passed into the <see cref="LoadCache"/> operation.
         /// </summary>
-        public object Data { get; set; }
+        public object? Data { get; set; }
 
         /// <summary>
         /// Gets the count of items in the cache (both expired and non-expired may co-exist until flushed).
@@ -73,7 +73,7 @@ namespace Beef.Caching
                 // Set the cache using the getCache Func<> and resets expiry.
                 SetCacheInternal(LoadCache(Data));
                 policy.Reset();
-                return _dict;
+                return _dict!;
             }
         }
 
@@ -145,7 +145,7 @@ namespace Beef.Caching
             var cache = GetCache();
             if (!cache.ContainsKey(key))
             {
-                value = default;
+                value = default!;
                 return false;
             }
 

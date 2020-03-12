@@ -1,4 +1,6 @@
-﻿using Beef.Mapper.Converters;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        object GetDestValue(TDest entity, OperationTypes operationType);
+        object? GetDestValue(TDest entity, OperationTypes operationType);
 
         /// <summary>
         /// Sets the destination property value.
@@ -29,7 +31,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void SetDestValue(TDest entity, object value, OperationTypes operationType);
+        void SetDestValue(TDest entity, object? value, OperationTypes operationType);
 
         /// <summary>
         /// Invokes the underlying <b>when</b> clause to determine whether the destination mapping should occur.
@@ -60,7 +62,7 @@ namespace Beef.Mapper
         /// <param name="sourcePropertyValue">The source property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination property value.</returns>
-        object ConvertToDestValue(object sourcePropertyValue, OperationTypes operationType);
+        object? ConvertToDestValue(object? sourcePropertyValue, OperationTypes operationType);
 
         /// <summary>
         /// Converts a destination property value into the source value.
@@ -68,12 +70,12 @@ namespace Beef.Mapper
         /// <param name="destinationPropertyValue">The destination property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination property value.</returns>
-        object ConvertToSrceValue(object destinationPropertyValue, OperationTypes operationType);
+        object? ConvertToSrceValue(object? destinationPropertyValue, OperationTypes operationType);
 
         /// <summary>
         /// Gets the <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
         /// </summary>
-        ComplexTypeReflector DestComplexTypeReflector { get; }
+        ComplexTypeReflector? DestComplexTypeReflector { get; }
 
         /// <summary>
         /// Indicates whether the property is a complex type or complex type collection (see <see cref="DestComplexTypeReflector"/>).
@@ -92,10 +94,10 @@ namespace Beef.Mapper
         where TSrce : class
         where TDest : class
     {
-        private Func<TSrce, bool> _mapSrceToDestWhen;
-        private Func<TDest, bool> _mapDestToSrceWhen;
-        private Func<TSrce, TDest, OperationTypes, TDestProperty> _mapSrceToDestOverride;
-        private Func<TDest, TSrce, OperationTypes, TSrceProperty> _mapDestToSrceOverride;
+        private Func<TSrce, bool>? _mapSrceToDestWhen;
+        private Func<TDest, bool>? _mapDestToSrceWhen;
+        private Func<TSrce, TDest, OperationTypes, TDestProperty>? _mapSrceToDestOverride;
+        private Func<TDest, TSrce, OperationTypes, TSrceProperty>? _mapDestToSrceOverride;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/> class.
@@ -140,8 +142,8 @@ namespace Beef.Mapper
             if (IsSrceComplexType && IsDestComplexType)
             {
                 // This is auto-mapping between types as a default.
-                if ((!SrceComplexTypeReflector.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
-                    && (!DestComplexTypeReflector.IsCollection || DestComplexTypeReflector.IsItemComplexType))
+                if ((!SrceComplexTypeReflector!.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
+                    && (!DestComplexTypeReflector!.IsCollection || DestComplexTypeReflector.IsItemComplexType))
                 {
                     SetMapper((IEntityMapperBase)typeof(EntityMapper<,>)
                             .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
@@ -211,7 +213,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the source <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
-        public ComplexTypeReflector SrceComplexTypeReflector { get; private set; }
+        public ComplexTypeReflector? SrceComplexTypeReflector { get; private set; }
 
         /// <summary>
         /// Indicates whether the source property is a complex type or complex type collection (see <see cref="SrceComplexTypeReflector"/>).
@@ -221,7 +223,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the destination <see cref="ComplexTypeReflector"/> (only set where the property <see cref="IsDestComplexType"/>).
         /// </summary>
-        public ComplexTypeReflector DestComplexTypeReflector { get; private set; }
+        public ComplexTypeReflector? DestComplexTypeReflector { get; private set; }
 
         /// <summary>
         /// Indicates whether the destination property is a complex type or complex type collection (see <see cref="SrceComplexTypeReflector"/>).
@@ -266,12 +268,12 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="IPropertyMapperConverter"/> (used where a specific source and destination type conversion is required).
         /// </summary>
-        IPropertyMapperConverter IPropertyMapperBase.Converter { get; }
+        IPropertyMapperConverter? IPropertyMapperBase.Converter { get; }
 
         /// <summary>
         /// Gets the <see cref="IPropertyMapperConverter{TSrceProperty, TDestProperty}"/> (used where a specific source and destination type conversion is required).
         /// </summary>
-        public IPropertyMapperConverter<TSrceProperty, TDestProperty> Converter { get; private set; }
+        public IPropertyMapperConverter<TSrceProperty, TDestProperty>? Converter { get; private set; }
 
         /// <summary>
         /// Sets the <see cref="Converter"/>.
@@ -291,17 +293,17 @@ namespace Beef.Mapper
         /// <remarks>The <see cref="Mapper"/> and <see cref="Converter"/> are mutually exclusive.</remarks>
         public PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> SetConverter(IPropertyMapperConverter<TSrceProperty, TDestProperty> converter)
         {
-            if (Mapper != null && converter != null)
+            if (Mapper != null)
                 throw new MapperException("The Mapper and Converter cannot be both set; only one is permissible.");
 
-            Converter = converter;
+            Converter = Check.NotNull(converter, nameof(converter));
             return this;
         }
 
         /// <summary>
         /// Gets the <see cref="IEntityMapperBase"/> to map complex types.
         /// </summary>
-        public IEntityMapperBase Mapper { get; private set; }
+        public IEntityMapperBase? Mapper { get; private set; }
 
         /// <summary>
         /// Set the <see cref="IEntityMapperBase"/> to map complex types.
@@ -310,7 +312,7 @@ namespace Beef.Mapper
         /// <remarks>The <see cref="Mapper"/> and <see cref="Converter"/> are mutually exclusive.</remarks>
         void IPropertyMapperBase.SetMapper(IEntityMapperBase mapper)
         {
-            SetMapper((IEntityMapper<TSrceProperty, TDestProperty>)mapper);
+            SetMapper(mapper);
         }
 
         /// <summary>
@@ -321,10 +323,10 @@ namespace Beef.Mapper
         /// <remarks>The <see cref="Mapper"/> and <see cref="Converter"/> are mutually exclusive.</remarks>
         public PropertyMapper<TSrce, TSrceProperty, TDest, TDestProperty> SetMapper(IEntityMapperBase mapper)
         {
-            if (Converter != null && mapper != null)
+            if (Converter != null)
                 throw new MapperException("The Mapper and Converter cannot be both set; only one is permissible.");
 
-            Mapper = mapper;
+            Mapper = Check.NotNull(mapper, nameof(mapper));
             return this;
         }
 
@@ -403,7 +405,7 @@ namespace Beef.Mapper
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default;
+                return default!;
         }
 
         /// <summary>
@@ -424,7 +426,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        object IPropertySrceMapper<TSrce>.GetSrceValue(TSrce entity, OperationTypes operationType)
+        object? IPropertySrceMapper<TSrce>.GetSrceValue(TSrce entity, OperationTypes operationType)
         {
             return GetSrceValue(entity, operationType);
         }
@@ -435,9 +437,9 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IPropertySrceMapper<TSrce>.SetSrceValue(TSrce entity, object value, OperationTypes operationType)
+        void IPropertySrceMapper<TSrce>.SetSrceValue(TSrce entity, object? value, OperationTypes operationType)
         {
-            SetSrceValue(entity, (TSrceProperty)value, operationType);
+            SetSrceValue(entity, (TSrceProperty)value!, operationType);
         }
 
 #pragma warning disable IDE0060, CA1801 // Remove unused parameter; by-design to have consistent interface
@@ -471,7 +473,7 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        object IPropertyMapper<TSrce, TDest>.GetDestValue(TDest entity, OperationTypes operationType)
+        object? IPropertyMapper<TSrce, TDest>.GetDestValue(TDest entity, OperationTypes operationType)
         {
             return GetDestValue(entity, operationType);
         }
@@ -482,9 +484,9 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="value">The property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
-        void IPropertyMapper<TSrce, TDest>.SetDestValue(TDest entity, object value, OperationTypes operationType)
+        void IPropertyMapper<TSrce, TDest>.SetDestValue(TDest entity, object? value, OperationTypes operationType)
         {
-            SetDestValue(entity, (TDestProperty)value, operationType);
+            SetDestValue(entity, (TDestProperty)value!, operationType);
         }
 
         /// <summary>
@@ -517,12 +519,12 @@ namespace Beef.Mapper
 
             TSrceProperty val = GetSrceValue(sourceEntity, operationType);
 
-            if (Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection))
+            if (Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection))
             {
                 TDestProperty dval = GetDestValue(destinationEntity, operationType);
                 if (dval != null)
                 {
-                    ((IEntityMapper)Mapper).MapToDest(val, dval, operationType);
+                    ((IEntityMapper)Mapper).MapToDest(val!, dval, operationType);
                     return;
                 }
             }
@@ -536,9 +538,9 @@ namespace Beef.Mapper
         /// <param name="sourcePropertyValue">The source property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination property value.</returns>
-        object IPropertyMapper<TSrce, TDest>.ConvertToDestValue(object sourcePropertyValue, OperationTypes operationType)
+        object? IPropertyMapper<TSrce, TDest>.ConvertToDestValue(object? sourcePropertyValue, OperationTypes operationType)
         {
-            return ConvertToDestValue((TSrceProperty)sourcePropertyValue, operationType);
+            return ConvertToDestValue((TSrceProperty)sourcePropertyValue!, operationType);
         }
 
         /// <summary>
@@ -550,26 +552,26 @@ namespace Beef.Mapper
         public TDestProperty ConvertToDestValue(TSrceProperty sourcePropertyValue, OperationTypes operationType)
         {
             if (!OperationTypes.HasFlag(operationType))
-                return default;
+                return default!;
 
             if (Converter != null)
                 return Converter.ConvertToDest(sourcePropertyValue);
 
             if (sourcePropertyValue == null)
-                return default;
+                return default!;
 
             if ((!IsSrceComplexType && !IsDestComplexType)
-                || ((IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection)))
+                || ((IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection)))
             {
                 if (Mapper != null)
-                    return (TDestProperty)((IEntityMapper)Mapper).MapToDest(sourcePropertyValue, operationType);
+                    return (TDestProperty)((IEntityMapper)Mapper).MapToDest(sourcePropertyValue, operationType)!;
 
                 return (TDestProperty)Convert.ChangeType(sourcePropertyValue, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            if (SrceComplexTypeReflector.IsCollection)
+            if (SrceComplexTypeReflector!.IsCollection)
             {
-                var c = new List<object>();
+                var c = new List<object?>();
                 foreach (var item in (System.Collections.IEnumerable)sourcePropertyValue)
                 {
                     if (Mapper != null)
@@ -578,7 +580,7 @@ namespace Beef.Mapper
                         c.Add(Convert.ChangeType(item, DestUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
                 }
 
-                return (TDestProperty)DestComplexTypeReflector.CreateValue(c);
+                return (TDestProperty)DestComplexTypeReflector!.CreateValue(c);
             }
 
             try
@@ -645,9 +647,9 @@ namespace Beef.Mapper
         /// <param name="sourcePropertyValue">The source property value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination property value.</returns>
-        object IPropertyMapper<TSrce, TDest>.ConvertToSrceValue(object sourcePropertyValue, OperationTypes operationType)
+        object? IPropertyMapper<TSrce, TDest>.ConvertToSrceValue(object? sourcePropertyValue, OperationTypes operationType)
         {
-            return ConvertToDestValue((TSrceProperty)sourcePropertyValue, operationType);
+            return ConvertToDestValue((TSrceProperty)sourcePropertyValue!, operationType);
         }
 
         /// <summary>
@@ -659,30 +661,30 @@ namespace Beef.Mapper
         public TSrceProperty ConvertToSrceValue(TDestProperty destinationPropertyValue, OperationTypes operationType)
         {
             if (!OperationTypes.HasFlag(operationType))
-                return default;
+                return default!;
 
             if (Converter != null)
                 return Converter.ConvertToSrce(destinationPropertyValue);
 
             if (destinationPropertyValue == null)
-                return default;
+                return default!;
 
             if ((!IsSrceComplexType && !IsDestComplexType)
-                || ((IsSrceComplexType && !SrceComplexTypeReflector.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector.IsCollection)))
+                || ((IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection)))
             {
                 if (Mapper != null)
-                    return (TSrceProperty)((IEntityMapper)Mapper).MapToSrce(destinationPropertyValue, operationType);
+                    return (TSrceProperty)((IEntityMapper)Mapper).MapToSrce(destinationPropertyValue, operationType)!;
 
                 return (TSrceProperty)Convert.ChangeType(destinationPropertyValue, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            if (IsSrceComplexType && SrceComplexTypeReflector.IsCollection)
+            if (IsSrceComplexType && SrceComplexTypeReflector!.IsCollection)
             {
                 var c = new List<object>();
                 foreach (var item in (System.Collections.IEnumerable)destinationPropertyValue)
                 {
                     if (Mapper != null)
-                        c.Add(((IEntityMapper)Mapper).MapToSrce(item, operationType));
+                        c.Add(((IEntityMapper)Mapper).MapToSrce(item, operationType)!);
                     else
                         c.Add(Convert.ChangeType(item, SrceUnderlyingPropertyType, System.Globalization.CultureInfo.InvariantCulture));
                 }

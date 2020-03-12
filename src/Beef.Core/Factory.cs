@@ -127,7 +127,7 @@ namespace Beef
         /// <param name="nameSubstitutionRegex">Optional substitution <see cref="Regex"/>. Where <c>null</c> a default <see cref="Regex"/> will be used with the
         /// pattern set to <see cref="DefaultNameSubstitutionPattern"/>.</param>
         /// <remarks>This can be called multiple times to define all required substitution relationships.</remarks>
-        public static void SetSubstitution(Type interfaceTypeExample, Type concreteTypeExample, Regex nameSubstitutionRegex = null)
+        public static void SetSubstitution(Type interfaceTypeExample, Type concreteTypeExample, Regex? nameSubstitutionRegex = null)
         {
             if (!Check.NotNull(interfaceTypeExample, nameof(interfaceTypeExample)).GetTypeInfo().IsInterface)
                 throw new ArgumentException($"Type '{interfaceTypeExample.AssemblyQualifiedName}' is not an interface.", nameof(interfaceTypeExample));
@@ -202,7 +202,7 @@ namespace Beef
         /// <returns>An instance of the requested <see cref="Type"/>.</returns>
         public static T Create<T>()
         {
-            return Create<T>(null);
+            return Create<T>(null!);
         }
 
         /// <summary>
@@ -212,10 +212,10 @@ namespace Beef
         /// <param name="args">An array of arguments that match in number, order, and type the parameters of the constructor to invoke. If <paramref name="args"/> 
         /// is an empty array or <c>null</c>, the constructor that takes no parameters (the default constructor) is invoked.</param>
         /// <returns>An instance of the requested <see cref="Type"/>.</returns>
-        public static T Create<T>(params object[] args)
+        public static T Create<T>(params object?[] args)
         {
             Type typeKey = typeof(T);
-            Type typeVal = null;
+            Type? typeVal = null;
 
             if (_localProviderValues.Value != null && _localProviderValues.Value.TryGetValue(typeKey.AssemblyQualifiedName, out var lval))
                 return (T)lval;
@@ -273,7 +273,7 @@ namespace Beef
         /// <returns>The <see cref="Type"/> qualified name.</returns>
         private static string MakeTypeName(Type type, string className)
         {
-            return type.AssemblyQualifiedName.Replace(type.FullName, type.Namespace + "." + className);
+            return type.AssemblyQualifiedName.Replace(type.FullName, type.Namespace + "." + className, StringComparison.InvariantCulture);
         }
     }
 }

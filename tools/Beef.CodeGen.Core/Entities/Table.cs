@@ -5,6 +5,7 @@ using Beef.Mapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen.Entities
@@ -14,7 +15,7 @@ namespace Beef.CodeGen.Entities
     /// </summary>
     public class Table
     {
-        private string _name;
+        private string? _name;
 
         /// <summary>
         /// Loads the table and column schema details from the database.
@@ -23,27 +24,27 @@ namespace Beef.CodeGen.Entities
         /// <param name="refDataSchema">The reference data schema.</param>
         /// <param name="autoSecurity">Indicates whether the UserRole security should be automatically applied.</param>
         /// <param name="skipSqlSpecific">Indicates whether to skip the Microsoft SQL Server specific metadata queries.</param>
-        public static List<Table> LoadTablesAndColumns(DatabaseBase db, string refDataSchema = null, bool autoSecurity = false, bool skipSqlSpecific = false)
+        public static async Task<List<Table>> LoadTablesAndColumnsAsync(DatabaseBase db, string? refDataSchema = null, bool autoSecurity = false, bool skipSqlSpecific = false)
         {
             if (db == null)
                 throw new ArgumentNullException(nameof(db));
 
             var tables = new List<Table>();
-            Table table = null;
+            Table? table = null;
 
-            db.SqlStatement(ResourceManager.GetResourceContent("SelectTableAndColumns.sql")).SelectQuery((dr) =>
+            await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableAndColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
             {
-                var ct = TableMapper.Default.MapFromDb(dr, Mapper.OperationTypes.Get);
+                var ct = TableMapper.Default.MapFromDb(dr, Mapper.OperationTypes.Get)!;
                 if (table == null || table.Schema != ct.Schema || table.Name != ct.Name)
                     tables.Add(table = ct);
 
-                table.Columns.Add(ColumnMapper.Default.MapFromDb(dr, Mapper.OperationTypes.Get));
+                table.Columns.Add(ColumnMapper.Default.MapFromDb(dr, Mapper.OperationTypes.Get)!);
                 if (autoSecurity && table.Schema != refDataSchema)
                     table.UserRole = $"{table.Schema}.{table.Name}";
-            });
+            }).ConfigureAwait(false);
 
             // Configure all the single column primary and unique constraints.
-            foreach (var pks in db.SqlStatement(ResourceManager.GetResourceContent("SelectTablePrimaryKey.sql")).SelectQuery((dr) =>
+            foreach (var pks in db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTablePrimaryKey.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
             {
                 return new
                 {
@@ -53,7 +54,7 @@ namespace Beef.CodeGen.Entities
                     TableColumnName = dr.GetValue<string>("COLUMN_NAME"),
                     IsPrimaryKey = dr.GetValue<string>("CONSTRAINT_TYPE").StartsWith("PRIMARY", StringComparison.InvariantCultureIgnoreCase),
                 };
-            }).GroupBy(x => x.ConstraintName))
+            }).GetAwaiter().GetResult().GroupBy(x => x.ConstraintName))
             {
                 // Only single column unique columns are supported.
                 if (pks.Count() > 1 && !pks.First().IsPrimaryKey)
@@ -80,7 +81,7 @@ namespace Beef.CodeGen.Entities
             if (!skipSqlSpecific)
             {
                 // Configure all the single column foreign keys.
-                foreach (var fks in db.SqlStatement(ResourceManager.GetResourceContent("SelectTableForeignKeys.sql")).SelectQuery((dr) =>
+                foreach (var fks in db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableForeignKeys.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
                 {
                     return new
                     {
@@ -92,7 +93,7 @@ namespace Beef.CodeGen.Entities
                         ForeignTable = dr.GetValue<string>("UQ_TABLE_NAME"),
                         ForiegnColumn = dr.GetValue<string>("UQ_COLUMN_NAME")
                     };
-                }).GroupBy(x => x.ConstraintName).Where(x => x.Count() == 1))
+                }).ConfigureAwait(false).GetAwaiter().GetResult().GroupBy(x => x.ConstraintName).Where(x => x.Count() == 1))
                 {
                     var fk = fks.Single();
                     var col = (from t in tables
@@ -106,36 +107,36 @@ namespace Beef.CodeGen.Entities
                     col.IsForeignRefData = col.ForeignSchema == refDataSchema;
                 }
 
-                db.SqlStatement(ResourceManager.GetResourceContent("SelectTableIdentityColumns.sql")).SelectQuery((dr) =>
+                await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableIdentityColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
                 {
                     var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
                     var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     c.IsIdentity = true;
                     c.IdentitySeed = 1;
                     c.IdentityIncrement = 1;
-                });
+                }).ConfigureAwait(false);
 
-                db.SqlStatement(ResourceManager.GetResourceContent("SelectTableAlwaysGeneratedColumns.sql")).SelectQuery((dr) =>
+                await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableAlwaysGeneratedColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
                 {
                     var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
                     var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     t.Columns.Remove(c);
-                });
+                }).ConfigureAwait(false);
 
-                db.SqlStatement(ResourceManager.GetResourceContent("SelectTableGeneratedColumns.sql")).SelectQuery((dr) =>
+                await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableGeneratedColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
                 {
                     var t = tables.Single(x => x.Schema == dr.GetValue<string>("TABLE_SCHEMA") && x.Name == dr.GetValue<string>("TABLE_NAME"));
                     var c = t.Columns.Single(x => x.Name == dr.GetValue<string>("COLUMN_NAME"));
                     c.IsComputed = true;
-                });
+                }).ConfigureAwait(false);
             }
 
             // Auto-determine reference data relationships even where no foreign key defined.
             foreach (var t in tables)
             {
-                foreach (var col in t.Columns.Where(x => !x.IsForeignRefData && x.Name.Length > 2 && x.Name.EndsWith("Id", StringComparison.InvariantCulture)))
+                foreach (var col in t.Columns.Where(x => !x.IsForeignRefData && x.Name!.Length > 2 && x.Name.EndsWith("Id", StringComparison.InvariantCulture)))
                 {
-                    var rt = tables.Where(x => x.Name != t.Name && x.Name == col.Name.Substring(0, col.Name.Length - 2) && x.Schema == refDataSchema).SingleOrDefault();
+                    var rt = tables.Where(x => x.Name != t.Name && x.Name == col.Name![0..^2] && x.Schema == refDataSchema).SingleOrDefault();
                     if (rt != null)
                     {
                         col.ForeignSchema = rt.Schema;
@@ -160,14 +161,14 @@ namespace Beef.CodeGen.Entities
                 throw new ArgumentNullException(nameof(name));
 
 #pragma warning disable CA1308 // Normalize strings to uppercase; by-design, a lowercase is required.
-            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name).Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
+            return new string(Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray());
 #pragma warning restore CA1308 
         }
 
         /// <summary>
         /// Gets or sets the table name.
         /// </summary>
-        public string Name
+        public string? Name
         {
             get { return _name; }
 
@@ -182,7 +183,7 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the schema.
         /// </summary>
-        public string Schema { get; set; }
+        public string? Schema { get; set; }
 
         /// <summary>
         /// Indicates whether the Table is actually a View.
@@ -192,7 +193,7 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the alias (automatically updated when the <see cref="Name"/> is set and the current alias value is <c>null</c>).
         /// </summary>
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         /// <summary>
         /// Indicates whether to create a corresponding View for the Table.
@@ -242,12 +243,12 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets or sets the default order by for a <see cref="GetAll"/>.
         /// </summary>
-        public string GetAllOrderBy { get; set; }
+        public string? GetAllOrderBy { get; set; }
 
         /// <summary>
         /// Gets or sets the user role.
         /// </summary>
-        public string UserRole { get; set; }
+        public string? UserRole { get; set; }
 
         /// <summary>
         /// Indicates whether to create the <b>EfModel</b> class.
@@ -343,7 +344,7 @@ namespace Beef.CodeGen.Entities
         /// <param name="operationType">The <see cref="OperationTypes"/>.</param>
         /// <param name="data">Optional data.</param>
         /// <returns>The <see cref="Table"/> value.</returns>
-        protected override Table OnMapFromDb(Table value, DatabaseRecord dr, OperationTypes operationType, object data)
+        protected override Table OnMapFromDb(Table value, DatabaseRecord dr, OperationTypes operationType, object? data)
         {
             value.View = !value.IsAView;
             value.Get = true;

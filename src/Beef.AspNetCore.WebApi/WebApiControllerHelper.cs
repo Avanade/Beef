@@ -34,7 +34,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
         /// <param name="eTag">The <b>ETag</b> <see cref="String"/>.</param>
-        public static void SetETag(HttpResponse response, string eTag)
+        public static void SetETag(HttpResponse response, string? eTag)
         {
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
@@ -48,7 +48,7 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
         /// <param name="paging">The <see cref="PagingResult"/> value to be added to the headers; <c>null</c> indicates to remove.</param>
-        public static void SetPaging(HttpResponse response, PagingResult paging)
+        public static void SetPaging(HttpResponse response, PagingResult? paging)
         {
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
@@ -63,7 +63,7 @@ namespace Beef.AspNetCore.WebApi
             }
             else
             {
-                response.Headers[WebApiConsts.PagingPageNumberHeaderName] = paging.Page.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                response.Headers[WebApiConsts.PagingPageNumberHeaderName] = paging.Page!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 response.Headers[WebApiConsts.PagingPageSizeHeaderName] = paging.Take.ToString(System.Globalization.CultureInfo.InvariantCulture);
             }
 
@@ -80,13 +80,13 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="response">The <see cref="HttpResponse"/> to update.</param>
         /// <param name="value">The value that implements <see cref="IPagingResult"/> (where the <paramref name="value"/> does not implement an
         /// <see cref="IPagingResult"/> the paging headers will not be set).</param>
-        public static void SetPaging(HttpResponse response, object value)
+        public static void SetPaging(HttpResponse response, object? value)
         {
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
 
             if (value != null && value is IPagingResult)
-                SetPaging(response, ((IPagingResult)value)?.Paging);
+                SetPaging(response, ((IPagingResult)value).Paging);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using Beef.Mapper.Converters;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Mapper.Converters;
 using Beef.Reflection;
 using System;
 
@@ -22,12 +24,12 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the destination property name.
         /// </summary>
-        string DestPropertyName { get; }
+        string? DestPropertyName { get; }
 
         /// <summary>
         /// Gets the destination property <see cref="Type"/>.
         /// </summary>
-        Type DestPropertyType { get; }
+        Type? DestPropertyType { get; }
 
         /// <summary>
         /// Indicates whether the property forms part of the unique (primary) key. 
@@ -48,7 +50,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="IPropertyMapperConverter"/> (used where a specific source and destination type conversion is required).
         /// </summary>
-        IPropertyMapperConverter Converter { get; }
+        IPropertyMapperConverter? Converter { get; }
 
         /// <summary>
         /// Sets the <see cref="Converter"/>.
@@ -60,7 +62,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="IEntityMapperBase"/> to map complex types.
         /// </summary>
-        IEntityMapperBase Mapper { get; }
+        IEntityMapperBase? Mapper { get; }
 
         /// <summary>
         /// Set the <see cref="IEntityMapperBase"/> to map complex types.
@@ -83,7 +85,7 @@ namespace Beef.Mapper
         /// <summary>
         /// Gets the <see cref="Beef.Reflection.ComplexTypeReflector"/> (only set where the property <see cref="IsSrceComplexType"/>).
         /// </summary>
-        ComplexTypeReflector SrceComplexTypeReflector { get; }
+        ComplexTypeReflector? SrceComplexTypeReflector { get; }
 
         /// <summary>
         /// Indicates whether the property is a complex type or complex type collection (see <see cref="SrceComplexTypeReflector"/>).

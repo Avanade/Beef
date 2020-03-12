@@ -86,7 +86,7 @@ namespace Beef.RefData
         /// Initializes a new instance of the <see cref="ReferenceDataSidList{TItem, TSid}"/> class with a reference to the underlying <b>Serialization Identifier</b> (SID) list.
         /// </summary>
         /// <param name="sids">A reference to the master <b>Serialization Identifier</b> (SID) list; it is this list that will be maintained by this collection.</param>
-        public ReferenceDataSidList(ref List<TSid> sids)
+        public ReferenceDataSidList(ref List<TSid>? sids)
         {
             if (sids == null)
                 sids = new List<TSid>();
@@ -98,15 +98,15 @@ namespace Beef.RefData
         /// Initializes a new instance of the <see cref="ReferenceDataSidList{TItem, TSid}"/> class with a list of items.
         /// </summary>
         /// <param name="items">The list of items.</param>
-        public ReferenceDataSidList(IEnumerable<TItem> items)
+        public ReferenceDataSidList(IEnumerable<TItem>? items)
         {
-            if (items != null)
+            _sids = new List<TSid>();
+            if (items == null)
+                return;
+
+            foreach (var item in items)
             {
-                _sids = new List<TSid>();
-                foreach (var item in items)
-                {
-                    Add(item);
-                }
+                Add(item);
             }
         }
 
@@ -129,11 +129,14 @@ namespace Beef.RefData
             var ids = new List<int>();
             foreach (var item in this)
             {
-                if (ids.Count == 0 && item.Id.GetType() != typeof(int))
+                if (item == null)
+                    throw new InvalidOperationException("An item should not have a value of null");
+
+                if (ids.Count == 0 && (item.Id == null || item.Id.GetType() != typeof(int)))
                     throw new InvalidOperationException("The underlying item identifier Type is not an Int32; cannot convert to Int32 list.");
 
                 if (item.IsValid)
-                    ids.Add((int)item.Id);
+                    ids.Add((int)item.Id!);
             }
 
             return ids;
@@ -149,11 +152,14 @@ namespace Beef.RefData
             var ids = new List<Guid>();
             foreach (var item in this)
             {
-                if (ids.Count == 0 && item.Id.GetType() != typeof(Guid))
+                if (item == null)
+                    throw new InvalidOperationException("An item should not have a value of null");
+
+                if (ids.Count == 0 && (item.Id == null || item.Id.GetType() != typeof(Guid)))
                     throw new InvalidOperationException("The underlying item identifier Type is not an Guid; cannot convert to Guid list.");
 
                 if (item.IsValid)
-                    ids.Add((Guid)item.Id);
+                    ids.Add((Guid)item.Id!);
             }
 
             return ids;
@@ -163,11 +169,14 @@ namespace Beef.RefData
         /// Creates a <see cref="string"/> list containing the <see cref="ReferenceDataBase"/> <see cref="ReferenceDataBase.Code"/> for each item (where <see cref="ReferenceDataBase.IsValid"/>).
         /// </summary>
         /// <returns>A <see cref="List{Int32}"/>.</returns>
-        public List<string> ToCodeList()
+        public List<string?> ToCodeList()
         {
-            var codes = new List<string>();
+            var codes = new List<string?>();
             foreach (var item in this)
             {
+                if (item == null)
+                    throw new InvalidOperationException("An item should not have a value of null");
+
                 if (item.IsValid)
                     codes.Add(item.Code);
             }
@@ -185,19 +194,19 @@ namespace Beef.RefData
         }
 
         /// <summary>
-        /// Gets Reference Data item by the SID.
+        /// Gets Reference Data <typeparamref name="TItem"/> by the SID.
         /// </summary>
         private TItem GetItem(object sid)
         {
             if (sid == null)
-                return default;
+                return default!;
 
             return _sidType switch
             {
                 SidType.String => ReferenceDataBase.ConvertFromCode<TItem>((string)sid),
                 SidType.Int32 => ReferenceDataBase.ConvertFromId<TItem>((int)sid),
                 SidType.Guid => ReferenceDataBase.ConvertFromId<TItem>((Guid)sid),
-                _ => default,
+                _ => default!,
             };
         }
 
@@ -206,20 +215,20 @@ namespace Beef.RefData
         /// </summary>
         private static TSid GetSidForItem(TItem item)
         {
-            if (item != null)
-            {
-                switch (_sidType)
-                {
-                    case SidType.String:
-                        return (TSid)(object)item.Code;
+            if (item == null)
+                return default!;
 
-                    case SidType.Int32:
-                    case SidType.Guid:
-                        return (TSid)item.Id;
-                }
+            switch (_sidType)
+            {
+                case SidType.String:
+                    return (TSid)(object)item.Code!;
+
+                case SidType.Int32:
+                case SidType.Guid:
+                    return (TSid)item.Id!;
             }
 
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -238,7 +247,7 @@ namespace Beef.RefData
         /// <returns><c>true</c> indicates that invalid items exist; otherwise, <c>false</c>.</returns>
         public override bool ContainsInvalidItems()
         {
-            return this.Any(x => x != null && !x.IsValid);
+            return this.Any(x => x != null! && !x.IsValid);
         }
 
         #region IEnumerable<>
@@ -250,7 +259,7 @@ namespace Beef.RefData
         {
             foreach (TSid sid in _sids)
             {
-                yield return GetItem(sid);
+                yield return GetItem(sid!);
             }
         }
 
@@ -289,11 +298,11 @@ namespace Beef.RefData
         /// <returns>The item at the specified index.</returns>
         public TItem this[int index]
         {
-            get { return GetItem(_sids[index]); }
+            get { return GetItem(_sids[index]!); }
 
             set
             {
-                var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, GetItem(_sids[index]));
+                var e = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, GetItem(_sids[index]!));
                 _sids[index] = GetSidForItem(value);
                 OnCollectionChanged(e);
             }
@@ -429,7 +438,7 @@ namespace Beef.RefData
         /// <summary>
         /// Occurs when an item is added, removed, changed, moved, or the entire list is refreshed.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         #endregion
     }

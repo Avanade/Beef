@@ -17,7 +17,7 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets or sets the error message format text (overrides the default).
         /// </summary>
-        public LText ErrorText { get; set; }
+        public LText? ErrorText { get; set; }
 
         /// <summary>
         /// Adds a clause (<see cref="IPropertyRuleClause{TEntity, TProperty}"/>) to the rule.

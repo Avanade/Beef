@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:50043/",
+      "applicationUrl": "http://localhost:56043/",
       "sslPort": 0
     }
   },
@@ -11,7 +11,7 @@
     "Beef.Demo.Api": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:50043/swagger"
+      "launchUrl": "swagger"
     }
   }
 }

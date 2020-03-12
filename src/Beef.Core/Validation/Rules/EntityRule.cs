@@ -12,22 +12,22 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TValidator">The property validator <see cref="Type"/>.</typeparam>
     public class EntityRule<TEntity, TProperty, TValidator> : ValueRuleBase<TEntity, TProperty>
         where TEntity : class
-        where TProperty : class
-        where TValidator : Validator<TProperty>
+        where TProperty : class?
+        where TValidator : IValidator
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityRule{TEntity, TProperty, TValidator}"/> class.
         /// </summary>
         /// <param name="validator">The <see cref="Beef.Validation.Validator{TProperty, TValidator}"/>.</param>
-        public EntityRule(Validator<TProperty> validator)
+        public EntityRule(IValidator validator)
         {
             Validator = Beef.Check.NotNull(validator, nameof(validator));
         }
 
         /// <summary>
-        /// Gets the <see cref="Beef.Validation.Validator{TProperty, TValidator}"/>.
+        /// Gets the <see cref="Beef.Validation.IValidator"/>.
         /// </summary>
-        public Validator<TProperty> Validator { get; private set; }
+        public IValidator Validator { get; private set; }
 
         /// <summary>
         /// Overrides the <b>Check</b> method and will not validate where performing a shallow validation.

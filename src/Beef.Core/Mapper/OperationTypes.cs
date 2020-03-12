@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using System;
 
 namespace Beef.Mapper
 {

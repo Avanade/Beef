@@ -31,6 +31,11 @@ namespace Beef
         public const char SpaceCharacter = ' ';
 
         /// <summary>
+        /// Gets the <see cref="WildcardSelection.None"/> and <see cref="WildcardSelection.Single"/> <see cref="Wildcard"/>; i.e does not directly support any wildcard characters.
+        /// </summary>
+        public static Wildcard None { get; } = new Wildcard(WildcardSelection.None | WildcardSelection.Equal);
+
+        /// <summary>
         /// Gets the <see cref="WildcardSelection.MultiBasic"/> <see cref="Wildcard"/> using only the <see cref="MultiWildcardCharacter"/>.
         /// </summary>
         public static Wildcard MultiBasic { get; } = new Wildcard(WildcardSelection.MultiBasic, MultiWildcardCharacter);
@@ -59,7 +64,7 @@ namespace Beef
         /// <param name="charactersNotAllowed">The list of characters that are not allowed.</param>
         /// <param name="transform">The <see cref="StringTransform"/> option for the wildcard text.</param>
         /// <param name="spaceTreatment">The <see cref="WildcardSpaceTreatment"/> that defines the treatment of embedded space ' ' characters within the wildcard.</param>
-        public Wildcard(WildcardSelection supported, char multiWildcard = MultiWildcardCharacter, char singleWildcard = char.MinValue, char[] charactersNotAllowed = null,
+        public Wildcard(WildcardSelection supported, char multiWildcard = MultiWildcardCharacter, char singleWildcard = char.MinValue, char[]? charactersNotAllowed = null,
             WildcardSpaceTreatment spaceTreatment = WildcardSpaceTreatment.None, StringTransform transform = StringTransform.EmptyToNull)
         {
             if (supported == WildcardSelection.Undetermined || supported.HasFlag(WildcardSelection.InvalidCharacter))
@@ -156,19 +161,19 @@ namespace Beef
         /// </summary>
         /// <param name="text">The wildcard text.</param>
         /// <returns>The corresponding <see cref="WildcardResult"/>.</returns>
-        public WildcardResult Parse(string text)
+        public WildcardResult Parse(string? text)
         {
             text = Cleaner.Clean(text, StringTrim.Both, Transform);
             if (string.IsNullOrEmpty(text))
-                return new WildcardResult { Wildcard = this, Selection = WildcardSelection.None, Text = text };
+                return new WildcardResult(this) { Selection = WildcardSelection.None, Text = text };
 
             var sb = new StringBuilder();
-            var wr = new WildcardResult { Wildcard = this, Selection = WildcardSelection.Undetermined };
+            var wr = new WildcardResult(this) { Selection = WildcardSelection.Undetermined };
 
             if (CharactersNotAllowed != null && CharactersNotAllowed.Count > 0 && text.IndexOfAny(CharactersNotAllowed.ToArray()) >= 0)
                 wr.Selection |= WildcardSelection.InvalidCharacter;
 
-            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter) >= 0;
+            var hasMulti = SpaceTreatment == WildcardSpaceTreatment.MultiWildcardWhenOthers && Supported.HasFlag(WildcardSelection.MultiWildcard) && text.IndexOf(MultiWildcardCharacter, StringComparison.InvariantCulture) >= 0;
             var hasTxt = false;
 
             for (int i = 0; i < text.Length; i++)
@@ -276,9 +281,15 @@ namespace Beef
     public class WildcardResult
     {
         /// <summary>
+        /// Initialize a new instance of the <see cref="WildcardResult"/> class.
+        /// </summary>
+        /// <param name="wildcard">The originating <see cref="Beef.Wildcard"/> configuration.</param>
+        internal WildcardResult(Wildcard wildcard) => Wildcard = wildcard;
+
+        /// <summary>
         /// Gets the originating <see cref="Beef.Wildcard"/> configuration.
         /// </summary>
-        internal Wildcard Wildcard { get; set; }
+        internal Wildcard Wildcard { get; private set; }
 
         /// <summary>
         /// Gets the resulting <see cref="WildcardSelection"/>.
@@ -288,7 +299,7 @@ namespace Beef
         /// <summary>
         /// Gets the updated wildcard text.
         /// </summary>
-        public string Text { get; internal set; }
+        public string? Text { get; internal set; }
 
         /// <summary>
         /// Indicates whether the <see cref="Text"/> contains one or more non-<see cref="Wildcard.Supported"/> errors.
@@ -298,14 +309,14 @@ namespace Beef
         /// <summary>
         /// Gets the <see cref="Text"/> with all the wildcard characters removed.
         /// </summary>
-        public string GetTextWithoutWildcards()
+        public string? GetTextWithoutWildcards()
         {
             var s = Text;
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                s = s.Replace(new string(Wildcard.MultiWildcard, 1), string.Empty);
+                s = s!.Replace(new string(Wildcard.MultiWildcard, 1), string.Empty, StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                s = s.Replace(new string(Wildcard.SingleWildcard, 1), string.Empty);
+                s = s!.Replace(new string(Wildcard.SingleWildcard, 1), string.Empty, StringComparison.InvariantCulture);
 
             return s;
         }
@@ -336,10 +347,10 @@ namespace Beef
 
             var p = Regex.Escape(Text);
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                p = p.Replace("\\*", ".*");
+                p = p.Replace("\\*", ".*", StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                p = p.Replace("\\?", ".");
+                p = p.Replace("\\?", ".", StringComparison.InvariantCulture);
 
             return CreateRegex($"^{p}$", ignoreCase);
         }
@@ -366,10 +377,10 @@ namespace Beef
 
             var p = Regex.Escape(Text);
             if (Selection.HasFlag(WildcardSelection.MultiWildcard))
-                p = p.Replace("\\*", ".*");
+                p = p.Replace("\\*", ".*", StringComparison.InvariantCulture);
 
             if (Selection.HasFlag(WildcardSelection.SingleWildcard))
-                p = p.Replace("\\?", ".");
+                p = p.Replace("\\?", ".", StringComparison.InvariantCulture);
 
             return $"^{p}$";
         }

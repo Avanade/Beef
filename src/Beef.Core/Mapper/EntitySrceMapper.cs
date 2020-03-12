@@ -1,4 +1,6 @@
-﻿using Beef.Reflection;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,14 +20,14 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        new IPropertySrceMapper<TSrce> GetBySrcePropertyName(string name);
+        new IPropertySrceMapper<TSrce>? GetBySrcePropertyName(string name);
 
         /// <summary>
         /// Gets the <see cref="IPropertySrceMapper{TSrce}"/> mapping by destination property name.
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        new IPropertySrceMapper<TSrce> GetByDestPropertyName(string name);
+        new IPropertySrceMapper<TSrce>? GetByDestPropertyName(string name);
     }
 
     /// <summary>
@@ -37,7 +39,7 @@ namespace Beef.Mapper
         private readonly List<IPropertySrceMapper<TSrce>> _mappings = new List<IPropertySrceMapper<TSrce>>();
         private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _srceMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
         private readonly Dictionary<string, IPropertySrceMapper<TSrce>> _destMappings = new Dictionary<string, IPropertySrceMapper<TSrce>>();
-        private IPropertyMapperBase[] _uniqueKey;
+        private IPropertyMapperBase[]? _uniqueKey;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntitySrceMapper{TSrce}"/> class.
@@ -92,7 +94,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertySrceMapper<TSrce> GetBySrcePropertyName(string name)
+        public IPropertySrceMapper<TSrce>? GetBySrcePropertyName(string name)
         {
             return _srceMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
         }
@@ -103,7 +105,7 @@ namespace Beef.Mapper
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertySrceMapper<TSrce> GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
+        public IPropertySrceMapper<TSrce>? GetBySrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -117,7 +119,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertySrceMapper{TSrce}"/> where found; otherwise, <c>null</c>.</returns>
-        public IPropertySrceMapper<TSrce> GetByDestPropertyName(string name)
+        public IPropertySrceMapper<TSrce>? GetByDestPropertyName(string name)
         {
             return _destMappings.TryGetValue(name, out IPropertySrceMapper<TSrce> map) ? map : null;
         }
@@ -127,7 +129,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase IEntityMapperBase.GetBySrcePropertyName(string name)
+        IPropertyMapperBase? IEntityMapperBase.GetBySrcePropertyName(string name)
         {
             return GetBySrcePropertyName(name);
         }
@@ -137,7 +139,7 @@ namespace Beef.Mapper
         /// </summary>
         /// <param name="name">The source property name.</param>
         /// <returns>The <see cref="IPropertyMapperBase"/> where found; otherwise, <c>null</c>.</returns>
-        IPropertyMapperBase IEntityMapperBase.GetByDestPropertyName(string name)
+        IPropertyMapperBase? IEntityMapperBase.GetByDestPropertyName(string name)
         {
             return GetByDestPropertyName(name);
         }

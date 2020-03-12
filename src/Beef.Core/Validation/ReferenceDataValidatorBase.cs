@@ -55,7 +55,7 @@ namespace Beef.Validation
         /// <summary>
         /// Perform more complex mandatory check based on the ReferenceData base ID type.
         /// </summary>
-        private void ValidateId(PropertyContext<TEntity, object> context)
+        private void ValidateId(PropertyContext<TEntity, object?> context)
         {
             if (context.Value != null)
             {

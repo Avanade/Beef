@@ -18,21 +18,21 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase GetById(int id);
+        ReferenceDataBase? GetById(int id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
         /// <param name="id">The specified <see cref="ReferenceDataBase.Id"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase GetById(Guid id);
+        ReferenceDataBase? GetById(Guid id);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified <see cref="ReferenceDataBase.Code"/>.
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase GetByCode(string code);
+        ReferenceDataBase? GetByCode(string? code);
 
         /// <summary>
         /// Gets the <see cref="ReferenceDataBase"/> for the specified mapping (<see cref="ReferenceDataBase.SetMapping{T}(string, T)"/>) name and value.
@@ -40,6 +40,6 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase GetByMappingValue(string name, IComparable value);
+        ReferenceDataBase? GetByMappingValue(string name, IComparable value);
     }
 }

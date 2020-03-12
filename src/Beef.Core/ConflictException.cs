@@ -29,7 +29,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="ConflictException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ConflictException(string message)
+        public ConflictException(string? message)
             : base(message ?? new LText("Beef.ConflictException"))
         {
         }
@@ -39,7 +39,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public ConflictException(string message, Exception innerException)
+        public ConflictException(string? message, Exception innerException)
             : base(message ?? new LText("Beef.ConflictException"), innerException)
         {
         }

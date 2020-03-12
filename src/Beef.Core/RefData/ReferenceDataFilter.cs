@@ -43,7 +43,7 @@ namespace Beef.RefData
         /// <summary>
         /// Gets or sets the <see cref="IETag.ETag"/>.
         /// </summary>
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, hiding is the desired outcome.
         /// <summary>
@@ -74,8 +74,8 @@ namespace Beef.RefData
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class ReferenceDataFilter : EntityBase
     {
-        private IEnumerable<string> _codes;
-        private string _text;
+        private IEnumerable<string>? _codes;
+        private string? _text;
 
         /// <summary>
         /// Gets the validator to ensure the wildcards are considered valid.
@@ -92,7 +92,7 @@ namespace Beef.RefData
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
         /// <returns>The filtered collection and corresponding ETag.</returns>
-        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string> codes = null, string text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, IEnumerable<string>? codes = null, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             return ApplyFilter<TColl, TItem>(coll, new ReferenceDataFilter { Codes = codes?.Where(x => !string.IsNullOrEmpty(x)).AsEnumerable(), Text = text }, includeInactive);
         }
@@ -107,7 +107,7 @@ namespace Beef.RefData
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <param name="includeInactive">Indicates whether to include inactive (<see cref="ReferenceDataBase.IsActive"/> equal <c>false</c>) entries.</param>
         /// <returns>The filtered collection and corresponding ETag.</returns>
-        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
+        public static ReferenceDataFilterResult<TItem> ApplyFilter<TColl, TItem>(TColl coll, StringValues codes = default, string? text = null, bool includeInactive = false) where TColl : ReferenceDataCollectionBase<TItem>, new() where TItem : ReferenceDataBase, new()
         {
             var list = new List<string>();
             foreach (var c in codes)
@@ -163,7 +163,7 @@ namespace Beef.RefData
         /// Gets or sets the list of codes.
         /// </summary>
         [JsonProperty("codes", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public IEnumerable<string> Codes
+        public IEnumerable<string>? Codes
         {
             get => _codes;
             set => SetValue(ref _codes, value, false, false, nameof(Codes));
@@ -173,7 +173,7 @@ namespace Beef.RefData
         /// Gets or sets the text (including wildcards).
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Text
+        public string? Text
         {
             get => _text;
             set => SetValue(ref _text, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Text));

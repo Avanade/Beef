@@ -22,7 +22,7 @@ namespace Beef.RefData
         private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _itemProviders = new ConcurrentDictionary<Type, IReferenceDataProvider>();
 
         [ThreadStatic()]
-        private static ReferenceDataContext _context;
+        private static ReferenceDataContext? _context;
 
         /// <summary>
         /// Registers one or more <see cref="IReferenceDataProvider"/> provider instances.

@@ -8,7 +8,7 @@ namespace Beef.Data.Database
     /// <summary>
     /// Represents a database <b>RowVersion</b> converter.
     /// </summary>
-    public class DatabaseRowVersionConverter : Singleton<DatabaseRowVersionConverter>, IPropertyMapperConverter<string, byte[]>
+    public class DatabaseRowVersionConverter : Singleton<DatabaseRowVersionConverter>, IPropertyMapperConverter<string?, byte[]>
     {
         /// <summary>
         /// Gets the source value <see cref="Type"/>.
@@ -35,7 +35,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public byte[] ConvertToDest(string value)
+        public byte[] ConvertToDest(string? value)
         {
             if (value == null)
                 return new byte[8];
@@ -48,9 +48,9 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public object ConvertToDest(object value)
+        object? IPropertyMapperConverter.ConvertToDest(object? value)
         {
-            return ConvertToDest((string)value);
+            return ConvertToDest((string)value!);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public string ConvertToSrce(byte[] value)
+        public string? ConvertToSrce(byte[] value)
         {
             return Convert.ToBase64String(value);
         }
@@ -68,9 +68,9 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        public object ConvertToSrce(object value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value)
         {
-            return ConvertToSrce((byte[])value);
+            return ConvertToSrce((byte[])value!);
         }
     }
 }

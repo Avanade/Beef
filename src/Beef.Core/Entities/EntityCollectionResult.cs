@@ -19,12 +19,12 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the <see cref="PagingResult"/>.
         /// </summary>
-        PagingResult Paging { get; set; }
+        PagingResult? Paging { get; set; }
 
         /// <summary>
         /// Gets the underlying <see cref="ICollection"/>.
         /// </summary>
-        ICollection Collection { get; }
+        ICollection? Collection { get; }
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the underlying <see cref="ICollection{TEntity}"/>.
         /// </summary>
-        new ICollection<TEntity> Collection { get; }
+        new ICollection<TEntity>? Collection { get; }
     }
 
     /// <summary>
@@ -48,14 +48,14 @@ namespace Beef.Entities
         where TColl : EntityBaseCollection<TEntity>, new()
         where TEntity : EntityBase
     {
-        private PagingResult _paging;
-        private TColl _result = new TColl();
+        private PagingResult? _paging;
+        private TColl? _result;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityCollectionResult{TColl, TEntity}"/> class.
         /// </summary>
         /// <param name="paging">Defaults the <see cref="Paging"/> to the requesting <see cref="PagingArgs"/>.</param>
-        protected EntityCollectionResult(PagingArgs paging = null)
+        protected EntityCollectionResult(PagingArgs? paging = null)
         {
             if (paging != null)
                 _paging = new PagingResult(paging);
@@ -68,18 +68,18 @@ namespace Beef.Entities
         public TColl Result
 #pragma warning restore CA2227
         {
-            get { return _result; }
-            set { SetValue<TColl>(ref _result, value, false, false, ResultProperty); }
+            get { return _result ?? (_result = new TColl()); }
+            set { SetValue(ref _result, value ?? throw new ArgumentNullException(nameof(value)), false, false, ResultProperty); }
         }
 
         /// <summary>
         /// Gets or sets the <see cref="PagingResult"/>.
         /// </summary>
         /// <remarks>Where this value is <c>null</c> it indicates that the paging was unable to be determined.</remarks>
-        public PagingResult Paging
+        public PagingResult? Paging
         {
             get { return _paging; }
-            set { SetValue<PagingResult>(ref _paging, value, false, false, PagingProperty); }
+            set { SetValue(ref _paging, value, false, false, PagingProperty); }
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the underlying <see cref="ICollection"/>.
         /// </summary>
-        ICollection IEntityCollectionResult.Collection
+        ICollection? IEntityCollectionResult.Collection
         {
 #pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
@@ -100,7 +100,7 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the underlying <see cref="ICollection{TEntity}"/>.
         /// </summary>
-        ICollection<TEntity> IEntityCollectionResult<TEntity>.Collection
+        ICollection<TEntity>? IEntityCollectionResult<TEntity>.Collection
         {
 #pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, serves an internal purpose therefore hiding property.
             get { return _result; }
@@ -115,7 +115,7 @@ namespace Beef.Entities
         {
             var fval = ValidateCopyFromType<EntityCollectionResult<TColl, TEntity>>(from);
             CopyFrom(fval);
-            Result = (fval.Result == null) ? null : (TColl)fval.Result.Clone();
+            Result = (TColl)fval.Result.Clone();
             Paging = (fval.Paging == null) ? null : new PagingResult(fval.Paging);
         }
 

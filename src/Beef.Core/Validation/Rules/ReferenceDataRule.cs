@@ -9,7 +9,7 @@ namespace Beef.Validation.Rules
     /// </summary>
     public class ReferenceDataRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty>
         where TEntity : class
-        where TProperty : ReferenceDataBase
+        where TProperty : ReferenceDataBase?
     {
         /// <summary>
         /// Validate the property value.

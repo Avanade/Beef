@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Loaders
 {
@@ -20,12 +21,15 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            CodeGenConfig entity = CodeGenConfig.FindConfig(config, "Entity");
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Operation element must have a Name property.");
+
+            CodeGenConfig entity = CodeGenConfig.FindConfig(config, "Entity") ?? throw new CodeGenException("Operation element must have an Entity element parent.");
 
             if (config.GetAttributeValue<bool>("UniqueKey"))
             {
@@ -70,14 +74,8 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("QualifiedName", entity.Attributes["Name"] + config.Attributes["Name"]);
-        }
 
-        /// <summary>
-        /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
-        /// </summary>
-        /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
-        {
+            return Task.CompletedTask;
         }
     }
 }

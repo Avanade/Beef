@@ -72,7 +72,7 @@ namespace Beef.Events
             Beef.Check.NotNull(valueType, nameof(valueType));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-            return (Beef.Events.EventData)Newtonsoft.Json.JsonConvert.DeserializeObject(body, typeof(Beef.Events.EventData<>).MakeGenericType(new Type[] { valueType }));
+            return (Beef.Events.EventData)JsonConvert.DeserializeObject(body, typeof(Beef.Events.EventData<>).MakeGenericType(new Type[] { valueType }))!;
         }
 
         /// <summary>

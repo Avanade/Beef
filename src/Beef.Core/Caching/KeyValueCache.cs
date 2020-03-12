@@ -17,8 +17,8 @@ namespace Beef.Caching
     public class KeyValueCache<TKey, TValue> : CacheCoreBase
     {
         private readonly ConcurrentDictionary<TKey, CacheValue<TValue>> _dict = new ConcurrentDictionary<TKey, CacheValue<TValue>>();
-        private readonly Func<TKey, TValue> _get;
-        private readonly Func<TKey, Task<TValue>> _getAsync;
+        private readonly Func<TKey, TValue>? _get;
+        private readonly Func<TKey, Task<TValue>>? _getAsync;
         private readonly bool _cacheDefaultValues;
         private readonly KeyedLock<TKey> _keyLock = new KeyedLock<TKey>();
 
@@ -29,7 +29,7 @@ namespace Beef.Caching
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="cacheDefaultValues"><c>true</c> indicates that <b>default</b> values returned from the <paramref name="get"/> are to be cached; otherwise, <c>false</c> will
         /// throw an <see cref="ArgumentException"/> indicating that the cache does not contain the specified key.</param>
-        public KeyValueCache(Func<TKey, TValue> get, string policyKey = null, bool cacheDefaultValues = false) : base(policyKey, doNotRegister: true)
+        public KeyValueCache(Func<TKey, TValue> get, string? policyKey = null, bool cacheDefaultValues = false) : base(policyKey, doNotRegister: true)
         {
             _get = Check.NotNull(get, nameof(get));
             _cacheDefaultValues = cacheDefaultValues;
@@ -45,12 +45,12 @@ namespace Beef.Caching
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="cacheDefaultValues"><c>true</c> indicates that <b>default</b> values returned from the <paramref name="getAsync"/> are to be cached; otherwise, <c>false</c> will
         /// throw an <see cref="ArgumentException"/> indicating that the cache does not contain the specified key.</param>
-        public KeyValueCache(Func<TKey, Task<TValue>> getAsync, string policyKey = null, bool cacheDefaultValues = false) : base(policyKey, doNotRegister: true)
+        public KeyValueCache(Func<TKey, Task<TValue>> getAsync, string? policyKey = null, bool cacheDefaultValues = false) : base(policyKey, doNotRegister: true)
         {
             _getAsync = Check.NotNull(getAsync, nameof(getAsync));
             _cacheDefaultValues = cacheDefaultValues;
 
-            // Register an internally policy key with NoCachePolicy to ensure always invoked; then handle internally.
+            // Register an internal policy key with NoCachePolicy to ensure always invoked; then handle internally.
             RegisterInternalPolicyKey();
         }
 
@@ -124,7 +124,7 @@ namespace Beef.Caching
             }
 
             // Lock against the key to minimise concurrent gets (which could be expensive).
-            TValue v = default;
+            TValue v = default!;
             lock (_keyLock.Lock(key))
             {
                 if (_dict.TryGetValue(key, out cv) && !cv.Policy.HasExpired())
@@ -133,10 +133,10 @@ namespace Beef.Caching
                     return true;
                 }
 
-                v = _get != null ? _get(key) : _getAsync(key).Result;
-                if (EqualityComparer<TValue>.Default.Equals(v, default))
+                v = _get != null ? _get(key) : _getAsync!(key).GetAwaiter().GetResult();
+                if (EqualityComparer<TValue>.Default.Equals(v, default!))
                 {
-                    value = default;
+                    value = default!;
                     if (!_cacheDefaultValues)
                         return false;
                 }

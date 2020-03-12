@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System.Threading.Tasks;
+
 namespace Beef.Database.Core
 {
     /// <summary>
@@ -12,9 +14,9 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The console arguments.</param>
         /// <returns>A statuc code.</returns>
-        public static int Main(string[] args)
+        public static Task<int> Main(string[] args)
         {
-            return DatabaseConsole.Create().Run(args);
+            return DatabaseConsole.Create().RunAsync(args);
         }
     }
 }

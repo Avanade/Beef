@@ -55,7 +55,7 @@ namespace Beef.Database.Core
             App.HelpOption(true);
 
             _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _connectionStringArg = App.Argument("connectionString", "Database connection string.").IsRequired();
+            _connectionStringArg = App.Argument("connectionstring", "Database connection string.").IsRequired();
             App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
 
@@ -75,7 +75,7 @@ namespace Beef.Database.Core
                 .Accepts(v => v.Use(new ParamsValidator()));
 
             App.OnValidate((ctx) => OnValidate());
-            App.OnExecute(() => RunRunAwayAsync());
+            App.OnExecuteAsync((_) => RunRunAwayAsync());
         }
 
         /// <summary>
@@ -102,10 +102,10 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The database tooling arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public int Run(string args = null)
+        public Task<int> RunAsync(string? args = null)
         {
             if (string.IsNullOrEmpty(args))
-                return Run(Array.Empty<string>());
+                return RunAsync(Array.Empty<string>());
 
             // See for inspiration: https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp/298990#298990
             var regex = Regex.Matches(args, @"\G(""((""""|[^""])+)""|(\S+)) *");
@@ -115,7 +115,7 @@ namespace Beef.Database.Core
                         ? m.Groups[2].Value
                         : m.Groups[4].Value, @"""""", @"""")).ToArray();
 
-            return Run(array);
+            return RunAsync(array);
         }
 
         /// <summary>
@@ -123,13 +123,13 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
-        public int Run(string[] args)
+        public async Task<int> RunAsync(string[] args)
         {
             SetupExecutionContext();
 
             try
             {
-                return App.Execute(args);
+                return await App.ExecuteAsync(args).ConfigureAwait(false);
             }
             catch (CommandParsingException cpex)
             {
@@ -153,7 +153,7 @@ namespace Beef.Database.Core
 
             WriteHeader(args);
 
-            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value, _scriptAssemblies.ToArray(), args)))
+            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray(), args)))
             {
                 var sw = Stopwatch.StartNew();
 
@@ -229,7 +229,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string text = null, ConsoleColor? foregroundColor = null)
+        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
         {
             if (string.IsNullOrEmpty(text))
                 Console.WriteLine();

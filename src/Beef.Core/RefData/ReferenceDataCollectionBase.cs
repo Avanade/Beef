@@ -57,7 +57,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The code value.</param>
         /// <returns>The converted code value.</returns>
-        protected string ConvertCode(string code)
+        protected string? ConvertCode(string? code)
         {
             if (code == null)
                 return null;
@@ -70,20 +70,20 @@ namespace Beef.RefData
         /// <summary>
         /// Internal <see cref="KeyedCollection{Object, TItem}"/> for <see cref="ReferenceDataBase.Id"/>.
         /// </summary>
-        private class ReferenceDataIdCollection : KeyedCollection<object, TItem>
+        private class ReferenceDataIdCollection : KeyedCollection<object?, TItem>
         {
             /// <summary>
             /// Gets the key (<see cref="ReferenceDataBase.Id"/>) for the <see cref="ReferenceDataBase"/> item.
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Id"/>.</returns>
-            protected override object GetKeyForItem(TItem item) => Check.NotNull(item, nameof(item)).Id;
+            protected override object? GetKeyForItem(TItem item) => Check.NotNull(item, nameof(item)).Id;
         }
 
         /// <summary>
         /// Internal <see cref="KeyedCollection{String, TItem}"/> for <see cref="ReferenceDataBase.Code"/>.
         /// </summary>
-        private class ReferenceDataCodeCollection : KeyedCollection<string, TItem>
+        private class ReferenceDataCodeCollection : KeyedCollection<string?, TItem>
         {
             private readonly ReferenceDataCollectionBase<TItem> _owner;
 
@@ -101,7 +101,7 @@ namespace Beef.RefData
             /// </summary>
             /// <param name="item">The <see cref="ReferenceDataBase"/> item.</param>
             /// <returns>The corresponding <see cref="ReferenceDataBase.Code"/>.</returns>
-            protected override string GetKeyForItem(TItem item) => _owner.ConvertCode(Check.NotNull(item, nameof(item)).Code);
+            protected override string? GetKeyForItem(TItem item) => _owner.ConvertCode(Check.NotNull(item, nameof(item)).Code!);
         }
 
         /// <summary>
@@ -136,14 +136,20 @@ namespace Beef.RefData
         {
             Check.NotNull(item, nameof(item));
 
+            if (item.Id == null)
+                throw new ArgumentException("Id must not be null.", nameof(item));
+
+            if (item.Code == null)
+                throw new ArgumentException("Code must not be null.", nameof(item));
+
             lock (_lock)
             {
                 // Check uniqueness of Id, Code and Mappings.
                 if (_rdcId.Contains(item.Id))
                     throw new ArgumentException($"Item with Id '{item.Id}' already exists within the collection.", nameof(item));
 
-                if (_rdcCode.Contains(ConvertCode(item.Code)))
-                    throw new ArgumentException($"Item with Code '{item.Code}' already exists within the collection.", nameof(item));
+                if (_rdcCode.Contains(ConvertCode(item.Code!)))
+                    throw new ArgumentException($"Item with Code '{item.Code!}' already exists within the collection.", nameof(item));
 
                 if (item.HasMappings)
                 {
@@ -162,7 +168,7 @@ namespace Beef.RefData
                 {
                     foreach (var map in item.Mappings)
                     {
-                        _mappingsDict.Add(new MappingsKey { Name = map.Key, Value = map.Value }, item.Code);
+                        _mappingsDict.Add(new MappingsKey { Name = map.Key, Value = map.Value }, item.Code!);
                     }
                 }
             }
@@ -269,7 +275,7 @@ namespace Beef.RefData
             if (_rdcId.Contains(id))
                 return _rdcId[id];
 
-            return null;
+            return default!;
         }
 
         /// <summary>
@@ -302,7 +308,7 @@ namespace Beef.RefData
             if (_rdcId.Contains(id))
                 return _rdcId[id];
 
-            return null;
+            return default!;
         }
 
         /// <summary>
@@ -320,7 +326,7 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, null.</returns>
-        ReferenceDataBase IReferenceDataCollection.GetByCode(string code)
+        ReferenceDataBase? IReferenceDataCollection.GetByCode(string? code)
         {
             return GetByCode(code);
         }
@@ -330,16 +336,13 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The specified <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns>The item where found; otherwise, null.</returns>
-        public TItem GetByCode(string code)
+        public TItem GetByCode(string? code)
         {
-            if (code == null)
-                return null;
-
             var c = ConvertCode(code);
             if (_rdcCode.Contains(c))
                 return _rdcCode[c];
 
-            return null;
+            return default!;
         }
 
         /// <summary>
@@ -347,11 +350,8 @@ namespace Beef.RefData
         /// </summary>
         /// <param name="code">The <see cref="ReferenceDataBase.Code"/>.</param>
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
-        public bool ContainsCode(string code)
+        public bool ContainsCode(string? code)
         {
-            if (code == null)
-                return false;
-
             return _rdcCode.Contains(ConvertCode(code));
         }
 
@@ -374,8 +374,8 @@ namespace Beef.RefData
         /// <returns>The <see cref="ReferenceDataBase"/> where found; otherwise, <c>null</c>.</returns>
         public TItem GetByMappingValue(string name, IComparable value)
         {
-            var key = new MappingsKey { Name = name, Value = value };
-            return _mappingsDict.ContainsKey(key) ? GetByCode(_mappingsDict[key]) : null;
+            var key = new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value };
+            return _mappingsDict.ContainsKey(key) ? GetByCode(_mappingsDict[key]) : default!;
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace Beef.RefData
         /// <returns><c>true</c> if it exists; otherwise, <c>false</c>.</returns>
         public bool ContainsMappingValue(string name, IComparable value)
         {
-            return _mappingsDict.ContainsKey(new MappingsKey { Name = name, Value = value });
+            return _mappingsDict.ContainsKey(new MappingsKey { Name = Check.NotNull(name, nameof(name)), Value = value });
         }
 
         /// <summary>
@@ -464,25 +464,13 @@ namespace Beef.RefData
             if (isActive != null)
                 list = list.Where(x => x.IsActive == isActive.Value);
 
-            switch (sortOrder ?? SortOrder)
+            list = (sortOrder ?? SortOrder) switch
             {
-                case ReferenceDataSortOrder.Id:
-                    list = list.OrderBy(x => x.Id);
-                    break;
-
-                case ReferenceDataSortOrder.Code:
-                    list = list.OrderBy(x => x.Code);
-                    break;
-
-                case ReferenceDataSortOrder.Text:
-                    list = list.OrderBy(x => x.Text);
-                    break;
-
-                case ReferenceDataSortOrder.SortOrder:
-                default:
-                    list = list.OrderBy(x => x.SortOrder);
-                    break;
-            }
+                ReferenceDataSortOrder.Id => list.OrderBy(x => x.Id),
+                ReferenceDataSortOrder.Code => list.OrderBy(x => x.Code),
+                ReferenceDataSortOrder.Text => list.OrderBy(x => x.Text),
+                _ => list.OrderBy(x => x.SortOrder),
+            };
 
             return list.ToList();
         }
@@ -503,7 +491,7 @@ namespace Beef.RefData
         /// <summary>
         /// Occurs when an item is added, removed, changed, moved, or the entire list is refreshed.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         #endregion
 
@@ -565,7 +553,7 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the <see cref="IETag.ETag"/> for the collection contents.
         /// </summary>
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Generates (updates) an <see cref="ETag"/> as an <see cref="System.Security.Cryptography.SHA1"/> hash of the collection contents.

@@ -18,7 +18,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets the <see cref="PagingResult"/>.
         /// </summary>
-        PagingResult Paging { get; }
+        PagingResult? Paging { get; }
 
         /// <summary>
         /// Gets the <see cref="IDatabaseMapper"/>.
@@ -88,7 +88,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets or sets the <see cref="PagingResult"/> (where paging is required for a <b>query</b>).
         /// </summary>
-        public PagingResult Paging { get; private set; }
+        public PagingResult? Paging { get; private set; }
 
         /// <summary>
         /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <c>true</c>).

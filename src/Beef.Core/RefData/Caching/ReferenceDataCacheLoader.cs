@@ -36,7 +36,7 @@ namespace Beef.RefData.Caching
         /// <param name="owner">The owning <see cref="IReferenceDataCache{TColl, TItem}"/>.</param>
         /// <param name="loadCollection">The specified function to load the collection from the data repository.</param>
         /// <returns>The collection from the data repository.</returns>
-        public virtual Task<TColl> Load<TColl, TItem>(IReferenceDataCache<TColl, TItem> owner, Func<Task<TColl>> loadCollection)
+        public virtual Task<TColl> LoadAsync<TColl, TItem>(IReferenceDataCache<TColl, TItem> owner, Func<Task<TColl>> loadCollection)
             where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
             where TItem : ReferenceDataBase, new()
         {

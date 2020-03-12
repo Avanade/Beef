@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -22,7 +24,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="assemblies">The <see cref="Assemblies"/>.</param>
         /// <param name="parameters">The <see cref="Parameters"/>.</param>
-        public CodeGenExecutorArgs(IEnumerable<Assembly> assemblies = null, Dictionary<string, string> parameters = null)
+        public CodeGenExecutorArgs(IEnumerable<Assembly>? assemblies = null, Dictionary<string, string>? parameters = null)
         {
             if (assemblies != null)
                 Assemblies.AddRange(assemblies);
@@ -31,26 +33,25 @@ namespace Beef.CodeGen
                 Parameters = parameters;
         }
 
-
         /// <summary>
         /// Gets or sets the configuration <see cref="FileInfo"/> (data source).
         /// </summary>
-        public FileInfo ConfigFile { get; set; }
+        public FileInfo? ConfigFile { get; set; }
 
         /// <summary>
         /// Gets or sets the script <see cref="FileInfo"/> (orchestrates template execution).
         /// </summary>
-        public FileInfo ScriptFile { get; set; }
+        public FileInfo? ScriptFile { get; set; }
 
         /// <summary>
         /// Gets or sets the template path <see cref="DirectoryInfo"/> (<c>null</c> indicates to use embedded resources).
         /// </summary>
-        public DirectoryInfo TemplatePath { get; set; }
+        public DirectoryInfo? TemplatePath { get; set; }
 
         /// <summary>
         /// Gets or sets the output path <see cref="DirectoryInfo"/> (defaults to the executing assembly path).
         /// </summary>
-        public DirectoryInfo OutputPath { get; set; }
+        public DirectoryInfo? OutputPath { get; set; }
 
         /// <summary>
         /// Gets or sets the assemblies that should be probed to find the embedded resources.
@@ -85,33 +86,43 @@ namespace Beef.CodeGen
         /// <summary>
         /// Executes the selected code generation.
         /// </summary>
-        protected override Task OnRunAsync(ExecutorRunArgs args)
+        protected override async Task OnRunAsync(ExecutorRunArgs args)
         {
             try
             {
-                // Load the script file instructions.
-                XElement xmlScript = (_args.ScriptFile.Exists) ? XElement.Load(_args.ScriptFile.FullName) : ResourceManager.GetScriptContentXml(_args.ScriptFile.Name, _args.Assemblies.ToArray());
-                if (xmlScript.Name != "Script")
+                XElement? xmlScript;
+                if (_args.ScriptFile!.Exists)
+                {
+                    using var fs = File.OpenText(_args.ScriptFile.FullName);
+                    xmlScript = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
+                }
+                else
+                {
+                    xmlScript = await ResourceManager.GetScriptContentXmlAsync(_args.ScriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
+                }
+
+                if (xmlScript?.Name != "Script")
                     throw new CodeGenException("The Script XML file must have a root element named 'Script'.");
 
                 if (!xmlScript.Elements("Generate").Any())
                     throw new CodeGenException("The Script XML file must have at least a single 'Generate' element.");
 
                 // Create the code generator instance.
-                string outputDir = null;
+                string? outputDir = null;
 
-                var gen = CodeGenerator.Create(XElement.Load(_args.ConfigFile.FullName), GetLoaders(xmlScript));
-                gen.CodeGenerated += (sender, e) => { CodeGenerated(outputDir, e); };
+                using var cfs = File.OpenText(_args.ConfigFile!.FullName);
+                var gen = CodeGenerator.Create(await XElement.LoadAsync(cfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false), GetLoaders(xmlScript));
+                gen.CodeGenerated += (sender, e) => { CodeGenerated(outputDir!, e); };
 
                 // Execute each of the script instructions.
                 foreach (var scriptEle in xmlScript.Elements("Generate"))
                 {
                     // As this can be long running, check and see if a stop has been initiated.
-                    if (this.State != ExecutionState.Running)
-                        return Task.CompletedTask;
+                    if (State != ExecutionState.Running)
+                        return;
 
-                    string template = null;
-                    string outDir = null;
+                    string? template = null;
+                    string? outDir = null;
                     var otherParameters = new Dictionary<string, string>();
                     foreach (var att in scriptEle.Attributes())
                     {
@@ -132,26 +143,27 @@ namespace Beef.CodeGen
                     CreatedCount = 0;
                     UpdatedCount = 0;
                     NotChangedCount = 0;
-                    Logger.Default.Info("  Template: {0}", template);
+                    Logger.Default.Info("  Template: {0}", template!);
 
                     XElement xmlTemplate;
                     if (_args.TemplatePath != null)
                     {
-                        var fi = new FileInfo(Path.Combine(_args.TemplatePath.FullName, template));
+                        var fi = new FileInfo(Path.Combine(_args.TemplatePath.FullName, template!));
                         if (!fi.Exists)
                             throw new CodeGenException($"The Template XML file '{fi.FullName}' does not exist.");
 
-                        xmlTemplate = XElement.Load(fi.FullName);
+                        using var fs = File.OpenText(fi.FullName);
+                        xmlTemplate = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
                     }
                     else
                     {
-                        xmlTemplate = ResourceManager.GetTemplateContentXml(template, _args.Assemblies.ToArray()) ??
+                        xmlTemplate = await ResourceManager.GetTemplateContentXmlAsync(template!, _args.Assemblies.ToArray()).ConfigureAwait(false) ??
                             throw new CodeGenException($"The Template XML resource '{template}' does not exist.");
                     }
 
                     // Execute the code generation itself.
-                    outputDir = Path.Combine(_args.OutputPath.FullName, SubstituteOutputDir(outDir));
-                    gen.Generate(xmlTemplate);
+                    outputDir = Path.Combine(_args.OutputPath!.FullName, SubstituteOutputDir(outDir!));
+                    await gen.GenerateAsync(xmlTemplate).ConfigureAwait(false);
 
                     // Provide statistics.
                     Logger.Default.Info("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
@@ -162,8 +174,6 @@ namespace Beef.CodeGen
                 Logger.Default.Error(gcex.Message);
                 Logger.Default.Info(string.Empty);
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -222,14 +232,14 @@ namespace Beef.CodeGen
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            var fi = new FileInfo(Path.Combine(dir, e.OutputFileName));
+            var fi = new FileInfo(Path.Combine(dir, e.OutputFileName!));
             if (fi.Exists)
             {
                 if (e.IsOutputNewOnly)
                     return; 
 
                 var prevContent = File.ReadAllText(fi.FullName);
-                if (string.Compare(e.Content, prevContent, StringComparison.InvariantCultureIgnoreCase) == 0)
+                if (string.Compare(e.Content, prevContent, StringComparison.InvariantCulture) == 0)
                 {
                     NotChangedCount++;
                     return;

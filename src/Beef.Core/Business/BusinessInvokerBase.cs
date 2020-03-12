@@ -24,19 +24,19 @@ namespace Beef.Business
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override void WrapInvoke(object caller, Action action, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override void WrapInvoke(object caller, Action action, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             Check.NotNull(action, nameof(action));
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
-            TransactionScope txn = null;
-            DataContextScope ctx = null;
+            TransactionScope? txn = null;
+            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -71,19 +71,19 @@ namespace Beef.Business
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task WrapInvokeAsync(object caller, Func<Task> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             Check.NotNull(func, nameof(func));
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
-            TransactionScope txn = null;
-            DataContextScope ctx = null;
+            TransactionScope? txn = null;
+            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -124,19 +124,19 @@ namespace Beef.Business
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             Check.NotNull(func, nameof(func));
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
-            TransactionScope txn = null;
-            DataContextScope ctx = null;
+            TransactionScope? txn = null;
+            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -175,19 +175,19 @@ namespace Beef.Business
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, BusinessInvokerArgs param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected async override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, BusinessInvokerArgs? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             Check.NotNull(func, nameof(func));
 
             BusinessInvokerArgs bia = Check.NotNull(param ?? BusinessInvokerArgs.Default, nameof(param));
-            TransactionScope txn = null;
-            DataContextScope ctx = null;
+            TransactionScope? txn = null;
+            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
             {
                 if (bia.IncludeTransactionScope)
-                    txn = new TransactionScope(bia.TransactionScopeOption);
+                    txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
                 ctx = DataContextScope.Begin(bia.DataContextScopeOption);
 
@@ -259,6 +259,6 @@ namespace Beef.Business
         /// <summary>
         /// Gets or sets the unhandled <see cref="Exception"/> handler.
         /// </summary>
-        public Action<Exception> ExceptionHandler { get; set; }
+        public Action<Exception>? ExceptionHandler { get; set; }
     }
 }

@@ -13,11 +13,11 @@ namespace Beef.Executors
     /// </summary>
     public abstract class Executor
     {
-        private ExecutionManager _executionManager;
+        private ExecutionManager? _executionManager;
         private readonly object _lock = new object();
         private readonly Stack<object> _stack = new Stack<object>();
-        private Action _triggerCallback;
-        private Stopwatch _stopwatch;
+        private Action? _triggerCallback;
+        private Stopwatch? _stopwatch;
 
         /// <summary>
         /// Repressents a <see cref="Executor.RunWrapperAsync(ExceptionHandling, Func{Task}, object, bool)"/> result.
@@ -38,7 +38,7 @@ namespace Beef.Executors
         /// </summary>
         /// <param name="executionManager">The <see cref="ExecutionManager"/>.</param>
         /// <param name="triggerCallback">An optional callback for post <b>Run</b> notification/processing within the invoking <see cref="Triggers.Trigger"/>.</param>
-        internal void Configure(ExecutionManager executionManager, Action triggerCallback)
+        internal void Configure(ExecutionManager executionManager, Action? triggerCallback)
         {
             lock (_lock)
             {
@@ -66,7 +66,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="System.Exception"/> that led to the <see cref="ExecutorResult.Unsuccessful"/> <see cref="Result"/>.
         /// </summary>
-        public Exception Exception { get; private set; }
+        public Exception? Exception { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Executor"/> instance identifier.
@@ -76,7 +76,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> argument where supported; otherwise, <c>null</c>.
         /// </summary>
-        public object ExecutorArgs { get; internal set; }
+        public object? ExecutorArgs { get; internal set; }
 
         /// <summary>
         /// Gets or sets a return code (represents a means to return a code to the invoker).
@@ -89,7 +89,7 @@ namespace Beef.Executors
         /// <param name="args">The <see cref="IExecutorArgs"/>.</param>
         internal void OnPerRunType(IExecutorArgs args)
         {
-            _executionManager.OnPerRunType(args);
+            _executionManager!.OnPerRunType(args);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Beef.Executors
         /// <param name="action">The action.</param>
         public void Trace(Action action)
         {
-            _executionManager.Trace(action);
+            _executionManager!.Trace(action);
         }
 
         #region Run
@@ -107,7 +107,7 @@ namespace Beef.Executors
         /// Runs the <see cref="Executor"/> asynchronously.
         /// </summary>
         /// <returns>The <see cref="Task"/>.</returns>
-        internal Task RunExecutorAsync(object args)
+        internal Task RunExecutorAsync(object? args)
         {
             return Task.Run(async () =>
             {
@@ -122,7 +122,7 @@ namespace Beef.Executors
 
                 Trace(() => Logger.Default.Trace($"Executor '{InstanceId}' running."));
                 State = ExecutionState.Running;
-                _executionManager.ExecutorAction(this, args);
+                _executionManager!.ExecutorAction(this, args);
             });
         }
 
@@ -155,7 +155,7 @@ namespace Beef.Executors
                 catch (ExecutorStopException esex)
                 {
                     if (esex.StopExecutionManager)
-                        _executionManager.StopExecutionManager(this);
+                        _executionManager!.StopExecutionManager(this);
                     else
                     {
                         if (State != ExecutionState.Stopping && State != ExecutionState.Stopped)
@@ -198,10 +198,10 @@ namespace Beef.Executors
         /// <summary>
         /// Runs each of the items in the collection.
         /// </summary>
-        internal Task<bool> RunItemsAsync<TColl, TItem>(CollectionExecutorCore<TColl, TItem> executor, TColl coll) where TColl : IEnumerable<TItem>
+        internal async Task<bool> RunItemsAsync<TColl, TItem>(CollectionExecutorCore<TColl, TItem> executor, TColl coll) where TColl : IEnumerable<TItem>
         {
             if (coll == null)
-                return Task.FromResult(true);
+                return true;
 
             try
             {
@@ -211,7 +211,7 @@ namespace Beef.Executors
                     if (executor.MaxDegreeOfParallelism.HasValue && executor.MaxDegreeOfParallelism.Value > 0)
                         po.MaxDegreeOfParallelism = executor.MaxDegreeOfParallelism.Value;
 
-                    var plr = Parallel.ForEach<TItem>(coll, po, (item, state, index) =>
+                    var plr = Parallel.ForEach<TItem>(coll, po, async (item, state, index) =>
                     {
                         // Before starting another unit of work make sure we are still in a running state.
                         if (state.IsStopped)
@@ -229,10 +229,10 @@ namespace Beef.Executors
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
+                        await RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).ConfigureAwait(false);
                     });
 
-                    return Task.FromResult(plr.IsCompleted);
+                    return plr.IsCompleted;
                 }
                 else
                 {
@@ -242,14 +242,14 @@ namespace Beef.Executors
                     {
                         // Before starting another unit of work make sure we are still in a running state. 
                         if (!executor.CompleteFullExecutionOnStop && State != ExecutionState.Running)
-                            return Task.FromResult(false);
+                            return false;
 
                         // Execute the unit of work.
                         var ea = new ExecutorItemRunArgs<TItem>(this, index++, item);
-                        RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).Wait();
+                        await RunWrapperAsync(executor.ItemExceptionHandling, async () => await executor.RunItemAsync(ea).ConfigureAwait(false), ea).ConfigureAwait(false);
                     }
 
-                    return Task.FromResult(true);
+                    return true;
                 }
             }
             catch (ExecutorStopException)
@@ -260,7 +260,7 @@ namespace Beef.Executors
             {
                 var args = new ExecutorCollectionIterateArgs(this);
                 args.SetException(ex);
-                _executionManager.OnPerRunType(args);
+                _executionManager!.OnPerRunType(args);
                 throw;
             }
         }
@@ -275,7 +275,7 @@ namespace Beef.Executors
         /// </summary>
         /// <param name="exception">The <see cref="ExecutorResult.Unsuccessful"/> <see cref="Exception"/>; <c>null</c> indicates <see cref="ExecutorResult.Successful"/> (default).</param>
         /// <exception cref="ExecutorStopException">The <see cref="ExecutorStopException"/> is for internal use only: do <b>NOT</b> catch and swallow this exception as it is used internally to manage the stop.</exception>
-        public void Stop(Exception exception = null)
+        public void Stop(Exception? exception = null)
         {
             throw new ExecutorStopException(false, exception);
         }
@@ -285,7 +285,7 @@ namespace Beef.Executors
         /// </summary>
         /// <param name="exception">The <see cref="ExecutorResult.Unsuccessful"/> <see cref="Exception"/>; <c>null</c> indicates <see cref="ExecutorResult.Successful"/> (default).</param>
         /// <exception cref="ExecutorStopException">The <see cref="ExecutorStopException"/> is for internal use only: do <b>NOT</b> catch and swallow this exception as it is used internally to manage the stop.</exception>
-        public void StopExecutionManager(Exception exception = null)
+        public void StopExecutionManager(Exception? exception = null)
         {
             throw new ExecutorStopException(true, exception);
         }
@@ -295,7 +295,7 @@ namespace Beef.Executors
         /// Stops the execution.
         /// </summary>
         /// <param name="exception">The <see cref="ExecutorResult.Unsuccessful"/> <see cref="Exception"/>; <c>null</c> indicates <see cref="ExecutorResult.Successful"/> (default).</param>
-        internal async Task StopAsync(Exception exception = null)
+        internal async Task StopAsync(Exception? exception = null)
         {
             lock (_lock)
             {
@@ -327,7 +327,7 @@ namespace Beef.Executors
             }
 
             // Given the processing for the Executor has completed the (optional) trigger callback can be invoked.
-            if (rwr.WasSuccessful && _triggerCallback != null && _executionManager.Trigger.State == Triggers.TriggerState.Running)
+            if (rwr.WasSuccessful && _triggerCallback != null && _executionManager!.Trigger.State == Triggers.TriggerState.Running)
             {
                 try
                 {
@@ -342,9 +342,9 @@ namespace Beef.Executors
             }
 
             State = ExecutionState.Stopped;
-            _stopwatch.Stop();
+            _stopwatch!.Stop();
             Trace(() => Logger.Default.Trace($"Executor '{InstanceId}' stopped (result: {Result}, elapsed: {_stopwatch.Elapsed})."));
-            _executionManager.ExecutorStopped(this);
+            _executionManager!.ExecutorStopped(this);
         }
 
         #endregion

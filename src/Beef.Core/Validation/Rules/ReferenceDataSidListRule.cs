@@ -9,7 +9,7 @@ namespace Beef.Validation.Rules
     /// Provides validation for a <see cref="ReferenceDataSidListBase"/> including <see cref="MinCount"/>, <see cref="MaxCount"/>, per item <see cref="ReferenceDataBase.IsValid"/>,
     /// and whether to <see cref="AllowDuplicates"/>.
     /// </summary>
-    public class ReferenceDataSidListRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty>
+    public class ReferenceDataSidListRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty?>
         where TEntity : class
         where TProperty : ReferenceDataSidListBase
     {
@@ -32,7 +32,7 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override void Validate(PropertyContext<TEntity, TProperty?> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
@@ -52,7 +52,7 @@ namespace Beef.Validation.Rules
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MaxCountFormat, MaxCount);
 
             // Check duplicates.
-            var dict = new KeyOnlyDictionary<string>();
+            var dict = new KeyOnlyDictionary<string?>();
             foreach (var item in context.Value.ToRefDataList().Where(x => x.IsValid))
             {
                 if (dict.ContainsKey(item.Code))

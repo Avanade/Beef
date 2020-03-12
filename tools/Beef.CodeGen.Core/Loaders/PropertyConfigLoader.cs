@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Loaders
 {
@@ -19,16 +20,19 @@ namespace Beef.CodeGen.Loaders
         /// Loads the <see cref="CodeGenConfig"/> before the corresponding <see cref="CodeGenConfig.Children"/>.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadBeforeChildren(CodeGenConfig config)
+        public Task LoadBeforeChildrenAsync(CodeGenConfig config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
+
+            if (!config.Attributes.ContainsKey("Name"))
+                throw new CodeGenException("Property element must have a Name property.");
 
             config.AttributeAdd("Type", "string");
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
-            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]))
+            else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]!))
                 config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
             else
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
@@ -41,6 +45,10 @@ namespace Beef.CodeGen.Loaders
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("DisplayName", GenerateDisplayName(config));
+
+            config.AttributeAdd("Nullable", CodeGenConfig.IgnoreNullableTypes.Contains(config.Attributes["Type"]!) ? "false" : "true");
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -48,7 +56,7 @@ namespace Beef.CodeGen.Loaders
         /// </summary>
         private string GenerateDisplayName(CodeGenConfig config)
         {
-            var dn = CodeGenerator.ToSentenceCase(config.Attributes["Name"]);
+            var dn = CodeGenerator.ToSentenceCase(config.Attributes["Name"])!;
             var parts = dn.Split(' ');
             if (parts.Length == 1)
                 return (parts[0] == "Id") ? "Identifier" : dn;
@@ -59,14 +67,6 @@ namespace Beef.CodeGen.Loaders
             var parts2 = new string[parts.Length - 1];
             Array.Copy(parts, parts2, parts.Length - 1);
             return string.Join(" ", parts2);
-        }
-
-        /// <summary>
-        /// Loads the <see cref="CodeGenConfig"/> after the corresponding <see cref="CodeGenConfig.Children"/>.
-        /// </summary>
-        /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
-        public void LoadAfterChildren(CodeGenConfig config)
-        {
         }
     }
 }

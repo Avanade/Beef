@@ -23,7 +23,7 @@ namespace Beef.Validation.Rules
             Beef.Check.NotNull(context, nameof(context));
 
             // Compare the value against its default.
-            if (Comparer<TProperty>.Default.Compare(context.Value, default(TProperty)) == 0)
+            if (Comparer<TProperty>.Default.Compare(context.Value, default!) == 0)
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MandatoryFormat);
                 return;

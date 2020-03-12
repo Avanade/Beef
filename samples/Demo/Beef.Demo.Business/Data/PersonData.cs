@@ -6,8 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Data.SqlClient;
-using Beef.Validation;
 
 namespace Beef.Demo.Business.Data
 {
@@ -22,8 +20,8 @@ namespace Beef.Demo.Business.Data
 
         private void GetByArgsOnQuery(DatabaseParameters p, PersonArgs args, IDatabaseArgs dbArgs)
         {
-            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[Person.Property_FirstName])
-             .ParamWithWildcard(args?.LastName, DbMapper.Default[Person.Property_LastName])
+            p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
+             .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
              .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
         }
 
@@ -62,18 +60,18 @@ namespace Beef.Demo.Business.Data
                 throw new NotSupportedException();
         }
 
-        private Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)
+        private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)
         {
             var pdcr = new PersonDetailCollectionResult(new PagingResult(paging));
 
-            Database.Default.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
+            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
                 .Params(p =>
                 {
-                    p.ParamWithWildcard(args?.FirstName, DbMapper.Default[Person.Property_FirstName])
-                     .ParamWithWildcard(args?.LastName, DbMapper.Default[Person.Property_LastName])
+                    p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
+                     .ParamWithWildcard(args?.LastName, DbMapper.Default[nameof(Person.LastName)])
                      .TableValuedParamWith(args?.Genders, "GenderIds", () => TableValuedParameter.Create(args.Genders.ToGuidIdList()));
                 })
-                .SelectQueryMultiSet(pdcr.Paging,
+                .SelectQueryMultiSetAsync(pdcr.Paging,
                     new MultiSetCollArgs<PersonCollection, Person>(PersonData.DbMapper.Default, (r) => r.ForEach((p) => { var pd = new PersonDetail(); pd.CopyFrom(p); pdcr.Result.Add(pd); })),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) =>
                     {
@@ -90,35 +88,35 @@ namespace Beef.Demo.Business.Data
                         }
                     }));
 
-            return Task.FromResult(pdcr);
+            return pdcr;
         }
 
-        private Task<PersonDetail> GetDetailOnImplementationAsync(Guid id)
+        private async Task<PersonDetail> GetDetailOnImplementationAsync(Guid id)
         {
             PersonDetail pd = null;
 
-            Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
-                .Param(DbMapper.Default.GetParamName(PersonDetail.Property_Id), id)
-                .SelectQueryMultiSet(
+            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
+                .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
+                .SelectQueryMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));
 
-            return Task.FromResult(pd);
+            return pd;
         }
 
-        private Task<PersonDetail> UpdateDetailOnImplementationAsync(PersonDetail value)
+        private async Task<PersonDetail> UpdateDetailOnImplementationAsync(PersonDetail value)
         {
             PersonDetail pd = null;
 
-            Database.Default.StoredProcedure("[Demo].[spPersonUpdateDetail]")
+            await Database.Default.StoredProcedure("[Demo].[spPersonUpdateDetail]")
                 .Params((p) => PersonData.DbMapper.Default.MapToDb(value, p, Mapper.OperationTypes.Update))
                 .TableValuedParam("@WorkHistoryList", WorkHistoryData.DbMapper.Default.CreateTableValuedParameter(value.History))
                 .ReselectRecordParam()
-                .SelectQueryMultiSet(
+                .SelectQueryMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, false, true),
                     new MultiSetCollArgs<WorkHistoryCollection, WorkHistory>(WorkHistoryData.DbMapper.Default, (r) => pd.History = r));
 
-            return Task.FromResult(pd);
+            return pd;
         }
 
         public partial class EfMapper

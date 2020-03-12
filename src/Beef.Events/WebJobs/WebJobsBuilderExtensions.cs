@@ -42,8 +42,8 @@ namespace Beef.Events.WebJobs
         /// <param name="environmentVariablesPrefix">The environment variables prefix.</param>
         /// <param name="configurationBuilder">Action to enable further configuration sources to be added.</param>
         /// <returns>The <see cref="IConfiguration"/> instance.</returns>
-        public static IConfiguration GetConfiguration(this IWebJobsBuilder builder, Assembly embeddedAssembly = null,
-            string embeddedFilePrefix = "webjobs", string environmentVariablesPrefix = null, Action<ConfigurationBuilder> configurationBuilder = null)
+        public static IConfiguration GetConfiguration(this IWebJobsBuilder builder, Assembly? embeddedAssembly = null,
+            string embeddedFilePrefix = "webjobs", string? environmentVariablesPrefix = null, Action<ConfigurationBuilder>? configurationBuilder = null)
         {
             return _configs.GetOrAdd(builder, (_) =>
             {

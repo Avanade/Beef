@@ -43,7 +43,7 @@ namespace Beef.AspNetCore.WebApi
         /// Gets or sets the exception handler function that creates a <see cref="IActionResult"/> from an <see cref="Exception"/> (defaults to <see cref="CreateResultFromException(ActionContext, Exception)"/>.
         /// </summary>
         /// <remarks>Where no handler is specified or returns a <c>null</c> this indicates that the <see cref="Exception"/> is not handled and the exception will continue to bubble up the stack.</remarks>
-        public static Func<ActionContext, Exception, IActionResult> ExecuteExceptionHandler { get; set; } = CreateResultFromException;
+        public static Func<ActionContext, Exception, IActionResult?> ExecuteExceptionHandler { get; set; } = CreateResultFromException;
 
         /// <summary>
         /// Creates a result for an <see cref="Exception"/>; specifically where it is a known/expected <see cref="IBusinessException"/>.
@@ -51,7 +51,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="exception">The <see cref="Exception"/>.</param>
         /// <returns>The <see cref="IActionResult"/> for an <see cref="IBusinessException"/>; otherwise, <c>null</c>.</returns>
-        public static IActionResult CreateResultFromException(ActionContext context, Exception exception)
+        public static IActionResult? CreateResultFromException(ActionContext context, Exception exception)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -59,7 +59,7 @@ namespace Beef.AspNetCore.WebApi
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
-            IBusinessException ex = null;
+            IBusinessException? ex = null;
 
             // Unwind to a known exception type if we can.
             if (exception is IBusinessException)
@@ -145,14 +145,14 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected WebApiActionBase(ControllerBase controller, OperationType operationType,
             HttpStatusCode statusCode, HttpStatusCode? alternateStatusCode = null,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             Controller = controller ?? throw new ArgumentNullException(nameof(controller));
             OperationType = operationType;
             StatusCode = statusCode;
             AlternateStatusCode = alternateStatusCode;
-            CallerMemberName = memberName;
-            CallerFilePath = filePath;
+            CallerMemberName = memberName!;
+            CallerFilePath = filePath!;
             CallerLineNumber = lineNumber;
 
             // Get the list of etags specified in the header.
@@ -235,12 +235,12 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the <see cref="IETag.ETag"/> values where the <c>If-None-Match</c> header is supplied.
         /// </summary>
-        public List<string> IfNoneMatchETags { get; private set; }
+        public List<string>? IfNoneMatchETags { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IETag.ETag"/> values where the <c>If-Match</c> header is supplied.
         /// </summary>
-        public List<string> IfMatchETags { get; private set; }
+        public List<string>? IfMatchETags { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="Entities.PagingArgs"/> for the request.
@@ -260,7 +260,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the <see cref="FromBodyAttribute"/> value.
         /// </summary>
-        public object BodyValue { get; internal set; }
+        public object? BodyValue { get; internal set; }
 
         /// <summary>
         /// Executes the result operation of the action method asynchronously.
@@ -297,7 +297,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <param name="json">The return <see cref="JToken"/>.</param>
         /// <returns>The <see cref="IActionResult"/>.</returns>
-        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken json)
+        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken? json)
         {
             Check.NotNull(context, nameof(context));
             return new ObjectResult(json) { StatusCode = (int)statusCode };
@@ -406,7 +406,7 @@ namespace Beef.AspNetCore.WebApi
         /// <item><description>Where the result is an <see cref="System.Collections.IEnumerable"/> a hash of the requesting query string and each item's <see cref="IETag"/> will be hashed.</description></item>
         /// <item><description>Otherwise, will generate by hashing the resulting JSON and requesting query string.</description></item>
         /// </list></remarks>
-        protected (JToken json, string etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
+        protected (JToken? json, string? etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
         {
             Check.NotNull(context, nameof(context));
 
@@ -416,7 +416,7 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields);
+            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields)!;
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
                 return (json, ExecutionContext.Current.ETag);
@@ -424,7 +424,7 @@ namespace Beef.AspNetCore.WebApi
             if (result is IETag ietag)
                 return (json, ietag?.ETag);
 
-            StringBuilder sb = null;
+            StringBuilder? sb = null;
             if (result is System.Collections.IEnumerable coll)
             {
                 sb = new StringBuilder();
@@ -447,7 +447,7 @@ namespace Beef.AspNetCore.WebApi
                     sb = null;
             }
 
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to hash to calculate an etag.
+#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate an etag.
             using var md5 = System.Security.Cryptography.MD5.Create();
 #pragma warning restore CA5351 
             var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context?.HttpContext.Request.QueryString.Value}");
@@ -460,9 +460,9 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="etag">The <b>ETag</b> value to compare against the <see cref="IfNoneMatchETags"/>.</param>
         /// <returns><c>true</c> where modified; otherwise, <c>false</c>.</returns>
-        protected bool IsIfNoneMatchModified(string etag)
+        protected bool IsIfNoneMatchModified(string? etag)
         {
-            if (string.IsNullOrEmpty(etag))
+            if (IfNoneMatchETags == null || string.IsNullOrEmpty(etag))
                 return false;
 
             return !IfNoneMatchETags.Contains(etag);
@@ -473,9 +473,9 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="etag">The <b>ETag</b> value to compare against the <see cref="IfNoneMatchETags"/>.</param>
         /// <returns><c>true</c> where modified; otherwise, <c>false</c>.</returns>
-        protected bool IsIfMatchModified(string etag)
+        protected bool IsIfMatchModified(string? etag)
         {
-            if (string.IsNullOrEmpty(etag))
+            if (IfMatchETags == null || string.IsNullOrEmpty(etag))
                 return false;
 
             return !IfMatchETags.Contains(etag);
@@ -507,7 +507,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiGet(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Read,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NotFound,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -550,7 +550,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiGet(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Read,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -624,7 +624,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiPost(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -663,7 +663,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiPost(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -704,7 +704,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiPut(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -743,7 +743,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiPut(ControllerBase controller, Func<Task<TResult>> func, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -784,7 +784,7 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         public WebApiDelete(ControllerBase controller, Func<Task> func, OperationType operationType = OperationType.Delete,
             HttpStatusCode statusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, statusCode, memberName, filePath, lineNumber)
         {
             _func = func ?? throw new ArgumentNullException(nameof(func));
@@ -813,9 +813,9 @@ namespace Beef.AspNetCore.WebApi
     public class WebApiPatch<T> : WebApiActionBase where T : class
     {
         private readonly JToken _value;
-        private readonly Func<Task<T>> _getFunc;
-        private readonly Func<T, Task> _updateFuncNoResult;
-        private readonly Func<T, Task<T>> _updateFuncWithResult;
+        private readonly Func<Task<T?>> _getFunc;
+        private readonly Func<T, Task>? _updateFuncNoResult;
+        private readonly Func<T, Task<T>>? _updateFuncWithResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiPatch{T}"/> class.
@@ -830,9 +830,9 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T>> getFunc, Func<T, Task> updateFuncNoResult, OperationType operationType = OperationType.Unspecified,
+        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task> updateFuncNoResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             _value = value;
@@ -853,9 +853,9 @@ namespace Beef.AspNetCore.WebApi
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
+        public WebApiPatch(ControllerBase controller, JToken value, Func<Task<T?>> getFunc, Func<T, Task<T>> updateFuncWithResult, OperationType operationType = OperationType.Unspecified,
             HttpStatusCode statusCode = HttpStatusCode.OK, HttpStatusCode? alternateStatusCode = HttpStatusCode.NoContent,
-            [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+            [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             : base(controller, operationType, statusCode, alternateStatusCode, memberName, filePath, lineNumber)
         {
             BodyValue = _value = value;
@@ -897,7 +897,7 @@ namespace Beef.AspNetCore.WebApi
         public override Task ExecuteResultAsync(ActionContext context)
         {
             if (_updateFuncWithResult == null)
-                return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult),
+                return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult!),
                     memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
             else
                 return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncWithResult),
@@ -929,12 +929,12 @@ namespace Beef.AspNetCore.WebApi
 
                 if (option == WebApiPatchOption.JsonPatch)
                 {
-                    if (!await UpdateUsingJsonPatchAsync(context, value, patch).ConfigureAwait(false))
+                    if (!await UpdateUsingJsonPatchAsync(context, value!, patch!).ConfigureAwait(false))
                         return;
                 }
                 else
                 {
-                    switch (await UpdateUsingMergePatchAsync(context, value).ConfigureAwait(false))
+                    switch (await UpdateUsingMergePatchAsync(context, value!).ConfigureAwait(false))
                     {
                         case JsonEntityMergeResult.Error: return;
                         case JsonEntityMergeResult.SuccessNoChanges: performUpdate = false; break;
@@ -944,10 +944,10 @@ namespace Beef.AspNetCore.WebApi
                 // Now perform the update.
                 if (performUpdate)
                 {
-                    if (currETag != null)
-                        (value as IETag).ETag = currETag;
+                    if (currETag != null && value is IETag ietag)
+                        ietag.ETag = currETag;
 
-                    await func(value).ConfigureAwait(false);
+                    await func(value!).ConfigureAwait(false);
                 }
 
                 WebApiControllerHelper.SetExecutionContext(context.HttpContext.Response);
@@ -989,12 +989,12 @@ namespace Beef.AspNetCore.WebApi
 
                 if (option == WebApiPatchOption.JsonPatch)
                 {
-                    if (! await UpdateUsingJsonPatchAsync(context, value, patch).ConfigureAwait(false))
+                    if (! await UpdateUsingJsonPatchAsync(context, value!, patch!).ConfigureAwait(false))
                         return;
                 }
                 else
                 {
-                    switch (await UpdateUsingMergePatchAsync(context, value).ConfigureAwait(false))
+                    switch (await UpdateUsingMergePatchAsync(context, value!).ConfigureAwait(false))
                     {
                         case JsonEntityMergeResult.Error: return;
                         case JsonEntityMergeResult.SuccessNoChanges: performUpdate = false; break;
@@ -1002,13 +1002,13 @@ namespace Beef.AspNetCore.WebApi
                 }
 
                 // Now perform the update and return the result (ignore any etag value patch).
-                T result = value;
+                T result = value!;
                 if (performUpdate)
                 {
-                    if (currETag != null)
-                        (value as IETag).ETag = currETag;
+                    if (currETag != null && value is IETag ietag)
+                        ietag.ETag = currETag;
 
-                    result = await func(value).ConfigureAwait(false);
+                    result = await func(value!).ConfigureAwait(false);
                 }
 
                 var (json, etag) = CreateJsonResultAndETag(context, result);
@@ -1035,24 +1035,24 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Determines the <see cref="WebApiPatchOption"/> and performs initial json validation.
         /// </summary>
-        private async Task<(WebApiPatchOption option, JsonPatchDocument<T> patch)> PatchValidationAsync(ActionContext context)
+        private async Task<(WebApiPatchOption option, JsonPatchDocument<T>? patch)> PatchValidationAsync(ActionContext context)
         {
             if (context.HttpContext.Request.ContentType.Equals("application/json-patch+json", StringComparison.InvariantCultureIgnoreCase))
             {
                 JsonPatchDocument<T> patch;
                 try
                 {
-                    patch = _value.ToObject<JsonPatchDocument<T>>();
+                    patch = _value.ToObject<JsonPatchDocument<T>>()!;
                 }
                 catch (JsonSerializationException jsex)
                 {
-                    await CreateResultFromException(context, new ValidationException(jsex.Message)).ExecuteResultAsync(context).ConfigureAwait(false);
+                    await CreateResultFromException(context, new ValidationException(jsex.Message))!.ExecuteResultAsync(context).ConfigureAwait(false);
                     return (WebApiPatchOption.NotSpecified, null);
                 }
 
                 if (patch.Operations.Count == 0)
                 {
-                    await CreateResultFromException(context, new ValidationException("The JSON patch document requires one or more operations to be considered valid.")).ExecuteResultAsync(context).ConfigureAwait(false);
+                    await CreateResultFromException(context, new ValidationException("The JSON patch document requires one or more operations to be considered valid."))!.ExecuteResultAsync(context).ConfigureAwait(false);
                     return (WebApiPatchOption.NotSpecified, null);
                 }
 
@@ -1073,13 +1073,13 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Get current value before attempting to patch.
         /// </summary>
-        private async Task<(bool success, T value)> GetCurrentValueAsync(ActionContext context)
+        private async Task<(bool success, T? value)> GetCurrentValueAsync(ActionContext context)
         {
             // Get the existing value.
             var value = await _getFunc().ConfigureAwait(false);
             if (value == null)
             {
-                await CreateResultFromException(context, new NotFoundException()).ExecuteResultAsync(context).ConfigureAwait(false);
+                await CreateResultFromException(context, new NotFoundException())!.ExecuteResultAsync(context).ConfigureAwait(false);
                 return (false, value);
             }
 
@@ -1088,13 +1088,13 @@ namespace Beef.AspNetCore.WebApi
             {
                 if (IfMatchETags == null || IfMatchETags.Count == 0)
                 {
-                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag).")).ExecuteResultAsync(context).ConfigureAwait(false);
+                    await CreateResultFromException(context, new ConcurrencyException("An 'If-Match' header is required for a PATCH where the underlying entity supports concurrency (ETag)."))!.ExecuteResultAsync(context).ConfigureAwait(false);
                     return (false, default(T));
                 }
 
                 if (IsIfMatchModified(et.ETag))
                 {
-                    await CreateResultFromException(context, new ConcurrencyException()).ExecuteResultAsync(context).ConfigureAwait(false);
+                    await CreateResultFromException(context, new ConcurrencyException())!.ExecuteResultAsync(context).ConfigureAwait(false);
                     return (false, value);
                 }
             }
@@ -1112,7 +1112,7 @@ namespace Beef.AspNetCore.WebApi
             if (msgs.Count == 0)
                 return true;
 
-            await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context).ConfigureAwait(false);
+            await CreateResultFromException(context, new ValidationException(msgs))!.ExecuteResultAsync(context).ConfigureAwait(false);
             return false;
         }
 
@@ -1128,7 +1128,7 @@ namespace Beef.AspNetCore.WebApi
             });
 
             if (mr == JsonEntityMergeResult.Error)
-                await CreateResultFromException(context, new ValidationException(msgs)).ExecuteResultAsync(context).ConfigureAwait(false);
+                await CreateResultFromException(context, new ValidationException(msgs))!.ExecuteResultAsync(context).ConfigureAwait(false);
 
             return mr;
         }

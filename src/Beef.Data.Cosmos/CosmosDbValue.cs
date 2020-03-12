@@ -14,7 +14,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets or sets the <see cref="Type"/> name.
         /// </summary>
-        string Type { get; }
+        string? Type { get; }
 
         /// <summary>
         /// Gets the model value.
@@ -42,15 +42,14 @@ namespace Beef.Data.Cosmos
         private TModel _value;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDbValue{TModel}"/> class.
-        /// </summary>
-        public CosmosDbValue() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbValue{TModel}"/> class with a <paramref name="value"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        public CosmosDbValue(TModel value) => Value = value;
+        public CosmosDbValue(TModel value)
+        {
+            Type = typeof(TModel).Name;
+            _value = Check.NotNull(value, nameof(value));
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> name.
@@ -76,23 +75,13 @@ namespace Beef.Data.Cosmos
         {
             if (Value != default)
             {
-                switch (Value)
+                Id = Value switch
                 {
-                    case IStringIdentifier isi:
-                        Id = isi.Id;
-                        break;
-
-                    case IIntIdentifier iii:
-                        Id = iii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture);
-                        break;
-
-                    case IGuidIdentifier igi:
-                        Id = igi.Id.ToString();
-                        break;
-
-                    default:
-                        throw new InvalidOperationException("An Identifier cannot be inferred for this Type.");
-                }
+                    IStringIdentifier isi => isi.Id,
+                    IIntIdentifier iii => iii.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    IGuidIdentifier igi => igi.Id.ToString(),
+                    _ => throw new InvalidOperationException("An Identifier cannot be inferred for this Type."),
+                };
 
                 if (Value is IETag etag)
                     ETag = etag.ETag;
@@ -112,15 +101,15 @@ namespace Beef.Data.Cosmos
             switch (Value)
             {
                 case IStringIdentifier isi:
-                    isi.Id = Id;
+                    isi.Id = Id!;
                     break;
 
                 case IIntIdentifier iii:
-                    iii.Id = int.Parse(Id, System.Globalization.CultureInfo.InvariantCulture);
+                    iii.Id = Id == null ? 0 : int.Parse(Id, System.Globalization.CultureInfo.InvariantCulture);
                     break;
 
                 case IGuidIdentifier igi:
-                    igi.Id = Guid.Parse(Id);
+                    igi.Id = Id == null ? Guid.Empty : Guid.Parse(Id);
                     break;
 
                 default:

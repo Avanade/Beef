@@ -24,17 +24,17 @@ namespace Beef.Validation
         /// Gets or sets the optional name of a selected (specific) property to validate for the entity (<c>null</c> indicates to validate all).
         /// </summary>
         /// <remarks>Nested or fully quailified entity names are not supported for this type of validation; only a property of the primary entity can be selected.</remarks>
-        public string SelectedPropertyName { get; set; }
+        public string? SelectedPropertyName { get; set; }
 
         /// <summary>
         /// Gets or sets the entity prefix used for fully qualified <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        public string FullyQualifiedEntityName { get; set; }
+        public string? FullyQualifiedEntityName { get; set; }
 
         /// <summary>
         /// Gets or sets the entity prefix used for fully qualified <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
-        public string FullyQualifiedJsonEntityName { get; set; }
+        public string? FullyQualifiedJsonEntityName { get; set; }
 
         /// <summary>
         /// Indicates (overrides <see cref="DefaultUseJsonNames"/>) whether to use the JSON name for the <see cref="MessageItem"/> <see cref="MessageItem.Property"/>;

@@ -86,7 +86,7 @@ namespace Beef.Data.Database
                 dbVal = DateTime.SpecifyKind((DateTime)dbVal, DatabaseCommand.Database.DefaultDateTimeKind);
 
             if (dbVal is DBNull)
-                return default;
+                return default!;
 
             Type nt = Nullable.GetUnderlyingType(typeof(T));
             if (nt == null)
@@ -131,7 +131,7 @@ namespace Beef.Data.Database
         /// <param name="columnName">The name of the column (defaults to <see cref="DatabaseColumns.RowVersionName"/>.</param>
         /// <returns>The resultant value.</returns>
         /// <remarks>The <b>RowVersion</b> <see cref="byte"/> array will be converted to an <see cref="Convert.ToBase64String(byte[])">encoded</see> <see cref="string"/> value.</remarks>
-        public string GetRowVersion(string columnName = null)
+        public string GetRowVersion(string? columnName = null)
         {
             int ordinal = DataRecord.GetOrdinal(string.IsNullOrEmpty(columnName) ? DatabaseColumns.RowVersionName : columnName);
             return GetRowVersion(ordinal);
@@ -154,7 +154,7 @@ namespace Beef.Data.Database
         /// <returns>The <see cref="ChangeLog"/> value or <c>null</c> where <see cref="ChangeLog.IsInitial"/>.</returns>
         /// <remarks>Uses the following column names: <see cref="DatabaseColumns.CreatedByName"/>, <see cref="DatabaseColumns.CreatedDateName"/>,
         /// <see cref="DatabaseColumns.UpdatedByName"/> and <see cref="DatabaseColumns.UpdatedDateName"/>.</remarks>
-        public ChangeLog GetChangeLog()
+        public ChangeLog? GetChangeLog()
         {
             var log = new ChangeLog
             {

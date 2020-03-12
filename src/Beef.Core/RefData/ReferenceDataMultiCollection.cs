@@ -41,7 +41,7 @@ namespace Beef.RefData
         /// Gets or sets the collection <see cref="IETag.ETag"/>.
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the reference data collection.

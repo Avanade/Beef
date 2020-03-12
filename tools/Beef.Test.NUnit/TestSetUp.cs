@@ -17,9 +17,9 @@ namespace Beef.Test.NUnit
     public sealed class TestSetUp
     {
         private static readonly object _lock = new object();
-        private static Func<int, object, bool> _registeredSetUp;
-        private static Func<int, object, Task<bool>> _registeredSetUpAsync;
-        private static object _registeredSetUpData;
+        private static Func<int, object?, bool>? _registeredSetUp;
+        private static Func<int, object?, Task<bool>>? _registeredSetUpAsync;
+        private static object? _registeredSetUpData;
         private static bool _registeredSetUpInvoked;
         private static int _registeredSetUpCount;
 
@@ -61,6 +61,8 @@ namespace Beef.Test.NUnit
                         ConsoleWriteLine(largs.ToString(), ConsoleColor.Cyan);
                         break;
                 }
+
+                TestContext.Progress.WriteLine(largs.ToString());
             });
         }
 
@@ -69,7 +71,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="text">The text.</param>
         /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string text = null, ConsoleColor? foregroundColor = null)
+        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
         {
             if (string.IsNullOrEmpty(text))
                 Console.WriteLine();
@@ -92,7 +94,7 @@ namespace Beef.Test.NUnit
         /// <param name="setUpIfAlreadyDone">Indicates whether to perform the setup if already done; defaults to <c>true</c>.</param>
         /// <param name="data">Optional data to be passed to the resgitered set up function.</param>
         /// <remarks>This also invokes the <see cref="CachePolicyManager.ForceFlush"/> and <see cref="DependencyGroupAttribute.Refresh"/>.</remarks>
-        public static void Reset(bool setUpIfAlreadyDone = true, object data = null)
+        public static void Reset(bool setUpIfAlreadyDone = true, object? data = null)
         {
             lock (_lock)
             {
@@ -112,7 +114,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="setUpFunc">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
-        public static void RegisterSetUp(Func<int, object, bool> setUpFunc)
+        public static void RegisterSetUp(Func<int, object?, bool> setUpFunc)
         {
             lock (_lock)
             {
@@ -129,7 +131,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="setUpFuncAsync">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
-        public static void RegisterSetUp(Func<int, object, Task<bool>> setUpFuncAsync)
+        public static void RegisterSetUp(Func<int, object?, Task<bool>> setUpFuncAsync)
         {
             lock (_lock)
             {
@@ -150,7 +152,7 @@ namespace Beef.Test.NUnit
             {
                 ShouldContinueRunningTestsAssert();
 
-                if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object needsSetUp) && !(bool)needsSetUp)
+                if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object? needsSetUp) && !(bool)needsSetUp)
                     return;
 
                 if (!_registeredSetUpInvoked)

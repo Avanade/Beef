@@ -8,7 +8,6 @@ This tutorial will demonstrate how to get a .NET Solution using _Beef_ created o
 
 The following need to be installed locally for the sample to run:
 
-- Download and install the **Azure Storage Emulator**: https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator
 - Download and install the **Azure Cosmos DB Emulator**: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator
 
 It is recommended that the following is installed to simplify the opening of a command line from Visual Studio:
@@ -60,10 +59,10 @@ The [code-generation](../tools/Beef.CodeGen.Core/README.md) will reference the f
 - `Foo.Bar.xml` - contains the entity(s) configuration.
 - `Foo.RefData.xml` - contains the reference data configuration.
 
-Let's generate the configured entities and reference data:
+Generate the configured entities and reference data:
 
 ```
-cd ..\Foo.Bar.CodeGen
+cd Foo.Bar.CodeGen
 dotnet new all
 ```
 
@@ -73,9 +72,20 @@ This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code g
 
 ## Testing
 
-To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/[PATCH](./Http-Patch.md)/DELETE operations.
+To verify that the generated APIs function as expected an example set of tests has been created to exercise the GET/PUT/POST/[PATCH](./Http-Patch.md)/DELETE operations:
 
 ```
 cd ..\Foo.Bar.Test
 dotnet test Foo.Bar.Test.csproj
+``` 
+
+<br/>
+
+## Visual Studio
+
+Open the solution within Visual Studio:
+
+```
+cd ..
+Foo.Bar.sln
 ``` 

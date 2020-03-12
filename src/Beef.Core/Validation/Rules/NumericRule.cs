@@ -26,7 +26,7 @@ namespace Beef.Validation.Rules
             // Where allowing negatives or the value is null, do nothing; i.e. Nullable<Type>.
             Beef.Check.NotNull(context, nameof(context));
 
-            if (AllowNegatives || Comparer<object>.Default.Compare(context.Value, null) == 0)
+            if (AllowNegatives || Comparer<object>.Default.Compare(context.Value!, null!) == 0)
                 return;
 
             // Convert numeric to a double value.

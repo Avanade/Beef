@@ -118,7 +118,7 @@ namespace Beef
         public static IQueryable<TElement> WhereWith<TElement, T>(this IQueryable<TElement> query, T with, Expression<Func<TElement, bool>> predicate)
         {
             Check.NotNull(query, nameof(query));
-            if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
+            if (Comparer<T>.Default.Compare(with, default!) != 0 && Comparer<T>.Default.Compare(with, default!) != 0)
             {
                 if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
                     return query;
@@ -139,7 +139,7 @@ namespace Beef
         /// <param name="ignoreCase">Indicates whether the comparison should ignore case (default) or not; will use <see cref="string.ToUpper()"/> when selected for comparisons.</param>
         /// <param name="checkForNull">Indicates whether a null check should also be performed before the comparion occurs (defaults to <c>true</c>).</param>
         /// <returns>The resulting (updated) query.</returns>
-        public static IQueryable<TElement> WhereWildcard<TElement>(this IQueryable<TElement> query, Expression<Func<TElement, string>> property, string text, bool ignoreCase = true, bool checkForNull = true)
+        public static IQueryable<TElement> WhereWildcard<TElement>(this IQueryable<TElement> query, Expression<Func<TElement, string?>> property, string? text, bool ignoreCase = true, bool checkForNull = true)
         {
             Check.NotNull(query, nameof(query));
             Check.NotNull(property, nameof(property));
@@ -159,7 +159,7 @@ namespace Beef
             var s = wr.GetTextWithoutWildcards();
             if (ignoreCase)
             {
-                s = s.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
+                s = s?.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
                 exp = Expression.Call(me, typeof(string).GetMethod("ToUpper", System.Type.EmptyTypes));
             }
 

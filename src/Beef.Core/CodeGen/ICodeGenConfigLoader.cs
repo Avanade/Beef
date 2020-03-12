@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System.Threading.Tasks;
+
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// Provides for extended <see cref="LoadBeforeChildren"/> and <see cref="LoadAfterChildren"/> activities on a <see cref="CodeGenConfig"/> item.
+    /// Provides for extended <see cref="LoadBeforeChildrenAsync"/> and <see cref="LoadAfterChildrenAsync"/> activities on a <see cref="CodeGenConfig"/> item.
     /// </summary>
     public interface ICodeGenConfigLoader
     {
@@ -17,14 +19,14 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         /// <remarks>All <see cref="CodeGenConfig.Attributes"/> configuration will have been loaded.</remarks>
-        void LoadBeforeChildren(CodeGenConfig config);
+        Task LoadBeforeChildrenAsync(CodeGenConfig config) => Task.CompletedTask;
 
         /// <summary>
         /// Performs extended load activities for a <see cref="CodeGenConfig"/> item after the corresponding <see cref="CodeGenConfig.Children"/> are loaded.
         /// </summary>
         /// <param name="config">The <see cref="CodeGenConfig"/> being loaded.</param>
         /// <remarks>All <see cref="CodeGenConfig.Attributes"/> configuration will have been loaded.</remarks>
-        void LoadAfterChildren(CodeGenConfig config);
+        Task LoadAfterChildrenAsync(CodeGenConfig config) => Task.CompletedTask;
     }
 
     /// <summary>

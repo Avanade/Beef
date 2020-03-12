@@ -143,7 +143,13 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <param name="args">The <see cref="PoisonMessageCreatePersistenceArgs"/>.</param>
         public PoisonMessagePersistence(PoisonMessageCreatePersistenceArgs args)
         {
-            _args = args ?? throw new ArgumentNullException(nameof(args));
+            _args = args ?? throw new ArgumentNullException(nameof(args))!;
+            if (_args.Options == null)
+                throw new ArgumentException("Args.Options must not be null.", nameof(args));
+
+            if (_args.Context == null)
+                throw new ArgumentException("Args.Context must not be null.", nameof(args));
+
             _storagePartitionKey = $"{_args.Options.EventHubPath}-{_args.Options.EventHubName}";
             _storageRowKey = $"{_args.Context.ConsumerGroupName}-{_args.Context.PartitionId}";
 
@@ -182,8 +188,8 @@ namespace Beef.Events.Triggers.PoisonMessages
                 SequenceNumber = @event.SystemProperties.SequenceNumber,
                 EnqueuedTimeUtc = @event.SystemProperties.EnqueuedTimeUtc,
                 PoisonedTimeUtc = DateTime.UtcNow,
-                FunctionType = _args.Options.FunctionType,
-                FunctionName = _args.Options.FunctionName,
+                FunctionType = _args.Options!.FunctionType,
+                FunctionName = _args.Options!.FunctionName,
                 Body = Substring(Encoding.UTF8.GetString(@event.Body.Array)),
                 Exception = Substring(exception.ToString())
             };

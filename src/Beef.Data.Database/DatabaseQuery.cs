@@ -3,6 +3,7 @@
 using Beef.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Data.Database
 {
@@ -18,11 +19,13 @@ namespace Beef.Data.Database
         /// <param name="database">The <see cref="DatabaseBase"/>.</param>
         /// <param name="queryArgs">The <see cref="IDatabaseArgs"/>.</param>
         /// <param name="queryParams">The query <see cref="DatabaseParameters"/> action/delegate.</param>
-        internal DatabaseQuery(DatabaseBase database, DatabaseArgs<T> queryArgs, Action<DatabaseParameters> queryParams)
+        internal DatabaseQuery(DatabaseBase database, DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams)
         {
             var db = database ?? throw new ArgumentNullException(nameof(database));
             QueryArgs = queryArgs ?? throw new ArgumentNullException(nameof(queryArgs));
-            Command = db.StoredProcedure(QueryArgs.StoredProcedure).Params(queryParams);
+            Command = db.StoredProcedure(QueryArgs.StoredProcedure);
+            if (queryParams != null)
+                Command.Params(queryParams);
         }
 
         /// <summary>
@@ -38,9 +41,9 @@ namespace Beef.Data.Database
         /// <summary>
         /// Sets the paging from the <see cref="PagingArgs"/>.
         /// </summary>
-        private bool SetPaging(PagingArgs paging)
+        private void SetPaging(PagingArgs paging)
         {
-            return Command.Parameters.AddPagingParameters(paging).Length > 0;
+            Command.Parameters.AddPagingParameters(paging);
         }
 
         #region SelectSingle/SelectFirst
@@ -49,36 +52,36 @@ namespace Beef.Data.Database
         /// Selects a single item.
         /// </summary>
         /// <returns>The single item.</returns>
-        public T SelectSingle() 
+        public Task<T> SelectSingleAsync() 
         {
-            return Command.SelectSingle(QueryArgs.Mapper);
+            return Command.SelectSingleAsync(QueryArgs.Mapper);
         }
 
         /// <summary>
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectSingleOrDefault()
+        public Task<T?> SelectSingleOrDefaultAsync()
         {
-            return Command.SelectSingleOrDefault(QueryArgs.Mapper);
+            return Command.SelectSingleOrDefaultAsync(QueryArgs.Mapper);
         }
 
         /// <summary>
         /// Selects first item.
         /// </summary>
         /// <returns>The first item.</returns>
-        public T SelectFirst()
+        public Task<T> SelectFirstAsync()
         {
-            return Command.SelectFirst(QueryArgs.Mapper);
+            return Command.SelectFirstAsync(QueryArgs.Mapper);
         }
 
         /// <summary>
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectFirstOrDefault() 
+        public Task<T?> SelectFirstOrDefaultAsync() 
         {
-            return Command.SelectFirstOrDefault(QueryArgs.Mapper);
+            return Command.SelectFirstOrDefaultAsync(QueryArgs.Mapper);
         }
 
         #endregion
@@ -90,18 +93,19 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <returns>A resultant collection.</returns>
-        public TColl SelectQuery<TColl>() where TColl : ICollection<T>, new()
+        public async Task<TColl> SelectQueryAsync<TColl>() where TColl : ICollection<T>, new()
         {
-            if (SetPaging(QueryArgs.Paging))
+            if (QueryArgs.Paging != null)
             {
-                var coll = Command.SelectQuery<TColl, T>(QueryArgs.Mapper, out int returnValue);
+                SetPaging(QueryArgs.Paging);
+                var (coll, returnValue) = await Command.SelectQueryWithValueAsync<TColl, T>(QueryArgs.Mapper).ConfigureAwait(false);
                 if (QueryArgs.Paging.IsGetCount && returnValue >= 0)
                     QueryArgs.Paging.TotalCount = returnValue;
 
                 return coll;
             }
 
-            return Command.SelectQuery<TColl, T>(QueryArgs.Mapper);
+            return await Command.SelectQueryAsync<TColl, T>(QueryArgs.Mapper).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -109,18 +113,19 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
-        public void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>
+        public async Task SelectQueryAsync<TColl>(TColl coll) where TColl : ICollection<T>
         {
-            if (SetPaging(QueryArgs.Paging))
+            if (QueryArgs.Paging != null)
             {
-                Command.SelectQuery<TColl, T>(coll, QueryArgs.Mapper, out int returnValue);
+                SetPaging(QueryArgs.Paging);
+                var returnValue = await Command.SelectQueryWithValueAsync(coll, QueryArgs.Mapper).ConfigureAwait(false);
                 if (QueryArgs.Paging.IsGetCount && returnValue >= 0)
                     QueryArgs.Paging.TotalCount = returnValue;
 
                 return;
             }
 
-            Command.SelectQuery<TColl, T>(coll, QueryArgs.Mapper);
+            await Command.SelectQueryAsync(coll, QueryArgs.Mapper).ConfigureAwait(false);
         }
 
         #endregion

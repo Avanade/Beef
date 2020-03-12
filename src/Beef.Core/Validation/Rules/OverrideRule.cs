@@ -12,8 +12,8 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class OverrideRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private readonly Func<TEntity, TProperty> _func;
-        private readonly TProperty _value;
+        private readonly Func<TEntity, TProperty>? _func;
+        private readonly TProperty _value = default!;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OverrideRule{TEntity, TProperty}"/> class with a <paramref name="func"/>.
@@ -48,7 +48,7 @@ namespace Beef.Validation.Rules
             var overrideVal = _func != null ? _func(context.Parent.Value) : _value;
 
             // Compare the value against override to see if there is a difference.
-            if (OnlyOverrideDefault && Comparer<TProperty>.Default.Compare(context.Value, default) != 0)
+            if (OnlyOverrideDefault && Comparer<TProperty>.Default.Compare(context.Value, default!) != 0)
                 return;
 
             context.OverrideValue(overrideVal);

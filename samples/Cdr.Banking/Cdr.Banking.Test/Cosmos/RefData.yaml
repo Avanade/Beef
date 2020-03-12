@@ -1,0 +1,37 @@
+﻿Ref:
+  - OpenStatus:
+    - OPEN: Open
+    - CLOSED: Closed
+    - ALL: All
+  - ProductCategory:
+    - TRANS_AND_SAVINGS_ACCOUNTS: Transactions and savings accounts
+    - TERM_DEPOSITS: Term deposits
+    - TRAVEL_CARDS: Travel cards
+    - REGULATED_TRUST_ACCOUNTS: Regulated trust accounts
+    - RESIDENTIAL_MORTGAGES: Residential mortgages
+    - CRED_AND_CHRG_CARDS: Credit and charge cards
+    - PERS_LOANS: Personal loans
+    - MARGIN_LOANS: Margin loans
+    - LEASES: Leases
+    - TRADE_FINANCE: Trade finance
+    - OVERDRAFTS: Overdrafts
+    - BUSINESS_LOANS: Business loans
+  - AccountUType:
+    - TERM_DEPOSIT: Term deposit
+    - CREDIT_CARD: Credit Card
+    - LOAN: Loan
+  - MaturityInstructions:
+    - ROLLED_OVER: Rolled over
+    - PAID_OUT_AT_MATURITY: Paid out at maturity
+  - TransactionType:
+    - FEE: FEE
+    - INTEREST_CHARGED: Interest charged
+    - INTEREST_Paid: Interest paid
+    - TRANSFER_OUTGOING: Transfer outgoing
+    - TRANSFER_INCOMING: Transger incoming
+    - PAYMENT: Payment
+    - DIRECT_DEBIT: Direct debit
+    - OTHER: OTHER
+  - TransactionStatus:
+    - PENDING: Pending
+    - POSTED: Posted

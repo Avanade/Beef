@@ -1,4 +1,6 @@
-﻿using Beef.Entities;
+﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+using Beef.Entities;
 using System;
 
 namespace Beef.Mapper
@@ -14,19 +16,19 @@ namespace Beef.Mapper
         /// </summary>
         public ChangeLogMapper() : base(true)
         {
-            var pm = GetBySrcePropertyName(ChangeLog.Property_CreatedBy);
+            var pm = GetBySrcePropertyName(nameof(ChangeLog.CreatedBy));
             if (pm != null)
                 pm.SetOperationTypes(OperationTypes.AnyExceptUpdate);
 
-            pm = GetBySrcePropertyName(ChangeLog.Property_CreatedDate);
+            pm = GetBySrcePropertyName(nameof(ChangeLog.CreatedDate));
             if (pm != null)
                 pm.SetOperationTypes(OperationTypes.AnyExceptUpdate);
 
-            pm = GetBySrcePropertyName(ChangeLog.Property_UpdatedBy);
+            pm = GetBySrcePropertyName(nameof(ChangeLog.UpdatedBy));
             if (pm != null)
                 pm.SetOperationTypes(OperationTypes.AnyExceptCreate);
 
-            pm = GetBySrcePropertyName(ChangeLog.Property_UpdatedDate);
+            pm = GetBySrcePropertyName(nameof(ChangeLog.UpdatedDate));
             if (pm != null)
                 pm.SetOperationTypes(OperationTypes.AnyExceptCreate);
         }
@@ -40,7 +42,7 @@ namespace Beef.Mapper
         /// <returns>The destination entity.</returns>
         protected override ChangeLog OnMapToSrce(TDestEntity destinationEntity, ChangeLog sourceEntity, OperationTypes operationType)
         {
-            return sourceEntity == null || sourceEntity.IsInitial ? null : sourceEntity;
+            return sourceEntity == null || sourceEntity.IsInitial ? null! : sourceEntity;
         }
     }
 

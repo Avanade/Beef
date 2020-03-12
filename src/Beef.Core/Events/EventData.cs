@@ -21,7 +21,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create(string template, string action, params KeyValuePair<string, object>[] keyValuePairs)
+        public static EventData Create(string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
         {
             return ApplySubjectTemplate(new EventData(), Check.NotEmpty(template, nameof(template)), action, keyValuePairs);
         }
@@ -35,7 +35,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>The <see cref="EventData{T}"/>.</returns>
-        public static EventData<T> Create<T>(T value, string template, string action, params KeyValuePair<string, object>[] keyValuePairs)
+        public static EventData<T> Create<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs) where T : class
         {
             return (EventData<T>)ApplySubjectTemplate(new EventData<T> { Value = Check.NotNull(value, nameof(value)) }, Check.NotEmpty(template, nameof(template)), action, keyValuePairs);
         }
@@ -43,7 +43,7 @@ namespace Beef.Events
         /// <summary>
         /// Applies the subject template.
         /// </summary>
-        private static EventData ApplySubjectTemplate(EventData ed, string template, string action, params KeyValuePair<string, object>[] keyValuePairs)
+        private static EventData ApplySubjectTemplate(EventData ed, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
         {
             ed.Subject = Event.CreateSubjectFromTemplate(template, keyValuePairs);
             ed.Action = action;
@@ -71,7 +71,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create<T>(T value, string subject, string action = null)
+        public static EventData Create<T>(T value, string subject, string? action = null) where T : class
         {
             Check.NotNull(value, nameof(value));
 
@@ -109,7 +109,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create(string subject, string action = null)
+        public static EventData Create(string subject, string? action = null)
         {
             var ed = new EventData { Action = action };
             ed.Subject = Check.NotEmpty(subject, nameof(subject)); ;
@@ -142,37 +142,37 @@ namespace Beef.Events
         /// Gets or sets the event subject (the name should use the '.' character to denote paths).
         /// </summary>
         [JsonProperty("subject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Subject { get; set; }
+        public string? Subject { get; set; }
 
         /// <summary>
         /// Gets or sets the event action.
         /// </summary>
         [JsonProperty("action", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Action { get; set; }
+        public string? Action { get; set; }
 
         /// <summary>
         /// Gets or sets the entity key (could be single value or an array of values).
         /// </summary>
         [JsonProperty("key", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public object Key { get; set; }
+        public object? Key { get; set; }
 
         /// <summary>
         /// Gets or sets the username that initiated the event.
         /// </summary>
         [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         /// <summary>
         /// Gets or sets the event timestamp.
         /// </summary>
         [JsonProperty("timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public DateTime Timestamp { get; set; }
+        public DateTime? Timestamp { get; set; }
 
         /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
         [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Resets the value to the default.
@@ -188,7 +188,7 @@ namespace Beef.Events
         /// Gets the <see cref="EventData"/> <b>value</b>; returns <c>null</c> where <see cref="HasValue"/> is <c>false</c>.
         /// </summary>
         /// <returns>The <see cref="EventData{T}.Value"/> or <c>null</c>.</returns>
-        public virtual object GetValue() => null;
+        public virtual object? GetValue() => null;
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ namespace Beef.Events
     /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
     public class EventData<T> : EventData
     {
-        private T _value;
+        private T _value = default!;
 
         /// <summary>
         /// Gets (same as <see cref="GetValue"/>) or sets the event value (automatically setting the <see cref="EventData.ETag"/> where not already set).
@@ -222,7 +222,7 @@ namespace Beef.Events
         /// </summary>
         public override void ResetValue()
         {
-            Value = default;
+            Value = default!;
         }
 
         /// <summary>
@@ -234,6 +234,6 @@ namespace Beef.Events
         /// Gets the <see cref="EventData"/> <see cref="Value"/>.
         /// </summary>
         /// <returns>The <see cref="Value"/>.</returns>
-        public override object GetValue() => Value;
+        public override object? GetValue() => Value;
     }
 }

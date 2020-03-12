@@ -29,7 +29,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public ValidationException(string message)
+        public ValidationException(string? message)
             : base(message ?? new LText("Beef.ValidationException"))
         {
         }
@@ -39,7 +39,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public ValidationException(string message, Exception innerException)
+        public ValidationException(string? message, Exception innerException)
             : base(message ?? new LText("Beef.ValidationException"), innerException)
         {
         }
@@ -60,7 +60,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="messages">The <see cref="MessageItem"/> list.</param>
-        public ValidationException(string message, IEnumerable<MessageItem> messages)
+        public ValidationException(string? message, IEnumerable<MessageItem> messages)
             : base(message ?? new LText("Beef.ValidationException"))
         {
             if (messages != null)
@@ -84,7 +84,7 @@ namespace Beef
         /// <param name="message">The message text.</param>
         /// <param name="messages">The <see cref="MessageItem"/> list.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public ValidationException(string message, IEnumerable<MessageItem> messages, Exception innerException)
+        public ValidationException(string? message, IEnumerable<MessageItem> messages, Exception innerException)
             : base(message ?? new LText("Beef.ValidationException"), innerException)
         {
             if (messages != null)

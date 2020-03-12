@@ -10,8 +10,14 @@ namespace Beef.Events.Triggers.Listener
     public class ResilientEventHubData
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ResilientEventHubData"/> class.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public ResilientEventHubData(EventHubs.EventData eventData) => EventData = eventData;
+
+        /// <summary>
         /// Gets or sets the <see cref="EventHubs.EventData"/>.
         /// </summary>
-        public EventHubs.EventData EventData { get; set; }
+        public EventHubs.EventData EventData { get; }
     }
 }

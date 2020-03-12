@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
         /// <returns>The <see cref="EventDataSubscriberHost"/>.</returns>
-        public static EventDataSubscriberHost Create(EventSubscriberHostArgs args = null) => new EventDataSubscriberHost(args);
+        public static EventDataSubscriberHost Create(EventSubscriberHostArgs? args = null) => new EventDataSubscriberHost(args);
 
         /// <summary>
         /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="logger"/>.
@@ -29,7 +30,7 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        private EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        private EventDataSubscriberHost(EventSubscriberHostArgs? args) : base(args) { }
 
         /// <summary>
         /// Indicates that multiple messages (<see cref="EventData"/>) can be processed.
@@ -53,9 +54,12 @@ namespace Beef.Events.Subscribe
             if (events.Length != 1 && !AreMultipleMessagesSupported)
                 throw new EventSubscriberException($"The {nameof(EventDataSubscriberHost)} does not AllowMultipleMessages; there were {events.Length} event messages.");
 
+            if (events.Any(x => string.IsNullOrEmpty(x.Subject)))
+                throw new EventSubscriberException($"The {nameof(EventDataSubscriberHost)} does not allow event messages where the `Subject` is not specified.");
+
             foreach (var @event in events)
             {
-                await ReceiveAsync(@event.Subject, @event.Action, (_) => @event).ConfigureAwait(false);
+                await ReceiveAsync(@event.Subject!, @event.Action, (_) => @event).ConfigureAwait(false);
             }
         }
     }

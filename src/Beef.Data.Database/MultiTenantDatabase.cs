@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 
 namespace Beef.Data.Database
 {
@@ -19,7 +19,7 @@ namespace Beef.Data.Database
         private static readonly object _lock = new object();
 
         private static readonly Dictionary<Guid, TDefault> _tenantDBs = new Dictionary<Guid, TDefault>();
-        private static Func<Guid, TDefault> _create;
+        private static Func<Guid, TDefault>? _create;
 
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design - is ok.
 
@@ -100,8 +100,8 @@ namespace Beef.Data.Database
         /// Initializes a new instance of the <see cref="MultiTenantDatabase{T}"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <param name="provider">The optional data provider (e.g. System.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        protected MultiTenantDatabase(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        /// <param name="provider">The optional data provider (e.g. Microsoft.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
+        protected MultiTenantDatabase(string connectionString, DbProviderFactory? provider = null) : base(connectionString, provider) { }
 
         /// <summary>
         /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.

@@ -17,7 +17,7 @@ namespace Beef.Data.EntityFrameworkCore
     public class EfDbQuery<T, TModel, TDbContext> where T : class, new() where TModel : class, new() where TDbContext : DbContext, new()
     {
         private readonly EfDbBase<TDbContext> _db;
-        private readonly Func<IQueryable<TModel>, IQueryable<TModel>> _query;
+        private readonly Func<IQueryable<TModel>, IQueryable<TModel>>? _query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EfDbQuery{T, TModel, TDbContext}"/> class.
@@ -25,7 +25,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="db">The <see cref="DbSet{TModel}"/>.</param>
         /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{TModel}"/>.</param>
-        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        internal EfDbQuery(EfDbBase<TDbContext> db, EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
             QueryArgs = queryArgs ?? throw new ArgumentNullException(nameof(queryArgs));
@@ -44,11 +44,9 @@ namespace Beef.Data.EntityFrameworkCore
         {
             EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
             {
-                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs))
-                {
-                    var dbSet = db.DbContext.Set<TModel>();
-                    execute((_query == null) ? dbSet : _query(dbSet));
-                }
+                using var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs);
+                var dbSet = db.DbContext.Set<TModel>();
+                execute((_query == null) ? dbSet : _query(dbSet));
             }, _db);
         }
 
@@ -59,18 +57,16 @@ namespace Beef.Data.EntityFrameworkCore
         {
             return EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
             {
-                using (var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs))
-                {
-                    var dbSet = db.DbContext.Set<TModel>();
-                    return execute((_query == null) ? dbSet : _query(dbSet));
-                }
+                using var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs);
+                var dbSet = db.DbContext.Set<TModel>();
+                return execute((_query == null) ? dbSet : _query(dbSet));
             }, _db);
         }
 
         /// <summary>
         /// Sets the paging from the <see cref="PagingArgs"/>.
         /// </summary>
-        private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs paging)
+        private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs? paging)
         {
             var q = query;
             if (paging != null && paging.Skip > 0)
@@ -87,7 +83,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <returns>The single item.</returns>
         public T SelectSingle()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.Single()), Mapper.OperationTypes.Get);
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.Single()), Mapper.OperationTypes.Get)!;
         }
 
         /// <summary>
@@ -96,7 +92,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <returns>The single item or default.</returns>
         public T SelectSingleOrDefault()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.SingleOrDefault()), Mapper.OperationTypes.Get);
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.SingleOrDefault()), Mapper.OperationTypes.Get)!;
         }
 
         /// <summary>
@@ -105,7 +101,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <returns>The first item.</returns>
         public T SelectFirst()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.First()), Mapper.OperationTypes.Get);
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.First()), Mapper.OperationTypes.Get)!;
         }
 
         /// <summary>
@@ -114,7 +110,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <returns>The single item or default.</returns>
         public T SelectFirstOrDefault()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.FirstOrDefault()), Mapper.OperationTypes.Get);
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.FirstOrDefault()), Mapper.OperationTypes.Get)!;
         }
 
         #endregion
@@ -146,7 +142,7 @@ namespace Beef.Data.EntityFrameworkCore
 
                 foreach (var item in q)
                 {
-                    coll.Add(QueryArgs.Mapper.MapToSrce(item, Mapper.OperationTypes.Get));
+                    coll.Add(QueryArgs.Mapper.MapToSrce(item, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value."));
                 }
 
                 if (QueryArgs.Paging != null && QueryArgs.Paging.IsGetCount)

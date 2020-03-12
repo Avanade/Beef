@@ -39,9 +39,9 @@ namespace Beef.Json
     public class JsonEntityMergeArgs
     {
         /// <summary>
-        /// Gets or sets the log action; bind a log write to an output.
+        /// Gets or sets the log action; enables binding of a log write to an output.
         /// </summary>
-        public Action<MessageItem> LogAction { get; set; } = null;
+        public Action<MessageItem>? LogAction { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to treat warnings as errors.
@@ -85,17 +85,23 @@ namespace Beef.Json
         private class UniqueKeyConfig
         {
             private readonly object _lock = new object();
-            private IPropertyReflector[] propertyReflectors = null;
+            private IPropertyReflector[]? propertyReflectors = null;
+
+            public UniqueKeyConfig(bool isEntityBaseCollection, string[] properties)
+            {
+                IsEntityBaseCollection = isEntityBaseCollection;
+                Properties = properties;
+            }
 
             /// <summary>
             /// Indicates whether the collection implements <see cref="IEntityBaseCollection"/>.
             /// </summary>
-            public bool IsEntityBaseCollection { get; set; }
+            public bool IsEntityBaseCollection { get; private set; }
 
             /// <summary>
             /// Gets or sets the property names that make up the unique key
             /// </summary>
-            public string[] Properties { get; set; }
+            public string[] Properties { get; private set; }
 
             /// <summary>
             /// Gets the <see cref="IPropertyReflector"/> properties that make up the unique key (lazy-loaded and cached for performance).
@@ -149,17 +155,11 @@ namespace Beef.Json
                     return false;
 
                 // Where the underlying type is an EntityBase determine whether it has a unique key and what it is, and whether collection is IEntityBaseCollection.
-                if (pr.IsComplexType && pr.ComplexTypeReflector.IsCollection && pr.ComplexTypeReflector.ItemType.IsSubclassOf(typeof(EntityBase)))
+                if (pr.IsComplexType && pr.ComplexTypeReflector!.IsCollection && pr.ComplexTypeReflector.ItemType.IsSubclassOf(typeof(EntityBase)))
                 {
                     var ival = (EntityBase)pr.ComplexTypeReflector.CreateItemValue();
                     if (ival.HasUniqueKey)
-                    {
-                        pr.Tag = new UniqueKeyConfig
-                        {
-                            IsEntityBaseCollection = pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)),
-                            Properties = ival.UniqueKeyProperties
-                        };
-                    }
+                        pr.Tag = new UniqueKeyConfig(pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)), ival.UniqueKeyProperties);
                 }
 
                 return true;
@@ -174,7 +174,7 @@ namespace Beef.Json
         /// <param name="value">The value to merge into.</param>
         /// <param name="args">The <see cref="JsonEntityMergeArgs"/>.</param>
         /// <returns><c>true</c> indicates that a least one change was made to the value; otherwise, <c>false</c>.</returns>
-        public static JsonEntityMergeResult Merge<TEntity>(JToken json, TEntity value, JsonEntityMergeArgs args = null)
+        public static JsonEntityMergeResult Merge<TEntity>(JToken json, TEntity value, JsonEntityMergeArgs? args = null) where TEntity : class
         {
             Check.NotNull(json, nameof(json));
             Check.NotNull(value, nameof(value));
@@ -183,7 +183,7 @@ namespace Beef.Json
             if (json.Type != JTokenType.Object)
                 return args.Log(MessageItem.CreateMessage(json.Path, MessageType.Error, $"The JSON document is malformed and could not be parsed."));
 
-            return MergeApply(args, _erArgs.GetReflector(typeof(TEntity)), json, value);
+            return MergeApply(args, _erArgs.GetReflector(typeof(TEntity)), json, value!);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace Beef.Json
                 return pr.SetValue(entity, null) ? JsonEntityMergeResult.SuccessWithChanges : JsonEntityMergeResult.SuccessNoChanges;
 
             // Update the sub-entity.
-            if (pr.ComplexTypeReflector.ComplexTypeCode == ComplexTypeCode.Object)
+            if (pr.ComplexTypeReflector!.ComplexTypeCode == ComplexTypeCode.Object)
             {
                 if (jp.Value.Type != JTokenType.Object)
                     return args.Log(MessageItem.CreateMessage(jp.Path, MessageType.Error, $"The JSON token is malformed and could not be parsed."));
@@ -268,7 +268,7 @@ namespace Beef.Json
                 else
                     hasChanged = false;
 
-                var mr = MergeApply(args, pr.GetEntityReflector(), jp.Value, current);
+                var mr = MergeApply(args, pr.GetEntityReflector()!, jp.Value, current!);
                 return mr == JsonEntityMergeResult.SuccessNoChanges ? (hasChanged ? JsonEntityMergeResult.SuccessWithChanges : JsonEntityMergeResult.SuccessNoChanges) : mr;
             }
             else
@@ -279,7 +279,7 @@ namespace Beef.Json
 
                 // Where empty array then update as such.
                 if (!jp.Value.HasValues)
-                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue());
+                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, (IEnumerable)pr.ComplexTypeReflector.CreateValue());
 
                 // Handle array with primitive types.
                 if (!pr.ComplexTypeReflector.IsItemComplexType)
@@ -287,10 +287,10 @@ namespace Beef.Json
                     var lo = new List<object>();
                     foreach (var iv in jp.Value.Values())
                     {
-                        lo.Add(iv.ToObject(pr.ComplexTypeReflector.ItemType));
+                        lo.Add(iv.ToObject(pr.ComplexTypeReflector.ItemType)!);
                     }
 
-                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity), (IEnumerable)pr.ComplexTypeReflector.CreateValue(lo));
+                    return UpdateArrayValue(pr, entity, (IEnumerable)pr.PropertyExpression.GetValue(entity)!, (IEnumerable)pr.ComplexTypeReflector.CreateValue(lo));
                 }
 
                 // Finally, handle array with complex entity items.
@@ -304,7 +304,7 @@ namespace Beef.Json
         private static JsonEntityMergeResult MergeApplyComplexItems(JsonEntityMergeArgs args, IPropertyReflector pr, JProperty jp, object entity)
         {
             var hasError = false;
-            var lo = new List<object>();
+            var lo = new List<object?>();
             var ier = pr.GetItemEntityReflector();
 
             foreach (var ji in jp.Values())
@@ -315,8 +315,8 @@ namespace Beef.Json
                     continue;
                 }
 
-                var ival = pr.ComplexTypeReflector.CreateItemValue();
-                if (MergeApply(args, ier, ji, ival) == JsonEntityMergeResult.Error)
+                var ival = pr.ComplexTypeReflector!.CreateItemValue();
+                if (MergeApply(args, ier!, ji, ival) == JsonEntityMergeResult.Error)
                     hasError = true;
                 else
                     lo.Add(ival);
@@ -325,7 +325,7 @@ namespace Beef.Json
             if (hasError)
                 return JsonEntityMergeResult.Error;
 
-            pr.ComplexTypeReflector.SetValue(entity, lo);
+            pr.ComplexTypeReflector!.SetValue(entity, lo);
             return JsonEntityMergeResult.SuccessWithChanges;
         }
 
@@ -337,15 +337,15 @@ namespace Beef.Json
             var hasError = false;
             var hasChanges = false;
             var count = 0;
-            var ukc = (UniqueKeyConfig)pr.Tag;
+            var ukc = (UniqueKeyConfig)pr.Tag!;
             var lo = new List<object>();
-            var ier = pr.GetItemEntityReflector();
+            var ier = pr.GetItemEntityReflector()!;
 
             // Determine the unique key for a comparison.
             var ukpr = ukc.GetPropertyReflectors(ier);
 
             // Get the current value to update.
-            var current = (IEnumerable)pr.PropertyExpression.GetValue(entity);
+            var current = (IEnumerable)pr.PropertyExpression.GetValue(entity)!;
             if (current == null)
                 hasChanges = true;
 
@@ -375,7 +375,7 @@ namespace Beef.Json
 
                     try
                     {
-                        uk[i] = ukpr[i].GetJTokenValue(jk);
+                        uk[i] = ukpr[i].GetJTokenValue(jk)!;
                     }
                     catch (FormatException fex)
                     {
@@ -402,7 +402,7 @@ namespace Beef.Json
                 if (item == null)
                 {
                     hasChanges = true;
-                    item = pr.ComplexTypeReflector.CreateItemValue();
+                    item = pr.ComplexTypeReflector!.CreateItemValue();
                 }
 
                 // Update.
@@ -423,10 +423,10 @@ namespace Beef.Json
                 return JsonEntityMergeResult.Error;
 
             // Confirm nothing was deleted (only needed where nothing changed so far).
-            if (!hasChanges && count == (ukc.IsEntityBaseCollection ? ((IEntityBaseCollection)current).Count : current.OfType<EntityBase>().Count()))
+            if (!hasChanges && count == (ukc.IsEntityBaseCollection ? ((IEntityBaseCollection)current!).Count : current.OfType<EntityBase>().Count()))
                 return JsonEntityMergeResult.SuccessNoChanges;
 
-            pr.ComplexTypeReflector.SetValue(entity, lo);
+            pr.ComplexTypeReflector!.SetValue(entity, lo);
             return JsonEntityMergeResult.SuccessWithChanges;
         }
 
@@ -435,7 +435,7 @@ namespace Beef.Json
         /// </summary>
         private static JsonEntityMergeResult UpdateArrayValue(IPropertyReflector pr, object entity, IEnumerable curVal, IEnumerable newVal)
         {
-            if (pr.ComplexTypeReflector.CompareSequence(newVal, curVal))
+            if (pr.ComplexTypeReflector!.CompareSequence(newVal, curVal))
                 return JsonEntityMergeResult.SuccessNoChanges;
 
             pr.ComplexTypeReflector.SetValue(entity, newVal);

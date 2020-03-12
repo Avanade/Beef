@@ -35,7 +35,7 @@ namespace Beef.WebApi
         /// <summary>
         /// Gets or sets the entity tag that will be passed as either a <c>If-None-Match</c> header where <see cref="HttpMethod.Get"/>; otherwise, an <c>If-Match</c> header.
         /// </summary>
-        public string ETag { get; set; }
+        public string? ETag { get; set; }
 
         /// <summary>
         /// Gets or sets the list of <b>included</b> fields (JSON property names) to limit the serialized data payload (results in url query string: "$fields=x,y,z").
@@ -81,9 +81,9 @@ namespace Beef.WebApi
 
 #pragma warning disable CA1056 // Uri properties should not be strings; by-design, is the query string component only.
         /// <summary>
-        /// Gets or sets the value to append to the end of URL query string.
+        /// Gets or sets the optional value to append to the end of URL query string.
         /// </summary>
-        public string UrlQueryString { get; set; }
+        public string? UrlQueryString { get; set; }
 #pragma warning restore CA1056 
     }
 }

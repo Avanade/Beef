@@ -376,13 +376,15 @@
                         </xs:attribute>
                         <xs:attribute name="WebApiFrom" use="optional">
                           <xs:annotation>
-                            <xs:documentation>Specifies that the parameter will be declared with the FromBodyAttribute/FromUriAttribute for the Web API method (defaults to FromUri if not specified).</xs:documentation>
+                            <xs:documentation>Specifies that the parameter will be declared with the FromBodyAttribute/FromQueryAttribute/FromRouteAttribute for the Web API method (defaults to FromQuery if not specified). The FromEntityProperties/FromUriUseProperties is special purpose to use properties of the referenced entity.</xs:documentation>
                           </xs:annotation>
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
                               <xs:enumeration value="FromUriUseProperties"/>
+                              <xs:enumeration value="FromEntityProperties"/>
                               <xs:enumeration value="FromBody"/>
-                              <xs:enumeration value="FromUri"/>
+                              <xs:enumeration value="FromQuery"/>
+                              <xs:enumeration value="FromRoute"/>
                             </xs:restriction>
                           </xs:simpleType>
                         </xs:attribute>
@@ -651,6 +653,11 @@
                   <xs:attribute name="DataCosmosValueContainer" type="xs:boolean" use="optional">
                     <xs:annotation>
                       <xs:documentation>Indicates that the 'CosmosDbValueContainer' is to be used; otherwise, 'CosmosDbContainer' (default). Overrides the 'Entity.CosmosValueContainer' value.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="DataCosmosPartitionKey" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the C# code to be used for setting the Cosmos PartitionKey (defaults to 'Entity.CosmosPartitionKey').</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                 </xs:complexType>
@@ -969,7 +976,7 @@
             </xs:attribute>
             <xs:attribute name="CosmosPartitionKey" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the C# code to be used for setting the Cosmos PartitionKey (optional where AutoImplement is 'Cosmos').</xs:documentation>
+                <xs:documentation>Specifies the C# code to be used for setting the Cosmos PartitionKey (optional where AutoImplement is 'Cosmos'; defaults to PartitionKey.None).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataCosmosValueContainer" type="xs:boolean" use="optional">
@@ -1083,7 +1090,7 @@
       </xs:attribute>
       <xs:attribute name="ValidatorLayer" use="optional">
         <xs:annotation>
-          <xs:documentation>Defines the layer (namespace) where the Validator's are defined (defaults to 'Common').</xs:documentation>
+          <xs:documentation>Defines the layer (namespace) where the Validator's are defined (defaults to 'Business').</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -1158,7 +1165,7 @@
       </xs:attribute>
       <xs:attribute name="MapperDefaultRefDataConverter" use="optional">
         <xs:annotation>
-          <xs:documentation>Specifies the default Reference Data Converter used by the Mapper where not specifically defined (defaults to ReferenceDataInt32IdConverter).</xs:documentation>
+          <xs:documentation>Specifies the default Reference Data Converter used by the Mapper where not specifically defined (defaults to ReferenceDataCodeConverter).</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">

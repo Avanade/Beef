@@ -11,15 +11,14 @@ using Beef.Entities;
 using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Cosmos = Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
 using Beef.Events;
 using Beef.Events.Publish;
 using Microsoft.Azure.EventHubs;
+using Microsoft.OpenApi.Models;
 
 namespace Beef.Demo.Api
 {
@@ -73,13 +72,14 @@ namespace Beef.Demo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            // Add services; note Beef requires NewtonsoftJson.
+            services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();
             services.AddHttpClient();
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Beef (Business Entity Execution Framework) Demo API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Beef (Business Entity Execution Framework) Demo API", Version = "v1" });
 
                 var xmlName = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
                 var xmlFile = Path.Combine(AppContext.BaseDirectory, xmlName);
@@ -89,7 +89,7 @@ namespace Beef.Demo.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
+        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
         {
             // Configure the logger.
             _logger = loggerFactory.CreateLogger("Logging");
@@ -121,8 +121,12 @@ namespace Beef.Demo.Api
                 ec.Timestamp = DateTime.Now;
             });
 
-            // Use mvc.
-            app.UseMvc();
+            // Use controllers.
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

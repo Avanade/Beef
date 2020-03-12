@@ -45,7 +45,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the value <see cref="Type"/>; <c>null</c> indicates no value.
         /// </summary>
-        public abstract Type ValueType { get; }
+        public abstract Type? ValueType { get; }
 
         /// <summary>
         /// Receive and process the <see cref="EventData"/>.
@@ -70,7 +70,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the value <see cref="Type"/>; always <c>null</c> as there will not be one.
         /// </summary>
-        public override Type ValueType { get => null; }
+        public override Type? ValueType { get => null; }
 
         /// <summary>
         /// Receive and process the <see cref="EventData"/>.
@@ -96,7 +96,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the value <see cref="Type"/>.
         /// </summary>
-        public override Type ValueType { get => typeof(T); }
+        public override Type? ValueType { get => typeof(T); }
 
         /// <summary>
         /// Receive and process the <see cref="EventData"/> (internally casts the <paramref name="eventData"/> to <see cref="EventData{T}"/> and invokes <see cref="ReceiveAsync(EventData{T})"/>).

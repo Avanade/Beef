@@ -1,4 +1,5 @@
 ﻿using Beef.CodeGen;
+using System.Threading.Tasks;
 
 namespace Company.AppName.CodeGen
 {
@@ -12,9 +13,9 @@ namespace Company.AppName.CodeGen
         /// </summary>
         /// <param name="args">The startup arguments.</param>
         /// <returns>The status code whereby zero indicates success.</returns>
-        public static int Main(string[] args)
+        public static Task<int> Main(string[] args)
         {
-            return CodeGenConsoleWrapper.Create("Company", "AppName").Supports(entity: true, refData: true).Run(args);
+            return CodeGenConsoleWrapper.Create("Company", "AppName").Supports(entity: true, refData: true).RunAsync(args);
         }
     }
 }

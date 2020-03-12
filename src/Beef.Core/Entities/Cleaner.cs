@@ -35,7 +35,7 @@ namespace Beef.Entities
         /// <returns>The cleaned value.</returns>
         /// <remarks>The <paramref name="value"/> will be trimmed and transformed using the respective default <see cref="DefaultStringTrim"/> and 
         /// <see cref="DefaultStringTransform"/> values.</remarks>
-        public static string Clean(string value)
+        public static string? Clean(string? value)
         {
             return Clean(value, DefaultStringTrim, DefaultStringTransform);
         }
@@ -47,7 +47,7 @@ namespace Beef.Entities
         /// <param name="trim">The <see cref="StringTrim"/> (defaults to <see cref="DefaultStringTrim"/>).</param>
         /// <param name="transform">The <see cref="StringTransform"/> (defaults to <see cref="DefaultStringTransform"/>).</param>
         /// <returns>The cleaned value.</returns>
-        public static string Clean(string value, StringTrim trim = DefaultStringTrim, StringTransform transform = DefaultStringTransform)
+        public static string? Clean(string? value, StringTrim trim = DefaultStringTrim, StringTransform transform = DefaultStringTransform)
         {
             // Handle a null string.
             if (value == null)
@@ -58,41 +58,21 @@ namespace Beef.Entities
                     return value;
             }
 
-            // Trim the string.
-            string tmp;
-            switch (trim)
+            var tmp = trim switch
             {
-                case StringTrim.Both:
-                    tmp = value.Trim();
-                    break;
-
-                case StringTrim.Start:
-                    tmp = value.TrimStart();
-                    break;
-
-                case StringTrim.End:
-                    tmp = value.TrimEnd();
-                    break;
-
-                case StringTrim.None:
-                default:
-                    tmp = value;
-                    break;
-            }
+                StringTrim.Both => value.Trim(),
+                StringTrim.Start => value.TrimStart(),
+                StringTrim.End => value.TrimEnd(),
+                _ => value,
+            };
 
             // Transform the string.
-            switch (transform)
+            return transform switch
             {
-                case StringTransform.EmptyToNull:
-                    return (tmp.Length == 0) ? null : tmp;
-
-                case StringTransform.NullToEmpty:
-                    return tmp ?? string.Empty;
-
-                case StringTransform.None:
-                default:
-                    return tmp;
-            }
+                StringTransform.EmptyToNull => (tmp.Length == 0) ? null : tmp,
+                StringTransform.NullToEmpty => tmp ?? string.Empty,
+                _ => tmp,
+            };
         }
 
         /// <summary>
@@ -195,7 +175,7 @@ namespace Beef.Entities
         /// <returns><c>true</c> indicates that the value is initial; otherwise, <c>false</c>.</returns>
         public static bool IsInitial<T>(T value)
         {
-            if (value == null || Comparer<T>.Default.Compare(value, default) == 0)
+            if (value == null || Comparer<T>.Default.Compare(value, default!) == 0)
                 return true;
 
             if (value is ICleanUp ic)

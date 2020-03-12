@@ -2,11 +2,12 @@
 
 using Beef.Entities;
 using Beef.Mapper;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Beef.Data.Database
@@ -16,6 +17,8 @@ namespace Beef.Data.Database
     /// </summary>
     public class DatabaseCommand
     {
+        private const string _mapperNullResultMessage = "Mapper must result in a non-null result.";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseCommand"/> class.
         /// </summary>
@@ -88,7 +91,7 @@ namespace Beef.Data.Database
         /// <param name="sqlDbType">The parameter <see cref="SqlDbType"/>.</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseCommand"/> instance to support chaining (fluent interface).</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseCommand Param(string name, object value, SqlDbType sqlDbType, ParameterDirection direction = ParameterDirection.Input)
         {
             Parameters.AddParameter(name, value, sqlDbType, direction);
@@ -117,7 +120,7 @@ namespace Beef.Data.Database
         /// <param name="size">The maximum size (in bytes).</param>
         /// <param name="direction">The <see cref="ParameterDirection"/> (default to <see cref="ParameterDirection.Input"/>).</param>
         /// <returns>The current <see cref="DatabaseCommand"/> instance to support chaining (fluent interface).</returns>
-        /// <remarks>This specifically implies that the <see cref="System.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
+        /// <remarks>This specifically implies that the <see cref="Microsoft.Data.SqlClient.SqlParameter"/> is being used; if not then an exception will be thrown.</remarks>
         public DatabaseCommand Param(string name, SqlDbType sqlDbType, int size = 0, ParameterDirection direction = ParameterDirection.Input)
         {
             Parameters.AddParameter(name, sqlDbType, size, direction);
@@ -308,7 +311,10 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseCommand"/> instance to support chaining (fluent interface).</returns>
         public DatabaseCommand Params(Action<DatabaseParameters> action)
         {
-            action?.Invoke(new DatabaseParameters(this));
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            action.Invoke(new DatabaseParameters(this));
             return this;
         }
 
@@ -322,36 +328,35 @@ namespace Beef.Data.Database
         /// <returns>The current <see cref="DatabaseCommand"/> instance to support chaining (fluent interface).</returns>
         public DatabaseCommand Params<T>(T value, Action<T, DatabaseParameters, OperationTypes, object> action, OperationTypes operationType)
         {
-            action?.Invoke(value, new DatabaseParameters(this), operationType, null);
+            action?.Invoke(value, new DatabaseParameters(this), operationType, null!);
             return this;
         }
 
         #endregion
 
+        #region DbCommandWrapper
+
         /// <summary>
         /// Wraps the "DbCommand" invocation.
         /// </summary>
-        private T DbCommandWrapper<T>(Func<CommandBehavior, T> func)
+        private Task<T> NonQueryScalarDbCommandWrapperAsync<T>(Func<CommandBehavior, Task<T>> func)
         {
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.Invoke(this, () =>
+            return DatabaseInvoker.Default.InvokeAsync(this, async () =>
             {
-                using (new DatabasePerformanceTimer(this))
+                try
                 {
-                    try
-                    {
-                        behavior = DetermineBehavior(DbCommand);
-                        return func(behavior);
-                    }
-                    finally
-                    {
-                        // Close the connection where specified in behavior.
-                        if (behavior == CommandBehavior.CloseConnection)
-                            DbCommand.Connection.Close();
+                    behavior = DetermineBehavior(DbCommand);
+                    return await func(behavior).ConfigureAwait(false);
+                }
+                finally
+                {
+                    // Close the connection where specified in behavior.
+                    if (behavior == CommandBehavior.CloseConnection)
+                        DbCommand.Connection.Close();
 
-                        DbCommand.Dispose();
-                    }
+                    DbCommand.Dispose();
                 }
             }, Database);
         }
@@ -359,37 +364,68 @@ namespace Beef.Data.Database
         /// <summary>
         /// Wraps the "DbDataReader" invocation.
         /// </summary>
-        private T DbDataReaderWrapper<T>(Func<DbDataReader, T> func)
+        private Task<T> DbDataReaderWrapperWithResultAsync<T>(Func<DbDataReader, Task<T>> func)
         {
-            DbDataReader dr = null;
+            DbDataReader? dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.Invoke(this, () =>
+            return DatabaseInvoker.Default.InvokeAsync(this, async () => 
             {
-                using (new DatabasePerformanceTimer(this))
+                try
                 {
-                    try
-                    {
-                        // Execute the data reader!
-                        dr = DbCommand.ExecuteReader(DetermineBehavior(DbCommand));
+                    // Execute the data reader!
+                    dr = await DbCommand.ExecuteReaderAsync(DetermineBehavior(DbCommand)).ConfigureAwait(false);
 
-                        // Execute the specific action.
-                        return func(dr);
-                    }
-                    finally
-                    {
-                        // Close and dispose the data reader.
-                        if (dr != null)
-                            dr.Dispose();
+                    // Execute the specific action.
+                    return await func(dr).ConfigureAwait(false);
+                }
+                finally
+                {
+                    // Close and dispose the data reader.
+                    if (dr != null)
+                        dr.Dispose();
 
-                        // Close the connection where specified in behavior.
-                        if (behavior == CommandBehavior.CloseConnection)
-                            DbCommand.Connection.Close();
+                    // Close the connection where specified in behavior.
+                    if (behavior == CommandBehavior.CloseConnection)
+                        DbCommand.Connection.Close();
 
-                        DbCommand.Dispose();
-                    }
+                    DbCommand.Dispose();
                 }
             }, Database);
+        }
+
+        /// <summary>
+        /// Wraps the "DbDataReader" invocation.
+        /// </summary>
+        private async Task DbDataReaderWrapperNoResultAsync(Func<DbDataReader, Task> func)
+        {
+            DbDataReader? dr = null;
+            CommandBehavior behavior = CommandBehavior.Default;
+
+            await DatabaseInvoker.Default.InvokeAsync(this, async () =>
+            {
+                try
+                {
+                    // Execute the data reader!
+                    dr = await DbCommand.ExecuteReaderAsync(DetermineBehavior(DbCommand)).ConfigureAwait(false);
+
+                    // Execute the specific action.
+                    await func(dr).ConfigureAwait(false);
+                }
+                finally
+                {
+                    // Close and dispose the data reader.
+                    if (dr != null)
+                        dr.Dispose();
+
+                    // Close the connection where specified in behavior.
+                    if (behavior == CommandBehavior.CloseConnection)
+                        DbCommand.Connection.Close();
+
+                    DbCommand.Dispose();
+                }
+
+            }, Database).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -412,6 +448,8 @@ namespace Beef.Data.Database
             return CommandBehavior.Default;
         }
 
+        #endregion
+
         #region SelectSingle/SelectFirst
 
         /// <summary>
@@ -420,10 +458,10 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for the record.</param>
         /// <returns>The single item.</returns>
-        public T SelectSingle<T>(Func<DatabaseRecord, T> mapFromDb)
+        public async Task<T> SelectSingleAsync<T>(Func<DatabaseRecord, T> mapFromDb)
         {
-            T item = SelectSingleSelectInternal<T>(mapFromDb, true);
-            if (item == null)
+            T item = await SelectSingleFirstInternalAsync(mapFromDb, true).ConfigureAwait(false);
+            if (Comparer<T>.Default.Compare(item, default!) == 0)
                 throw new InvalidOperationException("SelectSingle request has not returned a row.");
 
             return item;
@@ -435,10 +473,10 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>The single item.</returns>
-        public T SelectSingle<T>(IDatabaseMapper<T> mapper) where T : class, new()
+        public async Task<T> SelectSingleAsync<T>(IDatabaseMapper<T> mapper) where T : class, new()
         {
             Check.NotNull(mapper, nameof(mapper));
-            return SelectSingle((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            return await SelectSingleAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null) ?? throw new InvalidOperationException(_mapperNullResultMessage)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -447,9 +485,9 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for the record.</param>
         /// <returns>The single item or default.</returns>
-        public T SelectSingleOrDefault<T>(Func<DatabaseRecord, T> mapFromDb)
+        public async Task<T> SelectSingleOrDefaultAsync<T>(Func<DatabaseRecord, T> mapFromDb)
         {
-            return SelectSingleSelectInternal<T>(mapFromDb, true);
+            return await SelectSingleFirstInternalAsync(mapFromDb, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -458,10 +496,10 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>The single item.</returns>
-        public T SelectSingleOrDefault<T>(IDatabaseMapper<T> mapper) where T : class, new()
+        public async Task<T?> SelectSingleOrDefaultAsync<T>(IDatabaseMapper<T> mapper) where T : class, new()
         {
             Check.NotNull(mapper, nameof(mapper));
-            return SelectSingleOrDefault((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            return await SelectSingleOrDefaultAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!) ?? throw new InvalidOperationException(_mapperNullResultMessage)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -470,9 +508,9 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for the record.</param>
         /// <returns>The first item.</returns>
-        public T SelectFirst<T>(Func<DatabaseRecord, T> mapFromDb)
+        public async Task<T> SelectFirstAsync<T>(Func<DatabaseRecord, T> mapFromDb)
         {
-            T item = SelectSingleSelectInternal<T>(mapFromDb, false);
+            var item = await SelectSingleFirstInternalAsync(mapFromDb, false).ConfigureAwait(false);
             if (item == null)
                 throw new InvalidOperationException("SelectFirst request has not returned a row.");
 
@@ -485,10 +523,10 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>The single item.</returns>
-        public T SelectFirst<T>(IDatabaseMapper<T> mapper) where T : class, new()
+        public async Task<T> SelectFirstAsync<T>(IDatabaseMapper<T> mapper) where T : class, new()
         {
             Check.NotNull(mapper, nameof(mapper));
-            return SelectFirst((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            return await SelectFirstAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!) ?? throw new InvalidOperationException(_mapperNullResultMessage)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -497,9 +535,9 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for the record.</param>
         /// <returns>The single item or default.</returns>
-        public T SelectFirstOrDefault<T>(Func<DatabaseRecord, T> mapFromDb)
+        public async Task<T> SelectFirstOrDefaultAsync<T>(Func<DatabaseRecord, T> mapFromDb) 
         {
-            return SelectSingleSelectInternal<T>(mapFromDb, false);
+            return await SelectSingleFirstInternalAsync(mapFromDb, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -508,26 +546,26 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>The single item.</returns>
-        public T SelectFirstOrDefault<T>(IDatabaseMapper<T> mapper) where T : class, new()
+        public async Task<T?> SelectFirstOrDefaultAsync<T>(IDatabaseMapper<T> mapper) where T : class, new()
         {
             Check.NotNull(mapper, nameof(mapper));
-            return SelectFirstOrDefault((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            return await SelectFirstOrDefaultAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!) ?? throw new InvalidOperationException(_mapperNullResultMessage)).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Performs the database select single command.
         /// </summary>
-        private T SelectSingleSelectInternal<T>(Func<DatabaseRecord, T> mapFromDb, bool throwWhereMulti)
+        private Task<T> SelectSingleFirstInternalAsync<T>(Func<DatabaseRecord, T> mapFromDb, bool throwWhereMulti)
         {
             if (mapFromDb == null)
                 throw new ArgumentNullException(nameof(mapFromDb));
 
-            return DbDataReaderWrapper(dr =>
+            return DbDataReaderWrapperWithResultAsync(async dr => 
             {
-                T item = default;
+                T item = default!;
                 int i = 0;
 
-                while (dr.Read())
+                while (await dr.ReadAsync().ConfigureAwait(false))
                 {
                     if (i++ > 0)
                     {
@@ -552,84 +590,79 @@ namespace Beef.Data.Database
         /// Executes a query command.
         /// </summary>
         /// <param name="databaseRecord">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        public void SelectQuery(Action<DatabaseRecord> databaseRecord)
+        public async Task SelectQueryAsync(Action<DatabaseRecord> databaseRecord)
         {
             Check.NotNull(databaseRecord, nameof(databaseRecord));
 
-            DbDataReaderWrapper(dr =>
+            await DbDataReaderWrapperNoResultAsync(async dr =>
             {
-                while (dr.Read())
+                while (await dr.ReadAsync().ConfigureAwait(false))
                 {
-                    databaseRecord(new DatabaseRecord(this, (IDataRecord)dr));
+                    databaseRecord(new DatabaseRecord(this, dr));
                 }
-
-                return (object)null;
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Executes a query command; whilst also outputing the resulting <see cref="ParameterDirection.ReturnValue"/>.
+        /// Executes a query command; whilst also returning the resulting <see cref="ParameterDirection.ReturnValue"/>.
         /// </summary>
         /// <param name="databaseRecord">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        /// <param name="returnValue">The resultant return value.</param>
-        public void SelectQuery(Action<DatabaseRecord> databaseRecord, out int returnValue)
+        /// <returns>The resultant return value.</returns>
+        public async Task<int> SelectQueryWithValueAsync(Action<DatabaseRecord> databaseRecord)
         {
             var rvp = Parameters.AddReturnValueParameter();
 
-            SelectQuery(databaseRecord);
+            await SelectQueryAsync(databaseRecord).ConfigureAwait(false);
 
-            returnValue = rvp.Value == null ? -1 : (int)rvp.Value;
+            return rvp.Value == null ? -1 : (int)rvp.Value;
         }
 
         /// <summary>
         /// Executes a query command.
         /// </summary>
-        /// <typeparam name="TItem">The record <see cref="Type"/>.</typeparam>
+        /// <typeparam name="T">The result <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-        public IEnumerable<TItem> SelectQuery<TItem>(Func<DatabaseRecord, TItem> mapFromDb)
+        /// <returns>An <see cref="IEnumerable{T}"/>.</returns>
+        public async Task<IEnumerable<T>> SelectQueryAsync<T>(Func<DatabaseRecord, T> mapFromDb)
         {
             if (mapFromDb == null)
                 throw new ArgumentNullException(nameof(mapFromDb));
 
-            return DbDataReaderWrapper(dr =>
+            return await DbDataReaderWrapperWithResultAsync(async dr =>
             {
-                var coll = new List<TItem>();
+                var coll = new List<T>();
 
-                while (dr.Read())
+                while (await dr.ReadAsync().ConfigureAwait(false))
                 {
-                    coll.Add(mapFromDb(new DatabaseRecord(this, (IDataRecord)dr)));
+                    coll.Add(mapFromDb(new DatabaseRecord(this, dr)) ?? throw new InvalidOperationException(_mapperNullResultMessage));
                 }
 
                 return coll;
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Executes a query command using a <paramref name="mapper"/>.
         /// </summary>
-        /// <typeparam name="TItem">The record <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-        public IEnumerable<TItem> SelectQuery<TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new()
+        public async Task<IEnumerable<TItem>> SelectQueryAsync<TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new()
         {
-            return SelectQuery((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            return await SelectQueryAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!) ?? throw new InvalidOperationException(_mapperNullResultMessage)).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Executes a query command; whilst also outputing the resulting <see cref="ParameterDirection.ReturnValue"/>.
         /// </summary>
+        /// <typeparam name="T">The result <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        /// <param name="returnValue">The resultant return value.</param>
-        /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-        public IEnumerable<TItem> SelectQuery<TItem>(Func<DatabaseRecord, TItem> mapFromDb, out int returnValue)
+        /// <returns>An <see cref="IEnumerable{TItem}"/> collection and resultant return value.</returns>
+        public async Task<(IEnumerable<T> items, int returnValue)> SelectQueryWithValueAsync<T>(Func<DatabaseRecord, T> mapFromDb)
         {
             var rvp = Parameters.AddReturnValueParameter();
-
-            var coll = SelectQuery<TItem>(mapFromDb);
-
-            returnValue = rvp.Value == null ? -1 : (int)rvp.Value;
-            return coll;
+            var coll = await SelectQueryAsync<T>(mapFromDb).ConfigureAwait(false);
+            return (coll, rvp.Value == null ? -1 : (int)rvp.Value);
         }
 
         /// <summary>
@@ -637,11 +670,10 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TItem">The record <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
-        /// <param name="returnValue">The resultant return value.</param>
-        /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-        public IEnumerable<TItem> SelectQuery<TItem>(IDatabaseMapper<TItem> mapper, out int returnValue) where TItem : class, new()
+        /// <returns>An <see cref="IEnumerable{TItem}"/> collection and resultant return value.</returns>
+        public async Task<(IEnumerable<TItem> coll, int returnValue)> SelectQueryWithValueAsync<TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new()
         {
-            return SelectQuery((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null), out returnValue);
+            return await SelectQueryWithValueAsync((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -651,11 +683,11 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
         /// <returns>The resultant collection.</returns>
-        public TColl SelectQuery<TColl, TItem>(Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>, new()
+        public async Task<TColl> SelectQueryAsync<TColl, TItem>(Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>, new()
         {
             var coll = new TColl();
 
-            SelectQuery<TColl, TItem>(coll, mapFromDb);
+            await SelectQueryAsync(coll, mapFromDb).ConfigureAwait(false);
 
             return coll;
         }
@@ -667,9 +699,12 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
         /// <returns>The resultant collection.</returns>
-        public TColl SelectQuery<TColl, TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>, new()
+        public async Task<TColl> SelectQueryAsync<TColl, TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>, new()
         {
-            return SelectQuery<TColl, TItem>((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            return await SelectQueryAsync<TColl, TItem>((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!)!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -677,16 +712,13 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
-        /// <param name="returnValue">The resultant return value.</param>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        /// <returns>The resultant collection.</returns>
-        public TColl SelectQuery<TColl, TItem>(Func<DatabaseRecord, TItem> mapFromDb, out int returnValue) where TColl : ICollection<TItem>, new()
+        /// <returns>The resultant collection and return value.</returns>
+        public async Task<(TColl coll, int returnValue)> SelectQueryWithValueAsync<TColl, TItem>(Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>, new()
         {
             var coll = new TColl();
-
-            SelectQuery<TColl, TItem>(coll, mapFromDb, out returnValue);
-
-            return coll;
+            var value = await SelectQueryWithValueAsync(coll, mapFromDb).ConfigureAwait(false);
+            return (coll, value);
         }
 
         /// <summary>
@@ -694,12 +726,14 @@ namespace Beef.Data.Database
         /// </summary>
         /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
-        /// <param name="returnValue">The resultant return value.</param>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
-        /// <returns>The resultant collection.</returns>
-        public TColl SelectQuery<TColl, TItem>(IDatabaseMapper<TItem> mapper, out int returnValue) where TItem : class, new() where TColl : ICollection<TItem>, new()
+        /// <returns>The resultant collection and return value.</returns>
+        public async Task<(TColl coll, int returnValue)> SelectQueryWithValueAsync<TColl, TItem>(IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>, new()
         {
-            return SelectQuery<TColl, TItem>((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null), out returnValue);
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            return await SelectQueryWithValueAsync<TColl, TItem>((dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!)!).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -709,7 +743,7 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        public void SelectQuery<TColl, TItem>(TColl coll, Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>
+        public Task SelectQueryAsync<TColl, TItem>(TColl coll, Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>
         {
             if (coll == null)
                 throw new ArgumentNullException(nameof(coll));
@@ -717,14 +751,14 @@ namespace Beef.Data.Database
             if (mapFromDb == null)
                 throw new ArgumentNullException(nameof(mapFromDb));
 
-            DbDataReaderWrapper(dr =>
+            return DbDataReaderWrapperNoResultAsync(async dr =>
             {
-                while (dr.Read())
+                while (await dr.ReadAsync().ConfigureAwait(false))
                 {
-                    coll.Add(mapFromDb(new DatabaseRecord(this, (IDataRecord)dr)));
+                    var item = mapFromDb(new DatabaseRecord(this, (IDataRecord)dr));
+                    if (item != null)
+                        coll.Add(item);
                 }
-
-                return (object)null;
             });
         }
 
@@ -735,9 +769,12 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
-        public void SelectQuery<TColl, TItem>(TColl coll, IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>
+        public Task SelectQueryAsync<TColl, TItem>(TColl coll, IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>
         {
-            SelectQuery<TColl, TItem>(coll, (dr) => mapper.MapFromDb(dr, OperationTypes.Get, null));
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+            
+            return SelectQueryAsync(coll, (dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!)!);
         }
 
         /// <summary>
@@ -747,14 +784,14 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
         /// <param name="mapFromDb">The <see cref="DatabaseRecord"/> delegate invoked for each record.</param>
-        /// <param name="returnValue">The resultant return value.</param>
-        public void SelectQuery<TColl, TItem>(TColl coll, Func<DatabaseRecord, TItem> mapFromDb, out int returnValue) where TColl : ICollection<TItem>
+        /// <returns>An <see cref="IEnumerable{TItem}"/> collection and resultant return value.</returns>
+        public async Task<int> SelectQueryWithValueAsync<TColl, TItem>(TColl coll, Func<DatabaseRecord, TItem> mapFromDb) where TColl : ICollection<TItem>
         {
             var rvp = Parameters.AddReturnValueParameter();
 
-            SelectQuery<TColl, TItem>(coll, mapFromDb);
+            await SelectQueryAsync(coll, mapFromDb).ConfigureAwait(false);
 
-            returnValue = rvp.Value == null ? -1 : (int)rvp.Value;
+            return rvp.Value == null ? -1 : (int)rvp.Value;
         }
 
         /// <summary>
@@ -764,10 +801,13 @@ namespace Beef.Data.Database
         /// <typeparam name="TItem">The item <see cref="Type"/>.</typeparam>
         /// <param name="coll">The collection to add items to.</param>
         /// <param name="mapper">The <see cref="IDatabaseMapper{T}"/>.</param>
-        /// <param name="returnValue">The resultant return value.</param>
-        public void SelectQuery<TColl, TItem>(TColl coll, IDatabaseMapper<TItem> mapper, out int returnValue) where TItem : class, new() where TColl : ICollection<TItem>
+        /// <returns>The resultant return value.</returns>
+        public async Task<int> SelectQueryWithValueAsync<TColl, TItem>(TColl coll, IDatabaseMapper<TItem> mapper) where TItem : class, new() where TColl : ICollection<TItem>
         {
-            SelectQuery<TColl, TItem>(coll, (dr) => mapper.MapFromDb(dr, OperationTypes.Get, null), out returnValue);
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            return await SelectQueryWithValueAsync(coll, (dr) => mapper.MapFromDb(dr, OperationTypes.Get, null!)!).ConfigureAwait(false);
         }
 
         #endregion
@@ -779,12 +819,12 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="datasetRecord">An array of <see cref="DatabaseRecord"/> delegates invoked for each record for their respective dataset.</param>
         /// <remarks>The number of delegates specified must match the number of returned datasets. A null dataset indicates to ignore (skip) a dataset.</remarks>
-        public void SelectQueryMultiSet(params Action<DatabaseRecord>[] datasetRecord)
+        public async Task SelectQueryMultiSetAsync(params Action<DatabaseRecord>[] datasetRecord)
         {
             if (datasetRecord == null)
                 throw new ArgumentNullException(nameof(datasetRecord));
 
-            DbDataReaderWrapper(dr =>
+            await DbDataReaderWrapperNoResultAsync(async dr =>
             {
                 var index = 0;
                 do
@@ -794,35 +834,33 @@ namespace Beef.Data.Database
 
                     if (datasetRecord[index] != null)
                     {
-                        while (dr.Read())
+                        while (await dr.ReadAsync().ConfigureAwait(false))
                         {
-                            datasetRecord[index](new DatabaseRecord(this, (IDataRecord)dr));
+                            datasetRecord[index](new DatabaseRecord(this, dr));
                         }
                     }
 
                     index++;
-                } while (dr.NextResult());
+                } while (await dr.NextResultAsync().ConfigureAwait(false));
 
                 if (index < datasetRecord.Length)
                     throw new InvalidOperationException($"SelectQueryMultiSet has returned less ({index}) record sets than expected ({datasetRecord.Length}).");
-
-                return (object)null;
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Executes a multi-dataset query command; whilst also outputing the resulting <see cref="ParameterDirection.ReturnValue"/>.
         /// </summary>
         /// <param name="datasetRecord">An array of <see cref="DatabaseRecord"/> delegates invoked for each record for their respective dataset.</param>
-        /// <param name="returnValue">The resultant return value.</param>
+        /// <returns>The resultant return value.</returns>
         /// <remarks>The number of delegates specified must match the number of returned datasets. A null dataset indicates to ignore (skip) a dataset.</remarks>
-        public void SelectQueryMultiSet(out int returnValue, params Action<DatabaseRecord>[] datasetRecord)
+        public async Task<int> SelectQueryMultiSetWithValueAsync(params Action<DatabaseRecord>[] datasetRecord)
         {
             var rvp = Parameters.AddReturnValueParameter();
 
-            SelectQueryMultiSet(datasetRecord);
+            await SelectQueryMultiSetAsync(datasetRecord).ConfigureAwait(false);
 
-            returnValue = rvp.Value == null ? -1 : (int)rvp.Value;
+            return rvp.Value == null ? -1 : (int)rvp.Value;
         }
 
         /// <summary>
@@ -830,15 +868,15 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
         /// <remarks>The number of <see cref="IMultiSetArgs"/> specified must match the number of returned datasets. A null dataset indicates to ignore (skip) a dataset.</remarks>
-        public void SelectQueryMultiSet(params IMultiSetArgs[] multiSetArgs)
+        public Task SelectQueryMultiSetAsync(params IMultiSetArgs[] multiSetArgs)
         {
             Check.NotNull(multiSetArgs, nameof(multiSetArgs));
 
-            DbDataReaderWrapper(dr =>
+            return DbDataReaderWrapperNoResultAsync(async dr =>
             {
                 var index = 0;
                 var records = 0;
-                IMultiSetArgs multiSetArg = null;
+                IMultiSetArgs? multiSetArg = null;
                 do
                 {
                     if (index >= multiSetArgs.Length)
@@ -848,7 +886,7 @@ namespace Beef.Data.Database
                     {
                         records = 0;
                         multiSetArg = multiSetArgs[index];
-                        while (dr.Read())
+                        while (await dr.ReadAsync().ConfigureAwait(false))
                         {
                             records++;
                             if (multiSetArg.MaxRows.HasValue && records > multiSetArg.MaxRows.Value)
@@ -861,7 +899,7 @@ namespace Beef.Data.Database
                             throw new InvalidOperationException($"SelectQueryMultiSet (multiSetArgs[{index}]) has returned less records ({records}) than expected ({multiSetArg.MinRows}).");
 
                         if (records == 0 && multiSetArg.StopOnNull)
-                            return (object)null;
+                            return;
 
                         multiSetArg.InvokeResult();
                     }
@@ -871,8 +909,6 @@ namespace Beef.Data.Database
 
                 if (index < multiSetArgs.Length)
                     throw new InvalidOperationException($"SelectQueryMultiSet has returned less ({index}) record sets than expected ({multiSetArgs.Length}).");
-
-                return (object)null;
             });
         }
 
@@ -880,15 +916,15 @@ namespace Beef.Data.Database
         /// Executes a multi-dataset query command with one or more <see cref="IMultiSetArgs"/>; whilst also outputing the resulting <see cref="ParameterDirection.ReturnValue"/>.
         /// </summary>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
-        /// <param name="returnValue">The resultant return value.</param>
+        /// <returns>The resultant return value.</returns>
         /// <remarks>The number of <see cref="IMultiSetArgs"/> specified must match the number of returned datasets. A null dataset indicates to ignore (skip) a dataset.</remarks>
-        public void SelectQueryMultiSet(out int returnValue, params IMultiSetArgs[] multiSetArgs)
+        public async Task<int> SelectQueryMultiSetWithValueAsync(params IMultiSetArgs[] multiSetArgs)
         {
             var rvp = Parameters.AddReturnValueParameter();
 
-            SelectQueryMultiSet(multiSetArgs);
+            await SelectQueryMultiSetAsync(multiSetArgs).ConfigureAwait(false);
 
-            returnValue = rvp.Value == null ? -1 : (int)rvp.Value;
+            return rvp.Value == null ? -1 : (int)rvp.Value;
         }
 
         /// <summary>
@@ -897,11 +933,11 @@ namespace Beef.Data.Database
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
         /// <returns>The resulting <see cref="PagingResult"/>.</returns>
-        public void SelectQueryMultiSet(PagingResult paging, params IMultiSetArgs[] multiSetArgs)
+        public async Task SelectQueryMultiSetAsync(PagingResult paging, params IMultiSetArgs[] multiSetArgs)
         {
             Parameters.PagingParams(paging);
 
-            SelectQueryMultiSet(out int rv, multiSetArgs);
+            var rv = await SelectQueryMultiSetWithValueAsync(multiSetArgs).ConfigureAwait(false);
             if (paging != null && paging.IsGetCount && rv > 0)
                 paging.TotalCount = rv;
         }
@@ -915,11 +951,11 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="action">The post-execution delegate to enable parameter access.</param>
         /// <returns>The number of rows affected.</returns>
-        public int NonQuery(Action<DbParameterCollection> action = null)
+        public Task<int> NonQueryAsync(Action<DbParameterCollection>? action = null)
         {
-            return DbCommandWrapper(behaviour =>
+            return NonQueryScalarDbCommandWrapperAsync(async behaviour =>
             {
-                int result = DbCommand.ExecuteNonQuery();
+                int result = await DbCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
                 action?.Invoke(DbCommand.Parameters);
                 return result;
             });
@@ -931,11 +967,11 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The result <see cref="Type"/>.</typeparam>
         /// <param name="action">The post-execution delegate to enable parameter access.</param>
         /// <returns>The value of the first column of the first row in the result set.</returns>
-        public T Scalar<T>(Action<DbParameterCollection> action = null)
+        public Task<T> ScalarAsync<T>(Action<DbParameterCollection>? action = null)
         {
-            return DbCommandWrapper(behaviour =>
+            return NonQueryScalarDbCommandWrapperAsync(async behaviour =>
             {
-                var result = DbCommand.ExecuteScalar();
+                var result = await DbCommand.ExecuteScalarAsync().ConfigureAwait(false);
                 var value = result is DBNull ? default : (T)result;
                 action?.Invoke(DbCommand.Parameters);
                 return value;

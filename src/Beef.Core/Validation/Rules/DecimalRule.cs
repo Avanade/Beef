@@ -60,7 +60,7 @@ namespace Beef.Validation.Rules
         {
             // Where the value is null, do nothing; i.e. Nullable<Type>.
             Beef.Check.NotNull(context, nameof(context));
-            if (Comparer<object>.Default.Compare(context.Value, null) == 0)
+            if (Comparer<object>.Default.Compare(context.Value!, null!) == 0)
                 return;
 
             // Convert numeric to a decimal value.

@@ -35,7 +35,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the property value.
         /// </summary>
-        object Value { get; }
+        object? Value { get; }
 
         /// <summary>
         /// Gets the fully qualified property name.
@@ -67,7 +67,7 @@ namespace Beef.Validation
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text (<see cref="Text"/> and <see cref="Value"/> are automatically passed as the first two arguments to the string formatter).</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        MessageItem CreateErrorMessage(LText format, params object[] values);
+        MessageItem CreateErrorMessage(LText format, params object?[] values);
 
         /// <summary>
         /// Creates a fully qualified property name for the name.
@@ -97,13 +97,13 @@ namespace Beef.Validation
         /// <param name="name">The property name.</param>
         /// <param name="jsonName">The JSON property name.</param>
         /// <param name="text">The property text.</param>
-        public PropertyContext(ValidationContext<TEntity> context, TProperty value, string name, string jsonName, LText text = null)
+        public PropertyContext(ValidationContext<TEntity> context, TProperty value, string name, string? jsonName = null, LText? text = null)
         {
             Parent = Check.NotNull(context, nameof(context));
             Name = Check.NotEmpty(name, nameof(name));
             JsonName = jsonName ?? Name;
             UseJsonName = context.UseJsonNames;
-            Text = text ?? ValidationExtensions.ToSentenceCase(name);
+            Text = text ?? ValidationExtensions.ToSentenceCase(name)!;
             Value = value;
         }
 
@@ -150,7 +150,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the property value.
         /// </summary>
-        object IPropertyContext.Value => Value;
+        object? IPropertyContext.Value => Value;
 
         /// <summary>
         /// Gets the property value.
@@ -174,7 +174,7 @@ namespace Beef.Validation
             // Get the property info.
             if (Parent.Value is ValidationValue<TProperty> vv)
             {
-                var pi = Reflection.TypeReflector.GetPropertyInfo(vv.Entity.GetType(), Name) ?? throw new InvalidOperationException($"Property '{Name}' does not exist for Type {typeof(TEntity).Name}.");
+                var pi = Reflection.TypeReflector.GetPropertyInfo(vv.Entity!.GetType(), Name) ?? throw new InvalidOperationException($"Property '{Name}' does not exist for Type {typeof(TEntity).Name}.");
 
                 try
                 {
@@ -220,10 +220,10 @@ namespace Beef.Validation
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text (<see cref="Text"/> and <see cref="Value"/> are automatically passed as the first two arguments to the string formatter).</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public MessageItem CreateErrorMessage(LText format, params object[] values)
+        public MessageItem CreateErrorMessage(LText format, params object?[] values)
         {
             HasError = true;
-            var fVals = (new string[] { Text, Value?.ToString() }).Concat(values).ToArray();
+            var fVals = (new string[] { Text, Value?.ToString()! }).Concat(values).ToArray();
             return Parent.AddMessage(Name, JsonName, MessageType.Error, format, fVals);
         }
 
@@ -262,7 +262,7 @@ namespace Beef.Validation
                 FullyQualifiedEntityName = FullyQualifiedPropertyName,
                 FullyQualifiedJsonEntityName = FullyQualifiedJsonPropertyName,
                 SelectedPropertyName = Parent?.SelectedPropertyName,
-                UseJsonNames = Parent.UseJsonNames
+                UseJsonNames = Parent?.UseJsonNames
             };
 
             // Copy the configuration values; do not allow the higher-level dictionaries (stack) to be extended by lower-level validators.

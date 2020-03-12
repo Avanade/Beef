@@ -34,14 +34,14 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object ConvertToDest(object value);
+        object? ConvertToDest(object? value);
 
         /// <summary>
         /// Converts the destination <paramref name="value"/> to the source equivalent.
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object ConvertToSrce(object value);
+        object? ConvertToSrce(object? value);
     }
 
     /// <summary>

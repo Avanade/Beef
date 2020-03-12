@@ -54,6 +54,7 @@ Attribute | Description
 `DatabaseStoredProc` | Specifies the database stored procedure. Used where the	`Entity.AutoImplement` is `Database` and `Operation.AutoImplement` is `true`. Defaults to `sp + Entity.Name + Operation.Name`; e.g. `spPersonCreate`.
 `DataEntityMapper` | Overrides the data mapper class name.
 `DataCosmosValueContainer` | Indicates that the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer` (default). Overrides the `Entity.CosmosValueContainer` value.
+`DataCosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'. Overrides the  `Entity.CosmosPartitionKey` value.
 
 <br>
 

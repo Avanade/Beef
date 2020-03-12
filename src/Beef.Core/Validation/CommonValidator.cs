@@ -46,7 +46,7 @@ namespace Beef.Validation
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonValidator{T}"/>.
         /// </summary>
-        internal CommonValidator() { }
+        internal CommonValidator() : base("Common") { }
 
         /// <summary>
         /// The <b>Run</b> method is not supported.
@@ -66,7 +66,7 @@ namespace Beef.Validation
         /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as sentence case where not specified).</param>
         /// <param name="throwOnError">Indicates to throw a <see cref="ValidationException"/> where an error was found.</param>
         /// <returns>A <see cref="ValueValidatorResult{TEntity, TProperty}"/>.</returns>
-        public ValueValidatorResult<ValidationValue<T>, T> Validate(T value, string name = null, LText text = null, bool throwOnError = false)
+        public ValueValidatorResult<ValidationValue<T>, T> Validate(T value, string? name = null, LText? text = null, bool throwOnError = false)
         {
             var vv = new ValidationValue<T>(null, value);
             var ctx = new PropertyContext<ValidationValue<T>, T>(new ValidationContext<ValidationValue<T>>(vv,

@@ -49,7 +49,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public static void IsPublished(string template, string action = null)
+        public static void IsPublished(string template, string? action = null)
         {
             Check.NotEmpty(template, nameof(template));
 
@@ -62,7 +62,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public static void IsNotPublished(string template, string action = null)
+        public static void IsNotPublished(string template, string? action = null)
         {
             Check.NotEmpty(template, nameof(template));
             if (_localEvents.Value == null || _localEvents.Value.Count == 0)
@@ -138,9 +138,15 @@ namespace Beef.Test.NUnit
     public class ExpectedEvent
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ExpectedEvent"/> class.
+        /// </summary>
+        /// <param name="eventData"></param>
+        public ExpectedEvent(EventData eventData) => EventData = eventData ?? throw new ArgumentNullException(nameof(eventData));
+
+        /// <summary>
         /// Gets or sets the <see cref="Events.EventData"/>.
         /// </summary>
-        public EventData EventData { get; set; }
+        public EventData EventData { get; }
 
         /// <summary>
         /// Gets or sets the members to ignore for the <see cref="EventData.GetValue"/> comparison.

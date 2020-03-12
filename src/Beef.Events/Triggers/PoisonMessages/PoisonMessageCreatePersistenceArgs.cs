@@ -15,21 +15,21 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <summary>
         /// Gets or sets the <see cref="ResilientEventHubOptions"/>.
         /// </summary>
-        public ResilientEventHubOptions Options { get; set; }
+        public ResilientEventHubOptions? Options { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IConfiguration"/>.
         /// </summary>
-        public IConfiguration Config { get; set; }
+        public IConfiguration? Config { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ILogger"/>.
         /// </summary>
-        public ILogger Logger { get; set; }
+        public ILogger? Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="PartitionContext"/>.
         /// </summary>
-        public PartitionContext Context { get; set; }
+        public PartitionContext? Context { get; set; }
     }
 }

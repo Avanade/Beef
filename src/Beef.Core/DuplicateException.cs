@@ -27,7 +27,7 @@ namespace Beef
         /// Initializes a new instance of the <see cref="DuplicateException"/> class with a specified messsage.
         /// </summary>
         /// <param name="message">The message text.</param>
-        public DuplicateException(string message)
+        public DuplicateException(string? message)
             : base(message ?? new LText("Beef.DuplicateException"))
         {
         }
@@ -37,7 +37,7 @@ namespace Beef
         /// </summary>
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public DuplicateException(string message, Exception innerException)
+        public DuplicateException(string? message, Exception innerException)
             : base(message ?? new LText("Beef.DuplicateException"), innerException)
         {
         }

@@ -79,9 +79,9 @@ namespace Beef.Data.Database
     public class DatabasePropertyMapper<TSrce, TSrceProperty> : PropertyMapperCustomBase<TSrce, TSrceProperty>, IDatabasePropertyMapper<TSrce>
         where TSrce : class, new()
     {
-        private Func<DatabaseRecord, bool> _mapDestToSrceWhen;
-        private Action<TSrce, DatabaseParameters, OperationTypes> _mapToDbOverride;
-        private Func<DatabaseRecord, TSrce, OperationTypes, TSrceProperty> _mapFromDbOverride;
+        private Func<DatabaseRecord, bool>? _mapDestToSrceWhen;
+        private Action<TSrce, DatabaseParameters, OperationTypes>? _mapToDbOverride;
+        private Func<DatabaseRecord, TSrce, OperationTypes, TSrceProperty>? _mapFromDbOverride;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabasePropertyMapper{TSrce, TSrceProperty}"/> class.
@@ -89,12 +89,9 @@ namespace Beef.Data.Database
         /// <param name="srcePropertyExpression">The <see cref="LambdaExpression"/> to reference the source entity property.</param>
         /// <param name="destColumnName">The <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}.DestPropertyName">name</see> of the destination database column (auto-generated from the source where not specified).</param>
         /// <param name="operationTypes">The <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).</param>
-        public DatabasePropertyMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string destColumnName = null, OperationTypes operationTypes = OperationTypes.Any) 
+        public DatabasePropertyMapper(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, string? destColumnName = null, OperationTypes operationTypes = OperationTypes.Any) 
             : base(srcePropertyExpression, destColumnName, operationTypes)
         {
-            if (string.IsNullOrEmpty(destColumnName))
-                DestPropertyName = SrcePropertyName;
-
             DestParameterName = "@" + DestPropertyName;
         }
 
@@ -244,11 +241,11 @@ namespace Beef.Data.Database
                 return;
             }
 
-            TSrceProperty val = default;
+            TSrceProperty val = default!;
             if (Mapper != null)
             {
                 var em = (IDatabaseMapper)Mapper;
-                val = (TSrceProperty)em.MapFromDb(dr, operationType, this);
+                val = (TSrceProperty)em.MapFromDb(dr, operationType, this)!;
             }
             else
             {
@@ -256,7 +253,7 @@ namespace Beef.Data.Database
                 if (!dr.IsDBNull(index))
                 {
                     if (Converter != null)
-                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType, System.Globalization.CultureInfo.InvariantCulture));
+                        val = (TSrceProperty)Converter.ConvertToSrce(Convert.ChangeType(dr.DataRecord.GetValue(index), Converter.DestUnderlyingType, System.Globalization.CultureInfo.InvariantCulture))!;
                     else
                         val = dr.GetValue<TSrceProperty>(index);
                 }
@@ -288,7 +285,7 @@ namespace Beef.Data.Database
                 return;
             }
 
-            var val = GetSrceValue(value, operationType);
+            var val = GetSrceValue(value, operationType)!;
             if (Mapper != null)
             {
                 var em = (IDatabaseMapper)Mapper;

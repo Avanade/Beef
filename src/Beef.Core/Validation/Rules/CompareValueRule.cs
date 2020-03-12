@@ -13,9 +13,9 @@ namespace Beef.Validation.Rules
         where TEntity : class
     {
         private readonly TProperty _compareToValue;
-        private readonly Func<TEntity, TProperty> _compareToValueFunction;
-        private readonly LText _compareToText;
-        private readonly Func<TEntity, LText> _compareToTextFunction;
+        private readonly Func<TEntity, TProperty>? _compareToValueFunction;
+        private readonly LText? _compareToText;
+        private readonly Func<TEntity, LText>? _compareToTextFunction;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompareValueRule{TEntity, TProperty}"/> class specifying the compare to value.
@@ -23,7 +23,7 @@ namespace Beef.Validation.Rules
         /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
         /// <param name="compareToValue">The compare to value.</param>
         /// <param name="compareToText">The compare to text to be passed for the error message (default is to use <paramref name="compareToValue"/>).</param>
-        public CompareValueRule(CompareOperator compareOperator, TProperty compareToValue, LText compareToText = null) : base(compareOperator)
+        public CompareValueRule(CompareOperator compareOperator, TProperty compareToValue, LText? compareToText = null) : base(compareOperator)
         {
             _compareToValue = compareToValue;
             _compareToText = compareToText;
@@ -35,10 +35,11 @@ namespace Beef.Validation.Rules
         /// <param name="compareOperator">The <see cref="CompareOperator"/>.</param>
         /// <param name="compareToValueFunction">The compare to value function.</param>
         /// <param name="compareToTextFunction">The compare to text function (default is to use the result of the <paramref name="compareToValueFunction"/>).</param>
-        public CompareValueRule(CompareOperator compareOperator, Func<TEntity, TProperty> compareToValueFunction, Func<TEntity, LText> compareToTextFunction = null) : base(compareOperator)
+        public CompareValueRule(CompareOperator compareOperator, Func<TEntity, TProperty> compareToValueFunction, Func<TEntity, LText>? compareToTextFunction = null) : base(compareOperator)
         {
             _compareToValueFunction = compareToValueFunction ?? throw new ArgumentNullException(nameof(compareToValueFunction));
             _compareToTextFunction = compareToTextFunction;
+            _compareToValue = default!;
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace Beef.Validation.Rules
             var compareToValue = _compareToValueFunction == null ? _compareToValue : _compareToValueFunction.Invoke(context.Parent.Value);
             if (!Compare(context.Value, compareToValue))
             {
-                string compareToText = _compareToText ?? (compareToValue?.ToString());
+                string? compareToText = _compareToText ?? compareToValue?.ToString() ?? new LText("null");
                 if (_compareToTextFunction != null)
                     compareToText = _compareToTextFunction(context.Parent.Value);
 

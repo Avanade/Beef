@@ -14,10 +14,10 @@ namespace Beef.Validation.Rules
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
     public class ExistsRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
-        private readonly Predicate<TEntity> _predicate;
-        private readonly Func<bool> _exists;
-        private readonly Func<TEntity, object> _existsNotDefault;
-        private readonly Func<TEntity, WebApiAgentResult> _agentResult;
+        private readonly Predicate<TEntity>? _predicate;
+        private readonly Func<bool>? _exists;
+        private readonly Func<TEntity, object>? _existsNotDefault;
+        private readonly Func<TEntity, WebApiAgentResult>? _agentResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExistsRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.
@@ -92,7 +92,7 @@ namespace Beef.Validation.Rules
             }
             else
             {
-                if (_existsNotDefault(context.Parent.Value) == null)
+                if (_existsNotDefault!(context.Parent.Value) == null)
                     CreateErrorMessage(context);
             }
         }

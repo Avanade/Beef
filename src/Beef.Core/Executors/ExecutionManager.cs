@@ -22,11 +22,11 @@ namespace Beef.Executors
         public const int ProcessWaitIntervalMilliseconds = 10;
 
         private readonly Func<Executor> _createExecutor;
-        private ManualResetEvent _waiter;
+        private ManualResetEvent? _waiter;
         private readonly object _lock = new object();
         private readonly Dictionary<Guid, Executor> _executors = new Dictionary<Guid, Executor>();
-        private Stopwatch _stopwatch;
-        private Exception _ctorException;
+        private Stopwatch? _stopwatch;
+        private Exception? _ctorException;
         private bool _disposed;
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Beef.Executors
 
             return new ExecutionManager(trigger, () => executorCreate.Invoke(), async (executor, args) =>
             {
-                var exe = executor as ExecutorBase;
+                var exe = (executor as ExecutorBase)!;
                 var ea = new ExecutorRunArgs(exe);
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
@@ -148,8 +148,11 @@ namespace Beef.Executors
 
             return new ExecutionManager(trigger, () => executorCreate.Invoke(), async (executor, args) =>
             {
-                var exe = executor as ExecutorBase<TArgs>;
-                exe.ExecutorArgs = ((TriggerEventArgs)args).Args;
+                var exe = (executor as ExecutorBase<TArgs>)!;
+
+                if (args is TriggerEventArgs tea)
+                    exe.ExecutorArgs = tea.Args;
+
                 var ea = new ExecutorRunArgs<TArgs>(exe);
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
@@ -167,7 +170,7 @@ namespace Beef.Executors
         /// <returns>An <see cref="ExecutionManager"/>.</returns>
         public static ExecutionManager Create<TColl, TItem>(Func<CollectionExecutorBase<TColl, TItem>> executorCreate) where TColl : IEnumerable<TItem>
         {
-            return Create<TColl, TItem>(executorCreate, new SingleTrigger());
+            return Create(executorCreate, new SingleTrigger());
         }
 
         /// <summary>
@@ -188,7 +191,7 @@ namespace Beef.Executors
 
             return new ExecutionManager(trigger, () => executorCreate.Invoke(), async (executor, args) =>
             {
-                var exe = executor as CollectionExecutorBase<TColl, TItem>;
+                var exe = (executor as CollectionExecutorBase<TColl, TItem>)!;
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
                     await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs(exe)).ConfigureAwait(false)).ConfigureAwait(false))).ConfigureAwait(false);
@@ -207,7 +210,7 @@ namespace Beef.Executors
         /// <returns>The <see cref="ExecutionManager"/>.</returns>
         public static ExecutionManager Create<TColl, TItem, TArgs>(Func<CollectionExecutorBase<TColl, TItem, TArgs>> executorCreate, TArgs args) where TColl : IEnumerable<TItem>
         {
-            return Create<TColl, TItem, TArgs>(executorCreate, new SingleTrigger<TArgs>(args));
+            return Create(executorCreate, new SingleTrigger<TArgs>(args));
         }
 
         /// <summary>
@@ -223,8 +226,11 @@ namespace Beef.Executors
         {
             return new ExecutionManager(trigger, () => executorCreate.Invoke(), async (executor, args) =>
             {
-                var exe = executor as CollectionExecutorBase<TColl, TItem, TArgs>;
-                exe.ExecutorArgs = ((TriggerEventArgs)args).Args;
+                var exe = (executor as CollectionExecutorBase<TColl, TItem, TArgs>)!;
+
+                if (args is TriggerEventArgs tea)
+                    exe.ExecutorArgs = tea.Args;
+
                 await exe.RunWrapperAsync(ExceptionHandling.Stop, async () =>
                 {
                     await exe.CompletionRunAsync(new ExecutorCompletionRunArgs(exe, await exe.RunItemsAsync(exe, await exe.RunCollectionAsync(new ExecutorCollectionRunArgs<TArgs>(exe)).ConfigureAwait(false)).ConfigureAwait(false))).ConfigureAwait(false);
@@ -237,7 +243,7 @@ namespace Beef.Executors
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/>.
         /// </summary>
-        private ExecutionManager(Trigger trigger, Func<Executor> createExecutor, Action<Executor, object> executorAction)
+        private ExecutionManager(Trigger trigger, Func<Executor> createExecutor, Action<Executor, object?> executorAction)
         {
             Trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
             _createExecutor = createExecutor ?? throw new ArgumentNullException(nameof(createExecutor));
@@ -257,7 +263,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the executor action as defined in the <b>Create</b> methods (i.e. the configured work).
         /// </summary>
-        internal Action<Executor, object> ExecutorAction { get; private set; }
+        internal Action<Executor, object?> ExecutorAction { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ExecutionState"/>.
@@ -272,12 +278,12 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Executor"/> that initiated the stop (<see cref="ExecutionManagerStopReason.ExecutorStop"/> or <see cref="ExecutionManagerStopReason.ExecutorExceptionStop"/>).
         /// </summary>
-        public Executor StopExecutor { get; private set; }
+        public Executor? StopExecutor { get; private set; }
 
         /// <summary>
         /// Gets the last <see cref="Executor"/> that was executed.
         /// </summary>
-        public Executor LastExecutor { get; private set; }
+        public Executor? LastExecutor { get; private set; }
 
         /// <summary>
         /// Indicates whether the execution was stopped as a result of an <see cref="ExecutionException"/>.
@@ -287,7 +293,7 @@ namespace Beef.Executors
         /// <summary>
         /// Gets the <see cref="Exception"/> that led to the <see cref="Stop"/> (as per the <see cref="StopReason"/>).
         /// </summary>
-        public Exception ExecutionException
+        public Exception? ExecutionException
         {
             get
             {
@@ -295,7 +301,7 @@ namespace Beef.Executors
                 {
                     ExecutionManagerStopReason.ExecutionManagerException => _ctorException,
                     ExecutionManagerStopReason.TriggerException => Trigger.Exception,
-                    ExecutionManagerStopReason.ExecutorExceptionStop => StopExecutor.Exception,
+                    ExecutionManagerStopReason.ExecutorExceptionStop => StopExecutor!.Exception,
                     _ => null,
                 };
             }
@@ -393,7 +399,7 @@ namespace Beef.Executors
         /// <returns>The <see cref="ExecutionManager"/>.</returns>
         public ExecutionManager Run()
         {
-            RunAsync().Wait();
+            RunAsync().GetAwaiter().GetResult();
             return this;
         }
 
@@ -404,7 +410,6 @@ namespace Beef.Executors
         /// <returns>The <see cref="Task"/>.</returns>
         public Task RunAsync(CancellationToken cancellationToken)
         {
-            Check.NotNull(cancellationToken, nameof(cancellationToken));
             Check.IsFalse(cancellationToken.IsCancellationRequested, "CancellationToken must not be in a cancelled state.");
             _stopwatch = Stopwatch.StartNew();
 
@@ -453,7 +458,7 @@ namespace Beef.Executors
         public void Stop()
         {
             Trace(() => Logger.Default.Trace($"ExecutionManager '{InstanceId}' Stop invoked."));
-            StopExecution(ExecutionManagerStopReason.ExecutionManagerStop).Wait();
+            StopExecution(ExecutionManagerStopReason.ExecutionManagerStop).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -478,7 +483,7 @@ namespace Beef.Executors
         /// <summary>
         /// Stops the execution.
         /// </summary>
-        private Task StopExecution(ExecutionManagerStopReason stopReason, Executor stopExecutor = null)
+        private Task StopExecution(ExecutionManagerStopReason stopReason, Executor? stopExecutor = null)
         {
             if (Status == ExecutionState.NotStarted)
                 throw new InvalidOperationException($"ExecutionManager '{InstanceId}' must be in a Started or Running state to Stop.");
@@ -532,18 +537,18 @@ namespace Beef.Executors
                     // This is a safety net; should not have any outstanding Executors at this point.
                     while (_executors.Count > 0)
                     {
-                        Task.Delay(ProcessWaitIntervalMilliseconds).Wait();
+                        Task.Delay(ProcessWaitIntervalMilliseconds).GetAwaiter().GetResult();
                     }
                 }
 
-                _stopwatch.Stop();
+                _stopwatch!.Stop();
                 Status = ExecutionState.Stopped;
                 StopReason = (stopReason == ExecutionManagerStopReason.TriggerStop && Trigger.Exception != null) ? ExecutionManagerStopReason.TriggerException : stopReason;
                 StopExecutor = stopExecutor;
                 Trace(() => Logger.Default.Trace($"ExecutionManager '{InstanceId}' stopped (reason: {StopReason}, executors: {ExecutorCount}, elapsed: {_stopwatch.Elapsed})."));
 
                 // Signals work stopped.
-                _waiter.Set();
+                _waiter!.Set();
             });
         }
 
@@ -609,12 +614,12 @@ namespace Beef.Executors
             if (Status != ExecutionState.Started && Status != ExecutionState.Running)
                 return;
 
-            Executor executor = null;
+            Executor executor;
 
             try
             {
                 executor = _createExecutor() ?? throw new InvalidOperationException($"ExecutionManager '{InstanceId}' invoked CreateExecutor function; it must return an Executor instance.");
-                executor.Configure(this, args.CompletionCallback);
+                executor.Configure(this, args?.CompletionCallback);
                 lock (_lock)
                 {
                     ExecutorCount++;

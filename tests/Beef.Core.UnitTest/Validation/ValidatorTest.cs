@@ -82,6 +82,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.IsFalse(r.HasErrors);
         }
 
+        [Test]
         public void Ruleset_UsingInline()
         {
             var v = Validator.Create<TestItem>()
@@ -97,7 +98,7 @@ namespace Beef.Core.UnitTest.Validation
             var r = v.Validate(new TestItem { Code = "A", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
-            Assert.AreEqual("Text is invalid.", r.Messages[0].Text);
+            Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
@@ -107,7 +108,7 @@ namespace Beef.Core.UnitTest.Validation
             r = v.Validate(new TestItem { Code = "B", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
-            Assert.AreEqual("Text is invalid.", r.Messages[0].Text);
+            Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 

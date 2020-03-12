@@ -13,9 +13,9 @@ namespace Beef
     {
         private static readonly Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
 
-        private readonly DataContextScope _parent;
+        private readonly DataContextScope? _parent;
         private readonly DataContextScopeOption _option;
-        private readonly Dictionary<Type, object> _dataContexts = null;
+        private readonly Dictionary<Type, object> _dataContexts;
         private bool _disposed;
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Beef
         /// <summary>
         /// Gets the _current <see cref="DataContextScope"/>; otherwise, <c>null</c>.
         /// </summary>
-        public static DataContextScope Current
+        public static DataContextScope? Current
         {
             get { return ExecutionContext.Current.DataContextScope; }
             internal set { ExecutionContext.Current.DataContextScope = value; }
@@ -88,14 +88,14 @@ namespace Beef
         /// <summary>
         /// Initializes a new instance of the <see cref="DataContextScope"/> class referencing its parent.
         /// </summary>
-        private DataContextScope(DataContextScope parent, DataContextScopeOption option)
+        private DataContextScope(DataContextScope? parent, DataContextScopeOption option)
         {
             _parent = parent;
             _option = option;
             if (IsPrimaryInstance)
                 _dataContexts = new Dictionary<Type, object>();
             else
-                _dataContexts = parent._dataContexts;
+                _dataContexts = parent!._dataContexts;
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Beef
                 }
             }
 
-            _dataContexts.Clear();
+            _dataContexts?.Clear();
         }
 
         /// <summary>

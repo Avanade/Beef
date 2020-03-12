@@ -14,7 +14,7 @@ namespace Beef.Executors.Triggers
     public abstract class TimerTrigger<TArgs> : TriggerBase<TArgs>
     {
         private readonly object _lock = new object();
-        private Timer _timer;
+        private Timer? _timer;
         private int _iterations = 0;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Beef.Executors.Triggers
         /// </summary>
         protected override void OnStopped()
         {
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer?.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         /// <summary>

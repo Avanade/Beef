@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Data.Cosmos\Beef.Data.Cosmos.csproj" />
+    <ProjectReference Include="..\Cdr.Banking.Common\Cdr.Banking.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataSvc\" />
+  </ItemGroup>
+</Project>

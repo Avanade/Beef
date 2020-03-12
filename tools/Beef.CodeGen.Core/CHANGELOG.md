@@ -2,6 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.1
+- *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
+- *Enhancement:* Tool updated to execute asynchoronously. Both `CodeGenConsole` and `CodeGenConsoleWrapper` have breaking change; `Run` has been removed, replaced with `RunAsync`.
+- *Enhancement:* The templates where database access is performed have been updated to leverage the new asynchronous methods. All previous synchronous access has been removed.
+- *Enhancement:* All C# templates (e.g. `Entity_cs.xml`) have been updated to support nullable reference types (https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/).
+- *Enhancement:* The entity code-generation (`Entity_cs.xml`) will output all reference types as nullable unless overridden explicitly for a `Property` element using `Nullable="true|false"`.
+
 ## v2.1.29
 - *Fixed:* Code-gen of corresponding reference data text (`xxxText`) was being incorrectly output where the property supported multiple values (`RefDataList="true"`).
 

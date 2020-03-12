@@ -13,7 +13,7 @@ namespace Beef.Executors.Triggers
         /// Executes a single unit of work.
         /// </summary>
         /// <param name="completionCallback">An optional callback for post <see cref="Executor"/> <b>Run</b> notification/processing.</param>
-        protected void Run(Action completionCallback = null)
+        protected void Run(Action? completionCallback = null)
         {
             Run(this, null, completionCallback);
         }

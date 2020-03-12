@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="webapisettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="webapisettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
+    <ProjectReference Include="..\Cdr.Banking.Business\Cdr.Banking.Business.csproj" />
+    <ProjectReference Include="..\Cdr.Banking.Common\Cdr.Banking.Common.csproj" />
+  </ItemGroup>
+</Project>

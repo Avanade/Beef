@@ -17,7 +17,7 @@ namespace Beef.Caching
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
         /// <param name="createCache">The function that creates the cache for the <b>Tenant</b> <see cref="Guid"/> that should use the passed <see cref="ICachePolicy"/>.</param>
         /// <param name="doNotRegister">Indicates that the automatic <see cref="CachePolicyManager.Register"/> should not occur (inheriting class must perform).</param>
-        public MultiTenantCache(Func<Guid, ICachePolicy, TCache> createCache, string policyKey = null, bool doNotRegister = false) : base(createCache, policyKey, doNotRegister) { }
+        public MultiTenantCache(Func<Guid, ICachePolicy, TCache> createCache, string? policyKey = null, bool doNotRegister = false) : base(createCache, policyKey, doNotRegister) { }
 
         /// <summary>
         /// Gets the tenant identifier from the Execution Context.

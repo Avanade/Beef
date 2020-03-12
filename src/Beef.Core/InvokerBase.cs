@@ -33,7 +33,7 @@ namespace Beef
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public void Invoke(object caller, Action action, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public void Invoke(object caller, Action action, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => WrapInvoke(caller, action, param, memberName, filePath, lineNumber);
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Beef
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected virtual void WrapInvoke(object caller, Action action, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected virtual void WrapInvoke(object caller, Action action, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => Check.NotNull(action, nameof(action)).Invoke();
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace Beef
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        public Task InvokeAsync(object caller, Func<Task> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber);
+        public async Task InvokeAsync(object caller, Func<Task> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            => await WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber).ConfigureAwait(false);
 
         /// <summary>
         /// Invokes a <paramref name="func"/> asynchronously.
@@ -69,8 +69,11 @@ namespace Beef
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected virtual Task WrapInvokeAsync(object caller, Func<Task> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
-            => Check.NotNull(func, nameof(func)).Invoke();
+        protected virtual async Task WrapInvokeAsync(object caller, Func<Task> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        {
+            Check.NotNull(func, nameof(func));
+            await func.Invoke().ConfigureAwait(false);
+        }
 
         #endregion
 
@@ -87,7 +90,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        public TResult Invoke<TResult>(object caller, Func<TResult> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public TResult Invoke<TResult>(object caller, Func<TResult> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => WrapInvoke(caller, func, param, memberName, filePath, lineNumber);
 
         /// <summary>
@@ -101,7 +104,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected virtual TResult WrapInvoke<TResult>(object caller, Func<TResult> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected virtual TResult WrapInvoke<TResult>(object caller, Func<TResult> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => Check.NotNull(func, nameof(func)).Invoke();
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        public Task<TResult> InvokeAsync<TResult>(object caller, Func<Task<TResult>> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public Task<TResult> InvokeAsync<TResult>(object caller, Func<Task<TResult>> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber);
 
         /// <summary>
@@ -129,7 +132,7 @@ namespace Beef
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected virtual Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, TParam param = default, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected virtual Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, TParam param = default, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
             => Check.NotNull(func, nameof(func)).Invoke();
 
         #endregion

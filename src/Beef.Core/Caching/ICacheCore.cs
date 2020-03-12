@@ -19,7 +19,7 @@ namespace Beef.Caching
         /// Gets the <see cref="ICachePolicy"/>.
         /// </summary>
         /// <returns>The <see cref="ICachePolicy"/>.</returns>
-        ICachePolicy GetPolicy();
+        ICachePolicy? GetPolicy();
 
         /// <summary>
         /// Flush the cache.

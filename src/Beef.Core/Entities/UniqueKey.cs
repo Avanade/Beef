@@ -15,13 +15,13 @@ namespace Beef.Entities
         /// </summary>
         public static readonly UniqueKey Empty;
 
-        private object[] _args;
+        private object?[] _args;
 
         /// <summary>
         /// Initializes a new <see cref="UniqueKey"/> structure with 
         /// </summary>
         /// <param name="args">Tthe argument values for the key.</param>
-        public UniqueKey(params object[] args)
+        public UniqueKey(params object?[] args)
         {
             _args = Check.NotNull(args, nameof(args));
         }
@@ -30,12 +30,12 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the argument values for the key.
         /// </summary>
-        public object[] Args
+        public object?[] Args
         {
             get
             {
                 if (_args == null)
-                    _args = Array.Empty<object>();
+                    _args = Array.Empty<object?>();
 
                 return _args;
             }
@@ -143,7 +143,7 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the argument value (handles a null value).
         /// </summary>
-        private object GetArgValue(object arg)
+        private object GetArgValue(object? arg)
         {
             return arg ?? _nullObject;
         }

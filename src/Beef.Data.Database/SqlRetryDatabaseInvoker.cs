@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
+using Microsoft.Data.SqlClient;
 using Polly;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -24,14 +24,14 @@ namespace Beef.Data.Database
         /// <summary>
         /// Occurs where a retry will occur as a result of a transient (see <see cref="DatabaseBase.SqlTransientErrorNumbers"/>) error.
         /// </summary>
-        public static event EventHandler<SqlRetryDatabaseInvokerEventArgs> ExceptionRetry;
+        public static event EventHandler<SqlRetryDatabaseInvokerEventArgs>? ExceptionRetry;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlRetryDatabaseInvoker"/> class.
         /// </summary>
         /// <param name="maxRetries">The maximum number of retries (defaults to 4).</param>
         /// <param name="transientErrorNumbers">The list of of known <see cref="SqlException.Number"/> values that are considered transient (defaults to <see cref="DatabaseBase.SqlTransientErrorNumbers"/> where not specified).</param>
-        public SqlRetryDatabaseInvoker(int maxRetries = 4, IEnumerable<int> transientErrorNumbers = null)
+        public SqlRetryDatabaseInvoker(int maxRetries = 4, IEnumerable<int>? transientErrorNumbers = null)
         {
             if (maxRetries < 0)
                 throw new ArgumentException("Maximum retries can not be negative.", nameof(maxRetries));
@@ -71,7 +71,7 @@ namespace Beef.Data.Database
         private void LogRetryException(Exception ex, TimeSpan ts)
         {
             Logger.Default.Warning($"Transient SQL Server Error '{((SqlException)ex).Number}' encountered; will retry in {ts.TotalMilliseconds}ms: {ex.Message}");
-            ExceptionRetry?.Invoke(this, new SqlRetryDatabaseInvokerEventArgs { Exception = (SqlException)ex });
+            ExceptionRetry?.Invoke(this, new SqlRetryDatabaseInvokerEventArgs((SqlException)ex));
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Beef.Data.Database
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override void WrapInvoke(object caller, Action action, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override void WrapInvoke(object caller, Action action, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             CreateSyncPolicy().Execute(() => base.WrapInvoke(caller, action, param, memberName, filePath, lineNumber));
         }
@@ -97,7 +97,7 @@ namespace Beef.Data.Database
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
-        protected override Task WrapInvokeAsync(object caller, Func<Task> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override Task WrapInvokeAsync(object caller, Func<Task> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
         }
@@ -113,7 +113,7 @@ namespace Beef.Data.Database
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override TResult WrapInvoke<TResult>(object caller, Func<TResult> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             return CreateSyncPolicy().Execute(() => base.WrapInvoke(caller, func, param, memberName, filePath, lineNumber));
         }
@@ -129,7 +129,7 @@ namespace Beef.Data.Database
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The result.</returns>
-        protected override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DatabaseBase param = null, [CallerMemberName] string memberName = null, [CallerFilePath] string filePath = null, [CallerLineNumber] int lineNumber = 0)
+        protected override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
         }
@@ -140,6 +140,15 @@ namespace Beef.Data.Database
     /// </summary>
     public class SqlRetryDatabaseInvokerEventArgs : EventArgs
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlRetryDatabaseInvokerEventArgs"/> class.
+        /// </summary>
+        /// <param name="exception">The corresponding <see cref="SqlException"/>.</param>
+        public SqlRetryDatabaseInvokerEventArgs(SqlException exception)
+        {
+            Exception = exception ?? throw new ArgumentNullException(nameof(exception));
+        }
+
         /// <summary>
         /// Gets or sets the <see cref="SqlException"/>.
         /// </summary>

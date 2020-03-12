@@ -54,24 +54,18 @@ namespace Beef.Entities
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="System.Type"/>.</typeparam>
     public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection where TEntity : EntityBase
     {
-        private object _editCopy;
+        private object? _editCopy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
-        protected EntityBaseCollection()
-            : base()
-        {
-        }
+        protected EntityBaseCollection() : base() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
         /// </summary>
         /// <param name="collection">The entities.</param>
-        protected EntityBaseCollection(IEnumerable<TEntity> collection)
-            : base(collection)
-        {
-        }
+        protected EntityBaseCollection(IEnumerable<TEntity> collection) : base(collection) { }
 
         /// <summary>
         /// Creates a deep copy of the <see cref="EntityBaseCollection{TEntity}"/>.
@@ -110,10 +104,7 @@ namespace Beef.Entities
         /// </summary>
         /// <param name="key">The <see cref="UniqueKey"/>.</param>
         /// <returns>The item where found; otherwise, <c>null</c>.</returns>
-        object IEntityBaseCollection.GetByUniqueKey(UniqueKey key)
-        {
-            return GetByUniqueKey(key);
-        }
+        object IEntityBaseCollection.GetByUniqueKey(UniqueKey key) => GetByUniqueKey(key);
 
         /// <summary>
         /// Gets the first item by the specified <paramref name="key"/>.
@@ -122,7 +113,6 @@ namespace Beef.Entities
         /// <returns>The first item where found; otherwise, <c>null</c>.</returns>
         public TEntity GetByUniqueKey(UniqueKey key)
         {
-            Check.NotNull(key, nameof(key));
             return Items.Where(x => x.HasUniqueKey && key.Equals(x.UniqueKey)).FirstOrDefault();
         }
 
@@ -130,10 +120,7 @@ namespace Beef.Entities
         /// Gets a <see cref="IEnumerable{TEntity}"/> wrapper around the <see cref="EntityBaseCollection{TEntity}"/>.
         /// </summary>
         /// <remarks>This is provided to enable the likes of <b>LINQ</b> based queries over the collection.</remarks>
-        public new IEnumerable<TEntity> Items
-        {
-            get { return base.Items; }
-        }
+        public new IEnumerable<TEntity> Items => base.Items;
 
         /// <summary>
         /// Performs a clean-up of the <see cref="EntityBaseCollection{TEntity}"/> resetting item values as appropriate to ensure a basic level of data consistency.
@@ -196,10 +183,7 @@ namespace Beef.Entities
         /// <summary>
         /// Begins an edit on an collection.
         /// </summary>
-        public void BeginEdit()
-        {
-            _editCopy = Clone();
-        }
+        public void BeginEdit() => _editCopy = Clone();
 
         /// <summary>
         /// Discards the collection changes since the last <see cref="BeginEdit"/>.
@@ -219,10 +203,7 @@ namespace Beef.Entities
         /// <summary>
         /// Ends and commits the collection changes since the last <see cref="BeginEdit"/>.
         /// </summary>
-        public void EndEdit()
-        {
-            AcceptChanges();
-        }
+        public void EndEdit() => AcceptChanges();
 
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes.
@@ -257,7 +238,7 @@ namespace Beef.Entities
         /// <summary>
         /// Lists the properties (names of) that have been changed (note that this property is not JSON serialized). <i>Note:</i> always returns <c>null</c> as properties are not tracked for a collection.
         /// </summary>
-        public StringCollection ChangeTracking => null;
+        public StringCollection? ChangeTracking => null!;
 
         /// <summary>
         /// Indicates whether entity is currently <see cref="ChangeTracking"/>; <see cref="TrackChanges"/> and <see cref="IChangeTracking.AcceptChanges"/>.

@@ -83,7 +83,7 @@ namespace Beef.Core.UnitTest.Executors.Triggers
             protected override TimerTriggerResult<string> OnTrigger()
             {
                 Count++;
-                return new TimerTriggerResult<string> { Args = "XXX" };
+                return new TimerTriggerResult<string>("XXX");
             }
         }
     }

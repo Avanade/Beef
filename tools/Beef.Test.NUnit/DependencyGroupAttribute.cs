@@ -41,7 +41,7 @@ namespace Beef.Test.NUnit
         /// <param name="type">The <see cref="Type"/>.</param>
         public DependencyGroupAttribute(Type type) : base(type?.Name)
         {
-            _group = Check.NotNull(type, nameof(type)).Name;
+            _group = Check.NotNull(type, nameof(type))!.Name;
         }
 
         /// <summary>

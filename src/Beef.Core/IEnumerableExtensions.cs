@@ -94,7 +94,7 @@ namespace Beef
         /// <param name="checkForNull">Indicates whether a null check should also be performed before the comparion occurs (defaults to <c>true</c>).</param>
         /// <param name="wildcard">The <see cref="Wildcard"/> configuration to use; where <c>null</c> will use <see cref="Wildcard.Default"/>.</param>
         /// <returns>The resulting (updated) query.</returns>
-        public static IEnumerable<TElement> WhereWildcard<TElement>(this IEnumerable<TElement> query, Func<TElement, string> property, string text, bool ignoreCase = true, bool checkForNull = true, Wildcard wildcard = null)
+        public static IEnumerable<TElement> WhereWildcard<TElement>(this IEnumerable<TElement> query, Func<TElement, string?> property, string? text, bool ignoreCase = true, bool checkForNull = true, Wildcard? wildcard = null)
             where TElement : class
         {
             if (query == null)
@@ -116,7 +116,7 @@ namespace Beef
                 return query.Where(x =>
                 {
                     var v = property.Invoke(x);
-                    return checkForNull ? v != null && v.Equals(text, sc) : v.Equals(text, sc);
+                    return checkForNull ? v != null && v.Equals(text, sc) : v!.Equals(text, sc);
                 });
 
             // Handle the easy Contains/StartsWith/Endswith.
@@ -129,19 +129,19 @@ namespace Beef
                     return query.Where(x =>
                     {
                         var v = property.Invoke(x);
-                        return checkForNull ? v != null && v.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0 : v.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0;
+                        return checkForNull ? v != null && v.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0 : v!.IndexOf(wr.GetTextWithoutWildcards(), sc) >= 0;
                     });
                 else if (wr.Selection.HasFlag(WildcardSelection.StartsWith))
                     return query.Where(x =>
                     {
                         var v = property.Invoke(x);
-                        return checkForNull ? v != null && v.StartsWith(wr.GetTextWithoutWildcards(), sc) : v.StartsWith(wr.GetTextWithoutWildcards(), sc);
+                        return checkForNull ? v != null && v.StartsWith(wr.GetTextWithoutWildcards(), sc) : v!.StartsWith(wr.GetTextWithoutWildcards(), sc);
                     });
                 else if (wr.Selection.HasFlag(WildcardSelection.EndsWith))
                     return query.Where(x =>
                     {
                         var v = property.Invoke(x);
-                        return checkForNull ? v != null && v.EndsWith(wr.GetTextWithoutWildcards(), sc) : v.EndsWith(wr.GetTextWithoutWildcards(), sc);
+                        return checkForNull ? v != null && v.EndsWith(wr.GetTextWithoutWildcards(), sc) : v!.EndsWith(wr.GetTextWithoutWildcards(), sc);
                     });
             }
 

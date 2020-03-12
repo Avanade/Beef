@@ -58,7 +58,7 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="ValidationContext{TEntity}"/>.</returns>
-        public virtual ValidationContext<TEntity> Validate(TEntity value, ValidationArgs args = null)
+        public virtual ValidationContext<TEntity> Validate(TEntity value, ValidationArgs? args = null)
         {
             throw new NotSupportedException("Validate is not supported by this class.");
         }

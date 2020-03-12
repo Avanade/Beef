@@ -36,14 +36,14 @@ namespace Beef.Data.Cosmos
     public class CosmosDbQuery<T, TModel> : CosmosDbQueryBase where T : class, new() where TModel : class, new()
     {
         private readonly CosmosDbContainer<T, TModel> _container;
-        private readonly Func<IQueryable<TModel>, IQueryable<TModel>> _query;
+        private readonly Func<IQueryable<TModel>, IQueryable<TModel>>? _query;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbQuery{T, TModel}"/> class.
         /// </summary>
         /// <param name="container">The <see cref="CosmosDbContainer{T, TModel}"/>.</param>
         /// <param name="query">A function to modify the underlying <see cref="IQueryable{T}"/>.</param>
-        internal CosmosDbQuery(CosmosDbContainer<T, TModel> container, Func<IQueryable<TModel>, IQueryable<TModel>> query = null)
+        internal CosmosDbQuery(CosmosDbContainer<T, TModel> container, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null)
         {
             _container = Check.NotNull(container, nameof(container));
             _query = query;
@@ -65,13 +65,19 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Actually manage the underlying query construction and lifetime.
         /// </summary>
-        private IQueryable<TModel> ExecuteQueryInternal(Action<IQueryable<TModel>> execute)
+        private IQueryable<TModel> ExecuteQueryInternal(Action<IQueryable<TModel>>? execute)
         {
             IQueryable<TModel> q = _container.Container.GetItemLinqQueryable<TModel>(allowSynchronousQueryExecution: true, requestOptions: _container.CosmosDb.GetQueryRequestOptions(QueryArgs));
             q = _query == null ? q : _query(q);
 
-            if (QueryArgs.AuthorizationFilter != null)
-                q = (IQueryable<TModel>)QueryArgs.AuthorizationFilter(q);
+            if (QueryArgs.AuthorizeFilter != null)
+                q = (IQueryable<TModel>)QueryArgs.AuthorizeFilter(q);
+            else
+            {
+                var filter = _container.CosmosDb.GetAuthorizeFilter<TModel>(_container.Container.Id);
+                if (filter != null)
+                    q = (IQueryable<TModel>)filter(q);
+            }
 
             execute?.Invoke(q);
             return q;

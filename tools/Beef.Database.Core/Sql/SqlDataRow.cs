@@ -35,7 +35,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="name">The column name.</param>
         /// <param name="value">The column value.</param>
-        public void AddColumn(string name, object value)
+        public void AddColumn(string name, object? value)
         {
             AddColumn(new SqlDataColumn { Name = name, Value = value });
         }
@@ -48,6 +48,9 @@ namespace Beef.Database.Core.Sql
         {
             if (column == null)
                 throw new ArgumentNullException(nameof(column));
+
+            if (string.IsNullOrEmpty(column.Name))
+                throw new ArgumentException("Column.Name must have a value.", nameof(column));
 
             var col = Table.DbTable.Columns.Where(c => c.Name == column.Name).SingleOrDefault();
             if (col == null)
@@ -66,10 +69,10 @@ namespace Beef.Database.Core.Sql
             if (column.Value == null)
                 return;
 
-            string str = null;
+            string? str = null;
             try
             {
-                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString();
+                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
                 switch (col.DotNetType)
                 {
                     case "string": column.Value = str; break;

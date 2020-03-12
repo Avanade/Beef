@@ -15,9 +15,9 @@ namespace Beef.Entities
     public class MessageItem : EntityBase
     {
         private MessageType _type;
-        private string _text;
-        private string _property;
-        private object _tag;
+        private string? _text;
+        private string? _property;
+        private object? _tag;
 
         #region Static
 
@@ -77,7 +77,7 @@ namespace Beef.Entities
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public static MessageItem CreateMessage(string property, MessageType type, LText format, params object[] values)
+        public static MessageItem CreateMessage(string property, MessageType type, LText format, params object?[] values)
         {
             return new MessageItem
             {
@@ -110,7 +110,7 @@ namespace Beef.Entities
         /// <param name="format">The composite format string.</param>
         /// <param name="values">The values that form part of the message text.</param>
         /// <returns>A <see cref="MessageItem"/>.</returns>
-        public static MessageItem CreateErrorMessage(string property, LText format, params object[] values)
+        public static MessageItem CreateErrorMessage(string property, LText format, params object?[] values)
         {
             return new MessageItem
             {
@@ -132,37 +132,37 @@ namespace Beef.Entities
         public MessageType Type
         {
             get { return _type; }
-            set { SetValue<MessageType>(ref _type, value, false, false, TypeProperty); }
+            set { SetValue<MessageType>(ref _type, value, false, false, nameof(Type)); }
         }
 
         /// <summary>
         /// Gets or sets the message text.
         /// </summary>
         [JsonProperty("text")]
-        public string Text
+        public string? Text
         {
             get { return _text; }
-            set { SetValue<string>(ref _text, value, false, false, TextProperty); }
+            set { SetValue(ref _text, value, false, false, nameof(Text)); }
         }
 
         /// <summary>
         /// Gets or sets the name of the property that the message relates to.
         /// </summary>
         [JsonProperty("property", NullValueHandling = NullValueHandling.Ignore)]
-        public string Property
+        public string? Property
         {
             get { return _property; }
-            set { SetValue<string>(ref _property, value, false, false, PropertyProperty); }
+            set { SetValue(ref _property, value, false, false, nameof(Property)); }
         }
 
         /// <summary>
         /// Gets or sets an optional user tag associated with the message.
         /// </summary>
         /// <remarks>Note: This property is not serialized/deserialized.</remarks>
-        public object Tag
+        public object? Tag
         {
             get { return _tag; }
-            set { SetValue<object>(ref _tag, value, false, false, TagProperty); }
+            set { SetValue(ref _tag, value, false, false, nameof(Tag)); }
         }
 
         #endregion
@@ -199,9 +199,9 @@ namespace Beef.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Type = Cleaner.Clean<MessageType>(Type);
-            Text = Cleaner.Clean<string>(Text);
-            Property = Cleaner.Clean<string>(Property);
+            Type = Cleaner.Clean(Type);
+            Text = Cleaner.Clean(Text);
+            Property = Cleaner.Clean(Property);
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace Beef.Entities
         /// Returns the message <see cref="Text"/>.
         /// </summary>
         /// <returns>The message <see cref="Text"/>.</returns>
-        public override string ToString()
+        public override string? ToString()
         {
             return Text;
         }
@@ -229,30 +229,6 @@ namespace Beef.Entities
             Property = property;
             return this;
         }
-
-        #endregion
-
-        #region PropertyNames
-
-        /// <summary>
-        /// Represents the <see cref="Type"/> property name.
-        /// </summary>
-        public const string TypeProperty = "Type";
-
-        /// <summary>
-        /// Represents the <see cref="Text"/> property name.
-        /// </summary>
-        public const string TextProperty = "Text";
-
-        /// <summary>
-        /// Represents the <see cref="Property"/> property name.
-        /// </summary>
-        public const string PropertyProperty = "Property";
-
-        /// <summary>
-        /// Represents the <see cref="Tag"/> property name.
-        /// </summary>
-        public const string TagProperty = "Tag";
 
         #endregion
     }

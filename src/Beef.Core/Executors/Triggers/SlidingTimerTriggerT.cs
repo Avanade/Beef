@@ -13,7 +13,7 @@ namespace Beef.Executors.Triggers
     public abstract class SlidingTimerTrigger<TArgs> : TriggerBase<TArgs>
     {
         private readonly object _lock = new object();
-        private Timer _timer;
+        private Timer? _timer;
         private int _iterations = 0;
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace Beef.Executors.Triggers
         {
             try
             {
-                TimerTriggerResult<TArgs> tr = null;
+                TimerTriggerResult<TArgs> tr;
                 lock (_lock)
                 {
-                    _timer.Change(Timeout.Infinite, Timeout.Infinite);
+                    _timer!.Change(Timeout.Infinite, Timeout.Infinite);
                     tr = OnTrigger() ?? throw new InvalidOperationException("OnTrigger override must return a TimerTriggerResult instance.");
                     Trace(() => Logger.Default.Trace($"Trigger '{InstanceId}' timer has fired; Executor run enabled: {tr.IsExecutorRunEnabled}."));
                 }
@@ -103,7 +103,7 @@ namespace Beef.Executors.Triggers
                     else
                     {
                         this.Trace(() => Logger.Default.Trace($"Trigger '{InstanceId}' restarting timer."));
-                        _timer.Change(Interval, Interval);
+                        _timer!.Change(Interval, Interval);
                     }
                 }
             }
@@ -114,7 +114,7 @@ namespace Beef.Executors.Triggers
         /// </summary>
         protected override void OnStopped()
         {
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer!.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         /// <summary>

@@ -41,6 +41,6 @@ namespace Beef.Entities
         /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
-        string Id { get; set; }
+        string? Id { get; set; }
     }
 }

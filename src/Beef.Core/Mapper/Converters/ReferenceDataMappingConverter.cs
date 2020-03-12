@@ -64,10 +64,10 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        public TDestProperty ConvertToDest(TSrceProperty value)
+        public TDestProperty ConvertToDest(TSrceProperty? value)
         {
             if (value == null)
-                return default(TDestProperty);
+                return default!;
 
             ReferenceDataConverterUtils.CheckIsValid(((IPropertyMapperConverter)this).SrceType, value);
             if (!value.TryGetMapping(Name, out IComparable mval))
@@ -84,9 +84,9 @@ namespace Beef.Mapper.Converters
         public TSrceProperty ConvertToSrce(TDestProperty value)
         {
             if (value == null)
-                return null;
+                return default!;
 
-            return (TSrceProperty)ReferenceDataConverterUtils.CheckConverted(((IPropertyMapperConverter)this).SrceType, ReferenceDataManager.Current[typeof(TSrceProperty)].GetByMappingValue(Name, value), value);
+            return (TSrceProperty)ReferenceDataConverterUtils.CheckConverted(((IPropertyMapperConverter)this).SrceType, ReferenceDataManager.Current[typeof(TSrceProperty)].GetByMappingValue(Name, value)!, value);
         }
 
         /// <summary>
@@ -94,9 +94,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The source value.</param>
         /// <returns>The destination value.</returns>
-        object IPropertyMapperConverter.ConvertToDest(object value)
+        object? IPropertyMapperConverter.ConvertToDest(object? value)
         {
-            return ConvertToDest((TSrceProperty)value);
+            return ConvertToDest((TSrceProperty)value!);
         }
 
         /// <summary>
@@ -104,9 +104,9 @@ namespace Beef.Mapper.Converters
         /// </summary>
         /// <param name="value">The destination value.</param>
         /// <returns>The source value.</returns>
-        object IPropertyMapperConverter.ConvertToSrce(object value)
+        object? IPropertyMapperConverter.ConvertToSrce(object? value)
         {
-            return ConvertToSrce((TDestProperty)value);
+            return ConvertToSrce((TDestProperty)value!);
         }
     }
 }

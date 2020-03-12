@@ -19,7 +19,7 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <returns>The value.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="value"/> is null.</exception>
-        public static T NotNull<T>(T value, string paramName, string message = null)
+        public static T NotNull<T>(T? value, string paramName, string? message = null) where T : class
         {
             if (value == null)
                 throw new ArgumentNullException(paramName, message);
@@ -36,9 +36,9 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="value"/> is the default value for the <see cref="Type"/>.</exception>
         /// <returns>The value.</returns>
-        public static T NotDefault<T>(T value, string paramName, string message = null)
+        public static T NotDefault<T>(T value, string paramName, string? message = null)
         {
-            if (Comparer<T>.Default.Compare(value, default) == 0)
+            if (Comparer<T>.Default.Compare(value, default!) == 0)
                 throw new ArgumentException(message ?? "Argument with a default value is considered invalid.", paramName);
             else
                 return value;
@@ -52,7 +52,7 @@ namespace Beef
         /// <param name="message">An optional message.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="value"/> is null or <see cref="string.Empty"/>.</exception>
         /// <returns>The value.</returns>
-        public static string NotEmpty(string value, string paramName, string message = null)
+        public static string NotEmpty(string? value, string paramName, string? message = null)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentNullException(paramName, message);
@@ -67,7 +67,7 @@ namespace Beef
         /// <param name="paramName">The name of the parameter.</param>
         /// <param name="message">The exception message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="predicate"/> is <c>false</c>.</exception>
-        public static void IsTrue(bool predicate, string paramName, string message)
+        public static void IsTrue(bool predicate, string paramName, string? message = null)
         {
             if (!predicate)
                 throw new ArgumentException(message ?? "Argument is not valid.", paramName);
@@ -81,7 +81,7 @@ namespace Beef
         /// <param name="predicate">The predicate.</param>
         /// <param name="message">The exception message.</param>
         /// <returns>The value.</returns>
-        public static T IsTrue<T>(T value, Predicate<T> predicate, string message)
+        public static T IsTrue<T>(T value, Predicate<T> predicate, string? message = null)
         {
             if (predicate == null || predicate(value))
                 return value;
@@ -95,7 +95,7 @@ namespace Beef
         /// <param name="predicate">The predicate.</param>
         /// <param name="message">The exception message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="predicate"/> is <c>false</c>.</exception>
-        public static void IsTrue(bool predicate, string message = null)
+        public static void IsTrue(bool predicate, string? message = null)
         {
             if (!predicate)
                 throw new InvalidOperationException(message ?? "Operation is not valid.");
@@ -108,7 +108,7 @@ namespace Beef
         /// <param name="paramName">The name of the parameter.</param>
         /// <param name="message">The exception message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="predicate"/> is <c>false</c>.</exception>
-        public static void IsFalse(bool predicate, string paramName, string message)
+        public static void IsFalse(bool predicate, string paramName, string? message = null)
         {
             if (predicate)
                 throw new ArgumentException(message ?? "Argument is not valid.", paramName);
@@ -122,7 +122,7 @@ namespace Beef
         /// <param name="predicate">The predicate.</param>
         /// <param name="message">The exception message.</param>
         /// <returns>The value.</returns>
-        public static T IsFalse<T>(T value, Predicate<T> predicate, string message = null)
+        public static T IsFalse<T>(T value, Predicate<T> predicate, string? message = null)
         {
             if (predicate == null || !predicate(value))
                 return value;
@@ -136,7 +136,7 @@ namespace Beef
         /// <param name="predicate">The predicate.</param>
         /// <param name="message">The exception message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="predicate"/> is <c>false</c>.</exception>
-        public static void IsFalse(bool predicate, string message = null)
+        public static void IsFalse(bool predicate, string? message = null)
         {
             if (predicate)
                 throw new InvalidOperationException(message ?? "Operation is not valid.");
@@ -150,7 +150,7 @@ namespace Beef
         /// <param name="message">The exception message.</param>
         /// <exception cref="ArgumentException">Thrown when the <paramref name="predicate"/> is <c>false</c>.</exception>
         /// <returns>The value.</returns>
-        public static T IsValid<T>(T value, Predicate<T> predicate, string message)
+        public static T IsValid<T>(T value, Predicate<T> predicate, string? message = null)
         {
             if (predicate == null || predicate(value))
                 return value;

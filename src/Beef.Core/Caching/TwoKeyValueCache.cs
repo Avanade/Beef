@@ -25,10 +25,10 @@ namespace Beef.Caching
         private readonly KeyedLock<TKey1> _keyLock1 = new KeyedLock<TKey1>(); // this is the primary key used for *all* concurrency management.
         private readonly KeyedLock<TKey2> _keyLock2 = new KeyedLock<TKey2>(); // this is a secondary key, used to minimise get2 concurrency only.
 
-        private readonly Func<TKey1, (bool hasValue, TKey2 key2, TValue value)> _get1;
-        private readonly Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>> _getAsync1;
-        private readonly Func<TKey2, (bool hasValue, TKey1 key1, TValue value)> _get2;
-        private readonly Func<TKey2, Task<(bool hasValue, TKey1 key1, TValue value)>> _getAsync2;
+        private readonly Func<TKey1, (bool hasValue, TKey2 key2, TValue value)>? _get1;
+        private readonly Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>>? _getAsync1;
+        private readonly Func<TKey2, (bool hasValue, TKey1 key1, TValue value)>? _get2;
+        private readonly Func<TKey2, Task<(bool hasValue, TKey1 key1, TValue value)>>? _getAsync2;
 
         /// <summary>
         /// Represents the cached <see cref="Value"/>, corresponding <see cref="Policy"/> and <see cref="Key1"/> and <see cref="Key2"/>.
@@ -47,7 +47,7 @@ namespace Beef.Caching
         /// <param name="get1">The function to invoke to get the value (by key1) where not found in cache.</param>
         /// <param name="get2">The function to invoke to get the value (by key2) where not found in cache.</param>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
-        public TwoKeyValueCache(Func<TKey1, (bool hasValue, TKey2 key2, TValue value)> get1, Func<TKey2, (bool hasValue, TKey1 key1, TValue value)> get2, string policyKey = null) : base(policyKey, doNotRegister: true)
+        public TwoKeyValueCache(Func<TKey1, (bool hasValue, TKey2 key2, TValue value)> get1, Func<TKey2, (bool hasValue, TKey1 key1, TValue value)> get2, string? policyKey = null) : base(policyKey, doNotRegister: true)
         {
             _get1 = Check.NotNull(get1, nameof(get1));
             _get2 = Check.NotNull(get2, nameof(get2));
@@ -62,7 +62,7 @@ namespace Beef.Caching
         /// <param name="getAsync1">The function to invoke (asynchronously) to get the value (by key1) where not found in cache.</param>
         /// <param name="getAsync2">The function to invoke (asynchronously) to get the value (by key2) where not found in cache.</param>
         /// <param name="policyKey">The policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>); defaults to <see cref="Guid.NewGuid()"/> ensuring uniqueness.</param>
-        public TwoKeyValueCache(Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>> getAsync1, Func<TKey2, Task<(bool hasValue, TKey1 key1, TValue value)>> getAsync2, string policyKey = null) : base(policyKey, doNotRegister: true)
+        public TwoKeyValueCache(Func<TKey1, Task<(bool hasValue, TKey2 key2, TValue value)>> getAsync1, Func<TKey2, Task<(bool hasValue, TKey1 key1, TValue value)>> getAsync2, string? policyKey = null) : base(policyKey, doNotRegister: true)
         {
             _getAsync1 = Check.NotNull(getAsync1, nameof(getAsync1));
             _getAsync2 = Check.NotNull(getAsync2, nameof(getAsync2));
@@ -141,7 +141,7 @@ namespace Beef.Caching
                 }
                 
                 // Get the value by key1.
-                var r = _get1 != null ? _get1(key1) : _getAsync1(key1).Result;
+                var r = _get1 != null ? _get1(key1) : _getAsync1!(key1).Result;
                 if (r.hasValue)
                 {
                     var policy = (ICachePolicy)GetPolicy().Clone();
@@ -161,7 +161,7 @@ namespace Beef.Caching
 
             // Nothing found.
             Remove1(cv.Key1);
-            value = default;
+            value = default!;
             return false;
         }
 
@@ -255,13 +255,13 @@ namespace Beef.Caching
                     return true;
                 }
 
-                r = _get2 != null ? _get2(key2) : _getAsync2(key2).Result;
+                r = _get2 != null ? _get2(key2) : _getAsync2!(key2).Result;
 
                 // Exit where no data found.
                 if (!r.hasValue)
                 {
                     Remove1(cv.Key1);
-                    value = default;
+                    value = default!;
                     return false;
                 }
 

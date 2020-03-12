@@ -47,7 +47,7 @@ namespace Beef.Database.Core.Sql
             /// <summary>
             /// Gets or sets the value.
             /// </summary>
-            public string Value { get; set; }
+            public string? Value { get; set; }
         }
 
         /// <summary>
@@ -57,10 +57,8 @@ namespace Beef.Database.Core.Sql
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
         public static SqlObjectReader Read(string sql)
         {
-            using (var sr = new StringReader(sql))
-            {
-                return Read(sr);
-            }
+            using var sr = new StringReader(sql);
+            return Read(sr);
         }
 
         /// <summary>
@@ -70,10 +68,8 @@ namespace Beef.Database.Core.Sql
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
         public static SqlObjectReader Read(Stream s)
         {
-            using (var sr = new StreamReader(s))
-            {
-                return Read(sr);
-            }
+            using var sr = new StreamReader(s);
+            return Read(sr);
         }
 
         /// <summary>
@@ -97,10 +93,10 @@ namespace Beef.Database.Core.Sql
             if (!IsValid)
                 return;
 
-            Type = SqlObjectType.Value;
+            Type = SqlObjectType!.Value!;
             Order = SupportedObjectTypes.Where(x => string.Compare(x.Item1, Type, StringComparison.InvariantCultureIgnoreCase) == 0).Select(x => x.Item2).Single();
 
-            var parts = SqlObjectName.Value.Split('.');
+            var parts = SqlObjectName!.Value!.Split('.');
             if (parts.Length == 1)
                 Name = parts[0].Replace('[', ' ').Replace(']', ' ').Trim();
             else if (parts.Length == 2)
@@ -117,7 +113,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         private void Parse()
         {
-            Token token = null;
+            Token? token = null;
 
             while (true)
             {
@@ -142,7 +138,7 @@ namespace Beef.Database.Core.Sql
                     {
                         if (token != null)
                         {
-                            token.Value = txt.Substring(token.Column, col - token.Column);
+                            token.Value = txt[token.Column..col];
                             _tokens.Add(token);
                             token = null;
                         }
@@ -155,7 +151,7 @@ namespace Beef.Database.Core.Sql
 
                 if (token != null)
                 {
-                    token.Value = txt.Substring(token.Column, col - token.Column);
+                    token.Value = txt[token.Column..col];
                     _tokens.Add(token);
                     token = null;
                 }
@@ -172,12 +168,12 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the error message where not valid (see <see cref="IsValid"/>).
         /// </summary>
-        public string ErrorMessage { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Create the error message where not valid.
         /// </summary>
-        private string CreateErrorMessage()
+        private string? CreateErrorMessage()
         {
             if (SqlStatement == null)
                 return "The SQL statement could not be determined; expecting a `CREATE` statement.";
@@ -209,32 +205,32 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the primary SQL command (first token).
         /// </summary>
-        private Token SqlStatement => _tokens.Count < 1 ? null : _tokens[0];
+        private Token? SqlStatement => _tokens.Count < 1 ? null : _tokens[0];
 
         /// <summary>
         /// Gets the underlying SQL object type (second token).
         /// </summary>
-        private Token SqlObjectType => _tokens.Count < 2 ? null : _tokens[1];
+        private Token? SqlObjectType => _tokens.Count < 2 ? null : _tokens[1];
 
         /// <summary>
         /// Gets the underlying SQL object name (third token).
         /// </summary>
-        private Token SqlObjectName => _tokens.Count < 3 ? null : _tokens[2];
+        private Token? SqlObjectName => _tokens.Count < 3 ? null : _tokens[2];
 
         /// <summary>
         /// Gets the SQL object type.
         /// </summary>
-        public string Type { get; private set; }
+        public string? Type { get; private set; }
 
         /// <summary>
         /// Gets the SQL object schema.
         /// </summary>
-        public string Schema { get; private set; }
+        public string? Schema { get; private set; }
 
         /// <summary>
         /// Gets the SQL object name.
         /// </summary>
-        public string Name { get; private set; }
+        public string? Name { get; private set; }
 
         /// <summary>
         /// Gets the SQL object type order of precedence.

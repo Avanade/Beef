@@ -17,42 +17,42 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Page"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsPageQueryStringNames { get; set; } = new string[] { "$page", "$pageNumber" };
+        public static List<string> PagingArgsPageQueryStringNames { get; } = new List<string>(new string[] { "$page", "$pageNumber" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Skip"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsSkipQueryStringNames { get; set; } = new string[] { "$skip" };
+        public static List<string> PagingArgsSkipQueryStringNames { get; } = new List<string>(new string[] { "$skip" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsTakeQueryStringNames { get; set; } = new string[] { "$take", "$top", "$size", "$pageSize" };
+        public static List<string> PagingArgsTakeQueryStringNames { get; } = new List<string>(new string[] { "$take", "$top", "$size", "$pageSize" });
 
         /// <summary>
         /// Gets or sets the list of possible <see cref="PagingArgs.Take"/> query string names.
         /// </summary>
-        public static IEnumerable<string> PagingArgsCountQueryStringNames { get; set; } = new string[] { "$count", "$totalCount" };
+        public static List<string> PagingArgsCountQueryStringNames { get; } = new List<string>(new string[] { "$count", "$totalCount" });
 
         /// <summary>
         /// Gets or sets the list of possible "include field" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeFieldsQueryStringNames { get; set; } = new string[] { "$fields", "$includeFields", "$include" };
+        public static List<string> IncludeFieldsQueryStringNames { get; } = new List<string>(new string[] { "$fields", "$includeFields", "$include" });
 
         /// <summary>
         /// Gets or sets the list of possible "exclude field" query string names.
         /// </summary>
-        public static IEnumerable<string> ExcludeFieldsQueryStringNames { get; set; } = new string[] { "$excludeFields", "$exclude" };
+        public static List<string> ExcludeFieldsQueryStringNames { get; } = new List<string>(new string[] { "$excludeFields", "$exclude" });
 
         /// <summary>
         /// Gets or sets the list of possible "include inactive" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeInactiveQueryStringNames { get; set; } = new string[] { "$inactive", "$includeInactive" };
+        public static List<string> IncludeInactiveQueryStringNames { get; } = new List<string>(new string[] { "$inactive", "$includeInactive" });
 
         /// <summary>
         /// Gets or sets the list of possible reference data "include texts" query string names.
         /// </summary>
-        public static IEnumerable<string> IncludeRefDataTextQueryStringNames { get; set; } = new string[] { "$text", "$includeText" };
+        public static List<string> IncludeRefDataTextQueryStringNames { get; } = new List<string>(new string[] { "$text", "$includeText" });
 
         /// <summary>
         /// Creates the <see cref="PagingArgs"/> from the query string.
@@ -82,7 +82,7 @@ namespace Beef.AspNetCore.WebApi
                 if (skip == null && page == null)
                     pa = (take.HasValue) ? PagingArgs.CreateSkipAndTake(0, take) : new PagingArgs();
                 else
-                    pa = (skip.HasValue) ? PagingArgs.CreateSkipAndTake(skip.Value, take) : PagingArgs.CreatePageAndSize(page.Value, take);
+                    pa = (skip.HasValue) ? PagingArgs.CreateSkipAndTake(skip.Value, take) : PagingArgs.CreatePageAndSize(page == null ? 0 : page.Value, take);
 
                 pa.IsGetCount = ParseBoolValue(GetNamedQueryString(controller, PagingArgsCountQueryStringNames));
             }
@@ -117,7 +117,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Gets the value for the named query string.
         /// </summary>
-        private static string GetNamedQueryString(ControllerBase controller, IEnumerable<string> names)
+        private static string? GetNamedQueryString(ControllerBase controller, IEnumerable<string> names)
         {
             var q = controller.HttpContext.Request.Query.Where(x => names.Contains(x.Key, StringComparer.InvariantCultureIgnoreCase)).ToArray();
             return (q.Length != 1 || q[0].Value.Count != 1) ? null : q[0].Value[0];
@@ -126,7 +126,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Parses the value as a <see cref="long"/>.
         /// </summary>
-        private static long? ParseLongValue(string value)
+        private static long? ParseLongValue(string? value)
         {
             if (value == null)
                 return null;
@@ -140,7 +140,7 @@ namespace Beef.AspNetCore.WebApi
         /// <summary>
         /// Parses the value as a <see cref="bool"/>.
         /// </summary>
-        private static bool ParseBoolValue(string value)
+        private static bool ParseBoolValue(string? value)
         {
             if (value == null)
                 return false;
@@ -191,7 +191,7 @@ namespace Beef.AspNetCore.WebApi
             if (!controller.HttpContext.Request.Query.Any())
 #pragma warning restore CA1062
             {
-                ExecutionContext.Current.Messages.AddInfo("Query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
+                ExecutionContext.Current.Messages.AddInfo("A query string is required to filter selection; e.g. /ref?entity=codeX,codeY&entity2=codeZ&entity3");
                 return dict.Values;
             }
 

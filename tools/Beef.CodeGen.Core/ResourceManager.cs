@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -20,9 +21,9 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content where found; otherwise, <c>null</c>.</returns>
-        public static string GetResourceContent(string name, params Assembly[] assemblies)
+        public static Task<string?> GetResourceContentAsync(string name, params Assembly[] assemblies)
         {
-            return GetResourceContent(name, "Resources", assemblies);
+            return GetResourceContentAsync(name, "Resources", assemblies);
         }
 
         /// <summary>
@@ -31,9 +32,9 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static XElement GetResourceContentXml(string name, params Assembly[] assemblies)
+        public static async Task<XElement?> GetResourceContentXmlAsync(string name, params Assembly[] assemblies)
         {
-            var c = GetResourceContent(name, "Resources", assemblies);
+            var c = await GetResourceContentAsync(name, "Resources", assemblies).ConfigureAwait(false);
             return (c == null) ? null : XElement.Parse(c);
         }
 
@@ -43,9 +44,9 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content where found; otherwise, <c>null</c>.</returns>
-        public static string GetTemplateContent(string name, params Assembly[] assemblies)
+        public static Task<string?> GetTemplateContentAsync(string name, params Assembly[] assemblies)
         {
-            return GetResourceContent(name, "Templates", assemblies);
+            return GetResourceContentAsync(name, "Templates", assemblies);
         }
 
         /// <summary>
@@ -54,9 +55,9 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static XElement GetTemplateContentXml(string name, params Assembly[] assemblies)
+        public static async Task<XElement?> GetTemplateContentXmlAsync(string name, params Assembly[] assemblies)
         {
-            var c = GetResourceContent(name, "Templates", assemblies);
+            var c = await GetResourceContentAsync(name, "Templates", assemblies).ConfigureAwait(false);
             return (c == null) ? null : XElement.Parse(c);
         }
 
@@ -66,9 +67,9 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content where found; otherwise, <c>null</c>.</returns>
-        public static string GetScriptContent(string name, params Assembly[] assemblies)
+        public static Task<string?> GetScriptContentAsync(string name, params Assembly[] assemblies)
         {
-            return GetResourceContent(name, "Scripts", assemblies);
+            return GetResourceContentAsync(name, "Scripts", assemblies);
         }
 
         /// <summary>
@@ -77,16 +78,16 @@ namespace Beef.CodeGen
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static XElement GetScriptContentXml(string name, params Assembly[] assemblies)
+        public static async Task<XElement?> GetScriptContentXmlAsync(string name, params Assembly[] assemblies)
         {
-            var c = GetResourceContent(name, "Scripts", assemblies);
+            var c = await GetResourceContentAsync(name, "Scripts", assemblies).ConfigureAwait(false);
             return (c == null) ? null : XElement.Parse(c);
         }
 
         /// <summary>
         /// Gets the specified resource content.
         /// </summary>
-        private static string GetResourceContent(string name, string resourceType, params Assembly[] assemblies)
+        private static async Task<string?> GetResourceContentAsync(string name, string resourceType, params Assembly[] assemblies)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
@@ -102,10 +103,8 @@ namespace Beef.CodeGen
                     var ri = ass.GetManifestResourceInfo(rn);
                     if (ri != null)
                     {
-                        using (var sr = new StreamReader(ass.GetManifestResourceStream(rn)))
-                        {
-                            return sr.ReadToEnd();
-                        }
+                        using var sr = new StreamReader(ass.GetManifestResourceStream(rn)!);
+                        return await sr.ReadToEndAsync().ConfigureAwait(false);
                     }
                 }
             }

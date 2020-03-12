@@ -2,10 +2,10 @@
 
 using Beef.Data.Database;
 using Beef.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -82,7 +82,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
-        public EfDbQuery<T, TModel, TDbContext> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>> query = null) where T : class, new() where TModel : class, new()
+        public EfDbQuery<T, TModel, TDbContext> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
         {
             return new EfDbQuery<T, TModel, TDbContext>(this, queryArgs, query);
         }
@@ -95,7 +95,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task<T?> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));
@@ -104,16 +104,14 @@ namespace Beef.Data.EntityFrameworkCore
             var efKeys = new object[keys.Length];
             for (int i = 0; i < getArgs.Mapper.UniqueKey.Count; i++)
             {
-                efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
+                efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            using (var db = new EfDbContextManager(getArgs))
+            using var db = new EfDbContextManager(getArgs);
+            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
             {
-                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
-                {
-                    return await FindAsync(db, getArgs, efKeys).ConfigureAwait(false);
-                }, this).ConfigureAwait(false);
-            }
+                return await FindAsync(db, getArgs, efKeys).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -140,19 +138,17 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
 
-            using (var db = new EfDbContextManager(saveArgs))
+            using var db = new EfDbContextManager(saveArgs);
+            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
             {
-                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
-                {
-                    var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
-                    db.DbContext.Add(model);
+                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
+                db.DbContext.Add(model);
 
-                    if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                if (saveArgs.SaveChanges)
+                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
-                    return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
-                }, this).ConfigureAwait(false);
-            }
+                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -178,39 +174,37 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.UpdatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
                 cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
             }
-            
-            using (var db = new EfDbContextManager(saveArgs))
+
+            using var db = new EfDbContextManager(saveArgs);
+            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
             {
-                return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+                if (OnUpdatePreReadForNotFound)
                 {
-                    if (OnUpdatePreReadForNotFound)
+                    // Check (find) if the entity exists.
+                    var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
+                    for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
                     {
-                        // Check (find) if the entity exists.
-                        var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
-                        for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
-                        {
-                            var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
-                            efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified);
-                        }
-
-                        var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
-                        if (em == null)
-                            throw new NotFoundException();
-
-                        // Remove the entity from the tracker before we attempt to update; otherwise, will use existing rowversion and concurrency will not work as expected.
-                        db.DbContext.Remove(em);
-                        db.DbContext.ChangeTracker.AcceptAllChanges();
+                        var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
+                        efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
                     }
 
-                    var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update);
-                    db.DbContext.Update(model);
+                    var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                    if (em == null)
+                        throw new NotFoundException();
 
-                    if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                    // Remove the entity from the tracker before we attempt to update; otherwise, will use existing rowversion and concurrency will not work as expected.
+                    db.DbContext.Remove(em);
+                    db.DbContext.ChangeTracker.AcceptAllChanges();
+                }
 
-                    return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
-                }, this).ConfigureAwait(false);
-            }
+                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
+                db.DbContext.Update(model);
+
+                if (saveArgs.SaveChanges)
+                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+
+                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -227,24 +221,22 @@ namespace Beef.Data.EntityFrameworkCore
             var efKeys = new object[keys.Length];
             for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
             {
-                efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified);
+                efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            using (var db = new EfDbContextManager(saveArgs))
+            using var db = new EfDbContextManager(saveArgs);
+            await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
             {
-                await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
-                {
-                    // A pre-read is required to get the row version for concurrency.
-                    var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
-                    if (em == null)
-                        return;
+                // A pre-read is required to get the row version for concurrency.
+                var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                if (em == null)
+                    return;
 
-                    db.DbContext.Remove(em);
+                db.DbContext.Remove(em);
 
-                    if (saveArgs.SaveChanges)
-                        await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
-                }, this).ConfigureAwait(false);
-            }
+                if (saveArgs.SaveChanges)
+                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+            }, this).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -277,7 +269,10 @@ namespace Beef.Data.EntityFrameworkCore
         private async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
         {
             var model = await db.DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
-            return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get);
+            if (model == default)
+                return default!;
+            else
+                return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value.");
         }
 
         /// <summary>

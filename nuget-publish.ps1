@@ -47,8 +47,8 @@ foreach ($project in $projectsToPublish) {
     Invoke-Expression $packCommand
 }
 
-# Publish packages to NuGet repository (where a key has been provided).
-if ($apiKey.Length -gt 0) {
+# Publish packages to NuGet repository (where a key has been provided and is longer than 20 characters).
+if ($apiKey.Length -gt 20) {
 	Get-ChildItem -Path $publishFolder -Filter *.nupkg | ForEach-Object {
 		$package = -join($publishFolder, "\", $_.Name)
 		$pushCommand = -join("dotnet nuget push --source ", $nugetServer, " --api-key ", $apiKey, " ", $package)

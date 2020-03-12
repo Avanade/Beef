@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>2.1.12</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>3.1.1</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) template solution for use with 'dotnet new'.</Description>
     <Copyright>Avanade (c)</Copyright>
     <PackageProjectUrl>https://github.com/Avanade/Beef</PackageProjectUrl>
     <PackageIconUrl>https://github.com/Avanade/Beef/raw/master/docs/images/Logo256x256.png</PackageIconUrl>
+    <PackageIcon>Logo256x256.png</PackageIcon>
     <RepositoryUrl>https://github.com/Avanade/Beef</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -33,5 +34,9 @@
     <None Remove="content\Company.AppName.Test\Cosmos\Person.yaml" />
     <None Remove="content\Company.AppName.Test\Cosmos\RefData.yaml" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
 </Project>

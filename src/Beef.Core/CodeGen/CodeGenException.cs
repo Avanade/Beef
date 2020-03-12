@@ -25,7 +25,7 @@ namespace Beef.CodeGen
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="extra">Extra context information to append to the message.</param>
-        public CodeGenException(string message, string extra) : base($"{message}{Environment.NewLine}{extra}") { }
+        public CodeGenException(string message, string? extra) : base($"{message}{Environment.NewLine}{extra}") { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenException"/> class with a specified messsage and inner exception.

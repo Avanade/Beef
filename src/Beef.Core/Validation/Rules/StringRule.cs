@@ -8,7 +8,7 @@ namespace Beef.Validation.Rules
     /// Provides <see cref="string"/> validation including <see cref="MinLength"/>, <see cref="MaxLength"/>, and <see cref="Regex"/>.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="System.Type"/>.</typeparam>
-    public class StringRule<TEntity> : ValueRuleBase<TEntity, string> where TEntity : class
+    public class StringRule<TEntity> : ValueRuleBase<TEntity, string?> where TEntity : class
     {
         /// <summary>
         /// Gets or sets the minimum length;
@@ -23,13 +23,13 @@ namespace Beef.Validation.Rules
         /// <summary>
         /// Gets or sets the regex.
         /// </summary>
-        public Regex Regex { get; set; }
+        public Regex? Regex { get; set; }
 
         /// <summary>
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, string> context)
+        public override void Validate(PropertyContext<TEntity, string?> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
