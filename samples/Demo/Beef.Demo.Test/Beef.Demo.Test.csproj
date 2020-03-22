@@ -21,11 +21,13 @@
   <ItemGroup>
     <None Remove="Cosmos\Data.yaml" />
     <None Remove="Cosmos\RefData.yaml" />
+    <None Remove="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Cosmos\RefData.yaml" />
     <EmbeddedResource Include="Cosmos\Data.yaml" />
+    <EmbeddedResource Include="Migrations\20181231-040506-create-demo-other.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\tools\Beef.Test.NUnit\Beef.Test.NUnit.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
   </ItemGroup>

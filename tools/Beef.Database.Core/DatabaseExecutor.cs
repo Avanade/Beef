@@ -178,8 +178,8 @@ namespace Beef.Database.Core
                 {
                     result = DeployChanges.To
                         .SqlDatabase(_connectionString)
-                        .WithScriptsEmbeddedInAssemblies(_assemblies, x => ScriptsNamespaceFilter(x))
-                        .WithTransactionPerScript()
+                        .WithScripts(GetMigrationScripts(_assemblies))
+                        .WithoutTransaction()
                         .LogTo(ls)
                         .Build()
                         .PerformUpgrade();
@@ -265,6 +265,27 @@ namespace Beef.Database.Core
             sw.Stop();
             Logger.Default.Info($"Complete [{sw.ElapsedMilliseconds}ms].");
             return result;
+        }
+
+        /// <summary>
+        /// Gets all the migration scripts from the assemblies and ensures order.
+        /// </summary>
+        private List<SqlScript> GetMigrationScripts(Assembly[] assemblies)
+        {
+            var scripts = new List<SqlScript>();
+            var count = 0;
+
+            foreach (var ass in assemblies)
+            {
+                foreach (var name in ass.GetManifestResourceNames().Where(x => ScriptsNamespaceFilter(x)))
+                {
+                    scripts.Add(SqlScript.FromStream(name, ass.GetManifestResourceStream(name), Encoding.Default, new SqlScriptOptions { RunGroupOrder = count, ScriptType = DbUp.Support.ScriptType.RunOnce }));
+                }
+
+                count++;
+            }
+
+            return scripts;
         }
 
         /// <summary>

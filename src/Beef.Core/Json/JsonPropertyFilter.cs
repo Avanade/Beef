@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,32 @@ namespace Beef.Json
     /// </summary>
     public static class JsonPropertyFilter
     {
+        /// <summary>
+        /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> resulting in the same <paramref name="value"/> instance where no <paramref name="include"/> or <paramref name="exclude"/>
+        /// specified; otherwise, a <see cref="JsonToken"/> representation of the <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <param name="include">The list of JSON property names to include.</param>
+        /// <param name="exclude">The list of JSON property names to exclude.</param>
+        /// <returns>The resulting <see cref="JToken"/>.</returns>
+        /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
+        public static object? ApplyAsObject<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
+        {
+            if (value == null)
+                return value;
+
+            if (IsEmpty(include) && IsEmpty(exclude))
+                return value;
+
+            return Apply(value, include, exclude)!;
+        }
+
+        /// <summary>
+        /// Check if list is empty.
+        /// </summary>
+        private static bool IsEmpty(IEnumerable<string>? list) => list == null || !list.Any();
+
         /// <summary>
         /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> resulting in the corresponding <see cref="JToken"/>.
         /// </summary>

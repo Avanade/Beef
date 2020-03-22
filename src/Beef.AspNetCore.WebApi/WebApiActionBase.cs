@@ -26,7 +26,7 @@ namespace Beef.AspNetCore.WebApi
     /// </summary>
     public abstract class WebApiActionBase : IActionResult
     {
-        private const string AsciiArtRobot = " d[ o_0 ]b ";
+        private const string AsciiDivider = "|";
 
         /// <summary>
         /// Gets the <see cref="ExecutionContext.Properties"/> key for storing <c>this</c> (<see cref="WebApiActionBase"/>) request within the <see cref="ExecutionContext"/>.
@@ -295,12 +295,12 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
-        /// <param name="json">The return <see cref="JToken"/>.</param>
+        /// <param name="result">The result value or <see cref="JToken"/>.</param>
         /// <returns>The <see cref="IActionResult"/>.</returns>
-        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, JToken? json)
+        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, object? result)
         {
             Check.NotNull(context, nameof(context));
-            return new ObjectResult(json) { StatusCode = (int)statusCode };
+            return new ObjectResult(result) { StatusCode = (int)statusCode };
         }
 
         /// <summary>
@@ -398,7 +398,7 @@ namespace Beef.AspNetCore.WebApi
         /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="result">The result value.</param>
-        /// <returns>The <b>JSON</b> representation and related <see cref="IETag.ETag"/>.</returns>
+        /// <returns>The value or manipulated <b>JSON</b> representation, and related <see cref="IETag.ETag"/>.</returns>
         /// <remarks>The resulting etag will be determined by the following: 
         /// <list type="number">
         /// <item><description>The <see cref="ExecutionContext"/> <see cref="ExecutionContext.ETag"/>.</description></item>
@@ -406,7 +406,7 @@ namespace Beef.AspNetCore.WebApi
         /// <item><description>Where the result is an <see cref="System.Collections.IEnumerable"/> a hash of the requesting query string and each item's <see cref="IETag"/> will be hashed.</description></item>
         /// <item><description>Otherwise, will generate by hashing the resulting JSON and requesting query string.</description></item>
         /// </list></remarks>
-        protected (JToken? json, string? etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
+        protected (object? valueOrJson, string? etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
         {
             Check.NotNull(context, nameof(context));
 
@@ -416,7 +416,7 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var json = JsonPropertyFilter.Apply(result, IncludeFields, ExcludeFields)!;
+            var json = JsonPropertyFilter.ApplyAsObject(result, IncludeFields, ExcludeFields)!;
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
                 return (json, ExecutionContext.Current.ETag);
@@ -435,7 +435,7 @@ namespace Beef.AspNetCore.WebApi
                     if (item is IETag cetag && cetag.ETag != null)
                     {
                         sb.Append(cetag.ETag);
-                        sb.Append(AsciiArtRobot); // Ascii art robot
+                        sb.Append(AsciiDivider); // Ascii art robot
                         continue;
                     }
 
@@ -450,7 +450,7 @@ namespace Beef.AspNetCore.WebApi
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate an etag.
             using var md5 = System.Security.Cryptography.MD5.Create();
 #pragma warning restore CA5351 
-            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json.ToString())}{AsciiArtRobot}{context?.HttpContext.Request.QueryString.Value}");
+            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json)}{AsciiDivider}{context?.HttpContext.Request.QueryString.Value}");
             var hash = md5.ComputeHash(buf, 0, buf.Length);
             return (json, Convert.ToBase64String(hash));
         }

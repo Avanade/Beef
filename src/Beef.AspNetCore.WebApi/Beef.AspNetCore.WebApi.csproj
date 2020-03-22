@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.AspNetCore.WebApi</RootNamespace>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>

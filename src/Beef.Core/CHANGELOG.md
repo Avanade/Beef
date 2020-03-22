@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Enhanced:* Added `ApplyAsObject` to `JsonPropertyFilter` which will only return a `JToken` where filtering is performed; otherwise, will return the originating object value. This will avoid a JSON serialization where not needed.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
 - *Added:* Nullable rollout phase: https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/
