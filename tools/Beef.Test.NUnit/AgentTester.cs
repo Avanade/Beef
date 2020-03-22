@@ -470,7 +470,7 @@ namespace Beef.Test.NUnit
                 catch (Exception) { }
 #pragma warning restore CA1031
 
-                Logger.Default.Info($"Content [{result.Request.Content?.Headers?.ContentType?.MediaType}]:");
+                Logger.Default.Info($"Content: [{result.Request.Content?.Headers?.ContentType?.MediaType ?? "None"}]");
                 Logger.Default.Info(json == null ? result.Request.Content?.ToString() : json.ToString());
             }
 
@@ -513,7 +513,7 @@ namespace Beef.Test.NUnit
 #pragma warning restore CA1031
             }
 
-            TestContext.Out.Write($"Content: ");
+            TestContext.Out.Write($"Content: [{result.Response?.Content?.Headers?.ContentType?.MediaType ?? "none"}]");
             if (json != null)
             {
                 Logger.Default.Info(null);

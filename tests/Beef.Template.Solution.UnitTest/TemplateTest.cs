@@ -115,20 +115,20 @@ namespace Beef.Template.Solution.UnitTest
             // Mkdir and create solution from template. 
             var dir = Path.Combine(_unitTests.FullName, $"{company}.{appName}");
             Directory.CreateDirectory(dir);
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"new beef --company {company} --appname {appName} --datasource {datasource}", dir).exitCode, "dotnet new beef");
 
             // Restore nuget packages from our repository.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "nuget-publish")} -s https://api.nuget.org/v3/index.json", dir).exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"restore -s {Path.Combine(_rootDir.FullName, "nuget-publish")}", dir).exitCode, "dotnet restore");
 
             // CodeGen: Execute code-generation.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.CodeGen")).exitCode, "dotnet rull all (entity)");
 
             // Database: Execute code-generation.
             if (datasource == "Database" || datasource == "EntityFramework")
-                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode);
+                Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", "run all", Path.Combine(dir, $"{company}.{appName}.Database")).exitCode, "dotnet rull all (database)");
 
             // Run the intra-integration tests.
-            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode);
+            Assert.GreaterOrEqual(0, ExecuteCommand("dotnet", $"test {company}.{ appName}.Test.csproj", Path.Combine(dir, $"{company}.{appName}.Test")).exitCode, "dotnet test");
         }
     }
 }

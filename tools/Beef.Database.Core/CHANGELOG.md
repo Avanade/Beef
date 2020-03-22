@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Fixed:* Migrations scripts were being executed by `DbUp` in alphabetical order regardless of Assembly order (`DbUp` default); now will execute in Assembly, then alphabetical order (override).
+- *Fixed:* Migrations scripts were being executed by `DbUp` as `WithTransactionPerScript` which has been updated to `WithoutTransaction` as some DDL statements cannot run within a transactional context. However, it is recommended where possible that each migration script is transactional to avoid partial update on script failure; i.e. each script should only perform a single unit of work to ensure database consistency at all times.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
 - *Enhancement:* Tool updated to execute asynchoronously. Both `DatabaseConsole` and `DatabaseConsoleWrapper` have breaking change; `Run` has been removed, replaced with `RunAsync`.

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the projects to .NET Core 3.1 and amended for any other _Beef_ required changes.
 - *Added:* Introduced nullable reference types: https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/

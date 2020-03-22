@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Enhancement:* Added request and response `ContentType` to the logging to aid debugging.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Core 3.1.
 
