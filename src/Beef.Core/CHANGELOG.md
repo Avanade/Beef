@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Fixed:* The `PropertyMapper` will only auto map sub-entities at mapping execution time where no converter or mapper has been specified; was previously always auto mapping at construction, often unnecessarily where a converter or mapper was later being specified.
+- *Enhanced:* The `PropertyMapper` will check if a _collection_ property is writeable (i.e. read-only) before overridding value; if not, will using the underlying `Add` method to update.
+- *Enhanced:* The `ComplexTypeReflector` now exposes a `MethodInfo? AddMethod` property for an underlying _collection_ (where found). 
+
 ## v3.1.2
 - *Enhanced:* Added `ApplyAsObject` to `JsonPropertyFilter` which will only return a `JToken` where filtering is performed; otherwise, will return the originating object value. This will avoid a JSON serialization where not needed.
 

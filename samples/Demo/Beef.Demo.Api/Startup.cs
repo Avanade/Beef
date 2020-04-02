@@ -74,6 +74,7 @@ namespace Beef.Demo.Api
         {
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
+            services.AddGrpc();
             services.AddHealthChecks();
             services.AddHttpClient();
 
@@ -122,10 +123,12 @@ namespace Beef.Demo.Api
             });
 
             // Use controllers.
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGrpcService<Grpc.RobotService>();
             });
         }
     }

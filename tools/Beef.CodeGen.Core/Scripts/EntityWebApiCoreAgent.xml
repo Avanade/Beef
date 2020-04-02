@@ -14,4 +14,8 @@
 
   <Generate Template="EntityWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" />
   <Generate Template="EntityWebApiServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents\ServiceAgents" EntityScope="Common" />
+
+  <Generate Template="Grpc_proto.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc" EntityScope="Common" />
+  <Generate Template="GrpcTransformers_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc" EntityScope="Common" />
+  <Generate Template="GrpcService_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Grpc" EntityScope="Common" />
 </Script>

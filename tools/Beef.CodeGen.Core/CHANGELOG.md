@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Enhancement:* Added code-generation templates and configuration for gRPC support.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
 - *Enhancement:* Tool updated to execute asynchoronously. Both `CodeGenConsole` and `CodeGenConsoleWrapper` have breaking change; `Run` has been removed, replaced with `RunAsync`.

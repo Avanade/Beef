@@ -551,7 +551,7 @@ namespace Beef.Mapper
         /// <param name="sourceEntity">The source entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The destination entity.</returns>
-        public TDest? MapToDest(TSrce sourceEntity, OperationTypes operationType = OperationTypes.Unspecified)
+        public TDest? MapToDest(TSrce? sourceEntity, OperationTypes operationType = OperationTypes.Unspecified)
         {
             if (sourceEntity == null)
                 return default!;
@@ -623,7 +623,7 @@ namespace Beef.Mapper
         /// <param name="destinationEntity">The destination entity.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The source entity.</returns>
-        public TSrce? MapToSrce(TDest destinationEntity, OperationTypes operationType = OperationTypes.Unspecified)
+        public TSrce? MapToSrce(TDest? destinationEntity, OperationTypes operationType = OperationTypes.Unspecified)
         {
             if (destinationEntity == null)
                 return default!;

@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -33,10 +33,6 @@
     <WarningsAsErrors />
     <NoWarn>1701;1702;CA1303</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Scripts\DataModelOnly.xml" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\SelectTableAlwaysGeneratedColumns.sql" />
@@ -70,6 +66,9 @@
     <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\EntityWebApiServiceAgent_cs.xml" />
     <EmbeddedResource Include="Templates\Entity_cs.xml" />
+    <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
+    <EmbeddedResource Include="Templates\GrpcService_cs.xml" />
+    <EmbeddedResource Include="Templates\Grpc_proto.xml" />
     <EmbeddedResource Include="Templates\IEntityData_cs.xml" />
     <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />

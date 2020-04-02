@@ -4,14 +4,18 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:56043/",
-      "sslPort": 0
+      "sslPort": 44345
     }
   },
   "profiles": {
     "Beef.Demo.Api": {
-      "commandName": "IISExpress",
+      //  "commandName": "IISExpress",
+      //  "launchBrowser": true,
+      //  "launchUrl": "swagger"
+      "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "swagger"
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:56045/"
     }
-  }
+ }
 }
