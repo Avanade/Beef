@@ -165,12 +165,12 @@ namespace Cdr.Banking.Common.Agents
                 {
                     switch (name)
                     {
-                        case nameof(OpenStatus): GetCache(_nameDict[nameof(OpenStatus)]).SetCollection(JsonConvert.DeserializeObject<OpenStatus[]>(items!)); break;
-                        case nameof(ProductCategory): GetCache(_nameDict[nameof(ProductCategory)]).SetCollection(JsonConvert.DeserializeObject<ProductCategory[]>(items!)); break;
-                        case nameof(AccountUType): GetCache(_nameDict[nameof(AccountUType)]).SetCollection(JsonConvert.DeserializeObject<AccountUType[]>(items!)); break;
-                        case nameof(MaturityInstructions): GetCache(_nameDict[nameof(MaturityInstructions)]).SetCollection(JsonConvert.DeserializeObject<MaturityInstructions[]>(items!)); break;
-                        case nameof(TransactionType): GetCache(_nameDict[nameof(TransactionType)]).SetCollection(JsonConvert.DeserializeObject<TransactionType[]>(items!)); break;
-                        case nameof(TransactionStatus): GetCache(_nameDict[nameof(TransactionStatus)]).SetCollection(JsonConvert.DeserializeObject<TransactionStatus[]>(items!)); break;
+                        case nameof(OpenStatus): GetCache(_nameDict[nameof(OpenStatus)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.OpenStatus[]>(items!)); break;
+                        case nameof(ProductCategory): GetCache(_nameDict[nameof(ProductCategory)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.ProductCategory[]>(items!)); break;
+                        case nameof(AccountUType): GetCache(_nameDict[nameof(AccountUType)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.AccountUType[]>(items!)); break;
+                        case nameof(MaturityInstructions): GetCache(_nameDict[nameof(MaturityInstructions)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.MaturityInstructions[]>(items!)); break;
+                        case nameof(TransactionType): GetCache(_nameDict[nameof(TransactionType)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.TransactionType[]>(items!)); break;
+                        case nameof(TransactionStatus): GetCache(_nameDict[nameof(TransactionStatus)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.TransactionStatus[]>(items!)); break;
                     }
                  }
             }

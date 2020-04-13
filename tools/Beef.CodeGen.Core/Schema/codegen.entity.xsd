@@ -1049,6 +1049,11 @@
                 <xs:documentation>Indicates that the Entity does not inherit from 'EntityBase' and therefore related capabilites are not supported (omitted from generation).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="DataModel" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a data model version of the entity should also be generated (Business/Data/Model).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

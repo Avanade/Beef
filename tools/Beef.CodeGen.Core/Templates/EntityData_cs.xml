@@ -29,7 +29,7 @@
       </Property>
       <Operation Condition="Operation.OperationType != 'Custom' and Operation.AutoImplement != 'None'">
         <Exception Condition="Entity.AutoImplement == null" Message="Operation '{{Operation.Name}}' specifies AutoImplement where not specified for the Entity '{{Entity.Name}}'." />
-        <Exception Condition="System.HasKey == false" Message="Operation '{{Operation.Name}}' specifies UniqueKey where none are specified for the Entity '{{Entity.Name}}'." />
+        <Exception Condition="System.HasKey == false and Operation.OperationType != 'GetColl'" Message="Operation '{{Operation.Name}}' specifies UniqueKey where none are specified for the Entity '{{Entity.Name}}'." />
         <Set Name="System.UsesDatabase" Condition="Operation.AutoImplement == 'Database'" Value="true" />
         <Set Name="System.UsesOData" Condition="Operation.AutoImplement == 'OData'" Value="true" />
         <Set Name="System.UsesCosmos" Condition="Operation.AutoImplement == 'Cosmos'" Value="true" />

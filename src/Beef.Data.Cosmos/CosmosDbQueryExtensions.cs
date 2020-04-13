@@ -54,7 +54,7 @@ namespace Beef.Data.Cosmos
         /// <param name="query">The query.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The query.</returns>
-        public static IQueryable<T> Paging<T>(this IQueryable<T> query, PagingArgs paging)
+        public static IQueryable<T> Paging<T>(this IQueryable<T> query, PagingArgs? paging)
         {
             return paging == null ? query.Paging(0, null) : query.Paging(paging.Skip, paging.Take);
         }

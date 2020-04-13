@@ -22,6 +22,27 @@ namespace Beef.Demo.Common.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class PowerSource : ReferenceDataBaseGuid
     {
+        #region Privates
+
+        private string? _additionalInfo;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the Additional Info.
+        /// </summary>
+        [JsonProperty("additionalInfo", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [Display(Name="Additional Info")]
+        public string? AdditionalInfo
+        {
+            get => _additionalInfo;
+            set => SetValue(ref _additionalInfo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AdditionalInfo)); 
+        }
+
+        #endregion
+
         #region Operator
 
         /// <summary>
@@ -65,6 +86,7 @@ namespace Beef.Demo.Common.Entities
         public void CopyFrom(PowerSource from)
         {
             CopyFrom((ReferenceDataBaseGuid)from);
+            AdditionalInfo = from.AdditionalInfo;
 
             OnAfterCopyFrom(from);
         }
@@ -94,6 +116,7 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
+            AdditionalInfo = Cleaner.Clean(AdditionalInfo, StringTrim.End, StringTransform.EmptyToNull);
 
             OnAfterCleanUp();
         }
@@ -109,7 +132,7 @@ namespace Beef.Demo.Common.Entities
                 if (!base.IsInitial)
                     return false;
 
-                return true;
+                return Cleaner.IsInitial(AdditionalInfo);
             }
         }
 

@@ -128,7 +128,7 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Gets the <see cref="PagingResult"/> (where paging is required for a <b>query</b>).
         /// </summary>
-        public PagingResult Paging { get; private set; } = default!;
+        public PagingResult? Paging { get; private set; } = default;
 
         /// <summary>
         /// Gets the <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/> used for <b>Get</b>, <b>Create</b>, <b>Update</b>, and <b>Delete</b> (<seealso cref="QueryRequestOptions"/>).

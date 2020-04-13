@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.2
 - *Enhancement:* Added request and response `ContentType` to the logging to aid debugging.
 

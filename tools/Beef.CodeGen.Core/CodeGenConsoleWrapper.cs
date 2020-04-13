@@ -184,7 +184,7 @@ namespace Beef.CodeGen
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
         public async Task<int> RunAsync(string[] args)
         {
-            using var app = new CommandLineApplication(false)
+            using var app = new CommandLineApplication()
             {
                 Name = "beef.codegen",
                 Description = "Business Entity Execution Framework (Beef) Code Generator."

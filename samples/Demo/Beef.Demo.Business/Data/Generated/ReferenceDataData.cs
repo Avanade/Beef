@@ -9,11 +9,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Beef.Business;
+using Beef.Mapper;
 using Beef.Mapper.Converters;
-using RefDataNamespace = Beef.Demo.Common.Entities;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Data.Cosmos;
+using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.Data
 {
@@ -84,7 +85,8 @@ namespace Beef.Demo.Business.Data
         /// Provides the <see cref="RefDataNamespace.PowerSource"/> entity and Cosmos <see cref="RefDataNamespace.PowerSource"/> property mapping.
         /// </summary>
         public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>()
-            .AddStandardProperties();
+            .AddStandardProperties()
+            .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any));
     }
 }
 

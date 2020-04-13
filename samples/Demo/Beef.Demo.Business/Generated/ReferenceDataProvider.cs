@@ -18,7 +18,7 @@ namespace Beef.Demo.Business
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
     /// </summary>
-    public class ReferenceDataProvider : ReferenceData
+    public class ReferenceDataProvider : RefDataNamespace.ReferenceData
     {
         #region Collections
 

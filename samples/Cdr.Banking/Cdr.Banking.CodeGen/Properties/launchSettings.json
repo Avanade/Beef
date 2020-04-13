@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Cdr.Banking.CodeGen": {
+      "commandName": "Project",
+      "commandLineArgs": "entity",
+      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Cdr.Banking\\Cdr.Banking.CodeGen"
+    }
+  }
+}

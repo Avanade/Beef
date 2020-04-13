@@ -68,8 +68,11 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs? paging)
         {
+            if (paging == null)
+                return query;
+
             var q = query;
-            if (paging != null && paging.Skip > 0)
+            if (paging.Skip > 0)
                 q = q.Skip((int)paging.Skip);
 
             return q.Take((int)(paging == null ? PagingArgs.DefaultTake : paging.Take));

@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhanced:* Added _model_ representations of `ReferenceDataBase` and `ChangeLog`. 
+- *Enhanced:* Added `CustomConverter` to simplify process of creating converters. Added `GuidToStringConverter` and `NullableGuidToStringConverter`.
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.2
 - *Enhanced:* Added `ApplyAsObject` to `JsonPropertyFilter` which will only return a `JToken` where filtering is performed; otherwise, will return the originating object value. This will avoid a JSON serialization where not needed.
 

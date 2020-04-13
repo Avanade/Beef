@@ -11,8 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.WebApi;
-using Beef.Demo.Common.Entities;
 using Beef.Demo.Common.Agents.ServiceAgents;
+using Beef.Demo.Common.Entities;
+using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
@@ -42,7 +43,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.GenderGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.GenderGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="EyeColor"/> objects that match the filter arguments.
@@ -50,7 +51,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.EyeColorGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.EyeColorGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="PowerSource"/> objects that match the filter arguments.
@@ -58,7 +59,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.PowerSourceGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.PowerSourceGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="Company"/> objects that match the filter arguments.
@@ -66,7 +67,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.CompanyGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.CompanyCollection>> CompanyGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.CompanyGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3

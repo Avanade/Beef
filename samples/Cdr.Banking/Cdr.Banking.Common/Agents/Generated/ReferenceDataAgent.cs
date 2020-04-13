@@ -11,8 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.WebApi;
-using Cdr.Banking.Common.Entities;
 using Cdr.Banking.Common.Agents.ServiceAgents;
+using Cdr.Banking.Common.Entities;
+using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Common.Agents
 {
@@ -42,7 +43,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<OpenStatusCollection>> OpenStatusGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.OpenStatusGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.OpenStatusCollection>> OpenStatusGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.OpenStatusGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="ProductCategory"/> objects that match the filter arguments.
@@ -50,7 +51,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<ProductCategoryCollection>> ProductCategoryGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.ProductCategoryGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.ProductCategoryCollection>> ProductCategoryGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.ProductCategoryGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="AccountUType"/> objects that match the filter arguments.
@@ -58,7 +59,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<AccountUTypeCollection>> AccountUTypeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.AccountUTypeGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.AccountUTypeCollection>> AccountUTypeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.AccountUTypeGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="MaturityInstructions"/> objects that match the filter arguments.
@@ -66,7 +67,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.MaturityInstructionsGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.MaturityInstructionsCollection>> MaturityInstructionsGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.MaturityInstructionsGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="TransactionType"/> objects that match the filter arguments.
@@ -74,7 +75,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TransactionTypeCollection>> TransactionTypeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.TransactionTypeGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.TransactionTypeCollection>> TransactionTypeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.TransactionTypeGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets all of the <see cref="TransactionStatus"/> objects that match the filter arguments.
@@ -82,7 +83,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TransactionStatusCollection>> TransactionStatusGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.TransactionStatusGetAllAsync(args, requestOptions);      
+        public Task<WebApiAgentResult<RefDataNamespace.TransactionStatusCollection>> TransactionStatusGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.TransactionStatusGetAllAsync(args, requestOptions);      
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3

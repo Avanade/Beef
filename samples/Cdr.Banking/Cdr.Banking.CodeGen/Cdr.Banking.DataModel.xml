@@ -7,9 +7,8 @@
   
   <!-- Account model definitions.
        The IStringIdentifier is required to aid the Beef framework in identifying the Id property.
-       The OmitEntityBase simplifies the generated code and does not automatically inherit from EntityBase.
        -->
-  <Entity Name="Account" Text="Account model for data persistence" Implements="IStringIdentifier" OmitEntityBase="true">
+  <Entity Name="Account" Text="Account model for data persistence" Implements="IStringIdentifier">
     <Property Name="Id" Type="string" />
     <Property Name="CreationDate" Type="DateTime" />
     <Property Name="DisplayName" Type="string" />
@@ -28,7 +27,7 @@
     <Property Name="Balance" Type="Balance" />
   </Entity>
 
-  <Entity Name="TermDepositAccount" OmitEntityBase="true">
+  <Entity Name="TermDepositAccount">
     <Property Name="LodgementDate" Type="DateTime" />
     <Property Name="MaturityDate" Type="DateTime" />
     <Property Name="MaturityAmount" Type="decimal" />
@@ -36,14 +35,14 @@
     <Property Name="MaturityInstructions" Type="string" />
   </Entity>
 
-  <Entity Name="CreditCardAccount" OmitEntityBase="true">
+  <Entity Name="CreditCardAccount">
     <Property Name="MinPaymentAmount" Type="decimal" />
     <Property Name="PaymentDueAmount" Type="decimal" />
     <Property Name="PaymentCurrency" Type="string" />
     <Property Name="PaymentDueDate" Type="DateTime" />
   </Entity>
 
-  <Entity Name="Balance" OmitEntityBase="true">
+  <Entity Name="Balance">
     <Property Name="CurrentBalance" Type="decimal" />
     <Property Name="AvailableBalance" Type="decimal" />
     <Property Name="CreditLimit" Type="decimal" />
@@ -52,13 +51,13 @@
     <Property Name="Purses" Type="BalancePurseCollection" />
   </Entity>
 
-  <Entity Name="BalancePurse" OmitEntityBase="true" Collection="true">
+  <Entity Name="BalancePurse" Collection="true">
     <Property Name="Amount" Type="decimal" />
     <Property Name="Currency" Type="string" />
   </Entity>
 
   <!-- Transaction model definitions -->
-  <Entity Name="Transaction" Text="Transaction model for data persistence" Implements="IStringIdentifier" OmitEntityBase="true">
+  <Entity Name="Transaction" Text="Transaction model for data persistence" Implements="IStringIdentifier">
     <Property Name="Id" Type="string" />
     <Property Name="AccountId" Type="string" />
     <Property Name="IsDetailAvailable" Type="bool" />

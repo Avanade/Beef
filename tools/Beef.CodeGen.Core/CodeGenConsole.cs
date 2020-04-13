@@ -44,7 +44,7 @@ namespace Beef.CodeGen
         /// </summary>
         private CodeGenConsole()
         {
-            App = new CommandLineApplication(false)
+            App = new CommandLineApplication()
             {
                 Name = "beef.codegen",
                 Description = "Business Entity Execution Framework (Beef) Code Generator."

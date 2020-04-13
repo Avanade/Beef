@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Enhancement:* Add option to set identifier automatically when performing a `ImportBatchAsync` or `ImportValueBatchAsync`.
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Core 3.1.
 - *Added:* Nullable rollout phase: https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/
