@@ -123,6 +123,7 @@ namespace Beef.CodeGen
 
                     string? template = null;
                     string? outDir = null;
+                    string? helpText = null;
                     var otherParameters = new Dictionary<string, string>();
                     foreach (var att in scriptEle.Attributes())
                     {
@@ -130,6 +131,7 @@ namespace Beef.CodeGen
                         {
                             case "Template": template = att.Value; break;
                             case "OutDir": outDir = att.Value; break;
+                            case "HelpText": helpText = att.Value; break;
                             default: otherParameters.Add(att.Name.LocalName, att.Value); break;
                         }
                     }
@@ -143,7 +145,7 @@ namespace Beef.CodeGen
                     CreatedCount = 0;
                     UpdatedCount = 0;
                     NotChangedCount = 0;
-                    Logger.Default.Info("  Template: {0}", template!);
+                    Logger.Default.Info("  Template: {0} {1}", template!, helpText == null ? string.Empty : $"({helpText})");
 
                     XElement xmlTemplate;
                     if (_args.TemplatePath != null)

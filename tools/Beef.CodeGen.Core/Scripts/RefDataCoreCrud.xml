@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script LoaderType="Beef.CodeGen.Loaders.EntityConfigLoader, Beef.CodeGen.Core">
-  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" EntityScope="Common" />
-  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Entities" EntityScope="Business" />
+  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" EntityScope="Common" HelpText="Common\Entities" />
+  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Entities" EntityScope="Business" HelpText="Business\Entities" />
+  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data\Model" ModelFromEntity="true" IsDataModel="true" HelpText="Business\Data\Model" />
   
   <Generate Template="ReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" />
   <Generate Template="IReferenceDataData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" />

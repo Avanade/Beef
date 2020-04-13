@@ -84,6 +84,8 @@ namespace Company.AppName.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         /// <summary>

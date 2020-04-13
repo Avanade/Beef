@@ -33,7 +33,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding Web API agent.
     /// </summary>
-    public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
+    public class ReferenceDataAgentProvider : ]]><If Condition="Config.RefDataNamespace != null"><![CDATA[RefDataNamespace.]]></If><![CDATA[ReferenceData
     {
         private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
         private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
@@ -151,7 +151,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case nameof({{Entity.Name}}): GetCache(_nameDict[nameof({{Entity.Name}})]).SetCollection(JsonConvert.DeserializeObject<{{Entity.Name}}[]>(items!)); break;
+    <![CDATA[                        case nameof({{Entity.Name}}): GetCache(_nameDict[nameof({{Entity.Name}})]).SetCollection(JsonConvert.DeserializeObject<{{Entity.EntityName}}[]>(items!)); break;
 ]]>
   </Entity>
   <![CDATA[                    }

@@ -99,7 +99,7 @@ namespace Beef.Data.Cosmos
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
         /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey, QueryRequestOptions? requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
         {
             return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
         }

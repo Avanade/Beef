@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.2
+- *Fixed:* A query was always applying paging even where not specified. Where no paging is specified all rows will be returned by default (as expected).
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Core 3.1.
 - *Enhancement:* Migrated from `System.Data.SqlClient` to `Microsoft.Data.SqlClient`. See https://devblogs.microsoft.com/dotnet/introducing-the-new-microsoftdatasqlclient/.

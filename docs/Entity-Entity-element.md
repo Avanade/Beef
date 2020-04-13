@@ -159,12 +159,22 @@ The following represents the corresponding **Web API** attributes:
 
 Attribute | Description
 ---|---
-**`WebApiRoutePrefix`** |  Specifies the `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) URI for the entity and is extended when defining the underlying [`Operations`](Entity-Operation-element.md).
+**`WebApiRoutePrefix`** | Specifies the `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) URI for the entity and is extended when defining the underlying [`Operations`](Entity-Operation-element.md).
 **`WebApiAuthorize`** | Indicates whether the Web API controller should use the `Authorize` or `AllowAnonynous`. Uses `Config` value (inherits) where not specified; can be overridden at the [`Operation`](Entity-Operation-element.md) level also.
 
 The following represents the attributes for controlling (selecting) which specific code **artefacts** are to be generated; where none are specified all artefacts are implied:
 
 <br>
+
+### Model attributes
+
+The following represents the corresponding **Model** attributes:
+
+Attribute | Description
+---|---
+**`DataModel`** | Indicates whether a data _model_ version of the _entity_ should also be generated (output to `..\Business\Data\Model`). The _model_ will be generated with `OmitEntityBase = true`. Any reference data properties will be defined using their `RefDataType` versus their corresponding `Type`.
+
+</br>
 
 ### Exclusion attributes
 

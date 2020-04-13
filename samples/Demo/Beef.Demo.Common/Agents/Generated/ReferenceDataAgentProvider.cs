@@ -145,10 +145,10 @@ namespace Beef.Demo.Common.Agents
                 {
                     switch (name)
                     {
-                        case nameof(Gender): GetCache(_nameDict[nameof(Gender)]).SetCollection(JsonConvert.DeserializeObject<Gender[]>(items!)); break;
-                        case nameof(EyeColor): GetCache(_nameDict[nameof(EyeColor)]).SetCollection(JsonConvert.DeserializeObject<EyeColor[]>(items!)); break;
-                        case nameof(PowerSource): GetCache(_nameDict[nameof(PowerSource)]).SetCollection(JsonConvert.DeserializeObject<PowerSource[]>(items!)); break;
-                        case nameof(Company): GetCache(_nameDict[nameof(Company)]).SetCollection(JsonConvert.DeserializeObject<Company[]>(items!)); break;
+                        case nameof(Gender): GetCache(_nameDict[nameof(Gender)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Gender[]>(items!)); break;
+                        case nameof(EyeColor): GetCache(_nameDict[nameof(EyeColor)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.EyeColor[]>(items!)); break;
+                        case nameof(PowerSource): GetCache(_nameDict[nameof(PowerSource)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.PowerSource[]>(items!)); break;
+                        case nameof(Company): GetCache(_nameDict[nameof(Company)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Company[]>(items!)); break;
                     }
                  }
             }

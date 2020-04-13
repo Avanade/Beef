@@ -22,18 +22,9 @@ namespace Beef.Demo.Common.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Gender : ReferenceDataBaseGuid
     {
-        #region PropertyNames
-      
-        /// <summary>
-        /// Represents the <see cref="AlternateName"/> property name.
-        /// </summary>
-        public const string Property_AlternateName = nameof(AlternateName);
-
-        #endregion
-
         #region Privates
 
-        private string _alternateName;
+        private string? _alternateName;
 
         #endregion
 
@@ -44,10 +35,10 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         [JsonProperty("alternateName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Alternate Name")]
-        public string AlternateName
+        public string? AlternateName
         {
-            get { return _alternateName; }
-            set { SetValue(ref _alternateName, value, false, StringTrim.End, StringTransform.EmptyToNull, Property_AlternateName); }
+            get => _alternateName;
+            set => SetValue(ref _alternateName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AlternateName)); 
         }
 
         #endregion

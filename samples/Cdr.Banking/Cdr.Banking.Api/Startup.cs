@@ -84,6 +84,8 @@ namespace Cdr.Banking.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         /// <summary>

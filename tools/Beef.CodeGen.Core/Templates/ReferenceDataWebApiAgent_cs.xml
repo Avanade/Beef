@@ -18,9 +18,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Beef.RefData;
 using Beef.WebApi;
-using {{Config.Company}}.{{Config.AppName}}.Common.Entities;
 using {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents;
-
+using {{Config.Company}}.{{Config.AppName}}.Common.Entities;
+]]>
+  <If Condition="Config.RefDataNamespace != null">
+    <![CDATA[using RefDataNamespace = {{Config.RefDataNamespace}};
+]]>
+  </If>
+  <![CDATA[
 namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
 {
     /// <summary>
@@ -44,8 +49,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
         public IReferenceDataServiceAgent ServiceAgent { get; private set; }
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <Set Name="Entity.EntityName" Value="${{Entity.Name}}" />
-    <Set Name="Entity.EntityCollectionName" Value="${{Entity.Name}}Collection" />
+    <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
+    <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
     <![CDATA[
         /// <summary>
         /// Gets all of the <see cref="{{Entity.Name}}"/> objects that match the filter arguments.
