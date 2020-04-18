@@ -189,7 +189,7 @@ There is a minor change required, perform a find and replace: `IHostingEnvironme
 
 #### 5.2. Startup.cs
 
-Within the `ConfigureServices` method we need to switch from the new out-of-the-box JSON serializer to the `Newtonsoft.Json` version as _Beef_ currently has a hard dependency on this serializer. 
+Within the `ConfigureServices` method we need to switch from the new out-of-the-box JSON serializer to the `Newtonsoft.Json` version as _Beef_ currently has a hard dependency on this serializer. Nuget package `Swashbuckle.AspNetCore.Newtonsoft` is required to enable Swagger+Nuget support. 
 
 Remove the following:
 
@@ -199,9 +199,10 @@ public void ConfigureServices(IServiceCollection services)
     services.AddMvc();
 
     ...
+}
 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env, ...
-
+{
     ...
 
     // Use mvc.
@@ -219,12 +220,15 @@ public void ConfigureServices(IServiceCollection services)
 
     ...
 
-public void Configure(IApplicationBuilder app, IHostingEnvironment env, ...
-        {
+    // Add Swagger/Newtonsoft support. 
+    services.AddSwaggerGenNewtonsoftSupport();
+}
 
+public void Configure(IApplicationBuilder app, IHostingEnvironment env, ...
+{
     ...
 
-    // Use controllers.
+    // Use routing and map controllers.
     app.UseRouting();
     app.UseEndpoints(endpoints =>
     {

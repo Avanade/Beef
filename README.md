@@ -20,6 +20,29 @@ The key industralisation goals are:
 
 <br/>
 
+## Rapid enterprise-grade API development
+
+As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardised and consistent manner.
+
+The APIs created will have the following capabilities out-of-the-box with limited developer effort, so the developer can focus on the key business value:
+- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [INotifyPropertyChanged](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [IEditableObject](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [ICloneable](./src/Beef.Core/Entities/ICloneable.cs), [ICopyFrom](./src/Beef.Core/Entities/ICopyFrom.cs), [ICleanUp](./src/Beef.Core/Entities/ICleanUp.cs), [IUniueKey](./src/Beef.Core/Entities/IUniqueKey.cs), etc.
+- Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimised serialisation, and enriched API endpoints.
+- Rich [Validation](./docs/Beef-Validation.md) capability to simplify and ensure data integrity and consistency.
+- CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](./src/Beef.Data.Database/README.md) and [Entity Framework](./src/Beef.Data.EntityFrameworkCore/README.md)), [Cosmos DB](./src/Beef.Data.Cosmos/README.md) and [OData](./src/Beef.Data.OData/README.md) in a standardised manner. 
+- An approach and tooling to automate and manage [database](./tools/Beef.Database.Core/README.md) set up, configuration, and deployment.
+- [Paging](./src/Beef.Core/Entities/PagingArgs.cs) (skip and top) and resulting total count, that flows from API through to the underlying data source in a consistent and seamless manner.
+- [ETag](https://en.wikipedia.org/wiki/HTTP_ETag) (concurrency) and `If-Match`/`If-None-Match` handling.
+- JSON response field [filtering (include/exclude)](./src/Beef.Core/Json/JsonPropertyFilter.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
+- [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
+- An end-to-end intra-domain [integration testing](./tools/Beef.Test.NUnit/README.md) approach enables effective tests to be built easily and quickly.
+- [Event](./src/Beef.Events/README.md) publishing and subcribing to enable an event-driven architecture.
+
+To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined.
+
+To [get started](#Getting-started) a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get a solution up and running in minutes.
+
+<br/>
+
 ## Architecture
 
 _Beef_ has been developed to encourage the standardisation and industrialisation of the tiering and layering within the microservices (APIs) of an Application Architecture.
@@ -140,15 +163,12 @@ Sample | Description
 
 The following are references to additional documentation (these are all accessible via links within this and other documentation):
 
-### Major versions
-
-- [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
-
 ### General
 
 - [Reference data](./docs/Reference-Data.md)
 - [Validation](./docs/Beef-Validation.md)
 - [HTTP PATCH](./docs/Http-Patch.md)
+- [Authentication](./docs/Authentication.md)
 
 ### Solution
 
@@ -180,6 +200,10 @@ The following are references to additional documentation (these are all accessib
   - [OrderBy element](./docs/Table-OrderBy-element.md)
   - [Execute element](./docs/Table-Execute-element.md)
 
+### Major versions
+
+- [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
+
 <br/>
 
 ## License
@@ -190,7 +214,7 @@ _Beef_ is open source under the [MIT license](./LICENSE) and is free for commerc
 
 ## Getting started
 
-To start using _Beef_ you do not need to clone the repo; you just need to create a solution with the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md), including referencing the appropriate NuGet packages. To accelerate this a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
+To start using _Beef_ you do not need to clone or fork the repo; you just need to create a solution with the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md), including referencing the appropriate [NuGet packages](#Framework). To accelerate this a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
 
 See the following for example end-to-end usage; each demonstrating the same API functionality leveraging different data sources to accomplish:
 - [Cosmos sample](./docs/Sample-Cosmos-GettingStarted.md)

@@ -1,4 +1,6 @@
-﻿CREATE FUNCTION [dbo].[fnGetTimestamp]
+﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+CREATE FUNCTION [dbo].[fnGetTimestamp]
 (
 	@Override as datetime = null	
 )
@@ -21,4 +23,3 @@ BEGIN
 
 	RETURN @Timestamp
 END
-

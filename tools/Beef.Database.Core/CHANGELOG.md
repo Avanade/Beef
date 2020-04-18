@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancement:* Added `fnGetUserId` and updated `spSetSessionContext` to support the new `ExecutionContext.UserId`.
+
 ## v3.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

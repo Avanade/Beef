@@ -1,8 +1,8 @@
 # Entity (DTO)
 
-The *Entity* ([DTO](https://en.wikipedia.org/wiki/Data_transfer_object)) is primarily responsible for defining the domain-based data model (and contract where accessible externally over-the-wire). They are also used to define the [reference data](./Reference-Data.md) model.
+The *Entity* ([DTO](https://en.wikipedia.org/wiki/Data_transfer_object)) is primarily responsible for defining the domain-based model (and contract where accessible externally over-the-wire). They are also used to define the [reference data](./Reference-Data.md) model.
 
-The aim here is decouple this definition, where applicable, from the underlying data source. This is likely to be defined differently, with an alternate naming conversion, alternate shape/structure, etc. This also enables the data source to evolve independently of this model, as well as possibly hide additional implementaion details.
+The aim here is decouple this definition, where applicable, from the underlying data source. This is likely to be defined differently, with an alternate naming convention, alternate shape/structure, etc. This also enables the data source to evolve independently of this model, as well as possibly hide additional implementaion details.
 
 <br/>
 

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhanced:* Added `AuthenticationException` to enable standardized handling of this exception similar to the existing `AuthorizationException`. This allows for an _authentication_ exception to be thrown which in turn will result in an `HttpStatusCode.Unauthorized (401)`.
+- *Enhanced:* Added property `UserId` to `ExecutionContext`.
+
 ## v3.1.3
 - *Enhanced:* Added _model_ representations of `ReferenceDataBase` and `ChangeLog`. 
 - *Enhanced:* Added `CustomConverter` to simplify process of creating converters. Added `GuidToStringConverter` and `NullableGuidToStringConverter`.

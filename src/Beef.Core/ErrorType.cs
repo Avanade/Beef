@@ -40,6 +40,11 @@ namespace Beef
         /// <summary>
         /// Indicates a Duplicate error.
         /// </summary>
-        DuplicateError = 7
+        DuplicateError = 7,
+
+        /// <summary>
+        /// Indicates an Authentication error.
+        /// </summary>
+        AuthenticationError = 8
     }
 }

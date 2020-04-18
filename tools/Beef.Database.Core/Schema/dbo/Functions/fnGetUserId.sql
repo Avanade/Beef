@@ -1,21 +1,21 @@
 ﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-CREATE FUNCTION [dbo].[fnGetTenantId]
+CREATE FUNCTION [dbo].[fnGetUserId]
 (
 	@Override as uniqueidentifier = null
 )
 RETURNS uniqueidentifier
 AS
 BEGIN
-	DECLARE @TenantId uniqueidentifier
+	DECLARE @UserId uniqueidentifier
     IF @Override IS NULL
 	BEGIN
-		SET @TenantId = CONVERT(uniqueidentifier, SESSION_CONTEXT(N'TenantId'));
+		SET @UserId = CONVERT(uniqueidentifier, SESSION_CONTEXT(N'UserId'));
 	END
 	ELSE
 	BEGIN
-		SET @TenantId = @Override
+		SET @UserId = @Override
 	END
 
-	RETURN @TenantId
+	RETURN @UserId
 END

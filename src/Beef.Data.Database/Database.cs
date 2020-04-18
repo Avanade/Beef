@@ -93,7 +93,8 @@ namespace Beef.Data.Database
         /// <param name="username">The username.</param>
         /// <param name="timestamp">The timestamp <see cref="DateTime"/> (where <c>null</c> the value will default to <see cref="DateTime.Now"/>).</param>
         /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
-        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null)
+        /// <param name="userId">The unique user identifier.</param>
+        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null, Guid? userId = null)
         {
             if (dbConnection == null)
                 throw new ArgumentNullException(nameof(dbConnection));
@@ -125,18 +126,26 @@ namespace Beef.Data.Database
                 cmd.Parameters.Add(p);
             }
 
+            if (userId.HasValue)
+            {
+                p = cmd.CreateParameter();
+                p.ParameterName = "@" + DatabaseColumns.SessionContextUserId;
+                p.Value = userId.Value;
+                cmd.Parameters.Add(p);
+            }
+
             cmd.ExecuteNonQuery();
         }
 
         /// <summary>
-        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?)"/> using
+        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?, Guid?)"/> using
         /// <see cref="ExecutionContext.Username"/>, <see cref="ExecutionContext.Timestamp"/> and <see cref="ExecutionContext.TenantId"/>).
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         public void SetSqlSessionContext(DbConnection dbConnection)
         {
             var ec = ExecutionContext.Current ?? throw new InvalidOperationException("The ExecutionContext.Current must have an instance to SetSqlSessionContext.");
-            SetSqlSessionContext(dbConnection, ec.Username, ec.Timestamp, ec.TenantId);
+            SetSqlSessionContext(dbConnection, ec.Username, ec.Timestamp, ec.TenantId, ec.UserId);
         }
 
         /// <summary>

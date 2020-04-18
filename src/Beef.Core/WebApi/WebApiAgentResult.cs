@@ -2,7 +2,6 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -100,6 +99,9 @@ namespace Beef.WebApi
 
                     case Beef.ErrorType.DuplicateError:
                         throw new DuplicateException(ErrorMessage);
+
+                    case Beef.ErrorType.AuthenticationError:
+                        throw new AuthenticationException(ErrorMessage);
                 }
             }
 
