@@ -126,6 +126,9 @@ namespace Beef.Database.Core.Sql
                     continue;
 
                 // Remove comments.
+                if (txt.StartsWith("--", StringComparison.InvariantCulture))
+                    continue;
+
                 var ci = txt.IndexOf("--", StringComparison.InvariantCulture);
                 if (ci >= 0)
                     txt = txt.Substring(0, ci - 1).TrimEnd();
