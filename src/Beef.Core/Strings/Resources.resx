@@ -123,6 +123,9 @@
   <data name="Beef.ArgumentFormat" xml:space="preserve">
     <value>{0} is required.</value>
   </data>
+  <data name="Beef.AuthenticationException" xml:space="preserve">
+    <value>An authentication error occured; the credentials you provided are not valid.</value>
+  </data>
   <data name="Beef.AuthorizationException" xml:space="preserve">
     <value>An authorization error occurred; you are not permitted to perform this action.</value>
   </data>

@@ -16,7 +16,6 @@ namespace Beef
         /// </summary>
         public static bool ShouldExceptionBeLogged { get; set; }
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConflictException"/> class.
         /// </summary>

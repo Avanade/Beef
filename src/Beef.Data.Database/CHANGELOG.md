@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhancement:* `Database.SetSqlSessionContext` now supports the passing of a `UserId`. This will default to the `ExecutionContext.UserId`.
+
+## v3.1.2
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).
 - *Added:* Nullable rollout phase: https://devblogs.microsoft.com/dotnet/embracing-nullable-reference-types/

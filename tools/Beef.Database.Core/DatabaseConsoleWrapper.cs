@@ -127,7 +127,7 @@ namespace Beef.Database.Core
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
         public async Task<int> RunAsync(string[] args)
         {
-            using var app = new CommandLineApplication(false)
+            using var app = new CommandLineApplication()
             {
                 Name = "beef.database.core",
                 Description = "Business Entity Execution Framework (Beef) Database Tooling."

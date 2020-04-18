@@ -36,7 +36,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GenderGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Gender>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(ReferenceData.Current.Gender, codes, text, includeInactive: this.IncludeInactive())),
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -50,7 +50,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult EyeColorGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.EyeColor>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(ReferenceData.Current.EyeColor, codes, text, includeInactive: this.IncludeInactive())),
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(RefDataNamespace.ReferenceData.Current.EyeColor, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -64,7 +64,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult PowerSourceGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.PowerSource>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(ReferenceData.Current.PowerSource, codes, text, includeInactive: this.IncludeInactive())),
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(RefDataNamespace.ReferenceData.Current.PowerSource, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
@@ -78,7 +78,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Company>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult CompanyGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Company>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(ReferenceData.Current.Company, codes, text, includeInactive: this.IncludeInactive())),
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(RefDataNamespace.ReferenceData.Current.Company, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
@@ -98,16 +98,16 @@ namespace Beef.Demo.Api.Controllers
                 var refSelection = this.ReferenceDataSelection();
 
                 var names = refSelection.Select(x => x.Key).ToArray();
-                await ReferenceData.Current.PrefetchAsync(names);
+                await RefDataNamespace.ReferenceData.Current.PrefetchAsync(names);
 
                 foreach (var q in refSelection)
                 {
                     switch (q.Key)
                     {
-                        case var s when string.Compare(s, nameof(ReferenceData.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(ReferenceData.Gender), ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(ReferenceData.Current.Gender, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(ReferenceData.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(ReferenceData.EyeColor), ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(ReferenceData.Current.EyeColor, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(ReferenceData.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(ReferenceData.PowerSource), ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(ReferenceData.Current.PowerSource, q.Value, includeInactive: inactive))); break;
-                        case var s when string.Compare(s, nameof(ReferenceData.Company), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(ReferenceData.Company), ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(ReferenceData.Current.Company, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Gender), ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.EyeColor), ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(RefDataNamespace.ReferenceData.Current.EyeColor, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PowerSource), ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(RefDataNamespace.ReferenceData.Current.PowerSource, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.Company), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Company), ReferenceDataFilter.ApplyFilter<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(RefDataNamespace.ReferenceData.Current.Company, q.Value, includeInactive: inactive))); break;
                     }
                 }
                 

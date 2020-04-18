@@ -1,4 +1,6 @@
-﻿CREATE FUNCTION [dbo].[fnGetUsername]
+﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+CREATE FUNCTION [dbo].[fnGetUsername]
 (
 	@Override AS NVARCHAR(1024) = null
 )

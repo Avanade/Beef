@@ -46,7 +46,7 @@ namespace Beef.Database.Core
         /// </summary>
         private DatabaseConsole()
         {
-            App = new CommandLineApplication(false)
+            App = new CommandLineApplication()
             {
                 Name = "beef.database",
                 Description = "Business Entity Execution Framework (Beef) Database Tooling."

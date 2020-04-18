@@ -2,8 +2,13 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.2
+## v3.1.3
 - *Enhancement:* Added code-generation templates and configuration for gRPC support.
+
+## v3.1.2
+- *Fixed:* `ReferenceDataData` code generation for Cosmos DB was generating invalid code where the entity had addtional properties which has been corrected.
+- *Fixed:* `ReferenceDataServiceAgent` and `ReferenceDataAgent` code generation where a `RefDataNamespace` is defined.
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 
 ## v3.1.1
 - *Upgrade:* Upgraded the project to .NET Standard 2.1 (compatible with .NET Core 3.1).

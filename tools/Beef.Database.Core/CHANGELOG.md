@@ -2,6 +2,12 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancement:* Added `fnGetUserId` and updated `spSetSessionContext` to support the new `ExecutionContext.UserId`.
+
+## v3.1.3
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.2
 - *Fixed:* Migrations scripts were being executed by `DbUp` in alphabetical order regardless of Assembly order (`DbUp` default); now will execute in Assembly, then alphabetical order (override).
 - *Fixed:* Migrations scripts were being executed by `DbUp` as `WithTransactionPerScript` which has been updated to `WithoutTransaction` as some DDL statements cannot run within a transactional context. However, it is recommended where possible that each migration script is transactional to avoid partial update on script failure; i.e. each script should only perform a single unit of work to ensure database consistency at all times.

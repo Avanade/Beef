@@ -87,6 +87,8 @@ namespace Beef.Demo.Api
                 if (File.Exists(xmlFile))
                     c.IncludeXmlComments(xmlFile);
             });
+
+            services.AddSwaggerGenNewtonsoftSupport();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

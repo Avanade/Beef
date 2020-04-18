@@ -1,4 +1,6 @@
-﻿CREATE PROCEDURE [dbo].[spThrowNotFoundException]
+﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+CREATE PROCEDURE [dbo].[spThrowNotFoundException]
 	@Message NVARCHAR(2048) = NULL
 AS
 BEGIN

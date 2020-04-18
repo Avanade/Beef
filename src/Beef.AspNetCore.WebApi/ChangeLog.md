@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.2
 - *Enhancement:* Conversion to an intermediary `JToken` will only occur where field filtering is requested; otherwise, it will default to the standard ASP.NET serialization. Given that filtering is infrequently used this avoids an unnecessary conversion, which in micro-benchmark testing resulted in 2-4 times better serialization performance.
 

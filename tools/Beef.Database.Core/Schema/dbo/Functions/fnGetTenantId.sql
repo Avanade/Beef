@@ -1,4 +1,6 @@
-﻿CREATE FUNCTION [dbo].[fnGetTenantId]
+﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
+
+CREATE FUNCTION [dbo].[fnGetTenantId]
 (
 	@Override as uniqueidentifier = null
 )
@@ -17,4 +19,3 @@ BEGIN
 
 	RETURN @TenantId
 END
-

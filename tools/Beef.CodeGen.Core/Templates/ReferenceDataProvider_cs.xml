@@ -29,7 +29,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
     /// </summary>
-    public class ReferenceDataProvider : ReferenceData
+    public class ReferenceDataProvider : ]]>
+  <If Condition="Config.RefDataNamespace != null">
+    <![CDATA[RefDataNamespace.]]>
+  </If>
+  <If Condition="Config.RefDataBusNamespace != null and Config.RefDataNamespace == null">
+    <![CDATA[RefDataBusNamespace.]]>
+  </If>
+  <![CDATA[ReferenceData
     {
         #region Collections
 

@@ -137,21 +137,25 @@ namespace Beef.Entities
         /// Overrides/updates the <see cref="Skip"/> value.
         /// </summary>
         /// <param name="skip">The new skip value.</param>
-        public void OverrideSkip(long skip)
+        /// <returns>The <see cref="PagingArgs"/> instance to support fluent-style method chaining.</returns>
+        public PagingArgs OverrideSkip(long skip)
         {
             if (skip == Skip)
-                return;
+                return this;
 
             Skip = skip < 0 ? 0 : skip;
+            return this;
         }
 
         /// <summary>
         /// Overrides/updates the <see cref="Take"/> value bypassing the <see cref="MaxTake"/> checking.
         /// </summary>
         /// <param name="take">The new take value.</param>
-        public void OverrideTake(long take)
+        /// <returns>The <see cref="PagingArgs"/> instance to support fluent-style method chaining.</returns>
+        public PagingArgs OverrideTake(long take)
         {
             Take = take < 0 ? 0 : take;
+            return this;
         }
 
         /// <summary>

@@ -78,7 +78,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
     <![CDATA[        [ProducesResponseType(typeof(IEnumerable<{{Entity.EntityName}}>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult {{Entity.Name}}GetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<{{Entity.EntityName}}>>(this, 
-            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, codes, text, includeInactive: this.IncludeInactive())),
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(]]>
+        <If Condition="Config.RefDataNamespace != null">
+          <![CDATA[RefDataNamespace.]]>
+        </If>
+        <![CDATA[ReferenceData.Current.{{Entity.Name}}, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 ]]>
   </Entity>
@@ -105,7 +109,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 var refSelection = this.ReferenceDataSelection();
 
                 var names = refSelection.Select(x => x.Key).ToArray();
-                await ReferenceData.Current.PrefetchAsync(names);
+                await ]]>
+                <If Condition="Config.RefDataNamespace != null">
+                  <![CDATA[RefDataNamespace.]]>
+                </If>
+                <![CDATA[ReferenceData.Current.PrefetchAsync(names);
 
                 foreach (var q in refSelection)
                 {
@@ -113,7 +121,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                     {
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.EntityScope == 'Common'">
-    <![CDATA[                        case var s when string.Compare(s, nameof(ReferenceData.{{Entity.Name}}), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(ReferenceData.{{Entity.Name}}), ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(ReferenceData.Current.{{Entity.Name}}, q.Value, includeInactive: inactive))); break;
+    <![CDATA[                        case var s when string.Compare(s, nameof({{Entity.EntityName}}), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof({{Entity.EntityName}}), ReferenceDataFilter.ApplyFilter<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(]]>
+  <If Condition="Config.RefDataNamespace != null">
+    <![CDATA[RefDataNamespace.]]>
+  </If>
+  <![CDATA[ReferenceData.Current.{{Entity.Name}}, q.Value, includeInactive: inactive))); break;
 ]]>
   </Entity>
   <![CDATA[                    }

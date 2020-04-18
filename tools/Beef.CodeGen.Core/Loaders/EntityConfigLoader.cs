@@ -215,6 +215,7 @@ namespace Beef.CodeGen.Loaders
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "Id");
                 p.AttributeAdd("ArgumentName", "id");
+                p.AttributeAdd("PrivateName", "_id");
                 p.AttributeAdd("Text", "{{" + config.GetAttributeValue<string>("Name") + "}} identifier");
                 p.AttributeAdd("Type", refDataType);
                 p.AttributeAdd("UniqueKey", "true");
@@ -228,6 +229,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "Code");
+                p.AttributeAdd("ArgumentName", "code");
+                p.AttributeAdd("PrivateName", "_code");
                 p.AttributeAdd("Type", "string");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);
@@ -237,6 +240,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "Text");
+                p.AttributeAdd("ArgumentName", "text");
+                p.AttributeAdd("PrivateName", "_text");
                 p.AttributeAdd("Type", "string");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);
@@ -246,6 +251,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "IsActive");
+                p.AttributeAdd("ArgumentName", "isActive");
+                p.AttributeAdd("PrivateName", "_isActive");
                 p.AttributeAdd("Type", "bool");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);
@@ -255,6 +262,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "SortOrder");
+                p.AttributeAdd("ArgumentName", "sortOrder");
+                p.AttributeAdd("PrivateName", "_sortOrder");
                 p.AttributeAdd("Type", "int");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);
@@ -264,6 +273,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "ETag");
+                p.AttributeAdd("ArgumentName", "etag");
+                p.AttributeAdd("PrivateName", "_etag");
                 p.AttributeAdd("Type", "string");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);
@@ -273,6 +284,8 @@ namespace Beef.CodeGen.Loaders
             {
                 CodeGenConfig p = new CodeGenConfig("Property", config);
                 p.AttributeAdd("Name", "ChangeLog");
+                p.AttributeAdd("ArgumentName", "changeLog");
+                p.AttributeAdd("PrivateName", "_changeLog");
                 p.AttributeAdd("Type", "ChangeLog");
                 p.AttributeAdd("Inherited", "true");
                 propsConfig.Insert(i++, p);

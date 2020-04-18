@@ -23,6 +23,7 @@ namespace Beef
         private static Func<ExecutionContext?> _get = () => _asyncLocal.Value;
         private static Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
 
+        private Guid? _userId;
         private string? _username;
         private Guid? _tenantId;
         private string? _partitionKey;
@@ -180,6 +181,22 @@ namespace Beef
         /// Gets or sets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
         /// </summary>
         public OperationType OperationType { get; set; } = OperationType.Unspecified;
+
+        /// <summary>
+        /// Gets or sets the user identifier. This value is immutable.
+        /// </summary>
+        public Guid? UserId
+        {
+            get => _userId;
+
+            set
+            {
+                if (_userId != null && value != _userId)
+                    throw new ArgumentException(ImmutableText);
+
+                _userId = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the username for the request. This value is immutable.

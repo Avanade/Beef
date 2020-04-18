@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-
 namespace Beef.Data.Database
 {
     /// <summary>
@@ -59,18 +58,23 @@ namespace Beef.Data.Database
         public static string ReturnValueName { get; set; } = "ReturnValue";
 
         /// <summary>
-        /// Gets or sets the <b>TenantId</b> name (use by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
+        /// Gets or sets the <b>TenantId</b> name (used by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
         /// </summary>
         public static string SessionContextTenantId { get; set; } = "TenantId";
 
         /// <summary>
-        /// Gets or sets the <b>Username</b> name (use by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
+        /// Gets or sets the <b>Username</b> name (used by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
         /// </summary>
         public static string SessionContextUsername { get; set; } = "Username";
 
         /// <summary>
-        /// Gets or sets the <b>Timestamp</b> name (use by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
+        /// Gets or sets the <b>Timestamp</b> name (used by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
         /// </summary>
         public static string SessionContextTimestamp { get; set; } = "Timestamp";
+
+        /// <summary>
+        /// Gets or sets the <b>UserId</b> name (used by <see cref="Database{TDefault}.SetSqlSessionContext(System.Data.Common.DbConnection)"/>).
+        /// </summary>
+        public static string SessionContextUserId { get; set; } = "UserId";
     }
 }
