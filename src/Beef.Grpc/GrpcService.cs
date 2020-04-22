@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using grpc = Grpc.Core;
 namespace Beef.Grpc
 {
     /// <summary>
-    /// Provides the base <b>gRPC</b> Service capability.
+    /// Provides the base <b>gRPC</b> Service (server) capability.
     /// </summary>
     public abstract class GrpcServiceBase
     {
@@ -34,9 +35,9 @@ namespace Beef.Grpc
         public const string ExecutionContextPropertyKey = "Beef.Grpc.GrpcServiceBase";
 
         /// <summary>
-        /// Gets or sets the <see cref="Exception"/> handler that converts into a <see cref="grpc.Status"/> and throws a <see cref="grpc.RpcException"/> (by default set up to execute <see cref="CreateStatusFromException(GrpcServiceBase, Exception)"/>).
+        /// Gets or sets the <see cref="Exception"/> handler that throws a  corresponding <see cref="grpc.RpcException"/> (by default set up to execute <see cref="ThrowRpcExceptionFromException(GrpcServiceBase, Exception)"/>).
         /// </summary>
-        public Action<GrpcServiceBase, Exception> ExceptionHandler { get; set; } = (gs, ex) => CreateStatusFromException(gs, ex);
+        public Action<GrpcServiceBase, Exception> ExceptionHandler { get; set; } = (gs, ex) => ThrowRpcExceptionFromException(gs, ex);
 
         /// <summary>
         /// Create <see cref="grpc.Status"/> from the <see cref="Exception"/>.
@@ -44,7 +45,7 @@ namespace Beef.Grpc
         /// <param name="service">The <see cref="GrpcServiceBase"/>.</param>
         /// <param name="exception">The <see cref="Exception"/>.</param>
         /// <returns>The corresponding <see cref="grpc.Status"/>.</returns>
-        public static void CreateStatusFromException(GrpcServiceBase service, Exception exception)
+        public static void ThrowRpcExceptionFromException(GrpcServiceBase service, Exception exception)
         {
             if (service == null)
                 throw new ArgumentNullException(nameof(service));
@@ -73,6 +74,7 @@ namespace Beef.Grpc
 
                 grpc.Status? status = ex.ErrorType switch
                 {
+                    ErrorType.AuthenticationError => new grpc.Status(grpc.StatusCode.Unauthenticated, exception.Message),
                     ErrorType.AuthorizationError => new grpc.Status(grpc.StatusCode.PermissionDenied, exception.Message),
                     ErrorType.BusinessError => new grpc.Status(grpc.StatusCode.InvalidArgument, exception.Message),
                     ErrorType.ConcurrencyError => new grpc.Status(grpc.StatusCode.Aborted, exception.Message),
@@ -190,7 +192,7 @@ namespace Beef.Grpc
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
-        //[DebuggerStepThrough()]
+        [DebuggerStepThrough()]
         private async Task ExecuteResultAsyncInternal(Func<Task> func)
         {
             try
@@ -210,7 +212,7 @@ namespace Beef.Grpc
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
-        //[DebuggerStepThrough()]
+        [DebuggerStepThrough()]
         private async Task<TResult> ExecuteResultAsyncInternal<TResult>(Func<Task<TResult>> func)
         {
             try
@@ -233,9 +235,6 @@ namespace Beef.Grpc
             catch (grpc.RpcException) { throw; }
             catch (Exception ex)
             {
-                Context.ResponseTrailers.Add(GrpcConsts.ErrorTypeHeaderName, "ABC");
-                Context.ResponseTrailers.Add(GrpcConsts.ErrorCodeHeaderName, "123");
-
                 ExceptionHandler(this, ex);
                 throw;
             }

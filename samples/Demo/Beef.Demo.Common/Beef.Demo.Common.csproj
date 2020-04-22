@@ -19,6 +19,7 @@
     <Folder Include="Agents\Generated\" />
     <Folder Include="Agents\ServiceAgents\Generated\" />
     <Folder Include="Entities\Generated\" />
+    <Folder Include="Grpc\ServiceAgents\" />
   </ItemGroup>
 
   <ItemGroup>
