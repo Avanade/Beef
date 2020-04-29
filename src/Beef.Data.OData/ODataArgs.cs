@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Beef.Mapper;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http;
-using System.Text;
+using Soc = Simple.OData.Client;
 
 namespace Beef.Data.OData
 {
@@ -17,245 +15,127 @@ namespace Beef.Data.OData
     public interface IODataArgs
     {
         /// <summary>
-        /// Overrides the default HTTP Method for the request.
-        /// </summary>
-        HttpMethod OverrideHttpMethod { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="IODataMapper"/>.
-        /// </summary>
-        IODataMapper Mapper { get; set; }
-
-        /// <summary>
         /// Gets the <see cref="PagingResult"/>.
         /// </summary>
-        PagingResult Paging { get; }
+        PagingResult? Paging { get; }
 
         /// <summary>
-        /// Indicates whether there are any additional <see cref="Headers"/>.
+        /// Gets the <see cref="IEntityMapper"/>.
         /// </summary>
-        bool HasHeaders { get; }
+        IEntityMapper Mapper { get; }
+
+        /// <summary>
+        /// Gets the entity collection name.
+        /// </summary>
+        string? CollectionName { get; }
 
         /// <summary>
         /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
         /// </summary>
         bool NullOnNotFoundResponse { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ODataIfMatch"/> condition.
-        /// </summary>
-        ODataIfMatch IfMatch { get; set; }
-
-        /// <summary>
-        /// Gets the Headers <see cref="NameValueCollection"/> to be added to the OData request.
-        /// </summary>
-        NameValueCollection Headers { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="HttpRequestMessage"/>.
-        /// </summary>
-        HttpRequestMessage RequestMessage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="HttpResponseMessage"/>.
-        /// </summary>
-        HttpResponseMessage ResponseMessage { get; set; }
-
-        /// <summary>
-        /// Gets the <b>OData</b> query statement.
-        /// </summary>
-        /// <returns>The <b>OData</b> query statement.</returns>
-        string GetODataQuery();
     }
 
     /// <summary>
     /// Provides the base <b>OData</b> arguments capabilities.
     /// </summary>
-    public class ODataArgs : IODataArgs
+    public class ODataArgs<T, TModel> : IODataArgs where T : class, new() where TModel : class, new()
     {
-        private NameValueCollection _headers;
-
         /// <summary>
-        /// Creates a new instance of the <see cref="ODataArgs"/> class.
+        /// Initializes a new instance of the <see cref="ODataArgs{T, TModel}"/> class with a <paramref name="mapper"/>.
         /// </summary>
-        /// <returns>The <see cref="ODataArgs"/>.</returns>
-        public static ODataArgs Create()
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
+        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        public ODataArgs(IEntityMapper<T, TModel> mapper, string? collectionName = null)
         {
-            return new ODataArgs();
+            Mapper = Check.NotNull(mapper, nameof(mapper));
+            CollectionName = collectionName;
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ODataArgs"/> class overridding the <see cref="HttpMethod"/>.
+        /// Initializes a new instance of the <see cref="ODataArgs{T, TModel}"/> class with a <paramref name="mapper"/> and <paramref name="paging"/>.
         /// </summary>
-        /// <param name="overrideHttpMethod">The <see cref="HttpMethod"/>.</param>
-        /// <returns>The <see cref="ODataArgs"/>.</returns>
-        public static ODataArgs Create(HttpMethod overrideHttpMethod)
-        {
-            return new ODataArgs { OverrideHttpMethod = overrideHttpMethod };
-        }
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        public ODataArgs(IEntityMapper<T, TModel> mapper, PagingArgs paging, string? collectionName = null) 
+            : this(mapper, new PagingResult(Check.NotNull(paging, nameof(paging))), collectionName) { }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ODataArgs"/> class overridding the <see cref="IfMatch"/>.
+        /// Initializes a new instance of the <see cref="ODataArgs{T, TModel}"/> class.
         /// </summary>
-        /// <param name="ifMatch">The <see cref="HttpMethod"/>.</param>
-        /// <returns>The <see cref="ODataArgs"/>.</returns>
-        public static ODataArgs Create(ODataIfMatch ifMatch)
-        {
-            return new ODataArgs { IfMatch = ifMatch };
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataArgs"/> class.
-        /// </summary>
+        /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        public ODataArgs(PagingArgs paging) : this(new PagingResult(paging ?? throw new ArgumentNullException(nameof(paging)))) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataArgs"/> class.
-        /// </summary>
-        /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        public ODataArgs(PagingResult paging = null)
+        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        public ODataArgs(IEntityMapper<T, TModel> mapper, PagingResult paging, string? collectionName = null) : this(mapper, collectionName)
         {
-            Paging = paging;
+            Paging = Check.NotNull(paging, nameof(paging));
         }
-
-        /// <summary>
-        /// Overrides the default <see cref="HttpMethod"/> for the request.
-        /// </summary>
-        public HttpMethod OverrideHttpMethod { get; set; }
 
         /// <summary>
         /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/>.
         /// </summary>
-        public bool NullOnNotFoundResponse { get; set; }
+        public bool NullOnNotFoundResponse { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the <see cref="ODataIfMatch"/> condition.
+        /// Gets the <see cref="IEntityMapper"/>.
         /// </summary>
-        public ODataIfMatch IfMatch { get; set; } = ODataIfMatch.UpdateEtag;
+        IEntityMapper IODataArgs.Mapper => Mapper;
 
         /// <summary>
-        /// Gets or sets the <see cref="IODataMapper"/> (<see cref="ODataAutoMapper"/> is used where no value is specified).
+        /// Gets or sets the <see cref="IEntityMapper{T, TModel}"/>.
         /// </summary>
-        public IODataMapper Mapper { get; set; }
+        public IEntityMapper<T, TModel> Mapper { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="PagingResult"/> (where paging is required for a <b>query</b>).
         /// </summary>
-        public PagingResult Paging { get; private set; }
+        public PagingResult? Paging { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="NameValueCollection"/> that contains any additional headers that are to be added to the OData request.
+        /// Gets or sets the entity collection name where overridding the default.
         /// </summary>
-        public NameValueCollection Headers
+        public string? CollectionName { get; set; }
+
+        /// <summary>
+        /// Gets the converted <b>OData</b> keys from the specified keys.
+        /// </summary>
+        /// <param name="keys">The key values.</param>
+        /// <returns>The converted OData key values.</returns>
+        internal object[] GetODataKeys(IComparable?[] keys)
         {
-            get
+            if (keys == null || keys.Length == 0)
+                throw new ArgumentNullException(nameof(keys));
+
+            if (keys.Length != Mapper.UniqueKey.Count)
+                throw new ArgumentException($"The specified keys count '{keys.Length}' does not match the Mapper UniqueKey count '{Mapper.UniqueKey.Count}'.", nameof(keys));
+
+            var okeys = new object[keys.Length];
+            for (int i = 0; i < keys.Length; i++)
             {
-                if (_headers == null)
-                    _headers = new NameValueCollection();
-
-                return _headers;
-            }
-        }
-
-        /// <summary>
-        /// Indicates whether there are any additional <see cref="Headers"/>.
-        /// </summary>
-        public bool HasHeaders { get => _headers != null && _headers.Count > 0; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="HttpRequestMessage"/>.
-        /// </summary>
-        public HttpRequestMessage RequestMessage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="HttpResponseMessage"/>.
-        /// </summary>
-        public HttpResponseMessage ResponseMessage { get; set; }
-
-        /// <summary>
-        /// Gets the <b>OData</b> query statement.
-        /// </summary>
-        /// <returns>The <b>OData</b> query statement.</returns>
-        public virtual string GetODataQuery() => $"$select={Mapper.GetODataFieldNamesQuery()}";
-    }
-
-    /// <summary>
-    /// Provides the typed-mapper <b>OData</b> arguments capabilities.
-    /// </summary>
-    /// <typeparam name="T">The entity <see cref="Type"/>.</typeparam>
-    public class ODataArgs<T> : ODataArgs where T : class, new()
-    {
-        private List<Tuple<IODataMapper, string>> _expandList;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataArgs{T}"/> class.
-        /// </summary>
-        /// <param name="mapper">The <see cref="IODataMapper{TSrce}"/>.</param>
-        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public ODataArgs(IODataMapper<T> mapper, PagingArgs paging) : base(paging)
-        {
-            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataArgs"/> class.
-        /// </summary>
-        /// <param name="mapper">The <see cref="IODataMapper{TSrce}"/>.</param>
-        /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        public ODataArgs(IODataMapper<T> mapper, PagingResult paging = null) : base(paging)
-        {
-            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
-
-        /// <summary>
-        /// Chains one or more OData <b>$expand</b> query options to include the related entity(s); only applicable for a <see cref="ODataBase.GetAsync{T}(ODataArgs, IComparable[])"/>.
-        /// </summary>
-        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-        /// <param name="propertyExpression">The <see cref="Expression"/> to the underlying property that references the related entity.</param>
-        /// <param name="odataExpandName">Specifies the OData expand name (will default to configured OData entity name where <c>null</c>).</param>
-        /// <returns>The <see cref="ODataArgs{T}"/> (enables fluent).</returns>
-        public ODataArgs<T> Expand<TProperty>(Expression<Func<T, TProperty>> propertyExpression, string odataExpandName = null) where TProperty : class
-        {
-            if (propertyExpression == null)
-                throw new ArgumentNullException(nameof(propertyExpression));
-
-            if (propertyExpression.Body.NodeType != ExpressionType.MemberAccess)
-                throw new InvalidOperationException("Only Member access expressions are supported.");
-
-            var me = (MemberExpression)propertyExpression.Body;
-            var map = Mapper.GetBySrcePropertyName(me.Member.Name);
-            if (map == null || map.Mapper == null)
-                throw new ArgumentException($"Expand Property '{me.Member.Name}' must have ODataPropertyMapper configuration with a corresponding complex type Mapper to enable.");
-
-            if (_expandList == null)
-                _expandList = new List<Tuple<IODataMapper, string>>();
-
-            _expandList.Add(new Tuple<IODataMapper, string>((IODataMapper)map.Mapper, string.IsNullOrEmpty(odataExpandName) ? map.DestPropertyName : odataExpandName));
-            return this;
-        }
-
-        /// <summary>
-        /// Indicates whether one or more <see cref="Expand{TProperty}(Expression{Func{T, TProperty}}, string)"/> entities have been selected.
-        /// </summary>
-        public bool HasExpand => _expandList != null;
-
-        /// <summary>
-        /// Gets the <b>OData</b> query statement.
-        /// </summary>
-        /// <returns>The <b>OData</b> query statement.</returns>
-        public override string GetODataQuery()
-        {
-            if (!HasExpand)
-                return base.GetODataQuery();
-
-            var sb = new StringBuilder(base.GetODataQuery());
-            foreach (var map in _expandList)
-            {
-                sb.Append($"&$expand={map.Item2}($select={map.Item1.GetODataFieldNamesQuery()})");
+                okeys[i] = Mapper.UniqueKey[0].ConvertToDestValue(keys[0], OperationTypes.Unspecified)!;
             }
 
-            return sb.ToString();
+            return okeys;
+        }
+
+        /// <summary>
+        /// Gets the converted <b>OData</b> keys from the entity value.
+        /// </summary>
+        /// <param name="value">The entity value.</param>
+        /// <returns>The OData OData key values.</returns>
+        internal object[] GetODataKeys(T value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            var okeys = new object[Mapper.UniqueKey.Count];
+            for (int i = 0; i < Mapper.UniqueKey.Count; i++)
+            {
+                var v = Mapper.UniqueKey[i].GetSrceValue(value, OperationTypes.Unspecified);
+                okeys[i] = Mapper.UniqueKey[i].ConvertToDestValue(v, OperationTypes.Unspecified)!;
+            }
+
+            return okeys;
         }
     }
 }

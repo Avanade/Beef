@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
 using Beef.Data.OData;
+using Soc = Simple.OData.Client;
 using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
@@ -32,7 +33,7 @@ namespace Beef.Demo.Business.Data
         private readonly Func<Product?, int, Task>? _getOnAfterAsync;
         private readonly Action<Exception>? _getOnException;
 
-        private readonly Func<IQueryable<Product>, ProductArgs?, IODataArgs, IQueryable<Product>>? _getByArgsOnQuery;
+        private readonly Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
         private readonly Func<ProductArgs?, IODataArgs, Task>? _getByArgsOnBeforeAsync;
         private readonly Func<ProductCollectionResult, ProductArgs?, Task>? _getByArgsOnAfterAsync;
         private readonly Action<Exception>? _getByArgsOnException;
@@ -52,7 +53,7 @@ namespace Beef.Demo.Business.Data
                 Product? __result;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await TestOData.Default.GetAsync<Product?>(__dataArgs, id).ConfigureAwait(false);
+                __result = await TestOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
@@ -71,9 +72,7 @@ namespace Beef.Demo.Business.Data
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!);
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = await TestOData.Default.SelectQueryAsync<ProductCollection, Product>(__dataArgs,
-                    q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).ConfigureAwait(false);
-
+                __result.Result = TestOData.Default.Query(__dataArgs, q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<ProductCollection>();
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
@@ -82,16 +81,16 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Product"/> entity and OData property mapping.
         /// </summary>
-        public partial class ODataMapper : ODataMapper<Product, ODataMapper>
+        public partial class ODataMapper : ODataMapper<Product, Model.Product, ODataMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ODataMapper"/> class.
             /// </summary>
-            public ODataMapper() : base("Products")
+            public ODataMapper()
             {
-                Property(s => s.Id, "ID").SetUniqueKey(false);
-                Property(s => s.Name);
-                Property(s => s.Description);
+                Property(s => s.Id, d => d.ID).SetUniqueKey(false);
+                Property(s => s.Name, d => d.Name);
+                Property(s => s.Description, d => d.Description);
                 ODataMapperCtor();
             }
             

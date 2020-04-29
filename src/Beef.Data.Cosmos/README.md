@@ -62,7 +62,7 @@ Property | Description
 -|-
 `ContainerId` | The Cosmos `Container` identifier.
 `PartitionKey` | The [PartitionKey](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.partitionkey) (defaults to `PartitionKey.None`).
-`Paging` | The [paging](../Beef.Core/Entities/PagingResult.cs) configuration (used by **query** operation only).
+`Paging` | The [paging](../Beef.Core/Entities/PagingResult.cs) configuration (used by `Query` operation only).
 `ItemRequestOptions` | The [`ItemRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.itemrequestoptions) used for `Get`, `Create`, `Update` and `Delete`.
 `QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
 `NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
@@ -73,7 +73,7 @@ The following demonstrates the usage:
 
 ``` csharp
 var args1 = CosmosMapper.Default.CreateArgs("Persons");
-var args1 = CosmosMapper.Default.CreateArgs("Persons", paging);
+var args2 = CosmosMapper.Default.CreateArgs("Persons", paging);
 ```
 
 <br/>
@@ -132,7 +132,6 @@ Operation | Description
 `SelectSingle` | Selects a single item.**<sup>*</sup>**
 `SelectSingleOrDefault` | Selects a single item or default.**<sup>*</sup>**
 `SelectQuery` | Select multiple items and either creates, or updates an existing, collection. Where the corresponding [`CosmosDbArgs.Paging`](./CosmosDbArgs.cs) is provided the configured paging, and optional get count, will be enacted.
-`SelectValueQuery` | Select multiple items as per the `SelectQuery`; however, as the data was persisted using [`CosmosDbTypeValue`](./CosmosDbTypeValue.cs) this will ensure only the `Value` will be selected into the resulting collection.
 
 **<sup>*</sup>** These are provided for use versus than the default `IQueryable` equivalents (which are currently not supported) as they will only internally page one or two items accordingly to minimise query and data costs. Paging cannot be applied more than once as it will result in a invalid sub-query.
 

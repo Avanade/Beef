@@ -77,7 +77,7 @@ namespace Beef.Template.Solution.UnitTest
             var (exitCode, stdOut) = ExecuteCommand("dotnet", "nuget locals global-packages --list");
             Assert.GreaterOrEqual(0, exitCode);
 
-            var nugets = new DirectoryInfo(stdOut.Replace("info : global-packages: ", string.Empty));
+            var nugets = new DirectoryInfo(stdOut.Replace("info : global-packages: ", string.Empty).Replace("global-packages: ", string.Empty));
             Assert.IsTrue(nugets.Exists);
             foreach (var di in nugets.EnumerateDirectories().Where(x => x.Name.StartsWith("beef.")))
             {

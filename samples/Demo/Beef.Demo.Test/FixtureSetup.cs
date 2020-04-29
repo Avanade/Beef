@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
             TestSetUp.RegisterSetUp(async (count, data) =>
             {
                 if (count == 0)
-                    DatabaseExecutor.RunAsync(DatabaseExecutorCommand.Drop, AgentTester.Configuration["ConnectionStrings:BeefDemo"]).GetAwaiter().GetResult();
+                    await DatabaseExecutor.RunAsync(DatabaseExecutorCommand.Drop, AgentTester.Configuration["ConnectionStrings:BeefDemo"]);
 
                 return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 

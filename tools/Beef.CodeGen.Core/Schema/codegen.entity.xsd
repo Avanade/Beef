@@ -956,7 +956,12 @@
             </xs:attribute>
             <xs:attribute name="ODataEntity" type="xs:string" use="optional">
               <xs:annotation>
-                <xs:documentation>Specifies the corresponding OData entity name (required where AutoImplement is 'OData').</xs:documentation>
+                <xs:documentation>Specifies the corresponding OData entity/model name (defaults to 'Name').</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ODataCollectionName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the name of the underlying OData collection (will attempt to infer from 'Name' where not specified).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="CosmosName" type="xs:string" use="optional">
@@ -1053,6 +1058,17 @@
               <xs:annotation>
                 <xs:documentation>Indicates whether a data model version of the entity should also be generated (Business/Data/Model).</xs:documentation>
               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="JsonSerializer" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the JSON Serializer to use for JSON property attribution (defaults to 'CodeGeneration.JsonSerializer' where specified; otherwise, 'Newtonsoft').</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="None"/>
+                  <xs:enumeration value="Newtonsoft"/>
+                </xs:restriction>
+              </xs:simpleType>
             </xs:attribute>
           </xs:complexType>
         </xs:element>
@@ -1192,15 +1208,26 @@
           <xs:documentation>Provides the default OData instance name (where AutoImplement is 'OData'); defaults to 'OData'.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-          <xs:attribute name="CosmosName" type="xs:string" use="optional">
+      <xs:attribute name="CosmosName" type="xs:string" use="optional">
         <xs:annotation>
           <xs:documentation>Provides the default Cosmos instance name (where AutoImplement is 'Cosmos'); defaults to 'CosmosDb'.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-          <xs:attribute name="EntityFrameworkName" type="xs:string" use="optional">
+      <xs:attribute name="EntityFrameworkName" type="xs:string" use="optional">
         <xs:annotation>
           <xs:documentation>Provides the default Entity Framework instance name (where AutoImplement is 'EntityFramework'); defaults to 'EfDb'.</xs:documentation>
         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="JsonSerializer" use="optional">
+        <xs:annotation>
+          <xs:documentation>Specifies the default JSON Serializer to use for JSON property attribution (defaults to 'Newtonsoft'). Can be overridden (specified) per 'Entity'.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None"/>
+            <xs:enumeration value="Newtonsoft"/>
+          </xs:restriction>
+        </xs:simpleType>
       </xs:attribute>
     </xs:complexType>
   </xs:element>

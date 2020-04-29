@@ -7,6 +7,7 @@ CREATE PROCEDURE [Ref].[spGenderCreate]
   ,@CreatedBy AS NVARCHAR(250) NULL = NULL
   ,@CreatedDate AS DATETIME2 NULL = NULL
   ,@AlternateName AS NVARCHAR(50) NULL = NULL
+  ,@TripCode AS NVARCHAR(50) NULL = NULL
   ,@ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -35,6 +36,7 @@ BEGIN
        ,[CreatedBy]
        ,[CreatedDate]
        ,[AlternateName]
+       ,[TripCode]
     )
     OUTPUT inserted.GenderId INTO @InsertedIdentity
     VALUES (
@@ -45,6 +47,7 @@ BEGIN
        ,@CreatedBy
        ,@CreatedDate
        ,@AlternateName
+       ,@TripCode
     )
 
     -- Get the inserted identity.

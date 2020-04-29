@@ -974,7 +974,7 @@ namespace Beef.Data.Database
                 var result = await DbCommand.ExecuteScalarAsync().ConfigureAwait(false);
                 var value = result is DBNull ? default : (T)result;
                 action?.Invoke(DbCommand.Parameters);
-                return value;
+                return value!;
             });
         }
 
