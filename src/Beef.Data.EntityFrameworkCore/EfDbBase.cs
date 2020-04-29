@@ -147,7 +147,7 @@ namespace Beef.Data.EntityFrameworkCore
                 if (saveArgs.SaveChanges)
                     await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
-                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
+                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
         }
 
@@ -203,7 +203,7 @@ namespace Beef.Data.EntityFrameworkCore
                 if (saveArgs.SaveChanges)
                     await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
-                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) : value;
+                return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
         }
 

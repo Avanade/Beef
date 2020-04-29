@@ -1,0 +1,8 @@
+-- Migration Script
+
+BEGIN TRANSACTION
+
+ALTER TABLE [Ref].[Gender]
+  ADD TripCode NVARCHAR(50) NULL
+	
+COMMIT TRANSACTION

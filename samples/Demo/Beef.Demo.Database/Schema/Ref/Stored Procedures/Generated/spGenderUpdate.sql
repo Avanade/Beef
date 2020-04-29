@@ -8,6 +8,7 @@ CREATE PROCEDURE [Ref].[spGenderUpdate]
   ,@UpdatedBy AS NVARCHAR(250) NULL = NULL
   ,@UpdatedDate AS DATETIME2 NULL = NULL
   ,@AlternateName AS NVARCHAR(50) NULL = NULL
+  ,@TripCode AS NVARCHAR(50) NULL = NULL
   ,@ReselectRecord AS BIT = 0
 AS
 BEGIN
@@ -48,6 +49,7 @@ BEGIN
         ,[UpdatedBy] = @UpdatedBy
         ,[UpdatedDate] = @UpdatedDate
         ,[AlternateName] = @AlternateName
+        ,[TripCode] = @TripCode
       WHERE [GenderId] = @GenderId
 
     -- Commit the transaction.

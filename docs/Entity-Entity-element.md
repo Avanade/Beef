@@ -61,6 +61,7 @@ Attribute | Description
 `GenericWithT` | Indicates whether the class should be defined as a generic with a single parameter `T`.
 `Namespace` | Name of the entity namespace appended to end of the standard `[company].[appname].Common.Entities.Namespace`.
 `OmitEntityBase` | Indicates that the entity does not inherit from `EntityBase` and therefore related capabilites are not supported (omitted from generation). As such, some features will no longer be supported. The intention for this is more for the generation of internal entities.
+`JsonSerializer` | Defines the JSON Serializer to use for JSON property attribution. Options are `None` or `Newtonsoft`. Defaults to `CodeGeneration.JsonSerializer` where specified; otherwise, `Newtonsoft`.
 
 <br>
 
@@ -124,7 +125,8 @@ The following represents the corresponding **OData** attributes:
 Attribute | Description
 ---|---
 `ODataName` | Specifies the .NET OData wrapper instance name where `AutoImplement` is `OData`. Defaults to `CodeGeneration.ODataName` (`OData`).
-`ODataEntity` | Specifies the corresponding OData entity name. Required where `AutoImplement` is `OData`.
+`ODataEntity` | Specifies the corresponding OData entity/model name. Defaults to `Name` (i.e. the same type).
+`ODataCollectionName` | Specifies the name of the underlying OData collection (will attempt to infer from `Name` where not specified).
 `DataODataMapperInheritsFrom` | Specifies the mapper that the generated OData mapper inherits from.
 `DataODataCustomMapper` | Indicates that a custom OData `Mapper` will be used; i.e. not generated. Otherwise, by default a `Mapper` is generated.
 

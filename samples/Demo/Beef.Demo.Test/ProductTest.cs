@@ -48,7 +48,20 @@ namespace Beef.Demo.Test
         }
 
         [Test, Parallelizable, TestSetUp(needsSetUp: false)]
-        public void C110_GetByArgs_Wildcard1()
+        public void C120_GetByArgs_Null_Paging()
+        {
+            var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run((a) => a.Agent.GetByArgsAsync(null, Entities.PagingArgs.CreateSkipAndTake(4, 2, true)));
+
+            // Check paging and total count.
+            Assert.AreEqual(2, pcr?.Value?.Result?.Count);
+            Assert.AreEqual(new string[] { "Fruit Punch", "Cranberry Juice" }, pcr.Value.Result.Select(x => x.Name).ToArray());
+            Assert.AreEqual(11, pcr.Value.Paging.TotalCount);
+        }
+
+        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        public void C130_GetByArgs_Wildcard1()
         {
             var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -60,7 +73,7 @@ namespace Beef.Demo.Test
         }
 
         [Test, Parallelizable, TestSetUp(needsSetUp: false)]
-        public void C110_GetByArgs_Wildcard2()
+        public void C140_GetByArgs_Wildcard2()
         {
             var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)

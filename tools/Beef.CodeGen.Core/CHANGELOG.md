@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhancement:* Code generation enhanced to support new approach to OData.
+- *Enhancement:* New `Entity.JsonSerializer` attribute added to control the entity/property serializer used. Currently supports `None` or `Newtonsoft`.
+
 ## v3.1.2
 - *Fixed:* `ReferenceDataData` code generation for Cosmos DB was generating invalid code where the entity had addtional properties which has been corrected.
 - *Fixed:* `ReferenceDataServiceAgent` and `ReferenceDataAgent` code generation where a `RefDataNamespace` is defined.

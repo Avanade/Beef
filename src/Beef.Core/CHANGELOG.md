@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.5
+- *Fixed:* `ReferenceDataConverterUtils.CheckIsValid` validation logic fixed.
+
 ## v3.1.4
 - *Enhanced:* Added `AuthenticationException` to enable standardized handling of this exception similar to the existing `AuthorizationException`. This allows for an _authentication_ exception to be thrown which in turn will result in an `HttpStatusCode.Unauthorized (401)`.
 - *Enhanced:* Added property `UserId` to `ExecutionContext`.

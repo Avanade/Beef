@@ -10,4 +10,19 @@
     <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" />
   </Entity>
- </CodeGeneration>
+  
+  <!-- OData model -->
+  <Entity Name="Product" OmitEntityBase="true">
+    <Property Name="ID" Type="int" />
+    <Property Name="Name" Type="string"/>
+    <Property Name="Description" Type="string"/>
+  </Entity>
+
+  <Entity Name="Person" JsonSerializer="None">
+    <Property Name="UserName" Type="string" />
+    <Property Name="FirstName" Type="string" />
+    <Property Name="LastName" Type="string" />
+    <!-- The endpoint always fails when Gender is passed; removed for now. -->
+    <!--<Property Name="Gender" Type="string" />-->
+  </Entity>
+</CodeGeneration>

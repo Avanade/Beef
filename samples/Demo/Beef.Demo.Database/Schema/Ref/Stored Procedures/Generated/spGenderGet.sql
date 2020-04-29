@@ -20,6 +20,7 @@ BEGIN
        ,[g].[UpdatedBy]
        ,[g].[UpdatedDate]
        ,[g].[AlternateName]
+       ,[g].[TripCode]
     FROM [Ref].[Gender] AS [g]
     WHERE [g].[GenderId] = @GenderId
 END

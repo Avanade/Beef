@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Fixed:* A new nullable compile error fixed that appeared with Visual Studio 2019 v16.5.4.
+
 ## v3.1.2
 - *Fixed:* A query was always applying paging even where not specified. Where no paging is specified all rows will be returned by default (as expected).
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.

@@ -41,6 +41,16 @@ namespace Beef.Demo.Common.Entities
             set => SetValue(ref _alternateName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AlternateName)); 
         }
 
+        /// <summary>
+        /// Gets or sets the Trip OData Code.
+        /// </summary>
+        [Display(Name="Trip Code")]
+        public string? TripCode
+        {
+            get => GetMapping<string>(nameof(TripCode));
+            set { var __tripCode = GetMapping<string>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.End, StringTransform.EmptyToNull, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
+        }
+
         #endregion
 
         #region Operator
@@ -87,6 +97,7 @@ namespace Beef.Demo.Common.Entities
         {
             CopyFrom((ReferenceDataBaseGuid)from);
             AlternateName = from.AlternateName;
+            TripCode = from.TripCode;
 
             OnAfterCopyFrom(from);
         }

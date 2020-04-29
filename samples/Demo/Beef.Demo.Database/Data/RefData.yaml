@@ -1,7 +1,7 @@
 ﻿Ref:
   - $Gender:
-    - M: Male
-    - F: Female
+    - { Code: M, Text: Male, TripCode: Male }
+    - { Code: F, Text: Female, TripCode: Female }
   - $EyeColor:
     - BLUE: Blue
     - BROWN: Brown
