@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+
 ## v3.1.5
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 

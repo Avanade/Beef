@@ -147,7 +147,7 @@ namespace Beef.Data.OData
         /// <param name="getArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        public async Task<T?> GetAsync<T, TModel>(ODataArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task<T?> GetAsync<T, TModel>(ODataArgs<T, TModel> getArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
         {
             if (getArgs == null)
                 throw new ArgumentNullException(nameof(getArgs));
@@ -235,7 +235,7 @@ namespace Beef.Data.OData
         /// <param name="saveArgs">The <see cref="ODataArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task DeleteAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new()
+        public async Task DeleteAsync<T, TModel>(ODataArgs<T, TModel> saveArgs, params IComparable?[] keys) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));

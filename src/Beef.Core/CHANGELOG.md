@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Enhanced:* Added `IEquatable<T>` to `EntityBase`, `EntityBaseCollection` and `ReferenceDataBase`. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation. 
+
 ## v3.1.5
 - *Fixed:* `ReferenceDataConverterUtils.CheckIsValid` validation logic fixed.
 

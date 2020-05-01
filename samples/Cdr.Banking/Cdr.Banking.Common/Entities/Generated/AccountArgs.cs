@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the <see cref="Account"/> arguments entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class AccountArgs : EntityBase
+    public partial class AccountArgs : EntityBase, IEquatable<AccountArgs>
     {
         #region Privates
 
@@ -89,6 +89,70 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is AccountArgs val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="AccountArgs"/> is equal to the current <see cref="AccountArgs"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(AccountArgs? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(ProductCategorySid, value.ProductCategorySid)
+                && Equals(OpenStatusSid, value.OpenStatusSid)
+                && Equals(IsOwned, value.IsOwned);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="AccountArgs"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="AccountArgs"/> A.</param>
+        /// <param name="b"><see cref="AccountArgs"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (AccountArgs? a, AccountArgs? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="AccountArgs"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="AccountArgs"/> A.</param>
+        /// <param name="b"><see cref="AccountArgs"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (AccountArgs? a, AccountArgs? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="AccountArgs"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="AccountArgs"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(ProductCategorySid);
+            hash.Add(OpenStatusSid);
+            hash.Add(IsOwned);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

@@ -573,8 +573,8 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.GetAsync(1.ToGuid())).Value;
 
             // Update the person with an address.
-            p.FirstName = p.FirstName + "X";
-            p.LastName = p.LastName + "Y";
+            p.FirstName += "X";
+            p.LastName += "Y";
             p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
 
             p = AgentTester.Create<PersonAgent, Person>()
@@ -697,8 +697,8 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.GetWithEfAsync(1.ToGuid())).Value;
 
             // Update the person with an address.
-            p.FirstName = p.FirstName + "X";
-            p.LastName = p.LastName + "Y";
+            p.FirstName += "X";
+            p.LastName += "Y";
             p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
 
             p = AgentTester.Create<PersonAgent, Person>()

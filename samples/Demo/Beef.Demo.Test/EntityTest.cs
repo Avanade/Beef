@@ -1,4 +1,5 @@
-﻿using Beef.Demo.Common.Entities;
+﻿using Beef.Demo.Business.Data;
+using Beef.Demo.Common.Entities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -137,8 +138,138 @@ namespace Beef.Demo.Test
             pf.AcceptChanges();
             pt.AcceptChanges();
             pt.CopyFrom(pf);
-            Assert.IsTrue(pt.IsChanged); // Collections always cloned - therefore changed.
+            Assert.IsFalse(pt.IsChanged); // Although copied, data is the same - not changed.
             Assert.AreNotSame(pf.History, pt.History);
+
+            pf.History[0].Name = "Blah, blah";
+            pf.AcceptChanges();
+
+            pt.CopyFrom(pf);
+            Assert.IsTrue(pt.IsChanged); // Copied, and data was changed.
+            Assert.AreNotSame(pf.History, pt.History);
+            Assert.AreEqual(pf.History, pt.History);
+        }
+
+        [Test]
+        public void Equality()
+        {
+            var g = Guid.NewGuid();
+            var p1 = new PersonDetail { Id = g, FirstName = "Barry" };
+            var p2 = p1;
+
+            var p3 = new PersonDetail { Id = g, FirstName = "Barry" };
+            var p4 = new PersonDetail { Id = g, FirstName = "Karen" };
+
+            object o = null;
+            Address a = new Address();
+            Person p5 = null;
+
+            // Null 
+            Assert.IsFalse(p1.Equals(o));
+            Assert.IsFalse(p1.Equals(p5));
+            Assert.IsFalse(p1 == null);
+            Assert.IsTrue(p1 != null);
+
+            // Same instance
+            Assert.IsTrue(p1.Equals(p2));
+            Assert.IsTrue(p1.Equals((object)p2));
+            Assert.IsTrue(p1 == p2);
+            Assert.IsFalse(p1 != p2);
+
+            // Same values
+            Assert.IsTrue(p1.Equals(p3));
+            Assert.IsTrue(p1.Equals((object)p3));
+            Assert.IsTrue(p1 == p3);
+            Assert.IsFalse(p1 != p3);
+
+            // Not same
+            Assert.IsFalse(p1.Equals(a));
+            Assert.IsFalse(p1.Equals(p4));
+            Assert.IsFalse(p1 == p4);
+            Assert.IsTrue(p1 != p4);
+
+            // Check into sub-entities.
+            p1.Address = new Address { Street = "X" };
+            p3.Address = new Address { Street = "X" };
+            Assert.IsTrue(p1.Equals(p3));
+
+            // Change the address to no longer match.
+            p3.Address.Street += "X";
+            Assert.IsFalse(p1.Equals(p3));
+
+            // Change the address back again.
+            p3.Address.Street = "X";
+            Assert.IsTrue(p1.Equals(p3));
+
+            // Compare the collections.
+            p1.History = new WorkHistoryCollection { new WorkHistory { Name = "Q", StartDate = new DateTime(2000, 01, 01) } };
+            p3.History = new WorkHistoryCollection { new WorkHistory { Name = "Q", StartDate = new DateTime(2000, 01, 01) } };
+            Assert.IsTrue(p1.Equals(p3));
+
+            // Change the collections to not match.
+            p3.History[0].StartDate = new DateTime(2001, 01, 01);
+            Assert.IsFalse(p1.Equals(p3));
+
+            // Change the collections back again.
+            p3.History[0].StartDate = new DateTime(2000, 01, 01);
+            Assert.IsTrue(p1.Equals(p3));
+
+            // Change the collections to not match.
+            p3.History.Add(new WorkHistory { Name = "W", StartDate = new DateTime(2010, 01, 01) });
+            Assert.IsFalse(p1.Equals(p3));
+
+            // Make the collections match again.
+            p1.History.Add(new WorkHistory { Name = "W", StartDate = new DateTime(2010, 01, 01) });
+            Assert.IsTrue(p1.Equals(p3));
+        }
+
+        [Test]
+        public void HashCode()
+        {
+            var g = Guid.NewGuid();
+            var p1 = new PersonDetail { Id = g, FirstName = "Barry" };
+            var p2 = p1;
+
+            var p3 = new PersonDetail { Id = g, FirstName = "Barry" };
+            var p4 = new PersonDetail { Id = g, FirstName = "Karen" };
+
+            Assert.AreEqual(p1.GetHashCode(), p2.GetHashCode());
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
+            Assert.AreNotEqual(p1.GetHashCode(), p4.GetHashCode());
+
+            // Check into sub-entities.
+            p1.Address = new Address { Street = "X" };
+            p3.Address = new Address { Street = "X" };
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Change the address to no longer match.
+            p3.Address.Street += "X";
+            Assert.AreNotEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Change the address back again.
+            p3.Address.Street = "X";
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Compare the collections.
+            p1.History = new WorkHistoryCollection { new WorkHistory { Name = "Q", StartDate = new DateTime(2000, 01, 01) } };
+            p3.History = new WorkHistoryCollection { new WorkHistory { Name = "Q", StartDate = new DateTime(2000, 01, 01) } };
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Change the collections to not match.
+            p3.History[0].StartDate = new DateTime(2001, 01, 01);
+            Assert.AreNotEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Change the collections back again.
+            p3.History[0].StartDate = new DateTime(2000, 01, 01);
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Change the collections to not match.
+            p3.History.Add(new WorkHistory { Name = "W", StartDate = new DateTime(2010, 01, 01) });
+            Assert.AreNotEqual(p1.GetHashCode(), p3.GetHashCode());
+
+            // Make the collections match again.
+            p1.History.Add(new WorkHistory { Name = "W", StartDate = new DateTime(2010, 01, 01) });
+            Assert.AreEqual(p1.GetHashCode(), p3.GetHashCode());
         }
     }
 }

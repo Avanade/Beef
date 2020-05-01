@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Account entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Account : EntityBase, IStringIdentifier
+    public partial class Account : EntityBase, IStringIdentifier, IEquatable<Account>
     {
         #region Privates
 
@@ -191,6 +191,82 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Account val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Account"/> is equal to the current <see cref="Account"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(Account? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(CreationDate, value.CreationDate)
+                && Equals(DisplayName, value.DisplayName)
+                && Equals(Nickname, value.Nickname)
+                && Equals(OpenStatusSid, value.OpenStatusSid)
+                && Equals(IsOwned, value.IsOwned)
+                && Equals(MaskedNumber, value.MaskedNumber)
+                && Equals(ProductCategorySid, value.ProductCategorySid)
+                && Equals(ProductName, value.ProductName);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="Account"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="Account"/> A.</param>
+        /// <param name="b"><see cref="Account"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (Account? a, Account? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="Account"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="Account"/> A.</param>
+        /// <param name="b"><see cref="Account"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (Account? a, Account? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="Account"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="Account"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(CreationDate);
+            hash.Add(DisplayName);
+            hash.Add(Nickname);
+            hash.Add(OpenStatusSid);
+            hash.Add(IsOwned);
+            hash.Add(MaskedNumber);
+            hash.Add(ProductCategorySid);
+            hash.Add(ProductName);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

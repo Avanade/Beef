@@ -66,6 +66,66 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is PersonDetail val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="PersonDetail"/> is equal to the current <see cref="PersonDetail"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(PersonDetail? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(History, value.History);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="PersonDetail"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="PersonDetail"/> A.</param>
+        /// <param name="b"><see cref="PersonDetail"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (PersonDetail? a, PersonDetail? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="PersonDetail"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="PersonDetail"/> A.</param>
+        /// <param name="b"><see cref="PersonDetail"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (PersonDetail? a, PersonDetail? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="PersonDetail"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="PersonDetail"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(History);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

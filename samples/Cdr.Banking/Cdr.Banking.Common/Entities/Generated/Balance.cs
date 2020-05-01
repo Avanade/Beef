@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Balance entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Balance : EntityBase
+    public partial class Balance : EntityBase, IEquatable<Balance>
     {
         #region Privates
 
@@ -138,6 +138,78 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Balance val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Balance"/> is equal to the current <see cref="Balance"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(Balance? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(CurrentBalance, value.CurrentBalance)
+                && Equals(AvailableBalance, value.AvailableBalance)
+                && Equals(CreditLimit, value.CreditLimit)
+                && Equals(AmortisedLimit, value.AmortisedLimit)
+                && Equals(Currency, value.Currency)
+                && Equals(Purses, value.Purses);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="Balance"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="Balance"/> A.</param>
+        /// <param name="b"><see cref="Balance"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (Balance? a, Balance? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="Balance"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="Balance"/> A.</param>
+        /// <param name="b"><see cref="Balance"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (Balance? a, Balance? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="Balance"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="Balance"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(CurrentBalance);
+            hash.Add(AvailableBalance);
+            hash.Add(CreditLimit);
+            hash.Add(AmortisedLimit);
+            hash.Add(Currency);
+            hash.Add(Purses);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

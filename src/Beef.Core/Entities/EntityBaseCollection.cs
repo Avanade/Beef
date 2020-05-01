@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -52,7 +53,7 @@ namespace Beef.Entities
     /// Represents an <see cref="EntityBase"/> collection class.
     /// </summary>
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="System.Type"/>.</typeparam>
-    public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection where TEntity : EntityBase
+    public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection, IEquatable<EntityBaseCollection<TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;
 
@@ -249,5 +250,54 @@ namespace Beef.Entities
         /// Indicates whether the entity has changed.
         /// </summary>
         public bool IsChanged { get; private set; }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is EntityBaseCollection<TEntity> val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EntityBaseCollection{TEntity}"/> is equal to the current <see cref="EntityBaseCollection{TEntity}"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(EntityBaseCollection<TEntity> value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null || Count != value.Count)
+                return false;
+
+            for (int i = 0; i < Count; i++)
+            {
+                if (!this[i].Equals(value[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="EntityBaseCollection{TEntity}"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="EntityBaseCollection{TEntity}"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            foreach (var item in this)
+            {
+                hash.Add(item);
+            }
+
+            return hash.ToHashCode();
+        }
     }
 }
