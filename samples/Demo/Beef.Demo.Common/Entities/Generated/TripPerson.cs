@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Trip Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class TripPerson : EntityBase, IStringIdentifier
+    public partial class TripPerson : EntityBase, IStringIdentifier, IEquatable<TripPerson>
     {
         #region Privates
 
@@ -96,6 +96,70 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is TripPerson val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="TripPerson"/> is equal to the current <see cref="TripPerson"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(TripPerson? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(FirstName, value.FirstName)
+                && Equals(LastName, value.LastName);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="TripPerson"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="TripPerson"/> A.</param>
+        /// <param name="b"><see cref="TripPerson"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (TripPerson? a, TripPerson? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="TripPerson"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="TripPerson"/> A.</param>
+        /// <param name="b"><see cref="TripPerson"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (TripPerson? a, TripPerson? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="TripPerson"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="TripPerson"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(FirstName);
+            hash.Add(LastName);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

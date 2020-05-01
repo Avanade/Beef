@@ -9,7 +9,7 @@ namespace Beef.Entities
     /// Represents a Change log class.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public class ChangeLog : EntityBase
+    public class ChangeLog : EntityBase, IEquatable<ChangeLog>
     {
         private DateTime? _createdDate;
         private string? _createdBy;
@@ -55,6 +55,72 @@ namespace Beef.Entities
             get => _updatedBy;
             set => SetValue(ref _updatedBy!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(UpdatedBy));
         }
+
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is ChangeLog val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ChangeLog"/> is equal to the current <see cref="ChangeLog"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(ChangeLog? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(CreatedDate, value.CreatedDate)
+                && Equals(CreatedBy, value.CreatedBy)
+                && Equals(UpdatedDate, value.UpdatedDate)
+                && Equals(UpdatedBy, value.UpdatedBy);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="ChangeLog"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="ChangeLog"/> A.</param>
+        /// <param name="b"><see cref="ChangeLog"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator ==(ChangeLog? a, ChangeLog? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="ChangeLog"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="ChangeLog"/> A.</param>
+        /// <param name="b"><see cref="ChangeLog"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator !=(ChangeLog? a, ChangeLog? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="ChangeLog"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="ChangeLog"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(CreatedDate);
+            hash.Add(CreatedBy);
+            hash.Add(UpdatedDate);
+            hash.Add(UpdatedBy);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+
+        #endregion
 
         #region ICopyFrom
 

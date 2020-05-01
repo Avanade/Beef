@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person : EntityBase, IETag, IChangeLog
+    public partial class Person : EntityBase, IETag, IChangeLog, IEquatable<Person>
     {
         #region Privates
 
@@ -242,6 +242,84 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Person val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Person"/> is equal to the current <see cref="Person"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(Person? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(FirstName, value.FirstName)
+                && Equals(LastName, value.LastName)
+                && Equals(UniqueCode, value.UniqueCode)
+                && Equals(GenderSid, value.GenderSid)
+                && Equals(EyeColorSid, value.EyeColorSid)
+                && Equals(Birthday, value.Birthday)
+                && Equals(Address, value.Address)
+                && Equals(ETag, value.ETag)
+                && Equals(ChangeLog, value.ChangeLog);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="Person"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="Person"/> A.</param>
+        /// <param name="b"><see cref="Person"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (Person? a, Person? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="Person"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="Person"/> A.</param>
+        /// <param name="b"><see cref="Person"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (Person? a, Person? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="Person"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="Person"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(FirstName);
+            hash.Add(LastName);
+            hash.Add(UniqueCode);
+            hash.Add(GenderSid);
+            hash.Add(EyeColorSid);
+            hash.Add(Birthday);
+            hash.Add(Address);
+            hash.Add(ETag);
+            hash.Add(ChangeLog);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

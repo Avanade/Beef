@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Credit Card Account entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class CreditCardAccount : EntityBase
+    public partial class CreditCardAccount : EntityBase, IEquatable<CreditCardAccount>
     {
         #region Privates
 
@@ -80,6 +80,72 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is CreditCardAccount val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="CreditCardAccount"/> is equal to the current <see cref="CreditCardAccount"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(CreditCardAccount? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(MinPaymentAmount, value.MinPaymentAmount)
+                && Equals(PaymentDueAmount, value.PaymentDueAmount)
+                && Equals(PaymentCurrency, value.PaymentCurrency)
+                && Equals(PaymentDueDate, value.PaymentDueDate);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="CreditCardAccount"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="CreditCardAccount"/> A.</param>
+        /// <param name="b"><see cref="CreditCardAccount"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (CreditCardAccount? a, CreditCardAccount? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="CreditCardAccount"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="CreditCardAccount"/> A.</param>
+        /// <param name="b"><see cref="CreditCardAccount"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (CreditCardAccount? a, CreditCardAccount? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="CreditCardAccount"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="CreditCardAccount"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(MinPaymentAmount);
+            hash.Add(PaymentDueAmount);
+            hash.Add(PaymentCurrency);
+            hash.Add(PaymentDueDate);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

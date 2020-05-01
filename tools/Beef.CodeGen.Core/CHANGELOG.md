@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhanced:* Added `IEquatable<T>` implementation to the entity code generation. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation.
+
 ## v3.1.3
 - *Enhancement:* Code generation enhanced to support new approach to OData.
 - *Enhancement:* New `Entity.JsonSerializer` attribute added to control the entity/property serializer used. Currently supports `None` or `Newtonsoft`.
