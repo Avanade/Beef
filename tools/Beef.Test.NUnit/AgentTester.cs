@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
@@ -33,6 +34,7 @@ namespace Beef.Test.NUnit
         private static readonly object _lock = new object();
         private static TestServer? _testServer;
         private static IConfiguration? _configuration;
+        private static HttpClient? _httpClient;
         private static Action<HttpRequestMessage>? _beforeRequest;
 
         private HttpStatusCode? _expectedStatusCode;
@@ -106,16 +108,6 @@ namespace Beef.Test.NUnit
                     .UseConfiguration(config);
 
                 webHostBuilderAction?.Invoke(whb);
-                whb.UseKestrel(options =>
-                {
-                    options.Listen(IPAddress.Loopback, 5000);  // http:localhost:5000
-                    options.Listen(IPAddress.Any, 80);         // http:*:80
-                    options.Listen(IPAddress.Loopback, 443, listenOptions =>
-                    {
-                        listenOptions.UseHttps("certificate.pfx", "password");
-                    });
-                });
-
                 whb.UseStartup<TStartup>();
 
                 _configuration = config;
@@ -154,6 +146,53 @@ namespace Beef.Test.NUnit
 
                     throw new InvalidOperationException("TestServer is not running; use StartupTestServer method to start.");
                 }
+            }
+        }
+
+        #endregion
+
+        #region HttpClient()
+
+        /// <summary>
+        /// Gets the <see cref="System.Net.Http.HttpClient"/> for use with the <see cref="TestServer"/>. <b>Note:</b> this should be used instead of <c>TestServer.CreateClient()</c>.
+        /// </summary>
+        public static HttpClient HttpClient
+        {
+            get 
+            {
+                if (_httpClient != null)
+                    return _httpClient;
+
+                lock (_lock)
+                {
+                    if (_httpClient != null)
+                        return _httpClient;
+
+                    if (_testServer == null)
+                        throw new InvalidOperationException("TestServer is not running; use StartupTestServer method to start.");
+
+#pragma warning disable CA2000 // Dispose objects before losing scope; only ever created once (static) and should live for process lifetime.
+                    var responseVersionHandler = new ResponseVersionHandler { InnerHandler = _testServer.CreateHandler() };
+                    _httpClient = new HttpClient(responseVersionHandler) { BaseAddress = new System.Uri("http://localhost/") };
+                    return _httpClient;
+#pragma warning restore CA2000
+                }
+            }
+        }
+
+        /// <summary>
+        /// Required work around as provided for https://github.com/grpc/grpc-dotnet/issues/648
+        /// </summary>
+        private class ResponseVersionHandler : DelegatingHandler
+        {
+            /// <summary>
+            /// Correct the version issue: "Bad gRPC response. Response protocol downgraded to HTTP/1.1".
+            /// </summary>
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                response.Version = request.Version;
+                return response;
             }
         }
 
@@ -726,7 +765,7 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent>(TestServer.CreateClient(), BeforeRequest, this);
+        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent>(HttpClient, BeforeRequest, this);
     }
 
     /// <summary>
@@ -1100,6 +1139,6 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue>(TestServer.CreateClient(), BeforeRequest, this);
+        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue>(HttpClient, BeforeRequest, this);
     }
 }

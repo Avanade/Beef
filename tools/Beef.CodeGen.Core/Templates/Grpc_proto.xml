@@ -7,7 +7,7 @@
  */
 
 syntax = "proto3";
-package {{Config.Company:ToCamelCase}}.{{Config.AppName:ToCamelCase}}.common.grpc;
+package {{Config.Company:ToCamelCase}}.{{Config.AppName:ToCamelCase}}.common.grpc.proto;
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
@@ -147,7 +147,7 @@ message {{Entity.Name}}CollectionResult {
 * Services...
 */
 ]]>
-    <Entity>
+    <Entity Condition="Entity.Grpc == true">
       <Set Name="System.Bracket" Value="false"/>
       <Operation Condition="Operation.Grpc == true">
         <Set Name="System.Bracket" Value="true"/>

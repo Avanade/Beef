@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the Trip Person Web API agent.
     /// </summary>
-    public partial class TripPersonAgent : ITripPersonServiceAgent
+    public partial class TripPersonAgent : WebApiAgentBase, ITripPersonServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonAgent"/> class.
@@ -44,9 +44,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TripPerson>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null)
-        {
-            return TripPersonServiceAgent.GetAsync(id, requestOptions);
-        }
+            => TripPersonServiceAgent.GetAsync(id, requestOptions);
 
         /// <summary>
         /// Creates the <see cref="TripPerson"/> object.
@@ -55,12 +53,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TripPerson>> CreateAsync(TripPerson value, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return TripPersonServiceAgent.CreateAsync(value, requestOptions);
-        }
+            => TripPersonServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
 
         /// <summary>
         /// Updates the <see cref="TripPerson"/> object.
@@ -70,12 +63,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TripPerson>> UpdateAsync(TripPerson value, string? id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return TripPersonServiceAgent.UpdateAsync(value, id, requestOptions);
-        }
+            => TripPersonServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
 
         /// <summary>
         /// Deletes the <see cref="TripPerson"/> object that matches the selection criteria.
@@ -84,9 +72,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(string? id, WebApiRequestOptions? requestOptions = null)
-        {
-            return TripPersonServiceAgent.DeleteAsync(id, requestOptions);
-        }
+            => TripPersonServiceAgent.DeleteAsync(id, requestOptions);
     }
 }
 

@@ -94,7 +94,7 @@
   </Entity>
 
   <!-- CosmosDb -->
-  <Entity Name="Robot" Grpc="true" Text="Robot" Implements="IGuidIdentifier, IETag, IChangeLog" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
+  <Entity Name="Robot" Grpc="true" GrpcAgent="true" Text="Robot" Implements="IGuidIdentifier, IETag, IChangeLog" Collection="true" CollectionResult="true" Validator="RobotValidator" RefDataText="true" WebApiRoutePrefix="api/v1/robots" AutoImplement="Cosmos" CosmosContainerId="Items" CosmosEntity="Model.Robot">
     <Property Name="Id" Text="{{Robot}} identifier" Type="Guid" UniqueKey="true" GrpcFieldNo="1" />
     <Property Name="ModelNo" Text="Model number" Type="string" GrpcFieldNo="2" />
     <Property Name="SerialNo" Text="Unique serial number" Type="string" GrpcFieldNo="3" />

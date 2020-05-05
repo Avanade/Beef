@@ -10,6 +10,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Beef.Data.Cosmos;
+using System.Net.Http;
+using System.Threading;
 
 namespace Beef.Demo.Test
 {
@@ -364,6 +366,17 @@ namespace Beef.Demo.Test
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .ExpectNoEvents()
                 .Run((a) => a.Agent.GetAsync(1.ToGuid()));
+        }
+
+        #endregion
+
+        #region Grpc_Get
+
+        [Test, TestSetUp]
+        public async Task M120_Grpc_Get_Found()
+        {
+            var ra = new Beef.Demo.Common.Grpc.RobotAgent(AgentTester.HttpClient);
+            var rr = await ra.GetAsync(1.ToGuid());
         }
 
         #endregion

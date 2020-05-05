@@ -12,6 +12,7 @@ using System;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using entities = Beef.Demo.Common.Entities;
+using proto = Beef.Demo.Common.Grpc.Proto;
 
 namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
 {
@@ -23,17 +24,17 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
         #region Converters
         
         /// <summary>
-        /// Converts a <see cref="DateTime"/> to/from a <see cref="DateOnly"/>.
+        /// Converts a <see cref="DateTime"/> to/from a <see cref="proto.DateOnly"/>.
         /// </summary>
-        public static CustomConverter<DateTime, DateOnly> DateTimeToDateOnly => new CustomConverter<DateTime, DateOnly>(
-            s => new DateOnly { Year = s.Year, Month = s.Month, Day = s.Month },
+        public static CustomConverter<DateTime, proto.DateOnly> DateTimeToDateOnly => new CustomConverter<DateTime, proto.DateOnly>(
+            s => new proto.DateOnly { Year = s.Year, Month = s.Month, Day = s.Month },
             d => d == null ? new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified) : new DateTime(d.Year, d.Month, d.Day, 0, 0, 0, DateTimeKind.Unspecified));
 
         /// <summary>
-        /// Converts a <see cref="Nullable{DateTime}"/> to/from a <see cref="DateOnly"/>.
+        /// Converts a <see cref="Nullable{DateTime}"/> to/from a <see cref="proto.DateOnly"/>.
         /// </summary>
-        public static CustomConverter<DateTime?, DateOnly> NullableDateTimeToDateOnly => new CustomConverter<DateTime?, DateOnly>(
-            s => s == null ? null! : new DateOnly { Year = s.Value.Year, Month = s.Value.Month, Day = s.Value.Month },
+        public static CustomConverter<DateTime?, proto.DateOnly> NullableDateTimeToDateOnly => new CustomConverter<DateTime?, proto.DateOnly>(
+            s => s == null ? null! : new proto.DateOnly { Year = s.Value.Year, Month = s.Value.Month, Day = s.Value.Month },
             d => d == null ? (DateTime?)null : new DateTime(d.Year, d.Month, d.Day, 0, 0, 0, DateTimeKind.Unspecified));
 
         /// <summary>
@@ -65,31 +66,31 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
             d => d == null ? (Guid?)null : new Guid(d));
 
         /// <summary>
-        /// Converts a <see cref="decimal"/> to a <see cref="Decimal"/>.
+        /// Converts a <see cref="decimal"/> to a <see cref="proto.Decimal"/>.
         /// </summary>
-        public static CustomConverter<decimal, Decimal> DecimalToDecimalConverter = new CustomConverter<decimal, Decimal>(
-            s => new Decimal { Units = decimal.ToInt64(s), Nanos = decimal.ToInt32((s - decimal.ToInt64(s)) * 1_000_000_000) },
+        public static CustomConverter<decimal, proto.Decimal> DecimalToDecimalConverter = new CustomConverter<decimal, proto.Decimal>(
+            s => new proto.Decimal { Units = decimal.ToInt64(s), Nanos = decimal.ToInt32((s - decimal.ToInt64(s)) * 1_000_000_000) },
             d => d == null ? 0m : d.Units + d.Nanos / 1_000_000_000);
 
         /// <summary>
-        /// Converts a <see cref="Nullable"/> <see cref="decimal"/> to a <see cref="Decimal"/>.
+        /// Converts a <see cref="Nullable"/> <see cref="decimal"/> to a <see cref="proto.Decimal"/>.
         /// </summary>
-        public static CustomConverter<decimal?, Decimal> NullableDecimalToDecimalConverter = new CustomConverter<decimal?, Decimal>(
-            s => s == null ? null! : new Decimal { Units = decimal.ToInt64(s.Value), Nanos = decimal.ToInt32((s.Value - decimal.ToInt64(s.Value)) * 1_000_000_000) },
+        public static CustomConverter<decimal?, proto.Decimal> NullableDecimalToDecimalConverter = new CustomConverter<decimal?, proto.Decimal>(
+            s => s == null ? null! : new proto.Decimal { Units = decimal.ToInt64(s.Value), Nanos = decimal.ToInt32((s.Value - decimal.ToInt64(s.Value)) * 1_000_000_000) },
             d => d == null ? (decimal?)null : d.Units + d.Nanos / 1_000_000_000);
             
         /// <summary>
-        /// Converts a <see cref="Beef.Entities.PagingArgs"/> to a <see cref="Beef.Entities.PagingArgs"/>.
+        /// Converts a <see cref="Beef.Entities.PagingArgs"/> to a <see cref="proto.PagingArgs"/>.
         /// </summary>
-        public static CustomConverter<Beef.Entities.PagingArgs, PagingArgs> PagingArgsToPagingArgsConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingArgs, PagingArgs>(
-            s => s == null ? null! : new PagingArgs { Skip = s.Skip, Take = s.Take, GetCount = s.IsGetCount },
+        public static CustomConverter<Beef.Entities.PagingArgs, proto.PagingArgs> PagingArgsToPagingArgsConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingArgs, proto.PagingArgs>(
+            s => s == null ? null! : new proto.PagingArgs { Skip = s.Skip, Take = s.Take, GetCount = s.IsGetCount },
             d => d == null ? null! : Beef.Entities.PagingArgs.CreateSkipAndTake(d.Skip, d.Take, d.GetCount));
             
          /// <summary>
-        /// Converts a <see cref="Beef.Entities.PagingResult"/> to a <see cref="Beef.Entities.PagingResult"/>.
+        /// Converts a <see cref="Beef.Entities.PagingResult"/> to a <see cref="proto.PagingResult"/>.
         /// </summary>
-        public static CustomConverter<Beef.Entities.PagingResult?, PagingResult> PagingResultToPagingResultConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingResult?, PagingResult>(
-            s => s == null ? null! : new PagingResult { Skip = s.Skip, Take = s.Take, TotalCount = s.TotalCount },
+        public static CustomConverter<Beef.Entities.PagingResult?, proto.PagingResult> PagingResultToPagingResultConverter = new Mapper.Converters.CustomConverter<Beef.Entities.PagingResult?, proto.PagingResult>(
+            s => s == null ? null! : new proto.PagingResult { Skip = s.Skip, Take = s.Take, TotalCount = s.TotalCount },
             d => d == null ? null! : new Beef.Entities.PagingResult(Beef.Entities.PagingArgs.CreateSkipAndTake(d.Skip, d.Take), d.TotalCount));
 
         #endregion
@@ -99,7 +100,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
         /// <summary>
         /// Gets the <see cref="Beef.Entities.ChangeLog"/> gRpc mapper.
         /// </summary>
-        public static EntityMapper<Beef.Entities.ChangeLog, ChangeLog> ChangeLog => EntityMapper.Create<Beef.Entities.ChangeLog, ChangeLog>()
+        public static EntityMapper<Beef.Entities.ChangeLog, proto.ChangeLog> ChangeLog => EntityMapper.Create<Beef.Entities.ChangeLog, proto.ChangeLog>()
             .HasProperty(e => e.CreatedBy, g => g.CreatedBy)
             .HasProperty(e => e.CreatedDate, g => g.CreatedDate, p => p.SetConverter(NullableDateTimeToTimestamp))
             .HasProperty(e => e.UpdatedBy, g => g.UpdatedBy)
@@ -110,7 +111,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
         /// <summary>
         /// Gets the <see cref="entities.{{Entity.Name}}"/> gRpc mapper.
         /// </summary>
-        public static EntityMapper<entities.{{Entity.Name}}, {{Entity.Name}}> {{Entity.Name}} => EntityMapper.Create<entities.{{Entity.Name}}, {{Entity.Name}}>()]]>
+        public static EntityMapper<entities.{{Entity.Name}}, proto.{{Entity.Name}}> {{Entity.Name}} => EntityMapper.Create<entities.{{Entity.Name}}, proto.{{Entity.Name}}>()]]>
       <Property Condition="Property.GrpcFieldNo != null">
         <![CDATA[
             .HasProperty(e => e.{{Property.Name}}]]>
@@ -189,7 +190,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Grpc
         /// <summary>
         /// Gets the <see cref="entities.{{Entity.Name}}CollectionResult"/> gRpc mapper.
         /// </summary>
-        public static EntityMapper<entities.{{Entity.Name}}CollectionResult, {{Entity.Name}}CollectionResult> {{Entity.Name}}CollectionResult => EntityMapper.Create<entities.{{Entity.Name}}CollectionResult, {{Entity.Name}}CollectionResult>()
+        public static EntityMapper<entities.{{Entity.Name}}CollectionResult, proto.{{Entity.Name}}CollectionResult> {{Entity.Name}}CollectionResult => EntityMapper.Create<entities.{{Entity.Name}}CollectionResult, proto.{{Entity.Name}}CollectionResult>()
             .HasProperty(e => e.Result, g => g.Result, p => p.SetMapper({{Entity.Name}}))
             .HasProperty(e => e.Paging, g => g.Paging, p => p.SetConverter(PagingResultToPagingResultConverter));
 ]]>

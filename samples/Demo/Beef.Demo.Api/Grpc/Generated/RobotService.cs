@@ -10,13 +10,14 @@ using Grpc.Core;
 using System.Net;
 using System.Threading.Tasks;
 using Beef.Demo.Common.Grpc;
+using Beef.Demo.Common.Grpc.Proto;
 
 namespace Beef.Demo.Api.Grpc
 {
     /// <summary>
     /// Provides the <b>Robot</b> gRPC Server functionality.
     /// </summary>
-    public partial class RobotService : Beef.Demo.Common.Grpc.RobotGrpcService.RobotGrpcServiceBase
+    public partial class RobotService : RobotGrpcService.RobotGrpcServiceBase
     {
         /// <summary>
         /// Gets the <see cref="Robot"/> entity that matches the selection criteria.

@@ -3,7 +3,7 @@
  */
 
 syntax = "proto3";
-package beef.demo.common.grpc;
+package beef.demo.common.grpc.proto;
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";

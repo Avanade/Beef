@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the Product Web API agent.
     /// </summary>
-    public partial class ProductAgent : IProductServiceAgent
+    public partial class ProductAgent : WebApiAgentBase, IProductServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductAgent"/> class.
@@ -44,9 +44,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Product>> GetAsync(int id, WebApiRequestOptions? requestOptions = null)
-        {
-            return ProductServiceAgent.GetAsync(id, requestOptions);
-        }
+            => ProductServiceAgent.GetAsync(id, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Product"/> collection object that matches the selection criteria.
@@ -56,9 +54,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<ProductCollectionResult>> GetByArgsAsync(ProductArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return ProductServiceAgent.GetByArgsAsync(args, paging, requestOptions);
-        }
+            => ProductServiceAgent.GetByArgsAsync(args, paging, requestOptions);
     }
 }
 

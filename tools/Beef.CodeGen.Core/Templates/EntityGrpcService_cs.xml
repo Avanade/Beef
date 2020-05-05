@@ -20,6 +20,7 @@ using Grpc.Core;
 using System.Net;
 using System.Threading.Tasks;
 using {{Config.Company}}.{{Config.AppName}}.Common.Grpc;
+using {{Config.Company}}.{{Config.AppName}}.Common.Grpc.Proto;
 
 namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
 {
@@ -44,7 +45,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
           <![CDATA[    [{{System.WebApiAuthorize}}]
 ]]>
         </If>
-        <![CDATA[    public partial class {{Entity.Name}}Service : {{Config.Company}}.{{Config.AppName}}.Common.Grpc.{{Entity.Name}}GrpcService.{{Entity.Name}}GrpcServiceBase
+        <![CDATA[    public partial class {{Entity.Name}}Service : {{Entity.Name}}GrpcService.{{Entity.Name}}GrpcServiceBase
     {
 ]]>
         <Operation Condition="Operation.Grpc == true and Operation.OperationType != 'Patch'">
