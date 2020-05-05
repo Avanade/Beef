@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Robot entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Robot : EntityBase, IGuidIdentifier, IETag, IChangeLog
+    public partial class Robot : EntityBase, IGuidIdentifier, IETag, IChangeLog, IEquatable<Robot>
     {
         #region Privates
 
@@ -203,6 +203,78 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Robot val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Robot"/> is equal to the current <see cref="Robot"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(Robot? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(ModelNo, value.ModelNo)
+                && Equals(SerialNo, value.SerialNo)
+                && Equals(EyeColorSid, value.EyeColorSid)
+                && Equals(PowerSourceSid, value.PowerSourceSid)
+                && Equals(ETag, value.ETag)
+                && Equals(ChangeLog, value.ChangeLog);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="Robot"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="Robot"/> A.</param>
+        /// <param name="b"><see cref="Robot"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (Robot? a, Robot? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="Robot"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="Robot"/> A.</param>
+        /// <param name="b"><see cref="Robot"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (Robot? a, Robot? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="Robot"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="Robot"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(ModelNo);
+            hash.Add(SerialNo);
+            hash.Add(EyeColorSid);
+            hash.Add(PowerSourceSid);
+            hash.Add(ETag);
+            hash.Add(ChangeLog);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

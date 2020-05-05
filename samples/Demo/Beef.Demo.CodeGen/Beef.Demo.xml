@@ -77,7 +77,7 @@
   </Entity>
 
   <!-- ODATA basic -->
-  <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/products" AutoImplement="OData" ODataName="TestOData" ODataEntity="Products">
+  <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/products" AutoImplement="OData" ODataName="TestOData" ODataEntity="Model.Product" ODataCollectionName="Products">
     <Property Name="Id" Text="{{Product}} identifier" Type="int" Immutable="true" UniqueKey="true" DataName="ID" EmitDefaultValue="true" />
     <Property Name="Name" Type="string"/>
     <Property Name="Description" Type="string"/>
@@ -123,35 +123,16 @@
     <Property Name="SerialNo" JsonName="serial-no" Text="Unique serial number" Type="string" GrpcFieldNo="2" />
     <Property Name="PowerSources" JsonName="power-sources" Type="RefDataNamespace.PowerSource" RefDataType="string" RefDataList="true" GrpcFieldNo="3" />
   </Entity>
-
-  <!-- ODATA D365 -->
-  <Entity Name="CustomerGroup" Text="Customer group" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/customergroups" AutoImplement="OData" ODataName="DynamicsAx" ODataEntity="CustomerGroups">
-    <Property Name="Id" Text="{{CustomerGroup}} identifier" Type="string" Immutable="true" UniqueKey="true" DataName="CustomerGroupId"/>
-    <Property Name="Company" Type="RefDataNamespace.Company" RefDataType="string" Immutable="true" UniqueKey="true" DataName="dataAreaId" DataConverter="ExternalCodeConverter" IsDataConverterGeneric="true" />
-    <Property Name="Description" Type="string"/>
-    <Property Name="IsSalesTaxIncludedInPrice" Type="bool" DataConverter="BooleanToYesNoConverter"/>
-    <Property Name="TaxGroup" Type="string" DataName="TaxGroupId"/>
-
-    <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{company}/{id}" />
-    <Operation Name="GetByArgs" OperationType="GetColl" PagingArgs="true" WebApiRoute="" >
-      <Parameter Name="Args" Type="CustomerGroupArgs" Validator="CustomerGroupArgsValidator"/>
-    </Operation>
-    <Operation Name="Create" OperationType="Create" Validator="CustomerGroupValidator" WebApiRoute="{company}" >
-      <Parameter Name="Company" Property="Company" IsMandatory="true" LayerPassing="ToManagerSet"/>
-    </Operation>
-    <Operation Name="Update" OperationType="Update" UniqueKey="true" Validator="CustomerGroupValidator" WebApiRoute="{company}/{id}" />
-    <Operation Name="UpdateBatch" Text="Upserts a {{CustomerGroupCollection}} as a batch" OperationType="Custom" WebApiRoute="{company}" AutoImplement="None" WebApiMethod="HttpPut">
-      <Parameter Name="Value" Type="CustomerGroupCollection" IsMandatory="true" WebApiFrom="FromBody" ValidatorFluent="Collection(minCount: 1, maxCount:1, item: new Beef.Validation.Rules.CollectionRuleItem&lt;CustomerGroup&gt;(CustomerGroupValidator.Default))" />
-      <Parameter Name="Company" Property="Company" IsMandatory="true" LayerPassing="ToManagerCollSet"/>
-    </Operation>
-    <Operation Name="Delete" OperationType="Delete" UniqueKey="true" WebApiRoute="{company}/{id}" />
-  </Entity>
-
-  <Entity Name="CustomerGroupArgs" Text="{{CustomerGroup}} arguments" ExcludeAll="true">
-    <Property Name="Company" Type="RefDataNamespace.Company" RefDataType="string" />
-    <Property Name="Description" Type="string" />
-  </Entity>
   
+  <!-- ODATA CRUD -->
+  <Entity Name="TripPerson" Implements="IStringIdentifier" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/tripPeople" Get="true" Create="true" Update="true" Delete="true" AutoImplement="OData" ODataName="TripOData" ODataEntity="Model.Person" ODataCollectionName="Persons">
+    <Property Name="Id" Text="{{TripPerson}} identifier (username)" Type="string" UniqueKey="true" DataName="UserName" />
+    <Property Name="FirstName" Type="string" />
+    <Property Name="LastName" Type="string" />
+    <!-- The endpoint always fails when Gender is passed; removed for now. -->
+    <!--<Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" DataConverter="GenderTripCodeConverter" />-->
+  </Entity>
+
   <!-- Non EntityBase entity -->
   <Entity Name="PersonOther" Text="other {{Person}} without {{EntityBase}} capabilities" OmitEntityBase="true" Implements="IGuidIdentifier, IChangeLog, IETag" Collection="true" ExcludeAll="true">
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />

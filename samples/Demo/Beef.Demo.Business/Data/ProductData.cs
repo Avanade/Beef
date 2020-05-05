@@ -1,6 +1,6 @@
 ﻿using Beef.Data.OData;
 using Beef.Demo.Common.Entities;
-using System.Linq;
+using Simple.OData.Client;
 
 namespace Beef.Demo.Business.Data
 {
@@ -11,10 +11,10 @@ namespace Beef.Demo.Business.Data
             _getByArgsOnQuery = GetByArgs_OnQuery;
         }
 
-        private IQueryable<Product> GetByArgs_OnQuery(IQueryable<Product> q, ProductArgs args, IODataArgs da)
+        private IBoundClient<Model.Product> GetByArgs_OnQuery(IBoundClient<Model.Product> q, ProductArgs args, IODataArgs _)
         {
-            return q.WhereWildcard(p => p.Name, args?.Name)
-                .WhereWildcard(p => p.Description, args?.Description);
+            return q.FilterWildcard(p => p.Name, args?.Name)
+                    .FilterWildcard(p => p.Description, args?.Description);
         }
     }
 }

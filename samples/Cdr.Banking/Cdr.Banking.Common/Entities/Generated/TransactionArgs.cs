@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the <see cref="Account"/> arguments entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class TransactionArgs : EntityBase
+    public partial class TransactionArgs : EntityBase, IEquatable<TransactionArgs>
     {
         #region Privates
 
@@ -93,6 +93,74 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is TransactionArgs val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="TransactionArgs"/> is equal to the current <see cref="TransactionArgs"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(TransactionArgs? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(FromDate, value.FromDate)
+                && Equals(ToDate, value.ToDate)
+                && Equals(MinAmount, value.MinAmount)
+                && Equals(MaxAmount, value.MaxAmount)
+                && Equals(Text, value.Text);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="TransactionArgs"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="TransactionArgs"/> A.</param>
+        /// <param name="b"><see cref="TransactionArgs"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (TransactionArgs? a, TransactionArgs? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="TransactionArgs"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="TransactionArgs"/> A.</param>
+        /// <param name="b"><see cref="TransactionArgs"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (TransactionArgs? a, TransactionArgs? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="TransactionArgs"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="TransactionArgs"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(FromDate);
+            hash.Add(ToDate);
+            hash.Add(MinAmount);
+            hash.Add(MaxAmount);
+            hash.Add(Text);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

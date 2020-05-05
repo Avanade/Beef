@@ -183,7 +183,7 @@ namespace Beef.Data.Cosmos
                 CheckAuthorized(model!);
 
                 var resp = await Container.CreateItemAsync(model, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
-                return GetResponseValue(resp);
+                return GetResponseValue(resp!)!;
             }, CosmosDb).ConfigureAwait(false);
         }
 
@@ -217,7 +217,7 @@ namespace Beef.Data.Cosmos
                 ro.SessionToken = resp.Headers?.Session;
                 DbArgs.Mapper.MapToDest(value, resp.Resource, Mapper.OperationTypes.Update);
                 resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
-                return GetResponseValue(resp);
+                return GetResponseValue(resp)!;
             }, CosmosDb).ConfigureAwait(false);
         }
 

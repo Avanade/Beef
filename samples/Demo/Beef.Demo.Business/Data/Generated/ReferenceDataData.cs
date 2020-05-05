@@ -35,6 +35,7 @@ namespace Beef.Demo.Business.Data
                 await Database.Default.GetRefDataAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
                 {
                     item.AlternateName = dr.GetValue<string>("AlternateName");
+                    item.TripCode = dr.GetValue<string>("TripCode");
                 });
             }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
 

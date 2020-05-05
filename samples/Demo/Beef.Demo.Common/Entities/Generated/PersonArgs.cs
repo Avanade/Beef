@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the <see cref="Person"/> arguments entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PersonArgs : EntityBase
+    public partial class PersonArgs : EntityBase, IEquatable<PersonArgs>
     {
         #region Privates
 
@@ -78,6 +78,70 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is PersonArgs val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="PersonArgs"/> is equal to the current <see cref="PersonArgs"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(PersonArgs? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(FirstName, value.FirstName)
+                && Equals(LastName, value.LastName)
+                && Equals(GendersSids, value.GendersSids);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="PersonArgs"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="PersonArgs"/> A.</param>
+        /// <param name="b"><see cref="PersonArgs"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (PersonArgs? a, PersonArgs? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="PersonArgs"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="PersonArgs"/> A.</param>
+        /// <param name="b"><see cref="PersonArgs"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (PersonArgs? a, PersonArgs? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="PersonArgs"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="PersonArgs"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(FirstName);
+            hash.Add(LastName);
+            hash.Add(GendersSids);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

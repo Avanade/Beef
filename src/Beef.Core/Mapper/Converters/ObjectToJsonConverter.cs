@@ -51,7 +51,7 @@ namespace Beef.Mapper.Converters
         /// <returns>The source value.</returns>
         public TSrceProperty ConvertToSrce(string? value)
         {
-            return string.IsNullOrEmpty(value) ? default : JsonConvert.DeserializeObject<TSrceProperty>(value);
+            return string.IsNullOrEmpty(value) ? default! : JsonConvert.DeserializeObject<TSrceProperty>(value);
         }
 
         /// <summary>

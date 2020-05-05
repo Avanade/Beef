@@ -25,6 +25,7 @@ Attribute | Description
 `EntityUsing` | The namespace for the non reference data entities (adds using statements). Options are: `Common` to add `.Common.Entities` (default), `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude.
 `RefDataBusNamespace` | The namespace to be used for the reference data entities where the EntityScope is `Business` (adds using statement). Only used for the business namespace/assembly.
 `MapperDefaultRefDataConverter` | Specifies the default Reference Data property `Converter` used by the generated `Mapper(s)` where not specifically defined. Options are: `ReferenceDataInt32IdConverter` (default),  `ReferenceDataNullableInt32IdConverter`, `ReferenceDataCodeConverter`, `ReferenceDataGuidIdConverter` or `ReferenceDataNullableGuidIdConverter`. 
+`JsonSerializer` | Specifies the default JSON Serializer to use for JSON property attribution. Options are `None` or `Newtonsoft`. Defaults to `Newtonsoft`. Can be overridden (specified) per `Entity`.
 
 <br>
 

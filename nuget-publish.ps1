@@ -51,7 +51,7 @@ foreach ($project in $projectsToPublish) {
 if ($apiKey.Length -gt 20) {
 	Get-ChildItem -Path $publishFolder -Filter *.nupkg | ForEach-Object {
 		$package = -join($publishFolder, "\", $_.Name)
-		$pushCommand = -join("dotnet nuget push --source ", $nugetServer, " --api-key ", $apiKey, " ", $package)
+		$pushCommand = -join("dotnet nuget push --source ", $nugetServer, " --api-key ", $apiKey, " ", $package, " --skip-duplicate")
 
 		Write-Host ""
 		Write-Host $pushCommand -ForegroundColor Yellow

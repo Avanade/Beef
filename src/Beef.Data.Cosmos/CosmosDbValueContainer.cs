@@ -175,7 +175,7 @@ namespace Beef.Data.Cosmos
                 ((ICosmosDbValue)cvm).PrepareBefore();
 
                 var resp = await Container.CreateItemAsync(cvm, DbArgs.PartitionKey, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
-                return GetResponseValue(resp);
+                return GetResponseValue(resp)!;
             }, CosmosDb).ConfigureAwait(false);
         }
 
@@ -213,7 +213,7 @@ namespace Beef.Data.Cosmos
                 ((ICosmosDbValue)resp.Resource).PrepareBefore();
 
                 resp = await Container.ReplaceItemAsync(resp.Resource, key, DbArgs.PartitionKey, ro).ConfigureAwait(false);
-                return GetResponseValue(resp);
+                return GetResponseValue(resp)!;
 
             }, CosmosDb).ConfigureAwait(false);
         }

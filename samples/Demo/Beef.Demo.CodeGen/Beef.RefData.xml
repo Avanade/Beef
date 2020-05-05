@@ -3,6 +3,7 @@
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/genders" Get="true" Create="true" Update="true" AutoImplement="Database" DatabaseSchema="Ref">
     <Property Name="AlternateName" Type="string" />
+    <Property Name="TripCode" Text="Trip OData Code" Type="string" RefDataMapping="true" Immutable="true" IgnoreSerialization="true" />
   </Entity>
   <Entity Name="EyeColor" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/eyeColors" AutoImplement="EntityFramework" DatabaseSchema="Ref" EntityFrameworkEntity="EfModel.EyeColor" />
   <Entity Name="PowerSource" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/powerSources" AutoImplement="Cosmos" CosmosContainerId="RefData">

@@ -12,7 +12,7 @@ namespace Beef.Entities
     /// </summary>
     [DebuggerDisplay("Type = {Type}, Text = {Text}, Property = {Property}")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class MessageItem : EntityBase
+    public class MessageItem : EntityBase, IEquatable<MessageItem>
     {
         private MessageType _type;
         private string? _text;
@@ -163,6 +163,72 @@ namespace Beef.Entities
         {
             get { return _tag; }
             set { SetValue(ref _tag, value, false, false, nameof(Tag)); }
+        }
+
+        #endregion
+
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is MessageItem val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="MessageItem"/> is equal to the current <see cref="MessageItem"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(MessageItem? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Type, value.Type)
+                && Equals(Text, value.Text)
+                && Equals(Property, value.Property)
+                && Equals(Tag, value.Tag);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="MessageItem"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="MessageItem"/> A.</param>
+        /// <param name="b"><see cref="MessageItem"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator ==(MessageItem? a, MessageItem? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="MessageItem"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="MessageItem"/> A.</param>
+        /// <param name="b"><see cref="MessageItem"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator !=(MessageItem? a, MessageItem? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="MessageItem"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="MessageItem"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Type);
+            hash.Add(Text);
+            hash.Add(Property);
+            hash.Add(Tag);
+            return base.GetHashCode() ^ hash.ToHashCode();
         }
 
         #endregion

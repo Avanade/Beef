@@ -15,7 +15,7 @@ namespace Beef.Entities
     /// </summary>
     /// <typeparam name="TKey">The key <see cref="Type"/>.</typeparam>
     /// <typeparam name="TEntity">The <see cref="EntityBase"/> <see cref="Type"/>.</typeparam>
-    public abstract class EntityBaseKeyedCollection<TKey, TEntity> : KeyedCollection<TKey, TEntity>, IEntityBaseCollection, INotifyCollectionChanged where TEntity : EntityBase
+    public abstract class EntityBaseKeyedCollection<TKey, TEntity> : KeyedCollection<TKey, TEntity>, IEntityBaseCollection, INotifyCollectionChanged, IEquatable<EntityBaseKeyedCollection<TKey, TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;
         private readonly Func<TEntity, TKey>? _getKeyForItem;
@@ -287,5 +287,54 @@ namespace Beef.Entities
         /// Indicates whether the entity has changed.
         /// </summary>
         public bool IsChanged { get; private set; }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is EntityBaseKeyedCollection<TKey, TEntity> val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="EntityBaseKeyedCollection{TKey, TEntity}"/> is equal to the current <see cref="EntityBaseKeyedCollection{TKey, TEntity}"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(EntityBaseKeyedCollection<TKey, TEntity> value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null || Count != value.Count)
+                return false;
+
+            for (int i = 0; i < Count; i++)
+            {
+                if (!this[i].Equals(value[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="EntityBaseKeyedCollection{TKey, TEntity}"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="EntityBaseKeyedCollection{TKey, TEntity}"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            foreach (var item in this)
+            {
+                hash.Add(item);
+            }
+
+            return hash.ToHashCode();
+        }
     }
 }

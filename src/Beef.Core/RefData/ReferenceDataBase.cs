@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -13,11 +14,11 @@ namespace Beef.RefData
     /// <summary>
     /// Represents a <b>ReferenceData</b> base class.
     /// </summary>
-    /// <remarks>For equality and comparision checking the <see cref="Id"/> and <see cref="Code"/> combination is used.</remarks>
+    /// <remarks>For equality and comparision checking the <see cref="Id"/> and <see cref="Code"/> combination is used (all other properties are ignored).</remarks>
     [DebuggerDisplay("Id = {Id}, Code = {Code}, Text = {Text}, Active = {IsActive}, IsValid = {IsValid}")]
     [JsonObject(MemberSerialization.OptIn)]
 #pragma warning disable CA1036 // Override methods on comparable types; support for <, <=, > and >= not supported by-design.
-    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IETag, IChangeLog, IIdentifier
+    public abstract class ReferenceDataBase : EntityBase, IReferenceData, IComparable<ReferenceDataBase>, IConvertible, IEquatable<ReferenceDataBase>, IETag, IChangeLog, IIdentifier
 #pragma warning restore CA1036
     {
         #region RefDataKey
@@ -54,6 +55,14 @@ namespace Beef.RefData
                 }
                 else
                     throw new InvalidOperationException("Object must be of type RefDataKey.");
+            }
+
+            /// <summary>
+            /// Gets the hash code.
+            /// </summary>
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Id, Code);
             }
         }
 
@@ -491,12 +500,28 @@ namespace Beef.RefData
         }
 
         /// <summary>
+        /// Determines whether the <see cref="ReferenceDataBase"/> is equal to the current <see cref="ReferenceDataBase"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="ReferenceDataBase"/> to compare with.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        /// <remarks>Both the <see cref="Id"/> and <see cref="Code"/> must have the same values to be considered equal.</remarks>
+        public bool Equals(ReferenceDataBase? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return _key.Equals(value._key);
+        }
+
+        /// <summary>
         /// Returns a hash code for the <see cref="ReferenceDataBase"/>.
         /// </summary>
         /// <returns>A hash code for the <see cref="ReferenceDataBase"/>.</returns>
         public override int GetHashCode()
         {
-            return _key.GetHashCode();
+            return HashCode.Combine(_key);
         }
 
         /// <summary>

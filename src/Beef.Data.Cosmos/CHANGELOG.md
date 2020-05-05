@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Fixed:* A new nullable compile error fixed that appeared with Visual Studio 2019 v16.5.4.
+
 ## v3.1.2
 - *Enhancement:* Add option to set identifier automatically when performing a `ImportBatchAsync` or `ImportValueBatchAsync`.
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.

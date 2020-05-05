@@ -71,7 +71,7 @@ namespace Beef.Mapper.Converters
 
             ReferenceDataConverterUtils.CheckIsValid(((IPropertyMapperConverter)this).SrceType, value);
             if (!value.TryGetMapping(Name, out IComparable mval))
-                throw new InvalidOperationException($"The ReferenceData does not containing a '{Name}' Mapping property/value.");
+                throw new InvalidOperationException($"The ReferenceData does not contain a '{Name}' Mapping property/value.");
 
             return (TDestProperty)mval;
         }

@@ -105,6 +105,7 @@ The [`EntityBasicBase`](./Entities/EntityBasicBase.cs) provides the basic entity
 
 The [`EntityBase`](./Entities/EntityBase.cs) provides the rich entity capabilities (inherits from `EntityBasicBase`):
 - Implements [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject) for `BeginEdit`, `EndEdit` and `CancelEdit`.
+- Implements [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1) for `Equals` and `GetHashCode`. 
 - Implements [`ICleanUp`](./Entities/ICleanUp.cs) for `CleanUp` and `IsInitial`.
 - Implements [`IUniqueKey`](./Entities/ICleanUp.cs) for `HasUniqueKey` and `UniqueKey`.
 - Implements [`IChangeTrackingLogging`](./Entities/IChangeTrackingLogging.cs) for `TrackChanges` and `ChangeTracking`.
@@ -160,11 +161,6 @@ Provides the basic infrastructure support to support a basic _event-driven_ arch
 
 Provide for [`Executor`](./Executors/Executor.cs), and corresponding [`Trigger`](./Executors/Triggers/Trigger.cs) orchestration, to standardise the processing of long-running, batch-style, operations.
 
-<br/>
-
-## FlatFile namespace
-
-Provides a rich framework for [reading](./FlatFile/FileReader.cs) and [writing](./FlatFile/FileWriter.cs) [fixed](./FlatFile/FixedFileFormat.cs), and [delimited](./FlatFile/DelimitedFileFormat.cs), flat files.
 
 <br/>
 

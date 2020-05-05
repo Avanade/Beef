@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Work History entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class WorkHistory : EntityBase
+    public partial class WorkHistory : EntityBase, IEquatable<WorkHistory>
     {
         #region Privates
 
@@ -109,6 +109,72 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is WorkHistory val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(WorkHistory? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(PersonId, value.PersonId)
+                && Equals(Name, value.Name)
+                && Equals(StartDate, value.StartDate)
+                && Equals(EndDate, value.EndDate);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="WorkHistory"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="WorkHistory"/> A.</param>
+        /// <param name="b"><see cref="WorkHistory"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (WorkHistory? a, WorkHistory? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="WorkHistory"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="WorkHistory"/> A.</param>
+        /// <param name="b"><see cref="WorkHistory"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (WorkHistory? a, WorkHistory? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="WorkHistory"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="WorkHistory"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(PersonId);
+            hash.Add(Name);
+            hash.Add(StartDate);
+            hash.Add(EndDate);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

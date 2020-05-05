@@ -49,8 +49,9 @@ namespace Beef.Demo.Api
                 return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
             });
 
-            // Register the test OData service.
-            TestOData.Register(() => new TestOData(WebApiStartup.GetConnectionString(config, "TestOData")));
+            // Register the test OData services.
+            TestOData.Register(() => new TestOData(new Uri(WebApiStartup.GetConnectionString(config, "TestOData"))));
+            TripOData.Register(() => new TripOData(new Uri(WebApiStartup.GetConnectionString(config, "TripOData"))));
 
             // Default the page size.
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");

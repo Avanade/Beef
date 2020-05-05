@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Transaction entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Transaction : EntityBase, IStringIdentifier
+    public partial class Transaction : EntityBase, IStringIdentifier, IEquatable<Transaction>
     {
         #region Privates
 
@@ -276,6 +276,96 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Transaction val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Transaction"/> is equal to the current <see cref="Transaction"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(Transaction? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(AccountId, value.AccountId)
+                && Equals(IsDetailAvailable, value.IsDetailAvailable)
+                && Equals(TypeSid, value.TypeSid)
+                && Equals(StatusSid, value.StatusSid)
+                && Equals(Description, value.Description)
+                && Equals(PostingDateTime, value.PostingDateTime)
+                && Equals(ExecutionDateTime, value.ExecutionDateTime)
+                && Equals(Amount, value.Amount)
+                && Equals(Currency, value.Currency)
+                && Equals(Reference, value.Reference)
+                && Equals(MerchantName, value.MerchantName)
+                && Equals(MerchantCategoryCode, value.MerchantCategoryCode)
+                && Equals(BillerCode, value.BillerCode)
+                && Equals(BillerName, value.BillerName)
+                && Equals(ApcaNumber, value.ApcaNumber);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="Transaction"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="Transaction"/> A.</param>
+        /// <param name="b"><see cref="Transaction"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (Transaction? a, Transaction? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="Transaction"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="Transaction"/> A.</param>
+        /// <param name="b"><see cref="Transaction"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (Transaction? a, Transaction? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="Transaction"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="Transaction"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(AccountId);
+            hash.Add(IsDetailAvailable);
+            hash.Add(TypeSid);
+            hash.Add(StatusSid);
+            hash.Add(Description);
+            hash.Add(PostingDateTime);
+            hash.Add(ExecutionDateTime);
+            hash.Add(Amount);
+            hash.Add(Currency);
+            hash.Add(Reference);
+            hash.Add(MerchantName);
+            hash.Add(MerchantCategoryCode);
+            hash.Add(BillerCode);
+            hash.Add(BillerName);
+            hash.Add(ApcaNumber);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

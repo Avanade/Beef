@@ -2,10 +2,16 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.5
+## v3.1.7
 - *Fixed:* The `PropertyMapper` will only auto map sub-entities at mapping execution time where no converter or mapper has been specified; was previously always auto mapping at construction, often unnecessarily where a converter or mapper was later being specified.
 - *Enhanced:* The `PropertyMapper` will check if a _collection_ property is writeable (i.e. read-only) before overridding value; if not, will using the underlying `Add` method to update.
 - *Enhanced:* The `ComplexTypeReflector` now exposes a `MethodInfo? AddMethod` property for an underlying _collection_ (where found). 
+
+## v3.1.6
+- *Enhanced:* Added `IEquatable<T>` to `EntityBase`, `EntityBaseCollection` and `ReferenceDataBase`. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation. 
+
+## v3.1.5
+- *Fixed:* `ReferenceDataConverterUtils.CheckIsValid` validation logic fixed.
 
 ## v3.1.4
 - *Enhanced:* Added `AuthenticationException` to enable standardized handling of this exception similar to the existing `AuthorizationException`. This allows for an _authentication_ exception to be thrown which in turn will result in an `HttpStatusCode.Unauthorized (401)`.

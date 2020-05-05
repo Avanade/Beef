@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the <see cref="Product"/> arguments entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class ProductArgs : EntityBase
+    public partial class ProductArgs : EntityBase, IEquatable<ProductArgs>
     {
         #region Privates
 
@@ -55,6 +55,68 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is ProductArgs val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="ProductArgs"/> is equal to the current <see cref="ProductArgs"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(ProductArgs? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Name, value.Name)
+                && Equals(Description, value.Description);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="ProductArgs"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="ProductArgs"/> A.</param>
+        /// <param name="b"><see cref="ProductArgs"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (ProductArgs? a, ProductArgs? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="ProductArgs"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="ProductArgs"/> A.</param>
+        /// <param name="b"><see cref="ProductArgs"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (ProductArgs? a, ProductArgs? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="ProductArgs"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="ProductArgs"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Name);
+            hash.Add(Description);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

@@ -139,6 +139,76 @@ namespace Cdr.Banking.Common.Entities
 
         #endregion
 
+        #region IEquatable
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is AccountDetail val))
+                return false;
+
+            return Equals(val);
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/> by comparing the values of all the properties.
+        /// </summary>
+        /// <param name="value">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public bool Equals(AccountDetail? value)
+        {
+            if (((object)value!) == ((object)this))
+                return true;
+            else if (((object)value!) == null)
+                return false;
+
+            return base.Equals((object)value)
+                && Equals(Bsb, value.Bsb)
+                && Equals(AccountNumber, value.AccountNumber)
+                && Equals(BundleName, value.BundleName)
+                && Equals(SpecificAccountUTypeSid, value.SpecificAccountUTypeSid)
+                && Equals(TermDeposit, value.TermDeposit)
+                && Equals(CreditCard, value.CreditCard);
+        }
+
+        /// <summary>
+        /// Compares two <see cref="AccountDetail"/> types for equality.
+        /// </summary>
+        /// <param name="a"><see cref="AccountDetail"/> A.</param>
+        /// <param name="b"><see cref="AccountDetail"/> B.</param>
+        /// <returns><c>true</c> indicates equal; otherwise, <c>false</c> for not equal.</returns>
+        public static bool operator == (AccountDetail? a, AccountDetail? b) => Equals(a, b);
+
+        /// <summary>
+        /// Compares two <see cref="AccountDetail"/> types for non-equality.
+        /// </summary>
+        /// <param name="a"><see cref="AccountDetail"/> A.</param>
+        /// <param name="b"><see cref="AccountDetail"/> B.</param>
+        /// <returns><c>true</c> indicates not equal; otherwise, <c>false</c> for equal.</returns>
+        public static bool operator != (AccountDetail? a, AccountDetail? b) => !Equals(a, b);
+
+        /// <summary>
+        /// Returns a hash code for the <see cref="AccountDetail"/>.
+        /// </summary>
+        /// <returns>A hash code for the <see cref="AccountDetail"/>.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(Bsb);
+            hash.Add(AccountNumber);
+            hash.Add(BundleName);
+            hash.Add(SpecificAccountUTypeSid);
+            hash.Add(TermDeposit);
+            hash.Add(CreditCard);
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+    
+        #endregion
+        
         #region ICopyFrom
     
         /// <summary>

@@ -535,7 +535,7 @@ namespace Beef.Reflection
         /// <returns>The value.</returns>
         TProperty GetJTokenValue(JToken jtoken)
         {
-            return jtoken.ToObject<TProperty>();
+            return jtoken.ToObject<TProperty>()!;
         }
 
         /// <summary>

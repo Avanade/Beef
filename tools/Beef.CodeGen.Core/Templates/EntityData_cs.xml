@@ -19,6 +19,7 @@
       <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
       <Set Name="Entity.EntityCollectionResultName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}CollectionResult" Otherwise="${{Entity.Name}}CollectionResult&lt;T&gt;" />
       <Set Name="Entity.CosmosEntity" Condition="Entity.CosmosEntity == null" Value="${{Entity.EntityName}}" />
+      <Set Name="Entity.ODataEntity" Condition="Entity.ODataEntity == null" Value="${{Entity.EntityName}}" />
       <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" Otherwise="false" />
       <Set Name="System.UsesOData" Condition="Entity.AutoImplement == 'OData'" Value="true" Otherwise="false" />
       <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" Otherwise="false" />
@@ -67,6 +68,7 @@ using Beef.Business;
       </If>
       <If Condition="System.UsesOData == true">
         <![CDATA[using Beef.Data.OData;
+using Soc = Simple.OData.Client;
 ]]>
         <If Condition="Config.ODataUsingNamespace != null">
           <![CDATA[using {{Config.ODataUsingNamespace}};
@@ -149,7 +151,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[        private readonly Action<DatabaseParameters]]>
             </If>
             <If Condition="System.AutoImplement == 'OData'">
-              <![CDATA[        private readonly Func<IQueryable<{{Entity.EntityName}}>]]>
+              <![CDATA[        private readonly Func<Soc.IBoundClient<{{Entity.ODataEntity}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
               <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
@@ -171,7 +173,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[, IDatabaseArgs]]>
             </If>
             <If Condition="System.AutoImplement == 'OData'">
-              <![CDATA[, IODataArgs, IQueryable<{{Entity.EntityName}}>]]>
+              <![CDATA[, IODataArgs, Soc.IBoundClient<{{Entity.ODataEntity}}>]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
               <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
@@ -576,6 +578,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <If Condition="Operation.PagingArgs == true">
                 <![CDATA[__result.Paging!]]>
               </If>
+              <If Condition="Operation.ODataCollectionName != null">
+                <If Condition="Operation.PagingArgs == true"><![CDATA[, ]]></If>
+                <![CDATA["{{Operation.ODataCollectionName}}"]]>
+              </If>
               <![CDATA[);]]>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
@@ -673,7 +679,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <Set Name="System.ODataName" Condition="Entity.ODataName != null" Value="Entity.ODataName" Otherwise="Config.ODataName" />
               <Set Name="System.ODataName" Condition="System.ODataName == null" Value="'OData'" />
               <If Condition="Operation.OperationType == 'Get'">
-                <![CDATA[__result = await {{System.ODataName}}.Default.GetAsync<{{Entity.EntityName}}?>(__dataArgs, ]]>
+                <![CDATA[__result = await {{System.ODataName}}.Default.GetAsync(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -693,21 +699,19 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'GetColl'">
-                <![CDATA[__result.Result = await {{System.ODataName}}.Default.SelectQueryAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__dataArgs,
-                    q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
+                <![CDATA[__result.Result = {{System.ODataName}}.Default.Query(__dataArgs, q => {{Operation.PrivateName}}OnQuery == null ? q : {{Operation.PrivateName}}OnQuery(q]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <![CDATA[, {{Parameter.ArgumentName}}]]>
                 </Parameter>
-                <![CDATA[, __dataArgs)).ConfigureAwait(false);
-
+                <![CDATA[, __dataArgs)).SelectQuery<{{Entity.EntityCollectionName}}>();
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[__result = await {{System.ODataName}}.Default.{{Operation.OperationType}}Async<{{Entity.EntityName}}>(__dataArgs, value).ConfigureAwait(false);
+                <![CDATA[__result = await {{System.ODataName}}.Default.{{Operation.OperationType}}Async(__dataArgs, value).ConfigureAwait(false);
 ]]>
               </If>
               <If Condition="Operation.OperationType == 'Delete'">
-                <![CDATA[await {{System.ODataName}}.Default.DeleteAsync<{{Entity.EntityName}}>(__dataArgs, ]]>
+                <![CDATA[await {{System.ODataName}}.Default.DeleteAsync(__dataArgs, ]]>
                 <Parameter Condition="Parameter.LayerPassing == 'All'">
                   <If Condition="System.Index > 0">
                     <![CDATA[, ]]>
@@ -969,12 +973,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and OData property mapping.
         /// </summary>
-        public partial class ODataMapper : ODataMapper<{{Entity.EntityName}}, ODataMapper>
+        public partial class ODataMapper : ODataMapper<{{Entity.EntityName}}, {{Entity.ODataEntity}}, ODataMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ODataMapper"/> class.
             /// </summary>
-            public ODataMapper() : base("{{Entity.ODataEntity}}")
+            public ODataMapper()
             {
 ]]>
         <If Condition="Entity.DataODataMapperInheritsFrom != null">
@@ -1003,8 +1007,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               <![CDATA[                Property(s => s.{{Property.Name}}]]>
             </Else>
           </If>
-          <If Condition="Property.DataName != null">
-            <![CDATA[, "{{Property.DataName}}"]]>
+          <![CDATA[, d => d.]]>
+          <If Condition="Property.DataName == null">
+            <Then>
+              <![CDATA[{{Property.Name}}]]>
+            </Then>
+            <Else>
+              <![CDATA[{{Property.DataName}}]]>
+            </Else>
           </If>
           <If Condition="Property.DataOperationTypes != null">
             <![CDATA[, operationTypes: OperationTypes.{{Property.DataOperationTypes}}]]>
