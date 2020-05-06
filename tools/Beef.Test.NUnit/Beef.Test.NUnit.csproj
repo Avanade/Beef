@@ -50,6 +50,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Beef.Core\Beef.Core.csproj" />
+    <ProjectReference Include="..\..\src\Beef.Grpc\Beef.Grpc.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Beef.WebApi;
 using System;
+using System.Collections.Generic;
 
 namespace Beef.Grpc
 {
@@ -121,6 +122,11 @@ namespace Beef.Grpc
         /// </summary>
         /// <param name="ex">The <see cref="System.Exception"/>.</param>
         public GrpcAgentResult(Exception ex) : base(ex) => _value = default!;
+
+        /// <summary>
+        /// Indicates whether a <see cref="Value"/> was returned as <see cref="WebApiAgentResult.Content"/>.
+        /// </summary>
+        public bool HasValue => Comparer<T>.Default.Compare(_value, default!) != 0;
 
         /// <summary>
         /// Gets the response value.

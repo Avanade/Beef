@@ -3,6 +3,7 @@ using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
 using Beef.Test.NUnit;
+using grpc = Beef.Demo.Common.Grpc;
 using Cosmos = Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
@@ -312,8 +313,8 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.GetAsync(1.ToGuid())).Value;
 
             // Update the Robot with an address.
-            v.ModelNo = v.ModelNo + "X";
-            v.SerialNo = v.SerialNo + "Y";
+            v.ModelNo += "X";
+            v.SerialNo += "Y";
 
             v = AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -373,10 +374,14 @@ namespace Beef.Demo.Test
         #region Grpc_Get
 
         [Test, TestSetUp]
-        public async Task M120_Grpc_Get_Found()
+        public void M120_Grpc_Get_Found()
         {
-            var ra = new Beef.Demo.Common.Grpc.RobotAgent(AgentTester.HttpClient);
-            var rr = await ra.GetAsync(1.ToGuid());
+            AgentTester.CreateGrpc<grpc.RobotAgent, Robot>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .IgnoreChangeLog()
+                .IgnoreETag()
+                .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456", PowerSource = "F" })
+                .Run((a) => a.Agent.GetAsync(1.ToGuid()));
         }
 
         #endregion
