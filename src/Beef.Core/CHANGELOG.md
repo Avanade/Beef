@@ -2,10 +2,13 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.7
+## v3.1.8
 - *Fixed:* The `PropertyMapper` will only auto map sub-entities at mapping execution time where no converter or mapper has been specified; was previously always auto mapping at construction, often unnecessarily where a converter or mapper was later being specified.
 - *Enhanced:* The `PropertyMapper` will check if a _collection_ property is writeable (i.e. read-only) before overridding value; if not, will using the underlying `Add` method to update.
 - *Enhanced:* The `ComplexTypeReflector` now exposes a `MethodInfo? AddMethod` property for an underlying _collection_ (where found). 
+
+## v3.1.7
+- *Enhanced:* Added additional transformations `StartsWith`, `EndsWith`, `Contains`, `TrimStart`, `TrimEnd` and `Remove` to the code-generation templating.
 
 ## v3.1.6
 - *Enhanced:* Added `IEquatable<T>` to `EntityBase`, `EntityBaseCollection` and `ReferenceDataBase`. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation. 

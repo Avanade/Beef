@@ -245,7 +245,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             <![CDATA[        [ProducesResponseType(typeof(]]>
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.Name}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Else><![CDATA[{{Operation.ReturnType:Remove('?')}}]]></Else>
             </If>
             <![CDATA[), (int)HttpStatusCode.]]>
             <If Condition="Operation.WebApiStatus != null">
@@ -281,7 +281,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             <![CDATA[        [ProducesResponseType(typeof(]]>
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.Name}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Else><![CDATA[{{Operation.ReturnType:Remove('?')}}]]></Else>
             </If>
             <![CDATA[), (int)HttpStatusCode.]]>
             <If Condition="Operation.WebApiStatus != null">
@@ -316,7 +316,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             <![CDATA[        [ProducesResponseType(typeof(]]>
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.Name}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Else><![CDATA[{{Operation.ReturnType::Remove('?')}}]]></Else>
             </If>
             <![CDATA[), (int)HttpStatusCode.]]>
             <If Condition="Operation.WebApiStatus != null">
@@ -351,7 +351,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
             <![CDATA[        [ProducesResponseType(typeof(]]>
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.Name}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Else><![CDATA[{{Operation.ReturnType::Remove('?')}}]]></Else>
             </If>
             <![CDATA[), (int)HttpStatusCode.]]>
             <If Condition="Operation.WebApiStatus != null">
@@ -426,7 +426,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                   <![CDATA[        [Route("{{Operation.WebApiRoute}}")]
 ]]>
                 </If>
-                <![CDATA[        [ProducesResponseType(typeof({{Operation.ReturnType}}), (int)HttpStatusCode.]]>
+                <![CDATA[        [ProducesResponseType(typeof({{Operation.ReturnType:Remove('?')}}), (int)HttpStatusCode.]]>
                 <If Condition="Operation.WebApiStatus != null">
                   <Then><![CDATA[{{Operation.WebApiStatus}}]]></Then>
                   <Else><![CDATA[OK]]></Else>

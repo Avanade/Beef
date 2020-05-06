@@ -84,6 +84,11 @@ namespace Beef.Demo.Business
         private readonly Func<Task>? _dataSvcCustomOnBeforeAsync;
         private readonly Func<int, Task>? _dataSvcCustomOnAfterAsync;
 
+        private readonly Func<string?, Task>? _getNullOnPreValidateAsync;
+        private readonly Action<MultiValidator, string?>? _getNullOnValidate;
+        private readonly Func<string?, Task>? _getNullOnBeforeAsync;
+        private readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
+
         private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
         private readonly Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
         private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
@@ -431,6 +436,31 @@ namespace Beef.Demo.Business
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
                 var __result = await PersonDataSvc.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
+                Cleaner.Clean(__result);
+                return __result;
+            });
+        }
+
+        /// <summary>
+        /// Get Null.
+        /// </summary>
+        /// <param name="name">The Name.</param>
+        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        public Task<Person?> GetNullAsync(string? name)
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                EntityBase.CleanUp(name);
+                if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name))
+                    .Run().ThrowOnError();
+
+                if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
+                var __result = await PersonDataSvc.GetNullAsync(name).ConfigureAwait(false);
+                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });

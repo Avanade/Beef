@@ -37,6 +37,7 @@ namespace Beef.Demo.Business.DataSvc
         private static readonly Func<Task>? _markOnAfterAsync;
         private static readonly Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
         private static readonly Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
+        private static readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
         private static readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private static readonly Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private static readonly Func<Person, Task>? _createWithEfOnAfterAsync;
@@ -189,7 +190,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IPersonData>().MergeAsync(fromId, toId).ConfigureAwait(false);
                 await Beef.Events.Event.PublishAsync(
                     Beef.Events.EventData.Create(__result, "Demo.Person.{fromId}", "Merge", new KeyValuePair<string, object?>("fromId", fromId), new KeyValuePair<string, object?>("toId", toId))).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
             });
@@ -253,6 +253,22 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
+                return __result;
+            });
+        }
+
+        /// <summary>
+        /// Get Null.
+        /// </summary>
+        /// <param name="name">The Name.</param>
+        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        public static Task<Person?> GetNullAsync(string? name)
+        {
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            {
+                var __result = await Factory.Create<IPersonData>().GetNullAsync(name).ConfigureAwait(false);
+                ExecutionContext.Current.CacheSet(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
                 return __result;
             });
         }
