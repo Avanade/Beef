@@ -247,6 +247,21 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Get Null.
+        /// </summary>
+        /// <param name="name">The Name.</param>
+        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        [HttpGet]
+        [Route("null")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public IActionResult GetNull(string? name)
+        {
+            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetNullAsync(name),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>

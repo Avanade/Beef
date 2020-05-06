@@ -119,6 +119,11 @@ namespace Beef.Demo.Business.Data
             return pd;
         }
 
+        private Task<Person> GetNullOnImplementationAsync(string name)
+        {
+            return Task.FromResult<Person>(null);
+        }
+
         public partial class EfMapper
         {
             private readonly EfDbMapper<Address, EfModel.Person> _addressMapper = EfDbMapper.CreateAuto<Address, EfModel.Person>();

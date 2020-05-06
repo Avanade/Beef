@@ -104,6 +104,13 @@ namespace Beef.Demo.Business.Data
         Task<PersonDetail> UpdateDetailAsync(PersonDetail value);
 
         /// <summary>
+        /// Get Null.
+        /// </summary>
+        /// <param name="name">The Name.</param>
+        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        Task<Person?> GetNullAsync(string? name);
+
+        /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>

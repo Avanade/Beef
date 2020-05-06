@@ -70,6 +70,8 @@ namespace Beef.Demo.Business.Data
 
         private readonly Action<Exception>? _updateDetailOnException;
 
+        private readonly Action<Exception>? _getNullOnException;
+
         private readonly Func<IQueryable<EfModel.Person>, PersonArgs?, IEfDbArgs, IQueryable<EfModel.Person>>? _getByArgsWithEfOnQuery;
         private readonly Func<PersonArgs?, IEfDbArgs, Task>? _getByArgsWithEfOnBeforeAsync;
         private readonly Func<PersonCollectionResult, PersonArgs?, Task>? _getByArgsWithEfOnAfterAsync;
@@ -279,6 +281,17 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, () => UpdateDetailOnImplementationAsync(value),
                 new BusinessInvokerArgs { ExceptionHandler = _updateDetailOnException });
+        }
+
+        /// <summary>
+        /// Get Null.
+        /// </summary>
+        /// <param name="name">The Name.</param>
+        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        public Task<Person?> GetNullAsync(string? name)
+        {
+            return DataInvoker.Default.InvokeAsync(this, () => GetNullOnImplementationAsync(name),
+                new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
         }
 
         /// <summary>

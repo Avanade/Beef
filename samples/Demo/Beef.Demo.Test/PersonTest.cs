@@ -979,6 +979,14 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.MarkAsync());
         }
 
+        [Test, TestSetUp]
+        public void I130_Null()
+        {
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run((a) => a.Agent.GetNullAsync("blah"));
+        }
+
         #endregion
     }
 }
