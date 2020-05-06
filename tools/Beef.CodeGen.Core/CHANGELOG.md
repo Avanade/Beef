@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.5
+- *Fixed:* A null reference would occur where using a custom operation type and the resulting value is `null`. Code generation has been amended to support nullable return types (e.g. `Person?`) to allow.
+
 ## v3.1.4
 - *Enhanced:* Added `IEquatable<T>` implementation to the entity code generation. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation.
 

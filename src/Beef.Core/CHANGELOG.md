@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.7
+- *Enhanced:* Added additional transformations `StartsWith`, `EndsWith`, `Contains`, `TrimStart`, `TrimEnd` and `Remove` to the code-generation templating.
+
 ## v3.1.6
 - *Enhanced:* Added `IEquatable<T>` to `EntityBase`, `EntityBaseCollection` and `ReferenceDataBase`. Enables support for full property, sub entity and collection equality `Equals` checking and `GetHashCode` calculation. 
 

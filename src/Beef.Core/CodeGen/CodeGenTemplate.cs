@@ -511,7 +511,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Transforms the value.
         /// </summary>
-        private string? Transform(string? transform, string? value)
+        private string? Transform(string? transform, string? value, CodeGenConfig config)
         {
             if (string.IsNullOrEmpty(transform) || string.IsNullOrEmpty(value))
                 return value;
@@ -532,7 +532,30 @@ namespace Beef.CodeGen
                 "TOPLURAL" => CodeGenerator.ToPlural(value),
                 "TOCOMMENTS" => CodeGenerator.ToComments(value),
                 "TOSEECOMMENTS" => CodeGenerator.ToSeeComments(value),
-                _ => throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent?.ToString()),
+                _ => TransformCommand(transform!, value!, config)
+            };
+        }
+
+        /// <summary>
+        /// Transforms the value using the command.
+        /// </summary>
+        private string? TransformCommand(string transform, string value, CodeGenConfig config)
+        {
+            var cmdParts = transform.Split("(", StringSplitOptions.RemoveEmptyEntries);
+            if (cmdParts.Length != 2 || cmdParts[1].Length < 2 || !cmdParts[1].EndsWith(")", StringComparison.OrdinalIgnoreCase))
+                throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent?.ToString());
+
+            string arg = GetValue(cmdParts[1][0..^1], config)?.ToString()!;
+
+            return (cmdParts[0].ToUpperInvariant()) switch
+            {
+                "STARTSWITH" => value.StartsWith(arg, StringComparison.Ordinal).ToString(CultureInfo.InvariantCulture),
+                "ENDSWITH" => value.EndsWith(arg, StringComparison.Ordinal).ToString(CultureInfo.InvariantCulture),
+                "CONTAINS" => value.Contains(arg, StringComparison.Ordinal).ToString(CultureInfo.InvariantCulture),
+                "TRIMEND" => value.EndsWith(arg, StringComparison.Ordinal) ? value.Substring(0, value.IndexOf(arg, StringComparison.Ordinal)) : value,
+                "TRIMSTART" => value.StartsWith(arg, StringComparison.Ordinal) ? value[value.IndexOf(arg, StringComparison.Ordinal)..] : value,
+                "REMOVE" => value.Replace(arg, "", StringComparison.Ordinal),
+                _ => throw new CodeGenException($"Transform operation {transform} is not valid.", _xmlCurrent?.ToString())
             };
         }
 
@@ -676,7 +699,7 @@ namespace Beef.CodeGen
 
             for (int i = 1; i < parts.Length; i++)
             {
-                value = Transform(parts[i], value);
+                value = Transform(parts[i], value, config);
             }
 
             return value;

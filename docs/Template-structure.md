@@ -96,8 +96,16 @@ String-based values can be further transformed, using one of the following:
 - `ToComments` - converts to comments where any embedded `{{xyz}}` string will be converted to C# see comments (as per ToSeeComments). 
 - `ToSeeComments` - converts to C# see comments; e.g. `List<int>` would become `<see cref="List{int}"/>` respectively.
 - `ConvertMustacheComments` - converts mustache value to C# see comments; e.g. `{{xxx}}` would become `<see cref='xxx'/>`.
+- `StartsWith(Var-Value)` - indicates whether the value starts with the `Var-Value` instance.
+- `EndsWith(Var-Value)` - indicates whether the value ends with the `Var-Value` instance.
+- `Contains(Var-Value)` - indicates whether the value contains the `Var-Value` instance.
+- `TrimStart(Var-Value)` - removes the `Var-Value` instance from the start of the value.
+- `TrimEnd(Var-Value)` - removes the `Var-Value` instance from the end of the value.
+- `Remove(Var-Value)` - removes the `Var-Value` instances from the values.
 
 The above transformations suffix the existing dot-based notation (note that the transform must also be prefixed by a colon); e.g. `Entity.Name:ToPascalCase`.
+
+Where the transformation is suffixed by `(Var-Value)` this indicates that an argument is also passed to the transformation command; e.g. `Entity.Name:Remove('?')`.
 
 <br>
 
