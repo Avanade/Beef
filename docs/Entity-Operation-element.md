@@ -22,7 +22,7 @@ An example is as follows:
 <Operation Name="UpdateBatch" Text="Upserts a {{CustomerGroupCollection}} as a batch" OperationType="Custom" WebApiRoute="{company}" WebApiMethod="HttpPut">
 ```
 
-<br>
+<br/>
 
 ## Attributes
 
@@ -42,7 +42,7 @@ Attribute | Description
 `ReturnType` | Specifies the .NET return Type for the operation. Defaults to the parent `Entity` name for `OperationType` options: `Get`, `Create` and `Update`; otherwise, defaults to `void`.
 `ReturnText` | Text to be used in comments. This is only used for `OperationType` option `Custom`. To create a `<see cref="XXX"/>` use `{{XXX}}` shorthand.
 
-<br>
+<br/>
 
 ### Data attributes
 
@@ -56,7 +56,7 @@ Attribute | Description
 `DataCosmosValueContainer` | Indicates that the `CosmosDbValueContainer` is to be used; otherwise, `CosmosDbContainer` (default). Overrides the `Entity.CosmosValueContainer` value.
 `DataCosmosPartitionKey` | Specifies the C# code to be used for setting the Cosmos PartitionKey (optional) where AutoImplement is 'Cosmos'. Overrides the  `Entity.CosmosPartitionKey` value.
 
-<br>
+<br/>
 
 ### Event attributes
 
@@ -67,7 +67,7 @@ Attribute | Description
 `EventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a Create, Update or Delete. Uses `Config` value / `Entity` value (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
 `EventSubject` | Specifies the event subject template and corresponding event action pair separated by a colon. The event subject template defaults to `Config.AppName`.`Entity.Name` plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}`. The event action defaults to `WebApiOperationType` or `OperationType` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.
 
-<br>
+<br/>
 
 ### Web API attributes
 
@@ -82,7 +82,7 @@ Attribute | Description
 `WebApiOperationType` | Specifies (overrides) the `ExecutionContext.OperationType` (CRUD denotation) where it cannot be inferred from the `OperationType`. Options are `Create`, `Read`, `Update`, `Delete` and `Unspecified`.
 `PagingArgsParams` | Specifies the `PagingArgs` parameters to specifically use for the WebApi Controller. Options are: `PageNumberSize` (default), `PageBookmarkSize`, or `PageNumberBookmarkSize`.
 
-<br>
+<br/>
 
 ### Authorization attributes
 
@@ -94,7 +94,7 @@ Attribute | Description
 `AuthEntity` | Specifies the entity (permission) of the `ExecutionContext.IsAuthorized(entity, action)`. Defaults to the entity name where not specified.
 `AuthAction` | Specifies the action (permission) of the `ExecutionContext.IsAuthorized(entity, action)`.
 
-<br>
+<br/>
 
 ### Layer option attributes
 
@@ -107,7 +107,7 @@ Attribute | Description
 `DataSvcCustom` | Indicates that the `DataSvc` logic is a custom implementation; i.e. no `Data` invocation logic is to be generated.
 `DataSvcTransaction` | Indicates that a `System.TransactionScope` should be created around the `DataSvc` logic.
 
-<br>
+<br/>
 
 ### Exclusion attributes
 
@@ -123,3 +123,14 @@ Attribute | Description
 `ExcludeManager` | Indicates whether to exclude the creation of the Manager class (`XxxManager.cs`)
 `ExcludeWebApi` | Indicates whether to exclude the creation of the Web API Controller class (`XxxController.cs`)
 `ExcludeWebApiAgent` | Indicates whether to exclude the creation of the Web API Agent class (`XxxAgent.cs`)
+
+<br/>
+
+### gRPC attributes
+
+The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:
+
+Attribute | Description
+-|-
+`Grpc` | Indicates whether gRPC support is required for the Operation.
+`ExcludeGrpcAgent` | Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).

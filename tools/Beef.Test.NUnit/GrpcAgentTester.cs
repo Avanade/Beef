@@ -3,7 +3,9 @@ using Beef.Entities;
 using Beef.Events;
 using Beef.Grpc;
 using Beef.RefData;
+using Google.Protobuf;
 using KellermanSoftware.CompareNetObjects;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -41,59 +43,22 @@ namespace Beef.Test.NUnit
             Logger.Default.Info("GRPC AGENT TESTER...");
             Logger.Default.Info("");
             Logger.Default.Info($"REQUEST >");
-            //Logger.Default.Info($"Request: {result.Request.Method} {result.Request.RequestUri}");
-
             if (!string.IsNullOrEmpty(Username))
                 Logger.Default.Info($"Username: {Username}");
 
-//            Logger.Default.Info($"Headers: {(result.Request.Headers == null || !result.Request.Headers.Any() ? "none" : "")}");
-//            if (result.Request.Headers != null && result.Request.Headers.Any())
-//            {
-//                foreach (var hdr in result.Request.Headers)
-//                {
-//                    var sb = new StringBuilder();
-//                    foreach (var v in hdr.Value)
-//                    {
-//                        if (sb.Length > 0)
-//                            sb.Append(", ");
-
-//                        sb.Append(v);
-//                    }
-
-//                    Logger.Default.Info($"  {hdr.Key}: {sb}");
-//                }
-//            }
-
-//            JToken? json = null;
-//            if (result.Request.Content != null)
-//            {
-//                try
-//                {
-//                    json = JToken.Parse(result.Request.Content.ReadAsStringAsync().Result);
-//                }
-//#pragma warning disable CA1031 // Do not catch general exception types; by-design.
-//                catch (Exception) { }
-//#pragma warning restore CA1031
-
-//                Logger.Default.Info($"Content: [{result.Request.Content?.Headers?.ContentType?.MediaType ?? "None"}]");
-//                Logger.Default.Info(json == null ? result.Request.Content?.ToString() : json.ToString());
-//            }
+            Logger.Default.Info($"gRPC Request: {(result.Request == null ? "null" : $"{result.Request.CalculateSize()}bytes [JSON representation]")}");
+            if (result.Request != null)
+                Logger.Default.Info(JsonConvert.SerializeObject(result.Request, Formatting.Indented));
 
             Logger.Default.Info("");
             Logger.Default.Info($"RESPONSE >");
-            //Logger.Default.Info($"HttpStatusCode: {result.StatusCode} ({(int)result.StatusCode})");
+            if (result.Status.Detail == null)
+                Logger.Default.Info($"gRPC Status: {result.Status.StatusCode}");
+            else
+                Logger.Default.Info($"gRPC Status: {result.Status.StatusCode} ({result.Status.Detail})");
+
+            Logger.Default.Info($"HttpStatusCode: {result.HttpStatusCode} ({(int)result.HttpStatusCode})");
             Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
-
-//            var hdrs = result.Response?.Headers?.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            //Logger.Default.Info($"Headers: {(hdrs == null || !hdrs.Any() ? "none" : "")}");
-            //if (hdrs != null && hdrs.Any())
-            //{
-            //    foreach (var hdr in hdrs)
-            //    {
-            //        Logger.Default.Info($"  {hdr}");
-            //    }
-            //}
-
             Logger.Default.Info($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
 
             if (result.Messages != null && result.Messages.Count > 0)
@@ -106,26 +71,11 @@ namespace Beef.Test.NUnit
                 Logger.Default.Info(null);
             }
 
-//            json = null;
-//            if (!string.IsNullOrEmpty(result.Content) && result.Response?.Content?.Headers?.ContentType?.MediaType == "application/json")
-//            {
-//                try
-//                {
-//                    json = JToken.Parse(result.Content);
-//                }
-//#pragma warning disable CA1031 // Do not catch general exception types; by-design.
-//                catch (Exception) { /* This is being swallowed by design. */ }
-//#pragma warning restore CA1031
-//            }
+            var bytes = (result.Response is IMessage respm) ? respm.CalculateSize() : 0;
 
-//            TestContext.Out.Write($"Content: [{result.Response?.Content?.Headers?.ContentType?.MediaType ?? "none"}]");
-//            if (json != null)
-//            {
-//                Logger.Default.Info(null);
-//                Logger.Default.Info(json.ToString());
-//            }
-//            else
-//                Logger.Default.Info($"{(string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}");
+            Logger.Default.Info($"gRPC Response: {(result.Response == null ? "null" : $"{bytes}bytes [JSON representation]")}");
+            if (result.Response != null)
+                Logger.Default.Info(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
             Logger.Default.Info("");
             Logger.Default.Info($"EVENTS PUBLISHED >");
@@ -145,8 +95,8 @@ namespace Beef.Test.NUnit
             Logger.Default.Info(null);
 
             // Perform checks.
-            //if (_expectedStatusCode.HasValue && _expectedStatusCode != result.StatusCode)
-            //    Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.StatusCode} ({(int)result.StatusCode}).");
+            if (_expectedStatusCode.HasValue && _expectedStatusCode != result.HttpStatusCode)
+                Assert.Fail($"Expected HttpStatusCode was '{_expectedStatusCode} ({(int)_expectedStatusCode})'; actual was {result.HttpStatusCode} ({(int)result.HttpStatusCode}).");
 
             if (_expectedErrorType.HasValue && _expectedErrorType != result.ErrorType)
                 Assert.Fail($"Expected ErrorType was '{_expectedErrorType}'; actual was '{result.ErrorType}'.");
@@ -256,7 +206,7 @@ namespace Beef.Test.NUnit
         /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
         public GrpcAgentTester<TAgent> ExpectEvent<T>(string template, string action, T eventValue, params string[] membersToIgnore)
         {
-            SetExpectEvent<T>(false, template, action, eventValue, membersToIgnore);
+            SetExpectEvent(false, template, action, eventValue, membersToIgnore);
             return this;
         }
 

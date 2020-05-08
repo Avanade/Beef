@@ -2,6 +2,7 @@
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Template OutputGenDirName="Generated">
   <Entity Condition="Config.Grpc == true and Entity.Grpc == true and Entity.GrpcAgent == true and Entity.OperationCount > 0">
+    <Set Name="System.EntityExclude" Condition="Entity.ExcludeGrpcAgent == true or Entity.ExcludeAll == true" Value="true" Otherwise="false" />
     <Set Name="System.EntityName" Value="null" />
     <Operation Condition="Operation.Grpc == true and Operation.OperationType != 'Patch'">
       <Set Name="System.EntityName" Value="Entity.Name"/>
@@ -470,24 +471,56 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Grpc.ServiceAgents
         <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
           <Set Name="System.ReturnType" Value="'{{Operation.ReturnType}}'" />
         </If>
-        <![CDATA[            return Invoke]]>
-        <If Condition="System.ReturnType == 'void'">
-          <Then><![CDATA[NoResult]]></Then>
-          <Else><![CDATA[WithResult]]></Else>
-        </If>
-        <![CDATA[Async(async (c, o) => ]]>
-        <If Condition="System.ReturnType != 'void'">
-          <![CDATA[Transformers.{{System.ReturnType}}.MapToSrce(]]>
-        </If>
-        <![CDATA[await c.{{Operation.Name}}Async(]]>
+        <![CDATA[            return InvokeAsync((c, o) => c.{{Operation.Name}}Async(]]>
         <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.PagingArgs == true">
           <![CDATA[__req, ]]>
         </If>
-        <![CDATA[o)]]>
-        <If Condition="System.ReturnType != 'void'">
-          <![CDATA[)!]]>
+        <![CDATA[o), ]]>
+        <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.PagingArgs == true">
+          <![CDATA[__req, ]]>
         </If>
-        <![CDATA[, requestOptions);
+        <If Condition="System.ReturnType != 'void'">
+          <Set Name="System.Nullable" Condition="System.ReturnType:EndsWith('?') == true" Value="true" Otherwise="false" />
+          <Set Name="System.ReturnType2" Value="System.ReturnType:Remove('?')" />
+          <Switch Value="System.ReturnType2">
+            <Case Value="'void'"></Case>
+            <Case Value="'string'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'bool'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'int'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'uint'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'short'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'ushort'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'long'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'ulong'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Case Value="'DateTime'">
+              <![CDATA[Transformers.]]>
+              <If Condition="System.Nullable == true">
+                <![CDATA[Nullable]]>
+              </If>
+              <![CDATA[DateTimeToTimestamp]]>
+            </Case>
+            <Case Value="'Guid'">
+              <![CDATA[Transformers.]]>
+              <If Condition="System.Nullable == true">
+                <![CDATA[Nullable]]>
+              </If>
+              <![CDATA[GuidToStringConverter]]>
+            </Case>
+            <Case Value="'decimal'">
+              <![CDATA[Transformers.]]>
+              <If Condition="System.Nullable == true">
+                <![CDATA[Nullable]]>
+              </If>
+              <![CDATA[DecimalToDecimalConverter]]>
+            </Case>
+            <Case Value="'TimeSpan'"><![CDATA[{{Parameter.ArgumentName}}]]></Case>
+            <Default>
+              <![CDATA[Transformers.{{System.ReturnType2}}]]>
+            </Default>
+          </Switch>
+          <![CDATA[, ]]>
+        </If>
+        <![CDATA[requestOptions);
         }
 ]]>
       </Operation>

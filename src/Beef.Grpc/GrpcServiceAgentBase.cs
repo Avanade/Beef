@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 using System;
@@ -105,12 +107,13 @@ namespace Beef.Grpc
         /// Invokes the gRPC call with no result asynchronously.
         /// </summary>
         /// <param name="func">The <paramref name="func"/> to perform the gRPC call.</param>
+        /// <param name="request">The gRPC request value (for auditing).</param>
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="GrpcAgentResult"/>.</returns>
-        public Task<GrpcAgentResult> InvokeNoResultAsync(Func<TClient, CallOptions, Task> func, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public Task<GrpcAgentResult> InvokeAsync(Func<TClient, CallOptions, AsyncUnaryCall<Empty>> func, IMessage? request, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
             if (requestOptions?.ETag != null)
                 throw new NotImplementedException();
@@ -120,14 +123,13 @@ namespace Beef.Grpc
                 try
                 {
                     var options = new CallOptions();
-                    await Check.NotNull(func, nameof(func)).Invoke(Client, options).ConfigureAwait(false);
-                    return new GrpcAgentResult();
+                    using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
+                    await call.ResponseAsync.ConfigureAwait(false);
+                    return new GrpcAgentResult(call.GetStatus(), call.GetTrailers(), request);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, catching everything here.
-                catch (Exception ex)
-#pragma warning restore CA1031
+                catch (RpcException rex)
                 {
-                    return new GrpcAgentResult(ex);
+                    return new GrpcAgentResult(rex, request);
                 }
             }, null!, memberName, filePath, lineNumber);
         }
@@ -135,14 +137,18 @@ namespace Beef.Grpc
         /// <summary>
         /// Invokes the gRPC call with a result asynchronously.
         /// </summary>
-        /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TResult">The result <see cref="System.Type"/>.</typeparam>
+        /// <typeparam name="TResponse">The gRPC response <see cref="System.Type"/>.</typeparam>
         /// <param name="func">The <paramref name="func"/> to perform the gRPC call.</param>
+        /// <param name="request">The gRPC request value (for auditing).</param>
+        /// <param name="mapper">The <see cref="Beef.Mapper.EntityMapper{TResult, TResponse}"/> to map the result from the response.</param>
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <param name="memberName">The method or property name of the caller to the method.</param>
         /// <param name="filePath">The full path of the source file that contains the caller.</param>
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         /// <returns>The <see cref="GrpcAgentResult{T}"/>.</returns>
-        public Task<GrpcAgentResult<TResult>> InvokeWithResultAsync<TResult>(Func<TClient, CallOptions, Task<TResult>> func, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        public Task<GrpcAgentResult<TResult>> InvokeAsync<TResult, TResponse>(Func<TClient, CallOptions, AsyncUnaryCall<TResponse>> func, IMessage? request, Beef.Mapper.EntityMapper<TResult, TResponse> mapper, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+            where TResult : class, new() where TResponse : class, new()
         {
             if (requestOptions?.ETag != null)
                 throw new NotImplementedException();
@@ -152,14 +158,50 @@ namespace Beef.Grpc
                 try
                 {
                     var options = new CallOptions();
-                    var result = await Check.NotNull(func, nameof(func)).Invoke(Client, options).ConfigureAwait(false);
-                    return new GrpcAgentResult<TResult>(result);
+                    using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
+                    var response = await call.ResponseAsync.ConfigureAwait(false);
+                    var result = Check.NotNull(mapper, nameof(mapper)).MapToSrce(response);
+                    return new GrpcAgentResult<TResult>(call.GetStatus(), call.GetTrailers(), request, response, result!);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, catching everything here.
-                catch (Exception ex)
-#pragma warning restore CA1031
+                catch (RpcException rex)
                 {
-                    return new GrpcAgentResult<TResult>(ex);
+                    return new GrpcAgentResult<TResult>(rex, request);
+                }
+            }, null!, memberName, filePath, lineNumber);
+        }
+
+        /// <summary>
+        /// Invokes the gRPC call with a result asynchronously.
+        /// </summary>
+        /// <typeparam name="TResult">The result <see cref="System.Type"/>.</typeparam>
+        /// <typeparam name="TResponse">The gRPC response <see cref="System.Type"/>.</typeparam>
+        /// <param name="func">The <paramref name="func"/> to perform the gRPC call.</param>
+        /// <param name="request">The gRPC request value (for auditing).</param>
+        /// <param name="converter">The optional <see cref="Beef.Mapper.Converters.IPropertyMapperConverter{TResult, TResponse}"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="filePath">The full path of the source file that contains the caller.</param>
+        /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
+        /// <returns>The <see cref="GrpcAgentResult{T}"/>.</returns>
+        public Task<GrpcAgentResult<TResult>> InvokeAsync<TResult, TResponse>(Func<TClient, CallOptions, AsyncUnaryCall<TResponse>> func, IMessage? request, Beef.Mapper.Converters.IPropertyMapperConverter<TResult, TResponse>? converter, GrpcRequestOptions? requestOptions = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
+        {
+            if (requestOptions?.ETag != null)
+                throw new NotImplementedException();
+
+            return GrpcServiceAgentInvoker<TClient>.Default.InvokeAsync(this, async () =>
+            {
+                try
+                {
+                    var options = new CallOptions();
+                    using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
+                    TResponse response = await call.ResponseAsync.ConfigureAwait(false);
+                    return new GrpcAgentResult<TResult>(call.GetStatus(), call.GetTrailers(), request, response, converter == null 
+                        ? (TResult)Convert.ChangeType(response, typeof(TResult), System.Globalization.CultureInfo.InvariantCulture) 
+                        : converter.ConvertToSrce(response));
+                }
+                catch (RpcException rex)
+                {
+                    return new GrpcAgentResult<TResult>(rex, request);
                 }
             }, null!, memberName, filePath, lineNumber);
         }

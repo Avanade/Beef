@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -91,9 +95,7 @@ namespace Beef.Grpc
                     service.Context.ResponseTrailers.Add(GrpcConsts.ErrorCodeHeaderName, ((int)ex.ErrorType).ToString(System.Globalization.CultureInfo.InvariantCulture));
 
                     if (ex is ValidationException vex)
-                    {
-                        // TODO: Add messages to the response trailers.
-                    }
+                        AddMessagesToResponseTrailers(service, vex.Messages);
 
                     throw new grpc.RpcException(status.Value);
                 }
@@ -103,6 +105,22 @@ namespace Beef.Grpc
                 Beef.Diagnostics.Logger.Default.Exception(exception, UnhandledExceptionMessage);
 
             throw new grpc.RpcException(new grpc.Status(UnhandledExceptionStatusCode, IncludeUnhandledExceptionInResponse ? exception.ToString() : UnhandledExceptionMessage));
+        }
+
+        /// <summary>
+        /// Adds the messages to response trailers as a binary byte array.
+        /// </summary>
+        private static void AddMessagesToResponseTrailers(GrpcServiceBase service, MessageItemCollection? messages)
+        {
+            if (messages == null || messages.Count == 0)
+                return;
+
+            using var ms = new MemoryStream();
+            using var bdw = new BsonDataWriter(ms);
+            var js = new JsonSerializer();
+            js.Serialize(bdw, new GrpcMessages { Messages = messages });
+
+            service.Context.ResponseTrailers.Add(GrpcConsts.MessagesHeaderName, ms.ToArray());
         }
 
         /// <summary>
@@ -243,13 +261,16 @@ namespace Beef.Grpc
         /// <summary>
         /// Handle the status based on the corresponding <see cref="HttpStatusCode"/>.
         /// </summary>
-        private static void HandleResponseStatus(HttpStatusCode statusCode)
+        private void HandleResponseStatus(HttpStatusCode statusCode)
         {
+            Context.ResponseTrailers.Add(GrpcConsts.HttpStatusCodeHeaderName, ((int)statusCode).ToString(System.Globalization.CultureInfo.InvariantCulture));
+
             switch (statusCode)
             {
                 case HttpStatusCode.OK:
                 case HttpStatusCode.Created:
                 case HttpStatusCode.NoContent:
+                    AddMessagesToResponseTrailers(this, ExecutionContext.Current?.Messages);
                     break;
 
                 case HttpStatusCode.NotFound:

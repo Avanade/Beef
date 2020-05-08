@@ -193,3 +193,14 @@ Attribute | Description
 `ExcludeManager` | Indicates whether to exclude the creation of the Manager class (`XxxManager.cs`).
 `ExcludeWebApi` | Indicates whether to exclude the creation of the Web API Controller class (`XxxController.cs`).
 `ExcludeWebApiAgent` | Indicates whether to exclude the creation of the Web API Agent class (`XxxAgent.cs`).
+
+<br/>
+
+### gRPC attributes
+
+The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:
+
+Attribute | Description
+-|-
+`Grpc` | Indicates whether gRPC support is required for the Entity. Will require each corresponding [`Property`](./Entity-Property-element.md) and [`Operation`](./Entity-Operation-element.md) to be opted-in specifically.
+`ExcludeGrpcAgent` | Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).

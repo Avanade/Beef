@@ -263,6 +263,11 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
+                  <xs:attribute name="GrpcFieldNo" type="xs:int"  use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the unique (immutable) field number required to enable gRPC support.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                 </xs:complexType>
               </xs:element>
               <xs:element minOccurs="0" maxOccurs="unbounded" name="Operation">
@@ -658,6 +663,16 @@
                   <xs:attribute name="DataCosmosPartitionKey" type="xs:string" use="optional">
                     <xs:annotation>
                       <xs:documentation>Specifies the C# code to be used for setting the Cosmos PartitionKey (defaults to 'Entity.CosmosPartitionKey').</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Grpc" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether gRPC support is required.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeGrpcAgent" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                 </xs:complexType>
@@ -1070,6 +1085,16 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="Grpc" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether gRPC support is required. Will require each corresponding Property and Operation to be opted-in specifically.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeGrpcAgent" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -1228,6 +1253,11 @@
             <xs:enumeration value="Newtonsoft"/>
           </xs:restriction>
         </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Grpc" type="xs:boolean" use="optional">
+        <xs:annotation>
+          <xs:documentation>Indicates whether gRPC support is required. Will require each Entity and corresponding Property and Operation to be opted-in specifically.</xs:documentation>
+        </xs:annotation>
       </xs:attribute>
     </xs:complexType>
   </xs:element>

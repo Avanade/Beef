@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the Gender Web API agent.
     /// </summary>
-    public partial class GenderAgent : IGenderServiceAgent
+    public partial class GenderAgent : WebApiAgentBase, IGenderServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderAgent"/> class.
@@ -44,9 +44,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return GenderServiceAgent.GetAsync(id, requestOptions);
-        }
+            => GenderServiceAgent.GetAsync(id, requestOptions);
 
         /// <summary>
         /// Creates the <see cref="Gender"/> object.
@@ -55,12 +53,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return GenderServiceAgent.CreateAsync(value, requestOptions);
-        }
+            => GenderServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
 
         /// <summary>
         /// Updates the <see cref="Gender"/> object.
@@ -70,12 +63,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return GenderServiceAgent.UpdateAsync(value, id, requestOptions);
-        }
+            => GenderServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
     }
 }
 

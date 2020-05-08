@@ -52,7 +52,7 @@ Attribute | Description
 `RefDataCache` | Defines the cache used for the ReferenceData providers. Options are: `ReferenceDataCache` (single-tenant cache), or `ReferenceDataMultiTenantCache` (multi-tenant cache). The default is `ReferenceDataCache`.
 `RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 
-<br>
+<br/>
 
 ### Namespace attributes
 
@@ -61,11 +61,21 @@ The following represents optional **namespace** attributes:
 Attribute | Description
 -|-
 `DataUsingNamespace` | Adds an additional Namespace using statement to the Data code.
-`DatabaseUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'Database'.
-`EntityFrameworkUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'EntityFramework'.
-`ODataUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'OData'.
-`CosmosUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of 'Cosmos'.
+`DatabaseUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of `Database`.
+`EntityFrameworkUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of `EntityFramework`.
+`ODataUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of `OData`.
+`CosmosUsingNamespace` | Adds an additional Namespace using statement to the Data code where using AutoImplement of `Cosmos`.
 `UsingNamespace1` | Adds an additional Namespace using statement to the Entity code.
 `UsingNamespace2` | Adds an additional Namespace using statement to the Entity code.
 `UsingNamespace3` | Adds an additional Namespace using statement to the Entity code.
 `AppendToNamespace` | The name of the entity namespace appended to end of the standard `company.appname.Common.Entities` output (defaults to `null`; being nothing to append).
+
+<br/>
+
+### gRPC attributes
+
+The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:
+
+Attribute | Description
+-|-
+`Grpc` | Indicates whether _gRPC_ support is required; must be set to `true` for any of the subordinate _gRPC_ capabilities to be code-generated. Will require each [`Entity`](./Entity-Entity-element.md) and corresponding [`Property`](./Entity-Property-element.md) and [`Operation`](./Entity-Operation-element.md) to be opted-in specifically.

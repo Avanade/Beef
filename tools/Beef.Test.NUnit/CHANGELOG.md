@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancement:* Added `GrpcAgentTester` to give similar experience to `AgentTester` for invoking the gRPC service agents for intra-domain testing.
+
 ## v3.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

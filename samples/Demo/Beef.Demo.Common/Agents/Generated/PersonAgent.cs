@@ -186,9 +186,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetNullAsync(name, requestOptions);
-        }
+            => PersonServiceAgent.GetNullAsync(name, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.

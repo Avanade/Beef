@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Template OutputGenDirName="Generated">
-  <Entity Condition="Config.Grpc == true and Entity.Grpc == true and Entity.GrpcAgent == true and Entity.OperationCount > 0">
+  <Entity Condition="Config.Grpc == true and Entity.Grpc == true and Entity.OperationCount > 0">
+    <Set Name="System.EntityExclude" Condition="Entity.ExcludeGrpcAgent == true or Entity.ExcludeAll == true" Value="true" Otherwise="false" />
     <Set Name="System.EntityName" Value="null" />
     <Operation Condition="Operation.Grpc == true and Operation.OperationType != 'Patch'">
       <Set Name="System.EntityName" Value="Entity.Name"/>

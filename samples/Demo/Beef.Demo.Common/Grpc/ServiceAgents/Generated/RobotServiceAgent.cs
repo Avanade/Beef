@@ -97,7 +97,7 @@ namespace Beef.Demo.Common.Grpc.ServiceAgents
         public Task<GrpcAgentResult<Robot>> GetAsync(Guid id, GrpcRequestOptions? requestOptions = null)
         {
             var __req = new proto.RobotGetRequest { Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
-            return InvokeWithResultAsync(async (c, o) => Transformers.Robot.MapToSrce(await c.GetAsync(__req, o))!, requestOptions);
+            return InvokeAsync((c, o) => c.GetAsync(__req, o), __req, Transformers.Robot, requestOptions);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Beef.Demo.Common.Grpc.ServiceAgents
         public Task<GrpcAgentResult<Robot>> CreateAsync(Robot value, GrpcRequestOptions? requestOptions = null)
         {
             var __req = new proto.RobotCreateRequest { Value = Transformers.Robot.MapToDest(Check.NotNull(value, nameof(value))) };
-            return InvokeWithResultAsync(async (c, o) => Transformers.Robot.MapToSrce(await c.CreateAsync(__req, o))!, requestOptions);
+            return InvokeAsync((c, o) => c.CreateAsync(__req, o), __req, Transformers.Robot, requestOptions);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Beef.Demo.Common.Grpc.ServiceAgents
         public Task<GrpcAgentResult<Robot>> UpdateAsync(Robot value, Guid id, GrpcRequestOptions? requestOptions = null)
         {
             var __req = new proto.RobotUpdateRequest { Value = Transformers.Robot.MapToDest(Check.NotNull(value, nameof(value))), Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
-            return InvokeWithResultAsync(async (c, o) => Transformers.Robot.MapToSrce(await c.UpdateAsync(__req, o))!, requestOptions);
+            return InvokeAsync((c, o) => c.UpdateAsync(__req, o), __req, Transformers.Robot, requestOptions);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Beef.Demo.Common.Grpc.ServiceAgents
         public Task<GrpcAgentResult> DeleteAsync(Guid id, GrpcRequestOptions? requestOptions = null)
         {
             var __req = new proto.RobotDeleteRequest { Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
-            return InvokeNoResultAsync(async (c, o) => await c.DeleteAsync(__req, o), requestOptions);
+            return InvokeAsync((c, o) => c.DeleteAsync(__req, o), __req, requestOptions);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Beef.Demo.Common.Grpc.ServiceAgents
         public Task<GrpcAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, GrpcRequestOptions? requestOptions = null)
         {
             var __req = new proto.RobotGetByArgsRequest { Args = Transformers.RobotArgs.MapToDest(args), Paging = Transformers.PagingArgsToPagingArgsConverter.ConvertToDest(paging!) };
-            return InvokeWithResultAsync(async (c, o) => Transformers.RobotCollectionResult.MapToSrce(await c.GetByArgsAsync(__req, o))!, requestOptions);
+            return InvokeAsync((c, o) => c.GetByArgsAsync(__req, o), __req, Transformers.RobotCollectionResult, requestOptions);
         }
     }
 }

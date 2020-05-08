@@ -94,7 +94,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<RobotCollectionResult>(context, async () =>
             {
                 var __req = request ?? new RobotGetByArgsRequest();
-                var __result = await Factory.Create<IRobotManager>().GetByArgsAsync(Transformers.RobotArgs.MapToSrce(__req.Args)!, Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging)!);
+                var __result = await Factory.Create<IRobotManager>().GetByArgsAsync(Transformers.RobotArgs.MapToSrce(__req.Args)!, __req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging));
                 return Transformers.RobotCollectionResult.MapToDest(__result!)!;
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent).ExecuteAsync();
         }
