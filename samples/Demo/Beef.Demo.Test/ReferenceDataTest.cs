@@ -108,7 +108,7 @@ namespace Beef.Demo.Test
 
             AgentTester.Create<ReferenceDataAgent, GenderCollection>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .Run((a) => a.Agent.GenderGetAllAsync(null, new WebApi.WebApiRequestOptions { ETag = vals.First() }));
+                .Run((a) => a.Agent.GenderGetAllAsync(null, new Beef.WebApi.WebApiRequestOptions { ETag = vals.First() }));
         }
 
         [Test, Parallelizable]
@@ -148,7 +148,7 @@ namespace Beef.Demo.Test
 
             r = AgentTester.Create<ReferenceDataAgent, PowerSourceCollection>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }, new WebApi.WebApiRequestOptions { UrlQueryString = "$inactive=true" }));
+                .Run((a) => a.Agent.PowerSourceGetAllAsync(new RefData.ReferenceDataFilter { Codes = new List<string> { "o" } }, new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "$inactive=true" }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Value);
@@ -160,7 +160,7 @@ namespace Beef.Demo.Test
         {
             var r = AgentTester.Create<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetNamedAsync(new WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
+                .Run((a) => a.Agent.GetNamedAsync(new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "gender=m,f&powerSource=e&powerSource=f&eyecolor&$include=name,items.code" }));
 
             Assert.IsNotNull(r);
             Assert.IsNotNull(r.Content);

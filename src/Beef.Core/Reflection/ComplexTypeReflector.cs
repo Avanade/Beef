@@ -41,8 +41,6 @@ namespace Beef.Reflection
     /// </summary>
     public class ComplexTypeReflector
     {
-        private MethodInfo? _addMethod;
-
         /// <summary>
         /// Private constructor.
         /// </summary>
@@ -78,6 +76,11 @@ namespace Beef.Reflection
         public bool IsCollection => ComplexTypeCode != ComplexTypeCode.Object;
 
         /// <summary>
+        /// Gets the <b>Add</b> (where available) method for an <see cref="IsCollection"/>.
+        /// </summary>
+        public MethodInfo? AddMethod { get; private set; }
+
+        /// <summary>
         /// Creates the collection type from a <see cref="PropertyInfo"/>.
         /// </summary>
         /// <param name="pi">The <see cref="PropertyInfo"/>.</param>
@@ -103,8 +106,8 @@ namespace Beef.Reflection
                     {
                         ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
                         ctr.ItemType = t;
-                        ctr._addMethod = pi.PropertyType.GetMethod("Add", new Type[] { t });
-                        if (ctr._addMethod == null)
+                        ctr.AddMethod = pi.PropertyType.GetMethod("Add", new Type[] { t });
+                        if (ctr.AddMethod == null)
                             throw new ArgumentException($"Type '{pi.DeclaringType.Name}' Property '{pi.Name}' is an ICollection<> however no Add method could be found.", nameof(pi));
                     }
                     else
@@ -122,7 +125,7 @@ namespace Beef.Reflection
                             {
                                 ctr.ComplexTypeCode = ComplexTypeCode.ICollection;
                                 ctr.ItemType = result.ItemType;
-                                ctr._addMethod = result.AddMethod;
+                                ctr.AddMethod = result.AddMethod;
                             }
                         }
                     }
@@ -265,7 +268,7 @@ namespace Beef.Reflection
 
                 case ComplexTypeCode.ICollection:
                     var c = Activator.CreateInstance(PropertyInfo.PropertyType);
-                    _addMethod!.Invoke(c, new object[] { value });
+                    AddMethod!.Invoke(c, new object[] { value });
                     return c;
             }
 
@@ -314,7 +317,7 @@ namespace Beef.Reflection
                             break;
 
                         case ComplexTypeCode.ICollection:
-                            _addMethod!.Invoke(c, new object[] { val });
+                            AddMethod!.Invoke(c, new object[] { val });
                             break;
                     }
                 }

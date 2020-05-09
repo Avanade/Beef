@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Grpc;
+using Beef.WebApi;
 using System;
 using System.Net.Http;
 
@@ -42,7 +44,7 @@ namespace Beef.Test.NUnit
     /// Provides the <see cref="AgentTester"/> arguments.
     /// </summary>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
-    public class AgentTesterRunArgs<TAgent> : AgentTesterRunArgsBase<TAgent> where TAgent : class
+    public class AgentTesterRunArgs<TAgent> : AgentTesterRunArgsBase<TAgent> where TAgent : WebApiAgentBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTesterRunArgs{TAgent}"/> class.
@@ -63,7 +65,7 @@ namespace Beef.Test.NUnit
     /// </summary>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="Type"/>.</typeparam>
-    public class AgentTesterRunArgs<TAgent, TValue> : AgentTesterRunArgsBase<TAgent> where TAgent : class
+    public class AgentTesterRunArgs<TAgent, TValue> : AgentTesterRunArgsBase<TAgent> where TAgent : WebApiAgentBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTesterRunArgs{TAgent, TValue}"/> class.
@@ -77,5 +79,46 @@ namespace Beef.Test.NUnit
         /// Gets the executing <see cref="AgentTester"/>.
         /// </summary>
         public AgentTester<TAgent, TValue> Tester { get; }
+    }
+
+    /// <summary>
+    /// Provides the <see cref="GrpcAgentTester{TAgent}"/> arguments.
+    /// </summary>
+    /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
+    public class GrpcAgentTesterRunArgs<TAgent> : AgentTesterRunArgsBase<TAgent> where TAgent : GrpcAgentBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GrpcAgentTesterRunArgs{TAgent}"/> class.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        /// <param name="beforeRequest">The action to run before the request is made.</param>
+        /// <param name="tester">The executing <see cref="AgentTester"/>.</param>
+        internal GrpcAgentTesterRunArgs(HttpClient client, Action<HttpRequestMessage> beforeRequest, GrpcAgentTester<TAgent> tester) : base(client, beforeRequest) => Tester = tester;
+
+        /// <summary>
+        /// Gets the executing <see cref="GrpcAgentTester{TAgent}"/>.
+        /// </summary>
+        public GrpcAgentTester<TAgent> Tester { get; }
+    }
+
+    /// <summary>
+    /// Provides the <see cref="GrpcAgentTester{TAgent, TValue}"/> arguments.
+    /// </summary>
+    /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
+    /// <typeparam name="TValue">The response <see cref="Type"/>.</typeparam>
+    public class GrpcAgentTesterRunArgs<TAgent, TValue> : AgentTesterRunArgsBase<TAgent> where TAgent : GrpcAgentBase
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AgentTesterRunArgs{TAgent, TValue}"/> class.
+        /// </summary>
+        /// <param name="client">The <see cref="HttpClient"/>.</param>
+        /// <param name="beforeRequest">The action to run before the request is made.</param>
+        /// <param name="tester">The executing <see cref="AgentTester"/>.</param>
+        internal GrpcAgentTesterRunArgs(HttpClient client, Action<HttpRequestMessage> beforeRequest, GrpcAgentTester<TAgent, TValue> tester) : base(client, beforeRequest) => Tester = tester;
+
+        /// <summary>
+        /// Gets the executing <see cref="GrpcAgentTester{TAgent, TValue}"/>.
+        /// </summary>
+        public GrpcAgentTester<TAgent, TValue> Tester { get; }
     }
 }

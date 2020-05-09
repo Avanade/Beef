@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
@@ -20,7 +21,7 @@ namespace Cdr.Banking.Common.Agents
     /// <summary>
     /// Provides the Transaction Web API agent.
     /// </summary>
-    public partial class TransactionAgent : ITransactionServiceAgent
+    public partial class TransactionAgent : WebApiAgentBase, ITransactionServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionAgent"/> class.
@@ -46,9 +47,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return TransactionServiceAgent.GetTransactionsAsync(accountId, args, paging, requestOptions);
-        }
+            => TransactionServiceAgent.GetTransactionsAsync(accountId, args, paging, requestOptions);
     }
 }
 

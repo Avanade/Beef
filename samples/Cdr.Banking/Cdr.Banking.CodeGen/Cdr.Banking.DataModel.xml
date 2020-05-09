@@ -5,10 +5,8 @@
        Reference data properties need to be simplified (as string) for Cosmos. 
        -->
   
-  <!-- Account model definitions.
-       The IStringIdentifier is required to aid the Beef framework in identifying the Id property.
-       -->
-  <Entity Name="Account" Text="Account model for data persistence" Implements="IStringIdentifier">
+  <!-- Account model definitions. -->
+  <Entity Name="Account" Text="Account model for data persistence">
     <Property Name="Id" Type="string" />
     <Property Name="CreationDate" Type="DateTime" />
     <Property Name="DisplayName" Type="string" />
@@ -57,7 +55,7 @@
   </Entity>
 
   <!-- Transaction model definitions -->
-  <Entity Name="Transaction" Text="Transaction model for data persistence" Implements="IStringIdentifier">
+  <Entity Name="Transaction" Text="Transaction model for data persistence">
     <Property Name="Id" Type="string" />
     <Property Name="AccountId" Type="string" />
     <Property Name="IsDetailAvailable" Type="bool" />

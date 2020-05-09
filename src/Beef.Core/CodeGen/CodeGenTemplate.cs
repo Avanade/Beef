@@ -574,7 +574,7 @@ namespace Beef.CodeGen
             {
                 if (lval is decimal)
                     dlval = (decimal)lval;
-                else
+                else if (!(lval is string) || !decimal.TryParse((string)lval, out dlval))
                     throw new CodeGenException($"Increment 'Name' attribute value '{lval}' is not a valid decimal", xml.ToString());
             }
 
@@ -587,7 +587,7 @@ namespace Beef.CodeGen
                 {
                     if (rval is decimal)
                         drval = (decimal)rval;
-                    else
+                    else if (!(rval is string) || !decimal.TryParse((string)rval, out drval))
                         throw new CodeGenException($"Increment 'Value' attribute value '{rval}' is not a valid decimal", xml.ToString());
                 }
             }

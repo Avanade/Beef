@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Enhancement:* Added code-generation templates and configuration for gRPC support.
+
 ## v3.1.5
 - *Fixed:* A null reference would occur where using a custom operation type and the resulting value is `null`. Code generation has been amended to support nullable return types (e.g. `Person?`) to allow.
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
@@ -20,7 +21,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the Robot Web API agent.
     /// </summary>
-    public partial class RobotAgent : IRobotServiceAgent
+    public partial class RobotAgent : WebApiAgentBase, IRobotServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotAgent"/> class.
@@ -44,9 +45,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return RobotServiceAgent.GetAsync(id, requestOptions);
-        }
+            => RobotServiceAgent.GetAsync(id, requestOptions);
 
         /// <summary>
         /// Creates the <see cref="Robot"/> object.
@@ -55,12 +54,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> CreateAsync(Robot value, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return RobotServiceAgent.CreateAsync(value, requestOptions);
-        }
+            => RobotServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
 
         /// <summary>
         /// Updates the <see cref="Robot"/> object.
@@ -70,12 +64,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> UpdateAsync(Robot value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return RobotServiceAgent.UpdateAsync(value, id, requestOptions);
-        }
+            => RobotServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
 
         /// <summary>
         /// Patches the <see cref="Robot"/> object.
@@ -86,9 +75,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return RobotServiceAgent.PatchAsync(patchOption, value, id, requestOptions);
-        }
+            => RobotServiceAgent.PatchAsync(patchOption, value, id, requestOptions);
 
         /// <summary>
         /// Deletes the <see cref="Robot"/> object that matches the selection criteria.
@@ -97,9 +84,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return RobotServiceAgent.DeleteAsync(id, requestOptions);
-        }
+            => RobotServiceAgent.DeleteAsync(id, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
@@ -109,9 +94,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return RobotServiceAgent.GetByArgsAsync(args, paging, requestOptions);
-        }
+            => RobotServiceAgent.GetByArgsAsync(args, paging, requestOptions);
 
         /// <summary>
         /// Raises a <see cref="Robot.PowerSource"/> change event.
@@ -121,9 +104,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource, WebApiRequestOptions? requestOptions = null)
-        {
-            return RobotServiceAgent.RaisePowerSourceChangeAsync(id, powerSource, requestOptions);
-        }
+            => RobotServiceAgent.RaisePowerSourceChangeAsync(id, powerSource, requestOptions);
     }
 }
 

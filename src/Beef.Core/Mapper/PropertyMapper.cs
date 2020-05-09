@@ -139,19 +139,6 @@ namespace Beef.Mapper
                     DestUnderlyingPropertyType = DestComplexTypeReflector.ItemType;
             }
 
-            if (IsSrceComplexType && IsDestComplexType)
-            {
-                // This is auto-mapping between types as a default.
-                if ((!SrceComplexTypeReflector!.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
-                    && (!DestComplexTypeReflector!.IsCollection || DestComplexTypeReflector.IsItemComplexType))
-                {
-                    SetMapper((IEntityMapperBase)typeof(EntityMapper<,>)
-                            .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
-                            .GetMethod("CreateAuto", BindingFlags.Public | BindingFlags.Static)
-                            .Invoke(null, new object[] { Array.Empty<string>() }));
-                }
-            }
-
             OperationTypes = operationTypes;
         }
 
@@ -331,6 +318,30 @@ namespace Beef.Mapper
         }
 
         /// <summary>
+        /// Create a Mapper automatically where complex type to type and not defined previously.
+        /// </summary>
+        private void CreateAutoMapperIfRequired()
+        {
+            if (Converter != null || Mapper != null)
+                return;
+
+            if (IsSrceComplexType && IsDestComplexType)
+            {
+                // This is auto-mapping between types as a default.
+                if ((!SrceComplexTypeReflector!.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
+                    && (!DestComplexTypeReflector!.IsCollection || DestComplexTypeReflector.IsItemComplexType))
+                {
+                    var mapper = (IEntityMapperBase)typeof(EntityMapper<,>)
+                            .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
+                            .GetMethod("CreateAuto", BindingFlags.Public | BindingFlags.Static)
+                            .Invoke(null, new object[] { Array.Empty<string>() });
+
+                    SetMapper(mapper);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="Mapper.OperationTypes"/> selection to enable inclusion or exclusion of property (default to <see cref="OperationTypes.Any"/>).
         /// </summary>
         public OperationTypes OperationTypes { get; private set; } = OperationTypes.Any;
@@ -417,7 +428,26 @@ namespace Beef.Mapper
         protected void SetSrceValue(TSrce entity, TSrceProperty value, OperationTypes operationType)
         {
             if (OperationTypes.HasFlag(operationType))
+            {
+                if (SrcePropertyInfo.CanWrite == false && IsSrceComplexType && SrceComplexTypeReflector!.IsCollection && SrceComplexTypeReflector.AddMethod != null)
+                {
+                    if (value != null)
+                    {
+                        var coll = SrcePropertyInfo.GetValue(entity);
+                        foreach (var item in (System.Collections.IEnumerable)value)
+                        {
+                            SrceComplexTypeReflector.AddMethod.Invoke(coll, new object[] { item });
+                        }
+                    }
+
+                    return;
+                }
+
+                if (SrcePropertyInfo.CanWrite == false)
+                    throw new InvalidOperationException($"Srceination Property '{SrcePropertyName}' cannot be updated as it does not support write.");
+
                 SrcePropertyInfo.SetValue(entity, value);
+            }
         }
 
         /// <summary>
@@ -464,7 +494,26 @@ namespace Beef.Mapper
         protected void SetDestValue(TDest entity, TDestProperty value, OperationTypes operationType)
         {
             if (OperationTypes.HasFlag(operationType))
+            {
+                if (DestPropertyInfo.CanWrite == false && IsDestComplexType && DestComplexTypeReflector!.IsCollection && DestComplexTypeReflector.AddMethod != null)
+                {
+                    if (value != null)
+                    {
+                        var coll = DestPropertyInfo.GetValue(entity);
+                        foreach (var item in (System.Collections.IEnumerable)value)
+                        {
+                            DestComplexTypeReflector.AddMethod.Invoke(coll, new object[] { item });
+                        }
+                    }
+
+                    return;
+                }
+
+                if (DestPropertyInfo.CanWrite == false)
+                    throw new InvalidOperationException($"Destination Property '{DestPropertyName}' cannot be updated as it does not support write.");
+
                 DestPropertyInfo.SetValue(entity, value);
+            }
         }
 
         /// <summary>
@@ -519,6 +568,8 @@ namespace Beef.Mapper
 
             TSrceProperty val = GetSrceValue(sourceEntity, operationType);
 
+            CreateAutoMapperIfRequired();
+
             if (Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection))
             {
                 TDestProperty dval = GetDestValue(destinationEntity, operationType);
@@ -560,6 +611,7 @@ namespace Beef.Mapper
             if (sourcePropertyValue == null)
                 return default!;
 
+            CreateAutoMapperIfRequired();
             if ((!IsSrceComplexType && !IsDestComplexType)
                 || ((IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection)))
             {
@@ -669,6 +721,7 @@ namespace Beef.Mapper
             if (destinationPropertyValue == null)
                 return default!;
 
+            CreateAutoMapperIfRequired();
             if ((!IsSrceComplexType && !IsDestComplexType)
                 || ((IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection)))
             {

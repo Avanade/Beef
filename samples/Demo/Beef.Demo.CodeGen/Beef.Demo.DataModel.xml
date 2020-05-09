@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- CosmosDb model -->
-  <Entity Name="Robot" Text="Robot" Implements="IGuidIdentifier, IETag, IChangeLog" Collection="true" OmitEntityBase="true">
+  <Entity Name="Robot" Text="Robot" Collection="true" OmitEntityBase="true">
     <Property Name="Id" Type="Guid" />
     <Property Name="ModelNo" Type="string" />
     <Property Name="SerialNo" Type="string" />

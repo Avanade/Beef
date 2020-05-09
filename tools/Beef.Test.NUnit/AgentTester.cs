@@ -3,6 +3,7 @@
 using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Events;
+using Beef.Grpc;
 using Beef.RefData;
 using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
@@ -20,6 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
@@ -33,14 +35,15 @@ namespace Beef.Test.NUnit
         private static readonly object _lock = new object();
         private static TestServer? _testServer;
         private static IConfiguration? _configuration;
+        private static HttpClient? _httpClient;
         private static Action<HttpRequestMessage>? _beforeRequest;
 
-        private HttpStatusCode? _expectedStatusCode;
-        private ErrorType? _expectedErrorType;
-        private string? _expectedErrorMessage;
-        private MessageItemCollection? _expectedMessages;
-        private readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
-        private bool _expectedNonePublished;
+        internal HttpStatusCode? _expectedStatusCode;
+        internal ErrorType? _expectedErrorType;
+        internal string? _expectedErrorMessage;
+        internal MessageItemCollection? _expectedMessages;
+        internal readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
+        internal bool _expectedNonePublished;
 
         /// <summary>
         /// Defines the default environment as 'Development'.
@@ -149,6 +152,53 @@ namespace Beef.Test.NUnit
 
         #endregion
 
+        #region HttpClient()
+
+        /// <summary>
+        /// Gets the <see cref="System.Net.Http.HttpClient"/> for use with the <see cref="TestServer"/>. <b>Note:</b> this should be used instead of <c>TestServer.CreateClient()</c>.
+        /// </summary>
+        public static HttpClient HttpClient
+        {
+            get 
+            {
+                if (_httpClient != null)
+                    return _httpClient;
+
+                lock (_lock)
+                {
+                    if (_httpClient != null)
+                        return _httpClient;
+
+                    if (_testServer == null)
+                        throw new InvalidOperationException("TestServer is not running; use StartupTestServer method to start.");
+
+#pragma warning disable CA2000 // Dispose objects before losing scope; only ever created once (static) and should live for process lifetime.
+                    var responseVersionHandler = new ResponseVersionHandler { InnerHandler = _testServer.CreateHandler() };
+                    _httpClient = new HttpClient(responseVersionHandler) { BaseAddress = new System.Uri("http://localhost/") };
+                    return _httpClient;
+#pragma warning restore CA2000
+                }
+            }
+        }
+
+        /// <summary>
+        /// Required work around as provided for https://github.com/grpc/grpc-dotnet/issues/648
+        /// </summary>
+        private class ResponseVersionHandler : DelegatingHandler
+        {
+            /// <summary>
+            /// Correct the version issue: "Bad gRPC response. Response protocol downgraded to HTTP/1.1".
+            /// </summary>
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                response.Version = request.Version;
+                return response;
+            }
+        }
+
+        #endregion
+
         #region AssertCompare
 
         /// <summary>
@@ -240,11 +290,11 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Create a new <see cref="AgentTester{TAgent}"/> for a named <paramref name="username"/>.
         /// </summary>
-        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/> (see <see cref="WebApiAgentBase"/>).</typeparam>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
-        public static AgentTester<TAgent> Create<TAgent>(string? username = null, object? args = null) where TAgent : class
+        public static AgentTester<TAgent> Create<TAgent>(string? username = null, object? args = null) where TAgent : WebApiAgentBase
         {
             return new AgentTester<TAgent>(username, args);
         }
@@ -252,12 +302,12 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Create a new <see cref="AgentTester{TAgent, TValue}"/> for a named <paramref name="username"/>.
         /// </summary>
-        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/> (see <see cref="WebApiAgentBase"/>).</typeparam>
         /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
-        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string? username = null, object? args = null) where TAgent : class
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(string? username = null, object? args = null) where TAgent : WebApiAgentBase
         {
             return new AgentTester<TAgent, TValue>(username, args);
         }
@@ -269,7 +319,7 @@ namespace Beef.Test.NUnit
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
-        public static AgentTester<TAgent> Create<TAgent>(object? userIdentifier, object? args = null) where TAgent : class
+        public static AgentTester<TAgent> Create<TAgent>(object? userIdentifier, object? args = null) where TAgent : WebApiAgentBase
         {
             return new AgentTester<TAgent>(UsernameConverter?.Invoke(userIdentifier), args);
         }
@@ -282,7 +332,7 @@ namespace Beef.Test.NUnit
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
         /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
-        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : class
+        public static AgentTester<TAgent, TValue> Create<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : WebApiAgentBase
         {
             return new AgentTester<TAgent, TValue>(UsernameConverter?.Invoke(userIdentifier), args);
         }
@@ -298,6 +348,60 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <remarks>The <c>string</c> is the <see cref="Username"/> and the <c>object</c> is the optional <see cref="Args"/>.</remarks>
         public static Func<string?, object?, ExecutionContext> CreateExecutionContext { get; set; } = (username, _) => new ExecutionContext { Username = username ?? ExecutionContext.EnvironmentUsername };
+
+        #endregion
+
+        #region CreateGrpc
+
+        /// <summary>
+        /// Create a new <see cref="GrpcAgentTester{TAgent}"/> for a named <paramref name="username"/>.
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/> (see <see cref="GrpcAgentBase"/>).</typeparam>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
+        public static GrpcAgentTester<TAgent> CreateGrpc<TAgent>(string? username = null, object? args = null) where TAgent : GrpcAgentBase
+        {
+            return new GrpcAgentTester<TAgent>(username, args);
+        }
+
+        /// <summary>
+        /// Create a new <see cref="GrpcAgentTester{TAgent, TValue}"/> for a named <paramref name="username"/>.
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/> (see <see cref="GrpcAgentBase"/>).</typeparam>
+        /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
+        public static GrpcAgentTester<TAgent, TValue> CreateGrpc<TAgent, TValue>(string? username = null, object? args = null) where TAgent : GrpcAgentBase
+        {
+            return new GrpcAgentTester<TAgent, TValue>(username, args);
+        }
+
+        /// <summary>
+        /// Create a new <see cref="GrpcAgentTester{TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="UsernameConverter"/>).
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TResult}"/> instance.</returns>
+        public static GrpcAgentTester<TAgent> CreateGrpc<TAgent>(object? userIdentifier, object? args = null) where TAgent : GrpcAgentBase
+        {
+            return new GrpcAgentTester<TAgent>(UsernameConverter?.Invoke(userIdentifier), args);
+        }
+
+        /// <summary>
+        /// Create a new <see cref="GrpcAgentTester{TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="UsernameConverter"/>).
+        /// </summary>
+        /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
+        /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
+        /// <param name="args">Optional argument that can be referenced within the test.</param>
+        /// <returns>An <see cref="AgentTester{TValue}"/> instance</returns>
+        public static GrpcAgentTester<TAgent, TValue> CreateGrpc<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : GrpcAgentBase
+        {
+            return new GrpcAgentTester<TAgent, TValue>(UsernameConverter?.Invoke(userIdentifier), args);
+        }
 
         #endregion
 
@@ -577,7 +681,7 @@ namespace Beef.Test.NUnit
     /// Provides the <see cref="WebApiAgentResult"/> testing.
     /// </summary>
     [DebuggerStepThrough()]
-    public class AgentTester<TAgent> : AgentTester where TAgent : class
+    public class AgentTester<TAgent> : AgentTester where TAgent : WebApiAgentBase
     {
         private Action<AgentTester<TAgent>>? _beforeAction;
         private Action<AgentTester<TAgent>, WebApiAgentResult>? _afterAction;
@@ -594,7 +698,7 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="action">The <b>before</b> action.</param>
         /// <returns>The <see cref="AgentTester{TAgent}"/> instance to support fluent/chaining usage.</returns>
-        public AgentTester Before(Action<AgentTester> action)
+        public AgentTester<TAgent> Before(Action<AgentTester> action)
         {
             _beforeAction = action;
             return this;
@@ -716,7 +820,7 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent>(TestServer.CreateClient(), BeforeRequest, this);
+        public AgentTesterRunArgs<TAgent> GetRunArgs() => new AgentTesterRunArgs<TAgent>(HttpClient, BeforeRequest, this);
     }
 
     /// <summary>
@@ -725,7 +829,7 @@ namespace Beef.Test.NUnit
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="WebApiAgentResult{TValue}.Value"/> <see cref="Type"/>.</typeparam>
     [DebuggerStepThrough()]
-    public class AgentTester<TAgent, TValue> : AgentTester where TAgent : class
+    public class AgentTester<TAgent, TValue> : AgentTester where TAgent : WebApiAgentBase
     {
         private readonly ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();
         private Action<AgentTester<TAgent, TValue>>? _beforeAction;
@@ -1090,6 +1194,6 @@ namespace Beef.Test.NUnit
         /// Gets an <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.
         /// </summary>
         /// <returns>An <see cref="AgentTesterRunArgs{TAgent, TValue}"/> instance.</returns>
-        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue>(TestServer.CreateClient(), BeforeRequest, this);
+        public AgentTesterRunArgs<TAgent, TValue> GetRunArgs() => new AgentTesterRunArgs<TAgent, TValue>(HttpClient, BeforeRequest, this);
     }
 }

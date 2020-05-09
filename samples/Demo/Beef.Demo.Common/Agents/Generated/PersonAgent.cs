@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
@@ -20,7 +21,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the Person Web API agent.
     /// </summary>
-    public partial class PersonAgent : IPersonServiceAgent
+    public partial class PersonAgent : WebApiAgentBase, IPersonServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonAgent"/> class.
@@ -44,12 +45,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> CreateAsync(Person value, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return PersonServiceAgent.CreateAsync(value, requestOptions);
-        }
+            => PersonServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
 
         /// <summary>
         /// Deletes the <see cref="Person"/> object that matches the selection criteria.
@@ -58,9 +54,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.DeleteAsync(id, requestOptions);
-        }
+            => PersonServiceAgent.DeleteAsync(id, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> object that matches the selection criteria.
@@ -69,9 +63,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetAsync(id, requestOptions);
-        }
+            => PersonServiceAgent.GetAsync(id, requestOptions);
 
         /// <summary>
         /// Updates the <see cref="Person"/> object.
@@ -81,12 +73,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return PersonServiceAgent.UpdateAsync(value, id, requestOptions);
-        }
+            => PersonServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
 
         /// <summary>
         /// Patches the <see cref="Person"/> object.
@@ -97,9 +84,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.PatchAsync(patchOption, value, id, requestOptions);
-        }
+            => PersonServiceAgent.PatchAsync(patchOption, value, id, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
@@ -108,9 +93,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonCollectionResult>> GetAllAsync(PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetAllAsync(paging, requestOptions);
-        }
+            => PersonServiceAgent.GetAllAsync(paging, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
@@ -118,9 +101,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonCollectionResult>> GetAll2Async(WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetAll2Async(requestOptions);
-        }
+            => PersonServiceAgent.GetAll2Async(requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
@@ -130,9 +111,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonCollectionResult>> GetByArgsAsync(PersonArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetByArgsAsync(args, paging, requestOptions);
-        }
+            => PersonServiceAgent.GetByArgsAsync(args, paging, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="PersonDetail"/> collection object that matches the selection criteria.
@@ -142,9 +121,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetailCollectionResult>> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetDetailByArgsAsync(args, paging, requestOptions);
-        }
+            => PersonServiceAgent.GetDetailByArgsAsync(args, paging, requestOptions);
 
         /// <summary>
         /// Merge first <see cref="Person"/> into second.
@@ -154,9 +131,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> MergeAsync(Guid fromId, Guid toId, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.MergeAsync(fromId, toId, requestOptions);
-        }
+            => PersonServiceAgent.MergeAsync(fromId, toId, requestOptions);
 
         /// <summary>
         /// Mark <see cref="Person"/>.
@@ -164,9 +139,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> MarkAsync(WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.MarkAsync(requestOptions);
-        }
+            => PersonServiceAgent.MarkAsync(requestOptions);
 
         /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
@@ -175,9 +148,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetail>> GetDetailAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetDetailAsync(id, requestOptions);
-        }
+            => PersonServiceAgent.GetDetailAsync(id, requestOptions);
 
         /// <summary>
         /// Updates the <see cref="PersonDetail"/> object.
@@ -187,12 +158,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return PersonServiceAgent.UpdateDetailAsync(value, id, requestOptions);
-        }
+            => PersonServiceAgent.UpdateDetailAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
 
         /// <summary>
         /// Patches the <see cref="Person"/> object.
@@ -203,9 +169,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetail>> PatchDetailAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.PatchDetailAsync(patchOption, value, id, requestOptions);
-        }
+            => PersonServiceAgent.PatchDetailAsync(patchOption, value, id, requestOptions);
 
         /// <summary>
         /// Actually validating the FromBody parameter generation.
@@ -214,9 +178,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> AddAsync(Person? person, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.AddAsync(person, requestOptions);
-        }
+            => PersonServiceAgent.AddAsync(person, requestOptions);
 
         /// <summary>
         /// Get Null.
@@ -225,9 +187,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetNullAsync(name, requestOptions);
-        }
+            => PersonServiceAgent.GetNullAsync(name, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
@@ -237,9 +197,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonCollectionResult>> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetByArgsWithEfAsync(args, paging, requestOptions);
-        }
+            => PersonServiceAgent.GetByArgsWithEfAsync(args, paging, requestOptions);
 
         /// <summary>
         /// Gets the <see cref="Person"/> object that matches the selection criteria.
@@ -248,9 +206,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> GetWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.GetWithEfAsync(id, requestOptions);
-        }
+            => PersonServiceAgent.GetWithEfAsync(id, requestOptions);
 
         /// <summary>
         /// Creates the <see cref="Person"/> object.
@@ -259,12 +215,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> CreateWithEfAsync(Person value, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return PersonServiceAgent.CreateWithEfAsync(value, requestOptions);
-        }
+            => PersonServiceAgent.CreateWithEfAsync(Check.NotNull(value, nameof(value)), requestOptions);
 
         /// <summary>
         /// Updates the <see cref="Person"/> object.
@@ -274,12 +225,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateWithEfAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
-
-            return PersonServiceAgent.UpdateWithEfAsync(value, id, requestOptions);
-        }
+            => PersonServiceAgent.UpdateWithEfAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
 
         /// <summary>
         /// Deletes the <see cref="Person"/> object that matches the selection criteria.
@@ -288,9 +234,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-        {
-            return PersonServiceAgent.DeleteWithEfAsync(id, requestOptions);
-        }
+            => PersonServiceAgent.DeleteWithEfAsync(id, requestOptions);
     }
 }
 

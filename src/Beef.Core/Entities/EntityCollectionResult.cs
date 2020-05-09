@@ -130,11 +130,11 @@ namespace Beef.Entities
         }
 
         /// <summary>
-        /// Indicates whether the collection is empty; i.e. has no items in the collection.
+        /// Indicates whether the collection is <c>null</c> (empty collections are not considered initial).
         /// </summary>
         public override bool IsInitial
         {
-            get { return _result == null || _result.Count == 0; }
+            get { return _result == null; }
         }
 
         /// <summary>

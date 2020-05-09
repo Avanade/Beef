@@ -57,6 +57,7 @@ Attribute | Description
 ---|---
 `Inherits` | Defines the base class that the entity inherits from. Defaults to `EntityBase` for a standard entity. For Reference Data it will default to `ReferenceDataBaseInt` or `ReferenceDataBaseGuid` depending on the corresponding `RefDataType` value.
 `Implements` | List of comma separated interfaces that are to be declared for the class.
+`AutoInferImplements` | Indicates whether to automatically infer the interface implements for the entity from the properties declared (being `IGuidIdentifier`, `IIntIdentifier`, `IStringIdentifier`, `IETag` and `IChangeLog`). Defaults to `true`.
 `Abstract` | Indicates whether the class should be defined as `abstract`.
 `GenericWithT` | Indicates whether the class should be defined as a generic with a single parameter `T`.
 `Namespace` | Name of the entity namespace appended to end of the standard `[company].[appname].Common.Entities.Namespace`.
@@ -193,3 +194,14 @@ Attribute | Description
 `ExcludeManager` | Indicates whether to exclude the creation of the Manager class (`XxxManager.cs`).
 `ExcludeWebApi` | Indicates whether to exclude the creation of the Web API Controller class (`XxxController.cs`).
 `ExcludeWebApiAgent` | Indicates whether to exclude the creation of the Web API Agent class (`XxxAgent.cs`).
+
+<br/>
+
+### gRPC attributes
+
+The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:
+
+Attribute | Description
+-|-
+`Grpc` | Indicates whether gRPC support is required for the Entity. Will require each corresponding [`Property`](./Entity-Property-element.md) and [`Operation`](./Entity-Operation-element.md) to be opted-in specifically.
+`ExcludeGrpcAgent` | Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).

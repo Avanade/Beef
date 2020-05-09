@@ -87,7 +87,7 @@ namespace Beef.Demo.Test
                 .IgnoreChangeLog()
                 .IgnoreETag()
                 .ExpectValue((t) => new Robot { Id = 1.ToGuid(), ModelNo = "T1000", SerialNo = "123456", PowerSource = "F", PowerSourceText = "Fusion" })
-                .Run((a) => a.Agent.GetAsync(1.ToGuid(), new WebApi.WebApiRequestOptions { UrlQueryString = "$text=true" }));
+                .Run((a) => a.Agent.GetAsync(1.ToGuid(), new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "$text=true" }));
         }
 
         [Test, TestSetUp]
@@ -310,8 +310,8 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.GetAsync(1.ToGuid())).Value;
 
             // Update the Robot with an address.
-            v.ModelNo = v.ModelNo + "X";
-            v.SerialNo = v.SerialNo + "Y";
+            v.ModelNo += "X";
+            v.SerialNo += "Y";
 
             v = AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)

@@ -12,7 +12,7 @@ An example is as follows:
 <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
 ```
 
-<br>
+<br/>
 
 ## Attributes
 
@@ -28,7 +28,7 @@ Attribute | Description
 `PrivateName` | Name to be used for private fields; e.g. 'FirstName' reformatted as '_firstName'. Defaults from `Name`.
 `ArgumentName` | Name to be used for argument parameters; e.g. 'FirstName' reformatted as 'firstName'. Defaults from `Name`.
 
-<br>
+<br/>
 
 ### Property definition attributes
 
@@ -50,7 +50,7 @@ Attribute | Description
 `BubblePropertyChanged` | Indicates whether the value should bubble up property changes versus only recording within the sub-entity (see `IsEntity`) itself.
 `ExcludeCleanup` | Indicates that CleanUp is not to be performed for the property within the `Entity.CleanUp` method.
 
-<br>
+<br/>
 
 ### Reference data attributes
 
@@ -63,7 +63,7 @@ Attribute | Description
 `RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 `RefDataMapping` | Indicates whether the property should use the underlying Reference Data mapping capabilities. Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.
 
-<br>
+<br/>
 
 ### Serialization attributes
 
@@ -75,7 +75,7 @@ Attribute | Description
 `IgnoreSerialization` | Indicates whether the property is not to be serialized. All properties are serialized by default.
 `EmitDefaultValue` | Indicates whether to emit the default value when serializing (defaults to `false`).
 
-<br>
+<br/>
 
 ### Data attributes
 
@@ -98,7 +98,7 @@ Attribute | Description
 `DataCosmosMapper` | Specifies the Cosmos `Mapper` class name where `Entity.AutoImplement` is selected. A `Mapper` is used to convert a data source value to/from a .NET complex type (i.e. class with one or more properties).
 `DataCosmosIgnore` | Indicates whether the property should be ignored (excluded) from the Cosmos `Mapper` generated output.
 
-<br>
+<br/>
 
 ### Annotation attributes
 
@@ -110,3 +110,13 @@ Attribute | Description
 `Annotation1` | Property annotation (e.g. attribute) declaration code.
 `Annotation2` | Property annotation (e.g. attribute) declaration code.
 `Annotation3` | Property annotation (e.g. attribute) declaration code.
+
+<br/>
+
+### gRPC attributes
+
+The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:
+
+Attribute | Description
+-|-
+`GrpcFieldNo` | Specifies the unique (immutable) field number required to enable gRPC support.

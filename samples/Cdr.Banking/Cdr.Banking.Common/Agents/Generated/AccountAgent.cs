@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
@@ -20,7 +21,7 @@ namespace Cdr.Banking.Common.Agents
     /// <summary>
     /// Provides the Account Web API agent.
     /// </summary>
-    public partial class AccountAgent : IAccountServiceAgent
+    public partial class AccountAgent : WebApiAgentBase, IAccountServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountAgent"/> class.
@@ -45,9 +46,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-        {
-            return AccountServiceAgent.GetAccountsAsync(args, paging, requestOptions);
-        }
+            => AccountServiceAgent.GetAccountsAsync(args, paging, requestOptions);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
@@ -56,9 +55,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<AccountDetail>> GetDetailAsync(string? accountId, WebApiRequestOptions? requestOptions = null)
-        {
-            return AccountServiceAgent.GetDetailAsync(accountId, requestOptions);
-        }
+            => AccountServiceAgent.GetDetailAsync(accountId, requestOptions);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
@@ -67,9 +64,7 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Balance>> GetBalanceAsync(string? accountId, WebApiRequestOptions? requestOptions = null)
-        {
-            return AccountServiceAgent.GetBalanceAsync(accountId, requestOptions);
-        }
+            => AccountServiceAgent.GetBalanceAsync(accountId, requestOptions);
     }
 }
 

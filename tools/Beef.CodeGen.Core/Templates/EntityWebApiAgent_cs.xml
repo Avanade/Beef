@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
@@ -43,7 +44,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     /// <summary>
     /// Provides the {{Entity.Text:ToComments}} Web API agent.
     /// </summary>
-    public partial class {{Entity.Name}}Agent : I{{Entity.Name}}ServiceAgent
+    public partial class {{Entity.Name}}Agent : WebApiAgentBase, I{{Entity.Name}}ServiceAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Entity.Name}}Agent"/> class.
@@ -243,17 +244,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
           <![CDATA[, ]]>
         </If>
         <![CDATA[WebApiRequestOptions? requestOptions = null)
-        {
-]]>
+            => {{Entity.Name}}ServiceAgent.{{Operation.Name}}Async(]]>
         <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <![CDATA[            if (value == null)
-                throw new ArgumentNullException("value");
-
-]]>
-        </If>
-        <![CDATA[            return {{Entity.Name}}ServiceAgent.{{Operation.Name}}Async(]]>
-        <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <![CDATA[value]]>
+          <![CDATA[Check.NotNull(value, nameof(value))]]>
         </If>
         <If Condition="Operation.OperationType == 'Patch'">
           <![CDATA[patchOption, value]]>
@@ -274,7 +267,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
           <![CDATA[, ]]>
         </If>
         <![CDATA[requestOptions);
-        }
 ]]>
       </Operation>
       <![CDATA[    }

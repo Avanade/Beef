@@ -9,9 +9,9 @@ using System.Net.Http;
 namespace Beef.WebApi
 {
     /// <summary>
-    /// Represents a result for the <see cref="WebApiServiceAgentBase{TDefault}"/>.
+    /// Represents a result for the <see cref="WebApiServiceAgentBase"/>.
     /// </summary>
-    public class WebApiAgentResult
+    public class WebApiAgentResult : IWebApiAgentResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiAgentResult"/> class.
@@ -65,6 +65,12 @@ namespace Beef.WebApi
         public bool IsSuccess => Response.IsSuccessStatusCode;
 
         /// <summary>
+        /// Throws an exception if the request was not successful (see <see cref="IsSuccess"/>).
+        /// </summary>
+        /// <returns>The <see cref="WebApiAgentResult"/> instance to support fluent/chaining usage.</returns>
+        IWebApiAgentResult IWebApiAgentResult.ThrowOnError() => ThrowOnError();
+
+        /// <summary>
         /// Throws an exception if the <see cref="Response"/> <see cref="HttpResponseMessage.IsSuccessStatusCode"/> for the HTTP response is false 
         /// (see <see cref="HttpResponseMessage.EnsureSuccessStatusCode"/>). Where the <see cref="ErrorType"/> is known then the corresponding <b>BEEF</b> exception will be thrown.
         /// </summary>
@@ -113,9 +119,9 @@ namespace Beef.WebApi
     }
 
     /// <summary>
-    /// Represents a result for the <see cref="WebApiServiceAgentBase{TDefault}"/> with a deserialized (JSON) response <see cref="Value"/>.
+    /// Represents a result for the <see cref="WebApiServiceAgentBase"/> with a deserialized (JSON) response <see cref="Value"/>.
     /// </summary>
-    public class WebApiAgentResult<T> : WebApiAgentResult
+    public class WebApiAgentResult<T> : WebApiAgentResult, IWebApiAgentResult<T>
     {
         private bool _isValueSet = false;
         private T _value = default!;
@@ -179,6 +185,12 @@ namespace Beef.WebApi
         /// Indicates whether a <see cref="Value"/> was returned as <see cref="WebApiAgentResult.Content"/>.
         /// </summary>
         public bool HasValue => _isValueSet || !string.IsNullOrEmpty(Content);
+
+        /// <summary>
+        /// Throws an exception if the request was not successful (see <see cref="IWebApiAgentResult.IsSuccess"/>).
+        /// </summary>
+        /// <returns>The <see cref="WebApiAgentResult"/> instance to support fluent/chaining usage.</returns>
+        IWebApiAgentResult IWebApiAgentResult.ThrowOnError() => ThrowOnError();
 
         /// <summary>
         /// Throws an exception if the <see cref="WebApiAgentResult.Response"/> <see cref="HttpResponseMessage.IsSuccessStatusCode"/> for the HTTP response is false 

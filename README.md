@@ -35,6 +35,7 @@ The APIs created will have the following capabilities out-of-the-box with limite
 - JSON response field [filtering (include/exclude)](./src/Beef.Core/Json/JsonPropertyFilter.cs) to minimise resulting payload size (e.g. `$fields=firstname,lastname`)
 - [HTTP Patch](./docs/Http-Patch.md) support, where required, in a simplified and consistent manner.
 - An end-to-end intra-domain [integration testing](./tools/Beef.Test.NUnit/README.md) approach enables effective tests to be built easily and quickly.
+- [gRPC](./src/Beef.Grpc/README.md) server (and client) integration.
 - [Event](./src/Beef.Events/README.md) publishing and subcribing to enable an event-driven architecture.
 
 To implement these included capabilities would literally take  months/years to build and test; these are available for developers to use immediately, and contribute back if so inclined.

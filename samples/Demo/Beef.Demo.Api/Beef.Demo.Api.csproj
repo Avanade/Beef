@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.3.1" />
@@ -19,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Grpc\Beef.Grpc.csproj" />
     <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />
     <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
   </ItemGroup>
