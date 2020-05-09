@@ -20,7 +20,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person : EntityBase, IETag, IChangeLog, IEquatable<Person>
+    public partial class Person : EntityBase, IETag, IChangeLog, IGuidIdentifier, IEquatable<Person>
     {
         #region Privates
 

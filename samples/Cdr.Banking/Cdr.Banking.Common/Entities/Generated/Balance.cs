@@ -20,7 +20,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Balance entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Balance : EntityBase, IEquatable<Balance>
+    public partial class Balance : EntityBase, IStringIdentifier, IEquatable<Balance>
     {
         #region Privates
 

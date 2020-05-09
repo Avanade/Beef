@@ -1095,6 +1095,11 @@
                 <xs:documentation>Indicates whether to exclude the creation of the gRPC Agent class (`XxxAgent.cs`).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="AutoInferImplements" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to automatically infer the interface implements for the entity from the properties declared (being IGuidIdentifier, IIntIdentifier, IStringIdentifier, IETag and IChangeLog). Defaults to true.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

@@ -24,6 +24,7 @@ There are a number of key exceptions that have a specific built in behaviour; th
 
 Exception | Description | HTTP Status | [`ErrorType`](./ErrorType.cs) | SQL
 -|-|-|-|-
+[`AuthenticationException`](./AuthenticationException.cs) | Represents an **Authentication** exception. | 401 Unauthorized | 8 AuthenticationError | n/a
 [`AuthorizationException`](./AuthorizationException.cs) | Represents an **Authorization** exception. | 403 Forbidden | 3 AuthorizationError | [`spThrowAuthorizationException`](../../tools/Beef.Database.Core/Schema/dbo/Stored&#32;Procedures/spThrowAuthorizationException.sql)
 [`BusinessException`](./BusinessException.cs) | Represents a **Business** exception whereby the message returned should be displayed directly to the consumer. | 400 BadRequest | 2 BusinessError | [`spThrowBusinessException`](../../tools/Beef.Database.Core/Schema/dbo/Stored&#32;Procedures/spThrowBusinessException.sql)
 [`ConcurrencyException`](./ConcurrencyException.cs) | Represents a data **Concurrency** exception; generally as a result of an errant [ETag](./Entities/IETag.cs). | 412 PreconditionFailed | 4 ConcurrencyError | [`spThrowConcurrencyException`](../../tools/Beef.Database.Core/Schema/dbo/Stored&#32;Procedures/spThrowConcurrencyException.sql)

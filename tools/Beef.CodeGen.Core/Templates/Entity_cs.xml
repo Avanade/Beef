@@ -152,9 +152,54 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         </If>
       </Then>
       <Else>
+        <Set Name="System.IIdentifier" Value="null" />
+        <Set Name="System.IETag" Value="null" />
+        <Set Name="System.IChangeLog" Value="null" />
+        <If Condition="Entity.AutoInferImplements == null or Entity.AutoInferImplements == true">
+          <Property Condition="Property.Inherited == false">
+            <If Condition="Property.Name == 'Id'">
+              <Switch Value="Property.Type">
+                <Case Value="'Guid'">
+                  <Set Name="System.IIdentifier" Value="'IGuidIdentifier'" />
+                </Case>
+                <Case Value="'int'">
+                  <Set Name="System.IIdentifier" Value="'IIntIdentifier'" />
+                </Case>
+                <Case Value="'string'">
+                  <Set Name="System.IIdentifier" Value="'IStringIdentifier'" />
+                </Case>
+              </Switch>
+            </If>
+            <If Condition="Property.Name == 'ETag' and Property.Type == 'string'">
+              <Set Name="System.IETag" Value="'IETag'" />
+            </If>
+            <If Condition="Property.Name == 'ChangeLog' and Property.Type == 'ChangeLog'">
+              <Set Name="System.IChangeLog" Value="'IChangeLog'" />
+            </If>
+          </Property>
+          <Property Condition="Property.Inherited == false and System.IIdentifier != null and Property.UniqueKey == true and Property.Name != 'Id'">
+            <Set Name="System.IIdentifier" Value="null" />
+          </Property>
+        </If>
         <Set Name="System.Implements" Value="Entity.Implements" />
+        <ForEachList Name="System.Implements">
+          <Set Name="System.IIdentifier" Condition="System.Value == 'IGuidIdentifier'" Value="null" />
+          <Set Name="System.IIdentifier" Condition="System.Value == 'IIntIdentifier'" Value="null" />
+          <Set Name="System.IIdentifier" Condition="System.Value == 'IStringIdentifier'" Value="null" />
+          <Set Name="System.IETag" Condition="System.Value == 'IETag'" Value="null" />
+          <Set Name="System.IChangeLog" Condition="System.Value == 'IChangeLog'" Value="null" />
+        </ForEachList>
+        <If Condition="System.IIdentifier != null">
+          <Set Name="System.Implements" Condition="System.Implements == null" Value="System.IIdentifier" Otherwise="'{{System.Implements}}, {{System.IIdentifier}}'" />
+        </If>
+        <If Condition="System.IETag != null">
+          <Set Name="System.Implements" Condition="System.Implements == null" Value="System.IETag" Otherwise="'{{System.Implements}}, {{System.IETag}}'" />
+        </If>
+        <If Condition="System.IChangeLog != null">
+          <Set Name="System.Implements" Condition="System.Implements == null" Value="System.IChangeLog" Otherwise="'{{System.Implements}}, {{System.IChangeLog}}'" />
+        </If>
         <If Condition="System.OmitEntityBase == false and Config.ModelFromEntity == false and Entity.RefDataType == null">
-          <Set Name="System.Implements" Condition="Entity.Implements == null" Value="'IEquatable&lt;{{Entity.EntityName}}&gt;'" Otherwise="'{{Entity.Implements}}, IEquatable&lt;{{Entity.EntityName}}&gt;'" />
+          <Set Name="System.Implements" Condition="System.Implements == null" Value="'IEquatable&lt;{{Entity.EntityName}}&gt;'" Otherwise="'{{System.Implements}}, IEquatable&lt;{{Entity.EntityName}}&gt;'" />
         </If>
         <Set Name="System.Inherits" Value="'EntityBase'"/>
         <If Condition="Entity.Inherits == null">
