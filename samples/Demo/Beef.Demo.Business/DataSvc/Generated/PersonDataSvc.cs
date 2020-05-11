@@ -190,6 +190,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IPersonData>().MergeAsync(fromId, toId).ConfigureAwait(false);
                 await Beef.Events.Event.PublishAsync(
                     Beef.Events.EventData.Create(__result, "Demo.Person.{fromId}", "Merge", new KeyValuePair<string, object?>("fromId", fromId), new KeyValuePair<string, object?>("toId", toId))).ConfigureAwait(false);
+                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
             });

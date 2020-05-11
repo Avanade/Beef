@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.7
+- *Fixed:* Fix for `EntityDataSvc` code generation; internal caching was being accidently skipped for custom operation types.
+
 ## v3.1.6
 - *Enhancement:* Added code-generation templates and configuration for gRPC support.
 
