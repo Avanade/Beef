@@ -11,6 +11,7 @@ namespace Beef
     /// </summary>
     public sealed class DataContextScope : IDisposable
     {
+        private static readonly object _lock = new object();
         private static readonly Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
 
         private readonly DataContextScope? _parent;
@@ -125,15 +126,18 @@ namespace Beef
         /// <remarks>Where a context does not already exist a new instance will be created.</remarks>
         public object GetContext(Type type)
         {
-            if (_dataContexts.ContainsKey(type))
-                return _dataContexts[type];
+            lock (_lock)
+            {
+                if (_dataContexts.ContainsKey(type))
+                    return _dataContexts[type];
 
-            if (!_registered.ContainsKey(type))
-                throw new InvalidOperationException("Type must be registered (see RegisterContext) to enable creation.");
+                if (!_registered.ContainsKey(type))
+                    throw new InvalidOperationException("Type must be registered (see RegisterContext) to enable creation.");
 
-            var val = _registered[type].DynamicInvoke();
-            _dataContexts.Add(type, val);
-            return val;
+                var val = _registered[type].DynamicInvoke();
+                _dataContexts.Add(type, val);
+                return val;
+            }
         }
 
         /// <summary>
