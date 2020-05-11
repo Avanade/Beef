@@ -478,7 +478,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Custom'">
-            <If Condition="Operation.ReturnType == Entity.Name'">
+            <If Condition="Operation.ReturnType == Entity.Name">
               <![CDATA[                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
 ]]>
             </If>
