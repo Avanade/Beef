@@ -98,7 +98,7 @@ namespace Beef.Data.Database
             }
             else
             {
-                if (typeof(T).IsEnum)
+                if (nt.IsEnum)
                     return (T)Enum.ToObject(nt, dbVal);
                 else
                     return (T)Convert.ChangeType(dbVal, nt, System.Globalization.CultureInfo.InvariantCulture);
