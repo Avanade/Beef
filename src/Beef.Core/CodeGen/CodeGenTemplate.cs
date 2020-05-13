@@ -529,6 +529,7 @@ namespace Beef.CodeGen
                 "TOCAMELCASE" => CodeGenerator.ToCamelCase(value),
                 "TOSNAKECASE" => CodeGenerator.ToSnakeCase(value),
                 "TOKEBABCASE" => CodeGenerator.ToKebabCase(value),
+                "TOPASTTENSE" => CodeGenerator.ToPastTense(value),
                 "TOPLURAL" => CodeGenerator.ToPlural(value),
                 "TOCOMMENTS" => CodeGenerator.ToComments(value),
                 "TOSEECOMMENTS" => CodeGenerator.ToSeeComments(value),

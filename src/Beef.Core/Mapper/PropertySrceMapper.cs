@@ -16,7 +16,6 @@ namespace Beef.Mapper
     /// <typeparam name="TDest">The destination entity <see cref="Type"/>.</typeparam>
     public class PropertySrceMapper<TSrce, TSrceProperty, TDest> : IPropertyMapper<TSrce, TDest>
         where TSrce : class
-        where TSrceProperty : class
         where TDest : class
     {
         private Func<TSrce, bool>? _mapSrceToDestWhen;
@@ -142,28 +141,23 @@ namespace Beef.Mapper
         #region Mapper
 
         /// <summary>
-        /// Gets the <see cref="IEntityMapperBase"/> to map complex types.
-        /// </summary>
-        IEntityMapperBase? IPropertyMapperBase.Mapper { get => Mapper; }
-
-        /// <summary>
         /// Gets the <see cref="IEntityMapperBase"/> to map two properties that are classes.
         /// </summary>
-        public IEntityMapper<TSrceProperty, TDest>? Mapper { get; private set; }
+        public IEntityMapperBase? Mapper { get; private set; }
 
         /// <summary>
         /// Set the <see cref="IEntityMapperBase"/> to map complex types.
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapperBase"/>.</param>
         /// <remarks>The <see cref="Mapper"/> and <see cref="IPropertyMapperBase.Converter"/> are mutually exclusive.</remarks>
-        void IPropertyMapperBase.SetMapper(IEntityMapperBase mapper) => SetMapper((IEntityMapper<TSrceProperty, TDest>)mapper);
+        void IPropertyMapperBase.SetMapper(IEntityMapperBase mapper) => SetMapper(mapper);
 
         /// <summary>
         /// Set the <see cref="IEntityMapper{TSrceProperty, TDest}"/> to map two properties that are classes.
         /// </summary>
         /// <param name="mapper">The <see cref="PropertySrceMapper{TSrce, TSrceProperty, TDest}"/>.</param>
         /// <returns>The <see cref="PropertyMapperCustomBase{TSrce, TSrceProperty}"/>.</returns>
-        public PropertySrceMapper<TSrce, TSrceProperty, TDest> SetMapper(IEntityMapper<TSrceProperty, TDest> mapper)
+        public PropertySrceMapper<TSrce, TSrceProperty, TDest> SetMapper(IEntityMapperBase mapper)
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
@@ -225,12 +219,12 @@ namespace Beef.Mapper
         /// <param name="entity">The entity value.</param>
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         /// <returns>The property value.</returns>
-        protected TSrceProperty? GetSrceValue(TSrce entity, OperationTypes operationType)
+        protected TSrceProperty GetSrceValue(TSrce entity, OperationTypes operationType)
         {
             if (OperationTypes.HasFlag(operationType))
                 return SrcePropertyExpression.GetValue(entity);
             else
-                return default;
+                return default!;
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace Beef.Mapper
                 return;
 
             if (Mapper != null)
-                SetSrceValue(sourceEntity, Mapper.MapToSrce(destinationEntity, operationType)!, operationType);
+                SetSrceValue(sourceEntity, (TSrceProperty)((IEntityMapper)Mapper).MapToSrce(destinationEntity, operationType)!, operationType);
         }
 
         /// <summary>
@@ -365,6 +359,17 @@ namespace Beef.Mapper
         void IPropertyMapper<TSrce, TDest>.SetDestValue(TDest entity, object? value, OperationTypes operationType) => throw new NotSupportedException();
 
         /// <summary>
+        /// Maps the source to the destination updating an existing object.
+        /// </summary>
+        /// <param name="sourceEntity">The source entity.</param>
+        /// <param name="destinationEntity">The destination entity.</param>
+        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        void IPropertySrceMapper<TSrce>.MapToDest(TSrce sourceEntity, object destinationEntity, OperationTypes operationType)
+        {
+            MapToDest(sourceEntity, (TDest)destinationEntity, operationType);
+        }
+
+        /// <summary>
         /// Maps the source property to the destination property.
         /// </summary>
         /// <param name="sourceEntity">The source entity.</param>
@@ -389,8 +394,8 @@ namespace Beef.Mapper
             {
                 foreach (var pm in Mapper.Mappings)
                 {
-                    if (pm.OperationTypes.HasFlag(operationType) && pm.MapSrceToDestWhen(val))
-                        pm.MapToDest(val, destinationEntity, operationType);
+                    if (pm.OperationTypes.HasFlag(operationType) && ((IPropertySrceMapper<TSrceProperty>)pm).MapSrceToDestWhen(val))
+                        ((IPropertySrceMapper<TSrceProperty>)pm).MapToDest(val, destinationEntity, operationType);
                 }
             }
         }

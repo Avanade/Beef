@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.8
+- *Fixed:* Fix for `EntityData` code generation; `DataName` was not always being output where using `Database`.
+- *Enhancement:* Added `Config.EventActionFormat` to control the formatting of the event action text.
+
 ## v3.1.7
 - *Fixed:* Fix for `EntityDataSvc` code generation; internal caching was being accidently skipped for custom operation types.
 

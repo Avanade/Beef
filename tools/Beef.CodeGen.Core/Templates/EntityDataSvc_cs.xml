@@ -405,12 +405,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <![CDATA[{{Property.ArgumentName}}]]>
                 <![CDATA[}]]>
               </Property>
-              <![CDATA[", "]]>
               <If Condition="Operation.WebApiOperationType == null">
-                <Then><![CDATA[{{Operation.OperationType}}]]></Then>
-                <Else><![CDATA[{{Operation.WebApiOperationType}}]]></Else>
+                <Then>
+                  <Set Name="System.Action" Value="Operation.OperationType" /></Then>
+                <Else>
+                  <Set Name="System.Action" Value="Operation.WebApiOperationType" />
+                </Else>
               </If>
-              <![CDATA["]]>
+              <Set Name="System.Action" Condition="Config.EventActionFormat == 'PastTense' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToPastTense" />
+              <Set Name="System.Action" Condition="Config.EventActionFormat == 'UpperCase' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToUpperCase" />
+              <![CDATA[", "{{System.Action}}"]]>
               <If Condition="System.GetFromArgs == true">
                 <Then>
                   <Parameter>
@@ -444,6 +448,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                     <Set Name="System.Action" Value="System.Value"/>
                   </If>
                 </ForEachList>
+                <Set Name="System.Action" Condition="Config.EventActionFormat == 'PastTense' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToPastTense" />
+                <Set Name="System.Action" Condition="Config.EventActionFormat == 'UpperCase' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToUpperCase" />
                 <![CDATA[, "{{System.Action}}"]]>
                 <If Condition="System.GetFromArgs == true">
                   <Then>

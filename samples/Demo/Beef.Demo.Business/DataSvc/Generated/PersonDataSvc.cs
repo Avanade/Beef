@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Create", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Created", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await Factory.Create<IPersonData>().DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync("Demo.Person.{id}", "Delete", new KeyValuePair<string, object?>("id", id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync("Demo.Person.{id}", "Deleted", new KeyValuePair<string, object?>("id", id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Person>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
@@ -109,7 +109,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Updated", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -189,7 +189,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await Factory.Create<IPersonData>().MergeAsync(fromId, toId).ConfigureAwait(false);
                 await Beef.Events.Event.PublishAsync(
-                    Beef.Events.EventData.Create(__result, "Demo.Person.{fromId}", "Merge", new KeyValuePair<string, object?>("fromId", fromId), new KeyValuePair<string, object?>("toId", toId))).ConfigureAwait(false);
+                    Beef.Events.EventData.Create(__result, "Demo.Person.{fromId}", "Merged", new KeyValuePair<string, object?>("fromId", fromId), new KeyValuePair<string, object?>("toId", toId))).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
@@ -238,7 +238,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Updated", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -320,7 +320,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Create", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Created", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -337,7 +337,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<IPersonData>().UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Update", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Person.{id}", "Updated", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -354,7 +354,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await Factory.Create<IPersonData>().DeleteWithEfAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishAsync(
-                    Beef.Events.EventData.Create("Demo.Person.{id}", "Delete", new KeyValuePair<string, object?>("id", id))).ConfigureAwait(false);
+                    Beef.Events.EventData.Create("Demo.Person.{id}", "Deleted", new KeyValuePair<string, object?>("id", id))).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });
