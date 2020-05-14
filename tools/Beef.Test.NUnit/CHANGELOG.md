@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.5
+- *Enhancement:* Added support for the use of wildcards where specifying the user name for the `ExpectChangeLogCreated` and `ExpectChangeLogCreated` methods.
+
 ## v3.1.4
 - *Enhancement:* Added `GrpcAgentTester` to give similar experience to `AgentTester` for invoking the gRPC service agents for intra-domain testing.
 

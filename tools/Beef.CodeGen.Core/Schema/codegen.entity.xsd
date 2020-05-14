@@ -1214,6 +1214,18 @@
           <xs:documentation>Indicates whether to add logic to Publish an Event on the successful completion of the DataSvc layer invocation for a 'Create', 'Update' or 'Delete' (defaults to true).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="EventActionFormat" use="optional">
+        <xs:annotation>
+          <xs:documentation>Defines the format for the Action when an Event is published. Defaults to 'null' (no formatting).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="UpperCase"/>
+            <xs:enumeration value="PastTense"/>
+            <xs:enumeration value="PastTenseUpperCase"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="MapperDefaultRefDataConverter" use="optional">
         <xs:annotation>
           <xs:documentation>Specifies the default Reference Data Converter used by the Mapper where not specifically defined (defaults to ReferenceDataCodeConverter).</xs:documentation>

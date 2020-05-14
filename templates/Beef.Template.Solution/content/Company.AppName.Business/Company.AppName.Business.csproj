@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!--#if (implement_database || implement_entityframework) -->
-    <PackageReference Include="Beef.Data.Database" Version="3.1.4" />
+    <PackageReference Include="Beef.Data.Database" Version="3.1.5" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
     <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="3.1.3" />

@@ -277,5 +277,13 @@ namespace Beef.Mapper
         {
             SetSrceValue(entity, (TSrceProperty)value!, operationType);
         }
+
+        /// <summary>
+        /// Maps the source to the destination updating an existing object.
+        /// </summary>
+        /// <param name="sourceEntity">The source entity.</param>
+        /// <param name="destinationEntity">The destination entity.</param>
+        /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
+        void IPropertySrceMapper<TSrce>.MapToDest(TSrce sourceEntity, object destinationEntity, OperationTypes operationType) => throw new NotSupportedException();
     }
 }

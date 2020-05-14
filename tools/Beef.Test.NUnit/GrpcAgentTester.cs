@@ -391,7 +391,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Expects the <see cref="IChangeLog"/> to be implemented for the response with generated values for the underlying <see cref="ChangeLog.CreatedBy"/> and <see cref="ChangeLog.CreatedDate"/> matching the specified values.
         /// </summary>
-        /// <param name="createdby">The specific <see cref="ChangeLog.CreatedBy"/> value where specified; otherwise, indicates to check for user running the test (see <see cref="AgentTester.Username"/>).</param>
+        /// <param name="createdby">The specific <see cref="ChangeLog.CreatedBy"/> value where specified (can include wildcards); otherwise, indicates to check for user running the test (see <see cref="AgentTester.Username"/>).</param>
         /// <param name="createdDateGreaterThan">The <see cref="DateTime"/> in which the <see cref="ChangeLog.CreatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public GrpcAgentTester<TAgent, TValue> ExpectChangeLogCreated(string? createdby = null, DateTime? createdDateGreaterThan = null)
@@ -408,7 +408,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Expects the <see cref="IChangeLog"/> to be implemented for the response with generated values for the underlying <see cref="ChangeLog.UpdatedBy"/> and <see cref="ChangeLog.UpdatedDate"/> matching the specified values.
         /// </summary>
-        /// <param name="updatedby">The specific <see cref="ChangeLog.UpdatedBy"/> value where specified; otherwise, indicates to check for user runing the test (see <see cref="AgentTester.Username"/>).</param>
+        /// <param name="updatedby">The specific <see cref="ChangeLog.UpdatedBy"/> value where specified (can include wildcards); otherwise, indicates to check for user runing the test (see <see cref="AgentTester.Username"/>).</param>
         /// <param name="updatedDateGreaterThan">The <see cref="TimeSpan"/> in which the <see cref="ChangeLog.UpdatedDate"/> should be greater than; where <c>null</c> it will default to <see cref="DateTime.Now"/>.</param>
         /// <returns>The <see cref="AgentTester{TAgent, TValue}"/> instance to support fluent/chaining usage.</returns>
         public GrpcAgentTester<TAgent, TValue> ExpectChangeLogUpdated(string? updatedby = null, DateTime? updatedDateGreaterThan = null)
@@ -550,16 +550,20 @@ namespace Beef.Test.NUnit
             if (_isExpectNullValue && result.HasValue)
                 Assert.Fail($"Expected null response value; the following content was returned: 'result.Content'.");
 
-            //if ((_isExpectCreatedBy || _isExpectUpdatedBy || _isExpectedETag || _isExpectedUniqueKey || _expectValueFunc != null) && !result.HasValue)
-            //    Assert.Fail($"Expected non-null response content; no response returned.");
+            if ((_isExpectCreatedBy || _isExpectUpdatedBy || _isExpectedETag || _isExpectedUniqueKey || _expectValueFunc != null) && !result.HasValue)
+                Assert.Fail($"Expected non-null response value; no response returned.");
 
             if (_isExpectCreatedBy)
             {
                 var cl = result.Value as IChangeLog;
                 if (cl == null || cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.CreatedBy))
                     Assert.Fail("Expected IChangeLog.CreatedBy to have a non-null value.");
-                else if (_changeLogCreatedBy != cl.ChangeLog.CreatedBy)
-                    Assert.Fail($"Expected IChangeLog.CreatedBy '{_changeLogCreatedBy}'; actual '{cl.ChangeLog.CreatedBy}'.");
+                else
+                {
+                    var wcr = Wildcard.BothAll.Parse(_changeLogCreatedBy).ThrowOnError();
+                    if (!wcr.CreateRegex().IsMatch(cl.ChangeLog.CreatedBy))
+                        Assert.Fail($"Expected IChangeLog.CreatedBy '{_changeLogCreatedBy}'; actual '{cl.ChangeLog.CreatedBy}'.");
+                }
 
                 if (!cl!.ChangeLog!.CreatedDate.HasValue)
                     Assert.Fail("Expected IChangeLog.CreatedDate to have a non-null value.");
@@ -572,8 +576,12 @@ namespace Beef.Test.NUnit
                 var cl = result.Value as IChangeLog;
                 if (cl == null || cl.ChangeLog == null || string.IsNullOrEmpty(cl.ChangeLog.UpdatedBy))
                     Assert.Fail("Expected IChangeLog.UpdatedBy to have a non-null value.");
-                else if (_changeLogUpdatedBy != cl.ChangeLog.UpdatedBy)
-                    Assert.Fail($"Expected IChangeLog.UpdatedBy '{_changeLogUpdatedBy}'; actual was '{cl.ChangeLog.UpdatedBy}'.");
+                else
+                {
+                    var wcr = Wildcard.BothAll.Parse(_changeLogUpdatedBy).ThrowOnError();
+                    if (!wcr.CreateRegex().IsMatch(cl.ChangeLog.UpdatedBy))
+                        Assert.Fail($"Expected IChangeLog.UpdatedBy '{_changeLogUpdatedBy}'; actual was '{cl.ChangeLog.UpdatedBy}'.");
+                }
 
                 if (!cl!.ChangeLog!.UpdatedDate.HasValue)
                     Assert.Fail("Expected IChangeLog.UpdatedDate to have a non-null value.");

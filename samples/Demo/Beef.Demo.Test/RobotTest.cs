@@ -315,7 +315,7 @@ namespace Beef.Demo.Test
 
             v = AgentTester.Create<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .ExpectChangeLogUpdated()
+                .ExpectChangeLogUpdated(ExecutionContext.Current.Username)
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectEventWithValue("Demo.Robot.*", "Update")

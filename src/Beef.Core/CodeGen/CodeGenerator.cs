@@ -199,6 +199,41 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
+        /// Converts a text to past tense (english).
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        public static string? ToPastTense(string? text)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length < 3 || text.EndsWith("ed", StringComparison.InvariantCultureIgnoreCase))
+                return text;
+
+            // Ends with the letter e, then remove the final e and add the -ed suffix: tie->tied, like->liked, agree->agreed.
+            if (text[^1] == 'e')
+                return text + "d";
+
+            // Ends with the letter y preceded by a consonant, then change the y to an i and add the -ed suffix: apply->applied, pry->pried, study->studied.
+            if (text[^1] == 'y' && !IsVowel(text[^2]))
+                return text[0..^2] + "ied";
+
+            // Ends with a single consonant other than w or y preceded by a single vowel, then double the final consonant and add the -ed suffix: drop->dropped, admit->admitted, concur->concured.
+            if (!IsVowel(text[^1]) && text[^1] != 'w' && text[^1] != 'y' && IsVowel(text[^2]) && !IsVowel(text[^3]))
+                return text + text[^1] + "ed";
+
+            // Ends with the letter c, then add the letter k followed by the -ed suffix: frolic->frolicked, picnic->picnicked.
+            if (text[^1] == 'c')
+                return text + "ked";
+
+            // Add the -ed suffix.
+            return text + "ed";
+        }
+
+        /// <summary>
+        /// Determine whether the character is a vowel.
+        /// </summary>
+        private static bool IsVowel(char c) => char.IsLetter(c) && (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
+
+        /// <summary>
         /// Creates a new <see cref="CodeGenerator"/>.
         /// </summary>
         /// <param name="configXml">The configuration <see cref="XElement"/>.</param>

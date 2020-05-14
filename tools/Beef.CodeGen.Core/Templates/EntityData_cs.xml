@@ -915,9 +915,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
             </Else>
           </If>
           <If Condition="Property.DataName != null">
-            <If Condition="Entity.AutoImplement == 'Database'">
-              <![CDATA[, "{{Property.DataName}}"]]>
-            </If>
+            <![CDATA[, "{{Property.DataName}}"]]>
           </If>
           <If Condition="Property.DataOperationTypes != null">
             <![CDATA[, operationTypes: OperationTypes.{{Property.DataOperationTypes}}]]>

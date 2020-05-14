@@ -426,7 +426,6 @@ namespace Beef.Mapper
         /// <param name="srcePropertyExpression">The <see cref="Expression"/> to reference the source entity property.</param>
         /// <returns>The <see cref="PropertySrceMapper{TSrce, TSrceProperty, TDest}"/>.</returns>
         public virtual PropertySrceMapper<TSrce, TSrceProperty, TDest> SrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression)
-            where TSrceProperty : class
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));
@@ -444,7 +443,6 @@ namespace Beef.Mapper
         /// <param name="propertyAction">An <see cref="Action"/> enabling access to the created <see cref="PropertyMapper{TSrce, TSrceProperty, TDest, TDestProperty}"/>.</param>
         /// <returns>The <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
         public virtual EntityMapper<TSrce, TDest> HasSrceProperty<TSrceProperty>(Expression<Func<TSrce, TSrceProperty>> srcePropertyExpression, Action<PropertySrceMapper<TSrce, TSrceProperty, TDest>>? propertyAction = null)
-            where TSrceProperty : class
         {
             if (srcePropertyExpression == null)
                 throw new ArgumentNullException(nameof(srcePropertyExpression));

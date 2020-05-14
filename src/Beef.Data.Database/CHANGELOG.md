@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.5
+- *Fixed:* `DatabaseRecord.GetValue` changed to use the underlying type of nullable types for `IsEnum` checking and parsing.
+
 ## v3.1.4
 - *Fixed:* A new nullable compile error fixed that appeared with Visual Studio 2019 v16.5.4.
 
