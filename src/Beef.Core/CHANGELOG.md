@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v3.1.9
 - *Fixed:* The `IPropertySrceMapper` updated to fully support nullable reference types.
+- *Fixed:* Added `lock` to `DataContextScope.GetContext` to ensure thread-safety for parallel executions. 
 
 ## v3.1.8
 - *Fixed:* The `PropertyMapper` will only auto map sub-entities at mapping execution time where no converter or mapper has been specified; was previously always auto mapping at construction, often unnecessarily where a converter or mapper was later being specified.

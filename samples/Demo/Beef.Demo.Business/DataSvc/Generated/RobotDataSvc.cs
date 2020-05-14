@@ -64,7 +64,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __result = await Factory.Create<IRobotData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Created", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Create", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -81,7 +81,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __result = await Factory.Create<IRobotData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Updated", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync(__result, "Demo.Robot.{id}", "Update", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -97,7 +97,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 await Factory.Create<IRobotData>().DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync("Demo.Robot.{id}", "Deleted", new KeyValuePair<string, object?>("id", id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishAsync("Demo.Robot.{id}", "Delete", new KeyValuePair<string, object?>("id", id)).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
