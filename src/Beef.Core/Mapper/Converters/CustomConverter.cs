@@ -31,12 +31,12 @@ namespace Beef.Mapper.Converters
         /// <summary>
         /// Gets the destination value <see cref="Type"/>.
         /// </summary>
-        Type IPropertyMapperConverter.DestType { get; } = typeof(TSrceProperty);
+        Type IPropertyMapperConverter.DestType { get; } = typeof(TDestProperty);
 
         /// <summary>
         /// Gets the underlying source <see cref="Type"/> allowing for nullables.
         /// </summary>
-        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = typeof(TDestProperty);
+        Type IPropertyMapperConverter.SrceUnderlyingType { get; } = typeof(TSrceProperty);
 
         /// <summary>
         /// Gets the underlying destination <see cref="Type"/> allowing for nullables.

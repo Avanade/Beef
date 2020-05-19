@@ -23,7 +23,7 @@ The following represents the **key** property attributes:
 Attribute | Description
 ---|---
 **`Name`** | Unique property name. This is mandatory.
-`Text` | Text to be used in comments. Defaults to the `Name` converted to sentence case. Depending on whether the `Type` is bool, will appear in one of the two generated sentences: 'Gets or sets a value indicating whether {text}.' or 'Gets or sets the {text}.'. To create a <see cref="XXX"/> use moustache shorthand (e.g. {{Xxx}}.
+`Text` | Text to be used in comments. Defaults to the `Name` converted to sentence case. Depending on whether the `Type` is bool, will appear in one of the two generated sentences: 'Gets or sets a value indicating whether \{text}.' or 'Gets or sets the \{text}.'. To create a `<see cref="XXX"/>` use moustache shorthand (e.g. \{{Xxx}}).
 `Inherited` | Indicates whether the property is inherited and therefore should not be output within the generated entity class.
 `PrivateName` | Name to be used for private fields; e.g. 'FirstName' reformatted as '_firstName'. Defaults from `Name`.
 `ArgumentName` | Name to be used for argument parameters; e.g. 'FirstName' reformatted as 'firstName'. Defaults from `Name`.
@@ -36,7 +36,7 @@ The following represents the key .NET **property definition** attributes:
 
 Attribute | Description
 ---|---
-**`Type`** | Specifies the .NET type. Defaults to `string`. To reference a Reference Data type always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data using statement is used.
+**`Type`** | Specifies the .NET type. Defaults to `string`. To reference a Reference Data type always prefix with `RefDataNamespace` (e.g. `RefDataNamespace.Gender`). This will ensure that the appropriate Reference Data using statement is used. _Shortcut:_ Where the value starts with (prefix) `RefDataNamespace.` and the correspondong `RefDataType` attribute is not specified it will automatically default the `RefDataType` to `string`.
 **`Nullable`** | Indicates that the .NET Type should be declared as nullable; e.g. `Nullable<T>`.
 **`UniqueKey`** | Indicates that the property is considered part of the unique key. This is also used to simplify the parameter specification for entity operations.
 `Immutable` | Indicates that the value is immutable; cannot be changed once set. Consider using for properties that are a `UniqueKey`.
@@ -58,7 +58,7 @@ The following represents the **Reference Data** attributes:
 
 Attribute | Description
 ---|---
-**`RefDataType`** | Identifies the `Type` as being a Reference Data type as well as specifying the underlying .NET Type used for the Reference Data identifier serialization (SID). Options are: `string`, `int` and `Guid`.
+**`RefDataType`** | Identifies the `Type` as being a Reference Data type as well as specifying the underlying .NET Type used for the Reference Data identifier serialization (SID). Options are: `string`, `int` and `Guid`. _Shortcut:_ Where the value is not specified and the corresponding `Type` attribute value starts with (prefix) `RefDataNamespace.` it will automatically default to `string`.
 `RefDataList` | Indicates that the Reference Data property is to be a serializable list (`ReferenceDataSidList`). This is required to enable a list of Reference Data values (as per `RefDataType`) to be passed as an argument for example.
 `RefDataText` | Indicates whether a corresponding *text* property is added when generating a reference data propety. This is generally only used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (automatically performed where url contains '$text=true').
 `RefDataMapping` | Indicates whether the property should use the underlying Reference Data mapping capabilities. Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.
@@ -74,6 +74,16 @@ Attribute | Description
 `JsonName` | The name for the JSON property. Defaults to `ArgumentName` (i.e. camelCase).
 `IgnoreSerialization` | Indicates whether the property is not to be serialized. All properties are serialized by default.
 `EmitDefaultValue` | Indicates whether to emit the default value when serializing (defaults to `false`).
+
+<br/>
+
+### Web API attributes
+
+The following represents the **Web API** attributes:
+
+Attribute | Description
+---|---
+`WebApiQueryStringConverter` | Specifies the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string. Adds `WebApiArgFormatterAttribute` referencing `WebApiQueryStringConverter` to the entity code generation for use by the `WebApiArg` logic to write to the query string. The `Controller` code generation references `WebApiQueryStringConverter` directly to parse the query string into the underlying `Type`.
 
 <br/>
 

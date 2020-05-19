@@ -136,55 +136,7 @@ namespace Beef.Events
         public static bool PublishSynchronously { get; set; } = false;
 
         /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using a <see cref="EventData.Subject"/> <paramref name="template"/>.
-        /// </summary>
-        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object?}[])"/>).</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="keyValuePairs">The key/value pairs.</param>
-        /// <returns>he <see cref="Task"/>.</returns>
-        public static Task PublishAsync(string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
-        {
-            if (_publishFuncs.Count == 0)
-                return Task.CompletedTask;
-            else
-                return PublishAsync(new EventData[] { EventData.Create(template, action, keyValuePairs) });
-        }
-
-        /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using a <paramref name="value"/> and <see cref="EventData.Subject"/> <paramref name="template"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value.</param>
-        /// <param name="template">The <see cref="EventData.Subject"/> template (see <see cref="CreateSubjectFromTemplate(string, KeyValuePair{string, object?}[])"/>).</param>
-        /// <param name="action">The event action.</param>
-        /// <param name="keyValuePairs">The key/value pairs.</param>
-        /// <returns>he <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs) where T : class
-        {
-            if (_publishFuncs.Count == 0)
-                return Task.CompletedTask;
-            else
-                return PublishAsync(new EventData[] { EventData.Create(value, template, action, keyValuePairs) });
-        }
-
-        /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using the <paramref name="value"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subject">The event subject.</param>
-        /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public static Task PublishAsync<T>(T value, string subject, string? action = null) where T : class
-        {
-            if (_publishFuncs.Count == 0)
-                return Task.CompletedTask;
-            else
-                return PublishAsync(new EventData[] { EventData.Create(value, subject, action) });
-        }
-
-        /// <summary>
-        /// Publishes an <see cref="EventData"/> instance.
+        /// Publishes an <see cref="EventData"/> instance (with no <see cref="EventData.Key"/>).
         /// </summary>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
@@ -195,6 +147,54 @@ namespace Beef.Events
                 return Task.CompletedTask;
             else
                 return PublishAsync(new EventData[] { EventData.Create(subject, action) });
+        }
+
+        /// <summary>
+        /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
+        /// </summary>
+        /// <param name="subject">The event subject.</param>
+        /// <param name="action">The event action.</param>
+        /// <param name="key">The event key.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public static Task PublishAsync(string subject, string? action = null, params IComparable?[] key)
+        {
+            if (_publishFuncs.Count == 0)
+                return Task.CompletedTask;
+            else
+                return PublishAsync(new EventData[] { EventData.Create(subject, action, key) });
+        }
+
+        /// <summary>
+        /// Publishes an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="value">The event value</param>
+        /// <param name="subject">The event subject.</param>
+        /// <param name="action">The event action.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public static Task PublishValueAsync<T>(T value, string subject, string? action = null) where T : class
+        {
+            if (_publishFuncs.Count == 0)
+                return Task.CompletedTask;
+            else
+                return PublishAsync(new EventData[] { EventData.CreateValue<T>(value, subject, action) });
+        }
+
+        /// <summary>
+        /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="value">The event value</param>
+        /// <param name="subject">The event subject.</param>
+        /// <param name="action">The event action.</param>
+        /// <param name="key">The event key.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        public static Task PublishValueAsync<T>(T value, string subject, string? action = null, params IComparable?[] key)
+        {
+            if (_publishFuncs.Count == 0)
+                return Task.CompletedTask;
+            else
+                return PublishAsync(new EventData[] { EventData.CreateValue<T>(value, subject, action, key) });
         }
 
         /// <summary>

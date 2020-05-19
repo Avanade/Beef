@@ -25,8 +25,12 @@
       <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" Otherwise="false" />
       <Set Name="System.UsesEntityFramework" Condition="Entity.AutoImplement == 'EntityFramework'" Value="true" Otherwise="false" />
       <Set Name="System.HasKey" Value="false"/>
-      <Property Condition="Property.UniqueKey == true">
-        <Set Name="System.HasKey" Value="true"/>
+      <Property>
+        <Set Name="System.HasKey" Condition="Property.UniqueKey == true" Value="true"/>
+        <If Condition="Property.DataConverter:EndsWith('{T}') == true and Property.IsDataConverterGeneric == null">
+          <Set Name="Property.DataConverter" Value="Property.DataConverter:Remove('{T}')" />
+          <Set Name="Property.IsDataConverterGeneric" Value="true" />
+        </If>
       </Property>
       <Operation Condition="Operation.OperationType != 'Custom' and Operation.AutoImplement != 'None'">
         <Exception Condition="Entity.AutoImplement == null" Message="Operation '{{Operation.Name}}' specifies AutoImplement where not specified for the Entity '{{Entity.Name}}'." />

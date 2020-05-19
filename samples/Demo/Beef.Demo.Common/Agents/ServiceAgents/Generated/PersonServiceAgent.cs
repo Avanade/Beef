@@ -115,6 +115,14 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         Task<WebApiAgentResult> MarkAsync(WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -367,6 +375,18 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         {
             return base.PostAsync("api/v1/persons/mark", requestOptions: requestOptions,
                 args: new WebApiArg[] { });
+        }
+
+        /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null)
+        {
+            return base.PostAsync<MapCoordinates>("api/v1/persons/map", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<MapArgs?>("args", args, WebApiArgType.FromUriUseProperties) });
         }
 
         /// <summary>

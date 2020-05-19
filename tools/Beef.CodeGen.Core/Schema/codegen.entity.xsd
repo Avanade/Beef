@@ -47,7 +47,7 @@
                   </xs:attribute>
                   <xs:attribute name="Type" type="xs:string" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Defines the .NET Type (defaults to string).</xs:documentation>
+                      <xs:documentation>Defines the .NET Type (defaults to string). Shortcut: Where the value starts with 'RefDataNamespace.' and the correspondong 'RefDataType' attribute is not specified it will automatically default the 'RefDataType' to 'string'.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="DateTimeTransform" use="optional">
@@ -106,7 +106,7 @@
                   </xs:attribute>
                   <xs:attribute name="RefDataType" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Specifies the underlying .NET Type used for the ReferenceData identifier serialization.</xs:documentation>
+                      <xs:documentation>Specifies the underlying .NET Type used for the ReferenceData identifier serialization. Shortcut: Where the value is not specified and the 'Type' attribute value starts with 'RefDataNamespace.' it will automatically default to 'string'.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
@@ -194,6 +194,11 @@
                   <xs:attribute name="Annotation3" type="xs:string" use="optional">
                     <xs:annotation>
                       <xs:documentation>Property annotation (e.g. attribute) declaration code.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="WebApiQueryStringConverter" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the 'IPropertyMapperConverter' to perform 'Type' to 'string' conversion for writing to and parsing from the query string.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="DataName" type="xs:string" use="optional">
@@ -459,17 +464,22 @@
                   </xs:attribute>
                   <xs:attribute name="AuthPermission" type="xs:string" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Specifies the permission of the ExecutionContext.IsAuthorized(permission).</xs:documentation>
+                      <xs:documentation>Specifies the permission for the ExecutionContext.IsAuthorized(permission).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AuthRole" type="xs:string" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Specifies the role for the ExecutionContext.IsInRole(role).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="AuthEntity" type="xs:string" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Specifies the entity (permission) of the ExecutionContext.IsAuthorized(entity, action); defaults to Entity.Entity_Name where not specified.</xs:documentation>
+                      <xs:documentation>Specifies the entity (permission) for the ExecutionContext.IsAuthorized(entity, action); defaults to Entity.Entity_Name where not specified.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="AuthAction" type="xs:string" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Specifies the action (permission) of the ExecutionContext.IsAuthorized(entity, action).</xs:documentation>
+                      <xs:documentation>Specifies the action (permission) for the ExecutionContext.IsAuthorized(entity, action).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="ManagerTransaction" type="xs:boolean" use="optional">
@@ -763,6 +773,11 @@
             <xs:attribute name="Namespace" type="xs:string" use="optional">
               <xs:annotation>
                 <xs:documentation>The name of the entity namespace appended to end of the standard company.appname.Common.Entities (defaults to CodeGeneration element Namespace value).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="AuthRole" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the role for the ExecutionContext.IsInRole(role); used where not overridden for an Operation.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="WebApiRoutePrefix" type="xs:string" use="optional">

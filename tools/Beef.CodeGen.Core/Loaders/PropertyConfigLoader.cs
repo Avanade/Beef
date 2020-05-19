@@ -30,6 +30,9 @@ namespace Beef.CodeGen.Loaders
 
             config.AttributeAdd("Type", "string");
 
+            if (config.GetAttributeValue<string>("Type").StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                config.AttributeAdd("RefDataType", "string");
+
             if (config.GetAttributeValue<string>("RefDataType") != null)
                 config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
             else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]!))

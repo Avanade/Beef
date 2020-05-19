@@ -71,6 +71,11 @@ namespace Beef.Demo.Business
         private readonly Func<Task>? _markOnBeforeAsync;
         private readonly Func<Task>? _markOnAfterAsync;
 
+        private readonly Func<MapArgs?, Task>? _mapOnPreValidateAsync;
+        private readonly Action<MultiValidator, MapArgs?>? _mapOnValidate;
+        private readonly Func<MapArgs?, Task>? _mapOnBeforeAsync;
+        private readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+
         private readonly Func<Guid, Task>? _getDetailOnPreValidateAsync;
         private readonly Action<MultiValidator, Guid>? _getDetailOnValidate;
         private readonly Func<Guid, Task>? _getDetailOnBeforeAsync;
@@ -352,6 +357,31 @@ namespace Beef.Demo.Business
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
                 await PersonDataSvc.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
+            });
+        }
+
+        /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
+        public Task<MapCoordinates> MapAsync(MapArgs? args)
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Read;
+                EntityBase.CleanUp(args);
+                if (_mapOnPreValidateAsync != null) await _mapOnPreValidateAsync(args).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
+                    .Run().ThrowOnError();
+
+                if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
+                var __result = await PersonDataSvc.MapAsync(args).ConfigureAwait(false);
+                if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
+                Cleaner.Clean(__result);
+                return __result;
             });
         }
 

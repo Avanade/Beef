@@ -513,6 +513,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         <![CDATA[        [Display(Name="{{Property.DisplayName}}")]
 ]]>
       </If>
+      <If Condition="Property.WebApiQueryStringConverter != null">
+        <![CDATA[        [Beef.WebApi.WebApiArgFormatter(typeof({{Property.WebApiQueryStringConverter}}))]
+]]>
+      </If>
       <If Condition="System.OmitEntityBase == false">
         <If Condition="Property.DataFormatString != null">
           <Then>

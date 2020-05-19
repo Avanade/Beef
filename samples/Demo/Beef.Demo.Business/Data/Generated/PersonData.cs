@@ -66,6 +66,8 @@ namespace Beef.Demo.Business.Data
 
         private readonly Action<Exception>? _markOnException;
 
+        private readonly Action<Exception>? _mapOnException;
+
         private readonly Action<Exception>? _getDetailOnException;
 
         private readonly Action<Exception>? _updateDetailOnException;
@@ -256,6 +258,17 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, () => MarkOnImplementationAsync(),
                 new BusinessInvokerArgs { ExceptionHandler = _markOnException });
+        }
+
+        /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
+        public Task<MapCoordinates> MapAsync(MapArgs? args)
+        {
+            return DataInvoker.Default.InvokeAsync(this, () => MapOnImplementationAsync(args),
+                new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
         }
 
         /// <summary>

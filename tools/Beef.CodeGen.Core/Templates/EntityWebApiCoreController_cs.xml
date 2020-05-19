@@ -472,7 +472,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                     </If>
                     <If Condition="Property.RefDataType == null">
                       <Then>
-                        <![CDATA[{{Property.Type}}]]>
+                        <If Condition="Property.WebApiQueryStringConverter == null">
+                          <Then><![CDATA[{{Property.Type}}]]></Then>
+                          <Else><![CDATA[string]]></Else>
+                        </If>
                       </Then>
                       <Else>
                         <If Condition="Property.RefDataList == true">
@@ -542,7 +545,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                     <Else><![CDATA[Sid]]></Else>
                   </If>
                 </If>
-                <![CDATA[ = {{Property.ArgumentName}}]]>
+                <If Condition="Property.WebApiQueryStringConverter == null">
+                  <Then><![CDATA[ = {{Property.ArgumentName}}]]></Then>
+                  <Else><![CDATA[ = new {{Property.WebApiQueryStringConverter}}().ConvertToSrce({{Property.ArgumentName}})]]></Else>
+                </If>
               </Property>
             </Entity>
             <![CDATA[ };

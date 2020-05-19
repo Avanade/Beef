@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.10
+- **_Breaking:_** `Event.PublishAsync(string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)` and `PublishAsync<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)` have been removed. The `template` and `KeyValuePair` should be replaced using C# [string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated); e.g. `Event.PublishAsync($"Company.Entity.{id}", "Delete", id);`. Where previously the first parameter of the `PublishAsync` was the value, the method has been renamed to `PublishValueAsync`. The `EventData.Create` methods have been updated in the same manner. Code-generation should be performed to update the generated codebase to support. (_Note:_ Obsoleting method could not be achieved without artificially changing the method signature; therefore change required - apologies to those impacted.)
+- *Enhancement:* Added `WebApiArgFormatterAttribute` that can be applied to an entity property to enable conversion (`IPropertyMapperConverter`) from .NET `Type` to a corresponding URL query string value.
+
 ## v3.1.9
 - *Fixed:* The `IPropertySrceMapper` updated to fully support nullable reference types.
 - *Fixed:* Added `lock` to `DataContextScope.GetContext` to ensure thread-safety for parallel executions. 

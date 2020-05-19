@@ -142,6 +142,15 @@ namespace Beef.Demo.Common.Agents
             => PersonServiceAgent.MarkAsync(requestOptions);
 
         /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null)
+            => PersonServiceAgent.MapAsync(args, requestOptions);
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

@@ -197,6 +197,16 @@ Attribute | Description
 
 <br/>
 
+### Authorization attributes
+
+The following represents the corresponding **Authorization** attributes:
+
+Attribute | Description
+---|---
+`AuthRole` | Specifies the permission of the `ExecutionContext.IsInRole(role)`; used where not overridden specifically for an `Operation` element..
+
+<br/>
+
 ### gRPC attributes
 
 The following represents optional **[gRPC](../src/Beef.Grpc/README.md)** attributes:

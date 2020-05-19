@@ -90,6 +90,13 @@ namespace Beef.Demo.Business.Data
         Task MarkAsync();
 
         /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
+        Task<MapCoordinates> MapAsync(MapArgs? args);
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

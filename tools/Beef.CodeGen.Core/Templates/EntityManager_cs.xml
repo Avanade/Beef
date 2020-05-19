@@ -432,17 +432,37 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         <![CDATA[;
 ]]>
         <If Condition="Operation.AuthPermission != null">
-          <![CDATA[                ExecutionContext.Current.IsAuthorized("{{Operation.AuthPermission}}", true);
+          <Then>
+            <![CDATA[                ExecutionContext.Current.IsAuthorized("{{Operation.AuthPermission}}", true);
 ]]>
-        </If>
-        <If Condition="Operation.AuthAction != null">
-          <![CDATA[                ExecutionContext.Current.IsAuthorized(]]>
-          <If Condition="Operation.AuthEntity != null and Operation.AuthEntity != ''">
-            <Then><![CDATA[{{Operation.AuthEntity}}.Entity_Name]]></Then>
-            <Else><![CDATA[{{Entity.EntityName}}.Entity_Name]]></Else>
-          </If>
-          <![CDATA[, RefDataNamespace.SecurityAction.{{Operation.AuthAction}}, true);
+          </Then>
+          <Else>
+            <If Condition="Operation.AuthRole != null">
+              <Then>
+                <![CDATA[                ExecutionContext.Current.IsInRole("{{Operation.AuthRole}}", true);
+]]>
+              </Then>
+              <Else>
+                <If Condition="Operation.AuthAction != null">
+                  <Then>
+                    <![CDATA[                ExecutionContext.Current.IsAuthorized(]]>
+                    <If Condition="Operation.AuthEntity != null and Operation.AuthEntity != ''">
+                      <Then><![CDATA["{{Operation.AuthEntity}}"]]></Then>
+                      <Else><![CDATA[nameof({{Entity.EntityName}})]]></Else>
+                    </If>
+                    <![CDATA[, "{{Operation.AuthAction}}", true);
  ]]>
+                  </Then>
+                  <Else>
+                    <If Condition="Entity.AuthRole != null">
+                      <![CDATA[                ExecutionContext.Current.IsInRole("{{Entity.AuthRole}}", true);
+]]>
+                    </If>
+                  </Else>
+                </If>
+              </Else>
+            </If>
+          </Else>
         </If>
         <Parameter Condition="Parameter.LayerPassing == 'ToManagerSet' or Parameter.LayerPassing == 'ToManagerCollSet'">
           <If Condition="Parameter.LayerPassing == 'ToManagerSet'">

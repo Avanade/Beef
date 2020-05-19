@@ -15,87 +15,57 @@ namespace Beef.Events
     public class EventData : IETag
     {
         /// <summary>
-        /// Creates an <see cref="EventData"/> instance using a <see cref="Subject"/> <paramref name="template"/>.
+        /// Creates an <see cref="EventData"/> instance (with no <see cref="Key"/>.
         /// </summary>
-        /// <param name="template">The <see cref="Subject"/> template (see <see cref="Event.CreateSubjectFromTemplate(string, KeyValuePair{string, object}[])"/>).</param>
+        /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
-        /// <param name="keyValuePairs">The key/value pairs.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create(string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
-        {
-            return ApplySubjectTemplate(new EventData(), Check.NotEmpty(template, nameof(template)), action, keyValuePairs);
-        }
+        public static EventData Create(string subject, string? action = null) 
+            => new EventData { Subject = Check.NotEmpty(subject, nameof(subject)), Action = action };
 
         /// <summary>
-        /// Creates an <see cref="EventData{T}"/> instance using a <paramref name="value"/> and <see cref="Subject"/> <paramref name="template"/>.
+        /// Creates an <see cref="EventData"/> instance with the specified <see cref="Key"/>.
         /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <param name="template">The <see cref="Subject"/> template (see <see cref="Event.CreateSubjectFromTemplate(string, KeyValuePair{string, object}[])"/>).</param>
+        /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
-        /// <param name="keyValuePairs">The key/value pairs.</param>
-        /// <returns>The <see cref="EventData{T}"/>.</returns>
-        public static EventData<T> Create<T>(T value, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs) where T : class
-        {
-            return (EventData<T>)ApplySubjectTemplate(new EventData<T> { Value = Check.NotNull(value, nameof(value)) }, Check.NotEmpty(template, nameof(template)), action, keyValuePairs);
-        }
+        /// <param name="key">The event key.</param>
+        /// <returns>The <see cref="EventData"/>.</returns>
+        public static EventData Create(string subject, string? action = null, params IComparable?[] key) 
+            => new EventData { Subject = Check.NotEmpty(subject, nameof(subject)), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
 
         /// <summary>
-        /// Applies the subject template.
-        /// </summary>
-        private static EventData ApplySubjectTemplate(EventData ed, string template, string action, params KeyValuePair<string, object?>[] keyValuePairs)
-        {
-            ed.Subject = Event.CreateSubjectFromTemplate(template, keyValuePairs);
-            ed.Action = action;
-
-            switch (keyValuePairs.Length)
-            {
-                case 0:
-                    return ed;
-
-                case 1:
-                    ed.Key = keyValuePairs[0].Value;
-                    return ed;
-
-                default:
-                    ed.Key = keyValuePairs.Select(x => x.Value).ToArray();
-                    return ed;
-            }
-        }
-
-        /// <summary>
-        /// Creates an <see cref="EventData"/> instance using the <paramref name="value"/>.
+        /// Creates an <see cref="EventData"/> instance using the <paramref name="value"/> (infers the <see cref="Key"/> from either <see cref="IIdentifier"/> or <see cref="IUniqueKey"/>).
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create<T>(T value, string subject, string? action = null) where T : class
+        public static EventData<T> CreateValue<T>(T value, string subject, string? action = null) where T : class
         {
-            Check.NotNull(value, nameof(value));
-
-            var ed = new EventData<T> { Value = value };
+            var ed = new EventData<T> { Value = Check.NotNull(value, nameof(value)) };
             ed.Subject = Check.NotEmpty(subject, nameof(subject));
             ed.Action = action;
 
             switch (value)
             {
                 case IIntIdentifier ii:
-                    ed.Key = ii;
+                    ed.Key = ii.Id;
                     break;
 
                 case IGuidIdentifier gi:
-                    ed.Key = gi;
+                    ed.Key = gi.Id;
                     break;
 
                 case IStringIdentifier si:
-                    ed.Key = si;
+                    ed.Key = si.Id;
                     break;
 
                 case IUniqueKey uk:
                     if (uk.HasUniqueKey)
                         ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
+                    else
+                        throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
 
                     break;
             }
@@ -104,17 +74,16 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Creates an <see cref="EventData"/> instance. 
+        /// Creates an <see cref="EventData"/> instance with the specified <paramref name="value"/> <see cref="Key"/>.
         /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
+        /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData Create(string subject, string? action = null)
-        {
-            var ed = new EventData { Action = action };
-            ed.Subject = Check.NotEmpty(subject, nameof(subject)); ;
-            return ed;
-        }
+        public static EventData<T> CreateValue<T>(T value, string subject, string? action = null, params IComparable?[] key) 
+            => new EventData<T> { Value = value, Subject = Check.NotEmpty(subject, nameof(subject)), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventData"/> class defaulting the <see cref="TenantId"/> and <see cref="Timestamp"/> as applicable 
