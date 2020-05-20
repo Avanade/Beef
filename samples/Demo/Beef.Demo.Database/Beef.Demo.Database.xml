@@ -2,6 +2,8 @@
 <CodeGeneration RefDatabaseSchema="Ref" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- Reference data stored procedures -->
   <Table Name="Gender" Schema="Ref" GetAll="true" Get="true" Create="true" Update="true" />
+  <Table Name="Country" Schema="Ref" GetAll="true" />
+  <Table Name="USState" Schema="Ref" GetAll="true" />
 
   <!-- Reference data entity framework -->
   <Table Name="EyeColor" Schema="Ref" EfModel="true" />

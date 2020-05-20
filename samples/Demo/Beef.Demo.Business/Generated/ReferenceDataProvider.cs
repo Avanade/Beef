@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Beef;
 using Beef.RefData;
 using Beef.Demo.Business.DataSvc;
 using Beef.Demo.Common.Entities;
@@ -21,6 +22,16 @@ namespace Beef.Demo.Business
     public class ReferenceDataProvider : RefDataNamespace.ReferenceData
     {
         #region Collections
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.CountryCollection"/>.
+        /// </summary>
+        public override RefDataNamespace.CountryCollection Country => (RefDataNamespace.CountryCollection)this[typeof(RefDataNamespace.Country)];
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
+        /// </summary>
+        public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
@@ -68,16 +79,21 @@ namespace Beef.Demo.Business
                 {
                     switch (name)
                     {
+                        case var n when string.Compare(n, nameof(RefDataNamespace.Country), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Country)); break;
+                        case var n when string.Compare(n, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.USState)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Gender)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.EyeColor)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.PowerSource)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.Company), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.Company)); break;
-
                     }
                 }
             }
 
-            Parallel.ForEach(types, (type, state) => { var x = this[type]; });
+            ExecutionContext.FlowSuppression(ecf =>
+            {
+                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var x = this[type]; });
+            });
+
             return Task.CompletedTask;
         }
     }

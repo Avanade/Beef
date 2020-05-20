@@ -2,11 +2,17 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.9
-- *Enhancement:* Added `Property.WebApiQueryStringConverter` attribute to enable 'Type' to 'string' conversion for writing to and parsing from the query string.
+## v3.1.11
+- *Enhancement:* Added `Property.WebApiQueryStringConverter` attribute to enable `Type` to `string` conversion for writing to and parsing from the query string.
 - *Enhancement:* Shortcut added where the `Type` attribute for the `Property` element starts with `RefDataNamespace.` (e.g. `Type="RefDataNamespace.Gender"`) and the corresponding `RefDataType` attribute is not specified it will default to `string`.
 - *Enhancement:* Shortcut added where the `DataConverter` attribute for the `Property` element ends with `{T}` (e.g. `DataConverter="ReferenceDataNullableGuidIdConverter{T}"`) and the corresponding `IsDataConverterGeneric` attribute is not specified the `{T}` will be removed and the `IsDataConverterGeneric` will default to `true`.
 - *Enhancement:* Added `Operation.AuthRole` and `Entity.AuthRole` attributes to enable `ExecutionContext.IsInRole(role)` checking.
+
+## v3.1.10
+- *Fixed:* Fix to include the `Beef` namespace for the `ReferenceDataProvider.PrefetchAsync` capability.
+
+## v3.1.9
+- *Fixed:* Fix for `ReferenceDataProvider.PrefetchAsync` to leverage the new `ExecutionContext.FlowSuppression`.
 
 ## v3.1.8
 - *Fixed:* Fix for `EntityData` code generation; `DataName` was not always being output where using `Database`.

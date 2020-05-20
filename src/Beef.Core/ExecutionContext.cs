@@ -496,5 +496,75 @@ namespace Beef
         }
 
         #endregion
+
+        #region Flow
+
+        /// <summary>
+        /// Executes the <paramref name="action"/> suppressing the flow of the <see cref="ExecutionContext"/> across asynchronous threads. Any threads created that need the <see cref="ExecutionContext"/>
+        /// should use the <see cref="ExecutionContextFlow.SetExecutionContext"/> which will copy the key properties of the originating <see cref="ExecutionContext"/> and set up a new 
+        /// <see cref="Current"/> for usage. <i>Note:</i> any new threads <b>must</b> be created from within the <paramref name="action"/>. <b>Warning:</b> this is an advanced feature and should only be
+        /// used where this specific capability is required.
+        /// </summary>
+        /// <param name="action">The action to invoke with flow suppression.</param>
+        public static void FlowSuppression(Action<ExecutionContextFlow> action)
+        {
+            using var afc = System.Threading.ExecutionContext.SuppressFlow();
+            action?.Invoke(new ExecutionContextFlow(HasCurrent ? Current : null));
+        }
+
+        /// <summary>
+        /// Creates a copy of the <see cref="ExecutionContext"/> with only those properties that can be easily shared across a new executing thread context.
+        /// </summary>
+        /// <returns>The new <see cref="ExecutionContext"/>.</returns>
+        internal ExecutionContext FlowCopy()
+        {
+            return new ExecutionContext
+            {
+                Logger = Logger,
+                OperationType = OperationType,
+                _userId = _userId,
+                _username = _username,
+                _tenantId = _tenantId,
+                _partitionKey = _partitionKey,
+                _correlationId = _correlationId,
+                _sessionCorrelationId = _sessionCorrelationId,
+                _timestamp = _timestamp,
+                _pagingArgs = _pagingArgs,
+                _roles = _roles,
+            };
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Enables access to the <see cref="Originating"/> <see cref="ExecutionContext"/> and the ability to <see cref="SetExecutionContext"/> using a copy within the new executing thread context.
+    /// </summary>
+    public sealed class ExecutionContextFlow
+    {
+        private static readonly object _lock = new object();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionContextFlow"/> class.
+        /// </summary>
+        /// <param name="originating">The originating <see cref="ExecutionContext"/>.</param>
+        internal ExecutionContextFlow(ExecutionContext? originating) => Originating = originating;
+
+        /// <summary>
+        /// Gets the originating <see cref="ExecutionContext"/>.
+        /// </summary>
+        public ExecutionContext? Originating { get; }
+
+        /// <summary>
+        /// Sets the <see cref="ExecutionContext.Current"/> using a copy of the <see cref="Originating"/> <see cref="ExecutionContext"/>.
+        /// </summary>
+        public void SetExecutionContext()
+        {
+            lock (_lock)
+            {
+                if (Originating != null && !ExecutionContext.HasCurrent)
+                    ExecutionContext.SetCurrent(Originating.FlowCopy());
+            }
+        }
     }
 }

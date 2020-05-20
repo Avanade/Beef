@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Beef;
 using Beef.RefData;
 using {{Config.Company}}.{{Config.AppName}}.Business.DataSvc;
 using {{Config.Company}}.{{Config.AppName}}.Common.Entities;
@@ -82,12 +83,15 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
                       <![CDATA[                        case var n when string.Compare(n, nameof({{Entity.EntityName}}), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof({{Entity.EntityName}})); break;
 ]]>
                     </Entity>
-  <![CDATA[
-                    }
+  <![CDATA[                    }
                 }
             }
 
-            Parallel.ForEach(types, (type, state) => { var x = this[type]; });
+            ExecutionContext.FlowSuppression(ecf =>
+            {
+                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var x = this[type]; });
+            });
+
             return Task.CompletedTask;
         }
     }
