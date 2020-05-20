@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.10
+- *Fixed:* The automatic connection management/sharing does not support multiple concurrent threads - the internal stack was being unwound in the incorrect sequence closing the wrong connection. To support this a new `ExecutionContext.FlowSuppression` method has been added to assist the creation of new `ExecutionContext` instances to enable (and ensure separation). This is an opt-in requirement to enable.
+
 ## v3.1.9
 - *Fixed:* The `IPropertySrceMapper` updated to fully support nullable reference types.
 - *Fixed:* Added `lock` to `DataContextScope.GetContext` to ensure thread-safety for parallel executions. 

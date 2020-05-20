@@ -37,6 +37,12 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         static ReferenceDataAgentProvider()
         {
+            _nameDict.Add(nameof(Country), typeof(RefDataNamespace.Country));
+            _typeDict.Add(typeof(RefDataNamespace.Country), nameof(Country));
+
+            _nameDict.Add(nameof(USState), typeof(RefDataNamespace.USState));
+            _typeDict.Add(typeof(RefDataNamespace.USState), nameof(USState));
+
             _nameDict.Add(nameof(Gender), typeof(RefDataNamespace.Gender));
             _typeDict.Add(typeof(RefDataNamespace.Gender), nameof(Gender));
 
@@ -59,6 +65,8 @@ namespace Beef.Demo.Common.Agents
         {
             _agent = new ReferenceDataAgent(httpClient, beforeRequest);
 
+            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => _agent.CountryGetAllAsync().ContinueWith((t) => t.Result.Value)));
+            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value)));
             _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value)));
             _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value)));
             _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value)));
@@ -68,6 +76,18 @@ namespace Beef.Demo.Common.Agents
         #endregion
 
         #region Collections
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.CountryCollection"/>.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.CountryCollection"/>.</returns>
+        public override RefDataNamespace.CountryCollection Country => (RefDataNamespace.CountryCollection)this[typeof(RefDataNamespace.Country)];
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
+        public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
@@ -145,6 +165,8 @@ namespace Beef.Demo.Common.Agents
                 {
                     switch (name)
                     {
+                        case nameof(Country): GetCache(_nameDict[nameof(Country)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Country[]>(items!)); break;
+                        case nameof(USState): GetCache(_nameDict[nameof(USState)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.USState[]>(items!)); break;
                         case nameof(Gender): GetCache(_nameDict[nameof(Gender)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.Gender[]>(items!)); break;
                         case nameof(EyeColor): GetCache(_nameDict[nameof(EyeColor)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.EyeColor[]>(items!)); break;
                         case nameof(PowerSource): GetCache(_nameDict[nameof(PowerSource)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.PowerSource[]>(items!)); break;

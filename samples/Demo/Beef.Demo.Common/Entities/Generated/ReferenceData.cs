@@ -35,6 +35,8 @@ namespace Beef.Demo.Common.Entities
         /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
         public Type[] GetAllTypes() => new Type[] 
             {
+                typeof(Country),
+                typeof(USState),
                 typeof(Gender),
                 typeof(EyeColor),
                 typeof(PowerSource),
@@ -57,6 +59,16 @@ namespace Beef.Demo.Common.Entities
         public abstract Task PrefetchAsync(params string[] names);
         
         #region Collections
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.CountryCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.CountryCollection Country { get; }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.USStateCollection USState { get; }
 
         /// <summary> 
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.

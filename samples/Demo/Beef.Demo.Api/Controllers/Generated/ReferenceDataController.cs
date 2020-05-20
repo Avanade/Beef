@@ -26,6 +26,34 @@ namespace Beef.Demo.Api.Controllers
     public partial class ReferenceDataController : ControllerBase
     {
         /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data entities that match the specified criteria.
+        /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>A <see cref="RefDataNamespace.Country"/> collection.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/countries")]
+        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Country>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult CountryGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.Country>>(this, 
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(RefDataNamespace.ReferenceData.Current.Country, codes, text, includeInactive: this.IncludeInactive())),
+            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+
+        /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data entities that match the specified criteria.
+        /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>A <see cref="RefDataNamespace.USState"/> collection.</returns>
+        [HttpGet()]
+        [Route("api/v1/demo/ref/usStates")]
+        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult USStateGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.USState>>(this, 
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, codes, text, includeInactive: this.IncludeInactive())),
+            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+
+        /// <summary> 
         /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data entities that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
@@ -104,6 +132,8 @@ namespace Beef.Demo.Api.Controllers
                 {
                     switch (q.Key)
                     {
+                        case var s when string.Compare(s, nameof(RefDataNamespace.Country), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Country), ReferenceDataFilter.ApplyFilter<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(RefDataNamespace.ReferenceData.Current.Country, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.USState), ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, q.Value, includeInactive: inactive))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.Gender), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.Gender), ReferenceDataFilter.ApplyFilter<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(RefDataNamespace.ReferenceData.Current.Gender, q.Value, includeInactive: inactive))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.EyeColor), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.EyeColor), ReferenceDataFilter.ApplyFilter<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(RefDataNamespace.ReferenceData.Current.EyeColor, q.Value, includeInactive: inactive))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.PowerSource), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PowerSource), ReferenceDataFilter.ApplyFilter<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(RefDataNamespace.ReferenceData.Current.PowerSource, q.Value, includeInactive: inactive))); break;
