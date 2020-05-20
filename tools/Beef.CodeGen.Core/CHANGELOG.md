@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.10
+- *Fixed:* Fix to include the `Beef` namespace for the `ReferenceDataProvider.PrefetchAsync` capability.
+
 ## v3.1.9
 - *Fixed:* Fix for `ReferenceDataProvider.PrefetchAsync` to leverage the new `ExecutionContext.FlowSuppression`.
 
