@@ -95,6 +95,10 @@ namespace Beef.Demo.Business.Data
         {
             PersonDetail pd = null;
 
+            System.Diagnostics.Debug.WriteLine($"One, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
+            await GetAsync(id);
+
+            System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
             await Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
                 .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
                 .SelectQueryMultiSetAsync(

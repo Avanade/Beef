@@ -24,6 +24,36 @@ namespace Beef.Demo.Business.Data
     public partial class ReferenceDataData : IReferenceDataData
     {
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.Country"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.CountryCollection"/>.</returns>
+        public async Task<RefDataNamespace.CountryCollection> CountryGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.CountryCollection();
+            await DataInvoker.Default.InvokeAsync(this, async () => 
+            {
+                await Database.Default.GetRefDataAsync<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(__coll, "[Ref].[spCountryGetAll]", "CountryId");
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+
+            return __coll;
+        }
+
+        /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.USState"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.USStateCollection"/>.</returns>
+        public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.USStateCollection();
+            await DataInvoker.Default.InvokeAsync(this, async () => 
+            {
+                await Database.Default.GetRefDataAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(__coll, "[Ref].[spUSStateGetAll]", "USStateId");
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+
+            return __coll;
+        }
+
+        /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> objects.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.GenderCollection"/>.</returns>

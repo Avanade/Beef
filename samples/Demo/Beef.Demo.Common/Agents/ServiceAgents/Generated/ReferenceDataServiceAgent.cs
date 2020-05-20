@@ -22,6 +22,22 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
     public partial interface IReferenceDataServiceAgent
     {
         /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args, WebApiRequestOptions? requestOptions);
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args, WebApiRequestOptions? requestOptions);
+
+        /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.Gender"/> objects that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
@@ -86,6 +102,24 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         /// <param name="httpClient">The <see cref="HttpClient"/>.</param>
         /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
         public ReferenceDataServiceAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null) : base(httpClient, beforeRequest) { }
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
+            base.GetAsync<RefDataNamespace.CountryCollection>("api/v1/demo/ref/countries", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
+            base.GetAsync<RefDataNamespace.USStateCollection>("api/v1/demo/ref/usStates", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.Gender"/> objects that match the filter arguments.

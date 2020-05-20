@@ -38,6 +38,22 @@ namespace Beef.Demo.Common.Agents
         public IReferenceDataServiceAgent ServiceAgent { get; private set; }
 
         /// <summary>
+        /// Gets all of the <see cref="Country"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.CountryGetAllAsync(args, requestOptions);      
+
+        /// <summary>
+        /// Gets all of the <see cref="USState"/> objects that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) => ServiceAgent.USStateGetAllAsync(args, requestOptions);      
+
+        /// <summary>
         /// Gets all of the <see cref="Gender"/> objects that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>

@@ -84,12 +84,15 @@ namespace Cdr.Banking.Business
                         case var n when string.Compare(n, nameof(RefDataNamespace.MaturityInstructions), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.MaturityInstructions)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.TransactionType), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.TransactionType)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.TransactionStatus), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.TransactionStatus)); break;
-
                     }
                 }
             }
 
-            Parallel.ForEach(types, (type, state) => { var x = this[type]; });
+            ExecutionContext.FlowSuppression(ecf =>
+            {
+                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var x = this[type]; });
+            });
+
             return Task.CompletedTask;
         }
     }

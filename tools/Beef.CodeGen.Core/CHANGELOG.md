@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.9
+- *Fixed:* Fix for `ReferenceDataProvider.PrefetchAsync` to leverage the new `ExecutionContext.FlowSuppression`.
+
 ## v3.1.8
 - *Fixed:* Fix for `EntityData` code generation; `DataName` was not always being output where using `Database`.
 - *Enhancement:* Added `Config.EventActionFormat` to control the formatting of the event action text.

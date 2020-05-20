@@ -19,6 +19,18 @@ namespace Beef.Demo.Business.Data
     public partial interface IReferenceDataData
     {
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.Country"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.CountryCollection"/>.</returns>
+        Task<RefDataNamespace.CountryCollection> CountryGetAllAsync();
+
+        /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.USState"/> objects.
+        /// </summary>
+        /// <returns>A <see cref="RefDataNamespace.USStateCollection"/>.</returns>
+        Task<RefDataNamespace.USStateCollection> USStateGetAllAsync();
+
+        /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Gender"/> objects.
         /// </summary>
         /// <returns>A <see cref="RefDataNamespace.GenderCollection"/>.</returns>
