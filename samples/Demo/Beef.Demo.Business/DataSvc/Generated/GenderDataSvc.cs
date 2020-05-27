@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await Factory.Create<IGenderData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -79,7 +79,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await Factory.Create<IGenderData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;

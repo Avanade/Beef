@@ -19,10 +19,19 @@ namespace Beef.Events.Subscribe
         public static string SystemUsername { get; set; } = ExecutionContext.EnvironmentUsername;
 
         /// <summary>
+        /// Gets the username based on the <see cref="IEventSubscriber.RunAsUser"/> (see also <see cref="SystemUsername"/>).
+        /// </summary>
+        /// <param name="subscriber">The <see cref="IEventSubscriber"/> that will process the message.</param>
+        /// <param name="event">The <see cref="EventData"/>.</param>
+        /// <returns>The username.</returns>
+        protected static string GetUsername(IEventSubscriber subscriber, EventData @event)
+            => Check.NotNull(subscriber, nameof(subscriber)).RunAsUser == RunAsUser.Originating ? Check.NotNull(@event, nameof(@event)).Username ?? SystemUsername : SystemUsername;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        protected EventSubscriberHost(EventSubscriberHostArgs? args = null) => Args = Check.NotNull(args, nameof(args))!;
+        protected EventSubscriberHost(EventSubscriberHostArgs args) => Args = Check.NotNull(args, nameof(args));
 
         /// <summary>
         /// Gets the <see cref="EventSubscriberHostArgs"/>.
@@ -35,15 +44,35 @@ namespace Beef.Events.Subscribe
         public bool AreMultipleMessagesSupported { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>).
+        /// </summary>
+        public ResultHandling NotSubscribedHandling { get; set; } = ResultHandling.ContinueSilent;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>).
+        /// </summary>
+        public ResultHandling DataNotFoundHandling { get; set; } = ResultHandling.Stop;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (can be overriden by an <see cref="IEventSubscriber"/>).
+        /// </summary>
+        public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
+
+        /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
         /// </summary>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="getEventData">The function to get the corresponding <see cref="EventData"/> or <see cref="EventData{T}"/> only performed where subscribed for processing.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        protected async Task ReceiveAsync(string subject, string? action, Func<IEventSubscriber, EventData> getEventData)
+        /// <returns>The <see cref="Result"/>.</returns>
+        protected async Task<Result> ReceiveAsync(string subject, string? action, Func<IEventSubscriber, EventData> getEventData)
         {
-            Check.NotEmpty(subject, nameof(subject));
+            if (Args.AuditWriter == null)
+                throw new InvalidOperationException("The Args.AuditWriter must be specified; otherwise, ResultHandling.ContinueWithAudit cannot be actioned.");
+
+            if (string.IsNullOrEmpty(subject))
+                throw new EventSubscriberException("The Event Subject is required.");
+
             if (getEventData == null)
                 throw new ArgumentNullException(nameof(getEventData));
 
@@ -51,7 +80,7 @@ namespace Beef.Events.Subscribe
             var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
             var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber?)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
             if (subscriber == null)
-                return;
+                return CheckResult(Result.NotSubscribed(), subject, action, null);
 
             // Where matched get the EventData and execute the subscriber receive.
             var @event = getEventData(subscriber) ?? throw new EventSubscriberException($"An EventData instance must not be null (Subject `{subject}` and Action '{action}').");
@@ -60,18 +89,79 @@ namespace Beef.Events.Subscribe
             {
                 ExecutionContext.Reset(false);
                 ExecutionContext.SetCurrent(BindLogger(CreateExecutionContext(subscriber, @event)));
-                await subscriber.ReceiveAsync(@event).ConfigureAwait(false);
+                return CheckResult(await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber);
             }
+            catch (ValidationException vex) { return CheckResult(Result.InvalidData(vex), subject, action, subscriber); }
+            catch (BusinessException bex) { return CheckResult(Result.InvalidData(bex), subject, action, subscriber); }
+            catch (NotFoundException) { return CheckResult(Result.DataNotFound(), subject, action, subscriber); }
             catch (Exception ex)
             {
                 // Handle the exception as per the subscriber configuration.
                 if (subscriber.UnhandledExceptionHandling == UnhandledExceptionHandling.Continue)
-                {
-                    Logger.Default.Warning($"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.ToString()}");
-                    return;
-                }
+                    return CheckResult(Result.ExceptionContinue(ex, $"An unhandled exception was encountered and ignored as the EventSubscriberHost is configured to continue: {ex.Message}"), subject, action, subscriber);
 
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Checks the <see cref="Result"/> and handles accordingly.
+        /// </summary>
+        private Result CheckResult(Result result, string subject, string? action, IEventSubscriber? subscriber = null)
+        {
+            if (result == null)
+                throw new ArgumentNullException(nameof(result));
+
+            result.Subject = subject;
+            result.Action = action;
+            result.Subscriber = subscriber;
+
+            switch (result.Status)
+            {
+                case SubscriberStatus.Success: 
+                    break;
+
+                case SubscriberStatus.NotSubscribed:
+                    HandleTheHandling(result, NotSubscribedHandling);
+                    break;
+
+                case SubscriberStatus.DataNotFound:
+                    HandleTheHandling(result, subscriber?.DataNotFoundHandling ?? DataNotFoundHandling);
+                    break;
+
+                case SubscriberStatus.InvalidData:
+                    HandleTheHandling(result, subscriber?.InvalidDataHandling ?? InvalidDataHandling);
+                    break;
+
+                case SubscriberStatus.ExceptionContinue:
+                    Args.AuditWriter?.Invoke(result);
+                    break;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Handle the result as required.
+        /// </summary>
+        private void HandleTheHandling(Result result, ResultHandling handling)
+        {
+            switch (result.ResultHandling ?? handling)
+            {
+                case ResultHandling.ContinueWithLogging:
+                    Logger.Default.Warning(result.ToString());
+                    break;
+
+                case ResultHandling.ContinueWithAudit:
+                    Args.AuditWriter?.Invoke(result);
+                    break;
+
+                case ResultHandling.Stop:
+                    throw new EventSubscriberStopException(result);
+
+                case ResultHandling.ContinueSilent:
+                default:
+                    break;
             }
         }
 

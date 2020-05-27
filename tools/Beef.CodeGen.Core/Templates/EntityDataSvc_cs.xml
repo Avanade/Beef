@@ -388,12 +388,15 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           </If>
           <![CDATA[                await Beef.Events.Event.Publish]]>
           <If Condition="Operation.EventSubject == null">
-            <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <![CDATA[Value]]>
+            <If Condition="Operation.EventSubject == null">
+              <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[Value]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[Value]]>
+              </If>
             </If>
-            <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-              <![CDATA[Value]]>
-            </If>
+            <![CDATA[Event]]>
           </If>
           <![CDATA[Async(]]>
           <If Condition="Operation.EventSubject == null">
@@ -450,13 +453,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                   <![CDATA[Value]]>
                 </If>
-                <![CDATA[(]]>
+                <![CDATA[Event(]]>
                 <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                   <![CDATA[__result, ]]>
                 </If>
                 <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                   <![CDATA[__result, ]]>
                 </If>
+                <![CDATA[$]]>
                 <Set Name="System.Subject" Value="System.Value" />
                 <Set Name="System.Action" Condition="Operation.WebApiOperationType == null" Value="Operation.OperationType" Otherwise="Operation.WebApiOperationType" />
                 <ForEachList Name="System.Subject" Separator=":">

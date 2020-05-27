@@ -17,7 +17,7 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
         /// <returns>The <see cref="EventDataSubscriberHost"/>.</returns>
-        public static EventDataSubscriberHost Create(EventSubscriberHostArgs? args = null) => new EventDataSubscriberHost(args);
+        public static EventDataSubscriberHost Create(EventSubscriberHostArgs args) => new EventDataSubscriberHost(args);
 
         /// <summary>
         /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="logger"/>.
@@ -30,7 +30,7 @@ namespace Beef.Events.Subscribe
         /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        private EventDataSubscriberHost(EventSubscriberHostArgs? args) : base(args) { }
+        private EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
 
         /// <summary>
         /// Indicates that multiple messages (<see cref="EventData"/>) can be processed.
@@ -39,6 +39,39 @@ namespace Beef.Events.Subscribe
         public EventDataSubscriberHost AllowMultipleMessages()
         {
             AreMultipleMessagesSupported = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="EventSubscriberHost.NotSubscribedHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventDataSubscriberHost"/> instance (to support fluent-style method chaining).</returns>
+        public EventDataSubscriberHost NotSubscribed(ResultHandling handling)
+        {
+            NotSubscribedHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="EventSubscriberHost.DataNotFoundHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventDataSubscriberHost"/> instance (to support fluent-style method chaining).</returns>
+        public EventDataSubscriberHost DataNotFound(ResultHandling handling)
+        {
+            DataNotFoundHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="EventSubscriberHost.InvalidDataHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventDataSubscriberHost"/> instance (to support fluent-style method chaining).</returns>
+        public EventDataSubscriberHost InvalidData(ResultHandling handling)
+        {
+            InvalidDataHandling = handling;
             return this;
         }
 
@@ -59,7 +92,13 @@ namespace Beef.Events.Subscribe
 
             foreach (var @event in events)
             {
-                await ReceiveAsync(@event.Subject!, @event.Action, (_) => @event).ConfigureAwait(false);
+                var result = await ReceiveAsync(@event.Subject!, @event.Action, (_) => @event).ConfigureAwait(false);
+
+                switch (result.Status)
+                {
+                    case SubscriberStatus.UnhandledException:
+                        throw result.Exception!;
+                }
             }
         }
     }

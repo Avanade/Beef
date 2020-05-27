@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) Events framework.</Description>
@@ -27,6 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.3" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
@@ -39,10 +40,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Beef.Core\Beef.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Triggers\" />
   </ItemGroup>
 
   <ItemGroup>

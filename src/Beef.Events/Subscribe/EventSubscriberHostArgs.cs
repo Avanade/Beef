@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Beef.Events.Subscribe
 {
@@ -70,5 +71,20 @@ namespace Beef.Events.Subscribe
         /// Gets the list of specific <see cref="IEventSubscriber"/> instances.
         /// </summary>
         public IEnumerable<IEventSubscriber> EventSubscribers { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the audit writer. This is invoked where the <see cref="Result"/> has a corresponding <see cref="ResultHandling"/> of <see cref="ResultHandling.ContinueWithAudit"/>.
+        /// </summary>
+        public Action<Result>? AuditWriter { get; set; }
+
+        /// <summary>
+        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="Logger"/>; this should only be used in testing situations.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs UseLoggerForAuditing()
+        {
+            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. Status: {result.Status}, Subject: '{result.Subject}', Action: '{result.Action}', Reason: {result.Reason}'");
+            return this;
+        }
     }
 }

@@ -182,7 +182,16 @@ namespace Beef.Events.Triggers.PoisonMessages
             if (exception == null)
                 throw new ArgumentNullException(nameof(exception));
 
-            var msg = new PoisonMessage(_storagePartitionKey, _storageRowKey)
+            var msg = CreatePoisonMessage(@event, exception.ToString());
+            await _poisonTable.ExecuteAsync(TableOperation.InsertOrReplace(msg)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Create (instantiate) the <see cref="PoisonMessage"/>.
+        /// </summary>
+        private PoisonMessage CreatePoisonMessage(EventHubs.EventData @event, string exceptionText)
+        {
+            return new PoisonMessage(_storagePartitionKey, _storageRowKey)
             {
                 Offset = @event.SystemProperties.Offset,
                 SequenceNumber = @event.SystemProperties.SequenceNumber,
@@ -191,16 +200,14 @@ namespace Beef.Events.Triggers.PoisonMessages
                 FunctionType = _args.Options!.FunctionType,
                 FunctionName = _args.Options!.FunctionName,
                 Body = Substring(Encoding.UTF8.GetString(@event.Body.Array)),
-                Exception = Substring(exception.ToString())
+                Exception = exceptionText
             };
-
-            await _poisonTable.ExecuteAsync(TableOperation.InsertOrReplace(msg)).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Substring to a 64K (64,000 char) limit allowed by Azure Storage.
         /// </summary>
-        private string Substring(string text) => text.Length >= 64000 ? text.Substring(0, 64000) : text;
+        private static string Substring(string text) => text.Length >= 64000 ? text.Substring(0, 64000) : text;
 
         /// <summary>
         /// A previously identified poisoned <see cref="EventHubs.EventData"/> has either successfully processed or can be skipped and should be removed.
@@ -256,6 +263,30 @@ namespace Beef.Events.Triggers.PoisonMessages
                 return PoisonMessageAction.PoisonSkip;
             else
                 return PoisonMessageAction.PoisonRetry;
+        }
+
+        /// <summary>
+        /// Audits (persist) the skipped <see cref="EventHubs.EventData"/>.
+        /// </summary>
+        /// <param name="event">The corresponding <see cref="EventData"/>.</param>
+        /// <param name="exceptionText">The exception/reason text for skipping.</param>
+        /// <remarks>The corresponding <see cref="PoisonMessage"/> will be written to the <see cref="DefaultSkippedTableName">skipped</see> Azure table storage.</remarks>
+        public async Task SkipAuditAsync(EventHubs.EventData @event, string exceptionText)
+        {
+            if (@event == null)
+                throw new ArgumentNullException(nameof(@event));
+
+            if (string.IsNullOrEmpty(exceptionText))
+                throw new ArgumentNullException(nameof(exceptionText));
+
+            // Write out the audit record.
+            var msg = CreatePoisonMessage(@event, exceptionText);
+            msg.SkippedTimeUtc = DateTime.UtcNow;
+            msg.RowKey = msg.SkippedTimeUtc.Value.ToString("o", System.Globalization.CultureInfo.InvariantCulture) + "-" + msg.RowKey;
+            await _skippedTable.ExecuteAsync(TableOperation.InsertOrReplace(msg)).ConfigureAwait(false);
+
+            // Make sure no "poison" message remains (just in case safety / consistency).
+            await RemoveAsync(@event, PoisonMessageAction.Undetermined).ConfigureAwait(false);
         }
     }
 }

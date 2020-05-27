@@ -32,6 +32,16 @@ namespace Beef.Events.Subscribe
         UnhandledExceptionHandling UnhandledExceptionHandling { get; }
 
         /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (overrides <see cref="EventSubscriberHost.DataNotFoundHandling"/>).
+        /// </summary>
+        ResultHandling? DataNotFoundHandling { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (overrides <see cref="EventSubscriberHost.InvalidDataHandling"/>).
+        /// </summary>
+        ResultHandling? InvalidDataHandling { get; }
+
+        /// <summary>
         /// Gets the value <see cref="Type"/> if any.
         /// </summary>
         Type? ValueType { get; }
@@ -40,7 +50,7 @@ namespace Beef.Events.Subscribe
         /// Receive and process the subscribed <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        Task ReceiveAsync(EventData eventData);
+        /// <returns>The <see cref="Result"/>.</returns>
+        Task<Result> ReceiveAsync(EventData eventData);
     }
 }

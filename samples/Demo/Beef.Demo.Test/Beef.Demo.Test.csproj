@@ -43,6 +43,7 @@
     <ProjectReference Include="..\Beef.Demo.Abc.Database\Beef.Demo.Abc.Database.csproj" />
     <ProjectReference Include="..\Beef.Demo.Api\Beef.Demo.Api.csproj" />
     <ProjectReference Include="..\Beef.Demo.Database\Beef.Demo.Database.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Functions\Beef.Demo.Functions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

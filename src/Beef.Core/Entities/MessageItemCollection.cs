@@ -1,5 +1,7 @@
 // Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System.Text;
+
 namespace Beef.Entities
 {
     /// <summary>
@@ -320,6 +322,29 @@ namespace Beef.Entities
                 clone.Add((MessageItem)item.Clone());
 
             return clone;
+        }
+
+        /// <summary>
+        /// Outputs the list of messages as a <see cref="string"/>.
+        /// </summary>
+        /// <returns>The list of messages as a <see cref="string"/>.</returns>
+        public override string ToString()
+        {
+            if (Count == 0)
+                return new LText("None.");
+
+            var sb = new StringBuilder();
+            foreach (var item in this)
+            {
+                if (sb.Length > 0)
+                    sb.AppendLine();
+
+                sb.Append($"{item.Type}: {item.Text}");
+                if (!string.IsNullOrEmpty(item.Property))
+                    sb.Append($" [{item.Property}]");
+            }
+
+            return sb.ToString();
         }
     }
 }

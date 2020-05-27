@@ -15,19 +15,24 @@ namespace Beef.Events
     public static class EventDataMapper
     {
         /// <summary>
-        /// Gets the <b>Subject</b> property name.
+        /// Gets or sets the <b>Subject</b> property name.
         /// </summary>
-        public const string SubjectPropertyName = "Beef.Subject";
+        public static string SubjectPropertyName { get; set; } = "Beef.Subject";
 
         /// <summary>
-        /// Gets the <b>Action</b> property name.
+        /// Gets or sets the <b>Action</b> property name.
         /// </summary>
-        public const string ActionPropertyName = "Beef.Action";
+        public static string ActionPropertyName { get; set; } = "Beef.Action";
 
         /// <summary>
-        /// Gets the <b>TenantId</b> property name.
+        /// Gets or sets the <b>TenantId</b> property name.
         /// </summary>
-        public const string TenantIdPropertyName = "Beef.TenantId";
+        public static string TenantIdPropertyName { get; set; } = "Beef.TenantId";
+
+        /// <summary>
+        /// Gets or sets the <b>Key</b> property name.
+        /// </summary>
+        public static string KeyPropertyName { get; set; } = "Beef.Key";
 
         /// <summary>
         /// Converts the <see cref="EventHubs.EventData"/> instance to the corresponding <see cref="Beef.Events.EventData"/>.
@@ -40,7 +45,7 @@ namespace Beef.Events
                 throw new ArgumentNullException(nameof(eventData));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData>(body);
+            return OverrideKey(Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData>(body), eventData);
         }
 
         /// <summary>
@@ -55,7 +60,7 @@ namespace Beef.Events
                 throw new ArgumentNullException(nameof(eventData));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData<T>>(body);
+            return (Beef.Events.EventData<T>)OverrideKey(Newtonsoft.Json.JsonConvert.DeserializeObject<Beef.Events.EventData<T>>(body), eventData);
         }
 
         /// <summary>
@@ -72,7 +77,18 @@ namespace Beef.Events
             Beef.Check.NotNull(valueType, nameof(valueType));
 
             var body = Encoding.UTF8.GetString(eventData.Body.Array, eventData.Body.Offset, eventData.Body.Count);
-            return (Beef.Events.EventData)JsonConvert.DeserializeObject(body, typeof(Beef.Events.EventData<>).MakeGenericType(new Type[] { valueType }))!;
+            return OverrideKey((Beef.Events.EventData)JsonConvert.DeserializeObject(body, typeof(Beef.Events.EventData<>).MakeGenericType(new Type[] { valueType }))!, eventData);
+        }
+        
+        /// <summary>
+        /// Override the key - as the JSON serialized version loses the Type.
+        /// </summary>
+        private static Beef.Events.EventData OverrideKey(Beef.Events.EventData ed, EventHubs.EventData eh)
+        {
+            if (eh.Properties.TryGetValue(KeyPropertyName, out var key))
+                ed.Key = key;
+
+            return ed;
         }
 
         /// <summary>
@@ -95,6 +111,7 @@ namespace Beef.Events
             ed.Properties.Add(SubjectPropertyName, eventData.Subject);
             ed.Properties.Add(ActionPropertyName, eventData.Action);
             ed.Properties.Add(TenantIdPropertyName, eventData.TenantId);
+            ed.Properties.Add(KeyPropertyName, eventData.Key);
 
             return ed;
         }
@@ -109,9 +126,7 @@ namespace Beef.Events
             if (eventData == null)
                 throw new ArgumentNullException(nameof(eventData));
 
-            if (!eventData.Properties.TryGetValue(SubjectPropertyName, out var subject) || string.IsNullOrEmpty((string)subject))
-                throw new ArgumentException($"EventData does not contain required property '{SubjectPropertyName}'.");
-
+            eventData.Properties.TryGetValue(SubjectPropertyName, out var subject);
             eventData.Properties.TryGetValue(ActionPropertyName, out var action);
 
             if (eventData.Properties.TryGetValue(TenantIdPropertyName, out var tenantId) && tenantId != null && tenantId is Guid?)

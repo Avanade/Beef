@@ -12,7 +12,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private static async Task MarkOnAfterAsync()
         {
-            await Beef.Events.Event.PublishValueAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
+            await Beef.Events.Event.PublishValueEventAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
         }
 
         private static Task<int> DataSvcCustomOnImplementationAsync()

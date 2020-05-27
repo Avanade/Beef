@@ -250,13 +250,21 @@ namespace Beef.Events.Triggers.Listener
             var data = new TriggeredFunctionData { TriggerValue = new ResilientEventHubData(_currEventData!) };
             var fr = await _executor.TryExecuteAsync(data, ct).ConfigureAwait(false);
 
-            // Where we have a failure then checkpoint the last so we will at least restart back at this point.
-            if (fr.Succeeded)
+            // Where we have a failure then checkpoint the last so we will at least restart back at this point; an EventSubscriberStopException is a special case - skip + audit.
+            var essex = fr.Exception as Beef.Events.Subscribe.EventSubscriberStopException;
+            if (fr.Succeeded || essex != null)
             {
                 if (_currPoisonAction != PoisonMessageAction.NotPoison)
                 {
                     await _poisonOrchestrator!.RemoveAsync(_currEventData!, PoisonMessageAction.NotPoison).ConfigureAwait(false);
                     _currPoisonAction = PoisonMessageAction.NotPoison;
+                }
+
+                // Skip + audit; and return success result.
+                if (essex != null)
+                {
+                    await _poisonOrchestrator!.SkipAuditAsync(_currEventData!, essex!.Result?.Reason ?? essex!.ToString()).ConfigureAwait(false);
+                    return new FunctionResult(true);
                 }
             }
             else

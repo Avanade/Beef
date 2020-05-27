@@ -64,7 +64,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __result = await Factory.Create<IRobotData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -81,7 +81,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __result = await Factory.Create<IRobotData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -97,7 +97,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 await Factory.Create<IRobotData>().DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
+                await Beef.Events.Event.PublishEventAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });

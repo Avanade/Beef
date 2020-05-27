@@ -33,6 +33,13 @@ namespace Beef.Events.Triggers.PoisonMessages
         /// <param name="event">The <see cref="EventData"/>.</param>
         /// <returns>The resulting <see cref="PoisonMessageAction"/>.</returns>
         Task<PoisonMessageAction> CheckAsync(EventHubs.EventData @event);
+
+        /// <summary>
+        /// Audits (persist) the skipped <see cref="EventHubs.EventData"/>.
+        /// </summary>
+        /// <param name="event">The corresponding <see cref="EventData"/>.</param>
+        /// <param name="exceptionText">The exception/reason text for skipping.</param>
+        Task SkipAuditAsync(EventHubs.EventData @event, string exceptionText);
 #pragma warning restore CA1716
     }
 }

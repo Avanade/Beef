@@ -152,5 +152,44 @@ namespace Beef.Events.UnitTest.Triggers
             var sm = sms.Where(pm => pm.PartitionKey == msg.PartitionKey && pm.RowKey.EndsWith(msg.RowKey)).OrderByDescending(pm => pm.RowKey).FirstOrDefault();
             Assert.IsNotNull(sm.SkippedTimeUtc);
         }
+
+        [Test]
+        public async Task A120_SkipAudit()
+        {
+            var tn = GetConfig().GetValue<string>("EventHubPoisonMessageTable");
+            PoisonMessagePersistence.DefaultTableName = tn;
+
+            var cs = GetConfig().GetValue<string>("AzureWebJobsStorage");
+            var cst = await PoisonMessagePersistence.GetPoisonMessageSkippedTable(cs);
+            var smc = (await GetSkippedMessages(cst)).Count;
+
+            var pp = new PoisonMessagePersistence(new PoisonMessageCreatePersistenceArgs
+            {
+                Config = GetConfig(),
+                Context = ResilientEventHubProcessorTest.CreatePartitionContext(),
+                Logger = TestSetUp.CreateLogger(),
+                Options = ResilientEventHubProcessorTest.CreateOptions()
+            });
+
+            var ed = CreateEventData("200", 2);
+
+            await pp.SkipAuditAsync(ed, "Explicit audit.");
+
+            var smca = (await GetSkippedMessages(cst)).Count;
+            Assert.AreEqual(smc + 1, smca);
+
+            var msgs = await PoisonMessagePersistence.GetAllMessagesAsync(cst);
+            var msg = msgs.Last();
+            Assert.AreEqual("path-eventhub", msg.PartitionKey);
+            Assert.IsTrue(msg.RowKey.EndsWith("consumergroup-0"));
+            Assert.AreEqual("200", msg.Body);
+            Assert.AreEqual("Explicit audit.", msg.Exception);
+            Assert.AreEqual("200", msg.Offset);
+            Assert.AreEqual(2, msg.SequenceNumber);
+            Assert.AreEqual(false, msg.SkipMessage);
+            Assert.AreEqual("ns.class", msg.FunctionType);
+            Assert.AreEqual("testfunc", msg.FunctionName);
+            Assert.IsNotNull(msg.SkippedTimeUtc);
+        }
     }
 }
