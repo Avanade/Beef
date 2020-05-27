@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Beef.Mapper.Converters;
 using Beef.RefData;
 using Newtonsoft.Json;
 using System;
@@ -235,7 +236,20 @@ namespace Beef.WebApi
                             continue;
                     }
                     else
+                    {
+                        var waafa = pi.GetCustomAttribute<WebApiArgFormatterAttribute>();
+                        if (waafa != null)
+                        {
+                            var converter = (IPropertyMapperConverter)Activator.CreateInstance(waafa.ConverterType);
+                            if (converter.SrceType != pi.PropertyType || converter.DestType != typeof(string))
+                                throw new InvalidOperationException($"Converter Type '{waafa.ConverterType.Name}' must have SrceType of '{pi.PropertyType.Name}' and DestType of 'string'.");
+
+                            UriAppend(sb, CreateNameValue(pName, converter.ConvertToDest(pVal), false));
+                            continue;
+                        }
+
                         ThrowComplexityException(ti);
+                    }
 
                     UriAppend(sb, UriFormat(pName, pVal is DateTime ? ((DateTime)pVal).ToString("o", System.Globalization.CultureInfo.InvariantCulture) : pVal.ToString()));
                 }

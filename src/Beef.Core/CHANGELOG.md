@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.11
+- *Enhancement:* `Event.PublishAsync()`, `Event.PublishAsync<T>()`, `EventData.Create` and `EventData.Create<T>()` methods have been obsoleted (and will be removed in the future). These have been replaced with `Event.PublishEventAsync()`, `Event.PublishValueEventAsync<T>()`, `EventData.CreateEvent()` and `EventData.CreateValueEvent<T>()`. The `template` and `KeyValuePair` approach has been replaced with C# [string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated); e.g. `Event.PublishEventAsync($"Company.Entity.{id}", "Delete", id);`. Code-generation should be performed to update the generated codebase to support the new methods and approach.
+- *Enhancement:* Added `Event.EventSubjectPrefix` which when specified will be prepended to all `EventData.Subject` values when created (`EventData.Create*`). 
+- *Enhancement:* Added `WebApiArgFormatterAttribute` that can be applied to an entity property to enable conversion (`IPropertyMapperConverter`) from .NET `Type` to a corresponding URL query string value.
+
 ## v3.1.10
 - *Fixed:* The automatic connection management/sharing does not support multiple concurrent threads - the internal stack was being unwound in the incorrect sequence closing the wrong connection. To support this a new `ExecutionContext.FlowSuppression` method has been added to assist the creation of new `ExecutionContext` instances to enable (and ensure separation). This is an opt-in requirement to enable.
 

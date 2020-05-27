@@ -91,6 +91,7 @@ The following represents the attributes that control the **authorization** code 
 Attribute | Description
 ---|---
 `AuthPermission` | Specifies the permission of the `ExecutionContext.IsAuthorized(permission)`.
+`AuthRole` | Specifies the permission of the `ExecutionContext.IsInRole(role)`.
 `AuthEntity` | Specifies the entity (permission) of the `ExecutionContext.IsAuthorized(entity, action)`. Defaults to the entity name where not specified.
 `AuthAction` | Specifies the action (permission) of the `ExecutionContext.IsAuthorized(entity, action)`.
 

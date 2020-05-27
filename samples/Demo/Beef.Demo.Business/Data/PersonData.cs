@@ -54,6 +54,11 @@ namespace Beef.Demo.Business.Data
             return Task.CompletedTask;
         }
 
+        private Task<MapCoordinates> MapOnImplementationAsync(MapArgs args)
+        {
+            return Task.FromResult(args.Coordinates);
+        }
+
         private void MarkOnException(Exception ex)
         {
             if (ex is NotImplementedException)

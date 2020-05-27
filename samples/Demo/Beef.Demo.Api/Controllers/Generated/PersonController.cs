@@ -189,6 +189,22 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
+        /// </summary>
+        /// <param name="coordinates">The Coordinates (see <see cref="MapCoordinates"/>).</param>
+        /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
+        [HttpPost]
+        [Route("map")]
+        [ProducesResponseType(typeof(MapCoordinates), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult Map(string? coordinates = default)
+        {
+            var args = new MapArgs { Coordinates = new MapCoordinatesToStringConverter().ConvertToSrce(coordinates) };
+            return new WebApiPost<MapCoordinates>(this, () => Factory.Create<IPersonManager>().MapAsync(args),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> entity that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

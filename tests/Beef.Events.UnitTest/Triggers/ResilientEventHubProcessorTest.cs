@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Beef.Test.NUnit;
+using Beef.Events.Subscribe;
 
 namespace Beef.Events.UnitTest.Triggers
 {
@@ -38,6 +39,8 @@ namespace Beef.Events.UnitTest.Triggers
             public List<EventHubs.EventData> RemovedEvents { get; } = new List<EventHubs.EventData>();
 
             public Task<PoisonMessageAction> CheckAsync(EventHubs.EventData @event) => Task.FromResult(Result);
+
+            public List<EventHubs.EventData> AuditedEvents { get; } = new List<EventHubs.EventData>();
 
             public Task RemoveAsync(EventHubs.EventData @event, PoisonMessageAction action)
             {
@@ -66,6 +69,15 @@ namespace Beef.Events.UnitTest.Triggers
                     Result = pma;
                 }
             }
+
+            public Task SkipAuditAsync(EventHubs.EventData @event, string exceptionText)
+            {
+                lock (_lock)
+                {
+                    AuditedEvents.Add(@event);
+                    return Task.CompletedTask;
+                }
+            }
         }
 
         private class FuncExe : ITriggeredFunctionExecutor
@@ -79,6 +91,14 @@ namespace Beef.Events.UnitTest.Triggers
                 var e = ((ResilientEventHubData)input.TriggerValue).EventData;
                 e.Properties.TryGetValue("ExceptionCount", out var count);
 
+                if (e.Properties.TryGetValue("StopInvalidData", out var exc) && exc is bool bexc && bexc == true)
+                {
+                    return Task.FromResult(new FunctionResult(false,
+                         (Exception)typeof(EventSubscriberStopException).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null,
+                            new Type[] { typeof(Result) }, null)
+                            .Invoke(new object[] { CreateResult(SubscriberStatus.InvalidData, null) })));
+                }
+
                 if ((int)count > 0)
                 {
                     e.Properties["ExceptionCount"] = (int)count - 1;
@@ -90,6 +110,15 @@ namespace Beef.Events.UnitTest.Triggers
                     TotalSuccess++;
                     return Task.FromResult(new FunctionResult(true));
                 }
+            }
+
+            private Result CreateResult(SubscriberStatus status, Exception exception)
+            {
+                var result = (Result)typeof(Events.Subscribe.Result).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[0], null).Invoke(null);
+                typeof(Result).GetProperty("Status", BindingFlags.Public | BindingFlags.Instance).SetValue(result, status);
+                typeof(Result).GetProperty("Exception", BindingFlags.Public | BindingFlags.Instance).SetValue(result, exception);
+                typeof(Result).GetProperty("Reason", BindingFlags.Public | BindingFlags.Instance).SetValue(result, "Blah blah");
+                return result;
             }
         }
 
@@ -147,6 +176,7 @@ namespace Beef.Events.UnitTest.Triggers
             Assert.AreEqual(0, cp.Count);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -170,6 +200,7 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -193,6 +224,7 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -216,6 +248,7 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -243,6 +276,7 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -268,6 +302,7 @@ namespace Beef.Events.UnitTest.Triggers
             Assert.AreSame(e, pp.AddedEvents[0]);
             Assert.AreEqual(1, pp.RemovedEvents.Count);
             Assert.AreSame(e, pp.RemovedEvents[0]);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -298,6 +333,7 @@ namespace Beef.Events.UnitTest.Triggers
             Assert.AreEqual(2, pp.RemovedEvents.Count);
             Assert.AreSame(e1, pp.RemovedEvents[0]);
             Assert.AreSame(e3, pp.RemovedEvents[1]);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -336,6 +372,7 @@ namespace Beef.Events.UnitTest.Triggers
             Assert.AreEqual(1, f.TotalSuccess);
             Assert.AreEqual(1, pp.AddedEvents.Count);
             Assert.AreEqual(1, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -362,6 +399,7 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(1, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
 
@@ -388,6 +426,34 @@ namespace Beef.Events.UnitTest.Triggers
             await p.CloseAsync(c, CloseReason.Shutdown);
             Assert.AreEqual(0, pp.AddedEvents.Count);
             Assert.AreEqual(1, pp.RemovedEvents.Count);
+            Assert.AreEqual(0, pp.AuditedEvents.Count);
+            Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
+        }
+
+        [Test]
+        public async Task A110_PoisonMessageAuditAndContinueException()
+        {
+            var pp = CreatePoisonPersistence();
+            var f = new FuncExe();
+            var cp = new List<EventHubs.EventData>();
+            var p = CreateProcessor(f, cp);
+            var c = CreatePartitionContext();
+
+            await p.OpenAsync(c);
+            var e = CreateEvent(0);
+            e.Properties.Add("StopInvalidData", true);
+
+            await p.ProcessEventsAsync(c, new EventHubs.EventData[] { e });
+            Assert.AreEqual(0, f.TotalSuccess);
+            Assert.AreEqual(0, f.TotalError);
+            Assert.AreEqual(1, cp.Count);
+            Assert.AreSame(e, cp[0]);
+
+            await p.CloseAsync(c, CloseReason.Shutdown);
+            Assert.AreEqual(0, f.TotalSuccess);
+            Assert.AreEqual(0, pp.AddedEvents.Count);
+            Assert.AreEqual(0, pp.RemovedEvents.Count);
+            Assert.AreEqual(1, pp.AuditedEvents.Count);
             Assert.AreEqual(PoisonMessageAction.NotPoison, pp.Result);
         }
     }

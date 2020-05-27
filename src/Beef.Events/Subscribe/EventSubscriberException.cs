@@ -12,24 +12,19 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberException"/>.
         /// </summary>
-        public EventSubscriberException()
-        {
-        }
+        internal EventSubscriberException() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberException"/> with a specified <paramref name="message"/>.
         /// </summary>
         /// <param name="message">The message.</param>
-        public EventSubscriberException(string message) : base(message) { }
-
+        internal EventSubscriberException(string message) : base(message) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberException"/> with a specified <paramref name="message"/> and <paramref name="innerException"/>.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public EventSubscriberException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+        internal EventSubscriberException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

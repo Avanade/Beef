@@ -386,7 +386,19 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <Set Name="System.GetFromArgs" Value="false" />
           </If>
-          <![CDATA[                await Beef.Events.Event.PublishAsync(]]>
+          <![CDATA[                await Beef.Events.Event.Publish]]>
+          <If Condition="Operation.EventSubject == null">
+            <If Condition="Operation.EventSubject == null">
+              <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[Value]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[Value]]>
+              </If>
+            </If>
+            <![CDATA[Event]]>
+          </If>
+          <![CDATA[Async(]]>
           <If Condition="Operation.EventSubject == null">
             <Then>
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
@@ -395,19 +407,27 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
               <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                 <![CDATA[__result, ]]>
               </If>
-              <![CDATA["{{Config.AppName}}.{{Entity.Name}}]]>
+              <![CDATA[$"{{Config.AppName}}.{{Entity.Name}}]]>
               <Property Condition="Property.UniqueKey == true">
                 <If Condition="System.Index == 0">
                   <Then><![CDATA[.]]></Then>
                   <Else><![CDATA[,]]></Else>
                 </If>
                 <![CDATA[{]]>
-                <![CDATA[{{Property.ArgumentName}}]]>
+                <If Condition="System.GetFromArgs == true">
+                  <Then>
+                    <![CDATA[{{Property.ArgumentName}}]]>
+                  </Then>
+                  <Else>
+                    <![CDATA[__result.{{Property.Name}}]]>
+                  </Else>
+                </If>
                 <![CDATA[}]]>
               </Property>
               <If Condition="Operation.WebApiOperationType == null">
                 <Then>
-                  <Set Name="System.Action" Value="Operation.OperationType" /></Then>
+                  <Set Name="System.Action" Value="Operation.OperationType" />
+                </Then>
                 <Else>
                   <Set Name="System.Action" Value="Operation.WebApiOperationType" />
                 </Else>
@@ -416,16 +436,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
               <Set Name="System.Action" Condition="Config.EventActionFormat == 'UpperCase' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToUpperCase" />
               <![CDATA[", "{{System.Action}}"]]>
               <If Condition="System.GetFromArgs == true">
-                <Then>
-                  <Parameter>
-                    <![CDATA[, new KeyValuePair<string, object?>("{{Parameter.ArgumentName}}", {{Parameter.ArgumentName}})]]>
-                  </Parameter>
-                </Then>
-                <Else>
-                  <Property Condition="Property.UniqueKey == true">
-                    <![CDATA[, new KeyValuePair<string, object?>("{{Property.ArgumentName}}", __result.{{Property.Name}})]]>
-                  </Property>
-                </Else>
+                <Parameter>
+                  <![CDATA[, {{Parameter.ArgumentName}}]]>
+                </Parameter>
               </If>
             </Then>
             <Else>
@@ -433,13 +446,21 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <If Condition="System.Index > 0"><![CDATA[,]]></If>
                 <![CDATA[
                     ]]>
-                <![CDATA[Beef.Events.EventData.Create(]]>
+                <![CDATA[Beef.Events.EventData.Create]]>
+                <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                  <![CDATA[Value]]>
+                </If>
+                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                  <![CDATA[Value]]>
+                </If>
+                <![CDATA[Event(]]>
                 <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                   <![CDATA[__result, ]]>
                 </If>
                 <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                   <![CDATA[__result, ]]>
                 </If>
+                <![CDATA[$]]>
                 <Set Name="System.Subject" Value="System.Value" />
                 <Set Name="System.Action" Condition="Operation.WebApiOperationType == null" Value="Operation.OperationType" Otherwise="Operation.WebApiOperationType" />
                 <ForEachList Name="System.Subject" Separator=":">
@@ -452,16 +473,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <Set Name="System.Action" Condition="Config.EventActionFormat == 'UpperCase' or Config.EventActionFormat == 'PastTenseUpperCase'" Value="System.Action:ToUpperCase" />
                 <![CDATA[, "{{System.Action}}"]]>
                 <If Condition="System.GetFromArgs == true">
-                  <Then>
-                    <Parameter>
-                      <![CDATA[, new KeyValuePair<string, object?>("{{Parameter.ArgumentName}}", {{Parameter.ArgumentName}})]]>
-                    </Parameter>
-                  </Then>
-                  <Else>
-                    <Property Condition="Property.UniqueKey == true">
-                      <![CDATA[, new KeyValuePair<string, object?>("{{Property.ArgumentName}}", __result.{{Property.Name}})]]>
-                    </Property>
-                  </Else>
+                  <Parameter>
+                    <![CDATA[, {{Parameter.ArgumentName}}]]>
+                  </Parameter>
                 </If>
                 <![CDATA[)]]>
               </ForEachList>

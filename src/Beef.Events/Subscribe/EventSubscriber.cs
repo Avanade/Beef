@@ -43,6 +43,16 @@ namespace Beef.Events.Subscribe
         public UnhandledExceptionHandling UnhandledExceptionHandling { get; protected set; } = UnhandledExceptionHandling.Stop;
 
         /// <summary>
+        /// Gets or sets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (overrides <see cref="EventSubscriberHost.DataNotFoundHandling"/>).
+        /// </summary>
+        public ResultHandling? DataNotFoundHandling { get; set; }
+
+        /// <summary>
+        /// Gets or sets the the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (overrides <see cref="EventSubscriberHost.InvalidDataHandling"/>).
+        /// </summary>
+        public ResultHandling? InvalidDataHandling { get; set;  }
+
+        /// <summary>
         /// Gets the value <see cref="Type"/>; <c>null</c> indicates no value.
         /// </summary>
         public abstract Type? ValueType { get; }
@@ -51,8 +61,8 @@ namespace Beef.Events.Subscribe
         /// Receive and process the <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public abstract Task ReceiveAsync(EventData eventData);
+        /// <returns>The <see cref="Result"/>.</returns>
+        public abstract Task<Result> ReceiveAsync(EventData eventData);
     }
 
     /// <summary>
@@ -76,8 +86,8 @@ namespace Beef.Events.Subscribe
         /// Receive and process the <see cref="EventData"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public override abstract Task ReceiveAsync(EventData eventData);
+        /// <returns>The <see cref="Result"/>.</returns>
+        public override abstract Task<Result> ReceiveAsync(EventData eventData);
     }
 
     /// <summary>
@@ -102,14 +112,14 @@ namespace Beef.Events.Subscribe
         /// Receive and process the <see cref="EventData"/> (internally casts the <paramref name="eventData"/> to <see cref="EventData{T}"/> and invokes <see cref="ReceiveAsync(EventData{T})"/>).
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public override Task ReceiveAsync(EventData eventData) => ReceiveAsync((EventData<T>)eventData);
+        /// <returns>The <see cref="Result"/>.</returns>
+        public override Task<Result> ReceiveAsync(EventData eventData) => ReceiveAsync((EventData<T>)eventData);
 
         /// <summary>
         /// Receive and process the <see cref="EventData{T}"/>.
         /// </summary>
         /// <param name="eventData">The <see cref="EventData{T}"/>.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        public abstract Task ReceiveAsync(EventData<T> eventData);
+        /// <returns>The <see cref="Result"/>.</returns>
+        public abstract Task<Result> ReceiveAsync(EventData<T> eventData);
     }
 }

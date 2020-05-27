@@ -63,7 +63,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<ITripPersonData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.TripPerson.{id}", "Create", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -80,7 +80,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __result = await Factory.Create<ITripPersonData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(__result, "Demo.TripPerson.{id}", "Update", new KeyValuePair<string, object?>("id", __result.Id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
@@ -96,7 +96,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 await Factory.Create<ITripPersonData>().DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync("Demo.TripPerson.{id}", "Delete", new KeyValuePair<string, object?>("id", id)).ConfigureAwait(false);
+                await Beef.Events.Event.PublishEventAsync($"Demo.TripPerson.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<TripPerson>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });

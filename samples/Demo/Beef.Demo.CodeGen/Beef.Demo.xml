@@ -5,8 +5,8 @@
     <Property Name="FirstName" Type="string" GrpcFieldNo="2" />
     <Property Name="LastName" Type="string" GrpcFieldNo="3" />
     <Property Name="UniqueCode" Type="string" GrpcFieldNo="4" />
-    <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" GrpcFieldNo="5" DataName="GenderId" DataConverter="ReferenceDataNullableGuidIdConverter" IsDataConverterGeneric="true" />
-    <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" RefDataType="string" GrpcFieldNo="6" DataName="EyeColorCode" />
+    <Property Name="Gender" Type="RefDataNamespace.Gender" RefDataType="string" GrpcFieldNo="5" DataName="GenderId" DataConverter="ReferenceDataNullableGuidIdConverter{T}" />
+    <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" GrpcFieldNo="6" DataName="EyeColorCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" GrpcFieldNo="7" />
     <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" DataEntityFrameworkIgnore="true" />
     <Property Name="ETag" ArgumentName="etag" Type="string" GrpcFieldNo="500" />
@@ -32,6 +32,9 @@
     </Operation>
     
     <Operation Name="Mark" Text="Mark {{Person}}" OperationType="Custom" WebApiRoute="mark" WebApiStatus="Accepted" WebApiOperationType="Update" />
+    <Operation Name="Map" Text="Get {{Person}} at specified {{MapCoordinates}}" OperationType="Custom" ReturnType="MapCoordinates" WebApiRoute="map" WebApiStatus="OK" WebApiOperationType="Read">
+      <Parameter Name="Args" Type="MapArgs" />
+    </Operation>
 
     <Operation Name="GetDetail" OperationType="Get" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
     <Operation Name="UpdateDetail" OperationType="Update" ValueType="PersonDetail" ReturnType="PersonDetail" Validator="PersonDetailValidator" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
@@ -61,6 +64,15 @@
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
     <Property Name="Genders" Type="Gender" RefDataType="string" RefDataList="true" />
+  </Entity>
+  
+  <Entity Name="MapArgs" Text="Mapping arguments" ExcludeAll="true">
+    <Property Name="Coordinates" Type="MapCoordinates" WebApiQueryStringConverter="MapCoordinatesToStringConverter" />
+  </Entity>
+    
+  <Entity Name="MapCoordinates" ExcludeAll="true">
+    <Property Name="Latitude" Type="decimal" />
+    <Property Name="Longitude" Type="decimal" />
   </Entity>
 
   <Entity Name="Address" Grpc="true" ExcludeAll="true" ExcludeData="false" AutoImplement="Database" >
