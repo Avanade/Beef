@@ -407,7 +407,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
               <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                 <![CDATA[__result, ]]>
               </If>
-              <![CDATA[$"{{Config.AppName}}.{{Entity.Name}}]]>
+              <![CDATA[$"]]>
+              <If Condition="Config.EventSubjectRoot != null">
+                <![CDATA[{{Config.EventSubjectRoot}}.]]>
+              </If>
+              <![CDATA[{{Config.AppName}}.{{Entity.Name}}]]>
               <Property Condition="Property.UniqueKey == true">
                 <If Condition="System.Index == 0">
                   <Then><![CDATA[.]]></Then>
@@ -464,7 +468,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <Set Name="System.Subject" Value="System.Value" />
                 <Set Name="System.Action" Condition="Operation.WebApiOperationType == null" Value="Operation.OperationType" Otherwise="Operation.WebApiOperationType" />
                 <ForEachList Name="System.Subject" Separator=":">
-                  <If Condition="System.Index == 0"><![CDATA["{{System.Value}}"]]></If>
+                  <If Condition="System.Index == 0">
+                    <If Condition="Config.EventSubjectRoot != null">
+                      <![CDATA[{{Config.EventSubjectRoot}}.]]>
+                    </If>
+                    <![CDATA["{{System.Value}}"]]>
+                  </If>
                   <If Condition="System.Index == 1">
                     <Set Name="System.Action" Value="System.Value"/>
                   </If>

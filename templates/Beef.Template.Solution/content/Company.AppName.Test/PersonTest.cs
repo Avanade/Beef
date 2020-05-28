@@ -207,7 +207,7 @@ namespace Company.AppName.Test
                 .ExpectETag()
                 .ExpectUniqueKey()
                 .ExpectValue((t) => v)
-                .ExpectEvent("AppName.Person.*", "Create")
+                .ExpectEvent("Company.AppName.Person.*", "Create")
                 .Run((a) => a.Agent.CreateAsync(v)).Value;
 
             // Check the value was created properly.
@@ -279,7 +279,7 @@ namespace Company.AppName.Test
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue((t) => v)
-                .ExpectEvent($"AppName.Person.{id}", "Update")
+                .ExpectEvent($"Company.AppName.Person.{id}", "Update")
                 .Run((a) => a.Agent.UpdateAsync(v, id)).Value;
 
             // Check the value was updated properly.
@@ -350,7 +350,7 @@ namespace Company.AppName.Test
                 .ExpectETag(v.ETag)
                 .ExpectUniqueKey()
                 .ExpectValue((t) => v)
-                .ExpectEvent($"Bar.Person.{id}", "Update")
+                .ExpectEvent($"Company.AppName.Person.{id}", "Update")
                 .Run((a) => a.Agent.PatchAsync(WebApiPatchOption.MergePatch, $"{{ \"lastName\": \"{v.LastName}\" }}", id, new WebApiRequestOptions { ETag = v.ETag })).Value;
 
             // Check the value was updated properly.
@@ -376,7 +376,7 @@ namespace Company.AppName.Test
             // Delete value.
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Bar.Person.{id}", "Delete")
+                .ExpectEvent($"Company.AppName.Person.{id}", "Delete")
                 .Run((a) => a.Agent.DeleteAsync(id));
 
             // Check value no longer exists.
@@ -388,7 +388,7 @@ namespace Company.AppName.Test
             // Delete again (should still be successful as a Delete is idempotent). 
             AgentTester.Create<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Bar.Person.{id}", "Delete")
+                .ExpectEvent($"Company.AppName.Person.{id}", "Delete")
                 .Run((a) => a.Agent.DeleteAsync(id));
         }
 

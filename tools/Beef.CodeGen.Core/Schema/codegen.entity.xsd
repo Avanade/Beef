@@ -1291,6 +1291,11 @@
           <xs:documentation>Indicates whether gRPC support is required. Will require each Entity and corresponding Property and Operation to be opted-in specifically.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="EventSubjectRoot" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Provides the root for the event name by prepending to all event subject names.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 </xs:schema>

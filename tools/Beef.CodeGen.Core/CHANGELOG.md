@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.12
+- *Enhancement:* Added `Config.EventSubjectRoot` attribute used by the `DataSvc` code generation that provides the root for the event name by prepending to all event subject names.
+
 ## v3.1.11
 - *Enhancement:* The `DataSvc` code generation updated to use the new `Event` methods as existing have been obsoleted.
 - *Enhancement:* Added `Property.WebApiQueryStringConverter` attribute to enable `Type` to `string` conversion for writing to and parsing from the query string.

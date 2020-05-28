@@ -22,6 +22,7 @@ Attribute | Description
 **`ValidatorLayer`** | Defines the layer namespace where the Validator's are defined. Options are: `Common` (defined within the common namespace/assembly), or `Business` (defined within the business namespace/assembly). The default is `Business`.
 **`WebApiAuthorize`** | Indicates whether the Web API controller should use the `Authorize` or `AllowAnonynous` (default) attribute. This can be overridden within the **`Entity`** and **`Operation`** elements.
 `EventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a Create, Update or Delete. Defaults to `true`. Used to enable the sending of messages to the likes of EventHub, EventGrid, Service Broker, SignalR, etc.
+`EventSubjectRoot` | Provides the root for the event name by prepending to all event subject names.
 `EventActionFormat` | Defines the format for the Action when an Event is published. Options are: `UpperCase`, `PastTense`, and `PastTenseUpperCase`. Defaults to `null` (no formatting).
 `EntityUsing` | The namespace for the non reference data entities (adds using statements). Options are: `Common` to add `.Common.Entities` (default), `Business` to add `.Business.Entities`, `All` to add both, and `None` to exclude.
 `RefDataBusNamespace` | The namespace to be used for the reference data entities where the EntityScope is `Business` (adds using statement). Only used for the business namespace/assembly.

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Enhancement:* The ``
+
 ## v3.1.5
 - *Enhancement:* Added support for the use of wildcards where specifying the user name for the `ExpectChangeLogCreated` and `ExpectChangeLogCreated` methods.
 
