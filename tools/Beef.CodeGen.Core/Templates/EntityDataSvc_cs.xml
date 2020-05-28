@@ -468,12 +468,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <Set Name="System.Subject" Value="System.Value" />
                 <Set Name="System.Action" Condition="Operation.WebApiOperationType == null" Value="Operation.OperationType" Otherwise="Operation.WebApiOperationType" />
                 <ForEachList Name="System.Subject" Separator=":">
-                  <If Condition="System.Index == 0">
-                    <If Condition="Config.EventSubjectRoot != null">
-                      <![CDATA[{{Config.EventSubjectRoot}}.]]>
-                    </If>
-                    <![CDATA["{{System.Value}}"]]>
-                  </If>
+                  <If Condition="System.Index == 0"><![CDATA["{{System.Value}}"]]></If>
                   <If Condition="System.Index == 1">
                     <Set Name="System.Action" Value="System.Value"/>
                   </If>
