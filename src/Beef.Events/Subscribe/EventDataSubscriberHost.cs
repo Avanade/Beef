@@ -92,7 +92,7 @@ namespace Beef.Events.Subscribe
 
             foreach (var @event in events)
             {
-                var result = await ReceiveAsync(@event.Subject!, @event.Action, (_) => @event).ConfigureAwait(false);
+                var result = await ReceiveAsync(@event.Subject, @event.Action, (_) => @event).ConfigureAwait(false);
 
                 switch (result.Status)
                 {

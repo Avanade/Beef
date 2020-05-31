@@ -2,7 +2,14 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Enhancement:* The `TestEventSubscriberHost` updated to reuse the `ExecutionContext.Current` for the test.
+- *Enhancement:* Added additional capability around invalid event data (`SubscriberStatus.InvalidEventData`) conversion and auditing/logging.
+- *Enhancement:* Tidied up the test logging code to use `TestContext.Out.WriteLine`.
+- *Fixed:* The `EventSubscriberHost` was not correctly validating the `Result.Status` which has been corrected.
+
 ## v3.1.5
+- *Added:* `TestEventSubscriberHost` to suppoer the intra-domain based testing of event subscribers.
 - *Enhancement:* Added support for the use of wildcards where specifying the user name for the `ExpectChangeLogCreated` and `ExpectChangeLogCreated` methods.
 
 ## v3.1.4

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
 
 namespace Beef.Events.Triggers.Listener
 {
@@ -251,7 +252,10 @@ namespace Beef.Events.Triggers.Listener
             var fr = await _executor.TryExecuteAsync(data, ct).ConfigureAwait(false);
 
             // Where we have a failure then checkpoint the last so we will at least restart back at this point; an EventSubscriberStopException is a special case - skip + audit.
-            var essex = fr.Exception as Beef.Events.Subscribe.EventSubscriberStopException;
+            var essex = fr.Exception is FunctionInvocationException 
+                ? fr.Exception.InnerException as Beef.Events.Subscribe.EventSubscriberStopException 
+                : fr.Exception as Beef.Events.Subscribe.EventSubscriberStopException;
+
             if (fr.Succeeded || essex != null)
             {
                 if (_currPoisonAction != PoisonMessageAction.NotPoison)

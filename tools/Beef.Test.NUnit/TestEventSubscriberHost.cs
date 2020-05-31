@@ -2,6 +2,7 @@
 
 using Beef.Events;
 using Beef.Events.Subscribe;
+using System;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
@@ -11,11 +12,13 @@ namespace Beef.Test.NUnit
     /// </summary>
     internal class TestEventSubscriberHost : EventSubscriberHost
     {
+        private readonly ExecutionContext _ec;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestEventSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="TestEventSubscriberHost"/>.</param>
-        internal TestEventSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        internal TestEventSubscriberHost(EventSubscriberHostArgs args) : base(args) => _ec = ExecutionContext.HasCurrent ? ExecutionContext.Current : throw new InvalidOperationException("ExecutionContext.Current must have a value.");
 
         /// <summary>
         /// Performs the receive processing for <see cref="EventData"/> instance.
@@ -28,13 +31,21 @@ namespace Beef.Test.NUnit
 
             try
             {
-                Result = await ReceiveAsync(@event.Subject!, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
+                Result = await ReceiveAsync(@event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
             }
             catch (EventSubscriberStopException essex)
             {
                 Result = essex.Result;
             }
         }
+
+        /// <summary>
+        /// Use the existing <see cref="ExecutionContext"/>; i.e. that which was set up prior to <see cref="ReceiveAsync(EventData)"/>.
+        /// </summary>
+        /// <param name="subscriber">The subscriber.</param>
+        /// <param name="event">The event.</param>
+        /// <returns>The existing <see cref="ExecutionContext"/>.</returns>
+        protected override ExecutionContext CreateExecutionContext(IEventSubscriber subscriber, EventData @event) => _ec;
 
         /// <summary>
         /// Indicates whether a receive occured and an underlying subsriber was executed.

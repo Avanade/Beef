@@ -43,6 +43,11 @@ namespace Beef.Events.Subscribe
         public UnhandledExceptionHandling UnhandledExceptionHandling { get; protected set; } = UnhandledExceptionHandling.Stop;
 
         /// <summary>
+        /// Gets or sets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (overrides <see cref="EventSubscriberHost.InvalidEventDataHandling"/>).
+        /// </summary>
+        public ResultHandling? InvalidEventDataHandling { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (overrides <see cref="EventSubscriberHost.DataNotFoundHandling"/>).
         /// </summary>
         public ResultHandling? DataNotFoundHandling { get; set; }
@@ -113,7 +118,18 @@ namespace Beef.Events.Subscribe
         /// </summary>
         /// <param name="eventData">The <see cref="EventData"/>.</param>
         /// <returns>The <see cref="Result"/>.</returns>
-        public override Task<Result> ReceiveAsync(EventData eventData) => ReceiveAsync((EventData<T>)eventData);
+        public override Task<Result> ReceiveAsync(EventData eventData)
+        {
+            EventData<T> ed;
+
+            try
+            {
+                ed = (EventData<T>)eventData;
+            }
+            catch (InvalidCastException icex) { return Task.FromResult(Result.InvalidEventData(icex)); }
+
+            return ReceiveAsync(ed);
+        }
 
         /// <summary>
         /// Receive and process the <see cref="EventData{T}"/>.

@@ -51,6 +51,7 @@ namespace Beef.Demo.Business.Data
 
         private Task MarkOnImplementationAsync()
         {
+            Beef.Diagnostics.Logger.Default.Warning("Mark operation implementation currently does not exist.");
             return Task.CompletedTask;
         }
 

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.3
+- *Enhancement:* The `EventSubscriberHost` has been futher extended to support `InvalidEventData()`. This occurs where the `EventData` is not considered valid, or the `Value` is unable to be deserialized.
+- *Fixed:* The `ResilientEventHubProcessor` was not always catching and actioning the internal `EventSubscriberStopException`.
+
 ## v3.1.2
 - *Enhancement:* Added `EventHubSubscriberHost.ExecutionContext(createFunc)` to more easily support the creation of a customised `ExecutionContext` instance.
 - *Enhancement:* The `IEventSubscriber.ReceiveAsync` must now (**breaking change**) return a `Result`; these include `Success()`, `DataNotFound()` (also automatically inferred from a `NotFoundException`), `InvalidData()` (also automatically inferred from a `ValidationException` or `BusinessException`). Otherwise, for anything else, just allow an `Exception` to bubble out.

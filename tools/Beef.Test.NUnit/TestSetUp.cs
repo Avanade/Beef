@@ -32,59 +32,10 @@ namespace Beef.Test.NUnit
             Reset();
         }
 
-        #region Logging
-
         /// <summary>
         /// Execute the <see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/> and bind output to the console.
         /// </summary>
-        public static void RegisterGlobalLogger()
-        {
-            Beef.Diagnostics.Logger.RegisterGlobal((largs) =>
-            {
-                switch (largs.Type)
-                {
-                    case LogMessageType.Critical:
-                    case LogMessageType.Error:
-                        ConsoleWriteLine(largs.ToString(), ConsoleColor.Red);
-                        break;
-
-                    case LogMessageType.Warning:
-                        ConsoleWriteLine(largs.ToString(), ConsoleColor.Yellow);
-                        break;
-
-                    case LogMessageType.Info:
-                        ConsoleWriteLine(largs.ToString());
-                        break;
-
-                    case LogMessageType.Debug:
-                    case LogMessageType.Trace:
-                        ConsoleWriteLine(largs.ToString(), ConsoleColor.Cyan);
-                        break;
-                }
-
-                TestContext.Progress.WriteLine(largs.ToString());
-            });
-        }
-
-        /// <summary>
-        /// Writes the specified text to the console.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
-        {
-            if (string.IsNullOrEmpty(text))
-                Console.WriteLine();
-            else
-            {
-                var currColor = Console.ForegroundColor;
-                Console.ForegroundColor = foregroundColor ?? currColor;
-                Console.WriteLine(text);
-                Console.ForegroundColor = currColor;
-            }
-        }
-
-        #endregion
+        public static void RegisterGlobalLogger() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
 
         #region SetUp
 

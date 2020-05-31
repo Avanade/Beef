@@ -32,6 +32,11 @@ namespace Beef.Events.Subscribe
         UnhandledExceptionHandling UnhandledExceptionHandling { get; }
 
         /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (overrides <see cref="EventSubscriberHost.InvalidEventDataHandling"/>).
+        /// </summary>
+        ResultHandling? InvalidEventDataHandling { get; }
+
+        /// <summary>
         /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (overrides <see cref="EventSubscriberHost.DataNotFoundHandling"/>).
         /// </summary>
         ResultHandling? DataNotFoundHandling { get; }

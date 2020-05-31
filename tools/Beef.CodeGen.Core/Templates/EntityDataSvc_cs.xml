@@ -407,7 +407,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
               <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                 <![CDATA[__result, ]]>
               </If>
-              <![CDATA[$"{{Config.AppName}}.{{Entity.Name}}]]>
+              <![CDATA[$"]]>
+              <If Condition="Config.EventSubjectRoot != null">
+                <![CDATA[{{Config.EventSubjectRoot}}.]]>
+              </If>
+              <![CDATA[{{Config.AppName}}.{{Entity.Name}}]]>
               <Property Condition="Property.UniqueKey == true">
                 <If Condition="System.Index == 0">
                   <Then><![CDATA[.]]></Then>

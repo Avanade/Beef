@@ -83,7 +83,7 @@ namespace Beef.Events.Subscribe
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
         public EventSubscriberHostArgs UseLoggerForAuditing()
         {
-            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. Status: {result.Status}, Subject: '{result.Subject}', Action: '{result.Action}', Reason: {result.Reason}'");
+            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. Status: {result}'");
             return this;
         }
     }

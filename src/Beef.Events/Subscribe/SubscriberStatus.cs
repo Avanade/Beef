@@ -20,6 +20,11 @@ namespace Beef.Events.Subscribe
         DataNotFound,
 
         /// <summary>
+        /// Indicates that the <see cref="EventData"/> was invalid and therefore nothing could be actioned.
+        /// </summary>
+        InvalidEventData,
+
+        /// <summary>
         /// Indicates that the data was invalid and therefore nothing could be actioned.
         /// </summary>
         InvalidData,

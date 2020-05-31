@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Events;
 using Beef.Events.Subscribe;
 using NUnit.Framework;
@@ -112,29 +111,33 @@ namespace Beef.Test.NUnit
                 Assert.Fail("The Subscriber did not Receive the event; check that the Subject and/or Action are as expected.");
 
             // Log to output.
-            Logger.Default.Info("");
-            Logger.Default.Info("EVENT SUBSCRIBER TESTER...");
-            Logger.Default.Info("");
-            Logger.Default.Info($"SUBSCRIBER >");
-            Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
-            Logger.Default.Info($"{tesh.Result}");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine("EVENT SUBSCRIBER TESTER...");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"SUBSCRIBER >");
+            TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
+            TestContext.Out.WriteLine($"{tesh.Result?.ToMultiLineString()}");
 
-            Logger.Default.Info("");
-            Logger.Default.Info($"EVENTS PUBLISHED >");
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = Beef.Test.NUnit.ExpectEvent.GetEvents();
             if (events.Length == 0)
-                Logger.Default.Info("  None.");
+                TestContext.Progress.WriteLine("  None.");
             else
             {
                 foreach (var e in events)
                 {
-                    Logger.Default.Info($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Progress.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
                 }
             }
 
-            Logger.Default.Info(null);
-            Logger.Default.Info(new string('=', 80));
-            Logger.Default.Info(null);
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine(new string('=', 80));
+            TestContext.Out.WriteLine("");
+
+            if (_expectedStatus != tesh.Result!.Status)
+                Assert.Fail($"Expected Status was '{_expectedStatus}'; actual was '{tesh.Result!.Status}'");
 
             if (_expectedPublished.Count > 0)
                 Beef.Test.NUnit.ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());

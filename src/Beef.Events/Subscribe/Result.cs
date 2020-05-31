@@ -13,6 +13,13 @@ namespace Beef.Events.Subscribe
     public class Result
     {
         /// <summary>
+        /// Creates a <see cref="SubscriberStatus.InvalidEventData"/> <see cref="Result"/>.
+        /// </summary>
+        /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
+        internal static Result InvalidEventData(System.Exception? exception, string? reason = null)
+            => new Result { Status = SubscriberStatus.InvalidEventData, Reason = reason ?? (exception == null ? null : $"EventData is invalid: {exception.Message}") ?? "EventData is invalid.", Exception = exception };
+
+        /// <summary>
         /// Creates a <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.
         /// </summary>
         /// <returns>The <see cref="SubscriberStatus.NotSubscribed"/> <see cref="Result"/>.</returns>
@@ -124,17 +131,18 @@ namespace Beef.Events.Subscribe
         /// Outputs the <see cref="Result"/> as a <see cref="string"/>.
         /// </summary>
         /// <returns>The <see cref="Result"/> as a <see cref="string"/>.</returns>
-        public override string ToString()
+        public override string ToString() => $"Status: {Status}, Subject: {Subject}, Action: {Action}, Reason: {Reason}";
+
+        /// <summary>
+        /// Outputs the <see cref="Result"/> as a multi-line <see cref="string"/>.
+        /// </summary>
+        /// <returns>The <see cref="Result"/> as a multi-line <see cref="string"/>.</returns>
+        public string ToMultiLineString()
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Status: {Status}");
-
-            if (!string.IsNullOrEmpty(Subject))
-                sb.AppendLine($"Subject: {Subject}");
-
-            if (!string.IsNullOrEmpty(Action))
-                sb.AppendLine($"Action: {Action}");
-
+            sb.AppendLine($"Subject: {Subject}");
+            sb.AppendLine($"Action: {Action}");
             sb.Append($"Reason: {Reason}");
             return sb.ToString();
         }
