@@ -31,7 +31,7 @@ namespace Beef.Test.NUnit
 
             try
             {
-                Result = await ReceiveAsync(@event.Subject!, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
+                Result = await ReceiveAsync(@event.Subject, @event.Action, (subscriber) => { WasSubscribed = true; return @event; }).ConfigureAwait(false);
             }
             catch (EventSubscriberStopException essex)
             {

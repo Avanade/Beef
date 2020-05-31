@@ -40,6 +40,17 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
+        /// Sets the <see cref="EventSubscriberHost.InvalidEventDataHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventHubSubscriberHost"/> instance (to support fluent-style method chaining).</returns>
+        public EventHubSubscriberHost InvalidEventData(ResultHandling handling)
+        {
+            InvalidEventDataHandling = handling;
+            return this;
+        }
+
+        /// <summary>
         /// Sets the <see cref="EventSubscriberHost.NotSubscribedHandling"/> value.
         /// </summary>
         /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
@@ -106,13 +117,18 @@ namespace Beef.Events.Subscribe
             if (@event == null)
                 return;
 
-            // Convert EventHubs.EventData to Beef.EventData; only continue where a subject exits.
+            // Convert EventHubs.EventData to Beef.EventData..
             var (subject, action, _) = @event.GetBeefMetadata();
-            if (string.IsNullOrEmpty(subject))
-                return;
-
-            var result = await ReceiveAsync(subject, action, (subscriber) 
-                => subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType)).ConfigureAwait(false);
+            await ReceiveAsync(subject, action, (subscriber) =>
+            {
+                try
+                {
+                    return subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType);
+                }
+#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
+                catch (Exception ex) { throw new InvalidEventDataException(ex); }
+#pragma warning restore CA1031
+            }).ConfigureAwait(false);
         }
     }
 }

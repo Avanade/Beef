@@ -121,7 +121,7 @@ namespace Beef.Events
         /// </summary>
         /// <param name="eventData">The <see cref="EventHubs.EventData"/>.</param>
         /// <returns>The values of the following properties: <see cref="SubjectPropertyName"/>, <see cref="ActionPropertyName"/> and <see cref="TenantIdPropertyName"/>.</returns>
-        public static (string subject, string action, Guid? tenantId) GetBeefMetadata(this EventHubs.EventData eventData)
+        public static (string? subject, string? action, Guid? tenantId) GetBeefMetadata(this EventHubs.EventData eventData)
         {
             if (eventData == null)
                 throw new ArgumentNullException(nameof(eventData));

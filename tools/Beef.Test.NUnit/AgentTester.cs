@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Events;
 using Beef.Grpc;
@@ -536,16 +535,16 @@ namespace Beef.Test.NUnit
                 throw new ArgumentNullException(nameof(result));
 
             // Log to output.
-            Logger.Default.Info("");
-            Logger.Default.Info("AGENT TESTER...");
-            Logger.Default.Info("");
-            Logger.Default.Info($"REQUEST >");
-            Logger.Default.Info($"Request: {result.Request.Method} {result.Request.RequestUri}");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine("AGENT TESTER...");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"REQUEST >");
+            TestContext.Out.WriteLine($"Request: {result.Request.Method} {result.Request.RequestUri}");
 
             if (!string.IsNullOrEmpty(Username))
-                Logger.Default.Info($"Username: {Username}");
+                TestContext.Out.WriteLine($"Username: {Username}");
 
-            Logger.Default.Info($"Headers: {(result.Request.Headers == null || !result.Request.Headers.Any() ? "none" : "")}");
+            TestContext.Out.WriteLine($"Headers: {(result.Request.Headers == null || !result.Request.Headers.Any() ? "none" : "")}");
             if (result.Request.Headers != null && result.Request.Headers.Any())
             {
                 foreach (var hdr in result.Request.Headers)
@@ -559,7 +558,7 @@ namespace Beef.Test.NUnit
                         sb.Append(v);
                     }
 
-                    Logger.Default.Info($"  {hdr.Key}: {sb}");
+                    TestContext.Out.WriteLine($"  {hdr.Key}: {sb}");
                 }
             }
 
@@ -574,35 +573,35 @@ namespace Beef.Test.NUnit
                 catch (Exception) { }
 #pragma warning restore CA1031
 
-                Logger.Default.Info($"Content: [{result.Request.Content?.Headers?.ContentType?.MediaType ?? "None"}]");
-                Logger.Default.Info(json == null ? result.Request.Content?.ToString() : json.ToString());
+                TestContext.Out.WriteLine($"Content: [{result.Request.Content?.Headers?.ContentType?.MediaType ?? "None"}]");
+                TestContext.Out.WriteLine(json == null ? result.Request.Content?.ToString() : json.ToString());
             }
 
-            Logger.Default.Info("");
-            Logger.Default.Info($"RESPONSE >");
-            Logger.Default.Info($"HttpStatusCode: {result.StatusCode} ({(int)result.StatusCode})");
-            Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"RESPONSE >");
+            TestContext.Out.WriteLine($"HttpStatusCode: {result.StatusCode} ({(int)result.StatusCode})");
+            TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
 
             var hdrs = result.Response?.Headers?.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            Logger.Default.Info($"Headers: {(hdrs == null || !hdrs.Any() ? "none" : "")}");
+            TestContext.Out.WriteLine($"Headers: {(hdrs == null || !hdrs.Any() ? "none" : "")}");
             if (hdrs != null && hdrs.Any())
             {
                 foreach (var hdr in hdrs)
                 {
-                    Logger.Default.Info($"  {hdr}");
+                    TestContext.Out.WriteLine($"  {hdr}");
                 }
             }
 
-            Logger.Default.Info($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
+            TestContext.Out.WriteLine($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
 
             if (result.Messages != null && result.Messages.Count > 0)
             {
                 foreach (var m in result.Messages)
                 {
-                    Logger.Default.Info($" {m.Type}: {m.Text} {(m.Property == null ? "" : "(" + m.Property + ")")}");
+                    TestContext.Out.WriteLine($" {m.Type}: {m.Text} {(m.Property == null ? "" : "(" + m.Property + ")")}");
                 }
 
-                Logger.Default.Info(null);
+                TestContext.Out.WriteLine("");
             }
 
             json = null;
@@ -620,28 +619,28 @@ namespace Beef.Test.NUnit
             TestContext.Out.Write($"Content: [{result.Response?.Content?.Headers?.ContentType?.MediaType ?? "none"}]");
             if (json != null)
             {
-                Logger.Default.Info(null);
-                Logger.Default.Info(json.ToString());
+                TestContext.Out.WriteLine("");
+                TestContext.Out.WriteLine(json.ToString());
             }
             else
-                Logger.Default.Info($"{(string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}");
+                TestContext.Out.WriteLine($"{(string.IsNullOrEmpty(result.Content) ? "none" : result.Content)}");
 
-            Logger.Default.Info("");
-            Logger.Default.Info($"EVENTS PUBLISHED >");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = ExpectEvent.GetEvents();
             if (events.Length == 0)
-                Logger.Default.Info("  None.");
+                TestContext.Out.WriteLine("  None.");
             else
             {
                 foreach (var e in events)
                 {
-                    Logger.Default.Info($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
                 }
             }
 
-            Logger.Default.Info(null);
-            Logger.Default.Info(new string('=', 80));
-            Logger.Default.Info(null);
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine(new string('=', 80));
+            TestContext.Out.WriteLine("");
 
             // Perform checks.
             if (_expectedStatusCode.HasValue && _expectedStatusCode != result.StatusCode)
