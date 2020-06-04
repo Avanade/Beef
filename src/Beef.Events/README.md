@@ -18,7 +18,7 @@ However, further capabilities have also been enabled within _Beef_, leveraging t
 
 ## Event Data
 
-The [`EventData`](../../src/Beef.Core/Events/EventData.cs) provides a standardised, and flexible, message contract that is used to both publish and subscribe to events in a consistent manner. The key properties as follows:
+The _Beef_ [`EventData`](../../src/Beef.Core/Events/EventData.cs) provides a standardised, and flexible, message contract that is used to both publish and subscribe to events in a consistent manner. The key properties as follows:
 
 Property | Description
 -|-
@@ -27,7 +27,7 @@ Property | Description
 `Key` | The corresponding entity key (could be single value or an array of values).
 `Value` | The optional value that contains the underlying message data.
 
-The code-generation of _Beef_ will automatically infer the `Subject` and `Action` for an entity and the operation being performed. The Subject is `<domain>.<entity>.<uniquekey>` and `Action` is the operation.
+The code-generation of _Beef_ will automatically infer the `Subject` and `Action` for an entity and the operation being performed; this can be overridden. The `Subject` defaults to `<domain>.<entity>.<uniquekey>`; there is a code-gen configuration attribute [`EventSubjectRoot`](../../docs/Entity-CodeGeneration-element.md) that prepends the specified value to the `Subject`. The `Action` defaults to the `Operation` name; there is a code-gen configuration attribute [`EventActionFormat`](../../docs/Entity-CodeGeneration-element.md) that enables automatic reformatting to past tense where required (`Create` would be renamed to `Created` for example).
 
 For example, an invoice creation event could result in the following:
 - `Subject:` `Billing.Invoice.7634626f-edee-e911-bd3b-bc8385e26041`
@@ -42,7 +42,7 @@ The [`Event`](../../src/Beef.Core/Events/Event.cs) provides the standardised eve
 
 > To publish to Azure Event Hubs the [`EventHubPublisher`](../../src/Beef.Events/Publish/EventHubPublisher.cs) can be used. 
 
-The publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](../../docs/Layer-DataSvc.md) layer to ensure consistency of approach. All `Create`, `Update` and `Delete` operations raise events automatically; others will need to be issued by the developer.
+The publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](../../docs/Layer-DataSvc.md) layer to ensure consistency of approach. All `Create`, `Update` and `Delete` operations raise events automatically; others will need to be issued directly by the developer.
 
 <br/>
 
@@ -57,7 +57,7 @@ Within the _Beef_ context each Domain would subscribe (listen) to events and pro
 
 ### Subscribers
 
-To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. 
+To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) or [`EventSubscriber<T>`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) (defines the `Event.Value` `Type` to automatically deserialize) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. The `ReceiveAsync` must return a [`Result`](./Subscribe/Result.cs) to describer the processing outcome; being one of: `Success`, `DataNotFound` (also inferred from a [`NotFoundException`](../../src/Beef.Core/NotFoundException.cs)), `InvalidData` (also inferred from a [`ValidationException`](../../src/Beef.Core/ValidationException.cs) or [`BusinessException`](../../src/Beef.Core/BusinessException.cs)). 
 
 There are the following properties that can be set that will change the runtime logic:
 
@@ -65,6 +65,9 @@ Property | Description
 -|-
 [`UnhandledExceptionHandling`](../../src/Beef.Events/Subscribe/UnhandledExceptionHandling.cs) | Provides the unhandled `Exception` option as either `Stop` (stops and bubbles up the `Exception` allowing the [host](#Host) process to determine the appropriate action) or `Continue` (skips and continues effectively swallowing the `Exception`). Defaults to `Stop`.
 [`RunAsUser`](../../src/Beef.Events/Subscribe/RunAsUser.cs) | Provides the run as user option as either `Originating` (originating user being `EventData.Username`) or `System` (`EventSubscriberHost.SystemUsername`). Defaults to `Originating`.
+`InvalidEventDataHandling` | Overrides the default [`ResultHandling`](./Subscribe/ResultHandling.cs) as specified for the owning [`EventSubscriberHost`](#Subscriber-Host).
+`DataNotFoundHandling` | Overrides the default [`ResultHandling`](./Subscribe/ResultHandling.cs) as specified for the owning [`EventSubscriberHost`](#Subscriber-Host).
+`InvalidDataHandling` | Overrides the default [`ResultHandling`](./Subscribe/ResultHandling.cs) as specified for the owning [`EventSubscriberHost`](#Subscriber-Host).
 
 See [example](../../samples/Demo/Beef.Demo.Functions/Subscribers/PowerSourceChangeSubscriber.cs) below:
 
@@ -75,10 +78,11 @@ public class PowerSourceChangeSubscriber : EventSubscriber<string>
     // and Action 'PowerSourceChange'.
     public PowerSourceChangeSubscriber() : base("Demo.Robot.*", "PowerSourceChange") { }
 
-    public override async Task ReceiveAsync(EventData<string> @event)
+    public override async Task<Result> ReceiveAsync(EventData<string> @event)
     {
         var val = @event.Value;
         // Processing logic...
+        return Result.Success();
     }
 }
 ``` 
@@ -89,7 +93,18 @@ public class PowerSourceChangeSubscriber : EventSubscriber<string>
 
 The [`EventSubscriberHost`](../../src/Beef.Events/Subscribe/EventSubscriberHost.cs) provides the base capabilities for the host. The host is responsible for receiving (`ReceiveAsync`) each event and converting to an [`EventData`](../../src/Beef.Core/Events/EventData.cs) instance. The host checks whether there is a [subscriber](#subscribers) and will invoke where found; otherwise, the event will be skipped (ignored).
 
-The `EventSubscriberHost` infers the [subscribers](#subscribers) automatically by reflecting on the `Assembly` that instatiates the host. The subscribers can be specified by using the [`EventSubscriberHostArgs`](../../src/Beef.Events/Subscribe/EventSubscriberHostArgs.cs).
+The `EventSubscriberHost` infers the [subscribers](#subscribers) automatically by reflecting on the `Assembly` that instatiates the host. The subscribers can alternatively be specified by using the [`EventSubscriberHostArgs`](../../src/Beef.Events/Subscribe/EventSubscriberHostArgs.cs).
+
+There are the following properties that can be set that will change the runtime logic:
+
+Property | Description
+-|-
+`AreMultipleMessagesSupported` | Indicates whether multiple messages can be processed; default is `false`.
+`InvalidEventDataHandling` | Determines the behaviour ([`ResultHandling`](./Subscribe/ResultHandling.cs)) where the `EventData` is unable to be converted or has no `Subject` specified. Defaults to `Stop`.
+`DataNotFoundHandling` | Determines the behaviour ([`ResultHandling`](./Subscribe/ResultHandling.cs)) where the corresponding data is not found. Defaults to `Stop`.
+`InvalidDataHandling` | Determines the behaviour ([`ResultHandling`](./Subscribe/ResultHandling.cs)) where the specified data is invalid. Defaults to `Stop`.
+
+_Warning:_ The [`ResultHandling.Stop`](./Subscribe/ResultHandling.cs) implies that the data is currently unable to be processed; and should be attempted again (it could be transient) - this however could result in a _poison_ message that could stop further processing until resolved. Consider the `ResultHandling.ContinueWithAudit`, `ResultHandling.ContinueWithLogging` or `ResultHandling.ContinueSilent` as an alternative.
 
 The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can be overridden by overridding the `CreateExecutionContext` method where neccessary.
 
@@ -118,7 +133,7 @@ public static class EventSubscriber
 
 ## Resilient Event Hub Trigger
 
-A new custom Azure Function Trigger, [`ResilientEventHubTrigger`](./Triggers/ResilientEventHubTriggerAttribute.cs), has been created to support greater resiliency when processing (reading from) an Azure Event Hub Consumer Group. This should be used in scenarios where each message _must be_ processed, unless explicitly skipped.
+A new custom Azure Function Trigger, [`ResilientEventHubTrigger`](./Triggers/ResilientEventHubTriggerAttribute.cs), has been created to support greater resiliency when processing (reading from) an Azure Event Hub Consumer Group. This should be used in scenarios where each message **_must be_** processed, unless explicitly skipped.
 
 Unfortunately, probably by design, the out-of-the-box [`EventHubTrigger`](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-hubs) does not have any resiliency built-in. In that, if the underlying Function being executed fails (throws an `Exception`) this is essentially logged and swallowed, moving onto the next message in sequence (for the Consumer Group + Partition Id).
 
@@ -138,6 +153,7 @@ The underpinnings of the [`ResilientEventHubTrigger`](./Triggers/ResilientEventH
 - The *Poison* message will be written to an Azure Storage Table (`EventHubPoisonMessage`) for the Event Hub + Consumer Group + Partition Id, that includes the likes of: `Exception`, `EventData.Body` (as a string), Function Name, etc. There is a property `SkipMessage` that determines whether the message is to be skipped (defaults to `false`).
 - Whilst there is a *Poison* message with a `SkipMessage` of `false` it will continue to retry - even if the Function is restarted; i.e. the message will continue to be retried.
 - To skip the *Poison* message the `SkipMessage` must be set explicitly to `true`. Each time a *Poison* message is re-tried it looks for (re-reads) the `SkipMessage` value and acts accordingly. Once skipped the Poison messages is removed (deleted) from the storage table; a copy is written to a corresponding skipped Azure Storage Table (`EventHubPoisonMessageSkipped`) as an audit.
+- Where the [`ResultHandling`](./Subscribe/ResultHandling.cs) of an `EventSubscriber` is `ResultHandling.ContinueWithAudit` the message will be written to the skipped Azure Storage Table (`EventHubPoisonMessageSkipped`) as the audit. The `SkipMessage` value will be `false` to indicate that this was not explicitly (externally) set due to being *Poison*. 
 
 The [`PoisonMessagePersistence`](./Triggers/PoisonMessages/PoisonMessagePersistence.cs) provides the *Poison* message Azure storage persistence functionality described. This behaviour can be overridden using the [`IPoisonMessagePersistence`](./Triggers/PoisonMessages/IPoisonMessagePersistence.cs) where required.
 

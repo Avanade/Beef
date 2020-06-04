@@ -8,7 +8,7 @@ namespace Beef.Events.Subscribe
     public enum ResultHandling
     {
         /// <summary>
-        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is unexpected and should stop allowing the hosting process to determine the appropriate action.
+        /// Indicates that the <see cref="IEventSubscriber">subscriber</see> <see cref="Result"/> is unexpected and should stop, allowing the hosting process to determine the appropriate action.
         /// </summary>
         Stop,
 
