@@ -13,31 +13,46 @@ namespace Beef.Entities
     /// <seealso cref="ICleanUp"/>.
     public static class Cleaner
     {
-        /// <summary>
-        /// Represents the default <see cref="StringTrim"/> value (see <see cref="StringTrim.End"/>).
-        /// </summary>
-        public const StringTrim DefaultStringTrim = StringTrim.End;
+        private static DateTimeTransform _dateTimeTransform = DateTimeTransform.DateTimeUtc;
+        private static StringTransform _stringTransform = StringTransform.EmptyToNull;
+        private static StringTrim _stringTrim = StringTrim.End;
 
         /// <summary>
-        /// Represents the default <see cref="StringTransform"/> value (see <see cref="StringTransform.EmptyToNull"/>).
+        /// Gets or sets the default <see cref="Entities.DateTimeTransform"/> for all entities unless explicitly overridden. Defaults to <see cref="DateTimeTransform.DateTimeUtc"/>.
         /// </summary>
-        public const StringTransform DefaultStringTransform = StringTransform.EmptyToNull;
+        public static DateTimeTransform DefaultDateTimeTransform
+        {
+            get => _dateTimeTransform;
+            set => _dateTimeTransform = value == DateTimeTransform.UseDefault ? throw new ArgumentException("The default cannot be set to UseDefault.") : value;
+        }
 
         /// <summary>
-        /// Represents the default <see cref="DateTimeTransform"/> value (see <see cref="DateTimeTransform.None"/>).
+        /// Gets or sets the default <see cref="Entities.DateTimeTransform"/> for all entities unless explicitly overridden. Defaults to <see cref="StringTransform.EmptyToNull"/>.
         /// </summary>
-        public const DateTimeTransform DefaultDateTimeTransform = DateTimeTransform.None;
+        public static StringTransform DefaultStringTransform
+        {
+            get => _stringTransform;
+            set => _stringTransform = value == StringTransform.UseDefault ? throw new ArgumentException("The default cannot be set to UseDefault.") : value;
+        }
 
         /// <summary>
-        /// Cleans a <see cref="String"/>.
+        /// Gets or sets the default <see cref="Entities.DateTimeTransform"/> for all entities unless explicitly overridden. Defaults to <see cref="StringTransform.EmptyToNull"/>.
+        /// </summary>
+        public static StringTrim DefaultStringTrim
+        {
+            get => _stringTrim;
+            set => _stringTrim = value == StringTrim.UseDefault ? throw new ArgumentException("The default cannot be set to UseDefault.") : value;
+        }
+
+        /// <summary>
+        /// Cleans a <see cref="string"/>.
         /// </summary>
         /// <param name="value">The value to clean.</param>
         /// <returns>The cleaned value.</returns>
-        /// <remarks>The <paramref name="value"/> will be trimmed and transformed using the respective default <see cref="DefaultStringTrim"/> and 
-        /// <see cref="DefaultStringTransform"/> values.</remarks>
+        /// <remarks>The <paramref name="value"/> will be trimmed and transformed using the respective <see cref="DefaultStringTrim"/> and <see cref="DefaultStringTransform"/> values.</remarks>
         public static string? Clean(string? value)
         {
-            return Clean(value, DefaultStringTrim, DefaultStringTransform);
+            return Clean(value, StringTrim.UseDefault, StringTransform.UseDefault);
         }
 
         /// <summary>
@@ -47,8 +62,14 @@ namespace Beef.Entities
         /// <param name="trim">The <see cref="StringTrim"/> (defaults to <see cref="DefaultStringTrim"/>).</param>
         /// <param name="transform">The <see cref="StringTransform"/> (defaults to <see cref="DefaultStringTransform"/>).</param>
         /// <returns>The cleaned value.</returns>
-        public static string? Clean(string? value, StringTrim trim = DefaultStringTrim, StringTransform transform = DefaultStringTransform)
+        public static string? Clean(string? value, StringTrim trim = StringTrim.UseDefault, StringTransform transform = StringTransform.UseDefault)
         {
+            if (trim == StringTrim.UseDefault)
+                trim =DefaultStringTrim;
+
+            if (transform == StringTransform.UseDefault)
+                transform = DefaultStringTransform;
+
             // Handle a null string.
             if (value == null)
             {
@@ -89,12 +110,12 @@ namespace Beef.Entities
             if (value is string)
             {
                 string val = (string)Convert.ChangeType(value, typeof(string), CultureInfo.CurrentCulture);
-                return (T)Convert.ChangeType(Clean(val, DefaultStringTrim, DefaultStringTransform), typeof(T), CultureInfo.CurrentCulture);
+                return (T)Convert.ChangeType(Clean(val, StringTrim.UseDefault, StringTransform.UseDefault), typeof(T), CultureInfo.CurrentCulture);
             }
             else if (value is DateTime)
             {
                 DateTime val = (DateTime)Convert.ChangeType(value, typeof(DateTime), CultureInfo.CurrentCulture);
-                return (T)Convert.ChangeType(Clean(val, DefaultDateTimeTransform), typeof(DateTime), CultureInfo.CurrentCulture);
+                return (T)Convert.ChangeType(Clean(val, DateTimeTransform.UseDefault), typeof(DateTime), CultureInfo.CurrentCulture);
             }
             else if (value is IReferenceData)
             {
@@ -115,29 +136,48 @@ namespace Beef.Entities
         /// Cleans a <see cref="DateTime"/> value.
         /// </summary>
         /// <param name="value">The value to clean.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DefaultDateTimeTransform"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <returns>The cleaned value.</returns>
-        public static DateTime Clean(DateTime value, DateTimeTransform transform = DefaultDateTimeTransform)
+        public static DateTime Clean(DateTime value, DateTimeTransform transform = DateTimeTransform.UseDefault)
         {
+            if (transform == DateTimeTransform.UseDefault)
+                transform = DefaultDateTimeTransform;
+
             switch (transform)
             {
                 case DateTimeTransform.DateOnly:
-                    return DateTime.SpecifyKind(value.Date, DateTimeKind.Unspecified);
+                    if (value.Kind == DateTimeKind.Unspecified && value.TimeOfDay == TimeSpan.Zero)
+                        return value;
+                    else
+                        return DateTime.SpecifyKind(value.Date, DateTimeKind.Unspecified);
 
                 case DateTimeTransform.DateTimeLocal:
-                    if (value == DateTime.MinValue || value == DateTime.MaxValue)
-                        return DateTime.SpecifyKind(value, DateTimeKind.Local);
-                    else
-                        return (value.Kind == DateTimeKind.Local) ? value : TimeZoneInfo.ConvertTime(value, TimeZoneInfo.Local);
+                    if (value.Kind != DateTimeKind.Local)
+                    {
+                        if (value == DateTime.MinValue || value == DateTime.MaxValue || value.Kind == DateTimeKind.Unspecified)
+                            return DateTime.SpecifyKind(value, DateTimeKind.Local);
+                        else
+                            return (value.Kind == DateTimeKind.Local) ? value : TimeZoneInfo.ConvertTime(value, TimeZoneInfo.Local);
+                    }
+
+                    break;
 
                 case DateTimeTransform.DateTimeUtc:
-                    if (value == DateTime.MinValue || value == DateTime.MaxValue)
-                        return DateTime.SpecifyKind(value, DateTimeKind.Utc);
-                    else
-                        return (value.Kind == DateTimeKind.Utc) ? value : TimeZoneInfo.ConvertTime(value, TimeZoneInfo.Utc);
+                    if (value.Kind != DateTimeKind.Utc)
+                    {
+                        if (value == DateTime.MinValue || value == DateTime.MaxValue || value.Kind == DateTimeKind.Unspecified)
+                            return DateTime.SpecifyKind(value, DateTimeKind.Utc);
+                        else
+                            return (value.Kind == DateTimeKind.Utc) ? value : TimeZoneInfo.ConvertTime(value, TimeZoneInfo.Utc);
+                    }
+
+                    break;
 
                 case DateTimeTransform.DateTimeUnspecified:
-                    return DateTime.SpecifyKind(value, DateTimeKind.Unspecified);
+                    if (value.Kind != DateTimeKind.Unspecified)
+                        return DateTime.SpecifyKind(value, DateTimeKind.Unspecified);
+
+                    break;
             }
 
             return value;
@@ -147,9 +187,9 @@ namespace Beef.Entities
         /// Cleans a <see cref="Nullable{DateTime}"/> value.
         /// </summary>
         /// <param name="value">The value to clean.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DefaultDateTimeTransform"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <returns>The cleaned value.</returns>
-        public static DateTime? Clean(DateTime? value, DateTimeTransform transform = DefaultDateTimeTransform)
+        public static DateTime? Clean(DateTime? value, DateTimeTransform transform = DateTimeTransform.UseDefault)
         {
             if (value == null || !value.HasValue)
                 return value;

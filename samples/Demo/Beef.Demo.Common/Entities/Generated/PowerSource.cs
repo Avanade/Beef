@@ -38,7 +38,7 @@ namespace Beef.Demo.Common.Entities
         public string? AdditionalInfo
         {
             get => _additionalInfo;
-            set => SetValue(ref _additionalInfo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AdditionalInfo)); 
+            set => SetValue(ref _additionalInfo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AdditionalInfo)); 
         }
 
         #endregion
@@ -116,7 +116,7 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            AdditionalInfo = Cleaner.Clean(AdditionalInfo, StringTrim.End, StringTransform.EmptyToNull);
+            AdditionalInfo = Cleaner.Clean(AdditionalInfo, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

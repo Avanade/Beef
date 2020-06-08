@@ -51,7 +51,7 @@ namespace Beef.Demo.Common.Entities
         public string? Name
         {
             get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Name)); 
+            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name)); 
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Beef.Demo.Common.Entities
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description)); 
+            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description)); 
         }
 
         #endregion
@@ -211,8 +211,8 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Name = Cleaner.Clean(Name, StringTrim.End, StringTransform.EmptyToNull);
-            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
+            Name = Cleaner.Clean(Name, StringTrim.UseDefault, StringTransform.UseDefault);
+            Description = Cleaner.Clean(Description, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

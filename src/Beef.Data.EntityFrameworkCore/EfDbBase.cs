@@ -135,7 +135,7 @@ namespace Beef.Data.EntityFrameworkCore
                     cl.ChangeLog = new ChangeLog();
 
                 cl.ChangeLog.CreatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
-                cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
+                cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
             using var db = new EfDbContextManager(saveArgs);
@@ -172,7 +172,7 @@ namespace Beef.Data.EntityFrameworkCore
                     cl.ChangeLog = new ChangeLog();
 
                 cl.ChangeLog.UpdatedBy = ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : ExecutionContext.EnvironmentUsername;
-                cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : DateTime.Now;
+                cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
             using var db = new EfDbContextManager(saveArgs);
@@ -242,7 +242,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Checks keys provided and match against defined.
         /// </summary>
-        private void CheckKeys<T, TModel>(EfDbArgs<T, TModel> args, IComparable[] keys) where T : class, new() where TModel : class, new()
+        private static void CheckKeys<T, TModel>(EfDbArgs<T, TModel> args, IComparable[] keys) where T : class, new() where TModel : class, new()
         {
             if (keys == null || keys.Length == 0)
                 throw new ArgumentNullException(nameof(keys));
@@ -254,7 +254,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Check the consistency of the save arguments.
         /// </summary>
-        private void CheckSaveArgs<T, TModel>(EfDbArgs<T, TModel> saveArgs) where T : class, new() where TModel : class, new()
+        private static void CheckSaveArgs<T, TModel>(EfDbArgs<T, TModel> saveArgs) where T : class, new() where TModel : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
@@ -266,7 +266,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Performs the EF select single (find).
         /// </summary>
-        private async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
+        private static async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
         {
             var model = await db.DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
             if (model == default)

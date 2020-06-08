@@ -195,7 +195,7 @@ namespace Beef.CodeGen.Loaders
         /// <summary>
         /// Applies the Operation Loader.
         /// </summary>
-        private async Task<CodeGenConfig> ApplyOperationLoaderAsync(CodeGenConfig config)
+        private static async Task<CodeGenConfig> ApplyOperationLoaderAsync(CodeGenConfig config)
         {
             var opl = new OperationConfigLoader() as ICodeGenConfigLoader;
             await opl.LoadBeforeChildrenAsync(config).ConfigureAwait(false);
@@ -206,7 +206,7 @@ namespace Beef.CodeGen.Loaders
         /// <summary>
         /// Applies standard and configured reference data properties.
         /// </summary>
-        private void ApplyRefDataProperties(CodeGenConfig config, List<CodeGenConfig> propsConfig, string refDataType)
+        private static void ApplyRefDataProperties(CodeGenConfig config, List<CodeGenConfig> propsConfig, string refDataType)
         {
             var i = 0;
 

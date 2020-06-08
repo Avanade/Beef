@@ -192,7 +192,7 @@ namespace Beef.CodeGen.Loaders
             return Task.CompletedTask;
         }
 
-        private void AddTableColumns(CodeGenConfig config, Table table)
+        private static void AddTableColumns(CodeGenConfig config, Table table)
         {
             if (CodeGenConfig.FindConfigList(config, "Column") != null)
                 return;
@@ -236,7 +236,7 @@ namespace Beef.CodeGen.Loaders
                 config.Children.Add("Column", colList);
         }
 
-        private void ExcludeUdtColumns(CodeGenConfig config)
+        private static void ExcludeUdtColumns(CodeGenConfig config)
         {
             var ecx = string.IsNullOrEmpty(config.GetAttributeValue<string>("UdtExcludeColumns")) ? new List<string>() : config.GetAttributeValue<string>("UdtExcludeColumns").Split(',').Select(x => x.Trim()).ToList();
             if (ecx.Count == 0)

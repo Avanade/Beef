@@ -77,7 +77,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaturityCurrency
         {
             get => _maturityCurrency;
-            set => SetValue(ref _maturityCurrency, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MaturityCurrency)); 
+            set => SetValue(ref _maturityCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaturityCurrency)); 
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Cdr.Banking.Common.Entities
             LodgementDate = Cleaner.Clean(LodgementDate, DateTimeTransform.DateOnly);
             MaturityDate = Cleaner.Clean(MaturityDate, DateTimeTransform.DateOnly);
             MaturityAmount = Cleaner.Clean(MaturityAmount);
-            MaturityCurrency = Cleaner.Clean(MaturityCurrency, StringTrim.End, StringTransform.EmptyToNull);
+            MaturityCurrency = Cleaner.Clean(MaturityCurrency, StringTrim.UseDefault, StringTransform.UseDefault);
             MaturityInstructionsSid = Cleaner.Clean(MaturityInstructionsSid);
 
             OnAfterCleanUp();

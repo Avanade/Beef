@@ -23,7 +23,7 @@ namespace Beef.Entities
         public DateTime? CreatedDate
         {
             get => _createdDate; 
-            set => SetValue(ref _createdDate, value, false, DateTimeTransform.DateTimeLocal, nameof(CreatedDate)); 
+            set => SetValue(ref _createdDate, value, false, DateTimeTransform.UseDefault, nameof(CreatedDate)); 
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Beef.Entities
         public string? CreatedBy
         {
             get => _createdBy;
-            set => SetValue(ref _createdBy!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(CreatedBy));
+            set => SetValue(ref _createdBy!, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(CreatedBy));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Beef.Entities
         public DateTime? UpdatedDate
         {
             get => _updatedDate;
-            set => SetValue(ref _updatedDate, value, false, DateTimeTransform.DateTimeLocal, nameof(UpdatedDate));
+            set => SetValue(ref _updatedDate, value, false, DateTimeTransform.UseDefault, nameof(UpdatedDate));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Beef.Entities
         public string? UpdatedBy
         {
             get => _updatedBy;
-            set => SetValue(ref _updatedBy!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(UpdatedBy));
+            set => SetValue(ref _updatedBy!, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(UpdatedBy));
         }
 
         #region IEquatable
@@ -164,10 +164,10 @@ namespace Beef.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            CreatedDate = Cleaner.Clean(CreatedDate, DateTimeTransform.DateTimeLocal);
-            CreatedBy = Cleaner.Clean(CreatedBy, StringTrim.End, StringTransform.EmptyToNull);
-            UpdatedDate = Cleaner.Clean(UpdatedDate, DateTimeTransform.DateTimeLocal);
-            UpdatedBy = Cleaner.Clean(UpdatedBy, StringTrim.End, StringTransform.EmptyToNull);
+            CreatedDate = Cleaner.Clean(CreatedDate, DateTimeTransform.UseDefault);
+            CreatedBy = Cleaner.Clean(CreatedBy, StringTrim.UseDefault, StringTransform.UseDefault);
+            UpdatedDate = Cleaner.Clean(UpdatedDate, DateTimeTransform.UseDefault);
+            UpdatedBy = Cleaner.Clean(UpdatedBy, StringTrim.UseDefault, StringTransform.UseDefault);
         }
 
         /// <summary>

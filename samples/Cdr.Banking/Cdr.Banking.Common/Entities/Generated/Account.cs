@@ -46,7 +46,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Cdr.Banking.Common.Entities
         public string? DisplayName
         {
             get => _displayName;
-            set => SetValue(ref _displayName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(DisplayName)); 
+            set => SetValue(ref _displayName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(DisplayName)); 
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Nickname
         {
             get => _nickname;
-            set => SetValue(ref _nickname, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Nickname)); 
+            set => SetValue(ref _nickname, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Nickname)); 
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaskedNumber
         {
             get => _maskedNumber;
-            set => SetValue(ref _maskedNumber, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MaskedNumber)); 
+            set => SetValue(ref _maskedNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaskedNumber)); 
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Cdr.Banking.Common.Entities
         public string? ProductName
         {
             get => _productName;
-            set => SetValue(ref _productName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ProductName)); 
+            set => SetValue(ref _productName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductName)); 
         }
 
         #endregion
@@ -324,15 +324,15 @@ namespace Cdr.Banking.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Id = Cleaner.Clean(Id, StringTrim.End, StringTransform.EmptyToNull);
+            Id = Cleaner.Clean(Id, StringTrim.UseDefault, StringTransform.UseDefault);
             CreationDate = Cleaner.Clean(CreationDate, DateTimeTransform.DateOnly);
-            DisplayName = Cleaner.Clean(DisplayName, StringTrim.End, StringTransform.EmptyToNull);
-            Nickname = Cleaner.Clean(Nickname, StringTrim.End, StringTransform.EmptyToNull);
+            DisplayName = Cleaner.Clean(DisplayName, StringTrim.UseDefault, StringTransform.UseDefault);
+            Nickname = Cleaner.Clean(Nickname, StringTrim.UseDefault, StringTransform.UseDefault);
             OpenStatusSid = Cleaner.Clean(OpenStatusSid);
             IsOwned = Cleaner.Clean(IsOwned);
-            MaskedNumber = Cleaner.Clean(MaskedNumber, StringTrim.End, StringTransform.EmptyToNull);
+            MaskedNumber = Cleaner.Clean(MaskedNumber, StringTrim.UseDefault, StringTransform.UseDefault);
             ProductCategorySid = Cleaner.Clean(ProductCategorySid);
-            ProductName = Cleaner.Clean(ProductName, StringTrim.End, StringTransform.EmptyToNull);
+            ProductName = Cleaner.Clean(ProductName, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

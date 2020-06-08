@@ -163,7 +163,7 @@ namespace Beef.Core.UnitTest.Json
 
             Assert.IsNotNull(mi);
             Assert.AreEqual(MessageType.Error, mi.Type);
-            Assert.AreEqual("", mi.Property);
+            Assert.IsNull(mi.Property);
             Assert.AreEqual("The JSON document is malformed and could not be parsed.", mi.Text);
         }
 

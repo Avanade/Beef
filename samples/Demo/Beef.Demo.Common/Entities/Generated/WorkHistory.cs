@@ -51,7 +51,7 @@ namespace Beef.Demo.Common.Entities
         public string? Name
         {
             get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Name)); 
+            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name)); 
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Name = Cleaner.Clean(Name, StringTrim.End, StringTransform.EmptyToNull);
+            Name = Cleaner.Clean(Name, StringTrim.UseDefault, StringTransform.UseDefault);
             StartDate = Cleaner.Clean(StartDate, DateTimeTransform.DateOnly);
             EndDate = Cleaner.Clean(EndDate, DateTimeTransform.DateOnly);
 

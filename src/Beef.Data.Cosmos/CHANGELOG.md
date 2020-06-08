@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)`.
+
 ## v3.1.3
 - *Fixed:* A new nullable compile error fixed that appeared with Visual Studio 2019 v16.5.4.
 

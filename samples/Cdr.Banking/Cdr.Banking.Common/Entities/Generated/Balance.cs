@@ -44,7 +44,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
         }
 
         /// <summary>
@@ -265,12 +265,12 @@ namespace Cdr.Banking.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Id = Cleaner.Clean(Id, StringTrim.End, StringTransform.EmptyToNull);
+            Id = Cleaner.Clean(Id, StringTrim.UseDefault, StringTransform.UseDefault);
             CurrentBalance = Cleaner.Clean(CurrentBalance);
             AvailableBalance = Cleaner.Clean(AvailableBalance);
             CreditLimit = Cleaner.Clean(CreditLimit);
             AmortisedLimit = Cleaner.Clean(AmortisedLimit);
-            Currency = Cleaner.Clean(Currency, StringTrim.End, StringTransform.EmptyToNull);
+            Currency = Cleaner.Clean(Currency, StringTrim.UseDefault, StringTransform.UseDefault);
             Purses = Cleaner.Clean(Purses);
 
             OnAfterCleanUp();

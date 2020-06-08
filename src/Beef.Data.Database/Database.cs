@@ -115,7 +115,7 @@ namespace Beef.Data.Database
 
             p = cmd.CreateParameter();
             p.ParameterName = "@" + DatabaseColumns.SessionContextTimestamp;
-            p.Value = timestamp ?? DateTime.Now;
+            p.Value = timestamp ?? Entities.Cleaner.Clean(DateTime.Now);
             cmd.Parameters.Add(p);
 
             if (tenantId.HasValue)

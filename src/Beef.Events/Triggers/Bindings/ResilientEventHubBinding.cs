@@ -64,22 +64,14 @@ namespace Beef.Events.Triggers.Bindings
         /// <returns>The <see cref="ITriggerData"/>.</returns>
         public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            IValueProvider valueProvider;
-            switch (value)
+            IValueProvider valueProvider = value switch
             {
-                case ResilientEventHubData mehi:
-                    valueProvider = new ValueProvider(mehi.EventData);
-                    break;
+                ResilientEventHubData mehi => new ValueProvider(mehi.EventData),
+                string str => new ValueProvider(new EventHubs.EventData(Encoding.UTF8.GetBytes(str))),
+                _ => throw new InvalidOperationException($"Unable to bind as the value is not a 'ResilientEventHubInfo' Type; is Type {value.GetType()}."),
+            };
 
-                case string str:
-                    valueProvider = new ValueProvider(new EventHubs.EventData(Encoding.UTF8.GetBytes(str)));
-                    break;
-
-                default:
-                    throw new InvalidOperationException($"Unable to bind as the value is not a 'ResilientEventHubInfo' Type; is Type {value.GetType()}.");
-            }
-
-            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "ResilientEventHubTrigger", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture) } };
+            IReadOnlyDictionary<string, object> bindingData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { "ResilientEventHubTrigger", Entities.Cleaner.Clean(DateTime.Now).ToString(System.Globalization.CultureInfo.InvariantCulture) } };
             return Task.FromResult((ITriggerData)new TriggerData(valueProvider, bindingData));
         }
 
@@ -141,7 +133,7 @@ namespace Beef.Events.Triggers.Bindings
             /// </summary>
             public string ToInvokeString()
             {
-                return DateTime.Now.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+                return Entities.Cleaner.Clean(DateTime.Now).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
     }

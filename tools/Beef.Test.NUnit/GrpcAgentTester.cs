@@ -400,7 +400,7 @@ namespace Beef.Test.NUnit
 
             _isExpectCreatedBy = true;
             _changeLogCreatedBy = string.IsNullOrEmpty(createdby) ? Username : createdby;
-            _changeLogCreatedDate = createdDateGreaterThan ?? (DateTime?)DateTime.Now.Subtract(new TimeSpan(0, 0, 1));
+            _changeLogCreatedDate = createdDateGreaterThan ?? (DateTime?)Cleaner.Clean(DateTime.Now).Subtract(new TimeSpan(0, 0, 1));
             _comparisonConfig.MembersToIgnore.AddRange(new string[] { "ChangeLog" });
             return this;
         }
@@ -417,7 +417,7 @@ namespace Beef.Test.NUnit
 
             _isExpectUpdatedBy = true;
             _changeLogUpdatedBy = string.IsNullOrEmpty(updatedby) ? Username : updatedby;
-            _changeLogUpdatedDate = updatedDateGreaterThan ?? (DateTime?)DateTime.Now.Subtract(new TimeSpan(0, 0, 1));
+            _changeLogUpdatedDate = updatedDateGreaterThan ?? (DateTime?)Cleaner.Clean(DateTime.Now).Subtract(new TimeSpan(0, 0, 1));
             _comparisonConfig.MembersToIgnore.AddRange(new string[] { "ChangeLog" });
             return this;
         }

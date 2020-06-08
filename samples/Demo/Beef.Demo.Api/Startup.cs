@@ -122,7 +122,7 @@ namespace Beef.Demo.Api
             app.UseExecutionContext((context, ec) =>
             {
                 ec.Username = context.User.Identity.Name ?? WebApiExecutionContextMiddleware.DefaultUsername;
-                ec.Timestamp = DateTime.Now;
+                ec.Timestamp = Cleaner.Clean(DateTime.Now);
             });
 
             // Use controllers.

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using Beef.Mapper;
 using Beef.RefData;
 using Microsoft.Data.SqlClient;
@@ -102,10 +103,10 @@ namespace Beef.Data.Database
         public DatabaseWildcard Wildcard { get; set; } = new DatabaseWildcard();
 
         /// <summary>
-        /// Defines the default <see cref="DateTimeKind"/> to be used when retrieving (see <see cref="DatabaseRecord.GetValue{DateTime}(string)"/>)
-        /// a <see cref="DateTime"/> value from a <see cref="DatabaseRecord"/>.
+        /// Determines (overrides) the <see cref="Entities.DateTimeTransform"/> to be used when retrieving (see <see cref="DatabaseRecord.GetValue{DateTime}(string)"/>) a <see cref="DateTime"/> value
+        /// from a <see cref="DatabaseRecord"/>.
         /// </summary>
-        public DateTimeKind DefaultDateTimeKind { get; set; } = DateTimeKind.Local;
+        public DateTimeTransform DateTimeTransform { get; set; } = DateTimeTransform.UseDefault;
 
         /// <summary>
         /// Gets or sets the <see cref="SqlException"/> handler (by default set up to execute <see cref="ThrowTransformedSqlException(SqlException)"/>).

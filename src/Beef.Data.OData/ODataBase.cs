@@ -260,7 +260,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the corresponding entity value from the model value.
         /// </summary>
-        internal T GetValue<T, TModel>(ODataArgs<T, TModel> args, TModel model) where T : class, new() where TModel : class, new()
+        internal static T GetValue<T, TModel>(ODataArgs<T, TModel> args, TModel model) where T : class, new() where TModel : class, new()
         {
             if (model == default)
                 return default!;

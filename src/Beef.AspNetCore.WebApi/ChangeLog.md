@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancment:* `WebApiExecutionContextMiddleware` updated to use the `Cleaner.Clean` when setting the `ExecutionContext.Timestamp`.
+
 ## v3.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

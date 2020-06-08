@@ -258,7 +258,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Times the execution and reports result.
         /// </summary>
-        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action)
+        private static async Task<bool> TimeExecutionAsync(Func<Task<bool>> action)
         {
             var sw = Stopwatch.StartNew();
             var result = await action().ConfigureAwait(false);

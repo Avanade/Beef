@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Entities
         public string? Street
         {
             get => _street;
-            set => SetValue(ref _street, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Street)); 
+            set => SetValue(ref _street, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Street)); 
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Beef.Demo.Common.Entities
         public string? City
         {
             get => _city;
-            set => SetValue(ref _city, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(City)); 
+            set => SetValue(ref _city, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(City)); 
         }
 
         #endregion
@@ -167,8 +167,8 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Street = Cleaner.Clean(Street, StringTrim.End, StringTransform.EmptyToNull);
-            City = Cleaner.Clean(City, StringTrim.End, StringTransform.EmptyToNull);
+            Street = Cleaner.Clean(Street, StringTrim.UseDefault, StringTransform.UseDefault);
+            City = Cleaner.Clean(City, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

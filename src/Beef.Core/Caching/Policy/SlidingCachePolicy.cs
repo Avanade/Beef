@@ -70,7 +70,7 @@ namespace Beef.Caching.Policy
         {
             get
             {
-                DateTime now = DateTime.Now;
+                DateTime now = Entities.Cleaner.Clean(DateTime.Now);
                 if (Expiry != null && now <= Expiry)
                     return false;
 
@@ -115,7 +115,7 @@ namespace Beef.Caching.Policy
         /// </summary>
         public void Reset()
         {
-            DateTime now = DateTime.Now;
+            DateTime now = Entities.Cleaner.Clean(DateTime.Now);
             DateTime? expiry = now.Add(_duration);
 
             if (!_maxExpiry.HasValue && _maxDuration.TotalMilliseconds > 0)

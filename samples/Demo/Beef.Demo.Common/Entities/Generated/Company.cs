@@ -32,7 +32,7 @@ namespace Beef.Demo.Common.Entities
         public string? ExternalCode
         {
             get => GetMapping<string>(nameof(ExternalCode));
-            set { var __externalCode = GetMapping<string>(nameof(ExternalCode)) ?? default; SetValue(ref __externalCode, value, true, StringTrim.End, StringTransform.EmptyToNull, nameof(ExternalCode)); SetMapping(nameof(ExternalCode), __externalCode!); }
+            set { var __externalCode = GetMapping<string>(nameof(ExternalCode)) ?? default; SetValue(ref __externalCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ExternalCode)); SetMapping(nameof(ExternalCode), __externalCode!); }
         }
 
         #endregion

@@ -827,7 +827,7 @@ namespace Beef.Test.NUnit
     /// </summary>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="WebApiAgentResult{TValue}.Value"/> <see cref="Type"/>.</typeparam>
-    [DebuggerStepThrough()]
+    //[DebuggerStepThrough()]
     public class AgentTester<TAgent, TValue> : AgentTester where TAgent : WebApiAgentBase
     {
         private readonly ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();
@@ -967,7 +967,7 @@ namespace Beef.Test.NUnit
 
             _isExpectCreatedBy = true;
             _changeLogCreatedBy = string.IsNullOrEmpty(createdby) ? Username : createdby;
-            _changeLogCreatedDate = createdDateGreaterThan ?? (DateTime?)DateTime.Now.Subtract(new TimeSpan(0, 0, 1));
+            _changeLogCreatedDate = createdDateGreaterThan ?? (DateTime?)Cleaner.Clean(DateTime.Now.Subtract(new TimeSpan(0, 0, 1)));
             _comparisonConfig.MembersToIgnore.AddRange(new string[] { "ChangeLog" });
             return this;
         }
@@ -984,7 +984,7 @@ namespace Beef.Test.NUnit
 
             _isExpectUpdatedBy = true;
             _changeLogUpdatedBy = string.IsNullOrEmpty(updatedby) ? Username : updatedby;
-            _changeLogUpdatedDate = updatedDateGreaterThan ?? (DateTime?)DateTime.Now.Subtract(new TimeSpan(0, 0, 1));
+            _changeLogUpdatedDate = updatedDateGreaterThan ?? (DateTime?)Cleaner.Clean(DateTime.Now.Subtract(new TimeSpan(0, 0, 1)));
             _comparisonConfig.MembersToIgnore.AddRange(new string[] { "ChangeLog" });
             return this;
         }

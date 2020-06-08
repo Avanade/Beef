@@ -12,6 +12,8 @@ namespace Beef.Entities
     /// of time-zones to ensure that the correct values are passed.</remarks>
     public enum DateTimeTransform
     {
+        /// <summary>Indicates that the <see cref="Cleaner.DefaultDateTimeTransform"/> value should be used.</summary>
+        UseDefault,
         /// <summary>No transform required; the <see cref="DateTime"/> value will be updated as-is.</summary>
         None,
         /// <summary>A <b>DateOnly</b> transform is required; the <see cref="DateTime"/> value will be updated with the <see cref="DateTime.Date"/> only

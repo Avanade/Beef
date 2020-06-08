@@ -87,7 +87,7 @@ namespace Beef.Core.UnitTest.Entities
         {
             return new Task(() =>
             {
-                var now = DateTime.Now;
+                var now = Cleaner.Clean(DateTime.Now);
                 a.Id = now.Ticks;
                 a.Text = now.ToLongDateString();
                 a.Now = now;

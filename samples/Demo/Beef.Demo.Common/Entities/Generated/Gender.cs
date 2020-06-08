@@ -38,7 +38,7 @@ namespace Beef.Demo.Common.Entities
         public string? AlternateName
         {
             get => _alternateName;
-            set => SetValue(ref _alternateName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AlternateName)); 
+            set => SetValue(ref _alternateName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AlternateName)); 
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Beef.Demo.Common.Entities
         public string? TripCode
         {
             get => GetMapping<string>(nameof(TripCode));
-            set { var __tripCode = GetMapping<string>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.End, StringTransform.EmptyToNull, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
+            set { var __tripCode = GetMapping<string>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
         }
 
         #endregion
@@ -127,7 +127,7 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            AlternateName = Cleaner.Clean(AlternateName, StringTrim.End, StringTransform.EmptyToNull);
+            AlternateName = Cleaner.Clean(AlternateName, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

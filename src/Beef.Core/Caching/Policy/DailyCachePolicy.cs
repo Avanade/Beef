@@ -63,7 +63,7 @@ namespace Beef.Caching.Policy
         {
             get
             {
-                DateTime now = DateTime.Now;
+                DateTime now = Entities.Cleaner.Clean(DateTime.Now);
                 if (Expiry != null && now <= Expiry)
                     return false;
 
@@ -106,7 +106,7 @@ namespace Beef.Caching.Policy
             Hits = 0;
 
             // Where the expiry is not set then set.
-            DateTime now = DateTime.Now;
+            DateTime now = Entities.Cleaner.Clean(DateTime.Now);
             if (Expiry == null)
             {
                 DateTime time = now.Date;

@@ -57,7 +57,7 @@ namespace Beef.Demo.Common.Entities
         public string? ModelNo
         {
             get => _modelNo;
-            set => SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ModelNo)); 
+            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo)); 
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo
         {
             get => _serialNo;
-            set => SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SerialNo)); 
+            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo)); 
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Beef.Demo.Common.Entities
         public string? ETag
         {
             get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag)); 
+            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag)); 
         }
 
         /// <summary>
@@ -331,11 +331,11 @@ namespace Beef.Demo.Common.Entities
         {
             base.CleanUp();
             Id = Cleaner.Clean(Id);
-            ModelNo = Cleaner.Clean(ModelNo, StringTrim.End, StringTransform.EmptyToNull);
-            SerialNo = Cleaner.Clean(SerialNo, StringTrim.End, StringTransform.EmptyToNull);
+            ModelNo = Cleaner.Clean(ModelNo, StringTrim.UseDefault, StringTransform.UseDefault);
+            SerialNo = Cleaner.Clean(SerialNo, StringTrim.UseDefault, StringTransform.UseDefault);
             EyeColorSid = Cleaner.Clean(EyeColorSid);
             PowerSourceSid = Cleaner.Clean(PowerSourceSid);
-            ETag = Cleaner.Clean(ETag, StringTrim.End, StringTransform.EmptyToNull);
+            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
             ChangeLog = Cleaner.Clean(ChangeLog);
 
             OnAfterCleanUp();

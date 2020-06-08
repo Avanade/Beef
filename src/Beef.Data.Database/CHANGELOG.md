@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Enhancement:* `DatabaseBase.DefaultDateTimeKind` replaced with (_breaking change_) `DatabaseBase.DateTimeTransform`, and defaults to `UseDefault`.
+- *Enhancement:* `DatabaseRecord.GetValue` updated to use `Cleaner.Clean` when retrieving a `DateTime` value.
+- *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)` to ensure the value is set as configured by default.
+
 ## v3.1.5
 - *Fixed:* `DatabaseRecord.GetValue` changed to use the underlying type of nullable types for `IsEnum` checking and parsing.
 

@@ -40,7 +40,7 @@ namespace Beef.Demo.Common.Entities
         public string? ModelNo
         {
             get => _modelNo;
-            set => SetValue(ref _modelNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ModelNo)); 
+            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo)); 
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo
         {
             get => _serialNo;
-            set => SetValue(ref _serialNo, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SerialNo)); 
+            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo)); 
         }
 
         /// <summary>
@@ -193,8 +193,8 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            ModelNo = Cleaner.Clean(ModelNo, StringTrim.End, StringTransform.EmptyToNull);
-            SerialNo = Cleaner.Clean(SerialNo, StringTrim.End, StringTransform.EmptyToNull);
+            ModelNo = Cleaner.Clean(ModelNo, StringTrim.UseDefault, StringTransform.UseDefault);
+            SerialNo = Cleaner.Clean(SerialNo, StringTrim.UseDefault, StringTransform.UseDefault);
             PowerSourcesSids = Cleaner.Clean(PowerSourcesSids);
 
             OnAfterCleanUp();

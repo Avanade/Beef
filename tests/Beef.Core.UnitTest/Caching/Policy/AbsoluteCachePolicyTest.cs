@@ -16,7 +16,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
             var acp = new AbsoluteCachePolicy { Duration = new TimeSpan(0, 0, 1) };
 
             acp.Reset();
-            Assert.IsTrue(acp.Expiry <= DateTime.Now.AddMilliseconds(1000));
+            Assert.IsTrue(acp.Expiry <= Beef.Entities.Cleaner.Clean(DateTime.Now).AddMilliseconds(1000));
 
             Assert.IsFalse(((ICachePolicy)acp).HasExpired());
             Assert.IsFalse(acp.IsExpired);
@@ -31,13 +31,13 @@ namespace Beef.Core.UnitTest.Caching.Policy
             Assert.IsTrue(acp.IsExpired);
 
             acp.Reset();
-            Assert.IsTrue(acp.Expiry <= DateTime.Now.AddMilliseconds(1000));
+            Assert.IsTrue(acp.Expiry <= Beef.Entities.Cleaner.Clean(DateTime.Now).AddMilliseconds(1000));
         }
 
         [Test]
         public void Setup_WithRandomizer()
         {
-            var now = DateTime.Now;
+            var now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             var acp = new AbsoluteCachePolicy { Duration = new TimeSpan(0, 1, 0), RandomizerOffset = new TimeSpan(0, 30, 0) };
             acp.Reset();
 
