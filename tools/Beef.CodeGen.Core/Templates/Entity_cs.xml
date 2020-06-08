@@ -407,7 +407,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
               <Else><![CDATA[true]]></Else>
             </If>
             <If Condition="Property.RefDataType == 'string'">
-              <Then><![CDATA[, StringTrim.End, StringTransform.EmptyToNull]]></Then>
+              <Then><![CDATA[, StringTrim.UseDefault, StringTransform.UseDefault]]></Then>
               <Else><![CDATA[, false]]></Else>
             </If>
           </Else>

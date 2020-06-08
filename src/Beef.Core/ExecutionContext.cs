@@ -29,7 +29,7 @@ namespace Beef
         private string? _partitionKey;
         private string? _correlationId;
         private string? _sessionCorrelationId;
-        private DateTime _timestamp = DateTime.Now;
+        private DateTime _timestamp = Cleaner.Clean(DateTime.Now);
         private bool _timestampChanged;
         private PagingArgs? _pagingArgs;
         private KeyOnlyDictionary<string>? _roles;
@@ -291,7 +291,7 @@ namespace Beef
                 if (_timestampChanged && value != _timestamp)
                     throw new ArgumentException(ImmutableText);
 
-                _timestamp = value;
+                _timestamp = Cleaner.Clean(value);
                 _timestampChanged = true;
             }
         }

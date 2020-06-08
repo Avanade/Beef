@@ -83,7 +83,7 @@ namespace Beef.Data.Database
 
             object dbVal = DataRecord.GetValue(index);
             if (dbVal is DateTime)
-                dbVal = DateTime.SpecifyKind((DateTime)dbVal, DatabaseCommand.Database.DefaultDateTimeKind);
+                dbVal = Cleaner.Clean((DateTime)dbVal, DatabaseCommand.Database.DateTimeTransform);
 
             if (dbVal is DBNull)
                 return default!;

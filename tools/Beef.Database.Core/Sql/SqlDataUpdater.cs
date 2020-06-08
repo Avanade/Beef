@@ -19,7 +19,7 @@ namespace Beef.Database.Core.Sql
     /// </summary>
     public class SqlDataUpdater
     {
-        internal static readonly DateTime DateTimeNow = DateTime.Now;
+        internal static readonly DateTime DateTimeNow = Entities.Cleaner.Clean(DateTime.Now);
         internal const string DateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fff";
 
         private readonly JObject _json;

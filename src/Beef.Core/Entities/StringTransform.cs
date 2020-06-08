@@ -9,6 +9,8 @@ namespace Beef.Entities
     /// </summary>
     public enum StringTransform
     {
+        /// <summary>Indicates that the <see cref="Cleaner.DefaultStringTransform"/> value should be used.</summary>
+        UseDefault,
         /// <summary>No transform required; the <see cref="String"/> value will remain as-is.</summary>
         None,
         /// <summary>The string will be transformed from a <c>null</c> to <see cref="String.Empty"/> value.</summary>

@@ -53,7 +53,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Cdr.Banking.Common.Entities
         public string? AccountId
         {
             get => _accountId;
-            set => SetValue(ref _accountId, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AccountId)); 
+            set => SetValue(ref _accountId, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountId)); 
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description)); 
+            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description)); 
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Cdr.Banking.Common.Entities
         public DateTime PostingDateTime
         {
             get => _postingDateTime;
-            set => SetValue(ref _postingDateTime, value, false, DateTimeTransform.DateTimeLocal, nameof(PostingDateTime)); 
+            set => SetValue(ref _postingDateTime, value, false, DateTimeTransform.UseDefault, nameof(PostingDateTime)); 
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Cdr.Banking.Common.Entities
         public DateTime ExecutionDateTime
         {
             get => _executionDateTime;
-            set => SetValue(ref _executionDateTime, value, false, DateTimeTransform.DateTimeLocal, nameof(ExecutionDateTime)); 
+            set => SetValue(ref _executionDateTime, value, false, DateTimeTransform.UseDefault, nameof(ExecutionDateTime)); 
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Reference
         {
             get => _reference;
-            set => SetValue(ref _reference, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Reference)); 
+            set => SetValue(ref _reference, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Reference)); 
         }
 
         /// <summary>
@@ -198,7 +198,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MerchantName
         {
             get => _merchantName;
-            set => SetValue(ref _merchantName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MerchantName)); 
+            set => SetValue(ref _merchantName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantName)); 
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MerchantCategoryCode
         {
             get => _merchantCategoryCode;
-            set => SetValue(ref _merchantCategoryCode, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MerchantCategoryCode)); 
+            set => SetValue(ref _merchantCategoryCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantCategoryCode)); 
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BillerCode
         {
             get => _billerCode;
-            set => SetValue(ref _billerCode, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(BillerCode)); 
+            set => SetValue(ref _billerCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerCode)); 
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BillerName
         {
             get => _billerName;
-            set => SetValue(ref _billerName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(BillerName)); 
+            set => SetValue(ref _billerName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerName)); 
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace Cdr.Banking.Common.Entities
         public string? ApcaNumber
         {
             get => _apcaNumber;
-            set => SetValue(ref _apcaNumber, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ApcaNumber)); 
+            set => SetValue(ref _apcaNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ApcaNumber)); 
         }
 
         #endregion
@@ -430,22 +430,22 @@ namespace Cdr.Banking.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Id = Cleaner.Clean(Id, StringTrim.End, StringTransform.EmptyToNull);
-            AccountId = Cleaner.Clean(AccountId, StringTrim.End, StringTransform.EmptyToNull);
+            Id = Cleaner.Clean(Id, StringTrim.UseDefault, StringTransform.UseDefault);
+            AccountId = Cleaner.Clean(AccountId, StringTrim.UseDefault, StringTransform.UseDefault);
             IsDetailAvailable = Cleaner.Clean(IsDetailAvailable);
             TypeSid = Cleaner.Clean(TypeSid);
             StatusSid = Cleaner.Clean(StatusSid);
-            Description = Cleaner.Clean(Description, StringTrim.End, StringTransform.EmptyToNull);
-            PostingDateTime = Cleaner.Clean(PostingDateTime, DateTimeTransform.DateTimeLocal);
-            ExecutionDateTime = Cleaner.Clean(ExecutionDateTime, DateTimeTransform.DateTimeLocal);
+            Description = Cleaner.Clean(Description, StringTrim.UseDefault, StringTransform.UseDefault);
+            PostingDateTime = Cleaner.Clean(PostingDateTime, DateTimeTransform.UseDefault);
+            ExecutionDateTime = Cleaner.Clean(ExecutionDateTime, DateTimeTransform.UseDefault);
             Amount = Cleaner.Clean(Amount);
-            Currency = Cleaner.Clean(Currency, StringTrim.End, StringTransform.EmptyToNull);
-            Reference = Cleaner.Clean(Reference, StringTrim.End, StringTransform.EmptyToNull);
-            MerchantName = Cleaner.Clean(MerchantName, StringTrim.End, StringTransform.EmptyToNull);
-            MerchantCategoryCode = Cleaner.Clean(MerchantCategoryCode, StringTrim.End, StringTransform.EmptyToNull);
-            BillerCode = Cleaner.Clean(BillerCode, StringTrim.End, StringTransform.EmptyToNull);
-            BillerName = Cleaner.Clean(BillerName, StringTrim.End, StringTransform.EmptyToNull);
-            ApcaNumber = Cleaner.Clean(ApcaNumber, StringTrim.End, StringTransform.EmptyToNull);
+            Currency = Cleaner.Clean(Currency, StringTrim.UseDefault, StringTransform.UseDefault);
+            Reference = Cleaner.Clean(Reference, StringTrim.UseDefault, StringTransform.UseDefault);
+            MerchantName = Cleaner.Clean(MerchantName, StringTrim.UseDefault, StringTransform.UseDefault);
+            MerchantCategoryCode = Cleaner.Clean(MerchantCategoryCode, StringTrim.UseDefault, StringTransform.UseDefault);
+            BillerCode = Cleaner.Clean(BillerCode, StringTrim.UseDefault, StringTransform.UseDefault);
+            BillerName = Cleaner.Clean(BillerName, StringTrim.UseDefault, StringTransform.UseDefault);
+            ApcaNumber = Cleaner.Clean(ApcaNumber, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

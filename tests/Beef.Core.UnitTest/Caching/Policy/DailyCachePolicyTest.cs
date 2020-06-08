@@ -12,19 +12,19 @@ namespace Beef.Core.UnitTest.Caching.Policy
         [Test]
         public void Setup()
         {
-            var now = DateTime.Now;
+            var now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             var dcp = new DailyCachePolicy { Duration = new TimeSpan(1, 0, 0) };
             dcp.Reset();
             var dt = now.Date.AddHours(now.Hour + 1);
             Assert.AreEqual(dt, dcp.Expiry);
 
-            now = DateTime.Now;
+            now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             dcp = new DailyCachePolicy { Duration = new TimeSpan(4, 0, 0) };
             dcp.Reset();
             dt = now.Date.AddHours(now.Hour + 4 - (now.Hour % 4));
             Assert.AreEqual(dt, dcp.Expiry);
 
-            now = DateTime.Now;
+            now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             dcp = new DailyCachePolicy { Duration = new TimeSpan(24, 0, 0) };
             dcp.Reset();
             Assert.AreEqual(now.Date.AddDays(1), dcp.Expiry);
@@ -33,7 +33,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
         [Test]
         public void Setup_WithRandomizer()
         {
-            var now = DateTime.Now;
+            var now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             var dcp = new DailyCachePolicy { Duration = new TimeSpan(1, 0, 0), RandomizerOffset = new TimeSpan(0, 30, 0) };
             dcp.Reset();
 

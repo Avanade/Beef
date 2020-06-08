@@ -42,9 +42,9 @@ namespace Beef.CodeGen.Loaders
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
 
-            config.AttributeAdd("StringTrim", "End");
-            config.AttributeAdd("StringTransform", "EmptyToNull");
-            config.AttributeAdd("DateTimeTransform", "DateTimeLocal");
+            config.AttributeAdd("StringTrim", "UseDefault");
+            config.AttributeAdd("StringTransform", "UseDefault");
+            config.AttributeAdd("DateTimeTransform", "UseDefault");
             config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
             config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("DisplayName", GenerateDisplayName(config));
@@ -57,7 +57,7 @@ namespace Beef.CodeGen.Loaders
         /// <summary>
         /// Generates the display name (checks for Id and handles specifically).
         /// </summary>
-        private string GenerateDisplayName(CodeGenConfig config)
+        private static string GenerateDisplayName(CodeGenConfig config)
         {
             var dn = CodeGenerator.ToSentenceCase(config.Attributes["Name"])!;
             var parts = dn.Split(' ');

@@ -142,7 +142,7 @@ namespace Beef.Entities
         public string? Text
         {
             get { return _text; }
-            set { SetValue(ref _text, value, false, false, nameof(Text)); }
+            set { SetValue(ref _text, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Text)); }
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Beef.Entities
         public string? Property
         {
             get { return _property; }
-            set { SetValue(ref _property, value, false, false, nameof(Property)); }
+            set { SetValue(ref _property, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Property)); }
         }
 
         /// <summary>

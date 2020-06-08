@@ -50,7 +50,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
         }
 
         #endregion
@@ -168,7 +168,7 @@ namespace Cdr.Banking.Common.Entities
         {
             base.CleanUp();
             Amount = Cleaner.Clean(Amount);
-            Currency = Cleaner.Clean(Currency, StringTrim.End, StringTransform.EmptyToNull);
+            Currency = Cleaner.Clean(Currency, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

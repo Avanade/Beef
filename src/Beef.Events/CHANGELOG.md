@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.4
+- *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)`.
+
 ## v3.1.3
 - *Enhancement:* The `EventSubscriberHost` has been futher extended to support `InvalidEventData()`. This occurs where the `EventData` is not considered valid, or the `Value` is unable to be deserialized.
 - *Fixed:* The `ResilientEventHubProcessor` was not always catching and actioning the internal `EventSubscriberStopException`.

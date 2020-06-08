@@ -7,6 +7,8 @@ namespace Beef.Entities
     /// </summary>
     public enum StringTrim
     {
+        /// <summary>Indicates that the <see cref="Cleaner.DefaultStringTrim"/> value should be used.</summary>
+        UseDefault,
         /// <summary>The string is left unchanged.</summary>
         None,
         /// <summary>Removes all occurences of white space characters from the beginning and ending of a string.</summary>

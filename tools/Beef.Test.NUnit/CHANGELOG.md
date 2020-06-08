@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.7
+- *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
+
 ## v3.1.6
 - *Enhancement:* The `TestEventSubscriberHost` updated to reuse the `ExecutionContext.Current` for the test.
 - *Enhancement:* Added additional capability around invalid event data (`SubscriberStatus.InvalidEventData`) conversion and auditing/logging.

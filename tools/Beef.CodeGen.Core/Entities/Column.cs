@@ -69,6 +69,7 @@ namespace Beef.CodeGen.Entities
                 case "DATE":
                 case "DATETIME":
                 case "DATETIME2":
+                case "DATETIMEOFFSET":
                     return true;
 
                 default:

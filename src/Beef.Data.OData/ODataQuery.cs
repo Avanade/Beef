@@ -68,7 +68,7 @@ namespace Beef.Data.OData
         /// <returns>The single item.</returns>
         public T SelectSingle()
         {
-            return _odata.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(2).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.Single();
@@ -81,7 +81,7 @@ namespace Beef.Data.OData
         /// <returns>The single item or default.</returns>
         public T SelectSingleOrDefault()
         {
-            return _odata.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(2).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.SingleOrDefault();
@@ -94,7 +94,7 @@ namespace Beef.Data.OData
         /// <returns>The first item.</returns>
         public T SelectFirst()
         {
-            return _odata.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(1).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.First();
@@ -107,7 +107,7 @@ namespace Beef.Data.OData
         /// <returns>The single item or default.</returns>
         public T SelectFirstOrDefault()
         {
-            return _odata.GetValue(QueryArgs, ExecuteQuery(q =>
+            return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
                 var coll = q.Skip(0).Top(1).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.FirstOrDefault();
@@ -152,7 +152,7 @@ namespace Beef.Data.OData
 
                 foreach (var item in q.FindEntriesAsync(ann).GetAwaiter().GetResult())
                 {
-                    coll.Add(_odata.GetValue(QueryArgs, item));
+                    coll.Add(ODataBase.GetValue(QueryArgs, item));
                 }
 
                 if (ann != null)

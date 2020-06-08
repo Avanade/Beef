@@ -60,7 +60,7 @@ namespace Beef.Demo.Common.Entities
         public string? FirstName
         {
             get => _firstName;
-            set => SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(FirstName)); 
+            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName)); 
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Beef.Demo.Common.Entities
         public string? LastName
         {
             get => _lastName;
-            set => SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(LastName)); 
+            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName)); 
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Beef.Demo.Common.Entities
         public string? UniqueCode
         {
             get => _uniqueCode;
-            set => SetValue(ref _uniqueCode, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(UniqueCode)); 
+            set => SetValue(ref _uniqueCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(UniqueCode)); 
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace Beef.Demo.Common.Entities
         public string? ETag
         {
             get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag)); 
+            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag)); 
         }
 
         /// <summary>
@@ -379,14 +379,14 @@ namespace Beef.Demo.Common.Entities
         {
             base.CleanUp();
             Id = Cleaner.Clean(Id);
-            FirstName = Cleaner.Clean(FirstName, StringTrim.End, StringTransform.EmptyToNull);
-            LastName = Cleaner.Clean(LastName, StringTrim.End, StringTransform.EmptyToNull);
-            UniqueCode = Cleaner.Clean(UniqueCode, StringTrim.End, StringTransform.EmptyToNull);
+            FirstName = Cleaner.Clean(FirstName, StringTrim.UseDefault, StringTransform.UseDefault);
+            LastName = Cleaner.Clean(LastName, StringTrim.UseDefault, StringTransform.UseDefault);
+            UniqueCode = Cleaner.Clean(UniqueCode, StringTrim.UseDefault, StringTransform.UseDefault);
             GenderSid = Cleaner.Clean(GenderSid);
             EyeColorSid = Cleaner.Clean(EyeColorSid);
             Birthday = Cleaner.Clean(Birthday, DateTimeTransform.DateOnly);
             Address = Cleaner.Clean(Address);
-            ETag = Cleaner.Clean(ETag, StringTrim.End, StringTransform.EmptyToNull);
+            ETag = Cleaner.Clean(ETag, StringTrim.UseDefault, StringTransform.UseDefault);
             ChangeLog = Cleaner.Clean(ChangeLog);
 
             OnAfterCleanUp();

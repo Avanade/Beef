@@ -63,7 +63,7 @@ namespace Cdr.Banking.Common.Entities
         public string? PaymentCurrency
         {
             get => _paymentCurrency;
-            set => SetValue(ref _paymentCurrency, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(PaymentCurrency)); 
+            set => SetValue(ref _paymentCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PaymentCurrency)); 
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Cdr.Banking.Common.Entities
             base.CleanUp();
             MinPaymentAmount = Cleaner.Clean(MinPaymentAmount);
             PaymentDueAmount = Cleaner.Clean(PaymentDueAmount);
-            PaymentCurrency = Cleaner.Clean(PaymentCurrency, StringTrim.End, StringTransform.EmptyToNull);
+            PaymentCurrency = Cleaner.Clean(PaymentCurrency, StringTrim.UseDefault, StringTransform.UseDefault);
             PaymentDueDate = Cleaner.Clean(PaymentDueDate, DateTimeTransform.DateOnly);
 
             OnAfterCleanUp();

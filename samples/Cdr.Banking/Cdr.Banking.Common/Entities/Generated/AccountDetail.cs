@@ -43,7 +43,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Bsb
         {
             get => _bsb;
-            set => SetValue(ref _bsb, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Bsb)); 
+            set => SetValue(ref _bsb, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Bsb)); 
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Cdr.Banking.Common.Entities
         public string? AccountNumber
         {
             get => _accountNumber;
-            set => SetValue(ref _accountNumber, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(AccountNumber)); 
+            set => SetValue(ref _accountNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountNumber)); 
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BundleName
         {
             get => _bundleName;
-            set => SetValue(ref _bundleName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(BundleName)); 
+            set => SetValue(ref _bundleName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BundleName)); 
         }
 
         /// <summary>
@@ -263,9 +263,9 @@ namespace Cdr.Banking.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            Bsb = Cleaner.Clean(Bsb, StringTrim.End, StringTransform.EmptyToNull);
-            AccountNumber = Cleaner.Clean(AccountNumber, StringTrim.End, StringTransform.EmptyToNull);
-            BundleName = Cleaner.Clean(BundleName, StringTrim.End, StringTransform.EmptyToNull);
+            Bsb = Cleaner.Clean(Bsb, StringTrim.UseDefault, StringTransform.UseDefault);
+            AccountNumber = Cleaner.Clean(AccountNumber, StringTrim.UseDefault, StringTransform.UseDefault);
+            BundleName = Cleaner.Clean(BundleName, StringTrim.UseDefault, StringTransform.UseDefault);
             SpecificAccountUTypeSid = Cleaner.Clean(SpecificAccountUTypeSid);
             TermDeposit = Cleaner.Clean(TermDeposit);
             CreditCard = Cleaner.Clean(CreditCard);

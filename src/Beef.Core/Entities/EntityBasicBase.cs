@@ -156,12 +156,13 @@ namespace Beef.Entities
             {
                 // Check and see if the value has changed or not; exit if being set to same value.
                 var isChanged = true;
+                T val = Cleaner.Clean(setValue);
                 if (propertyValue is IComparable<T>)
                 {
-                    if (Comparer<T>.Default.Compare(setValue, propertyValue) == 0)
+                    if (Comparer<T>.Default.Compare(val, propertyValue) == 0)
                         isChanged = false;
                 }
-                else if (Equals(propertyValue, setValue))
+                else if (Equals(propertyValue, val))
                     isChanged = false;
 
                 if (!isChanged && !RaisePropertyChangedWhenSame)
@@ -178,11 +179,11 @@ namespace Beef.Entities
                 // Handle on before property changed.
                 if (beforeChange != null)
                 {
-                    if (beforeChange.Invoke(setValue))
+                    if (beforeChange.Invoke(val))
                         return false;
                 }
 
-                if (OnBeforePropertyChanged(propertyNames[0], setValue))
+                if (OnBeforePropertyChanged(propertyNames[0], val))
                     return false;
 
                 // Determine bubbling and unwire old value.
@@ -195,17 +196,17 @@ namespace Beef.Entities
                 }
 
                 // Track changes for the new value where parent (this) is tracking.
-                if (this is IChangeTrackingLogging ct && ct.IsChangeTracking && setValue is IChangeTrackingLogging sct && !sct.IsChangeTracking)
+                if (this is IChangeTrackingLogging ct && ct.IsChangeTracking && val is IChangeTrackingLogging sct && !sct.IsChangeTracking)
                     sct.TrackChanges();
 
                 // Update the property and trigger the property changed.
-                propertyValue = setValue;
+                propertyValue = val;
                 TriggerPropertyChanged(propertyNames);
 
                 // Determine bubbling and wire up new value.
-                if (bubblePropertyChanged && setValue != null)
+                if (bubblePropertyChanged && val != null)
                 {
-                    npc = setValue as INotifyPropertyChanged;
+                    npc = val as INotifyPropertyChanged;
                     if (npc != null)
                         npc.PropertyChanged += GetValue_PropertyChanged(propertyNames);
                 }
@@ -252,15 +253,15 @@ namespace Beef.Entities
         /// <param name="propertyValue">The property value to set.</param>
         /// <param name="setValue">The value to set.</param>
         /// <param name="immutable">Indicates whether the value is immutable; can not be changed once set.</param>
-        /// <param name="trim">The <see cref="StringTrim"/> (defaults to <see cref="StringTrim.End"/>).</param>
-        /// <param name="transform">The <see cref="StringTransform"/> (defaults to <see cref="StringTransform.EmptyToNull"/>).</param>
+        /// <param name="trim">The <see cref="StringTrim"/> (defaults to <see cref="StringTrim.UseDefault"/>).</param>
+        /// <param name="transform">The <see cref="StringTransform"/> (defaults to <see cref="StringTransform.UseDefault"/>).</param>
         /// <param name="beforeChange">Function to invoke before changing the value; a result of <c>true</c> indicates that the property change is to be cancelled; otherwise, <c>false</c>.</param>
         /// <param name="propertyNames">The names of the properties that changed.</param>
         /// <returns><c>true</c> indicates that the property value changed; otherwise, <c>false</c>.</returns>
         /// <remarks>The first property name specified (see <paramref name="propertyNames"/>) is the primary property; therefore, the only property
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
-        protected bool SetValue(ref string? propertyValue, string? setValue, bool immutable = false, StringTrim trim = StringTrim.End, StringTransform transform = StringTransform.EmptyToNull, Func<string?, bool>? beforeChange = null, params string[] propertyNames)
+        protected bool SetValue(ref string? propertyValue, string? setValue, bool immutable = false, StringTrim trim = StringTrim.UseDefault, StringTransform transform = StringTransform.UseDefault, Func<string?, bool>? beforeChange = null, params string[] propertyNames)
         {
             ValidateSetValuePropertyNames(propertyNames);
 
@@ -299,13 +300,13 @@ namespace Beef.Entities
         /// <param name="propertyValue">The property value to set.</param>
         /// <param name="setValue">The value to set.</param>
         /// <param name="immutable">Indicates whether the value is immutable; can not be changed once set.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.DateTimeLocal"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <param name="propertyNames">The names of the properties that changed.</param>
         /// <returns><c>true</c> indicates that the property value changed; otherwise, <c>false</c>.</returns>
         /// <remarks>The first property name specified (see <paramref name="propertyNames"/>) is the primary property; therefore, the only property
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
-        protected bool SetValue(ref DateTime propertyValue, DateTime setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.DateTimeLocal, params string[] propertyNames)
+        protected bool SetValue(ref DateTime propertyValue, DateTime setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, params string[] propertyNames)
         {
             return SetValue(ref propertyValue, setValue, immutable, transform, null, propertyNames);
         }
@@ -316,14 +317,14 @@ namespace Beef.Entities
         /// <param name="propertyValue">The property value to set.</param>
         /// <param name="setValue">The value to set.</param>
         /// <param name="immutable">Indicates whether the value is immutable; can not be changed once set.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.DateTimeLocal"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <param name="beforeChange">Function to invoke before changing the value; a result of <c>true</c> indicates that the property change is to be cancelled; otherwise, <c>false</c>.</param>
         /// <param name="propertyNames">The names of the properties that changed.</param>
         /// <returns><c>true</c> indicates that the property value changed; otherwise, <c>false</c>.</returns>
         /// <remarks>The first property name specified (see <paramref name="propertyNames"/>) is the primary property; therefore, the only property
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
-        protected bool SetValue(ref DateTime propertyValue, DateTime setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.DateTimeLocal, Func<DateTime, bool>? beforeChange = null, params string[] propertyNames)
+        protected bool SetValue(ref DateTime propertyValue, DateTime setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, Func<DateTime, bool>? beforeChange = null, params string[] propertyNames)
         {
             ValidateSetValuePropertyNames(propertyNames);
 
@@ -361,13 +362,13 @@ namespace Beef.Entities
         /// <param name="propertyValue">The property value to set.</param>
         /// <param name="setValue">The value to set.</param>
         /// <param name="immutable">Indicates whether the value is immutable; can not be changed once set.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.DateTimeLocal"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <param name="propertyNames">The names of the properties that changed.</param>
         /// <returns><c>true</c> indicates that the property value changed; otherwise, <c>false</c>.</returns>
         /// <remarks>The first property name specified (see <paramref name="propertyNames"/>) is the primary property; therefore, the only property
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
-        protected bool SetValue(ref DateTime? propertyValue, DateTime? setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.DateTimeLocal, params string[] propertyNames)
+        protected bool SetValue(ref DateTime? propertyValue, DateTime? setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, params string[] propertyNames)
         {
             return SetValue(ref propertyValue, setValue, immutable, transform, null!, propertyNames);
         }
@@ -378,14 +379,14 @@ namespace Beef.Entities
         /// <param name="propertyValue">The property value to set.</param>
         /// <param name="setValue">The value to set.</param>
         /// <param name="immutable">Indicates whether the value is immutable; can not be changed once set.</param>
-        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.DateTimeLocal"/>).</param>
+        /// <param name="transform">The <see cref="DateTimeTransform"/> to be applied (defaults to <see cref="DateTimeTransform.UseDefault"/>).</param>
         /// <param name="beforeChange">Function to invoke before changing the value; a result of <c>true</c> indicates that the property change is to be cancelled; otherwise, <c>false</c>.</param>
         /// <param name="propertyNames">The names of the properties that changed.</param>
         /// <returns><c>true</c> indicates that the property value changed; otherwise, <c>false</c>.</returns>
         /// <remarks>The first property name specified (see <paramref name="propertyNames"/>) is the primary property; therefore, the only property
         /// where the <see cref="BeforePropertyChanged"/> event is raised. The additional property names allow for the <see cref="PropertyChanged"/> 
         /// event to be raised for other properties where related versus having to raise seperately.</remarks>
-        protected bool SetValue(ref DateTime? propertyValue, DateTime? setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.DateTimeLocal, Func<DateTime?, bool>? beforeChange = null, params string[] propertyNames)
+        protected bool SetValue(ref DateTime? propertyValue, DateTime? setValue, bool immutable = false, DateTimeTransform transform = DateTimeTransform.UseDefault, Func<DateTime?, bool>? beforeChange = null, params string[] propertyNames)
         {
             ValidateSetValuePropertyNames(propertyNames);
 

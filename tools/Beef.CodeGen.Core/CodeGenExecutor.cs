@@ -198,7 +198,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the configured set of loaders.
         /// </summary>
-        private List<ICodeGenConfigLoader> GetLoaders(XElement xmlScript)
+        private static List<ICodeGenConfigLoader> GetLoaders(XElement xmlScript)
         {
             var loaders = new List<ICodeGenConfigLoader>();
 

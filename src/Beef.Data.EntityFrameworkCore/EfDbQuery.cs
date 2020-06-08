@@ -66,7 +66,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Sets the paging from the <see cref="PagingArgs"/>.
         /// </summary>
-        private IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs? paging)
+        private static IQueryable<TModel> SetPaging(IQueryable<TModel> query, PagingArgs? paging)
         {
             if (paging == null)
                 return query;

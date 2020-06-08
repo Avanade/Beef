@@ -148,7 +148,7 @@ namespace Beef.Events.UnitTest.Triggers
 
         public static EventHubs.EventData CreateEvent(int exceptionCount)
         {
-            var e = new EventHubs.EventData(Encoding.UTF8.GetBytes(DateTime.Now.ToString()));
+            var e = new EventHubs.EventData(Encoding.UTF8.GetBytes(Entities.Cleaner.Clean(DateTime.Now).ToString()));
             e.Properties.Add("ExceptionCount", exceptionCount);
             return e;
         }

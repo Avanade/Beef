@@ -21,7 +21,7 @@ namespace Beef.Yaml
         /// <summary>
         /// Gets or sets the default <see cref="ChangeLog.CreatedDate"/> value.
         /// </summary>
-        public static DateTime DefaultCreatedDate { get; set; } = DateTime.Now;
+        public static DateTime DefaultCreatedDate { get; set; } = Cleaner.Clean(DateTime.Now);
 
         /// <summary>
         /// Gets or sets the default <see cref="ChangeLog.CreatedBy"/> value.

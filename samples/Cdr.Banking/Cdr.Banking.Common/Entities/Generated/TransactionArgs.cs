@@ -43,7 +43,7 @@ namespace Cdr.Banking.Common.Entities
         public DateTime? FromDate
         {
             get => _fromDate;
-            set => SetValue(ref _fromDate, value, false, DateTimeTransform.DateTimeLocal, nameof(FromDate)); 
+            set => SetValue(ref _fromDate, value, false, DateTimeTransform.UseDefault, nameof(FromDate)); 
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Cdr.Banking.Common.Entities
         public DateTime? ToDate
         {
             get => _toDate;
-            set => SetValue(ref _toDate, value, false, DateTimeTransform.DateTimeLocal, nameof(ToDate)); 
+            set => SetValue(ref _toDate, value, false, DateTimeTransform.UseDefault, nameof(ToDate)); 
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Text
         {
             get => _text;
-            set => SetValue(ref _text, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Text)); 
+            set => SetValue(ref _text, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Text)); 
         }
 
         #endregion
@@ -214,11 +214,11 @@ namespace Cdr.Banking.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            FromDate = Cleaner.Clean(FromDate, DateTimeTransform.DateTimeLocal);
-            ToDate = Cleaner.Clean(ToDate, DateTimeTransform.DateTimeLocal);
+            FromDate = Cleaner.Clean(FromDate, DateTimeTransform.UseDefault);
+            ToDate = Cleaner.Clean(ToDate, DateTimeTransform.UseDefault);
             MinAmount = Cleaner.Clean(MinAmount);
             MaxAmount = Cleaner.Clean(MaxAmount);
-            Text = Cleaner.Clean(Text, StringTrim.End, StringTransform.EmptyToNull);
+            Text = Cleaner.Clean(Text, StringTrim.UseDefault, StringTransform.UseDefault);
 
             OnAfterCleanUp();
         }

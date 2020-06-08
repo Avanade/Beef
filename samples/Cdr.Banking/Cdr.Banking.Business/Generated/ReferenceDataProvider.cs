@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Beef;
 using Beef.RefData;
 using Cdr.Banking.Business.DataSvc;
 using Cdr.Banking.Common.Entities;

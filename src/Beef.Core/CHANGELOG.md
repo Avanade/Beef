@@ -2,6 +2,14 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.12
+- *Enhancement:* `DateTimeTransform`, `StringTransform` and `StringTrim` enums have a new `UseDefault` value added.
+- *Enhancement:* `Cleaner` updated to enable default behaviour for the following: `DateTimeTransform`, `StringTransform` and `StringTrim` (replaces existing `const` values).
+- *Enhancement:* `Cleaner.DateTimeTransform` defaults to `DateTimeUtc`.
+- *Enhancement:* `Cleaner.Clean` cleaning of `DateTime` and `string` updated to account for the new enum values.
+- *Enhancement:* `EntityBasicBase.SetValue` overloads (where applicable) have been updated to default to `UseDefault` for the following: `DateTimeTransform`, `StringTransform` and `StringTrim`.
+- *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)` to ensure the value is set as configured by default.
+
 ## v3.1.11
 - *Enhancement:* `Event.PublishAsync()`, `Event.PublishAsync<T>()`, `EventData.Create` and `EventData.Create<T>()` methods have been obsoleted (and will be removed in the future). These have been replaced with `Event.PublishEventAsync()`, `Event.PublishValueEventAsync<T>()`, `EventData.CreateEvent()` and `EventData.CreateValueEvent<T>()`. The `template` and `KeyValuePair` approach has been replaced with C# [string interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated); e.g. `Event.PublishEventAsync($"Company.Entity.{id}", "Delete", id);`. Code-generation should be performed to update the generated codebase to support the new methods and approach.
 - *Enhancement:* Added `Event.EventSubjectPrefix` which when specified will be prepended to all `EventData.Subject` values when created (`EventData.Create*`). 

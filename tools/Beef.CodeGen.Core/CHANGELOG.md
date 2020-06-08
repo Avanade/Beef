@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.13
+- *Enhancement*: `PropertyConfigLoader` updated to default the `DateTimeTransform`, `StringTransform` and `StringTrim` enum selections to the new `UseDefault` value.
+
 ## v3.1.12
 - *Enhancement:* Added `Config.EventSubjectRoot` attribute used by the `DataSvc` code generation that provides the root for the event name by prepending to all event subject names.
 

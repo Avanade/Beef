@@ -48,7 +48,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
         [Test]
         public void Setup_WithRandomizer()
         {
-            var now = DateTime.Now;
+            var now = Beef.Entities.Cleaner.Clean(DateTime.Now);
             var scp = new SlidingCachePolicy { Duration = new TimeSpan(0, 1, 0), RandomizerOffset = new TimeSpan(0, 0, 30) };
             scp.Reset();
 

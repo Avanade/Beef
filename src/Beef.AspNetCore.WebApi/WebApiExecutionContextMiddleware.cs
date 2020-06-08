@@ -29,7 +29,7 @@ namespace Beef.AspNetCore.WebApi
         internal static void DefaultUpdateAction(HttpContext context, ExecutionContext ec)
         {
             ec.Username = context.User.Identity.Name ?? DefaultUsername;
-            ec.Timestamp = DateTime.Now;
+            ec.Timestamp = Entities.Cleaner.Clean(DateTime.Now);
         }
 
         /// <summary>

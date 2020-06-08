@@ -40,7 +40,7 @@ namespace Beef.Demo.Common.Entities
         public string? FirstName
         {
             get => _firstName;
-            set => SetValue(ref _firstName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(FirstName)); 
+            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName)); 
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Beef.Demo.Common.Entities
         public string? LastName
         {
             get => _lastName;
-            set => SetValue(ref _lastName, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(LastName)); 
+            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName)); 
         }
 
         /// <summary>
@@ -193,8 +193,8 @@ namespace Beef.Demo.Common.Entities
         public override void CleanUp()
         {
             base.CleanUp();
-            FirstName = Cleaner.Clean(FirstName, StringTrim.End, StringTransform.EmptyToNull);
-            LastName = Cleaner.Clean(LastName, StringTrim.End, StringTransform.EmptyToNull);
+            FirstName = Cleaner.Clean(FirstName, StringTrim.UseDefault, StringTransform.UseDefault);
+            LastName = Cleaner.Clean(LastName, StringTrim.UseDefault, StringTransform.UseDefault);
             GendersSids = Cleaner.Clean(GendersSids);
 
             OnAfterCleanUp();

@@ -221,7 +221,7 @@ namespace Beef.RefData
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description!, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Description));
+            set => SetValue(ref _description!, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description));
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace Beef.RefData
         public string? ETag
         {
             get => _etag;
-            set => SetValue(ref _etag, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ETag));
+            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
         }
 
         /// <summary>

@@ -214,7 +214,7 @@ namespace Beef.Events
                 Username = ExecutionContext.Current.Username;
             }
             else
-                Timestamp = DateTime.Now;
+                Timestamp = Cleaner.Clean(DateTime.Now);
         }
 
         /// <summary>
