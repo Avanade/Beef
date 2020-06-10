@@ -528,11 +528,13 @@ namespace Beef.Reflection
             return GetJTokenValue(jtoken);
         }
 
+
         /// <summary>
         /// Gets the value from a <see cref="JToken"/>.
         /// </summary>
         /// <param name="jtoken">The <see cref="JToken"/>.</param>
         /// <returns>The value.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Needs to be a non-static as matches interface.")]
         TProperty GetJTokenValue(JToken jtoken)
         {
             return jtoken.ToObject<TProperty>()!;

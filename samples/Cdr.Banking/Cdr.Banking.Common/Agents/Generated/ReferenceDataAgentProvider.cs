@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -65,12 +66,12 @@ namespace Cdr.Banking.Common.Agents
         {
             _agent = new ReferenceDataAgent(httpClient, beforeRequest);
 
-            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => _agent.OpenStatusGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => _agent.ProductCategoryGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => _agent.AccountUTypeGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => _agent.MaturityInstructionsGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => _agent.TransactionTypeGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => _agent.TransactionStatusGetAllAsync().ContinueWith((t) => t.Result.Value)));
+            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => _agent.OpenStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => _agent.ProductCategoryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => _agent.AccountUTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => _agent.MaturityInstructionsGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => _agent.TransactionTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => _agent.TransactionStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
         }
 
         #endregion
@@ -131,8 +132,11 @@ namespace Cdr.Banking.Common.Agents
         /// <returns>The <see cref="IReferenceDataCache"/>.</returns>
         public IReferenceDataCache GetCache(Type type)
         {
-            if (!_cacheDict.ContainsKey(Beef.Check.NotNull(type, nameof(type))))
-                throw new ArgumentException(string.Format("Type {0} does not exist within the ReferenceDataProvider cache.", type.Name));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+        
+            if (!_cacheDict.ContainsKey(type))
+                throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataProvider cache.");
 
             return (IReferenceDataCache)_cacheDict[type];
         }
@@ -180,4 +184,5 @@ namespace Cdr.Banking.Common.Agents
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

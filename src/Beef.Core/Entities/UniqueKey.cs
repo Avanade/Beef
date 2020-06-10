@@ -143,7 +143,7 @@ namespace Beef.Entities
         /// <summary>
         /// Gets the argument value (handles a null value).
         /// </summary>
-        private object GetArgValue(object? arg)
+        private static object GetArgValue(object? arg)
         {
             return arg ?? _nullObject;
         }

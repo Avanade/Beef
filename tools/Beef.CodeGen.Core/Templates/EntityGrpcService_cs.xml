@@ -13,6 +13,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using Beef.Demo.Business;
 using Beef.Grpc;
@@ -259,6 +260,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
         <![CDATA[    }
 }
 
+#pragma warning restore IDE0005
 #nullable restore]]>
       </Entity>
     </Entity>

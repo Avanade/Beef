@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Cdr.Banking.Business.Data
     /// <summary>
     /// Provides the Transaction data access.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TransactionData : ITransactionData
     {
         #region Private
@@ -63,6 +65,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Provides the <see cref="Transaction"/> entity and Cosmos <see cref="Model.Transaction"/> property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Transaction, Model.Transaction, CosmosMapper>
         {
             /// <summary>
@@ -98,4 +101,5 @@ namespace Cdr.Banking.Business.Data
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

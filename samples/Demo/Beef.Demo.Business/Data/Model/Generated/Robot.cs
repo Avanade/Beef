@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -70,4 +72,6 @@ namespace Beef.Demo.Business.Data.Model
     public partial class RobotCollection : List<Robot> { }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

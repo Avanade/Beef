@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -75,7 +77,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is PersonDetail val))
+            if (!(obj is PersonDetail val))
                 return false;
 
             return Equals(val);
@@ -84,17 +86,17 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="PersonDetail"/> is equal to the current <see cref="PersonDetail"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(PersonDetail? value)
+        public bool Equals(PersonDetail? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(History, value.History);
+            return base.Equals((object)obj)
+                && Equals(History, obj.History);
         }
 
         /// <summary>
@@ -144,6 +146,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="PersonDetail"/> to copy from.</param>
         public void CopyFrom(PersonDetail from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((Person)from);
             History = CopyOrClone(from.History, History);
 
@@ -253,6 +258,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="PersonDetailCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="PersonDetailCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator PersonDetailCollection(PersonDetailCollectionResult result) => result?.Result!;
 
         #endregion
@@ -295,4 +301,6 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

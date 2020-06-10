@@ -6,6 +6,7 @@
  */
  
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -113,7 +114,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                 <If Condition="Config.RefDataNamespace != null">
                   <![CDATA[RefDataNamespace.]]>
                 </If>
-                <![CDATA[ReferenceData.Current.PrefetchAsync(names);
+                <![CDATA[ReferenceData.Current.PrefetchAsync(names).ConfigureAwait(false);
 
                 foreach (var q in refSelection)
                 {
@@ -137,5 +138,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore]]>
 </Template>

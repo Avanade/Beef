@@ -196,7 +196,7 @@ namespace Beef.RefData
         /// <summary>
         /// Gets Reference Data <typeparamref name="TItem"/> by the SID.
         /// </summary>
-        private TItem GetItem(object sid)
+        private static TItem GetItem(object sid)
         {
             if (sid == null)
                 return default!;

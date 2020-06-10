@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -147,7 +149,7 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Balance val))
+            if (!(obj is Balance val))
                 return false;
 
             return Equals(val);
@@ -156,23 +158,23 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Balance"/> is equal to the current <see cref="Balance"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Balance? value)
+        public bool Equals(Balance? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(CurrentBalance, value.CurrentBalance)
-                && Equals(AvailableBalance, value.AvailableBalance)
-                && Equals(CreditLimit, value.CreditLimit)
-                && Equals(AmortisedLimit, value.AmortisedLimit)
-                && Equals(Currency, value.Currency)
-                && Equals(Purses, value.Purses);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(CurrentBalance, obj.CurrentBalance)
+                && Equals(AvailableBalance, obj.AvailableBalance)
+                && Equals(CreditLimit, obj.CreditLimit)
+                && Equals(AmortisedLimit, obj.AmortisedLimit)
+                && Equals(Currency, obj.Currency)
+                && Equals(Purses, obj.Purses);
         }
 
         /// <summary>
@@ -228,6 +230,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Balance"/> to copy from.</param>
         public void CopyFrom(Balance from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             CurrentBalance = from.CurrentBalance;
@@ -306,4 +311,6 @@ namespace Cdr.Banking.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

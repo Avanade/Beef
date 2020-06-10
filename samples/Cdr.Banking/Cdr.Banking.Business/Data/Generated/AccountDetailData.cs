@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,14 @@ namespace Cdr.Banking.Business.Data
     /// <summary>
     /// Provides the <see cref="Account"/> Detail data access.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountDetailData
     {
 
         /// <summary>
         /// Provides the <see cref="AccountDetail"/> entity and Cosmos <see cref="Model.Account"/> property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<AccountDetail, Model.Account, CosmosMapper>
         {
             /// <summary>
@@ -56,4 +59,5 @@ namespace Cdr.Banking.Business.Data
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

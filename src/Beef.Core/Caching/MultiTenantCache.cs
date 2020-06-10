@@ -22,7 +22,7 @@ namespace Beef.Caching
         /// <summary>
         /// Gets the tenant identifier from the Execution Context.
         /// </summary>
-        private Guid GetTenantId()
+        private static Guid GetTenantId()
         {
             if (!ExecutionContext.HasCurrent)
                 return Guid.Empty;

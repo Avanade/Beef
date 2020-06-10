@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -89,9 +90,9 @@ namespace Cdr.Banking.Business
                 }
             }
 
-            ExecutionContext.FlowSuppression(ecf =>
+            Beef.ExecutionContext.FlowSuppression(ecf =>
             {
-                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var x = this[type]; });
+                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var __ = this[type]; });
             });
 
             return Task.CompletedTask;
@@ -99,4 +100,5 @@ namespace Cdr.Banking.Business
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -87,7 +89,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is RobotArgs val))
+            if (!(obj is RobotArgs val))
                 return false;
 
             return Equals(val);
@@ -96,19 +98,19 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="RobotArgs"/> is equal to the current <see cref="RobotArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(RobotArgs? value)
+        public bool Equals(RobotArgs? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(ModelNo, value.ModelNo)
-                && Equals(SerialNo, value.SerialNo)
-                && Equals(PowerSourcesSids, value.PowerSourcesSids);
+            return base.Equals((object)obj)
+                && Equals(ModelNo, obj.ModelNo)
+                && Equals(SerialNo, obj.SerialNo)
+                && Equals(PowerSourcesSids, obj.PowerSourcesSids);
         }
 
         /// <summary>
@@ -160,6 +162,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="RobotArgs"/> to copy from.</param>
         public void CopyFrom(RobotArgs from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             ModelNo = from.ModelNo;
             SerialNo = from.SerialNo;
@@ -226,4 +231,6 @@ namespace Beef.Demo.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

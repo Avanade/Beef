@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -105,7 +107,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Product val))
+            if (!(obj is Product val))
                 return false;
 
             return Equals(val);
@@ -114,19 +116,19 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Product"/> is equal to the current <see cref="Product"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Product? value)
+        public bool Equals(Product? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(Name, value.Name)
-                && Equals(Description, value.Description);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(Name, obj.Name)
+                && Equals(Description, obj.Description);
         }
 
         /// <summary>
@@ -178,6 +180,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Product"/> to copy from.</param>
         public void CopyFrom(Product from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             Name = from.Name;
@@ -288,6 +293,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="ProductCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="ProductCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator ProductCollection(ProductCollectionResult result) => result?.Result!;
 
         #endregion
@@ -330,4 +336,6 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

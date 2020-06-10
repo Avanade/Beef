@@ -16,6 +16,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -172,13 +173,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         <Case Value="'Cosmos'">
           <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
           <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
-          <![CDATA[{ {{System.CosmosName}}.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask; }]]>
+          <![CDATA[{ {{System.CosmosName}}.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
         </Case>
         <Default>
-          <![CDATA[await this.{{Entity.Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)]]>
+          <![CDATA[await {{Entity.Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)]]>
         </Default>
       </Switch>
-      <![CDATA[, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+      <![CDATA[, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
 ]]>
       <If Condition="Config.NewLine == true">
         <![CDATA[
@@ -196,7 +197,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Entity Framework {{Entity.EntityFrameworkEntity:ToSeeComments}} property mapping.
         /// </summary>
-        public static EfDbMapper<{{Entity.EntityName}}, {{Entity.EntityFrameworkEntity}}> {{Entity.Name}}Mapper = EfDbMapper.CreateAuto<{{Entity.EntityName}}, {{Entity.EntityFrameworkEntity}}>()
+        public static EfDbMapper<{{Entity.EntityName}}, {{Entity.EntityFrameworkEntity}}> {{Entity.Name}}Mapper => EfDbMapper.CreateAuto<{{Entity.EntityName}}, {{Entity.EntityFrameworkEntity}}>()
             .HasProperty(s => s.Id, d => d.{{Entity.Name}}Id)
             .AddStandardProperties()]]>
     <Property Condition="Property.DataEntityFrameworkIgnore == false">
@@ -277,7 +278,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Cosmos {{Entity.CosmosEntity:ToSeeComments}} property mapping.
         /// </summary>
-        public static CosmosDbMapper<{{Entity.EntityName}}, {{Entity.CosmosEntity}}> {{Entity.Name}}Mapper = CosmosDbMapper.CreateAuto<{{Entity.EntityName}}, {{Entity.CosmosEntity}}>(]]>
+        public static CosmosDbMapper<{{Entity.EntityName}}, {{Entity.CosmosEntity}}> {{Entity.Name}}Mapper => CosmosDbMapper.CreateAuto<{{Entity.EntityName}}, {{Entity.CosmosEntity}}>(]]>
     <Property Condition="Property.RefDataType != null">
       <If Condition="System.Index > 0"><![CDATA[, ]]></If>
       <![CDATA["{{Property.Name}}"]]>
@@ -360,6 +361,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
     <![CDATA[    }
 }
 
+#pragma warning restore IDE0005
 #nullable restore]]>
   </Footer>
 </Template>

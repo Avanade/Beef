@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Beef.Demo.Business.Data
             await DataInvoker.Default.InvokeAsync(this, async () => 
             {
                 await Database.Default.GetRefDataAsync<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(__coll, "[Ref].[spCountryGetAll]", "CountryId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -48,7 +49,7 @@ namespace Beef.Demo.Business.Data
             await DataInvoker.Default.InvokeAsync(this, async () => 
             {
                 await Database.Default.GetRefDataAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(__coll, "[Ref].[spUSStateGetAll]", "USStateId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -67,7 +68,7 @@ namespace Beef.Demo.Business.Data
                     item.AlternateName = dr.GetValue<string>("AlternateName");
                     item.TripCode = dr.GetValue<string>("TripCode");
                 });
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -79,7 +80,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { EfDb.Default.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { EfDb.Default.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -90,7 +91,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -101,24 +102,25 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
         {
             var __coll = new RefDataNamespace.CompanyCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => await this.CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false), BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => await CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false), BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.EyeColor"/> entity and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
         /// </summary>
-        public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper = EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
+        public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper => EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
             .HasProperty(s => s.Id, d => d.EyeColorId)
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.PowerSource"/> entity and Cosmos <see cref="RefDataNamespace.PowerSource"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>()
+        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>()
             .AddStandardProperties()
             .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any));
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore
