@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -91,7 +93,7 @@ namespace Cdr.Banking.Common.Entities
         public string? OpenStatusSid
         {
             get => _openStatusSid;
-            set => SetValue(ref _openStatusSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(OpenStatus));
+            set => SetValue(ref _openStatusSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(OpenStatus));
         }
 
         /// <summary>
@@ -135,7 +137,7 @@ namespace Cdr.Banking.Common.Entities
         public string? ProductCategorySid
         {
             get => _productCategorySid;
-            set => SetValue(ref _productCategorySid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(ProductCategory));
+            set => SetValue(ref _productCategorySid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductCategory));
         }
 
         /// <summary>
@@ -200,7 +202,7 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Account val))
+            if (!(obj is Account val))
                 return false;
 
             return Equals(val);
@@ -209,25 +211,25 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Account"/> is equal to the current <see cref="Account"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Account? value)
+        public bool Equals(Account? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(CreationDate, value.CreationDate)
-                && Equals(DisplayName, value.DisplayName)
-                && Equals(Nickname, value.Nickname)
-                && Equals(OpenStatusSid, value.OpenStatusSid)
-                && Equals(IsOwned, value.IsOwned)
-                && Equals(MaskedNumber, value.MaskedNumber)
-                && Equals(ProductCategorySid, value.ProductCategorySid)
-                && Equals(ProductName, value.ProductName);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(CreationDate, obj.CreationDate)
+                && Equals(DisplayName, obj.DisplayName)
+                && Equals(Nickname, obj.Nickname)
+                && Equals(OpenStatusSid, obj.OpenStatusSid)
+                && Equals(IsOwned, obj.IsOwned)
+                && Equals(MaskedNumber, obj.MaskedNumber)
+                && Equals(ProductCategorySid, obj.ProductCategorySid)
+                && Equals(ProductName, obj.ProductName);
         }
 
         /// <summary>
@@ -285,6 +287,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Account"/> to copy from.</param>
         public void CopyFrom(Account from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             CreationDate = from.CreationDate;
@@ -415,6 +420,7 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="AccountCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="AccountCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator AccountCollection(AccountCollectionResult result) => result?.Result!;
 
         #endregion
@@ -457,4 +463,6 @@ namespace Cdr.Banking.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

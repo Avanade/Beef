@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.13
+- *Fixed:* Corrected warnings identified by FxCop.
+
 ## v3.1.12
 - *Enhancement:* `DateTimeTransform`, `StringTransform` and `StringTrim` enums have a new `UseDefault` value added.
 - *Enhancement:* `Cleaner` updated to enable default behaviour for the following: `DateTimeTransform`, `StringTransform` and `StringTrim` (replaces existing `const` values).

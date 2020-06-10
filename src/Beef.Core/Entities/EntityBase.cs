@@ -104,12 +104,12 @@ namespace Beef.Entities
         public abstract object Clone();
 
         /// <summary>
-        /// Determines whether the specified <paramref name="value"/> is equal to the current instance by comparing the values of all the properties.
+        /// Determines whether the specified <paramref name="obj"/> is equal to the current instance by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         /// <remarks>At the <see cref="EntityBase"/> level no properties are checked therefore assumed always equals; this method is intended to be overridden.</remarks>
-        public override bool Equals(object value) => value != null;
+        public override bool Equals(object obj) => obj != null;
 
         /// <summary>
         /// Returns a hash code for the <see cref="EntityBase"/> (always returns the same value regardless; inheritors should override).

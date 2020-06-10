@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.OpenStatusCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(OpenStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(OpenStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -39,7 +40,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
         {
             var __coll = new RefDataNamespace.ProductCategoryCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(ProductCategoryMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(ProductCategoryMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -50,7 +51,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.AccountUTypeCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(AccountUTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(AccountUTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -61,7 +62,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
         {
             var __coll = new RefDataNamespace.MaturityInstructionsCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(MaturityInstructionsMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(MaturityInstructionsMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -72,7 +73,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionTypeCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(TransactionTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(TransactionTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -83,46 +84,47 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionStatusCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(TransactionStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress);
+            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(TransactionStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.OpenStatus"/> entity and Cosmos <see cref="RefDataNamespace.OpenStatus"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus> OpenStatusMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus>()
+        public static CosmosDbMapper<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus> OpenStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus>()
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.ProductCategory"/> entity and Cosmos <see cref="RefDataNamespace.ProductCategory"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory> ProductCategoryMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory>()
+        public static CosmosDbMapper<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory> ProductCategoryMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory>()
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.AccountUType"/> entity and Cosmos <see cref="RefDataNamespace.AccountUType"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType> AccountUTypeMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType>()
+        public static CosmosDbMapper<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType> AccountUTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType>()
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> entity and Cosmos <see cref="RefDataNamespace.MaturityInstructions"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions> MaturityInstructionsMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions>()
+        public static CosmosDbMapper<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions> MaturityInstructionsMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions>()
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.TransactionType"/> entity and Cosmos <see cref="RefDataNamespace.TransactionType"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType> TransactionTypeMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType>()
+        public static CosmosDbMapper<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType> TransactionTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType>()
             .AddStandardProperties();
 
         /// <summary>
         /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> entity and Cosmos <see cref="RefDataNamespace.TransactionStatus"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus> TransactionStatusMapper = CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus>()
+        public static CosmosDbMapper<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus> TransactionStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus>()
             .AddStandardProperties();
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

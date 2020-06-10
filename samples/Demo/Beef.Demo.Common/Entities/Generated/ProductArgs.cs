@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -64,7 +66,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is ProductArgs val))
+            if (!(obj is ProductArgs val))
                 return false;
 
             return Equals(val);
@@ -73,18 +75,18 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="ProductArgs"/> is equal to the current <see cref="ProductArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProductArgs? value)
+        public bool Equals(ProductArgs? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Name, value.Name)
-                && Equals(Description, value.Description);
+            return base.Equals((object)obj)
+                && Equals(Name, obj.Name)
+                && Equals(Description, obj.Description);
         }
 
         /// <summary>
@@ -135,6 +137,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="ProductArgs"/> to copy from.</param>
         public void CopyFrom(ProductArgs from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Name = from.Name;
             Description = from.Description;
@@ -198,4 +203,6 @@ namespace Beef.Demo.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

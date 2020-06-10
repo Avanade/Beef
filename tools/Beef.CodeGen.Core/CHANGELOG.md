@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.14
+- *Fixed*: Code-gen templates updated to correct warnings identified by FxCop. Where no direct fix, or by intention, these have been explicitly ignored.
+
 ## v3.1.13
 - *Enhancement*: `PropertyConfigLoader` updated to default the `DateTimeTransform`, `StringTransform` and `StringTrim` enum selections to the new `UseDefault` value.
 

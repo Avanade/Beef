@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -87,7 +89,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is PersonArgs val))
+            if (!(obj is PersonArgs val))
                 return false;
 
             return Equals(val);
@@ -96,19 +98,19 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="PersonArgs"/> is equal to the current <see cref="PersonArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(PersonArgs? value)
+        public bool Equals(PersonArgs? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(FirstName, value.FirstName)
-                && Equals(LastName, value.LastName)
-                && Equals(GendersSids, value.GendersSids);
+            return base.Equals((object)obj)
+                && Equals(FirstName, obj.FirstName)
+                && Equals(LastName, obj.LastName)
+                && Equals(GendersSids, obj.GendersSids);
         }
 
         /// <summary>
@@ -160,6 +162,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="PersonArgs"/> to copy from.</param>
         public void CopyFrom(PersonArgs from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             FirstName = from.FirstName;
             LastName = from.LastName;
@@ -226,4 +231,6 @@ namespace Beef.Demo.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

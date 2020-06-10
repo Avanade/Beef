@@ -49,6 +49,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -823,6 +825,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding {{Entity.EntityName:ToSeeComments}}.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{Entity.EntityName}}({{Entity.RefDataType}} id)
         {
             return ConvertFromId<{{Entity.EntityName}}>(id);
@@ -833,11 +836,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding {{Entity.EntityName:ToSeeComments}}.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{Entity.EntityName}}(string? code)
         {
             return ConvertFromCode<{{Entity.EntityName}}>(code);
         }
-        
+
         #endregion
 
 ]]>
@@ -852,7 +856,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is {{Entity.EntityName}} val))
+            if (!(obj is {{Entity.EntityName}} val))
                 return false;
 
             return Equals(val);
@@ -861,16 +865,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// <summary>
         /// Determines whether the specified {{Entity.EntityName:ToSeeComments}} is equal to the current {{Entity.EntityName:ToSeeComments}} by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals({{Entity.EntityName}}? value)
+        public bool Equals({{Entity.EntityName}}? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)]]>
+            return base.Equals((object)obj)]]>
       <Property Condition="Property.Inherited == false">
         <![CDATA[
                 && Equals({{Property.Name}}]]>
@@ -878,7 +882,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
           <![CDATA[Sid]]>
           <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
         </If>
-        <![CDATA[, value.{{Property.Name}}]]>
+        <![CDATA[, obj.{{Property.Name}}]]>
         <If Condition="Property.RefDataType != null">
           <![CDATA[Sid]]>
           <If Condition="Property.RefDataList == true"><![CDATA[s]]></If>
@@ -947,6 +951,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// <param name="from">The {{Entity.EntityName:ToSeeComments}} to copy from.</param>
         public void CopyFrom({{Entity.EntityName}} from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
 ]]>
       <If Condition="System.Inherits != null">
         <![CDATA[            CopyFrom(({{System.Inherits}})from);
@@ -1251,6 +1258,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// </summary>
         /// <param name="result">The {{Entity.EntityCollectionResultName:ToSeeComments}}.</param>
         /// <returns>The corresponding {{Entity.EntityCollectionName:ToSeeComments}}.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{Entity.EntityCollectionName}}({{Entity.EntityCollectionResultName}} result) => result?.Result!;
 
         #endregion
@@ -1307,6 +1315,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
     </If>
     <![CDATA[}
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore]]>
   </Entity>
 </Template>

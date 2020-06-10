@@ -10,6 +10,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync(ReferenceDataFilter? args, WebApiRequestOptions? requestOptions);
+        Task<WebApiAgentResult<{{Entity.EntityCollectionName}}>> {{Entity.Name}}GetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
 ]]>
   </Entity>
@@ -111,5 +112,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore]]>
 </Template>

@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the unique provider name.
         /// </summary>
-        string IReferenceDataProvider.ProviderName => typeof(ReferenceData).FullName;
+        public string ProviderName => typeof(ReferenceData).FullName;
 
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
@@ -48,6 +49,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Logical for type")]
         public abstract IReferenceDataCollection this[Type type] { get; }
 
         /// <summary>
@@ -94,4 +96,5 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

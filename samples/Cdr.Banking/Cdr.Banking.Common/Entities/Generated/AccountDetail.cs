@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -76,7 +78,7 @@ namespace Cdr.Banking.Common.Entities
         public string? SpecificAccountUTypeSid
         {
             get => _specificAccountUTypeSid;
-            set => SetValue(ref _specificAccountUTypeSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(SpecificAccountUType));
+            set => SetValue(ref _specificAccountUTypeSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SpecificAccountUType));
         }
 
         /// <summary>
@@ -148,7 +150,7 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is AccountDetail val))
+            if (!(obj is AccountDetail val))
                 return false;
 
             return Equals(val);
@@ -157,22 +159,22 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(AccountDetail? value)
+        public bool Equals(AccountDetail? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Bsb, value.Bsb)
-                && Equals(AccountNumber, value.AccountNumber)
-                && Equals(BundleName, value.BundleName)
-                && Equals(SpecificAccountUTypeSid, value.SpecificAccountUTypeSid)
-                && Equals(TermDeposit, value.TermDeposit)
-                && Equals(CreditCard, value.CreditCard);
+            return base.Equals((object)obj)
+                && Equals(Bsb, obj.Bsb)
+                && Equals(AccountNumber, obj.AccountNumber)
+                && Equals(BundleName, obj.BundleName)
+                && Equals(SpecificAccountUTypeSid, obj.SpecificAccountUTypeSid)
+                && Equals(TermDeposit, obj.TermDeposit)
+                && Equals(CreditCard, obj.CreditCard);
         }
 
         /// <summary>
@@ -227,6 +229,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="AccountDetail"/> to copy from.</param>
         public void CopyFrom(AccountDetail from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((Account)from);
             Bsb = from.Bsb;
             AccountNumber = from.AccountNumber;
@@ -305,4 +310,6 @@ namespace Cdr.Banking.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

@@ -3,6 +3,7 @@
  */
  
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -126,7 +127,7 @@ namespace Beef.Demo.Api.Controllers
                 var refSelection = this.ReferenceDataSelection();
 
                 var names = refSelection.Select(x => x.Key).ToArray();
-                await RefDataNamespace.ReferenceData.Current.PrefetchAsync(names);
+                await RefDataNamespace.ReferenceData.Current.PrefetchAsync(names).ConfigureAwait(false);
 
                 foreach (var q in refSelection)
                 {
@@ -147,4 +148,5 @@ namespace Beef.Demo.Api.Controllers
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

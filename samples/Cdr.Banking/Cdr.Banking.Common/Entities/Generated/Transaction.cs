@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -86,7 +88,7 @@ namespace Cdr.Banking.Common.Entities
         public string? TypeSid
         {
             get => _typeSid;
-            set => SetValue(ref _typeSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Type));
+            set => SetValue(ref _typeSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Type));
         }
 
         /// <summary>
@@ -108,7 +110,7 @@ namespace Cdr.Banking.Common.Entities
         public string? StatusSid
         {
             get => _statusSid;
-            set => SetValue(ref _statusSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Status));
+            set => SetValue(ref _statusSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Status));
         }
 
         /// <summary>
@@ -285,7 +287,7 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Transaction val))
+            if (!(obj is Transaction val))
                 return false;
 
             return Equals(val);
@@ -294,32 +296,32 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Transaction"/> is equal to the current <see cref="Transaction"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Transaction? value)
+        public bool Equals(Transaction? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(AccountId, value.AccountId)
-                && Equals(IsDetailAvailable, value.IsDetailAvailable)
-                && Equals(TypeSid, value.TypeSid)
-                && Equals(StatusSid, value.StatusSid)
-                && Equals(Description, value.Description)
-                && Equals(PostingDateTime, value.PostingDateTime)
-                && Equals(ExecutionDateTime, value.ExecutionDateTime)
-                && Equals(Amount, value.Amount)
-                && Equals(Currency, value.Currency)
-                && Equals(Reference, value.Reference)
-                && Equals(MerchantName, value.MerchantName)
-                && Equals(MerchantCategoryCode, value.MerchantCategoryCode)
-                && Equals(BillerCode, value.BillerCode)
-                && Equals(BillerName, value.BillerName)
-                && Equals(ApcaNumber, value.ApcaNumber);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(AccountId, obj.AccountId)
+                && Equals(IsDetailAvailable, obj.IsDetailAvailable)
+                && Equals(TypeSid, obj.TypeSid)
+                && Equals(StatusSid, obj.StatusSid)
+                && Equals(Description, obj.Description)
+                && Equals(PostingDateTime, obj.PostingDateTime)
+                && Equals(ExecutionDateTime, obj.ExecutionDateTime)
+                && Equals(Amount, obj.Amount)
+                && Equals(Currency, obj.Currency)
+                && Equals(Reference, obj.Reference)
+                && Equals(MerchantName, obj.MerchantName)
+                && Equals(MerchantCategoryCode, obj.MerchantCategoryCode)
+                && Equals(BillerCode, obj.BillerCode)
+                && Equals(BillerName, obj.BillerName)
+                && Equals(ApcaNumber, obj.ApcaNumber);
         }
 
         /// <summary>
@@ -384,6 +386,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Transaction"/> to copy from.</param>
         public void CopyFrom(Transaction from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             AccountId = from.AccountId;
@@ -535,6 +540,7 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="TransactionCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="TransactionCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator TransactionCollection(TransactionCollectionResult result) => result?.Result!;
 
         #endregion
@@ -577,4 +583,6 @@ namespace Cdr.Banking.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

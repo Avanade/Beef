@@ -45,6 +45,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -118,6 +119,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
     /// <summary>
     /// Provides the {{Entity.Text:ToComments}} data access.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class {{Entity.Name}}Data]]>
       <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
       <If Condition="Entity.OperationCount > 0">
@@ -884,6 +886,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and database property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<{{Entity.EntityName}}, DbMapper>
         {
             /// <summary>
@@ -975,6 +978,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and OData property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class ODataMapper : ODataMapper<{{Entity.EntityName}}, {{Entity.ODataEntity}}, ODataMapper>
         {
             /// <summary>
@@ -1068,6 +1072,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Entity Framework {{Entity.EntityFrameworkEntity:ToSeeComments}} property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<{{Entity.EntityName}}, {{Entity.EntityFrameworkEntity}}, EfMapper>
         {
             /// <summary>
@@ -1164,6 +1169,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         /// <summary>
         /// Provides the {{Entity.EntityName:ToSeeComments}} entity and Cosmos {{Entity.CosmosEntity:ToSeeComments}} property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<{{Entity.EntityName}}, {{Entity.CosmosEntity}}, CosmosMapper>
         {
             /// <summary>
@@ -1261,6 +1267,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
       <![CDATA[    }
 }
 
+#pragma warning restore IDE0005
 #nullable restore]]>
     </Entity>
   </Entity>

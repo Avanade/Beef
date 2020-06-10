@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -65,12 +66,12 @@ namespace Beef.Demo.Common.Agents
         {
             _agent = new ReferenceDataAgent(httpClient, beforeRequest);
 
-            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => _agent.CountryGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value)));
-            _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value)));
+            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => _agent.CountryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+            _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
         }
 
         #endregion
@@ -131,8 +132,11 @@ namespace Beef.Demo.Common.Agents
         /// <returns>The <see cref="IReferenceDataCache"/>.</returns>
         public IReferenceDataCache GetCache(Type type)
         {
-            if (!_cacheDict.ContainsKey(Beef.Check.NotNull(type, nameof(type))))
-                throw new ArgumentException(string.Format("Type {0} does not exist within the ReferenceDataProvider cache.", type.Name));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+        
+            if (!_cacheDict.ContainsKey(type))
+                throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataProvider cache.");
 
             return (IReferenceDataCache)_cacheDict[type];
         }
@@ -180,4 +184,5 @@ namespace Beef.Demo.Common.Agents
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Provides the Person data access.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class PersonData : IPersonData
     {
         #region Private
@@ -404,6 +406,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> entity and database property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<Person, DbMapper>
         {
             /// <summary>
@@ -432,6 +435,7 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> entity and Entity Framework <see cref="EfModel.Person"/> property mapping.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<Person, EfModel.Person, EfMapper>
         {
             /// <summary>
@@ -458,4 +462,5 @@ namespace Beef.Demo.Business.Data
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

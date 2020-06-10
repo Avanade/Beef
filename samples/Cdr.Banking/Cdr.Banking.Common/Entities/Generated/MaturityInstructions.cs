@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,7 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator MaturityInstructions(Guid id)
         {
             return ConvertFromId<MaturityInstructions>(id);
@@ -39,11 +42,12 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator MaturityInstructions(string? code)
         {
             return ConvertFromCode<MaturityInstructions>(code);
         }
-        
+
         #endregion
 
         #region ICopyFrom
@@ -64,6 +68,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="MaturityInstructions"/> to copy from.</param>
         public void CopyFrom(MaturityInstructions from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((ReferenceDataBaseGuid)from);
 
             OnAfterCopyFrom(from);
@@ -147,4 +154,6 @@ namespace Cdr.Banking.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

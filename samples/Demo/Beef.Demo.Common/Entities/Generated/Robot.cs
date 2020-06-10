@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -79,7 +81,7 @@ namespace Beef.Demo.Common.Entities
         public string? EyeColorSid
         {
             get => _eyeColorSid;
-            set => SetValue(ref _eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(EyeColor));
+            set => SetValue(ref _eyeColorSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(EyeColor));
         }
 
         /// <summary>
@@ -107,7 +109,7 @@ namespace Beef.Demo.Common.Entities
         public string? PowerSourceSid
         {
             get => _powerSourceSid;
-            set => SetValue(ref _powerSourceSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(PowerSource));
+            set => SetValue(ref _powerSourceSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PowerSource));
         }
 
         /// <summary>
@@ -212,7 +214,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Robot val))
+            if (!(obj is Robot val))
                 return false;
 
             return Equals(val);
@@ -221,23 +223,23 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Robot"/> is equal to the current <see cref="Robot"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Robot? value)
+        public bool Equals(Robot? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(ModelNo, value.ModelNo)
-                && Equals(SerialNo, value.SerialNo)
-                && Equals(EyeColorSid, value.EyeColorSid)
-                && Equals(PowerSourceSid, value.PowerSourceSid)
-                && Equals(ETag, value.ETag)
-                && Equals(ChangeLog, value.ChangeLog);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(ModelNo, obj.ModelNo)
+                && Equals(SerialNo, obj.SerialNo)
+                && Equals(EyeColorSid, obj.EyeColorSid)
+                && Equals(PowerSourceSid, obj.PowerSourceSid)
+                && Equals(ETag, obj.ETag)
+                && Equals(ChangeLog, obj.ChangeLog);
         }
 
         /// <summary>
@@ -293,6 +295,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Robot"/> to copy from.</param>
         public void CopyFrom(Robot from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             ModelNo = from.ModelNo;
@@ -417,6 +422,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="RobotCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="RobotCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator RobotCollection(RobotCollectionResult result) => result?.Result!;
 
         #endregion
@@ -459,4 +465,6 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

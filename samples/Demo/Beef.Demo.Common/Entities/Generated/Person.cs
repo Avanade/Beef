@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -93,7 +95,7 @@ namespace Beef.Demo.Common.Entities
         public string? GenderSid
         {
             get => _genderSid;
-            set => SetValue(ref _genderSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(Gender));
+            set => SetValue(ref _genderSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Gender));
         }
 
         /// <summary>
@@ -121,7 +123,7 @@ namespace Beef.Demo.Common.Entities
         public string? EyeColorSid
         {
             get => _eyeColorSid;
-            set => SetValue(ref _eyeColorSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(EyeColor));
+            set => SetValue(ref _eyeColorSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(EyeColor));
         }
 
         /// <summary>
@@ -251,7 +253,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is Person val))
+            if (!(obj is Person val))
                 return false;
 
             return Equals(val);
@@ -260,26 +262,26 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="Person"/> is equal to the current <see cref="Person"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Person? value)
+        public bool Equals(Person? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(Id, value.Id)
-                && Equals(FirstName, value.FirstName)
-                && Equals(LastName, value.LastName)
-                && Equals(UniqueCode, value.UniqueCode)
-                && Equals(GenderSid, value.GenderSid)
-                && Equals(EyeColorSid, value.EyeColorSid)
-                && Equals(Birthday, value.Birthday)
-                && Equals(Address, value.Address)
-                && Equals(ETag, value.ETag)
-                && Equals(ChangeLog, value.ChangeLog);
+            return base.Equals((object)obj)
+                && Equals(Id, obj.Id)
+                && Equals(FirstName, obj.FirstName)
+                && Equals(LastName, obj.LastName)
+                && Equals(UniqueCode, obj.UniqueCode)
+                && Equals(GenderSid, obj.GenderSid)
+                && Equals(EyeColorSid, obj.EyeColorSid)
+                && Equals(Birthday, obj.Birthday)
+                && Equals(Address, obj.Address)
+                && Equals(ETag, obj.ETag)
+                && Equals(ChangeLog, obj.ChangeLog);
         }
 
         /// <summary>
@@ -338,6 +340,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Person"/> to copy from.</param>
         public void CopyFrom(Person from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             Id = from.Id;
             FirstName = from.FirstName;
@@ -471,6 +476,7 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="PersonCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="PersonCollection"/>.</returns>
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator PersonCollection(PersonCollectionResult result) => result?.Result!;
 
         #endregion
@@ -513,4 +519,6 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

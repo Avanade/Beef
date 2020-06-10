@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -88,7 +90,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaturityInstructionsSid
         {
             get => _maturityInstructionsSid;
-            set => SetValue(ref _maturityInstructionsSid, value, false, StringTrim.End, StringTransform.EmptyToNull, nameof(MaturityInstructions));
+            set => SetValue(ref _maturityInstructionsSid, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaturityInstructions));
         }
 
         /// <summary>
@@ -113,7 +115,7 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is TermDepositAccount val))
+            if (!(obj is TermDepositAccount val))
                 return false;
 
             return Equals(val);
@@ -122,21 +124,21 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="TermDepositAccount"/> is equal to the current <see cref="TermDepositAccount"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(TermDepositAccount? value)
+        public bool Equals(TermDepositAccount? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(LodgementDate, value.LodgementDate)
-                && Equals(MaturityDate, value.MaturityDate)
-                && Equals(MaturityAmount, value.MaturityAmount)
-                && Equals(MaturityCurrency, value.MaturityCurrency)
-                && Equals(MaturityInstructionsSid, value.MaturityInstructionsSid);
+            return base.Equals((object)obj)
+                && Equals(LodgementDate, obj.LodgementDate)
+                && Equals(MaturityDate, obj.MaturityDate)
+                && Equals(MaturityAmount, obj.MaturityAmount)
+                && Equals(MaturityCurrency, obj.MaturityCurrency)
+                && Equals(MaturityInstructionsSid, obj.MaturityInstructionsSid);
         }
 
         /// <summary>
@@ -190,6 +192,9 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="TermDepositAccount"/> to copy from.</param>
         public void CopyFrom(TermDepositAccount from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             LodgementDate = from.LodgementDate;
             MaturityDate = from.MaturityDate;
@@ -262,4 +267,6 @@ namespace Cdr.Banking.Common.Entities
     } 
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

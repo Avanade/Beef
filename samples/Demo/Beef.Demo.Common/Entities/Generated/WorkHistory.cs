@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -118,7 +120,7 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null || !(obj is WorkHistory val))
+            if (!(obj is WorkHistory val))
                 return false;
 
             return Equals(val);
@@ -127,20 +129,20 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Determines whether the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="value">The object to compare with the current object.</param>
+        /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(WorkHistory? value)
+        public bool Equals(WorkHistory? obj)
         {
-            if (((object)value!) == ((object)this))
+            if (((object)obj!) == ((object)this))
                 return true;
-            else if (((object)value!) == null)
+            else if (((object)obj!) == null)
                 return false;
 
-            return base.Equals((object)value)
-                && Equals(PersonId, value.PersonId)
-                && Equals(Name, value.Name)
-                && Equals(StartDate, value.StartDate)
-                && Equals(EndDate, value.EndDate);
+            return base.Equals((object)obj)
+                && Equals(PersonId, obj.PersonId)
+                && Equals(Name, obj.Name)
+                && Equals(StartDate, obj.StartDate)
+                && Equals(EndDate, obj.EndDate);
         }
 
         /// <summary>
@@ -193,6 +195,9 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="WorkHistory"/> to copy from.</param>
         public void CopyFrom(WorkHistory from)
         {
+             if (from == null)
+                 throw new ArgumentNullException(nameof(from));
+
             CopyFrom((EntityBase)from);
             PersonId = from.PersonId;
             Name = from.Name;
@@ -301,4 +306,6 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
+#pragma warning restore CA2227
+#pragma warning restore IDE0005
 #nullable restore

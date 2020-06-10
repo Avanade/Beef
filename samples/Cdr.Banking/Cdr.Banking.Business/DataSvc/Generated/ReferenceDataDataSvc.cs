@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -44,8 +45,11 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
         public static IReferenceDataCollection GetCollection(Type type)
         {
-            if (!cacheDict.ContainsKey(Check.NotNull(type, nameof(type))))
-                throw new ArgumentException(string.Format("Type {0} does not exist within the ReferenceDataDataSvc cache.", type.Name));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (!cacheDict.ContainsKey(type))
+                throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
 
             IReferenceDataCache rdc = (IReferenceDataCache)cacheDict[type];
             return rdc.GetCollection();
@@ -53,4 +57,5 @@ namespace Cdr.Banking.Business.DataSvc
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore

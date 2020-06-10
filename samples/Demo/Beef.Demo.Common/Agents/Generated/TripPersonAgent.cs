@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -77,4 +78,5 @@ namespace Beef.Demo.Common.Agents
     }
 }
 
+#pragma warning restore IDE0005
 #nullable restore
