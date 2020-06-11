@@ -102,10 +102,10 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<TripPerson>> CreateAsync(TripPerson value, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PostAsync<TripPerson>("api/v1/tripPeople", value, requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<TripPerson>> UpdateAsync(TripPerson value, string? id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PutAsync<TripPerson>("api/v1/tripPeople/{id}", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("id", id) });

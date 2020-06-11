@@ -50,7 +50,7 @@
 
 #nullable enable
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227 // Collection properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using System.Collections.Generic;
@@ -377,6 +377,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
           <![CDATA[        [Display(Name="{{Property.DisplayName}}")]
 ]]>
         </If>
+        <If Condition="Property.Name:EndsWith('Url') == true">
+          <![CDATA[        [SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "Named by design; OK for DTO")]
+]]>
+        </If>
         <![CDATA[        public ]]>
         <If Condition="Property.RefDataList == true">
           <Then><![CDATA[List<{{Property.RefDataType}}>]]></Then>
@@ -517,6 +521,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
       </If>
       <If Condition="Property.WebApiQueryStringConverter != null">
         <![CDATA[        [Beef.WebApi.WebApiArgFormatter(typeof({{Property.WebApiQueryStringConverter}}))]
+]]>
+      </If>
+      <If Condition="Property.Name:EndsWith('Url') == true">
+        <![CDATA[        [SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "Named by design; OK for DTO")]
 ]]>
       </If>
       <If Condition="System.OmitEntityBase == false">
@@ -1315,7 +1323,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
     </If>
     <![CDATA[}
 
-#pragma warning restore CA2227
+#pragma warning restore CA2227, CA1819
 #pragma warning restore IDE0005
 #nullable restore]]>
   </Entity>

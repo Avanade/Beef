@@ -38,7 +38,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
             dcp.Reset();
 
             Assert.IsTrue(dcp.Expiry.HasValue);
-            Assert.IsTrue(dcp.Expiry.Value > new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0) && dcp.Expiry.Value < new DateTime(now.Year, now.Month, now.Day, now.Hour + 1, 0, 0).AddMinutes(30));
+            Assert.IsTrue(dcp.Expiry.Value > new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0).AddHours(1) && dcp.Expiry.Value < new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0).AddHours(1).AddMinutes(30));
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { EfDb.Default.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Default.InvokeAsync(this, async () => { EfDb.Default.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 

@@ -242,10 +242,10 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Person>> CreateAsync(Person value, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PostAsync<Person>("api/v1/persons", value, requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PutAsync<Person>("api/v1/persons/{id}", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
@@ -299,7 +299,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Person>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PatchAsync<Person>("api/v1/persons/{id}", patchOption, value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
@@ -325,7 +325,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<PersonCollectionResult>> GetAll2Async(WebApiRequestOptions? requestOptions = null)
         {
             return base.GetCollectionResultAsync<PersonCollectionResult, PersonCollection, Person>("api/v1/persons/allnopaging", requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult> MarkAsync(WebApiRequestOptions? requestOptions = null)
         {
             return base.PostAsync("api/v1/persons/mark", requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PutAsync<PersonDetail>("api/v1/persons/{id}/detail", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
@@ -429,7 +429,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<PersonDetail>> PatchDetailAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
@@ -493,10 +493,10 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Person>> CreateWithEfAsync(Person value, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PostAsync<Person>("api/v1/persons/ef", value, requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -509,7 +509,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Person>> UpdateWithEfAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PutAsync<Person>("api/v1/persons/ef/{id}", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
