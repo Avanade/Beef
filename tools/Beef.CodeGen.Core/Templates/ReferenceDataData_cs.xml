@@ -168,7 +168,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         <Case Value="'EntityFramework'">
           <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName != null" Value="Entity.EntityFrameworkName" Otherwise="Config.EntityFrameworkName" />
           <Set Name="System.EntityFrameworkName" Condition="System.EntityFrameworkName == null" Value="'EfDb'" />
-          <![CDATA[{ {{System.EntityFrameworkName}}.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask; }]]>
+          <![CDATA[{ {{System.EntityFrameworkName}}.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
         </Case>
         <Case Value="'Cosmos'">
           <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />

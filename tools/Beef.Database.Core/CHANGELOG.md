@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.6
+- *Fixed*: Code-gen templates updated to correct warnings identified by FxCop. Where no direct fix, or by intention, these have been explicitly ignored.
+
 ## v3.1.5
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

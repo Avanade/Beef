@@ -3,6 +3,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +72,9 @@ namespace Beef.Demo.Business.Data.EfModel
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
         public static void AddToModel(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+                throw new ArgumentNullException(nameof(modelBuilder));
+
             modelBuilder.Entity<EyeColor>(entity =>
             {
                 entity.ToTable("EyeColor", "Ref");
@@ -89,4 +94,6 @@ namespace Beef.Demo.Business.Data.EfModel
     }
 }
 
+#pragma warning restore CA2227, CA1819
+#pragma warning restore IDE0005
 #nullable restore

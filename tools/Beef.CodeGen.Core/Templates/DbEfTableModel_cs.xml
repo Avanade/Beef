@@ -27,6 +27,8 @@
  */
 
 #nullable enable
+#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
 
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +45,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data.EfModel
       <![CDATA[        /// <summary>
         /// Gets or sets the '{{Column.Name}}' column value.
         /// </summary>
-        public {{Column.DotNetType}}]]>
+]]>
+      <If Condition="Column.Name:EndsWith('Url') == true">
+        <![CDATA[        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "Named by design; OK for Model")]
+]]>
+      </If>
+      <![CDATA[        public {{Column.DotNetType}}]]>
       <If Condition="Column.DotNetType == 'string' or Column.DotNetType == 'byte[]' or Column.IsNullable == true">
         <![CDATA[?]]>
       </If>
@@ -57,6 +64,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data.EfModel
         /// <param name="modelBuilder">The <see cref="ModelBuilder"/>.</param>
         public static void AddToModel(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+                throw new ArgumentNullException(nameof(modelBuilder));
+
             modelBuilder.Entity<{{Table.Name}}>(entity =>
             {
                 entity.ToTable("{{System.TableName}}", "{{Table.Schema}}");
@@ -118,6 +128,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data.EfModel
     <![CDATA[    }
 }
 
+#pragma warning restore CA2227, CA1819
+#pragma warning restore IDE0005
 #nullable restore]]>
   </Table>
 </Template>

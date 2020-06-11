@@ -441,7 +441,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
 ]]>
         <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'Patch'">
           <![CDATA[            if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
 ]]>
         </If>
@@ -526,7 +526,17 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
           <![CDATA[patchOption, value, ]]>
         </If>
         <![CDATA[requestOptions: requestOptions,
-                args: new WebApiArg[] {]]>
+                args: ]]>
+        <If Condition="Operation.ParameterCount > 0 or Operation.PagingArgs == true">
+          <Then>
+            <Set Name="System.CloseArray" Value="true"/>
+            <![CDATA[new WebApiArg[] {]]>
+          </Then>
+          <Else>
+            <Set Name="System.CloseArray" Value="false"/>
+            <![CDATA[Array.Empty<WebApiArg>()]]>
+          </Else>
+        </If>
         <Parameter>
           <If Condition="System.Index > 0">
             <![CDATA[,]]>
@@ -554,7 +564,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents.ServiceAgents
           </If>
           <![CDATA[new WebApiPagingArgsArg("paging", paging)]]>
         </If>
-        <![CDATA[ });
+        <If Condition="System.CloseArray == true">
+          <![CDATA[ }]]>
+        </If>
+        <![CDATA[);
         }
 ]]>
       </Operation>
