@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore;
+﻿using Beef.AspNetCore.WebApi;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Cdr.Banking.Api
