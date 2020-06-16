@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.15
+- *Enhancement:* Generate a new `ModelBuilderExtensions.AddGeneratedModels` to simplify the adding of the generated models to the `ModelBuilder` (Entity Framework).
+
 ## v3.1.14
 - *Fixed*: Code-gen templates updated to correct warnings identified by FxCop. Where no direct fix, or by intention, these have been explicitly ignored.
 

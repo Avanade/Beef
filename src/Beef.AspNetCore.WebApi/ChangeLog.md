@@ -2,8 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.5
+- *Enhancement:* Added `WebApiStartup.BuildWebHost` and `WebApiStartup.ConfigurationBuilder` to provide the following capability in a standard manner: Builds (creates) the `IWebHost` using `WebHost.CreateDefaultBuilder`, and build the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration) or User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 2) environment variable (using specified prefix), 3) `appsettings.{environment}.json`, 4) `appsettings.json`, 5) `webapisettings.{environment}.json` (embedded resource), and 6) `webapisettings.json` (embedded resource).
+
 ## v3.1.4
-- *Enhancment:* `WebApiExecutionContextMiddleware` updated to use the `Cleaner.Clean` when setting the `ExecutionContext.Timestamp`.
+- *Enhancement:* `WebApiExecutionContextMiddleware` updated to use the `Cleaner.Clean` when setting the `ExecutionContext.Timestamp`.
 
 ## v3.1.3
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.

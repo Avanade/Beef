@@ -1,16 +1,18 @@
 {
+  "UseUserSecrets": false,
+  "KeyVaultName": null,
   "Logging": {
     "LogLevel": {
       "Default": "Warning"
     }
   },
   "AllowedHosts": "*",
-//#if (implement_database || implement_entityframework)
+  //#if (implement_database || implement_entityframework)
   "ConnectionStrings": {
     "Database": "Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True"
   },
-//#endif
-//#if (implement_cosmos)
+  //#endif
+  //#if (implement_cosmos)
   // Set using environment variables: 'AppName_DocumentDb__EndPoint' and 'AppName_DocumentDb__AuthKey' (keeps values out of config file).
   "CosmosDb": {
     "EndPoint": "https://localhost:8081",
@@ -18,7 +20,7 @@
     "Database": "Company.AppName",
     "RemoveAfterUse": false
   },
-//#endif
+  //#endif
   "BeefIncludeExceptionInInternalServerError": true,
   "BeefDefaultPageSize": 25,
   "BeefCaching": {

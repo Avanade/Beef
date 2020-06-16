@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Beef.Demo.Business.Data.EfModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beef.Demo.Business.Data
 {
@@ -29,7 +30,7 @@ namespace Beef.Demo.Business.Data
             base.OnModelCreating(modelBuilder);
 
             // Perform the model building.
-            EfModel.EfModelBuilder.Configure(modelBuilder);
+            modelBuilder.AddGeneratedModels();
         }
     }
 }

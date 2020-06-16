@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Company.AppName.Business.Data.EfModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Company.AppName.Business.Data
 {
@@ -28,8 +29,8 @@ namespace Company.AppName.Business.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Perform the model building.
-            EfModel.EfModelBuilder.Configure(modelBuilder);
+            // Add the generated models to the model builder.
+            modelBuilder.AddGeneratedModels();
         }
     }
 }

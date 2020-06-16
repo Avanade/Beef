@@ -74,7 +74,8 @@ namespace Beef.Test.NUnit
         /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
         /// <param name="environmentVariablesPrefix">Override the environment variables prexfix.</param>
         /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string? environmentVariablesPrefix = null, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
+        /// <param name="addUserSecrets">Indicates whether to add <see cref="UserSecretsConfigurationExtensions.AddUserSecrets{TStartup}(IConfigurationBuilder)"/>; see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets </param>
+        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string? environmentVariablesPrefix = null, Action<IWebHostBuilder>? webHostBuilderAction = null, bool addUserSecrets = false) where TStartup : class
         {
             var cb = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -85,6 +86,9 @@ namespace Beef.Test.NUnit
 
             if (addEnvironmentVariables)
                 cb.AddEnvironmentVariables(environmentVariablesPrefix);
+
+            if (addUserSecrets)
+                cb.AddUserSecrets<TStartup>();
 
             StartupTestServer<TStartup>(cb.Build(), environment, webHostBuilderAction);
         }

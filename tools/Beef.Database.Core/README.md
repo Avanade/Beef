@@ -146,7 +146,7 @@ Command | Description
 
 ### Program.cs
 
-The `Program.cs` for the new console application should be updated similar to the following. The connection string is provided as the default used at runtime. An environment variable `{Company}{AppName}ConnectionString` can be updated to override (where the `{Company}` and `{AppName}` values are specified); or alternatively use the command line option `-cs "connection-string-info"`. 
+The `Program.cs` for the new console application should be updated similar to the following. The connection string is provided as the default used at runtime. An environment variable `{Company}_{AppName}_ConnectionString` can be updated to override (any `.` characters will be replaced with `_`); or alternatively use the command line option `-cs "connection-string-info"`. 
 
 ``` csharp
 public class Program
