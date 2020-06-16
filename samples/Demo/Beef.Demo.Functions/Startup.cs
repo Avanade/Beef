@@ -14,7 +14,7 @@ namespace Beef.Demo.Functions
     {
         public void Configure(IWebJobsBuilder builder)
         {
-            var config = builder.GetConfiguration(typeof(Startup).Assembly, environmentVariablesPrefix: "Beef_");
+            var config = builder.GetConfiguration<Startup>(environmentVariablePrefix: "Beef_");
 
             // Load the cache policies.
             CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());

@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>3.1.15</Version>
+    <Version>3.1.16</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -35,6 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
     <None Remove="Templates\EntityGrpcServiceAgent_cs.xml" />
   </ItemGroup>
@@ -53,6 +54,7 @@
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
+    <EmbeddedResource Include="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.xml" />
     <EmbeddedResource Include="Templates\DbEfTableModel_cs.xml" />
     <EmbeddedResource Include="Templates\DbSpTableCreate_sql.xml" />

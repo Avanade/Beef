@@ -1,4 +1,6 @@
 {
+  "UseUserSecrets": false,
+  "KeyVaultName": null,
   "ConnectionStrings": {
     "BeefDemo": "Data Source=.;Initial Catalog=Beef.Test;Integrated Security=True"
   },

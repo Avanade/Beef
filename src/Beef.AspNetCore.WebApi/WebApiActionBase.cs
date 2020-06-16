@@ -65,12 +65,8 @@ namespace Beef.AspNetCore.WebApi
             if (exception is IBusinessException)
                 ex = exception as IBusinessException;
 
-            if (ex == null && exception is AggregateException)
-            {
-                var aex = (AggregateException)exception;
-                if (aex.InnerExceptions.Count == 1 && aex.InnerException is IBusinessException)
-                    ex = aex.InnerException as IBusinessException;
-            }
+            if (ex == null && exception is AggregateException aex && aex.InnerExceptions.Count == 1 && aex.InnerException is IBusinessException)
+                ex = aex.InnerException as IBusinessException;
 
             // Where it is not known then "action" as unhandled.
             if (ex == null)

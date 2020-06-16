@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.8
+- *Enhancement:* Added an overload to the `AgentTester.StartupTestServer` to `addUserSecrets`. This will enable: https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets.
+
 ## v3.1.7
 - *Enhancement:* Updated all dependent NuGet packages to their latest respective version.
 

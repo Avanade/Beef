@@ -1,43 +1,17 @@
-﻿using Microsoft.AspNetCore;
+﻿using Beef.AspNetCore.WebApi;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
 
 namespace Company.AppName.Api
 {
     /// <summary>
-    /// The <b>WebAPI</b> host.
+    /// The <b>Web API</b> host/program.
     /// </summary>
     public static class Program
     {
         /// <summary>
-        /// Main startup.
+        /// Main startup using the <i>Beef</i> <see cref="WebApiStartup"/> capability to build the host and underlying configuration probing.
         /// </summary>
         /// <param name="args">The startup arguments.</param>
-        public static void Main(string[] args)
-        {
-            BuildWebHost(args).Run();
-        }
-
-        /// <summary>
-        /// Builds the <see cref="IWebHost"/>.
-        /// </summary>
-        /// <param name="args">The startup arguments.</param>
-        /// <returns>The <see cref="IWebHost"/> instance.</returns>
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-               .ConfigureAppConfiguration((hostingContext, config) => ConfigBuilder(config, hostingContext.HostingEnvironment))
-               .UseStartup<Startup>()
-               .Build();
-
-        /// <summary>
-        /// Builds the configuration probing.
-        /// </summary>
-        private static void ConfigBuilder(IConfigurationBuilder configurationBuilder, IWebHostEnvironment hostingEnvironment) =>
-            configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.json", true, false)
-                .AddJsonFile(new EmbeddedFileProvider(typeof(Program).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables("AppName");
+        public static void Main(string[] args) => WebApiStartup.BuildWebHost<Startup>(args, "AppName").Run();
     }
 }

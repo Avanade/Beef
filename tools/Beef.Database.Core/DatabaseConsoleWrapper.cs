@@ -90,7 +90,7 @@ namespace Beef.Database.Core
         /// </summary>
         private void OverrideConnectionString()
         {
-            var cs = Environment.GetEnvironmentVariable($"{Company}{AppName}ConnectionString");
+            var cs = Environment.GetEnvironmentVariable($"{Company.Replace(".", "_", StringComparison.InvariantCulture)}_{AppName.Replace(".", "_", StringComparison.InvariantCulture)}_ConnectionString");
             if (cs != null)
                 ConnectionString = cs;
         }

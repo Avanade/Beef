@@ -83,7 +83,7 @@
         },
         {
           "condition": "(!implement_entityframework)",
-          "exclude": [ "Company.AppName.Business/Data/EfDb.cs", "Company.AppName.Business/Data/EfDbContext.cs", "Company.AppName.Business/Data/EfModel/**/*" ]
+          "exclude": [ "Company.AppName.Business/Data/EfDb.cs", "Company.AppName.Business/Data/EfDbContext.cs" ]
         },
         {
           "condition": "(!implement_cosmos)",

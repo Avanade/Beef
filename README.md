@@ -11,12 +11,13 @@ The _Beef_ framework, and the underlying code generation, has been primarily cre
 > A means to have software developers focus directly on the **accelerated** delivery of **business value**; with consistently **higher quality** outcomes at an overall **lower cost**.
 
 The key industralisation goals are:
-1. **Value** - focus on business value, not on boilerplate
+1. **Value** – focus on business value, not on boilerplate
 2. **Acceleration** – improve velocity; reduce costs and time to market
 3. **Simplicity** – increase effective usage and minimise learning
 4. **Standardised** – increase knowledgeable resource pool
 5. **Consistency** – improve overall quality and maintainability
 6. **Flexibility** – enable innovation and evolution easily over time
+7. **Confidence** – reduced delivery timeframes and risk 
 
 <br/>
 
