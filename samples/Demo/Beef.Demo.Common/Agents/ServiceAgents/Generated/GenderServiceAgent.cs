@@ -94,10 +94,10 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PostAsync<Gender>("api/v1/demo/ref/genders", value, requestOptions: requestOptions,
-                args: new WebApiArg[] { });
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions? requestOptions = null)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
 
             return base.PutAsync<Gender>("api/v1/demo/ref/genders/{id}", value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
