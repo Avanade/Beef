@@ -5,7 +5,6 @@ Represents the **NuGet** versions.
 ## v3.1.7
 - *Fixed:* Issue [53](https://github.com/Avanade/Beef/issues/53) has been resolved. The `Beef.Database.Core` environment variable naming for connection string has been renamed to be more consistent and compatible with linux.
 
-
 ## v3.1.6
 - *Fixed*: Code-gen templates updated to correct warnings identified by FxCop. Where no direct fix, or by intention, these have been explicitly ignored.
 
