@@ -43,7 +43,7 @@ namespace Beef.Database.Core
         Schema = 16,
 
         /// <summary>
-        /// Resets the database by deleting all existing data and reseting all identities (IDENT) to 0.  
+        /// Resets the database by deleting all existing data.  
         /// </summary>
         Reset = 32,
 

@@ -120,7 +120,7 @@ Command | Description
 `Migrate` | Migrate the database using the **Migrations** scripts (those that have not already been executed).
 `CodeGen` | Generates database **Schema** objects via code generation.
 `Schema` | Drops and creates the known database **Schema** objects.
-`Reset` | Resets the database by deleting all existing data and reseting all identities (IDENT) to 0.
+`Reset` | Resets the database by deleting all existing data.
 `Data` | Inserts or merges **Data** from embedded YAML files.
 
 The remainder are common combinations of the above:
