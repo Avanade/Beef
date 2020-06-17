@@ -5,7 +5,7 @@
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
-    <Version>3.1.7</Version>
+    <Version>3.1.8</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\DeleteAllAndResetIdent.sql" />
+    <None Remove="Resources\DeleteAllAndReset.sql" />
     <None Remove="Resources\ScriptNew_sql.xml" />
     <None Remove="Resources\TableInsertOrMerge_sql.xml" />
     <None Remove="Schema\dbo\Functions\fnGetTenantId.sql" />
@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DeleteAllAndResetIdent.sql" />
+    <EmbeddedResource Include="Resources\DeleteAllAndReset.sql" />
     <EmbeddedResource Include="Resources\ScriptNew_sql.xml" />
     <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.xml" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetTenantId.sql" />

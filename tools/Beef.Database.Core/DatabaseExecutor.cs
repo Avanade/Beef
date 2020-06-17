@@ -216,7 +216,7 @@ namespace Beef.Database.Core
             {
                 Logger.Default.Info(string.Empty);
                 Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB OBJECTS: Drops and creates the database objects...");
+                Logger.Default.Info("DB SCHEMA: Drops and creates the database objects...");
 
                 if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync(new string[] { "dbo", "Ref" })).ConfigureAwait(false))
                     return;
@@ -226,9 +226,9 @@ namespace Beef.Database.Core
             {
                 Logger.Default.Info(string.Empty);
                 Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB OBJECTS: Drops and creates the database objects...");
+                Logger.Default.Info("DB RESET: Resets database by dropping data from all tables...");
 
-                if (!await TimeExecutionAsync(() => DeleteAllAndResetIdentAsync()).ConfigureAwait(false))
+                if (!await TimeExecutionAsync(() => DeleteAllAndResetAsync()).ConfigureAwait(false))
                     return;
             }
 
@@ -437,13 +437,13 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Delete all data from all tables and reset any identity (IDENT) columns to zero.
+        /// Delete all data from all tables.
         /// </summary>
-        private async Task<bool> DeleteAllAndResetIdentAsync()
+        private async Task<bool> DeleteAllAndResetAsync()
         {
-            using var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.DeleteAllAndResetIdent.sql")!;
+            using var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.DeleteAllAndReset.sql")!;
             using var sr = new StreamReader(st);
-            return await ExecuteSqlStatementAsync(() => _db.SqlStatement(sr.ReadToEnd()).NonQueryAsync(), "the deletion of all data from all tables (excluding 'dbo' schema); then resetting any identity columns to zero.").ConfigureAwait(false);
+            return await ExecuteSqlStatementAsync(() => _db.SqlStatement(sr.ReadToEnd()).NonQueryAsync(), "the deletion of all data from all tables (excluding 'dbo' schema).").ConfigureAwait(false);
         }
 
         /// <summary>

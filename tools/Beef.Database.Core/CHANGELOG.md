@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.8
+- *Fixed:* Issue [55](https://github.com/Avanade/Beef/issues/55) has been resolved. Refactored database reset to no longer use `sp_MSforeachtable` which is not available in Azure SQL.
+
 ## v3.1.7
 - *Fixed:* Issue [53](https://github.com/Avanade/Beef/issues/53) has been resolved. The `Beef.Database.Core` environment variable naming for connection string has been renamed to be more consistent and compatible with linux.
 
