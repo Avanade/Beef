@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.9
+- *Enhancement:* Added `useBeefDbo` option to the `DatabaseExecutor.RunAsync` to include the standard _Beef_ `dbo` schema objects. Avoids having to specify the `Beef.Database.Core` assembly.
+- *Fix:* Threading issue with the Insert or Merge of Yaml data process that has been resolved. Also updated to return the number of rows affected and output to the log.
+
 ## v3.1.8
 - *Fixed:* Issue [55](https://github.com/Avanade/Beef/issues/55) has been resolved. Refactored database reset to no longer use `sp_MSforeachtable` which is not available in Azure SQL.
 

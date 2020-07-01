@@ -22,7 +22,7 @@ namespace Cdr.Banking.Test
             var ta = new TransactionArgs();
             var r = TransactionArgsValidator.Default.Validate(ta);
             Assert.IsFalse(r.HasErrors);
-            Assert.AreEqual(DateTime.Now.Date.AddDays(-90), ta.FromDate!.Value.Date);
+            Assert.AreEqual(DateTime.UtcNow.Date.AddDays(-90), ta.FromDate!.Value.Date);
             Assert.IsNull(ta.ToDate);
             Assert.IsNull(ta.MinAmount);
             Assert.IsNull(ta.MaxAmount);

@@ -6,15 +6,15 @@ namespace Company.AppName.Business.Data
     /// <summary>
     /// Represents the <b>Test</b> DocumentDb/CosmosDb client.
     /// </summary>
-    public class CosmosDb : CosmosDb<CosmosDb>
+    public class AppNameCosmosDb : CosmosDb<AppNameCosmosDb>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDb"/> class.
+        /// Initializes a new instance of the <see cref="AppNameCosmosDb"/> class.
         /// </summary>
         /// <param name="client">The <see cref="CosmosClient"/>.</param>
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
         /// <param name="throughput">The throughput (RU/S).</param>
-        public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
+        public AppNameCosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
     }
 }

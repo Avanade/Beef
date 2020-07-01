@@ -33,17 +33,17 @@ namespace Company.AppName.Test
             {
                 return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
-                    AgentTester.Configuration["ConnectionStrings:Database"],
-                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()).ConfigureAwait(false) == 0;
+                    AgentTester.Configuration["ConnectionStrings:Database"], useBeefDbo: true,
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()).ConfigureAwait(false) == 0;
             });
 
-            AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "AppName_");
+            AgentTester.TestServerStart<Startup>("AppName");
             AgentTester.DefaultExpectNoEvents = true;
         }
 #endif
 #if (implement_cosmos)
         private bool _removeAfterUse;
-        private CosmosDb? _cosmosDb;
+        private AppNameCosmosDb? _cosmosDb;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -52,7 +52,7 @@ namespace Company.AppName.Test
             {
                 var config = AgentTester.Configuration.GetSection("CosmosDb");
                 _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
-                _cosmosDb = new CosmosDb(new Cosmos.CosmosClient(config.GetValue<string>("EndPoint"), config.GetValue<string>("AuthKey")),
+                _cosmosDb = new AppNameCosmosDb(new Cosmos.CosmosClient(config.GetValue<string>("EndPoint"), config.GetValue<string>("AuthKey")),
                     config.GetValue<string>("Database"), createDatabaseIfNotExists: true);
 
                 var rc = await _cosmosDb.ReplaceOrCreateContainerAsync(
@@ -77,7 +77,7 @@ namespace Company.AppName.Test
                 return true;
             });
 
-            AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "AppName_");
+            AgentTester.TestServerStart<Startup>("AppName");
             AgentTester.DefaultExpectNoEvents = true;
         }
 

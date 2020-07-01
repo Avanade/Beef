@@ -44,12 +44,17 @@ namespace Beef.Validation.Rules
         private LText? _duplicateText = null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class.
+        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with no <see cref="Validator"/>.
+        /// </summary>
+        public CollectionRuleItem() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
         /// <param name="validator">The corresponding item <see cref="Validator{TItemEntity}"/>.</param>
-        public CollectionRuleItem(Validator<TItemEntity>? validator = null)
+        public CollectionRuleItem(Validator<TItemEntity>? validator)
         {
-            Validator = validator;
+            Validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
         /// <summary>
@@ -58,7 +63,7 @@ namespace Beef.Validation.Rules
         IValidator? ICollectionRuleItem.Validator => Validator;
 
         /// <summary>
-        /// Gets or sets the corresponding item <see cref="Validator{TItemEntity}"/>.
+        /// Gets the corresponding item <see cref="Validator{TItemEntity}"/>.
         /// </summary>
         public Validator<TItemEntity>? Validator { get; private set; }
 
@@ -240,7 +245,7 @@ namespace Beef.Validation.Rules
         public override bool Check(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
-            return context.Parent.ShallowValidation ? false : base.Check(context);
+            return !context.Parent.ShallowValidation && base.Check(context);
         }
 
         /// <summary>

@@ -8,7 +8,10 @@ using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -72,10 +75,11 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="addEnvironmentVariables">Indicates whether to add support for environment variables (defaults to <c>true</c>).</param>
-        /// <param name="environmentVariablesPrefix">Override the environment variables prexfix.</param>
+        /// <param name="environmentVariablePrefix">Override the environment variables prexfix.</param>
         /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
         /// <param name="addUserSecrets">Indicates whether to add <see cref="UserSecretsConfigurationExtensions.AddUserSecrets{TStartup}(IConfigurationBuilder)"/>; see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets </param>
-        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string? environmentVariablesPrefix = null, Action<IWebHostBuilder>? webHostBuilderAction = null, bool addUserSecrets = false) where TStartup : class
+        [Obsolete("Use TestServerStart<TStartup>(string, string?, Action<IWebHostBuilder>?) as the configuration probing is aligned with Beef.AspNetCore.WepApi.WebApiStartup.ConfigurationBuilder.")]
+        public static void StartupTestServer<TStartup>(string environment = DefaultEnvironment, bool addEnvironmentVariables = true, string? environmentVariablePrefix = null, Action<IWebHostBuilder>? webHostBuilderAction = null, bool addUserSecrets = false) where TStartup : class
         {
             var cb = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -85,12 +89,50 @@ namespace Beef.Test.NUnit
                 .AddJsonFile($"appsettings.{environment}.json", true, true);
 
             if (addEnvironmentVariables)
-                cb.AddEnvironmentVariables(environmentVariablesPrefix);
+                cb.AddEnvironmentVariables(environmentVariablePrefix);
 
             if (addUserSecrets)
                 cb.AddUserSecrets<TStartup>();
 
-            StartupTestServer<TStartup>(cb.Build(), environment, webHostBuilderAction);
+            TestServerStart<TStartup>(cb.Build(), environment, webHostBuilderAction);
+        }
+
+        /// <summary>
+        /// Starts up the <see cref="TestServer"/> using the specified <b>API startup</b> <see cref="Type"/> and building the underlying configuration.
+        /// </summary>
+        /// <typeparam name="TStartup">The startup <see cref="Type"/>.</typeparam>
+        /// <param name="environment">The environment to be used by the underlying web host.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
+        public static void TestServerStart<TStartup>(string? environmentVariablePrefix = null, string environment = DefaultEnvironment, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
+        {
+            var cb = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
+                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{environment}.json", true, false)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{environment}.json", true, true);
+
+            if (string.IsNullOrEmpty(environmentVariablePrefix))
+                cb.AddEnvironmentVariables();
+            else
+                cb.AddEnvironmentVariables(environmentVariablePrefix.EndsWith("_", StringComparison.InvariantCulture) ? environmentVariablePrefix : environmentVariablePrefix + "_");
+
+            var config = cb.Build();
+            if (config.GetValue<bool>("UseUserSecrets"))
+                cb.AddUserSecrets<TStartup>();
+
+            var kvn = config["KeyVaultName"];
+            if (!string.IsNullOrEmpty(kvn))
+            {
+                var astp = new AzureServiceTokenProvider();
+#pragma warning disable CA2000 // Dispose objects before losing scope; this object MUST NOT be disposed or will result in further error - only a single instance so is OK.
+                var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
+                cb.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
+#pragma warning restore CA2000
+            }
+
+            TestServerStart<TStartup>(cb.Build(), environment, webHostBuilderAction);
         }
 
         /// <summary>
@@ -100,7 +142,7 @@ namespace Beef.Test.NUnit
         /// <param name = "config" > The <see cref="IConfiguration"/>.</param> 
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="webHostBuilderAction">An optional <see cref="Action{WebHostBuilder}"/> to further configure the resulting <see cref="TestServer"/>.</param>
-        public static void StartupTestServer<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
+        public static void TestServerStart<TStartup>(IConfiguration config, string environment = DefaultEnvironment, Action<IWebHostBuilder>? webHostBuilderAction = null) where TStartup : class
         {
             lock (_lock)
             {
@@ -242,7 +284,6 @@ namespace Beef.Test.NUnit
             if (!cr.AreEqual)
                 Assert.Fail($"Expected vs Actual value mismatch: {cr.DifferencesString}");
         }
-
 
         /// <summary>
         /// Infer additional members to ignore based on the <paramref name="valueType"/>.
@@ -831,7 +872,7 @@ namespace Beef.Test.NUnit
     /// </summary>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
     /// <typeparam name="TValue">The response <see cref="WebApiAgentResult{TValue}.Value"/> <see cref="Type"/>.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public class AgentTester<TAgent, TValue> : AgentTester where TAgent : WebApiAgentBase
     {
         private readonly ComparisonConfig _comparisonConfig = GetDefaultComparisonConfig();

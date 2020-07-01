@@ -19,7 +19,7 @@ using Microsoft.Azure.WebJobs.Host;
 namespace Beef.Events.Triggers.Listener
 {
     /// <summary>
-    /// Represents the "resilient event hub" processor that performs the actual work of managing the function invocation ensuring in-order, at least-once execution of each event.
+    /// Represents the "resilient event hub" processor that performs the actual work of managing the function invocation ensuring in-order, at least-once execution, of each event.
     /// </summary>
     public class ResilientEventHubProcessor : IEventProcessor
     {
@@ -103,7 +103,7 @@ namespace Beef.Events.Triggers.Listener
                         switch (count)
                         {
                             case var val when val == _options.LogPoisonMessageAfterRetryCount:
-                                // Set the poison message now that we have (possibly) attempted enough times that it may not be transient in nature and some needs to be alerted.
+                                // Set the poison message now that we have (possibly) attempted enough times that it may not be transient in nature and someone needs to be alerted.
                                 await _poisonOrchestrator!.SetAsync(_currEventData!, dr.Result.Exception).ConfigureAwait(false);
                                 _currPoisonAction = PoisonMessageAction.PoisonRetry;
                                 _logger.LogError(dr.Result.Exception, msg);

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 
 namespace Beef.AspNetCore.WebApi
 {
@@ -25,8 +26,8 @@ namespace Beef.AspNetCore.WebApi
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
 
-            if (value != null && value is IETag)
-                SetETag(response, ((IETag)value)?.ETag);
+            if (value != null && value is IETag tag)
+                SetETag(response, tag?.ETag);
         }
 
         /// <summary>
@@ -85,8 +86,8 @@ namespace Beef.AspNetCore.WebApi
             if (response == null)
                 throw new ArgumentNullException(nameof(response));
 
-            if (value != null && value is IPagingResult)
-                SetPaging(response, ((IPagingResult)value).Paging);
+            if (value != null && value is IPagingResult result)
+                SetPaging(response, result.Paging);
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace Beef.AspNetCore.WebApi
                 return;
 
             if (ExecutionContext.Current.Messages != null && ExecutionContext.Current.Messages.Count > 0)
-                response.Headers[WebApiConsts.MessagesHeaderName] = JsonConvert.SerializeObject(ExecutionContext.Current.Messages);
+                SetMessages(response, ExecutionContext.Current.Messages);
 
             SetETag(response, ExecutionContext.Current);
         }

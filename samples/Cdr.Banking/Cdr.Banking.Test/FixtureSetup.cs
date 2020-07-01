@@ -62,7 +62,7 @@ namespace Cdr.Banking.Test
                 return true;
             });
 
-            AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "Banking_");
+            AgentTester.TestServerStart<Startup>("Banking");
             AgentTester.DefaultExpectNoEvents = true;
 
             // TODO: Passing the username as an http header for all requests; this would be replaced with OAuth integration, etc.

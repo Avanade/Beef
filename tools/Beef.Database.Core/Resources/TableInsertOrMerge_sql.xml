@@ -113,6 +113,8 @@ MERGE INTO [{{Table.Schema}}].[{{Table.Name}}] WITH (HOLDLOCK) as [t]
         <![CDATA[
     );
 
+SELECT @@ROWCOUNT
+
 DROP TABLE #{{Table.Alias}}]]>
       </Then>
       <Else>
@@ -141,6 +143,8 @@ DROP TABLE #{{Table.Alias}}]]>
           <![CDATA[)
 ]]>
         </Row>
+        <![CDATA[
+SELECT {{Table.RowCount}} -- Total rows inserted]]>
       </Else>
     </If>
   </Table>

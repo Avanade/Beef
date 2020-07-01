@@ -300,10 +300,10 @@ namespace Cdr.Banking.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public bool Equals(Transaction? obj)
         {
-            if (((object)obj!) == ((object)this))
-                return true;
-            else if (((object)obj!) == null)
+            if (obj == null)
                 return false;
+            else if (ReferenceEquals(obj, this))
+                return true;
 
             return base.Equals((object)obj)
                 && Equals(Id, obj.Id)

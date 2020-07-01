@@ -118,17 +118,16 @@ namespace Beef.Test.NUnit
             TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
             TestContext.Out.WriteLine($"{tesh.Result?.ToMultiLineString()}");
 
-
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = Beef.Test.NUnit.ExpectEvent.GetEvents();
             if (events.Length == 0)
-                TestContext.Progress.WriteLine("  None.");
+                TestContext.Out.WriteLine("  None.");
             else
             {
                 foreach (var e in events)
                 {
-                    TestContext.Progress.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
                 }
             }
 

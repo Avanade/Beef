@@ -84,12 +84,13 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
         /// <param name="connectionString">The database connection string.</param>
+        /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects.</param>
         /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
         /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
         /// <returns>The return code; zero equals success.</returns>
-        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
+        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
         {
-            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, codeGenArgs));
+            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, codeGenArgs));
             await em.RunAsync().ConfigureAwait(false);
             return HandleRunResult(em);
         }
@@ -99,11 +100,12 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
         /// <param name="connectionString">The database connection string.</param>
+        /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects.</param>
         /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
         /// <returns>The return code; zero equals success.</returns>
-        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
+        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, params Assembly[] assemblies)
         {
-            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, assemblies, null!));
+            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, null!));
             await em.RunAsync().ConfigureAwait(false);
             return HandleRunResult(em);
         }
@@ -466,12 +468,16 @@ namespace Beef.Database.Core
 
                     Logger.Default.Info($"Parsing and executing: {name}");
                     var sdm = SqlDataUpdater.ReadYaml(ass.GetManifestResourceStream(name)!);
-                    await sdm.GenerateSqlAsync(async (a) =>
+                    await sdm.GenerateSqlAsync((a) =>
                     {
+                        Logger.Default.Info("");
                         Logger.Default.Info($"Executing: {a.OutputFileName} ->");
                         Logger.Default.Info(a.Content);
                         if (a.Content != null)
-                            await _db.SqlStatement(a.Content).NonQueryAsync().ConfigureAwait(false);
+                        {
+                            var rows = _db.SqlStatement(a.Content).ScalarAsync<int>().GetAwaiter().GetResult();
+                            Logger.Default.Info($"Result: {rows} rows affected.");
+                        }
                     }).ConfigureAwait(false);
                 }
             }

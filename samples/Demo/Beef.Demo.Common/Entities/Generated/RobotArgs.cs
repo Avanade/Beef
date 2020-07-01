@@ -75,7 +75,7 @@ namespace Beef.Demo.Common.Entities
         public ReferenceDataSidList<RefDataNamespace.PowerSource, string>? PowerSources
         {
             get => new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref _powerSourcesSids);
-            set => SetValue(ref _powerSourcesSids, value?.ToSidList() ?? null, false, false, nameof(PowerSources)); 
+            set => SetValue(ref _powerSourcesSids, value?.ToSidList(), false, false, nameof(PowerSources)); 
         }
 
         #endregion
@@ -102,10 +102,10 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public bool Equals(RobotArgs? obj)
         {
-            if (((object)obj!) == ((object)this))
-                return true;
-            else if (((object)obj!) == null)
+            if (obj == null)
                 return false;
+            else if (ReferenceEquals(obj, this))
+                return true;
 
             return base.Equals((object)obj)
                 && Equals(ModelNo, obj.ModelNo)

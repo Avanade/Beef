@@ -75,6 +75,12 @@ namespace Beef.Data.EntityFrameworkCore
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
 
         /// <summary>
+        /// Creates a <typeparamref name="TDbContext"/> instance (it is up to the consumer to <see cref="DbContext.Dispose"/> when finished).
+        /// </summary>
+        /// <returns>A new <typeparamref name="TDbContext"/> instance.</returns>
+        public TDbContext CreateDbContext() => new TDbContext();
+
+        /// <summary>
         /// Creates an <see cref="EfDbQuery{T, TModel, TDbContext}"/> to enable select-like capabilities.
         /// </summary>
         /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
@@ -286,7 +292,7 @@ namespace Beef.Data.EntityFrameworkCore
             /// Initialize a new instance of the <see cref="EfDbContextManager"/> class.
             /// </summary>
             /// <param name="args">The <see cref="IEfDbArgs"/>.</param>
-            public EfDbContextManager(IEfDbArgs args)
+            internal EfDbContextManager(IEfDbArgs args)
             {
                 if (args != null && args.DbContext != null)
                     DbContext = (TDbContext)args.DbContext;

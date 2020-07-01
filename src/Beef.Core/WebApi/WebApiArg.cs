@@ -156,10 +156,10 @@ namespace Beef.WebApi
             if (IsDefault)
                 return null;
 
-            if (!(Value is string) && Value is IEnumerable)
+            if (!(Value is string) && Value is IEnumerable enumerable)
             {
                 var sb = new StringBuilder();
-                foreach (var v in (IEnumerable)Value)
+                foreach (var v in enumerable)
                 {
                     if (v != null)
                         UriAppend(sb, CreateNameValue(base.Name, v, false));
@@ -179,11 +179,11 @@ namespace Beef.WebApi
             if (value == null)
                 return UriFormat(name, null);
 
-            if (value is string)
-                return UriFormat(name, (string)value);
+            if (value is string str)
+                return UriFormat(name, str);
 
-            if (value is DateTime)
-                return UriFormat(name, ((DateTime)value).ToString("o", System.Globalization.CultureInfo.InvariantCulture));
+            if (value is DateTime dt)
+                return UriFormat(name, dt.ToString("o", System.Globalization.CultureInfo.InvariantCulture));
 
             TypeInfo ti = value.GetType().GetTypeInfo();
             if (ti.IsEnum || ti.IsValueType)
@@ -209,16 +209,16 @@ namespace Beef.WebApi
 
                     // Define name, and out strings directly.
                     string pName = ArgType == WebApiArgType.FromUriUseProperties ? jpa.PropertyName! : name + "." + jpa.PropertyName;
-                    if (pVal is string)
+                    if (pVal is string pstr)
                     {
-                        UriAppend(sb, UriFormat(pName, (string)pVal));
+                        UriAppend(sb, UriFormat(pName, pstr));
                         continue;
                     }
 
                     // Iterate enumerables where they contain non-class types only.
-                    if (pVal is IEnumerable)
+                    if (pVal is IEnumerable enumerable)
                     {
-                        foreach (var item in ((IEnumerable)pVal))
+                        foreach (var item in enumerable)
                         {
                             if (item != null)
                                 UriAppend(sb, CreateNameValue(pName, item, false));
@@ -251,7 +251,7 @@ namespace Beef.WebApi
                         ThrowComplexityException(ti);
                     }
 
-                    UriAppend(sb, UriFormat(pName, pVal is DateTime ? ((DateTime)pVal).ToString("o", System.Globalization.CultureInfo.InvariantCulture) : pVal.ToString()));
+                    UriAppend(sb, UriFormat(pName, pVal is DateTime dt2 ? dt2.ToString("o", System.Globalization.CultureInfo.InvariantCulture) : pVal.ToString()));
                 }
 
                 return sb.ToString();

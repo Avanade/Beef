@@ -582,7 +582,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
           <![CDATA[        public ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}>? {{Property.Name}}
         {
             get => new ReferenceDataSidList<{{Property.Type}}, {{Property.RefDataType}}>(ref {{Property.PrivateName}}Sids);
-            set => SetValue(ref {{Property.PrivateName}}Sids, value?.ToSidList() ?? null]]>
+            set => SetValue(ref {{Property.PrivateName}}Sids, value?.ToSidList()]]>
           <If Condition="Property.Immutable == false">
             <Then><![CDATA[, false]]></Then>
             <Else><![CDATA[, true]]></Else>
@@ -855,6 +855,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
 ]]>
     </If>
     <If Condition="System.OmitEntityBase == false and Entity.RefDataType == null">
+      <!-- Although the code generated looks a little funky this is required to function correctly. -->
       <![CDATA[        #region IEquatable
 
         /// <summary>
@@ -877,10 +878,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public bool Equals({{Entity.EntityName}}? obj)
         {
-            if (((object)obj!) == ((object)this))
-                return true;
-            else if (((object)obj!) == null)
+            if (obj == null)
                 return false;
+            else if (ReferenceEquals(obj, this))
+                return true;
 
             return base.Equals((object)obj)]]>
       <Property Condition="Property.Inherited == false">
