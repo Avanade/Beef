@@ -1,6 +1,6 @@
 {
-  "UseUserSecrets": false,
-  "KeyVaultName": null,
+  "UseUserSecrets": false, // Turns on: https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets (recommend setting via environment variable AppName_UseUserSecrets)
+  "KeyVaultName": null, // Turns on: https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration (recommend setting via environment variable AppName_KeyVaultName)
   "Logging": {
     "LogLevel": {
       "Default": "Warning"

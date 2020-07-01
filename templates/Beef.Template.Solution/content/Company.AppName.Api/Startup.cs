@@ -9,6 +9,9 @@ using Beef.Entities;
 using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
+#if (implement_cosmos)
+using Microsoft.Azure.Cosmos;
+#endif
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,15 +51,15 @@ namespace Company.AppName.Api
 
 #if (implement_database || implement_entityframework)
             // Register the database.
-            Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "Database")));
+            AppNameDb.Register(() => new AppNameDb(WebApiStartup.GetConnectionString(config, "Database")));
 
 #endif
 #if (implement_cosmos)
             // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
+            AppNameCosmosDb.Register(() =>
             {
                 var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+                return new AppNameCosmosDb(new CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
             });
 
 #endif

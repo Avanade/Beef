@@ -166,6 +166,7 @@ namespace Beef.Demo.Test
 
             // Null 
             Assert.IsFalse(p1.Equals(o));
+            Assert.IsFalse(p1.Equals((PersonDetail)o));
             Assert.IsFalse(p1.Equals(p5));
             Assert.IsFalse(p1 == null);
             Assert.IsTrue(p1 != null);

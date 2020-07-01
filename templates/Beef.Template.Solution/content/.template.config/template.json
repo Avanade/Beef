@@ -83,15 +83,15 @@
         },
         {
           "condition": "(!implement_entityframework)",
-          "exclude": [ "Company.AppName.Business/Data/EfDb.cs", "Company.AppName.Business/Data/EfDbContext.cs" ]
+          "exclude": [ "Company.AppName.Business/Data/AppNameEfDb.cs", "Company.AppName.Business/Data/AppNameEfDbContext.cs" ]
         },
         {
           "condition": "(!implement_cosmos)",
-          "exclude": [ "Company.AppName.Business/Data/CosmosDb.cs", "Company.AppName.Test/Cosmos/**/*" ]
+          "exclude": [ "Company.AppName.Business/Data/AppNameCosmosDb.cs", "Company.AppName.Test/Cosmos/**/*" ]
         },
         {
           "condition": "(!implement_database && !implement_entityframework)",
-          "exclude": [ "Company.AppName.Business/Data/Database.cs", "Company.AppName.Test/Data/**/*" ]
+          "exclude": [ "Company.AppName.Business/Data/AppNameDb.cs", "Company.AppName.Test/Data/**/*" ]
         }
       ]
     }

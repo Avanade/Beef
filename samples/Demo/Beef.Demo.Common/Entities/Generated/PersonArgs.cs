@@ -75,7 +75,7 @@ namespace Beef.Demo.Common.Entities
         public ReferenceDataSidList<Gender, string>? Genders
         {
             get => new ReferenceDataSidList<Gender, string>(ref _gendersSids);
-            set => SetValue(ref _gendersSids, value?.ToSidList() ?? null, false, false, nameof(Genders)); 
+            set => SetValue(ref _gendersSids, value?.ToSidList(), false, false, nameof(Genders)); 
         }
 
         #endregion
@@ -102,10 +102,10 @@ namespace Beef.Demo.Common.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public bool Equals(PersonArgs? obj)
         {
-            if (((object)obj!) == ((object)this))
-                return true;
-            else if (((object)obj!) == null)
+            if (obj == null)
                 return false;
+            else if (ReferenceEquals(obj, this))
+                return true;
 
             return base.Equals((object)obj)
                 && Equals(FirstName, obj.FirstName)

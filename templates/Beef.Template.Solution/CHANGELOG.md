@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.14
+- *Fixed:* Updated referenced *Beef* NuGet references to latest.
+- *Enhancement:* Updated the Database/EfDB/CosmosDb names to be prefixed by AppName to avoid potential conflict with Namespaces.
+
 ## v3.1.13
 - *Fixed:* Updated referenced *Beef* NuGet references to latest.
 

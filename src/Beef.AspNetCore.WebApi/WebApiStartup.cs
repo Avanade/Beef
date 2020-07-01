@@ -33,14 +33,14 @@ namespace Beef.AspNetCore.WebApi
                    .Build();
 
         /// <summary>
-        /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration) 
-        /// or User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 2) environment variable (see <paramref name="environmentVariablePrefix"/>),
-        /// 3) appsettings.{environment}.json, 4) appsettings.json, 5) webapisettings.{environment}.json (embedded resource), and 6) webapisettings.json (embedded resource).
+        /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
+        /// 2) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (see <paramref name="environmentVariablePrefix"/>),
+        /// 4) appsettings.{environment}.json, 5) appsettings.json, 6) webapisettings.{environment}.json (embedded resource), and 7) webapisettings.json (embedded resource).
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="configurationBuilder">The <see cref="IConfigurationBuilder"/>.</param>
         /// <param name="hostingEnvironment">The <see cref="IWebHostEnvironment"/>.</param>
-        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         public static void ConfigurationBuilder<TStartup>(IConfigurationBuilder configurationBuilder, IWebHostEnvironment hostingEnvironment, string? environmentVariablePrefix = null) where TStartup : class
         {
             if (configurationBuilder == null)
@@ -52,24 +52,25 @@ namespace Beef.AspNetCore.WebApi
             configurationBuilder.AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.json", true, false)
                 .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"webapisettings.{hostingEnvironment.EnvironmentName}.json", true, false)
                 .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
-                .AddEnvironmentVariables(environmentVariablePrefix);
+                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true);
+
+            if (string.IsNullOrEmpty(environmentVariablePrefix))
+                configurationBuilder.AddEnvironmentVariables();
+            else
+                configurationBuilder.AddEnvironmentVariables(environmentVariablePrefix.EndsWith("_", StringComparison.InvariantCulture) ? environmentVariablePrefix : environmentVariablePrefix + "_");
 
             var config = configurationBuilder.Build();
-            if (hostingEnvironment.IsDevelopment())
+            if (hostingEnvironment.IsDevelopment() && config.GetValue<bool>("UseUserSecrets"))
+                configurationBuilder.AddUserSecrets<TStartup>();
+
+            var kvn = config["KeyVaultName"];
+            if (!string.IsNullOrEmpty(kvn))
             {
-                if (config.GetValue<bool>("UseUserSecrets"))
-                    configurationBuilder.AddUserSecrets<TStartup>();
-            }
-            else
-            {
-                var kvn = config["KeyVaultName"];
-                if (!string.IsNullOrEmpty(kvn))
-                {
-                    var astp = new AzureServiceTokenProvider();
-                    using var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
-                    configurationBuilder.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
-                }
+                var astp = new AzureServiceTokenProvider();
+#pragma warning disable CA2000 // Dispose objects before losing scope; this object MUST NOT be disposed or will result in further error - only a single instance so is OK.
+                var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
+                configurationBuilder.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
+#pragma warning restore CA2000
             }
         }
 

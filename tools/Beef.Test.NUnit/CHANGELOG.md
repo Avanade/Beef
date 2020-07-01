@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.9
+- *Fixed:* The `EventSubscriberTester` was not outputting all messages to `Out`; was using `Progress` which generated confusing log output.
+- *Enhancement* Deprecated/obsoleted `AgentTester.StartupTestServer` and replaced with `AgentTester.TestServerStart` to align the configuration probing with `Beef.AspNetCore.WepApi.WebApiStartup.ConfigurationBuilder` for greater consistency.
+
 ## v3.1.8
 - *Enhancement:* Added an overload to the `AgentTester.StartupTestServer` to `addUserSecrets`. This will enable: https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets.
 

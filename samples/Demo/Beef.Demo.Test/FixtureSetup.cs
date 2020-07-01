@@ -14,16 +14,13 @@ namespace Beef.Demo.Test
         {
             TestSetUp.RegisterSetUp(async (count, data) =>
             {
-                if (count == 0)
-                    await DatabaseExecutor.RunAsync(DatabaseExecutorCommand.Drop, AgentTester.Configuration["ConnectionStrings:BeefDemo"]);
-
                 return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
-                    AgentTester.Configuration["ConnectionStrings:BeefDemo"],
-                    typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly).ConfigureAwait(false) == 0;
+                    AgentTester.Configuration["ConnectionStrings:BeefDemo"], useBeefDbo: true,
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly).ConfigureAwait(false) == 0;
             });
 
-            AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "Beef_");
+            AgentTester.TestServerStart<Startup>("Beef");
         }
     }
 }

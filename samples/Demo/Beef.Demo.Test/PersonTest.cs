@@ -459,6 +459,26 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void E130_Create_BadRequest()
+        {
+            var p = new Person
+            {
+                FirstName = "Bill",
+                LastName = "Gates",
+                Gender = "$",
+                Birthday = new DateTime(1955, 10, 28),
+                UniqueCode = "A1234"
+            };
+
+            // Try to create a person which will result in a bad request.
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectErrorType(ErrorType.ValidationError)
+                .ExpectMessages("Gender is invalid.")
+                .Run((a) => a.Agent.CreateAsync(p));
+        }
+
+        [Test, TestSetUp]
         public void E210_CreateWithEf()
         {
             var p = new Person

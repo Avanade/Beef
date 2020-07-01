@@ -19,7 +19,7 @@ namespace Company.AppName.Database
             return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: true).RunAsync(args);
 #endif
 #if (implement_entityframework)
-            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: false).RunAsync(args);
+            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Company.AppName;Integrated Security=True", "Company", "AppName", useBeefDbo: true).RunAsync(args);
 #endif
         }
     }
