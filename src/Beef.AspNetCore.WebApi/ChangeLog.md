@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.7
+
+- *Fixed:* Issue [60](https://github.com/Avanade/Beef/issues/60) fixed; ETag will be generated and returned correctly where underlying `Type` does not implement `IETag`.
+
 ## v3.1.6
 - *Enhancement:* Updated the `WebApiStartup.ConfigurationBuilder` to probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration), 2) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (using specified prefix), 4) `appsettings.{environment}.json`, 5) `appsettings.json`, 6) `webapisettings.{environment}.json` (embedded resource), and 7) `webapisettings.json` (embedded resource).
 

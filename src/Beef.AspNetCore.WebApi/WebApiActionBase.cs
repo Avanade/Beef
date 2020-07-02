@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -412,13 +413,13 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var json = JsonPropertyFilter.ApplyAsObject(result, IncludeFields, ExcludeFields)!;
+            var valOrJson = JsonPropertyFilter.ApplyAsObject(result, IncludeFields, ExcludeFields)!;
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
-                return (json, ExecutionContext.Current.ETag);
+                return (valOrJson, ExecutionContext.Current.ETag);
 
             if (result is IETag ietag)
-                return (json, ietag?.ETag);
+                return (valOrJson, ietag?.ETag);
 
             StringBuilder? sb = null;
             if (result is System.Collections.IEnumerable coll)
@@ -431,7 +432,7 @@ namespace Beef.AspNetCore.WebApi
                     if (item is IETag cetag && cetag.ETag != null)
                     {
                         sb.Append(cetag.ETag);
-                        sb.Append(AsciiDivider); // Ascii art robot
+                        sb.Append(AsciiDivider);
                         continue;
                     }
 
@@ -446,9 +447,9 @@ namespace Beef.AspNetCore.WebApi
 #pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate an etag.
             using var md5 = System.Security.Cryptography.MD5.Create();
 #pragma warning restore CA5351 
-            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : json)}{AsciiDivider}{context?.HttpContext.Request.QueryString.Value}");
+            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : valOrJson.GetHashCode().ToString(CultureInfo.InvariantCulture))}{AsciiDivider}{context?.HttpContext.Request.QueryString.Value}");
             var hash = md5.ComputeHash(buf, 0, buf.Length);
-            return (json, Convert.ToBase64String(hash));
+            return (valOrJson, Convert.ToBase64String(hash));
         }
 
         /// <summary>

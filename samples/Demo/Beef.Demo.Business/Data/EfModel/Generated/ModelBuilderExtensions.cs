@@ -25,6 +25,7 @@ namespace Beef.Demo.Business.Data.EfModel
 
             EyeColor.AddToModel(modelBuilder);
             Person.AddToModel(modelBuilder);
+            Contact.AddToModel(modelBuilder);
         }
     }
 }

@@ -55,4 +55,7 @@
 
   <!-- Check the generated output for the IsDeleted. -->
   <Table Name="Person2" Schema="Demo" Create="true" Update="true" Upsert="true" Delete="true" Get="true" GetAll="true" View="true" />
+
+  <!-- Basic table with no row version or change log. -->
+  <Table Name="Contact" Schema="Demo" EfModel="true" />
 </CodeGeneration>

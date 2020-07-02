@@ -9,3 +9,5 @@ Demo:
     - { WorkHistoryId: 2, PersonId: 2, Name: Optus, StartDate: 2016-04-16 }
     - { WorkHistoryId: 3, PersonId: 4, Name: Microsoft, StartDate: 2015-05-23, EndDate: 2016-04-06 }
     - { WorkHistoryId: 4, PersonId: 4, Name: Amazon, StartDate: 2016-04-16 }
+  - Contact:
+    - { ContactId: 1, FirstName: Jenny, LastName: Cuthbert }

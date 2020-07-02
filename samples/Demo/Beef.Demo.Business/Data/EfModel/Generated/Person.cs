@@ -4,17 +4,18 @@
 
 #nullable enable
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for an EF Model.
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Beef.Demo.Business.Data.EfModel
 {
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Demo.Person'.
     /// </summary>
-    public class Person
+    public partial class Person
     {
         /// <summary>
         /// Gets or sets the 'PersonId' column value.
@@ -113,8 +114,14 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
                 entity.Property(p => p.UniqueCode).HasColumnType("NVARCHAR(20)");
                 entity.Property(p => p.EyeColorCode).HasColumnType("NVARCHAR(50)");
+                AddToModel(entity);
             });
         }
+        
+        /// <summary>
+        /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
+        /// </summary>
+        static partial void AddToModel(EntityTypeBuilder<Person> entity);
     }
 }
 

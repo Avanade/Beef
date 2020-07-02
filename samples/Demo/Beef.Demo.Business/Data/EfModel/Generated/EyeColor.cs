@@ -4,17 +4,18 @@
 
 #nullable enable
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for an EF Model.
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Beef.Demo.Business.Data.EfModel
 {
     /// <summary>
     /// Represents the Entity Framework (EF) model for database object 'Ref.EyeColor'.
     /// </summary>
-    public class EyeColor
+    public partial class EyeColor
     {
         /// <summary>
         /// Gets or sets the 'EyeColorId' column value.
@@ -89,8 +90,14 @@ namespace Beef.Demo.Business.Data.EfModel
                 entity.Property(p => p.CreatedDate).HasColumnType("DATETIME2").ValueGeneratedOnUpdate();
                 entity.Property(p => p.UpdatedBy).HasColumnType("NVARCHAR(250)").ValueGeneratedOnAdd();
                 entity.Property(p => p.UpdatedDate).HasColumnType("DATETIME2").ValueGeneratedOnAdd();
+                AddToModel(entity);
             });
         }
+        
+        /// <summary>
+        /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
+        /// </summary>
+        static partial void AddToModel(EntityTypeBuilder<EyeColor> entity);
     }
 }
 
