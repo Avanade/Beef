@@ -63,7 +63,7 @@ Generate the configured entities and reference data:
 
 ```
 cd Foo.Bar.CodeGen
-dotnet new all
+dotnet run all
 ```
 
 This will build and run the `Foo.Bar.CodeGen` console; the outcome of the code generation will be logged to the console showing what was added or updated.
