@@ -31,25 +31,6 @@ namespace Beef.Demo.Business.Data
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
-        private readonly Func<IEfDbArgs, Task>? _getAllOnBeforeAsync;
-        private readonly Func<ContactCollectionResult, Task>? _getAllOnAfterAsync;
-        private readonly Action<Exception>? _getAllOnException;
-
-        private readonly Func<Guid, IEfDbArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Contact?, Guid, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
-
-        private readonly Func<Contact, IEfDbArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<Contact, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<Contact, IEfDbArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<Contact, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        private readonly Func<Guid, IEfDbArgs, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
-        private readonly Action<Exception>? _deleteOnException;
 
         #pragma warning restore CS0649
         #endregion
@@ -64,11 +45,9 @@ namespace Beef.Demo.Business.Data
             {
                 ContactCollectionResult __result = new ContactCollectionResult();
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(__dataArgs).ConfigureAwait(false);
-                __result.Result = EfDb.Default.Query(__dataArgs, q => _getAllOnQuery == null ? q : _getAllOnQuery(q, __dataArgs)).SelectQuery<ContactCollection>();
-                if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getAllOnException });
+                __result.Result = EfDb.Default.Query(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -80,13 +59,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Contact? __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await EfDb.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -101,13 +76,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Contact __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                return await EfDb.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -122,13 +93,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Contact __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                return await EfDb.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -140,10 +107,8 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
                 await EfDb.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
+            });
         }
 
         /// <summary>

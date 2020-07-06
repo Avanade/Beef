@@ -23,18 +23,6 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class ContactDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<ContactCollectionResult, Task>? _getAllOnAfterAsync;
-        private static readonly Func<Contact?, Guid, Task>? _getOnAfterAsync;
-        private static readonly Func<Contact, Task>? _createOnAfterAsync;
-        private static readonly Func<Contact, Task>? _updateOnAfterAsync;
-        private static readonly Func<Guid, Task>? _deleteOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
         /// </summary>
@@ -44,7 +32,6 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await Factory.Create<IContactData>().GetAllAsync().ConfigureAwait(false);
-                if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -59,12 +46,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Contact>(__key, out Contact __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Contact __val))
                     return __val;
 
                 var __result = await Factory.Create<IContactData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -81,7 +67,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IContactData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -98,7 +83,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IContactData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -114,7 +98,6 @@ namespace Beef.Demo.Business.DataSvc
                 await Factory.Create<IContactData>().DeleteAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishEventAsync($"Demo.Contact.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Contact>(new UniqueKey(id));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
         }
     }

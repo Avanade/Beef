@@ -129,7 +129,7 @@ namespace Beef.Demo.Business.Data
             return pd;
         }
 
-        private Task<Person> GetNullOnImplementationAsync(string name)
+        private Task<Person> GetNullOnImplementationAsync(string _)
         {
             return Task.FromResult<Person>(null);
         }

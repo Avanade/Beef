@@ -23,16 +23,6 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class GenderDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<Gender?, Guid, Task>? _getOnAfterAsync;
-        private static readonly Func<Gender, Task>? _createOnAfterAsync;
-        private static readonly Func<Gender, Task>? _updateOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -43,12 +33,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Gender>(__key, out Gender __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Gender __val))
                     return __val;
 
                 var __result = await Factory.Create<IGenderData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -65,7 +54,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IGenderData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -82,7 +70,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<IGenderData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }

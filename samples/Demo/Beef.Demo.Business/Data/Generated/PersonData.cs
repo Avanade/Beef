@@ -237,8 +237,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetDetailByArgsOnImplementationAsync(args, paging),
-                new BusinessInvokerArgs { ExceptionHandler = _getDetailByArgsOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => GetDetailByArgsOnImplementationAsync(args, paging), new BusinessInvokerArgs { ExceptionHandler = _getDetailByArgsOnException });
         }
 
         /// <summary>
@@ -249,8 +248,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => MergeOnImplementationAsync(fromId, toId),
-                new BusinessInvokerArgs { ExceptionHandler = _mergeOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => MergeOnImplementationAsync(fromId, toId), new BusinessInvokerArgs { ExceptionHandler = _mergeOnException });
         }
 
         /// <summary>
@@ -258,8 +256,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         public Task MarkAsync()
         {
-            return DataInvoker.Default.InvokeAsync(this, () => MarkOnImplementationAsync(),
-                new BusinessInvokerArgs { ExceptionHandler = _markOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => MarkOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _markOnException });
         }
 
         /// <summary>
@@ -269,8 +266,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => MapOnImplementationAsync(args),
-                new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => MapOnImplementationAsync(args), new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
         }
 
         /// <summary>
@@ -280,8 +276,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetDetailOnImplementationAsync(id),
-                new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => GetDetailOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
         }
 
         /// <summary>
@@ -294,8 +289,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, () => UpdateDetailOnImplementationAsync(value),
-                new BusinessInvokerArgs { ExceptionHandler = _updateDetailOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => UpdateDetailOnImplementationAsync(value), new BusinessInvokerArgs { ExceptionHandler = _updateDetailOnException });
         }
 
         /// <summary>
@@ -305,8 +299,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A resultant <see cref="Person?"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetNullOnImplementationAsync(name),
-                new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => GetNullOnImplementationAsync(name), new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
         }
 
         /// <summary>
@@ -322,7 +315,7 @@ namespace Beef.Demo.Business.Data
                 PersonCollectionResult __result = new PersonCollectionResult(paging);
                 var __dataArgs = EfMapper.Default.CreateArgs(__result.Paging!);
                 if (_getByArgsWithEfOnBeforeAsync != null) await _getByArgsWithEfOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = EfDb.Default.Query(__dataArgs, q => _getByArgsWithEfOnQuery == null ? q : _getByArgsWithEfOnQuery(q, args, __dataArgs)).SelectQuery<PersonCollection>();
+                __result.Result = EfDb.Default.Query(__dataArgs, q => _getByArgsWithEfOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<PersonCollection>();
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsWithEfOnException });

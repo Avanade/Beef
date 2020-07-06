@@ -83,18 +83,68 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
       <![CDATA[
     {
 ]]>
-      <!-- Private Funcs/Actions as Partial Methods do not support Async :-( -->
-      <Set Name="System.EndRegion" Value="false"/>
-      <Operation Condition="Operation.ExcludeManager == false and Operation.ExcludeAll == false and Operation.ManagerCustom == false and Operation.OperationType != 'Patch'">
-        <If Condition="System.Index == 0">
-          <Set Name="System.EndRegion" Value="true"/>
-          <![CDATA[        #region Private
+      <If Condition="Entity.ManagerExtensions == true">
+        <!-- Private Funcs/Actions as Partial Methods do not support Async :-( -->
+        <Set Name="System.EndRegion" Value="false"/>
+        <Operation Condition="Operation.ExcludeManager == false and Operation.ExcludeAll == false and Operation.ManagerCustom == false and Operation.OperationType != 'Patch'">
+          <If Condition="System.Index == 0">
+            <Set Name="System.EndRegion" Value="true"/>
+            <![CDATA[        #region Private
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 ]]>
-        </If>
-        <![CDATA[
+          </If>
+          <![CDATA[
 ]]>
-        <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.ParameterCount > 0">
+          <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.ParameterCount > 0">
+            <![CDATA[        private readonly Func<]]>
+            <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+              <If Condition="Operation.ReturnType == 'void'">
+                <Then><![CDATA[{{Entity.EntityName}}]]></Then>
+                <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              </If>
+            </If>
+            <Parameter>
+              <If Condition="System.Index > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[, ]]>
+              </If>
+              <![CDATA[{{Parameter.Type}}]]>
+              <If Condition="Parameter.Nullable == true">
+                <![CDATA[?]]>
+              </If>
+            </Parameter>
+            <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+              <Then>
+                <If Condition="Operation.ParameterCount > 0">
+                  <![CDATA[, ]]>
+                </If>
+                <![CDATA[PagingArgs?, ]]>
+              </Then>
+              <Else>
+                <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                  <![CDATA[, ]]>
+                </If>
+              </Else>
+            </If>
+            <![CDATA[Task>? {{Operation.PrivateName}}OnPreValidateAsync;
+        private readonly Action<MultiValidator]]>
+            <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+              <If Condition="Operation.ReturnType == 'void'">
+                <Then><![CDATA[, {{Entity.EntityName}}]]></Then>
+                <Else><![CDATA[, {{Operation.ReturnType}}]]></Else>
+              </If>
+            </If>
+            <Parameter>
+              <![CDATA[, {{Parameter.Type}}]]>
+              <If Condition="Parameter.Nullable == true">
+                <![CDATA[?]]>
+              </If>
+            </Parameter>
+            <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+              <![CDATA[, PagingArgs?]]>
+            </If>
+            <![CDATA[>? {{Operation.PrivateName}}OnValidate;
+]]>
+          </If>
           <![CDATA[        private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
@@ -124,119 +174,71 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
             </Else>
           </If>
-          <![CDATA[Task>? {{Operation.PrivateName}}OnPreValidateAsync;
-        private readonly Action<MultiValidator]]>
-          <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+          <![CDATA[Task>? {{Operation.PrivateName}}OnBeforeAsync;
+        private readonly Func<]]>
+          <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[, {{Entity.EntityName}}]]></Then>
-              <Else><![CDATA[, {{Operation.ReturnType}}]]></Else>
+              <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}?]]></Else>
             </If>
           </If>
+          <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+            <If Condition="Operation.ReturnType == 'void'">
+              <Then><![CDATA[{{Entity.EntityName}}]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+            </If>
+          </If>
+          <If Condition="Operation.OperationType == 'GetColl'">
+            <If Condition="Operation.ReturnType == 'void'">
+              <Then><![CDATA[{{Entity.EntityCollectionResultName}}]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult]]></Else>
+            </If>
+          </If>
+          <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+            <![CDATA[{{Operation.ReturnType}}]]>
+          </If>
           <Parameter>
-            <![CDATA[, {{Parameter.Type}}]]>
+            <If Condition="System.Index == 0">
+              <Then>
+                <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
+                  <![CDATA[, ]]>
+                </If>
+                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                  <![CDATA[, ]]>
+                </If>
+              </Then>
+              <Else><![CDATA[, ]]></Else>
+            </If>
+            <![CDATA[{{Parameter.Type}}]]>
             <If Condition="Parameter.Nullable == true">
               <![CDATA[?]]>
             </If>
           </Parameter>
           <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-            <![CDATA[, PagingArgs?]]>
-          </If>
-          <![CDATA[>? {{Operation.PrivateName}}OnValidate;
-]]>
-        </If>
-        <![CDATA[        private readonly Func<]]>
-        <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityName}}]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
-          </If>
-        </If>
-        <Parameter>
-          <If Condition="System.Index > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-            <![CDATA[, ]]>
-          </If>
-          <![CDATA[{{Parameter.Type}}]]>
-          <If Condition="Parameter.Nullable == true">
-            <![CDATA[?]]>
-          </If>
-        </Parameter>
-        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-          <Then>
-            <If Condition="Operation.ParameterCount > 0">
-              <![CDATA[, ]]>
-            </If>
-            <![CDATA[PagingArgs?, ]]>
-          </Then>
-          <Else>
-            <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <![CDATA[, ]]>
-            </If>
-          </Else>
-        </If>
-        <![CDATA[Task>? {{Operation.PrivateName}}OnBeforeAsync;
-        private readonly Func<]]>
-        <If Condition="Operation.OperationType == 'Get'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}?]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityName}}]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'GetColl'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityCollectionResultName}}]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}CollectionResult]]></Else>
-          </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[{{Operation.ReturnType}}]]>
-        </If>
-        <Parameter>
-          <If Condition="System.Index == 0">
             <Then>
-              <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
-                <![CDATA[, ]]>
-              </If>
-              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                <![CDATA[, ]]>
-              </If>
+              <![CDATA[, PagingArgs?, ]]>
             </Then>
-            <Else><![CDATA[, ]]></Else>
+            <Else>
+              <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <Then><![CDATA[, ]]></Then>
+                <Else>
+                  <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                    <![CDATA[, ]]>
+                  </If>
+                </Else>
+              </If>
+            </Else>
           </If>
-          <![CDATA[{{Parameter.Type}}]]>
-          <If Condition="Parameter.Nullable == true">
-            <![CDATA[?]]>
-          </If>
-        </Parameter>
-        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-          <Then>
-            <![CDATA[, PagingArgs?, ]]>
-          </Then>
-          <Else>
-            <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <Then><![CDATA[, ]]></Then>
-              <Else>
-                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                  <![CDATA[, ]]>
-                </If>
-              </Else>
-            </If>
-          </Else>
-        </If>
-        <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
+          <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
 ]]>
-      </Operation>
-      <If Condition="System.EndRegion == true">
-        <![CDATA[
+        </Operation>
+        <If Condition="System.EndRegion == true">
+          <![CDATA[
         #pragma warning restore CS0649
         #endregion
 
 ]]>
+        </If>
       </If>
 
       <!-- Comments + Method Definition -->
@@ -477,11 +479,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         </Parameter>
         <If Condition="Operation.ManagerCustom == false">
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.ParameterCount > 0">
-            <![CDATA[                EntityBase.CleanUp(]]>
+            <![CDATA[                Cleaner.CleanUp(]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <![CDATA[value]]>
             </If>
-            <Parameter Condition="Parameter.RefDataType == null">
+            <Parameter Condition="Parameter.RefDataType == null and Parameter.LayerPassing != 'ToManagerSet' and Parameter.LayerPassing != 'ToManagerCollSet'">
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                 <If Condition="System.Index == 0">
                   <![CDATA[, ]]>
@@ -493,25 +495,29 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               <![CDATA[{{Parameter.ArgumentName}}]]>
             </Parameter>
             <![CDATA[);
-                if ({{Operation.PrivateName}}OnPreValidateAsync != null) await {{Operation.PrivateName}}OnPreValidateAsync(]]>
-            <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <![CDATA[value]]>
-            </If>
-            <Parameter>
-              <If Condition="System.Index > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[, ]]>
+]]>
+            <If Condition="Entity.ManagerExtensions == true">
+              <![CDATA[                if ({{Operation.PrivateName}}OnPreValidateAsync != null) await {{Operation.PrivateName}}OnPreValidateAsync(]]>
+              <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[value]]>
               </If>
-              <![CDATA[{{Parameter.ArgumentName}}]]>
-            </Parameter>
-            <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-              <If Condition="Operation.ParameterCount > 0">
-                <![CDATA[, ]]>
+              <Parameter>
+                <If Condition="System.Index > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                  <![CDATA[, ]]>
+                </If>
+                <![CDATA[{{Parameter.ArgumentName}}]]>
+              </Parameter>
+              <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+                <If Condition="Operation.ParameterCount > 0">
+                  <![CDATA[, ]]>
+                </If>
+                <![CDATA[paging]]>
               </If>
-              <![CDATA[paging]]>
-            </If>
-            <![CDATA[).ConfigureAwait(false);
+              <![CDATA[).ConfigureAwait(false);
 
-                MultiValidator.Create()]]>
+]]>
+            </If>
+            <![CDATA[                MultiValidator.Create()]]>
             <Set Name="System.NewLine" Value="false" />
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <Set Name="System.NewLine" Value="true" />
@@ -545,24 +551,33 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               <If Condition="Parameter.ValidatorFluent != null"><![CDATA[.{{Parameter.ValidatorFluent}}]]></If>
               <![CDATA[)]]>
             </Parameter>
-            <![CDATA[
+            <If Condition="Entity.ManagerExtensions == true">
+              <Then>
+                <![CDATA[
                     .Additional((__mv) => {{Operation.PrivateName}}OnValidate?.Invoke(__mv]]>
-            <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <![CDATA[, value]]>
+                <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                  <![CDATA[, value]]>
+                </If>
+                <Parameter>
+                  <![CDATA[, {{Parameter.ArgumentName}}]]>
+                </Parameter>
+                <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+                  <![CDATA[, paging]]>
+                </If>
+                <![CDATA[))
+]]>
+              </Then>
+              <Else>
+                <![CDATA[
+]]>
+              </Else>
             </If>
-            <Parameter>
-              <![CDATA[, {{Parameter.ArgumentName}}]]>
-            </Parameter>
-            <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-              <![CDATA[, paging]]>
-            </If>
-            <![CDATA[))
-                    .Run().ThrowOnError();
+            <![CDATA[                    .Run().ThrowOnError();
 
 ]]>
           </If>
         </If>
-        <If Condition="Operation.ManagerCustom == false">
+        <If Condition="Operation.ManagerCustom == false and Entity.ManagerExtensions == true">
           <![CDATA[                if ({{Operation.PrivateName}}OnBeforeAsync != null) await {{Operation.PrivateName}}OnBeforeAsync(]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <![CDATA[value]]>
@@ -583,14 +598,25 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
         </If>
         <![CDATA[                ]]>
+        <Set Name="System.HasResult" Value="false" />
         <If Condition="Operation.OperationType == 'GetColl'">
-          <![CDATA[var __result = ]]>
+          <Set Name="System.HasResult" Value="true" />
         </If>
         <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <![CDATA[var __result = ]]>
+          <Set Name="System.HasResult" Value="true" />
         </If>
         <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[var __result = ]]>
+          <Set Name="System.HasResult" Value="true" />
+        </If>
+        <If Condition="System.HasResult == true">
+          <If Condition="Operation.ManagerCustom == true or Entity.ManagerExtensions == true">
+            <Then>
+              <![CDATA[var __result = ]]>
+            </Then>
+            <Else>
+              <![CDATA[return Cleaner.Clean(]]>
+            </Else>
+          </If>
         </If>
         <If Condition="Operation.ManagerCustom == true">
           <Then>
@@ -654,57 +680,67 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </If>
               <![CDATA[paging]]>
             </If>
-            <![CDATA[).ConfigureAwait(false);
-                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
-            <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-              <![CDATA[__result]]>
-            </If>
-            <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-              <![CDATA[__result]]>
-            </If>
-            <Parameter>
-              <If Condition="System.Index == 0">
-                <Then>
-                  <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                    <![CDATA[, ]]>
-                  </If>
-                  <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                    <![CDATA[, ]]>
-                  </If>
-                </Then>
-                <Else>
-                  <![CDATA[, ]]>
-                </Else>
-              </If>
-              <![CDATA[{{Parameter.ArgumentName}}]]>
-            </Parameter>
-            <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-              <If Condition="Operation.ParameterCount > 0">
-                <Then>
-                  <![CDATA[, ]]>
-                </Then>
-                <Else>
-                  <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
-                    <![CDATA[, ]]>
-                  </If>
-                  <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                    <![CDATA[, ]]>
-                  </If>
-                </Else>
-              </If>
-              <![CDATA[paging]]>
-            </If>
-            <![CDATA[).ConfigureAwait(false);
+            <![CDATA[).ConfigureAwait(false)]]>
+            <If Condition="Operation.ManagerCustom == true or Entity.ManagerExtensions == true">
+              <Then>
+                <![CDATA[;
 ]]>
+              </Then>
+              <Else>
+                <If Condition="System.HasResult == true">
+                  <![CDATA[)]]>
+                </If>
+                <![CDATA[;
+]]>
+              </Else>
+            </If>
+            <If Condition="Entity.ManagerExtensions == true">
+              <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
+              <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                <![CDATA[__result]]>
+              </If>
+              <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                <![CDATA[__result]]>
+              </If>
+              <Parameter>
+                <If Condition="System.Index == 0">
+                  <Then>
+                    <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+                      <![CDATA[, ]]>
+                    </If>
+                    <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                      <![CDATA[, ]]>
+                    </If>
+                  </Then>
+                  <Else>
+                    <![CDATA[, ]]>
+                  </Else>
+                </If>
+                <![CDATA[{{Parameter.ArgumentName}}]]>
+              </Parameter>
+              <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+                <If Condition="Operation.ParameterCount > 0">
+                  <Then>
+                    <![CDATA[, ]]>
+                  </Then>
+                  <Else>
+                    <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
+                      <![CDATA[, ]]>
+                    </If>
+                    <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+                      <![CDATA[, ]]>
+                    </If>
+                  </Else>
+                </If>
+                <![CDATA[paging]]>
+              </If>
+              <![CDATA[).ConfigureAwait(false);
+]]>
+            </If>
           </Else>
         </If>
-        <If Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <![CDATA[                Cleaner.Clean(__result);
-                return __result;
-]]>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[                Cleaner.Clean(__result);
+        <If Condition="Entity.ManagerExtensions == true and System.HasResult == true">
+          <![CDATA[                Cleaner.CleanUp(__result);
                 return __result;
 ]]>
         </If>

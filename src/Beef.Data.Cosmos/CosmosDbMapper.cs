@@ -82,13 +82,16 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Creates a <see cref="CosmosDbArgs{T, TModel}"/>.
         /// </summary>
-        /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null)
+        /// <param name="requestOptions">Optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>
@@ -97,11 +100,14 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
+        /// <param name="requestOptions">Optional <see cref="FeedOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>
@@ -110,11 +116,14 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
+        /// <param name="requestOptions">Optional <see cref="FeedOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>

@@ -27,24 +27,6 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class GenderData : IGenderData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private readonly Func<Guid, IDatabaseArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Gender?, Guid, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
-
-        private readonly Func<Gender, IDatabaseArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<Gender, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<Gender, IDatabaseArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<Gender, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -54,13 +36,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Gender? __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -75,13 +53,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Gender __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                return await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -96,13 +70,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Gender __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                return await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

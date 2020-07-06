@@ -32,17 +32,7 @@ namespace Cdr.Banking.Business.Data
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
-
         private readonly Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
-        private readonly Func<AccountArgs?, ICosmosDbArgs, Task>? _getAccountsOnBeforeAsync;
-        private readonly Func<AccountCollectionResult, AccountArgs?, Task>? _getAccountsOnAfterAsync;
-        private readonly Action<Exception>? _getAccountsOnException;
-
-        private readonly Func<string?, ICosmosDbArgs, Task>? _getDetailOnBeforeAsync;
-        private readonly Func<AccountDetail?, string?, Task>? _getDetailOnAfterAsync;
-        private readonly Action<Exception>? _getDetailOnException;
-
-        private readonly Action<Exception>? _getBalanceOnException;
 
         #pragma warning restore CS0649
         #endregion
@@ -58,13 +48,10 @@ namespace Cdr.Banking.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 AccountCollectionResult __result = new AccountCollectionResult(paging);
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getAccountsOnBeforeAsync != null) await _getAccountsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getAccountsOnQuery == null ? q : _getAccountsOnQuery(q, args, __dataArgs)).SelectQuery<AccountCollection>();
-                if (_getAccountsOnAfterAsync != null) await _getAccountsOnAfterAsync(__result, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getAccountsOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -76,14 +63,9 @@ namespace Cdr.Banking.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                AccountDetail? __result;
-                var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(accountId, __dataArgs).ConfigureAwait(false);
-                __result = await CosmosDb.Default.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
-                if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, accountId).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
+                var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None, onCreate: _onDataArgsCreate);
+                return await CosmosDb.Default.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -93,8 +75,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId),
-                new BusinessInvokerArgs { ExceptionHandler = _getBalanceOnException });
+            return DataInvoker.Default.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
         }
 
         /// <summary>

@@ -25,17 +25,6 @@ namespace Cdr.Banking.Business
     /// </summary>
     public partial class TransactionManager : ITransactionManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private readonly Func<string?, TransactionArgs?, PagingArgs?, Task>? _getTransactionsOnPreValidateAsync;
-        private readonly Action<MultiValidator, string?, TransactionArgs?, PagingArgs?>? _getTransactionsOnValidate;
-        private readonly Func<string?, TransactionArgs?, PagingArgs?, Task>? _getTransactionsOnBeforeAsync;
-        private readonly Func<TransactionCollectionResult, string?, TransactionArgs?, PagingArgs?, Task>? _getTransactionsOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Get transaction for account.
         /// </summary>
@@ -48,20 +37,13 @@ namespace Cdr.Banking.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(accountId, args);
-                if (_getTransactionsOnPreValidateAsync != null) await _getTransactionsOnPreValidateAsync(accountId, args, paging).ConfigureAwait(false);
-
+                Cleaner.CleanUp(accountId, args);
                 MultiValidator.Create()
                     .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
                     .Add(args.Validate(nameof(args)).Entity(TransactionArgsValidator.Default))
-                    .Additional((__mv) => _getTransactionsOnValidate?.Invoke(__mv, accountId, args, paging))
                     .Run().ThrowOnError();
 
-                if (_getTransactionsOnBeforeAsync != null) await _getTransactionsOnBeforeAsync(accountId, args, paging).ConfigureAwait(false);
-                var __result = await TransactionDataSvc.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
-                if (_getTransactionsOnAfterAsync != null) await _getTransactionsOnAfterAsync(__result, accountId, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await TransactionDataSvc.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
             });
         }
     }

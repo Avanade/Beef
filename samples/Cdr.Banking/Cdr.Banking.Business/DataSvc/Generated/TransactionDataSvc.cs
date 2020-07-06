@@ -23,14 +23,6 @@ namespace Cdr.Banking.Business.DataSvc
     /// </summary>
     public static partial class TransactionDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<TransactionCollectionResult, string?, TransactionArgs?, PagingArgs?, Task>? _getTransactionsOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Get transaction for account.
         /// </summary>
@@ -43,7 +35,6 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(TransactionDataSvc), async () => 
             {
                 var __result = await Factory.Create<ITransactionData>().GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
-                if (_getTransactionsOnAfterAsync != null) await _getTransactionsOnAfterAsync(__result, accountId, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }

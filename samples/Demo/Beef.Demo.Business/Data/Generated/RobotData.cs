@@ -32,27 +32,7 @@ namespace Beef.Demo.Business.Data
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
-
-        private readonly Func<Guid, ICosmosDbArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Robot?, Guid, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
-
-        private readonly Func<Robot, ICosmosDbArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<Robot, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<Robot, ICosmosDbArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<Robot, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        private readonly Func<Guid, ICosmosDbArgs, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
-        private readonly Action<Exception>? _deleteOnException;
-
         private readonly Func<IQueryable<Model.Robot>, RobotArgs?, ICosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
-        private readonly Func<RobotArgs?, ICosmosDbArgs, Task>? _getByArgsOnBeforeAsync;
-        private readonly Func<RobotCollectionResult, RobotArgs?, Task>? _getByArgsOnAfterAsync;
-        private readonly Action<Exception>? _getByArgsOnException;
 
         #pragma warning restore CS0649
         #endregion
@@ -66,14 +46,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Robot? __result;
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await CosmosDb.Default.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+                return await CosmosDb.Default.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -88,14 +63,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Robot __result;
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await CosmosDb.Default.Container(__dataArgs).CreateAsync(value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+                return await CosmosDb.Default.Container(__dataArgs).CreateAsync(value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -110,14 +80,9 @@ namespace Beef.Demo.Business.Data
 
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Robot __result;
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await CosmosDb.Default.Container(__dataArgs).UpdateAsync(value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
+                return await CosmosDb.Default.Container(__dataArgs).UpdateAsync(value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -128,12 +93,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
                 await CosmosDb.Default.Container(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
+            });
         }
 
         /// <summary>
@@ -147,13 +109,10 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 RobotCollectionResult __result = new RobotCollectionResult(paging);
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", __result.Paging!, PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<RobotCollection>();
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

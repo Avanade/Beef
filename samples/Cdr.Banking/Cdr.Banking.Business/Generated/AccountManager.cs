@@ -25,27 +25,6 @@ namespace Cdr.Banking.Business
     /// </summary>
     public partial class AccountManager : IAccountManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private readonly Func<AccountArgs?, PagingArgs?, Task>? _getAccountsOnPreValidateAsync;
-        private readonly Action<MultiValidator, AccountArgs?, PagingArgs?>? _getAccountsOnValidate;
-        private readonly Func<AccountArgs?, PagingArgs?, Task>? _getAccountsOnBeforeAsync;
-        private readonly Func<AccountCollectionResult, AccountArgs?, PagingArgs?, Task>? _getAccountsOnAfterAsync;
-
-        private readonly Func<string?, Task>? _getDetailOnPreValidateAsync;
-        private readonly Action<MultiValidator, string?>? _getDetailOnValidate;
-        private readonly Func<string?, Task>? _getDetailOnBeforeAsync;
-        private readonly Func<AccountDetail?, string?, Task>? _getDetailOnAfterAsync;
-
-        private readonly Func<string?, Task>? _getBalanceOnPreValidateAsync;
-        private readonly Action<MultiValidator, string?>? _getBalanceOnValidate;
-        private readonly Func<string?, Task>? _getBalanceOnBeforeAsync;
-        private readonly Func<Balance?, string?, Task>? _getBalanceOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Get all accounts.
         /// </summary>
@@ -57,19 +36,12 @@ namespace Cdr.Banking.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
-                if (_getAccountsOnPreValidateAsync != null) await _getAccountsOnPreValidateAsync(args, paging).ConfigureAwait(false);
-
+                Cleaner.CleanUp(args);
                 MultiValidator.Create()
                     .Add(args.Validate(nameof(args)).Entity(AccountArgsValidator.Default))
-                    .Additional((__mv) => _getAccountsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
-                if (_getAccountsOnBeforeAsync != null) await _getAccountsOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await AccountDataSvc.GetAccountsAsync(args, paging).ConfigureAwait(false);
-                if (_getAccountsOnAfterAsync != null) await _getAccountsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await AccountDataSvc.GetAccountsAsync(args, paging).ConfigureAwait(false));
             });
         }
 
@@ -83,19 +55,12 @@ namespace Cdr.Banking.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(accountId);
-                if (_getDetailOnPreValidateAsync != null) await _getDetailOnPreValidateAsync(accountId).ConfigureAwait(false);
-
+                Cleaner.CleanUp(accountId);
                 MultiValidator.Create()
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
-                    .Additional((__mv) => _getDetailOnValidate?.Invoke(__mv, accountId))
                     .Run().ThrowOnError();
 
-                if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(accountId).ConfigureAwait(false);
-                var __result = await AccountDataSvc.GetDetailAsync(accountId).ConfigureAwait(false);
-                if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, accountId).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await AccountDataSvc.GetDetailAsync(accountId).ConfigureAwait(false));
             });
         }
 
@@ -109,19 +74,12 @@ namespace Cdr.Banking.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(accountId);
-                if (_getBalanceOnPreValidateAsync != null) await _getBalanceOnPreValidateAsync(accountId).ConfigureAwait(false);
-
+                Cleaner.CleanUp(accountId);
                 MultiValidator.Create()
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
-                    .Additional((__mv) => _getBalanceOnValidate?.Invoke(__mv, accountId))
                     .Run().ThrowOnError();
 
-                if (_getBalanceOnBeforeAsync != null) await _getBalanceOnBeforeAsync(accountId).ConfigureAwait(false);
-                var __result = await AccountDataSvc.GetBalanceAsync(accountId).ConfigureAwait(false);
-                if (_getBalanceOnAfterAsync != null) await _getBalanceOnAfterAsync(__result, accountId).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await AccountDataSvc.GetBalanceAsync(accountId).ConfigureAwait(false));
             });
         }
     }

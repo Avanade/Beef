@@ -23,15 +23,6 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class ProductDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<Product?, int, Task>? _getOnAfterAsync;
-        private static readonly Func<ProductCollectionResult, ProductArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
         /// </summary>
@@ -42,12 +33,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Product>(__key, out Product __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Product __val))
                     return __val;
 
                 var __result = await Factory.Create<IProductData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -63,7 +53,6 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }

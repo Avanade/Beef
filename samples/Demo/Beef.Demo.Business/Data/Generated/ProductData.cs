@@ -31,14 +31,7 @@ namespace Beef.Demo.Business.Data
         #region Private
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
-        private readonly Func<int, IODataArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Product?, int, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
-
         private readonly Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
-        private readonly Func<ProductArgs?, IODataArgs, Task>? _getByArgsOnBeforeAsync;
-        private readonly Func<ProductCollectionResult, ProductArgs?, Task>? _getByArgsOnAfterAsync;
-        private readonly Action<Exception>? _getByArgsOnException;
 
         #pragma warning restore CS0649
         #endregion
@@ -52,13 +45,9 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
-                Product? __result;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await TestOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await TestOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -73,11 +62,9 @@ namespace Beef.Demo.Business.Data
             {
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!);
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = TestOData.Default.Query(__dataArgs, q => _getByArgsOnQuery == null ? q : _getByArgsOnQuery(q, args, __dataArgs)).SelectQuery<ProductCollection>();
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsOnException });
+                __result.Result = TestOData.Default.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

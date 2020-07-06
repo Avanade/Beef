@@ -135,7 +135,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
-                EntityBase.CleanUp(value);
+                Cleaner.CleanUp(value);
                 if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -146,7 +146,7 @@ namespace Beef.Demo.Business
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
                 var __result = await PersonDataSvc.CreateAsync(value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -160,7 +160,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
-                EntityBase.CleanUp(id);
+                Cleaner.CleanUp(id);
                 if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -184,7 +184,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
+                Cleaner.CleanUp(id);
                 if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -195,7 +195,7 @@ namespace Beef.Demo.Business
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetAsync(id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -214,7 +214,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
+                Cleaner.CleanUp(value);
                 if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -225,7 +225,7 @@ namespace Beef.Demo.Business
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.UpdateAsync(value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -243,7 +243,7 @@ namespace Beef.Demo.Business
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -260,7 +260,7 @@ namespace Beef.Demo.Business
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -276,7 +276,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
+                Cleaner.CleanUp(args);
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -287,7 +287,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -303,7 +303,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
+                Cleaner.CleanUp(args);
                 if (_getDetailByArgsOnPreValidateAsync != null) await _getDetailByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -314,7 +314,7 @@ namespace Beef.Demo.Business
                 if (_getDetailByArgsOnBeforeAsync != null) await _getDetailByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -330,7 +330,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
-                EntityBase.CleanUp(fromId, toId);
+                Cleaner.CleanUp(fromId, toId);
                 if (_mergeOnPreValidateAsync != null) await _mergeOnPreValidateAsync(fromId, toId).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -342,7 +342,7 @@ namespace Beef.Demo.Business
                 if (_mergeOnBeforeAsync != null) await _mergeOnBeforeAsync(fromId, toId).ConfigureAwait(false);
                 var __result = await PersonDataSvc.MergeAsync(fromId, toId).ConfigureAwait(false);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -371,7 +371,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
+                Cleaner.CleanUp(args);
                 if (_mapOnPreValidateAsync != null) await _mapOnPreValidateAsync(args).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -381,7 +381,7 @@ namespace Beef.Demo.Business
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
                 var __result = await PersonDataSvc.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -396,7 +396,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
+                Cleaner.CleanUp(id);
                 if (_getDetailOnPreValidateAsync != null) await _getDetailOnPreValidateAsync(id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -407,7 +407,7 @@ namespace Beef.Demo.Business
                 if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetDetailAsync(id).ConfigureAwait(false);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -426,7 +426,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
+                Cleaner.CleanUp(value);
                 if (_updateDetailOnPreValidateAsync != null) await _updateDetailOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -437,7 +437,7 @@ namespace Beef.Demo.Business
                 if (_updateDetailOnBeforeAsync != null) await _updateDetailOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.UpdateDetailAsync(value).ConfigureAwait(false);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -467,7 +467,7 @@ namespace Beef.Demo.Business
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
                 var __result = await PersonDataSvc.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -482,7 +482,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
-                EntityBase.CleanUp(name);
+                Cleaner.CleanUp(name);
                 if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -492,7 +492,7 @@ namespace Beef.Demo.Business
                 if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetNullAsync(name).ConfigureAwait(false);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -508,7 +508,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
+                Cleaner.CleanUp(args);
                 if (_getByArgsWithEfOnPreValidateAsync != null) await _getByArgsWithEfOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -519,7 +519,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsWithEfOnBeforeAsync != null) await _getByArgsWithEfOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -534,7 +534,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
+                Cleaner.CleanUp(id);
                 if (_getWithEfOnPreValidateAsync != null) await _getWithEfOnPreValidateAsync(id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -545,7 +545,7 @@ namespace Beef.Demo.Business
                 if (_getWithEfOnBeforeAsync != null) await _getWithEfOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.GetWithEfAsync(id).ConfigureAwait(false);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -562,7 +562,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
-                EntityBase.CleanUp(value);
+                Cleaner.CleanUp(value);
                 if (_createWithEfOnPreValidateAsync != null) await _createWithEfOnPreValidateAsync(value).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -573,7 +573,7 @@ namespace Beef.Demo.Business
                 if (_createWithEfOnBeforeAsync != null) await _createWithEfOnBeforeAsync(value).ConfigureAwait(false);
                 var __result = await PersonDataSvc.CreateWithEfAsync(value).ConfigureAwait(false);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -592,7 +592,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
+                Cleaner.CleanUp(value);
                 if (_updateWithEfOnPreValidateAsync != null) await _updateWithEfOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 MultiValidator.Create()
@@ -603,7 +603,7 @@ namespace Beef.Demo.Business
                 if (_updateWithEfOnBeforeAsync != null) await _updateWithEfOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await PersonDataSvc.UpdateWithEfAsync(value).ConfigureAwait(false);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
+                Cleaner.CleanUp(__result);
                 return __result;
             });
         }
@@ -617,7 +617,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
-                EntityBase.CleanUp(id);
+                Cleaner.CleanUp(id);
                 if (_deleteWithEfOnPreValidateAsync != null) await _deleteWithEfOnPreValidateAsync(id).ConfigureAwait(false);
 
                 MultiValidator.Create()

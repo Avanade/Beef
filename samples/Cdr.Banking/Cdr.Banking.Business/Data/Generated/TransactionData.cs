@@ -32,11 +32,7 @@ namespace Cdr.Banking.Business.Data
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
-
         private readonly Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, ICosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
-        private readonly Func<string?, TransactionArgs?, ICosmosDbArgs, Task>? _getTransactionsOnBeforeAsync;
-        private readonly Func<TransactionCollectionResult, string?, TransactionArgs?, Task>? _getTransactionsOnAfterAsync;
-        private readonly Action<Exception>? _getTransactionsOnException;
 
         #pragma warning restore CS0649
         #endregion
@@ -53,13 +49,10 @@ namespace Cdr.Banking.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 TransactionCollectionResult __result = new TransactionCollectionResult(paging);
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Transaction", __result.Paging!, new PartitionKey(accountId));
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getTransactionsOnBeforeAsync != null) await _getTransactionsOnBeforeAsync(accountId, args, __dataArgs).ConfigureAwait(false);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getTransactionsOnQuery == null ? q : _getTransactionsOnQuery(q, accountId, args, __dataArgs)).SelectQuery<TransactionCollection>();
-                if (_getTransactionsOnAfterAsync != null) await _getTransactionsOnAfterAsync(__result, accountId, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getTransactionsOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Transaction", __result.Paging!, new PartitionKey(accountId), onCreate: _onDataArgsCreate);
+                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getTransactionsOnQuery?.Invoke(q, accountId, args, __dataArgs) ?? q).SelectQuery<TransactionCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

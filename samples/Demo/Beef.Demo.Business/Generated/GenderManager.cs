@@ -24,27 +24,6 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class GenderManager : IGenderManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private readonly Func<Guid, Task>? _getOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getOnValidate;
-        private readonly Func<Guid, Task>? _getOnBeforeAsync;
-        private readonly Func<Gender?, Guid, Task>? _getOnAfterAsync;
-
-        private readonly Func<Gender, Task>? _createOnPreValidateAsync;
-        private readonly Action<MultiValidator, Gender>? _createOnValidate;
-        private readonly Func<Gender, Task>? _createOnBeforeAsync;
-        private readonly Func<Gender, Task>? _createOnAfterAsync;
-
-        private readonly Func<Gender, Guid, Task>? _updateOnPreValidateAsync;
-        private readonly Action<MultiValidator, Gender, Guid>? _updateOnValidate;
-        private readonly Func<Gender, Guid, Task>? _updateOnBeforeAsync;
-        private readonly Func<Gender, Guid, Task>? _updateOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -55,19 +34,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
-                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await GenderDataSvc.GetAsync(id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await GenderDataSvc.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -83,19 +55,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
-                EntityBase.CleanUp(value);
-                if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
-                    .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
                     .Run().ThrowOnError();
 
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
-                var __result = await GenderDataSvc.CreateAsync(value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await GenderDataSvc.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -113,19 +78,12 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
-                if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
-                    .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
                     .Run().ThrowOnError();
 
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await GenderDataSvc.UpdateAsync(value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await GenderDataSvc.UpdateAsync(value).ConfigureAwait(false));
             });
         }
     }

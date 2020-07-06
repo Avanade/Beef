@@ -91,7 +91,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Person>(__key, out Person __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Person __val))
                     return __val;
 
                 var __result = await Factory.Create<IPersonData>().GetAsync(id).ConfigureAwait(false);
@@ -235,7 +235,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<PersonDetail>(__key, out PersonDetail __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out PersonDetail __val))
                     return __val;
 
                 var __result = await Factory.Create<IPersonData>().GetDetailAsync(id).ConfigureAwait(false);
@@ -317,7 +317,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Person>(__key, out Person __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Person __val))
                     return __val;
 
                 var __result = await Factory.Create<IPersonData>().GetWithEfAsync(id).ConfigureAwait(false);

@@ -23,17 +23,6 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public static partial class TripPersonDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<TripPerson?, string?, Task>? _getOnAfterAsync;
-        private static readonly Func<TripPerson, Task>? _createOnAfterAsync;
-        private static readonly Func<TripPerson, Task>? _updateOnAfterAsync;
-        private static readonly Func<string?, Task>? _deleteOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
         /// </summary>
@@ -44,12 +33,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<TripPerson>(__key, out TripPerson __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out TripPerson __val))
                     return __val;
 
                 var __result = await Factory.Create<ITripPersonData>().GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -66,7 +54,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<ITripPersonData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -83,7 +70,6 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await Factory.Create<ITripPersonData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -99,7 +85,6 @@ namespace Beef.Demo.Business.DataSvc
                 await Factory.Create<ITripPersonData>().DeleteAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishEventAsync($"Demo.TripPerson.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<TripPerson>(new UniqueKey(id));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
         }
     }

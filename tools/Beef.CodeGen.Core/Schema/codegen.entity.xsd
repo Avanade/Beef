@@ -1115,6 +1115,69 @@
                 <xs:documentation>Indicates whether to automatically infer the interface implements for the entity from the properties declared (being IGuidIdentifier, IIntIdentifier, IStringIdentifier, IETag and IChangeLog). Defaults to true.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="ManagerExtensions" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies whether the extensions should be generated for the Manager code. Default to false.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataSvcExtensions" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies whether the extensions should be generated for the DataSvc code. Default to false.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="DataExtensions" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies whether the extensions should be generated for the Data code. Default to false.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ControllerConstructor" use="optional">
+              <xs:annotation>
+                <xs:documentation>Defines the access modifier for the generated for the Controller constructor. Default to 'Public'.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Public"/>
+                  <xs:enumeration value="Private"/>
+                  <xs:enumeration value="Protected"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ManagerConstructor" use="optional">
+              <xs:annotation>
+                <xs:documentation>Defines the access modifier for the generated for the Manager constructor. Default to 'Public'.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Public"/>
+                  <xs:enumeration value="Private"/>
+                  <xs:enumeration value="Protected"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="DataSvcConstructor" use="optional">
+              <xs:annotation>
+                <xs:documentation>Defines the access modifier for the generated for the Manager constructor. Default to 'Public'.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Public"/>
+                  <xs:enumeration value="Private"/>
+                  <xs:enumeration value="Protected"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="DataConstructor" use="optional">
+              <xs:annotation>
+                <xs:documentation>Defines the access modifier for the generated for the Manager constructor. Default to 'Public'.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Public"/>
+                  <xs:enumeration value="Private"/>
+                  <xs:enumeration value="Protected"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

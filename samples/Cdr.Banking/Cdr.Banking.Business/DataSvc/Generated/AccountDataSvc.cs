@@ -23,16 +23,6 @@ namespace Cdr.Banking.Business.DataSvc
     /// </summary>
     public static partial class AccountDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
-
-        private static readonly Func<AccountCollectionResult, AccountArgs?, PagingArgs?, Task>? _getAccountsOnAfterAsync;
-        private static readonly Func<AccountDetail?, string?, Task>? _getDetailOnAfterAsync;
-        private static readonly Func<Balance?, string?, Task>? _getBalanceOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
-
         /// <summary>
         /// Get all accounts.
         /// </summary>
@@ -44,7 +34,6 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __result = await Factory.Create<IAccountData>().GetAccountsAsync(args, paging).ConfigureAwait(false);
-                if (_getAccountsOnAfterAsync != null) await _getAccountsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -59,12 +48,11 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue<AccountDetail>(__key, out AccountDetail __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out AccountDetail __val))
                     return __val;
 
                 var __result = await Factory.Create<IAccountData>().GetDetailAsync(accountId).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, accountId).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -79,12 +67,11 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue<Balance>(__key, out Balance __val))
+                if (ExecutionContext.Current.TryGetCacheValue(__key, out Balance __val))
                     return __val;
 
                 var __result = await Factory.Create<IAccountData>().GetBalanceAsync(accountId).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getBalanceOnAfterAsync != null) await _getBalanceOnAfterAsync(__result, accountId).ConfigureAwait(false);
                 return __result;
             });
         }

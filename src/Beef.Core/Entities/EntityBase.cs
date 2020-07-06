@@ -14,27 +14,6 @@ namespace Beef.Entities
     {
         private object? _editCopy;
 
-        #region Static
-
-        /// <summary>
-        /// Performs a <see cref="ICleanUp.CleanUp"/> on the <paramref name="values"/>.
-        /// </summary>
-        /// <param name="values">List of values to <see cref="ICleanUp.CleanUp"/>.</param>
-        /// <remarks>Only cleans up values that implement <see cref="ICleanUp"/>; otherwise, they will remain unchanged.</remarks>
-        public static void CleanUp(params object?[] values)
-        {
-            if (values == null)
-                return;
-
-            foreach (object? o in values)
-            {
-                if (o != null && o is ICleanUp value)
-                    value.CleanUp();
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Performs a deep copy from another object updating this instance.
         /// </summary>
