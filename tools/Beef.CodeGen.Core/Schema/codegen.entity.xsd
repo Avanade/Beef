@@ -606,9 +606,14 @@
                       <xs:documentation>Indicates whether to exlcude the creation of the operation in the XxxData.cs</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="ExcludeDataSvc" type="xs:boolean" use="optional">
+                  <xs:attribute name="ExcludeIDataSvc" type="xs:boolean" use="optional">
                     <xs:annotation>
                       <xs:documentation>Indicates whether to exclude the creation of the operation in the IXxxDataService.cs</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeDataSvc" type="xs:boolean" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether to exclude the creation of the operation in the XxxDataService.cs</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="ExcludeIManager" type="xs:boolean" use="optional">
@@ -833,6 +838,11 @@
             <xs:attribute name="ExcludeData" type="xs:boolean" use="optional">
               <xs:annotation>
                 <xs:documentation>Indicates whether to exlcude the creation of the Data class (XxxData.cs).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeIDataSvc" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Indicates whether to exclude the creation of the IDataSvc class (IXxxDataSvc.cs).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ExcludeDataSvc" type="xs:boolean" use="optional">

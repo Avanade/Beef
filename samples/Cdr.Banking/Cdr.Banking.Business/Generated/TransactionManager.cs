@@ -43,7 +43,7 @@ namespace Cdr.Banking.Business
                     .Add(args.Validate(nameof(args)).Entity(TransactionArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await TransactionDataSvc.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<ITransactionDataSvc>().GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
             });
         }
     }

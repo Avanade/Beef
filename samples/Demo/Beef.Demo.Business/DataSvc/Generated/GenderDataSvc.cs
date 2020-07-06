@@ -21,14 +21,14 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Gender data repository services.
     /// </summary>
-    public static partial class GenderDataSvc
+    public partial class GenderDataSvc : IGenderDataSvc
     {
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Gender?> GetAsync(Guid id)
+        public Task<Gender?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
@@ -47,7 +47,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
-        public static Task<Gender> CreateAsync(Gender value)
+        public Task<Gender> CreateAsync(Gender value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
@@ -63,7 +63,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
-        public static Task<Gender> UpdateAsync(Gender value)
+        public Task<Gender> UpdateAsync(Gender value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {

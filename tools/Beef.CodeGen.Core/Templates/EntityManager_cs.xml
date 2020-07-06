@@ -657,9 +657,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
           </Then>
           <Else>
-            <![CDATA[await {{Entity.Name}}DataSvc]]>
+            <![CDATA[await Factory.Create<I{{Entity.Name}}DataSvc]]>
             <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
-            <![CDATA[.{{Operation.Name}}Async(]]>
+            <![CDATA[>().{{Operation.Name}}Async(]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <![CDATA[value]]>
             </If>

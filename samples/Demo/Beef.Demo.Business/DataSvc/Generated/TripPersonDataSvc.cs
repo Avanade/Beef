@@ -21,14 +21,14 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Trip Person data repository services.
     /// </summary>
-    public static partial class TripPersonDataSvc
+    public partial class TripPersonDataSvc : ITripPersonDataSvc
     {
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<TripPerson?> GetAsync(string? id)
+        public Task<TripPerson?> GetAsync(string? id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
@@ -47,7 +47,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/> object.</param>
         /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
-        public static Task<TripPerson> CreateAsync(TripPerson value)
+        public Task<TripPerson> CreateAsync(TripPerson value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
@@ -63,7 +63,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/> object.</param>
         /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
-        public static Task<TripPerson> UpdateAsync(TripPerson value)
+        public Task<TripPerson> UpdateAsync(TripPerson value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
@@ -78,7 +78,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="TripPerson"/> object.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        public static Task DeleteAsync(string? id)
+        public Task DeleteAsync(string? id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {

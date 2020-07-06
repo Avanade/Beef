@@ -33,7 +33,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                return Cleaner.Clean(await ContactDataSvc.GetAllAsync().ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().GetAllAsync().ConfigureAwait(false));
             });
         }
 
@@ -52,7 +52,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await ContactDataSvc.GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await ContactDataSvc.CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -96,7 +96,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await ContactDataSvc.UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -114,7 +114,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await ContactDataSvc.DeleteAsync(id).ConfigureAwait(false);
+                await Factory.Create<IContactDataSvc>().DeleteAsync(id).ConfigureAwait(false);
             });
         }
     }

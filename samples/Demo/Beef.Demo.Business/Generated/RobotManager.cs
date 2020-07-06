@@ -40,7 +40,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await RobotDataSvc.GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -61,7 +61,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await RobotDataSvc.CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -84,7 +84,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await RobotDataSvc.UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -102,7 +102,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await RobotDataSvc.DeleteAsync(id).ConfigureAwait(false);
+                await Factory.Create<IRobotDataSvc>().DeleteAsync(id).ConfigureAwait(false);
             });
         }
 
@@ -122,7 +122,7 @@ namespace Beef.Demo.Business
                     .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await RobotDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
 

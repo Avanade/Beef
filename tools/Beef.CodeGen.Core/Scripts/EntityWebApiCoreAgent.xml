@@ -7,6 +7,7 @@
   
   <Generate Template="IEntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" HelpText="Business\Data" />
   <Generate Template="EntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" HelpText="Business\Data" />
+  <Generate Template="IEntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" HelpText="Business\DataSvc" />
   <Generate Template="EntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" HelpText="Business\DataSvc" />
   <Generate Template="IEntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" />
   <Generate Template="EntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" />

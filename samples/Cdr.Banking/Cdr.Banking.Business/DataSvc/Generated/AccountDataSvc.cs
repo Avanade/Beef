@@ -21,7 +21,7 @@ namespace Cdr.Banking.Business.DataSvc
     /// <summary>
     /// Provides the Account data repository services.
     /// </summary>
-    public static partial class AccountDataSvc
+    public partial class AccountDataSvc : IAccountDataSvc
     {
         /// <summary>
         /// Get all accounts.
@@ -29,7 +29,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
-        public static Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
@@ -43,7 +43,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
@@ -62,7 +62,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Balance?> GetBalanceAsync(string? accountId)
+        public Task<Balance?> GetBalanceAsync(string? accountId)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {

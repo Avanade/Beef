@@ -39,7 +39,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await TripPersonDataSvc.GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +60,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await TripPersonDataSvc.CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -83,7 +83,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await TripPersonDataSvc.UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -101,7 +101,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await TripPersonDataSvc.DeleteAsync(id).ConfigureAwait(false);
+                await Factory.Create<ITripPersonDataSvc>().DeleteAsync(id).ConfigureAwait(false);
             });
         }
     }

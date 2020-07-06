@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Beef.Demo.Business.DataSvc
 {
-    public static partial class PersonDataSvc
+    public partial class PersonDataSvc
     {
-        static PersonDataSvc()
+        public PersonDataSvc()
         {
             _markOnAfterAsync = MarkOnAfterAsync;
         }

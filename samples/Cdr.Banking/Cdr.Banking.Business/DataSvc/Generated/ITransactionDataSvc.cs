@@ -10,18 +10,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Beef;
-using Beef.Business;
 using Beef.Entities;
-using Cdr.Banking.Business.Data;
 using Cdr.Banking.Common.Entities;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Transaction data repository services.
+    /// Defines the Transaction data repository services.
     /// </summary>
-    public partial class TransactionDataSvc : ITransactionDataSvc
+    public partial interface ITransactionDataSvc
     {
         /// <summary>
         /// Get transaction for account.
@@ -30,14 +28,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
-        public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
-        {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TransactionDataSvc), async () => 
-            {
-                var __result = await Factory.Create<ITransactionData>().GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
-                return __result;
-            });
-        }
+        Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
     }
 }
 

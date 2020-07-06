@@ -39,7 +39,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await GenderDataSvc.GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +60,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await GenderDataSvc.CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -83,7 +83,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await GenderDataSvc.UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().UpdateAsync(value).ConfigureAwait(false));
             });
         }
     }

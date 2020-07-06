@@ -21,13 +21,13 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Contact data repository services.
     /// </summary>
-    public static partial class ContactDataSvc
+    public partial class ContactDataSvc : IContactDataSvc
     {
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
         /// </summary>
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
-        public static Task<ContactCollectionResult> GetAllAsync()
+        public Task<ContactCollectionResult> GetAllAsync()
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
@@ -41,7 +41,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Contact?> GetAsync(Guid id)
+        public Task<Contact?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
@@ -60,7 +60,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Contact"/> object.</param>
         /// <returns>A refreshed <see cref="Contact"/> object.</returns>
-        public static Task<Contact> CreateAsync(Contact value)
+        public Task<Contact> CreateAsync(Contact value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
@@ -76,7 +76,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Contact"/> object.</param>
         /// <returns>A refreshed <see cref="Contact"/> object.</returns>
-        public static Task<Contact> UpdateAsync(Contact value)
+        public Task<Contact> UpdateAsync(Contact value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
@@ -91,7 +91,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="Contact"/> object.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        public static Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {

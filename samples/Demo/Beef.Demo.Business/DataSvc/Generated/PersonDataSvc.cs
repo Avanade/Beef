@@ -21,30 +21,30 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Person data repository services.
     /// </summary>
-    public static partial class PersonDataSvc
+    public partial class PersonDataSvc : IPersonDataSvc
     {
         #region Private
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
-        private static readonly Func<Person, Task>? _createOnAfterAsync;
-        private static readonly Func<Guid, Task>? _deleteOnAfterAsync;
-        private static readonly Func<Person?, Guid, Task>? _getOnAfterAsync;
-        private static readonly Func<Person, Task>? _updateOnAfterAsync;
-        private static readonly Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
-        private static readonly Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
-        private static readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
-        private static readonly Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
-        private static readonly Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
-        private static readonly Func<Task>? _markOnAfterAsync;
-        private static readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
-        private static readonly Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
-        private static readonly Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
-        private static readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
-        private static readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
-        private static readonly Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
-        private static readonly Func<Person, Task>? _createWithEfOnAfterAsync;
-        private static readonly Func<Person, Task>? _updateWithEfOnAfterAsync;
-        private static readonly Func<Guid, Task>? _deleteWithEfOnAfterAsync;
+        private readonly Func<Person, Task>? _createOnAfterAsync;
+        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
+        private readonly Func<Person?, Guid, Task>? _getOnAfterAsync;
+        private readonly Func<Person, Task>? _updateOnAfterAsync;
+        private readonly Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
+        private readonly Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
+        private readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
+        private readonly Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
+        private readonly Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
+        private readonly Func<Task>? _markOnAfterAsync;
+        private readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+        private readonly Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
+        private readonly Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
+        private readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
+        private readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
+        private readonly Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
+        private readonly Func<Person, Task>? _createWithEfOnAfterAsync;
+        private readonly Func<Person, Task>? _updateWithEfOnAfterAsync;
+        private readonly Func<Guid, Task>? _deleteWithEfOnAfterAsync;
 
         #pragma warning restore CS0649
         #endregion
@@ -54,7 +54,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Person"/> object.</param>
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
-        public static Task<Person> CreateAsync(Person value)
+        public Task<Person> CreateAsync(Person value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -70,7 +70,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="Person"/> object.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public static Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -86,7 +86,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Person?> GetAsync(Guid id)
+        public Task<Person?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -106,7 +106,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Person"/> object.</param>
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
-        public static Task<Person> UpdateAsync(Person value)
+        public Task<Person> UpdateAsync(Person value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -123,7 +123,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
-        public static Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
+        public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -137,7 +137,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
         /// </summary>
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
-        public static Task<PersonCollectionResult> GetAll2Async()
+        public Task<PersonCollectionResult> GetAll2Async()
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -153,7 +153,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
-        public static Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
+        public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -169,7 +169,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
-        public static Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
+        public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -185,7 +185,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public static Task<Person> MergeAsync(Guid fromId, Guid toId)
+        public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -201,7 +201,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        public static Task MarkAsync()
+        public Task MarkAsync()
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -215,7 +215,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        public static Task<MapCoordinates> MapAsync(MapArgs? args)
+        public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -230,7 +230,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<PersonDetail?> GetDetailAsync(Guid id)
+        public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -250,7 +250,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="PersonDetail"/> object.</param>
         /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
-        public static Task<PersonDetail> UpdateDetailAsync(PersonDetail value)
+        public Task<PersonDetail> UpdateDetailAsync(PersonDetail value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -266,7 +266,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Validate a DataSvc Custom generation.
         /// </summary>
         /// <returns>A resultant <see cref="int"/>.</returns>
-        public static Task<int> DataSvcCustomAsync()
+        public Task<int> DataSvcCustomAsync()
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -280,7 +280,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="name">The Name.</param>
         /// <returns>A resultant <see cref="Person?"/>.</returns>
-        public static Task<Person?> GetNullAsync(string? name)
+        public Task<Person?> GetNullAsync(string? name)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -297,7 +297,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
-        public static Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
+        public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -312,7 +312,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Person?> GetWithEfAsync(Guid id)
+        public Task<Person?> GetWithEfAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -332,7 +332,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Person"/> object.</param>
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
-        public static Task<Person> CreateWithEfAsync(Person value)
+        public Task<Person> CreateWithEfAsync(Person value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -349,7 +349,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Person"/> object.</param>
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
-        public static Task<Person> UpdateWithEfAsync(Person value)
+        public Task<Person> UpdateWithEfAsync(Person value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
@@ -365,7 +365,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="Person"/> object.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        public static Task DeleteWithEfAsync(Guid id)
+        public Task DeleteWithEfAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {

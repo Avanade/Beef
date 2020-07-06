@@ -53,7 +53,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     /// <summary>
     /// Provides the {{Entity.Text:ToComments}} data repository services.
     /// </summary>
-    public static partial class {{Entity.Name}}DataSvc]]>
+    public partial class {{Entity.Name}}DataSvc : I{{Entity.Name}}DataSvc]]>
       <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
       <![CDATA[
     {
@@ -68,7 +68,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 
 ]]>
           </If>
-          <![CDATA[        private static readonly Func<]]>
+          <![CDATA[        private readonly Func<]]>
           <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
@@ -225,11 +225,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>A {{Entity.EntityCollectionResultName:ToSeeComments}}.</returns>
-        public static Task<{{Entity.EntityCollectionResultName}}> {{Operation.Name}}Async(]]>
+        public Task<{{Entity.EntityCollectionResultName}}> {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>A <see cref="{{Operation.ReturnType}}CollectionResult"/>.</returns>
-        public static Task<{{Operation.ReturnType}}CollectionResult> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}CollectionResult> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>
@@ -237,11 +237,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>The selected {{Entity.EntityName:ToSeeComments}} object where found; otherwise, <c>null</c>.</returns>
-        public static Task<{{Entity.EntityName}}?> {{Operation.Name}}Async(]]>
+        public Task<{{Entity.EntityName}}?> {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>The selected {{Operation.ReturnType:ToSeeComments}} object where found; otherwise, <c>null</c>.</returns>
-        public static Task<{{Operation.ReturnType}}?> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}?> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>
@@ -249,11 +249,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>A refreshed {{Entity.EntityName:ToSeeComments}} object.</returns>
-        public static Task<{{Entity.EntityName}}>]]>
+        public Task<{{Entity.EntityName}}>]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>A refreshed {{Operation.ReturnType:ToSeeComments}} object.</returns>
-        public static Task<{{Operation.ReturnType}}>]]>
+        public Task<{{Operation.ReturnType}}>]]>
             </Else>
           </If>
           <![CDATA[ {{Operation.Name}}Async(]]>
@@ -264,16 +264,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <![CDATA[ value]]>
         </If>
         <If Condition="Operation.OperationType == 'Delete'">
-          <![CDATA[        public static Task {{Operation.Name}}Async(]]>
+          <![CDATA[        public Task {{Operation.Name}}Async(]]>
         </If>
         <If Condition="Operation.OperationType == 'Custom'">
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
-              <![CDATA[        public static Task {{Operation.Name}}Async(]]>
+              <![CDATA[        public Task {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>{{Operation.ReturnText:ToComments}}</returns>
-        public static Task<{{Operation.ReturnType}}> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>

@@ -21,14 +21,14 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Robot data repository services.
     /// </summary>
-    public static partial class RobotDataSvc
+    public partial class RobotDataSvc : IRobotDataSvc
     {
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Robot?> GetAsync(Guid id)
+        public Task<Robot?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
@@ -47,7 +47,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Robot"/> object.</param>
         /// <returns>A refreshed <see cref="Robot"/> object.</returns>
-        public static Task<Robot> CreateAsync(Robot value)
+        public Task<Robot> CreateAsync(Robot value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
@@ -63,7 +63,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Robot"/> object.</param>
         /// <returns>A refreshed <see cref="Robot"/> object.</returns>
-        public static Task<Robot> UpdateAsync(Robot value)
+        public Task<Robot> UpdateAsync(Robot value)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
@@ -78,7 +78,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="Robot"/> object.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public static Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
@@ -94,7 +94,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
-        public static Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
+        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {

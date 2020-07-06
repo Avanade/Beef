@@ -41,7 +41,7 @@ namespace Cdr.Banking.Business
                     .Add(args.Validate(nameof(args)).Entity(AccountArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await AccountDataSvc.GetAccountsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetAccountsAsync(args, paging).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +60,7 @@ namespace Cdr.Banking.Business
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await AccountDataSvc.GetDetailAsync(accountId).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetDetailAsync(accountId).ConfigureAwait(false));
             });
         }
 
@@ -79,7 +79,7 @@ namespace Cdr.Banking.Business
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await AccountDataSvc.GetBalanceAsync(accountId).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetBalanceAsync(accountId).ConfigureAwait(false));
             });
         }
     }

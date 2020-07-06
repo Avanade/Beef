@@ -38,6 +38,7 @@
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
     <None Remove="Templates\EntityGrpcServiceAgent_cs.xml" />
+    <None Remove="Templates\IEntityDataSvc_cs.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +79,7 @@
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
     <EmbeddedResource Include="Templates\Grpc_proto.xml" />
+    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\IEntityData_cs.xml" />
     <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />

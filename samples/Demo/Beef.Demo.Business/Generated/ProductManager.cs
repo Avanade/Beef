@@ -40,7 +40,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await ProductDataSvc.GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IProductDataSvc>().GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +60,7 @@ namespace Beef.Demo.Business
                     .Add(args.Validate(nameof(args)).Entity(ProductArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await ProductDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await Factory.Create<IProductDataSvc>().GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
     }
