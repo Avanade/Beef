@@ -11,7 +11,11 @@
   <Generate Template="EntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" HelpText="Business\DataSvc" />
   <Generate Template="IEntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" />
   <Generate Template="EntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" />
-  
+
+  <Generate Template="ServiceCollectionExtensionsManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" />
+  <Generate Template="ServiceCollectionExtensionsDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" HelpText="Business\DataSvc" />
+  <Generate Template="ServiceCollectionExtensionsData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" HelpText="Business\Data" />
+
   <Generate Template="EntityWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Controllers" EntityScope="Common" HelpText="Api\Controllers" />
   <Generate Template="EntityWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" HelpText="Common\Agents" />
   <Generate Template="EntityWebApiServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents\ServiceAgents" EntityScope="Common" HelpText="Common\Agents\ServiceAgents" />

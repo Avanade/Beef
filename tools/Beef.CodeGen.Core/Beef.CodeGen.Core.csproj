@@ -39,6 +39,9 @@
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
     <None Remove="Templates\EntityGrpcServiceAgent_cs.xml" />
     <None Remove="Templates\IEntityDataSvc_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsData_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsManager_cs.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +94,9 @@
     <EmbeddedResource Include="Templates\ReferenceDataWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiServiceAgent_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.xml" />
   </ItemGroup>
 
   <ItemGroup>
