@@ -21,11 +21,24 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Contact</b> API functionality.
+    /// Provides the <b>Contact</b> Web API functionality.
     /// </summary>
     [Route("api/v1/contacts")]
     public partial class ContactController : ControllerBase
     {
+        private readonly IContactManager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ContactController() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IContactManager"/>.</param>
+        public ContactController(IContactManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="Contact"/> collection entity that matches the selection criteria.
         /// </summary>
@@ -36,7 +49,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll()
         {
-            return new WebApiGet<ContactCollectionResult, ContactCollection, Contact>(this, () => Factory.Create<IContactManager>().GetAllAsync(),
+            return new WebApiGet<ContactCollectionResult, ContactCollection, Contact>(this, () => _manager.GetAllAsync(),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -51,7 +64,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
         {
-            return new WebApiGet<Contact?>(this, () => Factory.Create<IContactManager>().GetAsync(id),
+            return new WebApiGet<Contact?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -65,7 +78,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Contact value)
         {
-            return new WebApiPost<Contact>(this, () => Factory.Create<IContactManager>().CreateAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<Contact>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -80,7 +93,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Contact value, Guid id)
         {
-            return new WebApiPut<Contact>(this, () => Factory.Create<IContactManager>().UpdateAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<Contact>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -93,7 +106,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {
-            return new WebApiDelete(this, () => Factory.Create<IContactManager>().DeleteAsync(id),
+            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
     }

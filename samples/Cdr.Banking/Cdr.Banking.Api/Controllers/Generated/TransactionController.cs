@@ -21,11 +21,24 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Transaction</b> API functionality.
+    /// Provides the <b>Transaction</b> Web API functionality.
     /// </summary>
     [Route("api/v1/banking/accounts")]
     public partial class TransactionController : ControllerBase
     {
+        private readonly ITransactionManager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TransactionController() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="ITransactionManager"/>.</param>
+        public TransactionController(ITransactionManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+
         /// <summary>
         /// Get transaction for account.
         /// </summary>
@@ -43,7 +56,7 @@ namespace Cdr.Banking.Api.Controllers
         public IActionResult GetTransactions([FromRoute] string? accountId, [FromQuery(Name = "oldest-time")] DateTime? fromDate = default, [FromQuery(Name = "newest-time")] DateTime? toDate = default, [FromQuery(Name = "min-amount")] decimal? minAmount = default, [FromQuery(Name = "max-amount")] decimal? maxAmount = default, string? text = default)
         {
             var args = new TransactionArgs { FromDate = fromDate, ToDate = toDate, MinAmount = minAmount, MaxAmount = maxAmount, Text = text };
-            return new WebApiGet<TransactionCollectionResult, TransactionCollection, Transaction>(this, () => Factory.Create<ITransactionManager>().GetTransactionsAsync(accountId, args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<TransactionCollectionResult, TransactionCollection, Transaction>(this, () => _manager.GetTransactionsAsync(accountId, args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
     }

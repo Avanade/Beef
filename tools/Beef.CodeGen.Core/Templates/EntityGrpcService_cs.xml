@@ -18,6 +18,7 @@
 using Beef.Demo.Business;
 using Beef.Grpc;
 using Grpc.Core;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using {{Config.Company}}.{{Config.AppName}}.Common.Grpc;
@@ -48,13 +49,28 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
         </If>
         <![CDATA[    public partial class {{Entity.Name}}Service : {{Entity.Name}}GrpcService.{{Entity.Name}}GrpcServiceBase
     {
+        private readonly I{{Entity.Name}}Manager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private {{Entity.Name}}Service() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}Service"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="I{{Entity.Name}}Manager"/>.</param>
+        ]]>
+        <Switch Value="Entity.GrpcServiceConstructor">
+          <Case Value="'Private'"><![CDATA[private]]></Case>
+          <Case Value="'Protected'"><![CDATA[protected]]></Case>
+          <Default><![CDATA[public]]></Default>
+        </Switch>
+        <![CDATA[ {{Entity.Name}}Service(I{{Entity.Name}}Manager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 ]]>
         <Operation Condition="Operation.Grpc == true and Operation.OperationType != 'Patch'">
-          <If Condition="System.Index > 0">
-            <![CDATA[
-]]>
-          </If>
-          <![CDATA[        /// <summary>
+          <![CDATA[
+        /// <summary>
 ]]>
           <If Condition="Operation.Text == null">
             <Then>
@@ -121,7 +137,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
           <If Condition="Operation.OperationType == 'Custom'">
             <Set Name="System.ReturnType" Condition="Operation.ReturnType == 'void'" Value="'Google.Protobuf.WellKnownTypes.Empty'" Otherwise="'Operation.ReturnType'" />
           </If>
-          
+
           <![CDATA[        /// </summary>
         /// <param name="request">The <see cref="{{Entity.Name}}{{Operation.Name}}Request"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
@@ -135,7 +151,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
           <If Condition="System.ReturnType != 'Google.Protobuf.WellKnownTypes.Empty'">
             <![CDATA[var __result = ]]>
           </If>
-          <![CDATA[await Factory.Create<I{{Entity.Name}}Manager>().{{Operation.Name}}Async(]]>
+          <![CDATA[await _manager.{{Operation.Name}}Async(]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <![CDATA[Transformers.{{Entity.Name}}.MapToSrce(__req.Value)!]]>
           </If>

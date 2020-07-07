@@ -34,7 +34,7 @@ using {{Config.Company}}.{{Config.AppName}}.Common.Entities;
 namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
 {
     /// <summary>
-    /// Provides the <b>{{Entity.Name}}</b> API functionality.
+    /// Provides the <b>{{Entity.Name}}</b> Web API functionality.
     /// </summary>
 ]]>
       <Set Name="System.WebApiAuthorize" Value="null" />
@@ -60,14 +60,29 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
       </If>
       <![CDATA[    public partial class {{Entity.Name}}Controller : ControllerBase
     {
+        private readonly I{{Entity.Name}}Manager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private {{Entity.Name}}Controller() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}Controller"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="I{{Entity.Name}}Manager"/>.</param>
+        ]]>
+      <Switch Value="Entity.ControllerConstructor">
+        <Case Value="'Private'"><![CDATA[private]]></Case>
+        <Case Value="'Protected'"><![CDATA[protected]]></Case>
+        <Default><![CDATA[public]]></Default>
+      </Switch>
+      <![CDATA[ {{Entity.Name}}Controller(I{{Entity.Name}}Manager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 ]]>
       <If Condition="Entity.OperationCount > 0">
         <Operation Condition="Operation.ExcludeWebApi == false and Operation.ExcludeAll == false">
-          <If Condition="System.Index > 0">
-            <![CDATA[
-]]>
-          </If>
-          <![CDATA[        /// <summary>
+          <![CDATA[
+        /// <summary>
 ]]>
           <If Condition="Operation.Text == null">
             <Then>
@@ -605,7 +620,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
               <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
             </If>
             <If Condition="Operation.PatchGetOperation == null">
-              <Then><![CDATA[>(this, value, () => Factory.Create<I{{Entity.Name}}Manager>().GetAsync(]]></Then>
+              <Then><![CDATA[>(this, value, () => _manager.GetAsync(]]></Then>
               <Else>
                 <Set Name="System.Part1" Value="null" />
                 <Set Name="System.Part2" Value="null" />
@@ -620,8 +635,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                   </If>
                 </ForEachList>
                 <If Condition="System.Part2 == null">
-                  <Then><![CDATA[>(this, value, () => Factory.Create<I{{Entity.Name}}Manager>().{{System.Part1}}Async(]]></Then>
-                  <Else><![CDATA[>(this, value, () => Factory.Create<I{{System.Part1}}>().{{System.Part2}}Async(]]></Else>
+                  <Then><![CDATA[>(this, value, () => _manager.{{System.Part1}}Async(]]></Then>
+                  <Else><![CDATA[>(this, value, () => _manager.{{System.Part2}}Async(]]></Else>
                 </If>
               </Else>
             </If>
@@ -666,7 +681,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
           <If Condition="Operation.OperationType == 'Patch'">
             <Then>
               <If Condition="Operation.PatchUpdateOperation == null">
-                <Then><![CDATA[(__value) => Factory.Create<I{{Entity.Name}}Manager>().UpdateAsync(]]></Then>
+                <Then><![CDATA[(__value) => _manager.UpdateAsync(]]></Then>
                 <Else>
                   <Set Name="System.Part1" Value="null" />
                   <Set Name="System.Part2" Value="null" />
@@ -677,13 +692,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
                     </If>
                   </ForEachList>
                   <If Condition="System.Part2 == null">
-                    <Then><![CDATA[(__value) => Factory.Create<I{{Entity.Name}}Manager>().{{System.Part1}}Async(]]></Then>
-                    <Else><![CDATA[(__value) => Factory.Create<I{{System.Part1}}>().{{System.Part2}}Async(]]></Else>
+                    <Then><![CDATA[(__value) => _manager.{{System.Part1}}Async(]]></Then>
+                    <Else><![CDATA[(__value) => _manager.{{System.Part2}}Async(]]></Else>
                   </If>
                 </Else>
               </If>
             </Then>
-            <Else><![CDATA[() => Factory.Create<I{{Entity.Name}}Manager>().{{Operation.Name}}Async(]]></Else>
+            <Else><![CDATA[() => _manager.{{Operation.Name}}Async(]]></Else>
           </If>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <![CDATA[WebApiActionBase.Value(value)]]>

@@ -25,6 +25,24 @@ namespace Cdr.Banking.Business
     /// </summary>
     public partial class AccountManager : IAccountManager
     {
+        private readonly IAccountDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private AccountManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IAccountDataSvc"/>.</param>
+        public AccountManager(IAccountDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); AccountManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void AccountManagerCtor();
+
         /// <summary>
         /// Get all accounts.
         /// </summary>
@@ -41,7 +59,7 @@ namespace Cdr.Banking.Business
                     .Add(args.Validate(nameof(args)).Entity(AccountArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetAccountsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +78,7 @@ namespace Cdr.Banking.Business
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetDetailAsync(accountId).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
             });
         }
 
@@ -79,7 +97,7 @@ namespace Cdr.Banking.Business
                     .Add(accountId.Validate(nameof(accountId)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IAccountDataSvc>().GetBalanceAsync(accountId).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
             });
         }
     }

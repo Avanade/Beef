@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Cdr.Banking.Business.DataSvc
     /// </summary>
     public partial class TransactionDataSvc : ITransactionDataSvc
     {
+        private readonly ITransactionData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TransactionDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="ITransactionData"/>.</param>
+        public TransactionDataSvc(ITransactionData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); TransactionDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TransactionDataSvcCtor();
+
         /// <summary>
         /// Get transaction for account.
         /// </summary>
@@ -34,12 +52,12 @@ namespace Cdr.Banking.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TransactionDataSvc), async () => 
             {
-                var __result = await Factory.Create<ITransactionData>().GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
+                var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

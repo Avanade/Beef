@@ -27,6 +27,24 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class GenderData : IGenderData
     {
+        private readonly IDatabase _db;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private GenderData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenderData"/> class.
+        /// </summary>
+        /// <param name="db">The <see cref="IDatabase"/>.</param>
+        public GenderData(IDatabase db) { _db = db ?? throw new ArgumentNullException(nameof(db));  GenderDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void GenderDataCtor();
+
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -37,7 +55,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
-                return await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+                return await _db.GetAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 
@@ -54,7 +72,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                return await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _db.CreateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 
@@ -71,7 +89,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                return await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _db.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 

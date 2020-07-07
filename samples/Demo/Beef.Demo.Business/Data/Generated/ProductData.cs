@@ -28,13 +28,31 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class ProductData : IProductData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ITestOData _odata;
 
-        private readonly Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        #pragma warning restore CS0649
+        private Func<Soc.IBoundClient<Model.Product>, ProductArgs?, IODataArgs, Soc.IBoundClient<Model.Product>>? _getByArgsOnQuery;
+
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ProductData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductData"/> class.
+        /// </summary>
+        /// <param name="odata">The <see cref="ITestOData"/>.</param>
+        public ProductData(ITestOData odata) { _odata = odata ?? throw new ArgumentNullException(nameof(odata)); ProductDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ProductDataCtor();
 
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
@@ -46,7 +64,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await TestOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+                return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 
@@ -62,7 +80,7 @@ namespace Beef.Demo.Business.Data
             {
                 ProductCollectionResult __result = new ProductCollectionResult(paging);
                 var __dataArgs = ODataMapper.Default.CreateArgs(__result.Paging!);
-                __result.Result = TestOData.Default.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
+                __result.Result = _odata.Query(__dataArgs, q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<ProductCollection>();
                 return await Task.FromResult(__result).ConfigureAwait(false);
             });
         }

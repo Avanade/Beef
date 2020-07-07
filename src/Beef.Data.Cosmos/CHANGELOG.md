@@ -3,6 +3,9 @@
 Represents the **NuGet** versions.
 
 ## v3.1.x
+- *Enhancement:* Added `ICosmosDb` to support the likes of dependency injection.
+
+## v3.1.x
 - *Enhancement:* `CosmosDbMapper.CreateArgs` method extended to support an optional `action` to further update the `CosmosDbArgs` (helps simplify the generated code logic).
 
 ## v3.1.4

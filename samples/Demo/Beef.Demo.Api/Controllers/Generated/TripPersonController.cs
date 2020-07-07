@@ -21,11 +21,24 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>TripPerson</b> API functionality.
+    /// Provides the <b>TripPerson</b> Web API functionality.
     /// </summary>
     [Route("api/v1/tripPeople")]
     public partial class TripPersonController : ControllerBase
     {
+        private readonly ITripPersonManager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TripPersonController() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TripPersonController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="ITripPersonManager"/>.</param>
+        public TripPersonController(ITripPersonManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="TripPerson"/> entity that matches the selection criteria.
         /// </summary>
@@ -37,7 +50,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(string? id)
         {
-            return new WebApiGet<TripPerson?>(this, () => Factory.Create<ITripPersonManager>().GetAsync(id),
+            return new WebApiGet<TripPerson?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -51,7 +64,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] TripPerson value)
         {
-            return new WebApiPost<TripPerson>(this, () => Factory.Create<ITripPersonManager>().CreateAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<TripPerson>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -66,7 +79,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] TripPerson value, string? id)
         {
-            return new WebApiPut<TripPerson>(this, () => Factory.Create<ITripPersonManager>().UpdateAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<TripPerson>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -79,7 +92,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(string? id)
         {
-            return new WebApiDelete(this, () => Factory.Create<ITripPersonManager>().DeleteAsync(id),
+            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
     }

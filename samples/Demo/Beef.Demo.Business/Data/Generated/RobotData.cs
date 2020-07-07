@@ -28,14 +28,32 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class RobotData : IRobotData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ICosmosDb _cosmos;
 
-        private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private readonly Func<IQueryable<Model.Robot>, RobotArgs?, ICosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        #pragma warning restore CS0649
+        private Action<ICosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Robot>, RobotArgs?, ICosmosDbArgs, IQueryable<Model.Robot>>? _getByArgsOnQuery;
+
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private RobotData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotData"/> class.
+        /// </summary>
+        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
+        public RobotData(ICosmosDb cosmos) { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); RobotDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void RobotDataCtor();
 
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
@@ -47,7 +65,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-                return await CosmosDb.Default.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
+                return await _cosmos.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
             });
         }
 
@@ -64,7 +82,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-                return await CosmosDb.Default.Container(__dataArgs).CreateAsync(value).ConfigureAwait(false);
+                return await _cosmos.Container(__dataArgs).CreateAsync(value).ConfigureAwait(false);
             });
         }
 
@@ -81,7 +99,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-                return await CosmosDb.Default.Container(__dataArgs).UpdateAsync(value).ConfigureAwait(false);
+                return await _cosmos.Container(__dataArgs).UpdateAsync(value).ConfigureAwait(false);
             });
         }
 
@@ -94,7 +112,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
-                await CosmosDb.Default.Container(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
+                await _cosmos.Container(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
             });
         }
 
@@ -110,7 +128,7 @@ namespace Beef.Demo.Business.Data
             {
                 RobotCollectionResult __result = new RobotCollectionResult(paging);
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
+                __result.Result = _cosmos.Container(__dataArgs).Query(q => _getByArgsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<RobotCollection>();
                 return await Task.FromResult(__result).ConfigureAwait(false);
             });
         }

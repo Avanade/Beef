@@ -1,5 +1,5 @@
 using Beef.Demo.Business;
-using Beef.Demo.Business.Data;
+using Beef.Demo.Business.DataSvc;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
@@ -28,29 +28,27 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A110_Validation_Null()
         {
-            TestSetUp.CreateMock<IPersonData>();
             ExpectValidationException.Throws(
-                () => (new PersonManager()).CreateAsync(null),
+                () => new PersonManager(TestSetUp.CreateMock<IPersonDataSvc>().Object).CreateAsync(null),
                 "Value is required.");
 
             ExpectValidationException.Throws(
-                () => (new PersonManager()).UpdateAsync(null, 1.ToGuid()),
+                () => new PersonManager(TestSetUp.CreateMock<IPersonDataSvc>().Object).UpdateAsync(null, 1.ToGuid()),
                 "Value is required.");
         }
 
         [Test, TestSetUp]
         public async Task A110_Validation_Empty()
         {
-            TestSetUp.CreateMock<IPersonData>();
             await ExpectValidationException.ThrowsAsync(
-                () => (new PersonManager()).CreateAsync(new Person()),
+                () => new PersonManager(TestSetUp.CreateMock<IPersonDataSvc>().Object).CreateAsync(new Person()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.");
 
             await ExpectValidationException.ThrowsAsync(
-                () => (new PersonManager()).UpdateAsync(new Person(), 1.ToGuid()),
+                () => new PersonManager(TestSetUp.CreateMock<IPersonDataSvc>().Object).UpdateAsync(new Person(), 1.ToGuid()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
@@ -60,9 +58,8 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A130_Validation_Invalid()
         {
-            TestSetUp.CreateMock<IPersonData>();
             ExpectValidationException.Throws(
-                () => (new PersonManager()).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
+                () => new PersonManager(TestSetUp.CreateMock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
                 "Last Name must not exceed 50 characters in length.",
                 "Gender is invalid.",

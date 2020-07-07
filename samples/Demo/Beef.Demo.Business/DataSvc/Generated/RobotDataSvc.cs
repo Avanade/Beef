@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public partial class RobotDataSvc : IRobotDataSvc
     {
+        private readonly IRobotData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private RobotDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IRobotData"/>.</param>
+        public RobotDataSvc(IRobotData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); RobotDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void RobotDataSvcCtor();
+
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
         /// </summary>
@@ -36,7 +54,7 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out Robot __val))
                     return __val;
 
-                var __result = await Factory.Create<IRobotData>().GetAsync(id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -51,7 +69,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -67,7 +85,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -82,7 +100,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                await Factory.Create<IRobotData>().DeleteAsync(id).ConfigureAwait(false);
+                await _data.DeleteAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishEventAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
             });
@@ -98,12 +116,12 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
+                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

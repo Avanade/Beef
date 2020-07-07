@@ -24,6 +24,24 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class ContactManager : IContactManager
     {
+        private readonly IContactDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ContactManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
+        public ContactManager(IContactDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ContactManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ContactManagerCtor();
+
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
         /// </summary>
@@ -33,7 +51,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Default.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().GetAllAsync().ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
             });
         }
 
@@ -52,7 +70,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -73,7 +91,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -96,7 +114,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IContactDataSvc>().UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -114,7 +132,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await Factory.Create<IContactDataSvc>().DeleteAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
     }

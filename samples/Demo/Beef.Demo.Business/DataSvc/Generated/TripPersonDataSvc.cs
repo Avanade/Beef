@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public partial class TripPersonDataSvc : ITripPersonDataSvc
     {
+        private readonly ITripPersonData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TripPersonDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TripPersonDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="ITripPersonData"/>.</param>
+        public TripPersonDataSvc(ITripPersonData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); TripPersonDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TripPersonDataSvcCtor();
+
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
         /// </summary>
@@ -36,7 +54,7 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out TripPerson __val))
                     return __val;
 
-                var __result = await Factory.Create<ITripPersonData>().GetAsync(id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -51,7 +69,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
-                var __result = await Factory.Create<ITripPersonData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -67,7 +85,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
-                var __result = await Factory.Create<ITripPersonData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.TripPerson.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -82,7 +100,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
-                await Factory.Create<ITripPersonData>().DeleteAsync(id).ConfigureAwait(false);
+                await _data.DeleteAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishEventAsync($"Demo.TripPerson.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<TripPerson>(new UniqueKey(id));
             });
@@ -90,5 +108,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

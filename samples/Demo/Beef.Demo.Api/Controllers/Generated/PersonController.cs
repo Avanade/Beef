@@ -21,11 +21,24 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Person</b> API functionality.
+    /// Provides the <b>Person</b> Web API functionality.
     /// </summary>
     [Route("api/v1/persons")]
     public partial class PersonController : ControllerBase
     {
+        private readonly IPersonManager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private PersonController() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PersonController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IPersonManager"/>.</param>
+        public PersonController(IPersonManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+
         /// <summary>
         /// Creates the <see cref="Person"/> entity.
         /// </summary>
@@ -36,7 +49,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Person value)
         {
-            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<Person>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -49,7 +62,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {
-            return new WebApiDelete(this, () => Factory.Create<IPersonManager>().DeleteAsync(id),
+            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
 
@@ -64,7 +77,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
         {
-            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetAsync(id),
+            return new WebApiGet<Person?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -79,7 +92,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Person value, Guid id)
         {
-            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<Person>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -94,7 +107,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
         {
-            return new WebApiPatch<Person>(this, value, () => Factory.Create<IPersonManager>().GetAsync(id), (__value) => Factory.Create<IPersonManager>().UpdateAsync(__value, id),
+            return new WebApiPatch<Person>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -108,7 +121,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll()
         {
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => Factory.Create<IPersonManager>().GetAllAsync(WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetAllAsync(WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -122,7 +135,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll2()
         {
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => Factory.Create<IPersonManager>().GetAll2Async(),
+            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetAll2Async(),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -140,7 +153,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => Factory.Create<IPersonManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -158,7 +171,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonDetailCollectionResult, PersonDetailCollection, PersonDetail>(this, () => Factory.Create<IPersonManager>().GetDetailByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<PersonDetailCollectionResult, PersonDetailCollection, PersonDetail>(this, () => _manager.GetDetailByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -173,7 +186,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Merge(Guid fromId, Guid toId)
         {
-            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().MergeAsync(fromId, toId),
+            return new WebApiPost<Person>(this, () => _manager.MergeAsync(fromId, toId),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -185,7 +198,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult Mark()
         {
-            return new WebApiPost(this, () => Factory.Create<IPersonManager>().MarkAsync(),
+            return new WebApiPost(this, () => _manager.MarkAsync(),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.Accepted);
         }
 
@@ -201,7 +214,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult Map(string? coordinates = default)
         {
             var args = new MapArgs { Coordinates = new MapCoordinatesToStringConverter().ConvertToSrce(coordinates) };
-            return new WebApiPost<MapCoordinates>(this, () => Factory.Create<IPersonManager>().MapAsync(args),
+            return new WebApiPost<MapCoordinates>(this, () => _manager.MapAsync(args),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -216,7 +229,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetDetail(Guid id)
         {
-            return new WebApiGet<PersonDetail?>(this, () => Factory.Create<IPersonManager>().GetDetailAsync(id),
+            return new WebApiGet<PersonDetail?>(this, () => _manager.GetDetailAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -231,7 +244,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult UpdateDetail([FromBody] PersonDetail value, Guid id)
         {
-            return new WebApiPut<PersonDetail>(this, () => Factory.Create<IPersonManager>().UpdateDetailAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<PersonDetail>(this, () => _manager.UpdateDetailAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -246,7 +259,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult PatchDetail([FromBody] JToken value, Guid id)
         {
-            return new WebApiPatch<PersonDetail>(this, value, () => Factory.Create<IPersonManager>().GetDetailAsync(id), (__value) => Factory.Create<IPersonManager>().UpdateDetailAsync(__value, id),
+            return new WebApiPatch<PersonDetail>(this, value, () => _manager.GetDetailAsync(id), (__value) => _manager.UpdateDetailAsync(__value, id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -259,7 +272,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public IActionResult Add([FromBody] Person? person)
         {
-            return new WebApiPost(this, () => Factory.Create<IPersonManager>().AddAsync(person),
+            return new WebApiPost(this, () => _manager.AddAsync(person),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Created);
         }
 
@@ -274,7 +287,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetNull(string? name)
         {
-            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetNullAsync(name),
+            return new WebApiGet<Person?>(this, () => _manager.GetNullAsync(name),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -292,7 +305,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
         {
             var args = new PersonArgs { FirstName = firstName, LastName = lastName, GendersSids = genders };
-            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => Factory.Create<IPersonManager>().GetByArgsWithEfAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<PersonCollectionResult, PersonCollection, Person>(this, () => _manager.GetByArgsWithEfAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -307,7 +320,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetWithEf(Guid id)
         {
-            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetWithEfAsync(id),
+            return new WebApiGet<Person?>(this, () => _manager.GetWithEfAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -321,7 +334,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult CreateWithEf([FromBody] Person value)
         {
-            return new WebApiPost<Person>(this, () => Factory.Create<IPersonManager>().CreateWithEfAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<Person>(this, () => _manager.CreateWithEfAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -336,7 +349,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult UpdateWithEf([FromBody] Person value, Guid id)
         {
-            return new WebApiPut<Person>(this, () => Factory.Create<IPersonManager>().UpdateWithEfAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<Person>(this, () => _manager.UpdateWithEfAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -349,7 +362,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult DeleteWithEf(Guid id)
         {
-            return new WebApiDelete(this, () => Factory.Create<IPersonManager>().DeleteWithEfAsync(id),
+            return new WebApiDelete(this, () => _manager.DeleteWithEfAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
     }

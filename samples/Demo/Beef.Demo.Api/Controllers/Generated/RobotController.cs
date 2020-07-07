@@ -21,11 +21,24 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Robot</b> API functionality.
+    /// Provides the <b>Robot</b> Web API functionality.
     /// </summary>
     [Route("api/v1/robots")]
     public partial class RobotController : ControllerBase
     {
+        private readonly IRobotManager _manager;
+        
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private RobotController() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IRobotManager"/>.</param>
+        public RobotController(IRobotManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="Robot"/> entity that matches the selection criteria.
         /// </summary>
@@ -37,7 +50,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
         {
-            return new WebApiGet<Robot?>(this, () => Factory.Create<IRobotManager>().GetAsync(id),
+            return new WebApiGet<Robot?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -51,7 +64,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Robot value)
         {
-            return new WebApiPost<Robot>(this, () => Factory.Create<IRobotManager>().CreateAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<Robot>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -66,7 +79,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Robot value, Guid id)
         {
-            return new WebApiPut<Robot>(this, () => Factory.Create<IRobotManager>().UpdateAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<Robot>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -81,7 +94,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
         {
-            return new WebApiPatch<Robot>(this, value, () => Factory.Create<IRobotManager>().GetAsync(id), (__value) => Factory.Create<IRobotManager>().UpdateAsync(__value, id),
+            return new WebApiPatch<Robot>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
@@ -94,7 +107,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {
-            return new WebApiDelete(this, () => Factory.Create<IRobotManager>().DeleteAsync(id),
+            return new WebApiDelete(this, () => _manager.DeleteAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
 
@@ -112,7 +125,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult GetByArgs([FromQuery(Name = "model-no")] string? modelNo = default, [FromQuery(Name = "serial-no")] string? serialNo = default, [FromQuery(Name = "power-sources")] List<string>? powerSources = default)
         {
             var args = new RobotArgs { ModelNo = modelNo, SerialNo = serialNo, PowerSourcesSids = powerSources };
-            return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => Factory.Create<IRobotManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<RobotCollectionResult, RobotCollection, Robot>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -126,7 +139,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult RaisePowerSourceChange(Guid id, string? powerSource)
         {
-            return new WebApiPost(this, () => Factory.Create<IRobotManager>().RaisePowerSourceChangeAsync(id, powerSource),
+            return new WebApiPost(this, () => _manager.RaisePowerSourceChangeAsync(id, powerSource),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Accepted);
         }
     }

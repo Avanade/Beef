@@ -28,14 +28,32 @@ namespace Cdr.Banking.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountData : IAccountData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ICosmosDb _cosmos;
 
-        private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
-        private readonly Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        #pragma warning restore CS0649
+        private Action<ICosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
+
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private AccountData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountData"/> class.
+        /// </summary>
+        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
+        public AccountData(ICosmosDb cosmos) { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); AccountDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void AccountDataCtor();
 
         /// <summary>
         /// Get all accounts.
@@ -49,7 +67,7 @@ namespace Cdr.Banking.Business.Data
             {
                 AccountCollectionResult __result = new AccountCollectionResult(paging);
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
+                __result.Result = _cosmos.Container(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
                 return await Task.FromResult(__result).ConfigureAwait(false);
             });
         }
@@ -64,7 +82,7 @@ namespace Cdr.Banking.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None, onCreate: _onDataArgsCreate);
-                return await CosmosDb.Default.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
+                return await _cosmos.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
             });
         }
 

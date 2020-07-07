@@ -24,6 +24,24 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class GenderManager : IGenderManager
     {
+        private readonly IGenderDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private GenderManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenderManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
+        public GenderManager(IGenderDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); GenderManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void GenderManagerCtor();
+
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
@@ -39,7 +57,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +78,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -83,7 +101,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(new ReferenceDataValidator<Gender>()))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IGenderDataSvc>().UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
     }

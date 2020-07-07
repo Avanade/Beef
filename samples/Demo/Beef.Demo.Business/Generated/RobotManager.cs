@@ -25,6 +25,24 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class RobotManager : IRobotManager
     {
+        private readonly IRobotDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private RobotManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
+        public RobotManager(IRobotDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); RobotManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void RobotManagerCtor();
+
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
         /// </summary>
@@ -40,7 +58,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -61,7 +79,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -84,7 +102,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -102,7 +120,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await Factory.Create<IRobotDataSvc>().DeleteAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
 
@@ -122,7 +140,7 @@ namespace Beef.Demo.Business
                     .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IRobotDataSvc>().GetByArgsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
 

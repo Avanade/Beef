@@ -12,10 +12,65 @@ using System.Threading.Tasks;
 namespace Beef.Data.EntityFrameworkCore
 {
     /// <summary>
+    /// Provides the entity framework capabilities.
+    /// </summary>
+    public interface IEfDb
+    {
+        /// <summary>
+        /// Creates an <see cref="EfDbQuery{T, TModel, TDbContext}"/> to enable select-like capabilities.
+        /// </summary>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
+        /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="query">The function to further define the query.</param>
+        /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
+        IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new();
+
+        /// <summary>
+        /// Gets the entity for the specified <paramref name="keys"/> mapping from <typeparamref name="TModel"/> to <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
+        /// <param name="getArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="keys">The key values.</param>
+        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
+        Task<T?> GetAsync<T, TModel>(EfDbArgs<T, TModel> getArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+
+        /// <summary>
+        /// Performs a create for the value (reselects and/or automatically saves changes where specified).
+        /// </summary>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
+        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>The value (refreshed where specified).</returns>
+        Task<T> CreateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+
+        /// <summary>
+        /// Performs an update for the value (reselects and/or automatically saves changes where specified).
+        /// </summary>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
+        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>The value (refreshed where specified).</returns>
+        Task<T> UpdateAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, T value) where T : class, new() where TModel : class, new();
+
+        /// <summary>
+        /// Performs a delete for the specified <paramref name="keys"/>.
+        /// </summary>
+        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
+        /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
+        /// <param name="keys">The key values.</param>
+        Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+    }
+
+    /// <summary>
     /// Represents the base class for encapsulating the database access layer using an entity framework <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
     /// </summary>
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public abstract class EfDbBase<TDbContext> where TDbContext : DbContext, new()
+    public abstract class EfDbBase<TDbContext> : IEfDb where TDbContext : DbContext, new()
     {
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
@@ -88,7 +143,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
-        public EfDbQuery<T, TModel, TDbContext> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
+        public IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
         {
             return new EfDbQuery<T, TModel, TDbContext>(this, queryArgs, query);
         }

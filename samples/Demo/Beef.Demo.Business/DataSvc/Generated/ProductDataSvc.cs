@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public partial class ProductDataSvc : IProductDataSvc
     {
+        private readonly IProductData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ProductDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IProductData"/>.</param>
+        public ProductDataSvc(IProductData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ProductDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ProductDataSvcCtor();
+
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
         /// </summary>
@@ -36,7 +54,7 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out Product __val))
                     return __val;
 
-                var __result = await Factory.Create<IProductData>().GetAsync(id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -52,12 +70,12 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
-                var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
+                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Beef.Demo.Business.DataSvc
     /// </summary>
     public partial class ContactDataSvc : IContactDataSvc
     {
+        private readonly IContactData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ContactDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IContactData"/>.</param>
+        public ContactDataSvc(IContactData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ContactDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ContactDataSvcCtor();
+
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
         /// </summary>
@@ -31,7 +49,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
-                var __result = await Factory.Create<IContactData>().GetAllAsync().ConfigureAwait(false);
+                var __result = await _data.GetAllAsync().ConfigureAwait(false);
                 return __result;
             });
         }
@@ -49,7 +67,7 @@ namespace Beef.Demo.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out Contact __val))
                     return __val;
 
-                var __result = await Factory.Create<IContactData>().GetAsync(id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -64,7 +82,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
-                var __result = await Factory.Create<IContactData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Create").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -80,7 +98,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
-                var __result = await Factory.Create<IContactData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Update").ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
                 return __result;
@@ -95,7 +113,7 @@ namespace Beef.Demo.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
-                await Factory.Create<IContactData>().DeleteAsync(id).ConfigureAwait(false);
+                await _data.DeleteAsync(id).ConfigureAwait(false);
                 await Beef.Events.Event.PublishEventAsync($"Demo.Contact.{id}", "Delete", id).ConfigureAwait(false);
                 ExecutionContext.Current.CacheRemove<Contact>(new UniqueKey(id));
             });
@@ -103,5 +121,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

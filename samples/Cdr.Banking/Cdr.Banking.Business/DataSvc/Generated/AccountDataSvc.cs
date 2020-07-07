@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,24 @@ namespace Cdr.Banking.Business.DataSvc
     /// </summary>
     public partial class AccountDataSvc : IAccountDataSvc
     {
+        private readonly IAccountData _data;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private AccountDataSvc() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IAccountData"/>.</param>
+        public AccountDataSvc(IAccountData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); AccountDataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void AccountDataSvcCtor();
+
         /// <summary>
         /// Get all accounts.
         /// </summary>
@@ -33,7 +51,7 @@ namespace Cdr.Banking.Business.DataSvc
         {
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
-                var __result = await Factory.Create<IAccountData>().GetAccountsAsync(args, paging).ConfigureAwait(false);
+                var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -51,7 +69,7 @@ namespace Cdr.Banking.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out AccountDetail __val))
                     return __val;
 
-                var __result = await Factory.Create<IAccountData>().GetDetailAsync(accountId).ConfigureAwait(false);
+                var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -70,7 +88,7 @@ namespace Cdr.Banking.Business.DataSvc
                 if (ExecutionContext.Current.TryGetCacheValue(__key, out Balance __val))
                     return __val;
 
-                var __result = await Factory.Create<IAccountData>().GetBalanceAsync(accountId).ConfigureAwait(false);
+                var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
                 ExecutionContext.Current.CacheSet(__key, __result!);
                 return __result;
             });
@@ -78,5 +96,5 @@ namespace Cdr.Banking.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

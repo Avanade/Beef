@@ -27,13 +27,31 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class ContactData : IContactData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IEfDb _ef;
 
-        private readonly Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        #pragma warning restore CS0649
+        private Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
+
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ContactData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactData"/> class.
+        /// </summary>
+        /// <param name="ef">The <see cref="IEfDb"/>.</param>
+        public ContactData(IEfDb ef) { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); ContactDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ContactDataCtor();
 
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
@@ -45,7 +63,7 @@ namespace Beef.Demo.Business.Data
             {
                 ContactCollectionResult __result = new ContactCollectionResult();
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                __result.Result = EfDb.Default.Query(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
+                __result.Result = _ef.Query(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
                 return await Task.FromResult(__result).ConfigureAwait(false);
             });
         }
@@ -60,7 +78,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await EfDb.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+                return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 
@@ -77,7 +95,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await EfDb.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _ef.CreateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 
@@ -94,7 +112,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await EfDb.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _ef.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 
@@ -107,7 +125,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                await EfDb.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+                await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 

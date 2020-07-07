@@ -28,6 +28,24 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TripPersonData : ITripPersonData
     {
+        private readonly ITripOData _odata;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TripPersonData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TripPersonData"/> class.
+        /// </summary>
+        /// <param name="odata">The <see cref="ITripOData"/>.</param>
+        public TripPersonData(ITripOData odata) { _odata = odata ?? throw new ArgumentNullException(nameof(odata)); TripPersonDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TripPersonDataCtor();
+
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
         /// </summary>
@@ -38,7 +56,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await TripOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
+                return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 
@@ -55,7 +73,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await TripOData.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _odata.CreateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 
@@ -72,7 +90,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await TripOData.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _odata.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
             });
         }
 
@@ -85,7 +103,7 @@ namespace Beef.Demo.Business.Data
             return DataInvoker.Default.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                await TripOData.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+                await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
             });
         }
 

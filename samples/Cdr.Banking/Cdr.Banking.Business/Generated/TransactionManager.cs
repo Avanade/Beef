@@ -25,6 +25,24 @@ namespace Cdr.Banking.Business
     /// </summary>
     public partial class TransactionManager : ITransactionManager
     {
+        private readonly ITransactionDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TransactionManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>
+        public TransactionManager(ITransactionDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TransactionManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TransactionManagerCtor();
+
         /// <summary>
         /// Get transaction for account.
         /// </summary>
@@ -43,7 +61,7 @@ namespace Cdr.Banking.Business
                     .Add(args.Validate(nameof(args)).Entity(TransactionArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<ITransactionDataSvc>().GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
             });
         }
     }

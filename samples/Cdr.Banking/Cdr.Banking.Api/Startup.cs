@@ -14,8 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Cdr.Banking.Business;
+using Cdr.Banking.Business.DataSvc;
 using Cdr.Banking.Business.Data;
-using System.Collections.Generic;
 
 namespace Cdr.Banking.Api
 {
@@ -70,6 +70,17 @@ namespace Cdr.Banking.Api
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            // Add the data sources as singletons for dependency injection requirements.
+            services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(CosmosDb.Default);
+
+            // Add the generated services for dependency injection requirements.
+            services.AddGeneratedManagerServices()
+                    .AddGeneratedDataSvcServices()
+                    .AddGeneratedDataServices();
+
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();

@@ -25,103 +25,121 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class PersonManager : IPersonManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IPersonDataSvc _dataService;
 
-        private readonly Func<Person, Task>? _createOnPreValidateAsync;
-        private readonly Action<MultiValidator, Person>? _createOnValidate;
-        private readonly Func<Person, Task>? _createOnBeforeAsync;
-        private readonly Func<Person, Task>? _createOnAfterAsync;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        private readonly Func<Guid, Task>? _deleteOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _deleteOnValidate;
-        private readonly Func<Guid, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
+        private Func<Person, Task>? _createOnPreValidateAsync;
+        private Action<MultiValidator, Person>? _createOnValidate;
+        private Func<Person, Task>? _createOnBeforeAsync;
+        private Func<Person, Task>? _createOnAfterAsync;
 
-        private readonly Func<Guid, Task>? _getOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getOnValidate;
-        private readonly Func<Guid, Task>? _getOnBeforeAsync;
-        private readonly Func<Person?, Guid, Task>? _getOnAfterAsync;
+        private Func<Guid, Task>? _deleteOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _deleteOnValidate;
+        private Func<Guid, Task>? _deleteOnBeforeAsync;
+        private Func<Guid, Task>? _deleteOnAfterAsync;
 
-        private readonly Func<Person, Guid, Task>? _updateOnPreValidateAsync;
-        private readonly Action<MultiValidator, Person, Guid>? _updateOnValidate;
-        private readonly Func<Person, Guid, Task>? _updateOnBeforeAsync;
-        private readonly Func<Person, Guid, Task>? _updateOnAfterAsync;
+        private Func<Guid, Task>? _getOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _getOnValidate;
+        private Func<Guid, Task>? _getOnBeforeAsync;
+        private Func<Person?, Guid, Task>? _getOnAfterAsync;
 
-        private readonly Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
-        private readonly Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
+        private Func<Person, Guid, Task>? _updateOnPreValidateAsync;
+        private Action<MultiValidator, Person, Guid>? _updateOnValidate;
+        private Func<Person, Guid, Task>? _updateOnBeforeAsync;
+        private Func<Person, Guid, Task>? _updateOnAfterAsync;
 
-        private readonly Func<Task>? _getAll2OnBeforeAsync;
-        private readonly Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
+        private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
+        private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
 
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
-        private readonly Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsOnValidate;
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
-        private readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
+        private Func<Task>? _getAll2OnBeforeAsync;
+        private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
 
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnPreValidateAsync;
-        private readonly Action<MultiValidator, PersonArgs?, PagingArgs?>? _getDetailByArgsOnValidate;
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnBeforeAsync;
-        private readonly Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
+        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsOnValidate;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
+        private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
 
-        private readonly Func<Guid, Guid, Task>? _mergeOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid, Guid>? _mergeOnValidate;
-        private readonly Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
-        private readonly Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnPreValidateAsync;
+        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getDetailByArgsOnValidate;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnBeforeAsync;
+        private Func<PersonDetailCollectionResult, PersonArgs?, PagingArgs?, Task>? _getDetailByArgsOnAfterAsync;
 
-        private readonly Func<Task>? _markOnBeforeAsync;
-        private readonly Func<Task>? _markOnAfterAsync;
+        private Func<Guid, Guid, Task>? _mergeOnPreValidateAsync;
+        private Action<MultiValidator, Guid, Guid>? _mergeOnValidate;
+        private Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
+        private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
 
-        private readonly Func<MapArgs?, Task>? _mapOnPreValidateAsync;
-        private readonly Action<MultiValidator, MapArgs?>? _mapOnValidate;
-        private readonly Func<MapArgs?, Task>? _mapOnBeforeAsync;
-        private readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+        private Func<Task>? _markOnBeforeAsync;
+        private Func<Task>? _markOnAfterAsync;
 
-        private readonly Func<Guid, Task>? _getDetailOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getDetailOnValidate;
-        private readonly Func<Guid, Task>? _getDetailOnBeforeAsync;
-        private readonly Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
+        private Func<MapArgs?, Task>? _mapOnPreValidateAsync;
+        private Action<MultiValidator, MapArgs?>? _mapOnValidate;
+        private Func<MapArgs?, Task>? _mapOnBeforeAsync;
+        private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
 
-        private readonly Func<PersonDetail, Guid, Task>? _updateDetailOnPreValidateAsync;
-        private readonly Action<MultiValidator, PersonDetail, Guid>? _updateDetailOnValidate;
-        private readonly Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
-        private readonly Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
+        private Func<Guid, Task>? _getDetailOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _getDetailOnValidate;
+        private Func<Guid, Task>? _getDetailOnBeforeAsync;
+        private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
 
-        private readonly Func<Task>? _dataSvcCustomOnBeforeAsync;
-        private readonly Func<int, Task>? _dataSvcCustomOnAfterAsync;
+        private Func<PersonDetail, Guid, Task>? _updateDetailOnPreValidateAsync;
+        private Action<MultiValidator, PersonDetail, Guid>? _updateDetailOnValidate;
+        private Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
+        private Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
 
-        private readonly Func<string?, Task>? _getNullOnPreValidateAsync;
-        private readonly Action<MultiValidator, string?>? _getNullOnValidate;
-        private readonly Func<string?, Task>? _getNullOnBeforeAsync;
-        private readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
+        private Func<Task>? _dataSvcCustomOnBeforeAsync;
+        private Func<int, Task>? _dataSvcCustomOnAfterAsync;
 
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
-        private readonly Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
-        private readonly Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
-        private readonly Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
+        private Func<string?, Task>? _getNullOnPreValidateAsync;
+        private Action<MultiValidator, string?>? _getNullOnValidate;
+        private Func<string?, Task>? _getNullOnBeforeAsync;
+        private Func<Person?, string?, Task>? _getNullOnAfterAsync;
 
-        private readonly Func<Guid, Task>? _getWithEfOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getWithEfOnValidate;
-        private readonly Func<Guid, Task>? _getWithEfOnBeforeAsync;
-        private readonly Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
+        private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
+        private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
+        private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
 
-        private readonly Func<Person, Task>? _createWithEfOnPreValidateAsync;
-        private readonly Action<MultiValidator, Person>? _createWithEfOnValidate;
-        private readonly Func<Person, Task>? _createWithEfOnBeforeAsync;
-        private readonly Func<Person, Task>? _createWithEfOnAfterAsync;
+        private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _getWithEfOnValidate;
+        private Func<Guid, Task>? _getWithEfOnBeforeAsync;
+        private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
 
-        private readonly Func<Person, Guid, Task>? _updateWithEfOnPreValidateAsync;
-        private readonly Action<MultiValidator, Person, Guid>? _updateWithEfOnValidate;
-        private readonly Func<Person, Guid, Task>? _updateWithEfOnBeforeAsync;
-        private readonly Func<Person, Guid, Task>? _updateWithEfOnAfterAsync;
+        private Func<Person, Task>? _createWithEfOnPreValidateAsync;
+        private Action<MultiValidator, Person>? _createWithEfOnValidate;
+        private Func<Person, Task>? _createWithEfOnBeforeAsync;
+        private Func<Person, Task>? _createWithEfOnAfterAsync;
 
-        private readonly Func<Guid, Task>? _deleteWithEfOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _deleteWithEfOnValidate;
-        private readonly Func<Guid, Task>? _deleteWithEfOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteWithEfOnAfterAsync;
+        private Func<Person, Guid, Task>? _updateWithEfOnPreValidateAsync;
+        private Action<MultiValidator, Person, Guid>? _updateWithEfOnValidate;
+        private Func<Person, Guid, Task>? _updateWithEfOnBeforeAsync;
+        private Func<Person, Guid, Task>? _updateWithEfOnAfterAsync;
 
-        #pragma warning restore CS0649
+        private Func<Guid, Task>? _deleteWithEfOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _deleteWithEfOnValidate;
+        private Func<Guid, Task>? _deleteWithEfOnBeforeAsync;
+        private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
+
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private PersonManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PersonManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
+        public PersonManager(IPersonDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); PersonManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void PersonManagerCtor();
 
         /// <summary>
         /// Creates the <see cref="Person"/> object.
@@ -144,7 +162,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().CreateAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -169,7 +187,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id).ConfigureAwait(false);
-                await Factory.Create<IPersonDataSvc>().DeleteAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
         }
@@ -193,7 +211,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetAsync(id).ConfigureAwait(false);
+                var __result = await _dataService.GetAsync(id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -223,7 +241,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().UpdateAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -241,7 +259,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetAllAsync(paging).ConfigureAwait(false);
+                var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -258,7 +276,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetAll2Async().ConfigureAwait(false);
+                var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -285,7 +303,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetByArgsAsync(args, paging).ConfigureAwait(false);
+                var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -312,7 +330,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getDetailByArgsOnBeforeAsync != null) await _getDetailByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
+                var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -340,7 +358,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_mergeOnBeforeAsync != null) await _mergeOnBeforeAsync(fromId, toId).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().MergeAsync(fromId, toId).ConfigureAwait(false);
+                var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -356,7 +374,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
-                await Factory.Create<IPersonDataSvc>().MarkAsync().ConfigureAwait(false);
+                await _dataService.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
             });
         }
@@ -379,7 +397,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().MapAsync(args).ConfigureAwait(false);
+                var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -405,7 +423,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetDetailAsync(id).ConfigureAwait(false);
+                var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -435,7 +453,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_updateDetailOnBeforeAsync != null) await _updateDetailOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().UpdateDetailAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -465,7 +483,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().DataSvcCustomAsync().ConfigureAwait(false);
+                var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -490,7 +508,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetNullAsync(name).ConfigureAwait(false);
+                var __result = await _dataService.GetNullAsync(name).ConfigureAwait(false);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -517,7 +535,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getByArgsWithEfOnBeforeAsync != null) await _getByArgsWithEfOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
+                var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -543,7 +561,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_getWithEfOnBeforeAsync != null) await _getWithEfOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().GetWithEfAsync(id).ConfigureAwait(false);
+                var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -571,7 +589,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_createWithEfOnBeforeAsync != null) await _createWithEfOnBeforeAsync(value).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().CreateWithEfAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -601,7 +619,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_updateWithEfOnBeforeAsync != null) await _updateWithEfOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await Factory.Create<IPersonDataSvc>().UpdateWithEfAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
@@ -626,7 +644,7 @@ namespace Beef.Demo.Business
                     .Run().ThrowOnError();
 
                 if (_deleteWithEfOnBeforeAsync != null) await _deleteWithEfOnBeforeAsync(id).ConfigureAwait(false);
-                await Factory.Create<IPersonDataSvc>().DeleteWithEfAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });
         }

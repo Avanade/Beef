@@ -1,24 +1,25 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Reflection;
-using Beef.AspNetCore.WebApi;
+﻿using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
+using Beef.Demo.Business.DataSvc;
 using Beef.Diagnostics;
 using Beef.Entities;
+using Beef.Events;
+using Beef.Events.Publish;
 using Beef.Validation;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
-using Cosmos = Microsoft.Azure.Cosmos;
+using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Beef.Events;
-using Beef.Events.Publish;
-using Microsoft.Azure.EventHubs;
 using Microsoft.OpenApi.Models;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Reflection;
+using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Api
 {
@@ -73,6 +74,18 @@ namespace Beef.Demo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add the data sources as singletons for dependency injection requirements.
+            services.AddSingleton<Data.Database.IDatabase>(Database.Default)
+                    .AddSingleton<Data.EntityFrameworkCore.IEfDb>(EfDb.Default)
+                    .AddSingleton<Data.Cosmos.ICosmosDb>(CosmosDb.Default)
+                    .AddSingleton<ITestOData>(TestOData.Default)
+                    .AddSingleton<ITripOData>(TripOData.Default);
+
+            // Add the generated services for dependency injection requirements.
+            services.AddGeneratedManagerServices()
+                    .AddGeneratedDataSvcServices()
+                    .AddGeneratedDataServices();
+
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddGrpc();

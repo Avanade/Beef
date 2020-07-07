@@ -17,7 +17,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class setting the required internal configurations.
         /// </summary>
-        public AccountData()
+        partial void AccountDataCtor()
         {
             _getAccountsOnQuery = GetAccountsOnQuery;   // Wire up the plug-in to enable filtering. 
         }

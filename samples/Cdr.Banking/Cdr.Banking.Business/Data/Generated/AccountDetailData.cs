@@ -28,7 +28,6 @@ namespace Cdr.Banking.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountDetailData
     {
-
         /// <summary>
         /// Provides the <see cref="AccountDetail"/> entity and Cosmos <see cref="Model.Account"/> property mapping.
         /// </summary>

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.x
+- *Enhancement:* Added `IOData` to support the likes of dependency injection.
+
 ## v3.1.2
 - *Enhancement:* Refactored to leverage [Simple.OData.Client](https://github.com/simple-odata-client/Simple.OData.Client/) versus the previously custom version, as this is a far richer and complete OData implementation. This was chosen as it is lightweight and is completely decoupled from the underlying OData endpoint. 
 

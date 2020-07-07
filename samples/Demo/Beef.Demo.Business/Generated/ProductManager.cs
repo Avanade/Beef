@@ -25,6 +25,24 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class ProductManager : IProductManager
     {
+        private readonly IProductDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ProductManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>
+        public ProductManager(IProductDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ProductManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ProductManagerCtor();
+
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
         /// </summary>
@@ -40,7 +58,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IProductDataSvc>().GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +78,7 @@ namespace Beef.Demo.Business
                     .Add(args.Validate(nameof(args)).Entity(ProductArgsValidator.Default))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<IProductDataSvc>().GetByArgsAsync(args, paging).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
     }

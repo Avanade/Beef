@@ -11,7 +11,7 @@ namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
-        public PersonData()
+        partial void PersonDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
             _getByArgsWithEfOnQuery = GetByArgsWithEfOnQuery;

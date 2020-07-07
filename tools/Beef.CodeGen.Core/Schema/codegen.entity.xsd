@@ -1149,6 +1149,7 @@
                   <xs:enumeration value="Public"/>
                   <xs:enumeration value="Private"/>
                   <xs:enumeration value="Protected"/>
+                  <xs:enumeration value="None"/>
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
@@ -1185,6 +1186,19 @@
                   <xs:enumeration value="Public"/>
                   <xs:enumeration value="Private"/>
                   <xs:enumeration value="Protected"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="GrpcServiceConstructor" use="optional">
+              <xs:annotation>
+                <xs:documentation>Defines the access modifier for the generated for the Grpc Service constructor. Default to 'Public'.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Public"/>
+                  <xs:enumeration value="Private"/>
+                  <xs:enumeration value="Protected"/>
+                  <xs:enumeration value="None"/>
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

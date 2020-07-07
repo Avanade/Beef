@@ -24,6 +24,24 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class TripPersonManager : ITripPersonManager
     {
+        private readonly ITripPersonDataSvc _dataService;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private TripPersonManager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TripPersonManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="ITripPersonDataSvc"/>.</param>
+        public TripPersonManager(ITripPersonDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TripPersonManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TripPersonManagerCtor();
+
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
         /// </summary>
@@ -39,7 +57,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().GetAsync(id).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -60,7 +78,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().CreateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -83,7 +101,7 @@ namespace Beef.Demo.Business
                     .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
-                return Cleaner.Clean(await Factory.Create<ITripPersonDataSvc>().UpdateAsync(value).ConfigureAwait(false));
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -101,7 +119,7 @@ namespace Beef.Demo.Business
                     .Add(id.Validate(nameof(id)).Mandatory())
                     .Run().ThrowOnError();
 
-                await Factory.Create<ITripPersonDataSvc>().DeleteAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
     }

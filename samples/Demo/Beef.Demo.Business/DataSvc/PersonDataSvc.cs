@@ -5,17 +5,17 @@ namespace Beef.Demo.Business.DataSvc
 {
     public partial class PersonDataSvc
     {
-        public PersonDataSvc()
+        partial void PersonDataSvcCtor()
         {
             _markOnAfterAsync = MarkOnAfterAsync;
         }
 
-        private static async Task MarkOnAfterAsync()
+        private async Task MarkOnAfterAsync()
         {
             await Beef.Events.Event.PublishValueEventAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
         }
 
-        private static Task<int> DataSvcCustomOnImplementationAsync()
+        private Task<int> DataSvcCustomOnImplementationAsync()
         {
             throw new NotImplementedException();
         }

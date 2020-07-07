@@ -82,6 +82,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
       <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
       <![CDATA[
     {
+        private readonly I{{Entity.Name}}DataSvc _dataService;
+
 ]]>
       <If Condition="Entity.ManagerExtensions == true">
         <!-- Private Funcs/Actions as Partial Methods do not support Async :-( -->
@@ -89,14 +91,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         <Operation Condition="Operation.ExcludeManager == false and Operation.ExcludeAll == false and Operation.ManagerCustom == false and Operation.OperationType != 'Patch'">
           <If Condition="System.Index == 0">
             <Set Name="System.EndRegion" Value="true"/>
-            <![CDATA[        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+            <![CDATA[        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 ]]>
           </If>
           <![CDATA[
 ]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.ParameterCount > 0">
-            <![CDATA[        private readonly Func<]]>
+            <![CDATA[        private Func<]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <If Condition="Operation.ReturnType == 'void'">
                 <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -126,7 +128,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               </Else>
             </If>
             <![CDATA[Task>? {{Operation.PrivateName}}OnPreValidateAsync;
-        private readonly Action<MultiValidator]]>
+        private Action<MultiValidator]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <If Condition="Operation.ReturnType == 'void'">
                 <Then><![CDATA[, {{Entity.EntityName}}]]></Then>
@@ -145,7 +147,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             <![CDATA[>? {{Operation.PrivateName}}OnValidate;
 ]]>
           </If>
-          <![CDATA[        private readonly Func<]]>
+          <![CDATA[        private Func<]]>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}]]></Then>
@@ -175,7 +177,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             </Else>
           </If>
           <![CDATA[Task>? {{Operation.PrivateName}}OnBeforeAsync;
-        private readonly Func<]]>
+        private Func<]]>
           <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == 'void'">
               <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
@@ -234,12 +236,35 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         </Operation>
         <If Condition="System.EndRegion == true">
           <![CDATA[
-        #pragma warning restore CS0649
+        #pragma warning restore CS0649, IDE0044
         #endregion
 
 ]]>
         </If>
       </If>
+      <![CDATA[        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private {{Entity.Name}}Manager() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
+        ]]>
+      <Switch Value="Entity.ManagerConstructor">
+        <Case Value="'Private'"><![CDATA[private]]></Case>
+        <Case Value="'Protected'"><![CDATA[protected]]></Case>
+        <Default><![CDATA[public]]></Default>
+      </Switch>
+      <![CDATA[ {{Entity.Name}}Manager(I{{Entity.Name}}DataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); {{Entity.Name}}ManagerCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void {{Entity.Name}}ManagerCtor();
+
+]]>
 
       <!-- Comments + Method Definition -->
       <Operation Condition="Operation.ExcludeManager == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch'">
@@ -657,9 +682,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
           </Then>
           <Else>
-            <![CDATA[await Factory.Create<I{{Entity.Name}}DataSvc]]>
-            <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
-            <![CDATA[>().{{Operation.Name}}Async(]]>
+            <![CDATA[await _dataService.{{Operation.Name}}Async(]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <![CDATA[value]]>
             </If>

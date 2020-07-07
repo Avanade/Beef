@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.x
+- *Enhancement:* Added `IDatabase` to support the likes of dependency injection.
+
 ## v3.1.6
 - *Enhancement:* `DatabaseBase.DefaultDateTimeKind` replaced with (_breaking change_) `DatabaseBase.DateTimeTransform`, and defaults to `UseDefault`.
 - *Enhancement:* `DatabaseRecord.GetValue` updated to use `Cleaner.Clean` when retrieving a `DateTime` value.
