@@ -145,7 +145,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Entity.Name}}DataSvc"/> class.
         /// </summary>
-        /// <param name="dataService">The <see cref="I{{Entity.Name}}Data"/>.</param>
+        /// <param name="data">The <see cref="I{{Entity.Name}}Data"/>.</param>
         ]]>
       <Switch Value="Entity.DataSvcConstructor">
         <Case Value="'Private'"><![CDATA[private]]></Case>

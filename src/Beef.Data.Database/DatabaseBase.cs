@@ -13,102 +13,14 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database
 {
     /// <summary>
-    /// Provides the database access layer capabilities.
-    /// </summary>
-    public interface IDatabase
-    {
-        /// <summary>
-        /// Creates a <see cref="DbConnection"/>.
-        /// </summary>
-        /// <param name="useDataContextScope">Indicates whether to use the <see cref="DataContextScope"/>; defaults to <c>true</c>.</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        DbConnection CreateConnection(bool useDataContextScope = true);
-
-        /// <summary>
-        /// Creates a stored procedure <see cref="DatabaseCommand"/>.
-        /// </summary>
-        /// <param name="storedProcedure">The stored procedure name.</param>
-        /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        DatabaseCommand StoredProcedure(string storedProcedure);
-
-        /// <summary>
-        /// Creates a SQL statement <see cref="DatabaseCommand"/>.
-        /// </summary>
-        /// <param name="sqlStatement">The SQL statement.</param>
-        /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        DatabaseCommand SqlStatement(string sqlStatement);
-
-        /// <summary>
-        /// Creates a <see cref="DatabaseQuery{T}"/> to enable select-like capabilities.
-        /// </summary>
-        /// <param name="queryArgs">The <see cref="DatabaseArgs{T}"/>.</param>
-        /// <param name="queryParams">The query <see cref="DatabaseParameters"/> delegate.</param>
-        /// <returns>A <see cref="DatabaseQuery{T}"/>.</returns>
-        DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new();
-
-        /// <summary>
-        /// Gets the entity for the specified <paramref name="keys"/> mapping to <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
-        /// <param name="getArgs">The <see cref="DatabaseArgs{T}"/>.</param>
-        /// <param name="keys">The key values.</param>
-        /// <returns>The entity value where found; otherwise, <c>null</c>.</returns>
-        Task<T?> GetAsync<T>(DatabaseArgs<T> getArgs, params IComparable[] keys) where T : class, new();
-
-        /// <summary>
-        /// Performs a create for the specified stored procedure and value (reselects where specified).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="DatabaseArgs{T}"/>.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns>The value (reselected where specified).</returns>
-        /// <remarks>Automatically invokes <see cref="DatabaseParameters.AddChangeLogParameters(Entities.ChangeLog, bool, bool, ParameterDirection)"/>.</remarks>
-        Task<T> CreateAsync<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new();
-
-        /// <summary>
-        /// Performs an update for the specified stored procedure and value (reselects where specified).
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="DatabaseArgs{T}"/>.</param>
-        /// <param name="value">The value to update.</param>
-        /// <returns>The value (reselected where specified).</returns>
-        /// <remarks>Automatically invokes <see cref="DatabaseParameters.AddRowVersionParameter{T}(T, ParameterDirection)"/> and <see cref="DatabaseParameters.AddChangeLogParameters{T}(T, bool, bool, ParameterDirection)"/>.</remarks>
-        Task<T> UpdateAsync<T>(DatabaseArgs<T> saveArgs, T value) where T : class, new();
-
-        /// <summary>
-        /// Performs a delete for the specified <paramref name="keys"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="saveArgs">The <see cref="DatabaseArgs{T}"/>.</param>
-        /// <param name="keys">The key values.</param>
-        Task DeleteAsync<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new();
-
-        /// <summary>
-        /// Executes a <b>ReferenceData</b> query updating the <paramref name="coll"/>.
-        /// </summary>
-        /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TItem">The item <see cref="ReferenceDataBase"/> <see cref="Type"/>.</typeparam>
-        /// <param name="coll">The <see cref="ReferenceDataCollectionBase{TItem}"/>.</param>
-        /// <param name="storedProcedure">The stored procedure name.</param>
-        /// <param name="idColumnName">The <see cref="ReferenceDataBase.Id"/> column name override; defaults to <see cref="DatabaseRefDataColumns.IdColumnName"/>.</param>
-        /// <param name="additionalProperties">The additional properties action that enables non-standard properties to be updated from the <see cref="DatabaseRecord"/>.</param>
-        /// <param name="additionalDatasetRecords">The additional dataset record delegates where additional datasets are returned.</param>
-        /// <param name="confirmItemIsToBeAdded">The action to confirm whether the item is to be added (defaults to <c>true</c>).</param>
-        Task GetRefDataAsync<TColl, TItem>(TColl coll, string storedProcedure, string? idColumnName = null,
-            Action<DatabaseRecord, TItem, DatabaseRecordFieldCollection>? additionalProperties = null,
-            Action<DatabaseRecord>[]? additionalDatasetRecords = null,
-            Func<DatabaseRecord, TItem, bool>? confirmItemIsToBeAdded = null)
-                where TColl : ReferenceDataCollectionBase<TItem>
-                where TItem : ReferenceDataBase, new();
-    }
-
-    /// <summary>
     /// Represents the base class for encapsulating the database access layer using old skool ADO.NET - because sometimes it is all you need, and it is super efficient.
     /// </summary>
     /// <remarks>Provides automatic database connection management by leveraging the <see cref="DataContextScope"/>.</remarks>
-    public abstract class DatabaseBase : IDatabase
+    public abstract class DatabaseBase : IDatabase, IDisposable
     {
+        private Guid _identifier = Guid.NewGuid();
         private DbConnection? _connection;
+        private bool disposed;
 
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for the <see cref="SqlException"/> known list.
@@ -175,6 +87,14 @@ namespace Beef.Data.Database
         {
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
+
+            DataContextScope.RegisterContext(_identifier, () =>
+            {
+                var conn = CreateConnection(false);
+                conn.Open();
+                OnConnectionOpen(conn);
+                return conn;
+            });
         }
 
         /// <summary>
@@ -202,6 +122,74 @@ namespace Beef.Data.Database
         /// Gets or sets the <see cref="SqlException"/> handler (by default set up to execute <see cref="ThrowTransformedSqlException(SqlException)"/>).
         /// </summary>
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
+
+        /// <summary>
+        /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
+        /// </summary>
+        public string SessionContextStoredProcedure { get; set; } = "[dbo].[spSetSessionContext]";
+
+        /// <summary>
+        /// Sets the SQL session context using the specified values by invoking the <see cref="SessionContextStoredProcedure"/> using parameters named
+        /// <see cref="DatabaseColumns.SessionContextUsername"/> and <see cref="DatabaseColumns.SessionContextTimestamp"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="timestamp">The timestamp <see cref="DateTime"/> (where <c>null</c> the value will default to <see cref="DateTime.Now"/>).</param>
+        /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
+        /// <param name="userId">The unique user identifier.</param>
+        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null, Guid? userId = null)
+        {
+            if (dbConnection == null)
+                throw new ArgumentNullException(nameof(dbConnection));
+
+            if (string.IsNullOrEmpty(SessionContextStoredProcedure))
+                throw new InvalidOperationException("The SessionContextStoredProcedure property must have a value.");
+
+            var cmd = dbConnection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, is a stored procedure command type.
+            cmd.CommandText = SessionContextStoredProcedure;
+#pragma warning restore CA2100
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            var p = cmd.CreateParameter();
+            p.ParameterName = "@" + DatabaseColumns.SessionContextUsername;
+            p.Value = username;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = "@" + DatabaseColumns.SessionContextTimestamp;
+            p.Value = timestamp ?? Entities.Cleaner.Clean(DateTime.Now);
+            cmd.Parameters.Add(p);
+
+            if (tenantId.HasValue)
+            {
+                p = cmd.CreateParameter();
+                p.ParameterName = "@" + DatabaseColumns.SessionContextTenantId;
+                p.Value = tenantId.Value;
+                cmd.Parameters.Add(p);
+            }
+
+            if (userId.HasValue)
+            {
+                p = cmd.CreateParameter();
+                p.ParameterName = "@" + DatabaseColumns.SessionContextUserId;
+                p.Value = userId.Value;
+                cmd.Parameters.Add(p);
+            }
+
+            cmd.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?, Guid?)"/> using
+        /// <see cref="ExecutionContext.Username"/>, <see cref="ExecutionContext.Timestamp"/> and <see cref="ExecutionContext.TenantId"/>).
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        public void SetSqlSessionContext(DbConnection dbConnection)
+        {
+            var ec = ExecutionContext.Current ?? throw new InvalidOperationException("The ExecutionContext.Current must have an instance to SetSqlSessionContext.");
+            SetSqlSessionContext(dbConnection, ec.Username, ec.Timestamp, ec.TenantId, ec.UserId);
+        }
 
         /// <summary>
         /// Sets up the <see cref="DatabaseBase"/> to always use the <paramref name="connection"/> bypassing the <see cref="DataContextScope"/>.
@@ -232,8 +220,15 @@ namespace Beef.Data.Database
                 return conn;
             }
             else
-                return (DbConnection)DataContextScope.Current.GetContext(this.GetType());
+                return (DbConnection)DataContextScope.Current.GetContext(_identifier);
         }
+
+        /// <summary>
+        /// Occurs when a connection is opened before any corresponding data access is performed.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <remarks>This is where the <see cref="SetSqlSessionContext(DbConnection)"/> should be invoked; nothing is performed by default.</remarks>
+        public virtual void OnConnectionOpen(DbConnection dbConnection) { }
 
         /// <summary>
         /// Creates a stored procedure <see cref="DatabaseCommand"/>.
@@ -427,6 +422,30 @@ namespace Beef.Data.Database
                 list.AddRange(additionalDatasetRecords);
 
             await StoredProcedure(storedProcedure).SelectQueryMultiSetAsync(list.ToArray()).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="DatabaseBase"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                    DataContextScope.DeregisterContext(_identifier);
+
+                disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Closes and disposes the <see cref="DatabaseBase"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

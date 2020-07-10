@@ -257,7 +257,7 @@ namespace Beef.CodeGen.Loaders
         {
             Logger.Default.Info($"   Querying database: {connString}");
 
-            var db = new SqlServerDb(connString);
+            using var db = new SqlServerDb(connString);
             using (db.SetBypassDataContextScopeDbConnection())
             {
                 _tables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema, false, false).ConfigureAwait(false);

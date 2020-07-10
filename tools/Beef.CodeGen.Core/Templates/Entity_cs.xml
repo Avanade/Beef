@@ -122,6 +122,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.EntityScope}}.Entities]
       <![CDATA[    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 ]]>
     </If>
+    <If Condition="Entity.RefDataType != null">
+      <![CDATA[    [ReferenceDataInterface(typeof(IReferenceData))]
+]]>
+    </If>
     <![CDATA[    public ]]>
     <If Condition="Entity.Abstract == true">
       <![CDATA[abstract ]]>

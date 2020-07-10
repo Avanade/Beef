@@ -4,13 +4,19 @@
   <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" EntityScope="Common" />
   <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Entities" EntityScope="Business" />
   
+  <Generate Template="IReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" />
   <Generate Template="ReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Entities" />
   <Generate Template="IReferenceDataData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" />
   <Generate Template="ReferenceDataData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" />
+  <Generate Template="IReferenceDataDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" />
   <Generate Template="ReferenceDataDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" />
   <Generate Template="ReferenceDataProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" />
   <Generate Template="ReferenceDataWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Controllers" EntityScope="Common" />
   <Generate Template="ReferenceDataWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" />
   <Generate Template="ReferenceDataWebApiServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents\ServiceAgents" EntityScope="Common" />
   <Generate Template="ReferenceDataWebApiAgentProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" />
+
+  <Generate Template="ServiceCollectionExtensionsManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" RefData="ReferenceData" />
+  <Generate Template="ServiceCollectionExtensionsDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\DataSvc" HelpText="Business\DataSvc" RefData="ReferenceData" />
+  <Generate Template="ServiceCollectionExtensionsData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" HelpText="Business\Data" RefData="ReferenceData" />
 </Script>

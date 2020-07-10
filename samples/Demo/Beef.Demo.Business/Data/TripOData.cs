@@ -11,7 +11,7 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Represents the <b>Trip</b> OData endpoint.
     /// </summary>
-    public class TripOData : OData<TripOData>, ITripOData
+    public class TripOData : ODataBase, ITripOData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TestOData"/> class.

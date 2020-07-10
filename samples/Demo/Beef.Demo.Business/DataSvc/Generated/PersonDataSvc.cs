@@ -59,7 +59,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonDataSvc"/> class.
         /// </summary>
-        /// <param name="dataService">The <see cref="IPersonData"/>.</param>
+        /// <param name="data">The <see cref="IPersonData"/>.</param>
         public PersonDataSvc(IPersonData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); PersonDataSvcCtor(); }
 
         /// <summary>

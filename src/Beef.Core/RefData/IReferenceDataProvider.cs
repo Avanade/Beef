@@ -11,9 +11,9 @@ namespace Beef.RefData
     public interface IReferenceDataProvider
     {
         /// <summary>
-        /// Gets the unique provider name.
+        /// Gets the provider <see cref="Type"/>.
         /// </summary>
-        string ProviderName { get; }
+        Type ProviderType { get; }
 
 #pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design.
         /// <summary>

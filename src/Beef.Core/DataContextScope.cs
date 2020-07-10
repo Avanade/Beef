@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Beef
@@ -11,25 +12,30 @@ namespace Beef
     /// </summary>
     public sealed class DataContextScope : IDisposable
     {
-        private static readonly object _lock = new object();
-        private static readonly Dictionary<Type, Delegate> _registered = new Dictionary<Type, Delegate>();
+        private static readonly ConcurrentDictionary<Guid, Delegate> _registered = new ConcurrentDictionary<Guid, Delegate>();
 
         private readonly DataContextScope? _parent;
         private readonly DataContextScopeOption _option;
-        private readonly Dictionary<Type, object> _dataContexts;
+        private readonly ConcurrentDictionary<Guid, object> _dataContexts;
         private bool _disposed;
 
         /// <summary>
-        /// Register a <b>context</b> and its creation function.
+        /// Registers a <b>context</b> and its creation function.
         /// </summary>
-        /// <typeparam name="T">The registering <see cref="Type"/>.</typeparam>
         /// <typeparam name="TDc">The data context <see cref="Type"/>.</typeparam>
+        /// <param name="identifier">The unique identifier.</param>
         /// <param name="create">The data context creation function.</param>
-        public static void RegisterContext<T, TDc>(Func<TDc> create) where TDc : class
+        public static void RegisterContext<TDc>(Guid identifier, Func<TDc> create) where TDc : class
         {
             Check.NotNull(create, nameof(create));
-            _registered.Add(typeof(T), create);
+            _registered.TryAdd(identifier, create);
         }
+
+        /// <summary>
+        /// Deregisters a preivously registered <b>context</b>.
+        /// </summary>
+        /// <param name="identifier">The unique identifier.</param>
+        public static void DeregisterContext(Guid identifier) => _registered.TryRemove(identifier, out _);
 
         /// <summary>
         /// Begins a new <see cref="DataContextScope"/>.
@@ -94,7 +100,7 @@ namespace Beef
             _parent = parent;
             _option = option;
             if (IsPrimaryInstance)
-                _dataContexts = new Dictionary<Type, object>();
+                _dataContexts = new ConcurrentDictionary<Guid, object>();
             else
                 _dataContexts = parent!._dataContexts;
         }
@@ -108,36 +114,23 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets the context value for the <see cref="Type"/>.
+        /// Gets the context value for the unique identifier.
         /// </summary>
-        /// <typeparam name="T">The registering <see cref="Type"/>.</typeparam>
-        /// <typeparam name="TDc">The data context <see cref="Type"/>.</typeparam>
-        /// <returns>The data context value.</returns>
-        /// <remarks>Where a context does not already exist a new instance will be created.</remarks>
-        public TDc GetContext<T, TDc>()
-        {
-            return (TDc)GetContext(typeof(T));
-        }
-
-        /// <summary>
-        /// Gets the context value for the <see cref="Type"/>.
-        /// </summary>
+        /// <param name="identifier">The unique identifier.</param>
         /// <returns>The context value.</returns>
         /// <remarks>Where a context does not already exist a new instance will be created.</remarks>
-        public object GetContext(Type type)
+        public object GetContext(Guid identifier)
         {
-            lock (_lock)
+            if (!_registered.TryGetValue(identifier, out var del))
+                throw new InvalidOperationException("Identifier must be registered (see RegisterContext) to enable.");
+
+            return _dataContexts.GetOrAdd(identifier, id =>
             {
-                if (_dataContexts.ContainsKey(type))
-                    return _dataContexts[type];
+                if (!_registered.TryGetValue(identifier, out var del))
+                    throw new InvalidOperationException("Identifier must be registered (see RegisterContext) to enable.");
 
-                if (!_registered.ContainsKey(type))
-                    throw new InvalidOperationException("Type must be registered (see RegisterContext) to enable creation.");
-
-                var val = _registered[type].DynamicInvoke();
-                _dataContexts.Add(type, val);
-                return val;
-            }
+                return del.DynamicInvoke();
+            });
         }
 
         /// <summary>
@@ -178,7 +171,7 @@ namespace Beef
             // Close and dispose of all object contexts.
             if (_dataContexts != null && _dataContexts.Count > 0)
             {
-                foreach (KeyValuePair<Type, object> pair in _dataContexts)
+                foreach (KeyValuePair<Guid, object> pair in _dataContexts)
                 {
                     if (pair.Value != null)
                     {

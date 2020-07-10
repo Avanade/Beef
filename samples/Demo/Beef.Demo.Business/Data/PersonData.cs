@@ -27,9 +27,9 @@ namespace Beef.Demo.Business.Data
 
         private IQueryable<EfModel.Person> GetByArgsWithEfOnQuery(IQueryable<EfModel.Person> q, PersonArgs args, IEfDbArgs efArgs)
         {
-            EfDb.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-            EfDb.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-            EfDb.With(args?.Genders, () => q = q.Where(x => args.Genders.ToGuidIdList().Contains(x.GenderId.Value)));
+            _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
+            _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
+            _ef.With(args?.Genders, () => q = q.Where(x => args.Genders.ToGuidIdList().Contains(x.GenderId.Value)));
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 
@@ -70,7 +70,7 @@ namespace Beef.Demo.Business.Data
         {
             var pdcr = new PersonDetailCollectionResult(new PagingResult(paging));
 
-            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
+            await _db.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
                 .Params(p =>
                 {
                     p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
@@ -105,7 +105,7 @@ namespace Beef.Demo.Business.Data
             await GetAsync(id);
 
             System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
-            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
+            await _db.StoredProcedure("[Demo].[spPersonGetDetail]")
                 .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
                 .SelectQueryMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
@@ -118,7 +118,7 @@ namespace Beef.Demo.Business.Data
         {
             PersonDetail pd = null;
 
-            await Database.Default.StoredProcedure("[Demo].[spPersonUpdateDetail]")
+            await _db.StoredProcedure("[Demo].[spPersonUpdateDetail]")
                 .Params((p) => PersonData.DbMapper.Default.MapToDb(value, p, Mapper.OperationTypes.Update))
                 .TableValuedParam("@WorkHistoryList", WorkHistoryData.DbMapper.Default.CreateTableValuedParameter(value.History))
                 .ReselectRecordParam()

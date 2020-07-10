@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Beef;
 using Beef.Business;
 using Beef.RefData;
@@ -33,15 +35,18 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public static class ReferenceDataDataSvc
+    public class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
-        private static readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
+        private readonly IServiceProvider _provider;
+        private readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
 
         /// <summary>
-        /// Initializes static members of the <see cref="ReferenceDataDataSvc" /> class.
+        /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
         /// </summary>
-        static ReferenceDataDataSvc()
+        /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
+        public ReferenceDataDataSvc(IServiceProvider provider)
         {
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
 ]]>
   </Header>
   <Entity Condition="Entity.RefDataType != null and Entity.ExcludeDataSvc == false and Entity.ExcludeAll == false">
@@ -59,7 +64,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
       </Then>
       <Else>
-        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().{{Entity.Name}}GetAllAsync())));
+        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.{{Entity.Name}}GetAllAsync()))));
 ]]>
       </Else>
     </If>
@@ -68,11 +73,22 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     <![CDATA[        }
 
         /// <summary>
+        /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
+        /// </summary>
+        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        {
+            using (_provider.CreateScope())
+            {
+                return func(_provider.GetService<IReferenceDataData>());
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public static IReferenceDataCollection GetCollection(Type type)
+        public IReferenceDataCollection GetCollection(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));

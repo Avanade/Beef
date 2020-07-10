@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Beef;
 using Beef.Business;
 using Beef.RefData;
@@ -21,21 +23,35 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public static class ReferenceDataDataSvc
+    public class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
-        private static readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
+        private readonly IServiceProvider _provider;
+        private readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
 
         /// <summary>
-        /// Initializes static members of the <see cref="ReferenceDataDataSvc" /> class.
+        /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
         /// </summary>
-        static ReferenceDataDataSvc()
+        /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
+        public ReferenceDataDataSvc(IServiceProvider provider)
         {
-            cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().CountryGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().USStateGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().GenderGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().EyeColorGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().PowerSourceGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().CompanyGetAllAsync())));
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.CountryGetAllAsync()))));
+            cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.USStateGetAllAsync()))));
+            cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.GenderGetAllAsync()))));
+            cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.EyeColorGetAllAsync()))));
+            cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.PowerSourceGetAllAsync()))));
+            cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.CompanyGetAllAsync()))));
+        }
+
+        /// <summary>
+        /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
+        /// </summary>
+        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        {
+            using (_provider.CreateScope())
+            {
+                return func(_provider.GetService<IReferenceDataData>());
+            }
         }
 
         /// <summary>
@@ -43,7 +59,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public static IReferenceDataCollection GetCollection(Type type)
+        public IReferenceDataCollection GetCollection(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));

@@ -134,7 +134,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
                 .Run((a) => a.Agent.GetAsync(1.ToGuid()));
         }
 
@@ -145,7 +145,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 3.ToGuid(), FirstName = "Rachael", LastName = "Browne", Gender = "F", Birthday = new DateTime(1972, 06, 28), Address = new Address { Street = "25 Upoko Road", City = "Wellington" } })
+                .ExpectValue((t) => new Person { Id = 3.ToGuid(), FirstName = "Rachael", LastName = "Browne", GenderSid = "F", Birthday = new DateTime(1972, 06, 28), Address = new Address { Street = "25 Upoko Road", City = "Wellington" } })
                 .Run((a) => a.Agent.GetAsync(3.ToGuid()));
         }
 
@@ -193,7 +193,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new PersonDetail { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new PersonDetail { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
                 .Run((a) => a.Agent.GetDetailAsync(1.ToGuid()));
         }
 
@@ -205,8 +205,8 @@ namespace Beef.Demo.Test
                 Id = 2.ToGuid(),
                 FirstName = "Brian",
                 LastName = "Smith",
-                Gender = "M",
-                EyeColor = "BLUE",
+                GenderSid = "M",
+                EyeColorSid = "BLUE",
                 UniqueCode = "B2345",
                 Birthday = new DateTime(1994, 11, 07),
                 History = new WorkHistoryCollection {
@@ -238,7 +238,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", Gender = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
+                .ExpectValue((t) => new Person { Id = 1.ToGuid(), FirstName = "Wendy", LastName = "Jones", GenderSid = "F", UniqueCode = "A1234", Birthday = new DateTime(1985, 03, 18) })
                 .Run((a) => a.Agent.GetWithEfAsync(1.ToGuid()));
         }
 
@@ -249,7 +249,7 @@ namespace Beef.Demo.Test
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
-                .ExpectValue((t) => new Person { Id = 3.ToGuid(), FirstName = "Rachael", LastName = "Browne", Gender = "F", Birthday = new DateTime(1972, 06, 28), Address = new Address { Street = "25 Upoko Road", City = "Wellington" } })
+                .ExpectValue((t) => new Person { Id = 3.ToGuid(), FirstName = "Rachael", LastName = "Browne", GenderSid = "F", Birthday = new DateTime(1972, 06, 28), Address = new Address { Street = "25 Upoko Road", City = "Wellington" } })
                 .Run((a) => a.Agent.GetWithEfAsync(3.ToGuid()));
         }
 
@@ -378,7 +378,7 @@ namespace Beef.Demo.Test
         private void GetByArgs_Args_FirstNameAndGender(bool useEf)
         {
             // Test with null args.
-            var args = new PersonArgs { FirstName = "*a*", Genders = new RefData.ReferenceDataSidList<Gender, string>(new Gender[] { "F" }) };
+            var args = new PersonArgs { FirstName = "*a*", Genders = new RefData.ReferenceDataSidList<Gender, string>("F") };
             var pcr = AgentTester.Create<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.Agent.GetByArgsWithEfAsync(args) : a.Agent.GetByArgsAsync(args));
@@ -415,7 +415,7 @@ namespace Beef.Demo.Test
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                Gender = "M",
+                GenderSid = "M",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = "B7890"
             };
@@ -443,7 +443,7 @@ namespace Beef.Demo.Test
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                Gender = "M",
+                GenderSid = "M",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = "A1234"
             };
@@ -462,7 +462,7 @@ namespace Beef.Demo.Test
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                Gender = "$",
+                GenderSid = "$",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = "A1234"
             };
@@ -482,7 +482,7 @@ namespace Beef.Demo.Test
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                Gender = "M",
+                GenderSid = "M",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = "C5678"
             };
@@ -510,7 +510,7 @@ namespace Beef.Demo.Test
             {
                 FirstName = "Bill",
                 LastName = "Gates",
-                Gender = "M",
+                GenderSid = "M",
                 Birthday = new DateTime(1955, 10, 28),
                 UniqueCode = "A1234"
             };

@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.66.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.5" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>

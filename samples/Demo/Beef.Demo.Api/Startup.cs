@@ -25,10 +25,13 @@ namespace Beef.Demo.Api
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
         private ILogger _logger;
 
         public Startup(IConfiguration config)
         {
+            _config = config;
+
             // Use JSON property names in validation.
             ValidationArgs.DefaultUseJsonNames = true;
 
@@ -36,23 +39,20 @@ namespace Beef.Demo.Api
             CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
             CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
 
-            // Register the ReferenceData provider.
-            RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
-
             // Register the database.
-            Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
-            Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
+            // Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
+            //Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
 
             // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
+            //CosmosDb.Register(() =>
+            //{
+            //    var cs = config.GetSection("CosmosDb");
+            //    return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+            //});
 
             // Register the test OData services.
-            TestOData.Register(() => new TestOData(new Uri(WebApiStartup.GetConnectionString(config, "TestOData"))));
-            TripOData.Register(() => new TripOData(new Uri(WebApiStartup.GetConnectionString(config, "TripOData"))));
+            //TestOData.Register(() => new TestOData(new Uri(WebApiStartup.GetConnectionString(config, "TestOData"))));
+            //TripOData.Register(() => new TripOData(new Uri(WebApiStartup.GetConnectionString(config, "TripOData"))));
 
             // Default the page size.
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
@@ -75,13 +75,20 @@ namespace Beef.Demo.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Add the data sources as singletons for dependency injection requirements.
-            services.AddSingleton<Data.Database.IDatabase>(Database.Default)
-                    .AddSingleton<Data.EntityFrameworkCore.IEfDb>(EfDb.Default)
-                    .AddSingleton<Data.Cosmos.ICosmosDb>(CosmosDb.Default)
-                    .AddSingleton<ITestOData>(TestOData.Default)
-                    .AddSingleton<ITripOData>(TripOData.Default);
+            var ccs = _config.GetSection("CosmosDb");
+            services.AddScoped<Data.Database.IDatabase>(_ => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
+                    .AddDbContext<EfDbContext>()
+                    .AddTransient<Data.EntityFrameworkCore.IEfDb, EfDb>()
+                    .AddSingleton<Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")))
+                    .AddSingleton<ITestOData>(_ => new TestOData(new Uri(WebApiStartup.GetConnectionString(_config, "TestOData"))))
+                    .AddSingleton<ITripOData>(_ => new TripOData(new Uri(WebApiStartup.GetConnectionString(_config, "TripOData"))));
 
-            // Add the generated services for dependency injection requirements.
+            // Add the generated reference data services for dependency injection requirements.
+            services.AddGeneratedReferenceDataManagerServices()
+                    .AddGeneratedReferenceDataDataSvcServices()
+                    .AddGeneratedReferenceDataDataServices();
+
+            // Add the generated entity services for dependency injection requirements.
             services.AddGeneratedManagerServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
@@ -106,8 +113,10 @@ namespace Beef.Demo.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
+        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory, IServiceProvider serviceProvider)
         {
+            var x = serviceProvider.GetService<Data.EntityFrameworkCore.IEfDb>();
+
             // Configure the logger.
             _logger = loggerFactory.CreateLogger("Logging");
             Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));

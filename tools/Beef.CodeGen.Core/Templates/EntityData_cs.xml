@@ -387,7 +387,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         ]]>
         </If>
 
-        <Switch Value="Entity.DataSvcConstructor">
+        <Switch Value="Entity.DataConstructor">
           <Case Value="'Private'"><![CDATA[private]]></Case>
           <Case Value="'Protected'"><![CDATA[protected]]></Case>
           <Default><![CDATA[public]]></Default>
@@ -395,50 +395,22 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         <![CDATA[ {{Entity.Name}}Data(]]>
         <Set Name="System.NeedsComma" Value="false" />
         <If Condition="System.UsesDatabase == true">
-          <If Condition="Entity.DatabaseName == null">
-            <Then><![CDATA[IDatabase]]></Then>
-            <Else>
-              <If Condition="Entity.DatabaseName:StartsWith('I')" Not="true"><![CDATA[I]]></If>
-              <![CDATA[{{Entity.DatabaseName}}]]>
-            </Else>
-          </If>
-          <![CDATA[ db]]>
+          <![CDATA[{{System.DatabaseName}} db]]>
           <Set Name="System.NeedsComma" Value="true" />
         </If>
         <If Condition="System.UsesEntityFramework == true">
           <If Condition="System.NeedsComma == true"><![CDATA[, ]]></If>
-          <If Condition="Entity.EntityFrameworkName == null">
-            <Then><![CDATA[IEfDb]]></Then>
-            <Else>
-              <If Condition="Entity.EntityFrameworkName:StartsWith('I')" Not="true"><![CDATA[I]]></If>
-              <![CDATA[{{Entity.EntityFrameworkName}}]]>
-            </Else>
-          </If>
-          <![CDATA[ ef]]>
+          <![CDATA[{{System.EntityFrameworkName}} ef]]>
           <Set Name="System.NeedsComma" Value="true" />
         </If>
         <If Condition="System.UsesCosmos == true">
           <If Condition="System.NeedsComma == true"><![CDATA[, ]]></If>
-          <If Condition="Entity.CosmosName == null">
-            <Then><![CDATA[ICosmosDb]]></Then>
-            <Else>
-              <If Condition="Entity.CosmosName:StartsWith('I')" Not="true"><![CDATA[I]]></If>
-              <![CDATA[{{Entity.CosmosName}}]]>
-            </Else>
-          </If>
-          <![CDATA[ cosmos]]>
+          <![CDATA[{{System.CosmosName}} cosmos]]>
           <Set Name="System.NeedsComma" Value="true" />
         </If>
         <If Condition="System.UsesOData == true">
           <If Condition="System.NeedsComma == true"><![CDATA[, ]]></If>
-          <If Condition="Entity.ODataName == null">
-            <Then><![CDATA[IOData]]></Then>
-            <Else>
-              <If Condition="Entity.ODataName:StartsWith('I')" Not="true"><![CDATA[I]]></If>
-              <![CDATA[{{Entity.ODataName}}]]>
-            </Else>
-          </If>
-          <![CDATA[ odata]]>
+          <![CDATA[{{System.ODataName}} odata]]>
           <Set Name="System.NeedsComma" Value="true" />
         </If>
         <![CDATA[) { ]]>
@@ -446,15 +418,15 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[_db = db ?? throw new ArgumentNullException(nameof(db)); ]]>
         </If>
         <If Condition="System.UsesEntityFramework == true">
-          <![CDATA[_ef = ef ?? throw new ArgumentNullException(nameof(ef));]]>
+          <![CDATA[_ef = ef ?? throw new ArgumentNullException(nameof(ef)); ]]>
         </If>
         <If Condition="System.UsesCosmos == true">
-          <![CDATA[_cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos));]]>
+          <![CDATA[_cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ]]>
         </If>
         <If Condition="System.UsesOData == true">
-          <![CDATA[_odata = odata ?? throw new ArgumentNullException(nameof(odata));]]>
+          <![CDATA[_odata = odata ?? throw new ArgumentNullException(nameof(odata)); ]]>
         </If>
-        <![CDATA[ {{Entity.Name}}DataCtor(); }
+        <![CDATA[{{Entity.Name}}DataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

@@ -23,6 +23,7 @@ namespace Beef
         private static Func<ExecutionContext?> _get = () => _asyncLocal.Value;
         private static Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
 
+        private IServiceProvider? _serviceProvider;
         private Guid? _userId;
         private string? _username;
         private Guid? _tenantId;
@@ -181,6 +182,22 @@ namespace Beef
         /// Gets or sets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
         /// </summary>
         public OperationType OperationType { get; set; } = OperationType.Unspecified;
+
+        /// <summary>
+        /// Gets or sets the <see cref="IServiceProvider"/> that provides access to the service container.
+        /// </summary>
+        public IServiceProvider? ServiceProvider
+        {
+            get => _serviceProvider;
+
+            set
+            {
+                if (_serviceProvider != null && value != _serviceProvider)
+                    throw new ArgumentException(ImmutableText);
+
+                _serviceProvider = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the user identifier. This value is immutable.
@@ -522,6 +539,7 @@ namespace Beef
             {
                 Logger = Logger,
                 OperationType = OperationType,
+                _serviceProvider = _serviceProvider,
                 _userId = _userId,
                 _username = _username,
                 _tenantId = _tenantId,

@@ -19,16 +19,19 @@ namespace Cdr.Banking.Common.Entities
     {
         private static ReferenceData? _current;
 
+        ///// <summary>
+        ///// Gets the current <see cref="ReferenceData"/> instance; uses the <see cref="ReferenceDataManager.Register(IReferenceDataProvider[])">registered</see> instance from the
+        ///// <see cref="ReferenceDataManager.GetProvider(string)"/> using the defined <see cref="IReferenceDataProvider.ProviderName"/>.
+        ///// </summary>
         /// <summary>
-        /// Gets the current <see cref="ReferenceData"/> instance; uses the <see cref="ReferenceDataManager.Register(IReferenceDataProvider[])">registered</see> instance from the
-        /// <see cref="ReferenceDataManager.GetProvider(string)"/> using the defined <see cref="IReferenceDataProvider.ProviderName"/>.
+        /// 
         /// </summary>
-        public static ReferenceData Current => _current ?? (_current = (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(ReferenceData).FullName));
+        public static ReferenceData Current => _current ?? (_current = (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(ReferenceData)));
 
         /// <summary>
         /// Gets the unique provider name.
         /// </summary>
-        public string ProviderName => typeof(ReferenceData).FullName;
+        public Type ProviderType => typeof(ReferenceData);
 
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.

@@ -12,20 +12,17 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
         /// Adds the generated <b>DataSvc</b>-layer services.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
+        public static IServiceCollection AddGeneratedReferenceDataDataSvcServices(this IServiceCollection services)
         {
-            return services.AddScoped<IPersonDataSvc, PersonDataSvc>()
-                           .AddScoped<IProductDataSvc, ProductDataSvc>()
-                           .AddScoped<IRobotDataSvc, RobotDataSvc>()
-                           .AddScoped<ITripPersonDataSvc, TripPersonDataSvc>()
-                           .AddScoped<IContactDataSvc, ContactDataSvc>();
+            return services.AddSingleton<IReferenceDataDataSvc, ReferenceDataDataSvc>()
+                           .AddScoped<IGenderDataSvc, GenderDataSvc>();
         }
     }
 }

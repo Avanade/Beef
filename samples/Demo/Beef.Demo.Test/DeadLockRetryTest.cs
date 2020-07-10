@@ -28,17 +28,18 @@ namespace Beef.Demo.Test
             var p1 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(1.ToGuid())).Value;
             var p2 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(2.ToGuid())).Value;
 
-            var task1 = Task.Run(async () =>
-            {
-                await Beef.Demo.Business.Data.Database.Default.SqlStatement(
-                    @"begin transaction
-select * from Demo.WorkHistory with (tablock, holdlock)
-waitfor delay '00:00:02'
-select * from Demo.Person with (tablock, holdlock)
-waitfor delay '00:00:04'
-commit transaction"
-                    ).NonQueryAsync();
-            });
+            //            var task1 = Task.Run(async () =>
+            //            {
+            //                await Beef.Demo.Business.Data.Database.Default.SqlStatement(
+            //                    @"begin transaction
+            //select * from Demo.WorkHistory with (tablock, holdlock)
+            //waitfor delay '00:00:02'
+            //select * from Demo.Person with (tablock, holdlock)
+            //waitfor delay '00:00:04'
+            //commit transaction"
+            //                    ).NonQueryAsync();
+            //            });
+            Assert.Fail("fix this");
 
             var task2 = Task.Run(() =>
             {
@@ -56,7 +57,7 @@ commit transaction"
                 Console.WriteLine($"Person {p2.Id} update status code: {r2.StatusCode}");
             });
 
-            Task.WaitAll(task1, task2, task3);
+            //Task.WaitAll(task1, task2, task3);
 
             if (count == 0)
                 Assert.Inconclusive("Unable to cause the required database deadlock; therefore, the retry logic was not exercised for this test.");

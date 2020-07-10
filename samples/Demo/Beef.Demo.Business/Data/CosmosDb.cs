@@ -6,7 +6,7 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Represents the <b>Test</b> DocumentDb/CosmosDb client.
     /// </summary>
-    public class CosmosDb : CosmosDb<CosmosDb>
+    public class CosmosDb : CosmosDbBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDb"/> class.

@@ -6,7 +6,7 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Represents the <b>Beef.Demo</b> database.
     /// </summary>
-    public class Database : Database<Database>
+    public class Database : DatabaseBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Database{T}"/> class.

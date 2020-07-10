@@ -21,17 +21,17 @@ namespace Beef.Demo.Functions
             CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
 
             // Register the ReferenceData provider.
-            RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
+            // TODO: RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
 
             // Register the database.
-            Database.Register(() => new Database(config.GetConnectionString("BeefDemo")));
+            //Database.Register(() => new Database(config.GetConnectionString("BeefDemo")));
 
             // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
+            //CosmosDb.Register(() =>
+            //{
+            //    var cs = config.GetSection("CosmosDb");
+            //    return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
+            //});
         }
     }
 }

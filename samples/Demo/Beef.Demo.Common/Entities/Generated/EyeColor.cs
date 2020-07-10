@@ -22,6 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Eye Color entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class EyeColor : ReferenceDataBaseGuid
     {
         #region Operator

@@ -23,7 +23,9 @@ namespace Beef.Database.Core
     /// <summary>
     /// Represents the database executor.
     /// </summary>
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
     public class DatabaseExecutor : ExecutorBase
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
         /// <summary>
         /// Gets or sets the <b>Migrations</b> scripts namespace part name.
@@ -72,7 +74,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Represents the Database being upgraded.
         /// </summary>
-        private class Db : Database<Db>
+        private class Db : DatabaseBase
         {
             public Db(string cs) : base(cs) { }
         }

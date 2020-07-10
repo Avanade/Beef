@@ -1224,7 +1224,8 @@ namespace Beef.Test.NUnit
                     throw new InvalidOperationException("ExpectValue function must not return null.");
 
                 // Further configure the comparison configuration.
-                _comparisonConfig.TypesToIgnore.AddRange(ReferenceDataManager.Current.GetAllTypes());
+                //_comparisonConfig.TypesToIgnore.AddRange(ReferenceDataManager.Current.GetAllTypes());
+                _comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
                 InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
 
                 // Perform the actual comparison.

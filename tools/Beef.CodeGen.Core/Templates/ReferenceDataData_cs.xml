@@ -9,6 +9,24 @@
     <Set Name="System.UsesDatabase" Condition="Entity.AutoImplement == 'Database'" Value="true" />
     <Set Name="System.UsesEntityFramework" Condition="Entity.AutoImplement == 'EntityFramework'" Value="true" />
     <Set Name="System.UsesCosmos" Condition="Entity.AutoImplement == 'Cosmos'" Value="true" />
+    <If Condition="System.UsesDatabase == true">
+      <Set Name="System.DatabaseName" Value="'IDatabase'"/>
+      <If Condition="Entity.DatabaseName != null">
+        <Set Name="System.DatabaseName" Condition="Entity.DatabaseName:StartsWith('I')" Value="Entity.DatabaseName" Otherwise="'I{{Entity.DatabaseName}}'"/>
+      </If>
+    </If>
+    <If Condition="System.UsesEntityFramework == true">
+      <Set Name="System.EntityFrameworkName" Value="'IEfDb'"/>
+      <If Condition="Entity.EntityFrameworkName != null">
+        <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName:StartsWith('I')" Value="Entity.EntityFrameworkName" Otherwise="'I{{Entity.EntityFrameworkName}}'"/>
+      </If>
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <Set Name="System.CosmosName" Value="'ICosmosDb'"/>
+      <If Condition="Entity.CosmosName != null">
+        <Set Name="System.CosmosName" Condition="Entity.CosmosName:StartsWith('I')" Value="Entity.CosmosName" Otherwise="'I{{Entity.CosmosName}}'"/>
+      </If>
+    </If>
   </Entity>
   <Header>
     <![CDATA[/*
@@ -71,6 +89,84 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
     public partial class ReferenceDataData : IReferenceDataData
     {
 ]]>
+    <If Condition="System.UsesDatabase == true">
+      <![CDATA[        private readonly {{System.DatabaseName}} _db;
+]]>
+    </If>
+    <If Condition="System.UsesEntityFramework == true">
+      <![CDATA[        private readonly {{System.EntityFrameworkName}} _ef;
+]]>
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <![CDATA[        private readonly {{System.CosmosName}} _cosmos;
+]]>
+    </If>
+    <If Condition="System.UsesDatabase == true or System.UsesEntityFramework == true or System.UsesCosmos == true">
+      <![CDATA[
+]]>
+    </If>
+    <![CDATA[        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ReferenceDataData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
+        /// </summary>
+        ]]>
+
+    <If Condition="System.UsesDatabase == true">
+      <![CDATA[/// <param name="db">The <see cref="{{System.DatabaseName}}"/>.</param>
+        ]]>
+    </If>
+    <If Condition="System.UsesEntityFramework == true">
+      <![CDATA[/// <param name="ef">The <see cref="{{System.EntityFrameworkName}}"/>.</param>
+        ]]>
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <![CDATA[/// <param name="cosmos">The <see cref="{{System.CosmosName}}"/>.</param>
+        ]]>
+    </If>
+
+    <Switch Value="Entity.DataConstructor">
+      <Case Value="'Private'"><![CDATA[private]]></Case>
+      <Case Value="'Protected'"><![CDATA[protected]]></Case>
+      <Default><![CDATA[public]]></Default>
+    </Switch>
+    <![CDATA[ ReferenceDataData(]]>
+    <Set Name="System.NeedsComma" Value="false" />
+    <If Condition="System.UsesDatabase == true">
+      <![CDATA[{{System.DatabaseName}} db]]>
+      <Set Name="System.NeedsComma" Value="true" />
+    </If>
+    <If Condition="System.UsesEntityFramework == true">
+      <If Condition="System.NeedsComma == true"><![CDATA[, ]]></If>
+      <![CDATA[{{System.EntityFrameworkName}} ef]]>
+      <Set Name="System.NeedsComma" Value="true" />
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <If Condition="System.NeedsComma == true"><![CDATA[, ]]></If>
+      <![CDATA[{{System.CosmosName}} cosmos]]>
+      <Set Name="System.NeedsComma" Value="true" />
+    </If>
+     <![CDATA[) { ]]>
+    <If Condition="System.UsesDatabase == true">
+      <![CDATA[_db = db ?? throw new ArgumentNullException(nameof(db)); ]]>
+    </If>
+    <If Condition="System.UsesEntityFramework == true">
+      <![CDATA[_ef = ef ?? throw new ArgumentNullException(nameof(ef)); ]]>
+    </If>
+    <If Condition="System.UsesCosmos == true">
+      <![CDATA[_cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ]]>
+    </If>
+     <![CDATA[ReferenceDataDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ReferenceDataDataCtor();
+
+]]>
   </Header>
   <Entity>
     <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
@@ -91,11 +187,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
       <Set Name="Config.NewLine" Value="false" />
       <Switch Value="Entity.AutoImplement">
         <Case Value="'Database'">
-          <Set Name="System.DatabaseName" Condition="Entity.DatabaseName != null" Value="Entity.DatabaseName" Otherwise="Config.DatabaseName" />
-          <Set Name="System.DatabaseName" Condition="System.DatabaseName == null" Value="'Database'" />
           <![CDATA[
             {
-                await {{System.DatabaseName}}.Default.GetRefDataAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__coll, "[]]>
+                await _db.GetRefDataAsync<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(__coll, "[]]>
           <If Condition="Entity.DatabaseSchema == null">
             <Then><![CDATA[dbo]]></Then>
             <Else><![CDATA[{{Entity.DatabaseSchema}}]]></Else>
@@ -166,14 +260,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <Set Name="Config.NewLine" Value="true" />
         </Case>
         <Case Value="'EntityFramework'">
-          <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName != null" Value="Entity.EntityFrameworkName" Otherwise="Config.EntityFrameworkName" />
-          <Set Name="System.EntityFrameworkName" Condition="System.EntityFrameworkName == null" Value="'EfDb'" />
-          <![CDATA[{ {{System.EntityFrameworkName}}.Default.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
+          <![CDATA[{ _ef.Query({{Entity.Name}}Mapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
         </Case>
         <Case Value="'Cosmos'">
-          <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
-          <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
-          <![CDATA[{ {{System.CosmosName}}.Default.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
+          <![CDATA[{ _cosmos.ValueQuery({{Entity.Name}}Mapper.CreateArgs("{{Entity.CosmosContainerId}}")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }]]>
         </Case>
         <Default>
           <![CDATA[await {{Entity.Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)]]>
