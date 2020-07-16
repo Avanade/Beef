@@ -35,7 +35,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="TripPersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="ITripPersonDataSvc"/>.</param>
-        public TripPersonManager(ITripPersonDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TripPersonManagerCtor(); }
+        public TripPersonManager(ITripPersonDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); TripPersonManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

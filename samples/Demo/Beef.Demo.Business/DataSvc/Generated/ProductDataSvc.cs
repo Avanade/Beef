@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
@@ -24,6 +25,7 @@ namespace Beef.Demo.Business.DataSvc
     public partial class ProductDataSvc : IProductDataSvc
     {
         private readonly IProductData _data;
+        private readonly IRequestCache _cache;
 
         /// <summary>
         /// Parameterless constructor is explictly not supported.
@@ -34,7 +36,8 @@ namespace Beef.Demo.Business.DataSvc
         /// Initializes a new instance of the <see cref="ProductDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IProductData"/>.</param>
-        public ProductDataSvc(IProductData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); ProductDataSvcCtor(); }
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public ProductDataSvc(IProductData data, IRequestCache cache) { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ProductDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -51,11 +54,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out Product __val))
+                if (_cache.TryGetValue(__key, out Product __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }

@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         /// Initializes a new instance of the <see cref="PersonController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IPersonManager"/>.</param>
-        public PersonController(IPersonManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public PersonController(IPersonManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Creates the <see cref="Person"/> entity.

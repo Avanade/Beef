@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.WebApi;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.AspNetCore.WebApi
@@ -56,8 +58,13 @@ namespace Beef.AspNetCore.WebApi
         public async Task InvokeAsync(HttpContext context)
         {
             ExecutionContext.Reset(true);
-            UpdateAction.Invoke(context, ExecutionContext.Current);
-            ExecutionContext.Current.ServiceProvider = context.RequestServices;
+            var ec = ExecutionContext.Current;
+            UpdateAction.Invoke(context, ec);
+            ec.ServiceProvider = context.RequestServices;
+
+            if (context.Request.Headers.TryGetValue(WebApiConsts.CorrelationIdHeaderName, out var val))
+                ec.CorrelationId = val.FirstOrDefault();
+
             await _next(context).ConfigureAwait(false);
         }
     }

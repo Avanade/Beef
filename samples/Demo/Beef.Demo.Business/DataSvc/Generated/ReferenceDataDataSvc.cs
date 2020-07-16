@@ -34,7 +34,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
         public ReferenceDataDataSvc(IServiceProvider provider)
         {
-            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _provider = Check.NotNull(provider, nameof(provider));
             _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.CountryGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.USStateGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.GenderGetAllAsync()))));

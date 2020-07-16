@@ -38,7 +38,7 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="GenderData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
-        public GenderData(IDatabase db) { _db = db ?? throw new ArgumentNullException(nameof(db)); GenderDataCtor(); }
+        public GenderData(IDatabase db) { _db = Check.NotNull(db, nameof(db)); GenderDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

@@ -151,13 +151,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
     </If>
      <![CDATA[) { ]]>
     <If Condition="System.UsesDatabase == true">
-      <![CDATA[_db = db ?? throw new ArgumentNullException(nameof(db)); ]]>
+      <![CDATA[_db = Check.NotNull(db, nameof(db)); ]]>
     </If>
     <If Condition="System.UsesEntityFramework == true">
-      <![CDATA[_ef = ef ?? throw new ArgumentNullException(nameof(ef)); ]]>
+      <![CDATA[_ef = Check.NotNull(ef, nameof(ef)); ]]>
     </If>
     <If Condition="System.UsesCosmos == true">
-      <![CDATA[_cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ]]>
+      <![CDATA[_cosmos = Check.NotNull(cosmos, nameof(cosmos)); ]]>
     </If>
      <![CDATA[ReferenceDataDataCtor(); }
 

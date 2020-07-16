@@ -113,7 +113,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public PersonData(IDatabase db, IEfDb ef) { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); PersonDataCtor(); }
+        public PersonData(IDatabase db, IEfDb ef) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); PersonDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

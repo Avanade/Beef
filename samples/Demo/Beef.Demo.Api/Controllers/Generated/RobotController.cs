@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         /// Initializes a new instance of the <see cref="RobotController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
-        public RobotController(IRobotManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public RobotController(IRobotManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Gets the <see cref="Robot"/> entity that matches the selection criteria.

@@ -28,7 +28,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
-        public ReferenceDataProvider(IReferenceDataDataSvc dataService) => _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+        public ReferenceDataProvider(IReferenceDataDataSvc dataService) => _dataService = Check.NotNull(dataService, nameof(dataService));
     
         #region Collections
 

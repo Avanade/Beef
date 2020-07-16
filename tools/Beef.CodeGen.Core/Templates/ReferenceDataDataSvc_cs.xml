@@ -46,7 +46,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
         public ReferenceDataDataSvc(IServiceProvider provider)
         {
-            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _provider = Check.NotNull(provider, nameof(provider));
 ]]>
   </Header>
   <Entity Condition="Entity.RefDataType != null and Entity.ExcludeDataSvc == false and Entity.ExcludeAll == false">

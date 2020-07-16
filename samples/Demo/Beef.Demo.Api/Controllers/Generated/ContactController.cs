@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         /// Initializes a new instance of the <see cref="ContactController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IContactManager"/>.</param>
-        public ContactController(IContactManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public ContactController(IContactManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Gets the <see cref="Contact"/> collection entity that matches the selection criteria.

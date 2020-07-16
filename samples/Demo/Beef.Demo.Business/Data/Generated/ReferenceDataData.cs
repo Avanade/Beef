@@ -39,7 +39,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos) { _db = db ?? throw new ArgumentNullException(nameof(db)); _ef = ef ?? throw new ArgumentNullException(nameof(ef)); _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); ReferenceDataDataCtor(); }
+        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); ReferenceDataDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

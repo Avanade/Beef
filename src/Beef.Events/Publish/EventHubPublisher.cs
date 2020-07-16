@@ -10,9 +10,9 @@ using Newtonsoft.Json;
 namespace Beef.Events.Publish
 {
     /// <summary>
-    /// <see cref="Publish(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
+    /// <see cref="PublishEventsAsync(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
     /// </summary>
-    public class EventHubPublisher
+    public class EventHubPublisher : EventPublisherBase
     {
         private readonly EventHubs.EventHubClient _client;
 
@@ -24,11 +24,16 @@ namespace Beef.Events.Publish
         public EventHubPublisher(EventHubs.EventHubClient client) => _client = Check.NotNull(client, nameof(client));
 
         /// <summary>
+        /// Indicates whether any <see cref="Exception"/> thrown during the publish should be swallowed (e.g. log and continue processing).
+        /// </summary>
+        public bool SwallowException { get; set; }
+
+        /// <summary>
         /// Publishes the <paramref name="events"/>.
         /// </summary>
         /// <param name="events">The <see cref="EventData"/> instances.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
-        public async Task Publish(EventData[] events)
+        protected override async Task PublishEventsAsync(params EventData[] events)
         {
             if (events == null || events.Length == 0)
                 return;

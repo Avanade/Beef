@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         /// Initializes a new instance of the <see cref="ProductController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IProductManager"/>.</param>
-        public ProductController(IProductManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public ProductController(IProductManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Gets the <see cref="Product"/> entity that matches the selection criteria.

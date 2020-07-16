@@ -34,10 +34,8 @@ namespace Beef.Test.NUnit.Tests
         protected AgentTestCore(AgentTesterBase agentTesterBase, string? username = null, object? args = null)
         {
             AgentTesterBase = agentTesterBase ?? throw new ArgumentNullException(nameof(agentTesterBase));
-            ExpectEvent.SetUp();
-
-            if (username != null || !ExecutionContext.HasCurrent)
-                AgentTesterBase.Prepare(username, args);
+            AgentTesterBase.Prepare(username ?? (ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : null), args);
+            ExecutionContext.Current.CorrelationId = CorrelationId;
 
             Args = args;
             Username = ExecutionContext.Current.Username;
@@ -50,6 +48,11 @@ namespace Beef.Test.NUnit.Tests
         /// Gets the owning/parent <see cref="Beef.Test.NUnit.Tests.AgentTesterBase"/>.
         /// </summary>
         protected AgentTesterBase AgentTesterBase { get; private set; }
+
+        /// <summary>
+        /// Gets the unique correlation identifier that is sent via the agent to underlying API.
+        /// </summary>
+        public string CorrelationId { get; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Gets the username.
@@ -160,6 +163,8 @@ namespace Beef.Test.NUnit.Tests
             }
             else if (_expectedNonePublished)
                 ExpectEvent.NonePublished();
+
+            ExpectEventPublisher.Remove();
         }
 
         /// <summary>

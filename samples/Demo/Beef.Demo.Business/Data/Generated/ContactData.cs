@@ -46,7 +46,7 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="ContactData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public ContactData(IEfDb ef) { _ef = ef ?? throw new ArgumentNullException(nameof(ef)); ContactDataCtor(); }
+        public ContactData(IEfDb ef) { _ef = Check.NotNull(ef, nameof(ef)); ContactDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

@@ -77,7 +77,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
         <Case Value="'Protected'"><![CDATA[protected]]></Case>
         <Default><![CDATA[public]]></Default>
       </Switch>
-      <![CDATA[ {{Entity.Name}}Controller(I{{Entity.Name}}Manager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+      <![CDATA[ {{Entity.Name}}Controller(I{{Entity.Name}}Manager manager) => _manager = Check.NotNull(manager, nameof(manager));
 ]]>
       <If Condition="Entity.OperationCount > 0">
         <Operation Condition="Operation.ExcludeWebApi == false and Operation.ExcludeAll == false">

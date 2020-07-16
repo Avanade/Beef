@@ -35,7 +35,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="GenderManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
-        public GenderManager(IGenderDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); GenderManagerCtor(); }
+        public GenderManager(IGenderDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); GenderManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

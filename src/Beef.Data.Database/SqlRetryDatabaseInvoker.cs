@@ -14,7 +14,7 @@ namespace Beef.Data.Database
     /// A <see cref="DatabaseInvoker"/> for <b>Microsoft SQL Server</b> that uses <b>Polly</b> to perform an exponential retry where a transient error (see <see cref="TransientErrorNumbers"/>) occurs.
     /// </summary>
     /// <remarks>
-    /// A retry is attempted using an exponential (2 seconds ^ n / 2) backoff strategy with a 100 ms jitter to add a level of randomness (values would be: 1s, 2s, 4s, 8s, ...). The 
+    /// A retry is attempted using a 250ms backoff strategy (e.g. 0ms, 250ms, 500ms, 750ms, 1000ms) with a 100ms jitter to add a further level of randomness. The 
     /// <see cref="MaxRetries"/> defines how many retries are performed before failing and allowing the error to bubble up and out.
     /// </remarks>
     public class SqlRetryDatabaseInvoker : DatabaseInvoker
@@ -63,7 +63,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Calculates the retry timespan.
         /// </summary>
-        private static TimeSpan CalcRetryTimeSpan(int count) => TimeSpan.FromSeconds(Math.Pow(2, count) / 2) + TimeSpan.FromMilliseconds(_jitterer.Next(0, 100));
+        private static TimeSpan CalcRetryTimeSpan(int count) => TimeSpan.FromMilliseconds((count * 1000) / 4) + TimeSpan.FromMilliseconds(_jitterer.Next(0, 100));
 
         /// <summary>
         /// Logs the retry exception as a warning.

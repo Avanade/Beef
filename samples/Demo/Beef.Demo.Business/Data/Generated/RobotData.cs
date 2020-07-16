@@ -48,7 +48,7 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="RobotData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public RobotData(ICosmosDb cosmos) { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); RobotDataCtor(); }
+        public RobotData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); RobotDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

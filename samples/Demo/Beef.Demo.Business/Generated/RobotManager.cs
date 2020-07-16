@@ -36,7 +36,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
-        public RobotManager(IRobotDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); RobotManagerCtor(); }
+        private RobotManager(IRobotDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

@@ -141,7 +141,7 @@ namespace Beef.Test.NUnit.Tests
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = ExpectEvent.GetEvents();
-            if (events.Length == 0)
+            if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
             {

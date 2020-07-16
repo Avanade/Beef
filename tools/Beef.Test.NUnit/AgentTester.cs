@@ -332,10 +332,10 @@ namespace Beef.Test.NUnit
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
-        /// <param name="configureServices">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
+        /// <param name="services">The <see cref="Action{IServiceCollection}"/>.</param>
         /// <returns>An <see cref="AgentTesterServer{TStartup}"/> instance.</returns>
-        public static AgentTesterServer<TStartup> CreateServer<TStartup>(string? environmentVariablePrefix = null, string environment = AgentTester.DefaultEnvironment, IConfiguration? config = null, Action<WebHostBuilderContext, IServiceCollection>? configureServices = null)
-            where TStartup : class => new AgentTesterServer<TStartup>(environmentVariablePrefix, environment, config, configureServices);
+        public static AgentTesterServer<TStartup> CreateServer<TStartup>(string? environmentVariablePrefix = null, string environment = DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null)
+            where TStartup : class => new AgentTesterServer<TStartup>(environmentVariablePrefix, environment, config, services);
 
         /// <summary>
         /// Creates an <see cref="AgentTesterWaf{TStartup}"/> to manage the orchestration of the <see cref="WebApplicationFactory{TStartup}"/> to execute one or more integration tests against.

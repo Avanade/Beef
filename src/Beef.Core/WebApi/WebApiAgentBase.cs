@@ -51,6 +51,9 @@ namespace Beef.WebApi
             if (content != null)
                 req.Content = content;
 
+            if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.CorrelationId))
+                req.Headers.Add(WebApiConsts.CorrelationIdHeaderName, ExecutionContext.Current.CorrelationId);
+
             ApplyWebApiOptions(req, requestOptions);
 
             Args.BeforeRequest?.Invoke(req);

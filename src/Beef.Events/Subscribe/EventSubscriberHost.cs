@@ -64,6 +64,16 @@ namespace Beef.Events.Subscribe
         public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
 
         /// <summary>
+        /// Gets or sets the subject path seperator <see cref="string"/> (see <see cref="IEventPublisher.PathSeparator"/>).
+        /// </summary>
+        public string SubjectPathSeparator { get; set; } = ".";
+
+        /// <summary>
+        /// Gets or sets the subject template wildcard <see cref="string"/> (see <see cref="IEventPublisher.TemplateWildcard"/>).
+        /// </summary>
+        public string SubjectTemplateWildcard { get; set; } = "*";
+
+        /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
         /// </summary>
         /// <param name="subject">The event subject.</param>
@@ -82,7 +92,7 @@ namespace Beef.Events.Subscribe
                 return CheckResult(Result.InvalidEventData(null, "EventData is invalid; Subject is required."), null, null, null);
 
             // Match a subscriber to the subject + template supplied.
-            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
+            var subscribers = Args.EventSubscribers.Where(r => EventSubjectMatcher.Match(SubjectTemplateWildcard, SubjectPathSeparator, r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
             var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber?)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
             if (subscriber == null)
                 return CheckResult(Result.NotSubscribed(), subject, action, null);

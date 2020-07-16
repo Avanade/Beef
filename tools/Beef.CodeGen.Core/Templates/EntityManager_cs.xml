@@ -257,7 +257,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         <Case Value="'Protected'"><![CDATA[protected]]></Case>
         <Default><![CDATA[public]]></Default>
       </Switch>
-      <![CDATA[ {{Entity.Name}}Manager(I{{Entity.Name}}DataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); {{Entity.Name}}ManagerCtor(); }
+      <![CDATA[ {{Entity.Name}}Manager(I{{Entity.Name}}DataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Entity.Name}}ManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

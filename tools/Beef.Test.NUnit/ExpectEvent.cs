@@ -7,45 +7,28 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Represents a test that captures and verifies that an <see cref="Event"/> <see cref="EventData"/> has been published within an <see cref="AsyncLocal{T}"/> context.
+    /// Represents the expect event logic that leverages the <see cref="ExpectEventPublisher"/>.
     /// </summary>
     public static class ExpectEvent
     {
-        private static readonly System.Threading.AsyncLocal<List<EventData>> _localEvents = new System.Threading.AsyncLocal<List<EventData>>();
-
         /// <summary>
-        /// Static constructor.
+        /// Gets or sets the singleton <see cref="ExpectEventPublisher"/> instance.
         /// </summary>
-        static ExpectEvent()
-        {
-            Event.Register((events) =>
-            {
-                if (_localEvents.Value != null)
-                    _localEvents.Value.AddRange(events);
-
-                return Task.CompletedTask;
-            });
-        }
-
-        /// <summary>
-        /// Resets the capturing of events for the <see cref="System.Threading.AsyncLocal{T}"/>.
-        /// </summary>
-        public static void SetUp() => _localEvents.Value = new List<EventData>();
+        public static ExpectEventPublisher EventPublisher { get; set; } = new ExpectEventPublisher();
 
         /// <summary>
         /// Gets the events for the <see cref="System.Threading.AsyncLocal{T}"/>.
         /// </summary>
+        /// <param name="correlationId">The correlation identifier.</param>
         /// <returns>An <see cref="Beef.Events.EventData"/> array.</returns>
-        public static EventData[] GetEvents() => _localEvents.Value == null ? Array.Empty<EventData>() : _localEvents.Value.ToArray();
+        public static List<EventData> GetEvents(string? correlationId = null) => ExpectEventPublisher.GetEvents(correlationId);
 
         /// <summary>
-        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="IEventPublisher.TemplateWildcard"/>) and optional <paramref name="action"/>.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
@@ -53,22 +36,25 @@ namespace Beef.Test.NUnit
         {
             Check.NotEmpty(template, nameof(template));
 
-            if (_localEvents.Value == null || _localEvents.Value.Count == 0 || !_localEvents.Value.Any(x => Event.Match(template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
+            var events = GetEvents();
+            if (events == null || events.Count == 0 || !events.Any(x => EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
                 Assert.Fail($"Event with a subject template '{template}' and Action '{action ?? "any"}' was expected and did not match one of the events published.");
         }
 
         /// <summary>
-        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="Event.TemplateWildcard"/>) and optional <paramref name="action"/>.
+        /// Verifies that the no event was published that matches the <paramref name="template"/> which may contain wildcards (<see cref="IEventPublisher.TemplateWildcard"/>) and optional <paramref name="action"/>.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
         public static void IsNotPublished(string template, string? action = null)
         {
             Check.NotEmpty(template, nameof(template));
-            if (_localEvents.Value == null || _localEvents.Value.Count == 0)
+
+            var events = GetEvents();
+            if (events == null || events.Count == 0)
                 return;
 
-            if (_localEvents.Value.Any(x => Event.Match(template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
+            if (events.Any(x => EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
                 Assert.Fail($"Event with a subject template '{template}' and Action '{action ?? "any"}' was not expected; however, it was published.");
         }
 
@@ -84,39 +70,40 @@ namespace Beef.Test.NUnit
                 throw new ArgumentNullException(nameof(expectedEvents));
 
             var actualEvents = GetEvents();
-            if (actualEvents.Length != expectedEvents.Count)
-                Assert.Fail($"Expected {expectedEvents.Count} Event(s) to be published; there were {actualEvents.Length} published.");
+            if (actualEvents.Count != expectedEvents.Count)
+                Assert.Fail($"Expected {expectedEvents.Count} Event(s) to be published; there were {actualEvents.Count} published.");
 
-            for (int i = 0; i < actualEvents.Length; i++)
+            for (int i = 0; i < actualEvents.Count; i++)
             {
                 // Assert subject and action.
                 var exp = expectedEvents[i].EventData;
                 var act = actualEvents[i];
 
-                if (!Event.Match(exp.Subject, act.Subject))
+                if (!EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, exp.Subject, act.Subject))
                     Assert.Fail($"Expected published Event[{i}].Subject '{exp.Subject}' is not equal to actual '{act.Subject}'.");
 
                 if (!string.IsNullOrEmpty(exp.Action) && string.CompareOrdinal(exp.Action, act.Action) != 0)
                     Assert.Fail($"Expected published Event[{i}].Action '{exp.Action}' is not equal to actual '{act.Action}'.");
 
                 // Where there is *no* expected value then skip value comparison.
-                //if (!exp.HasValue)
-                //    continue;
+                if (!exp.HasValue)
+                    continue;
 
                 // Assert value.
-                //var eVal = exp.GetValue();
-                //var aVal = act.GetValue();
+                var eVal = exp.GetValue();
+                var aVal = act.GetValue();
 
-                //var comparisonConfig = AgentTester.GetDefaultComparisonConfig();
-                //comparisonConfig.TypesToIgnore.AddRange(ReferenceDataManager.Current.GetAllTypes());
-                //var type = eVal?.GetType() ?? aVal?.GetType();
-                //if (type != null)
-                //    AgentTester.InferAdditionalMembersToIgnore(comparisonConfig, type);
+                var comparisonConfig = AgentTester.GetDefaultComparisonConfig();
+                comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
 
-                //var cl = new CompareLogic(comparisonConfig);
-                //var cr = cl.Compare(eVal, aVal);
-                //if (!cr.AreEqual)
-                //    Assert.Fail($"Expected published Event[{i}].Value is not equal to actual: {cr.DifferencesString}");
+                var type = eVal?.GetType() ?? aVal?.GetType();
+                if (type != null)
+                    AgentTester.InferAdditionalMembersToIgnore(comparisonConfig, type);
+
+                var cl = new CompareLogic(comparisonConfig);
+                var cr = cl.Compare(eVal, aVal);
+                if (!cr.AreEqual)
+                    Assert.Fail($"Expected published Event[{i}].Value is not equal to actual: {cr.DifferencesString}");
             }
         }
 
@@ -125,10 +112,11 @@ namespace Beef.Test.NUnit
         /// </summary>
         public static void NonePublished()
         {
-            if (_localEvents.Value == null || _localEvents.Value.Count == 0)
+            var events = GetEvents();
+            if (events == null || events.Count == 0)
                 return;
 
-            Assert.Fail($"Expected no events to be published, there were '{_localEvents.Value.Count}' published.");
+            Assert.Fail($"Expected no events to be published, there were '{events.Count}' published.");
         }
     }
 

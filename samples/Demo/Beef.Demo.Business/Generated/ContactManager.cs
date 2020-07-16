@@ -35,7 +35,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ContactManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
-        public ContactManager(IContactDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ContactManagerCtor(); }
+        public ContactManager(IContactDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

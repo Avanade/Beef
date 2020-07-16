@@ -1,4 +1,5 @@
 ﻿using Beef.AspNetCore.WebApi;
+using Beef.Caching;
 using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
@@ -62,13 +63,13 @@ namespace Beef.Demo.Api
             //sac?.RegisterAll();
 
             // Set up the event publishing to event hubs.
-            if (config.GetValue<bool>("EventHubPublishing"))
-            {
-                var ehc = EventHubClient.CreateFromConnectionString(config.GetValue<string>("EventHubConnectionString"));
-                ehc.RetryPolicy = RetryPolicy.Default;
-                var ehp = new EventHubPublisher(ehc);
-                Event.Register((events) => ehp.Publish(events));
-            }
+            //if (config.GetValue<bool>("EventHubPublishing"))
+            //{
+            //    var ehc = EventHubClient.CreateFromConnectionString(config.GetValue<string>("EventHubConnectionString"));
+            //    ehc.RetryPolicy = RetryPolicy.Default;
+            //    var ehp = new EventHubPublisher(ehc);
+            //    Event.Register((events) => ehp.Publish(events));
+            //}
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -92,6 +93,22 @@ namespace Beef.Demo.Api
             services.AddGeneratedManagerServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
+
+            // Add event publishing.
+            services.AddSingleton<IEventPublisher>(_ =>
+            {
+                if (_config.GetValue<bool>("EventHubPublishing"))
+                {
+                    var ehc = EventHubClient.CreateFromConnectionString(_config.GetValue<string>("EventHubConnectionString"));
+                    ehc.RetryPolicy = RetryPolicy.Default;
+                    return new EventHubPublisher(ehc);
+                }
+                else
+                    return new NullEventPublisher();
+            });
+
+            // Add other related services.
+            services.AddScoped<IRequestCache, RequestCache>();
 
             // Cache policy management.
             services.AddSingleton(_ =>

@@ -54,6 +54,7 @@ namespace Beef.Demo.Test
             r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
+                .ExpectEvent("Demo.Contact.00000001-0000-0000-0000-000000000000", "Update")
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);

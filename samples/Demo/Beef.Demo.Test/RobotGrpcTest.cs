@@ -168,6 +168,8 @@ namespace Beef.Demo.Test
         [Test]
         public void E110_Create()
         {
+            _agentTester.Prepare();
+
             var r = new Robot
             {
                 ModelNo = "T500",
@@ -196,6 +198,8 @@ namespace Beef.Demo.Test
         [Test]
         public void E120_Create_Duplicate()
         {
+            _agentTester.Prepare();
+
             var r = new Robot
             {
                 ModelNo = "T500",

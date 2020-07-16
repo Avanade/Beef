@@ -79,7 +79,7 @@ namespace Beef.Test.NUnit.Tests
             Logger.Default.Info("");
             Logger.Default.Info($"EVENTS PUBLISHED >");
             var events = ExpectEvent.GetEvents();
-            if (events.Length == 0)
+            if (events.Count == 0)
                 Logger.Default.Info("  None.");
             else
             {

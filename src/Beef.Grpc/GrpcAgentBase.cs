@@ -69,7 +69,7 @@ namespace Beef.Grpc
             {
                 try
                 {
-                    var options = new CallOptions();
+                    var options = new CallOptions(CreateRequestHeaders());
                     using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
                     await call.ResponseAsync.ConfigureAwait(false);
                     return new GrpcAgentResult(call.GetStatus(), call.GetTrailers(), request);
@@ -104,7 +104,7 @@ namespace Beef.Grpc
             {
                 try
                 {
-                    var options = new CallOptions();
+                    var options = new CallOptions(CreateRequestHeaders());
                     using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
                     var response = await call.ResponseAsync.ConfigureAwait(false);
                     var result = Check.NotNull(mapper, nameof(mapper)).MapToSrce(response);
@@ -139,7 +139,7 @@ namespace Beef.Grpc
             {
                 try
                 {
-                    var options = new CallOptions();
+                    var options = new CallOptions(CreateRequestHeaders());
                     using var call = Check.NotNull(func, nameof(func)).Invoke(Client, options);
                     TResponse response = await call.ResponseAsync.ConfigureAwait(false);
                     return new GrpcAgentResult<TResult>(call.GetStatus(), call.GetTrailers(), request, response, converter == null 
@@ -151,6 +151,18 @@ namespace Beef.Grpc
                     return new GrpcAgentResult<TResult>(rex, request);
                 }
             }, null!, memberName, filePath, lineNumber);
+        }
+
+        /// <summary>
+        /// Create request headers.
+        /// </summary>
+        private static Metadata CreateRequestHeaders()
+        {
+            var headers = new Metadata();
+            if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.CorrelationId))
+                headers.Add(WebApiConsts.CorrelationIdHeaderName, ExecutionContext.Current.CorrelationId);
+
+            return headers;
         }
     }
 }

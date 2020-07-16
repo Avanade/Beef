@@ -39,7 +39,7 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="TripPersonData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITripOData"/>.</param>
-        public TripPersonData(ITripOData odata) { _odata = odata ?? throw new ArgumentNullException(nameof(odata)); TripPersonDataCtor(); }
+        public TripPersonData(ITripOData odata) { _odata = Check.NotNull(odata, nameof(odata)); TripPersonDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

@@ -36,7 +36,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ProductManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>
-        public ProductManager(IProductDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); ProductManagerCtor(); }
+        public ProductManager(IProductDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ProductManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

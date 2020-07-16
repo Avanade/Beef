@@ -32,7 +32,7 @@ namespace Beef.Demo.Api.Grpc
         /// Initializes a new instance of the <see cref="RobotService"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
-        public RobotService(IRobotManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public RobotService(IRobotManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Gets the <see cref="Robot"/> entity that matches the selection criteria.

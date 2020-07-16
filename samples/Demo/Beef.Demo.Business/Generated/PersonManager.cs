@@ -134,7 +134,7 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        public PersonManager(IPersonDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); PersonManagerCtor(); }
+        public PersonManager(IPersonDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

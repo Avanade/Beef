@@ -66,7 +66,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
           <Case Value="'Protected'"><![CDATA[protected]]></Case>
           <Default><![CDATA[public]]></Default>
         </Switch>
-        <![CDATA[ {{Entity.Name}}Service(I{{Entity.Name}}Manager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        <![CDATA[ {{Entity.Name}}Service(I{{Entity.Name}}Manager manager) => _manager = Check.NotNull(manager, nameof(manager));
 ]]>
         <Operation Condition="Operation.Grpc == true and Operation.OperationType != 'Patch'">
           <![CDATA[

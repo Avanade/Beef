@@ -26,7 +26,19 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="configuration">The <see cref="IWebHostBuilder"/>.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Class has a Dispose method.")]
-        internal AgentTesterWaf(Action<IWebHostBuilder> configuration) => WebApplicationFactory = new WebApplicationFactory<TStartup>().WithWebHostBuilder(configuration);
+        internal AgentTesterWaf(Action<IWebHostBuilder> configuration)
+        {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            var action = new Action<IWebHostBuilder>(whb =>
+            {
+                configuration(whb);
+                whb.ConfigureServices(sc => ReplaceEventPublisher(sc));
+            }); 
+
+            WebApplicationFactory = new WebApplicationFactory<TStartup>().WithWebHostBuilder(action);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApplicationFactory{TStartup}"/> class with default <see cref="IWebHostBuilder"/> configuration optionally enabling specific

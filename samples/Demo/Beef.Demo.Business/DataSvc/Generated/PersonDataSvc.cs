@@ -11,7 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
@@ -24,6 +26,8 @@ namespace Beef.Demo.Business.DataSvc
     public partial class PersonDataSvc : IPersonDataSvc
     {
         private readonly IPersonData _data;
+        private readonly IEventPublisher _evtPub;
+        private readonly IRequestCache _cache;
 
         #region Extensions
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
@@ -60,7 +64,9 @@ namespace Beef.Demo.Business.DataSvc
         /// Initializes a new instance of the <see cref="PersonDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IPersonData"/>.</param>
-        public PersonDataSvc(IPersonData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); PersonDataSvcCtor(); }
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public PersonDataSvc(IPersonData data, IEventPublisher evtPub, IRequestCache cache) { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); PersonDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -77,8 +83,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
@@ -93,8 +99,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishEventAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheRemove<Person>(new UniqueKey(id));
+                await _evtPub.PublishEventAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
+                _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
             });
         }
@@ -109,11 +115,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out Person __val))
+                if (_cache.TryGetValue(__key, out Person __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
@@ -129,8 +135,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
@@ -208,9 +214,9 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(
-                    Beef.Events.EventData.CreateValueEvent(__result, $"Demo.Person.{fromId}", "Merge", fromId, toId)).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishAsync(
+                    EventData.CreateValueEvent(_evtPub, __result, $"Demo.Person.{fromId}", "Merge", fromId, toId)).ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
             });
@@ -253,11 +259,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out PersonDetail __val))
+                if (_cache.TryGetValue(__key, out PersonDetail __val))
                     return __val;
 
                 var __result = await _data.GetDetailAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
@@ -273,8 +279,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
@@ -303,7 +309,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetNullAsync(name).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+                _cache.SetValue(__result?.UniqueKey ?? UniqueKey.Empty, __result);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
                 return __result;
             });
@@ -335,11 +341,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out Person __val))
+                if (_cache.TryGetValue(__key, out Person __val))
                     return __val;
 
                 var __result = await _data.GetWithEfAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
@@ -355,8 +361,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
@@ -372,8 +378,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                await _evtPub.PublishValueEventAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
@@ -388,9 +394,9 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishAsync(
-                    Beef.Events.EventData.CreateEvent($"Demo.Person.{id}", "Delete", id)).ConfigureAwait(false);
-                ExecutionContext.Current.CacheRemove<Person>(new UniqueKey(id));
+                await _evtPub.PublishAsync(
+                    EventData.CreateEvent(_evtPub, $"Demo.Person.{id}", "Delete", id)).ConfigureAwait(false);
+                _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });
         }

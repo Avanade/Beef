@@ -30,16 +30,20 @@ namespace Beef.Test.NUnit
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
         /// <param name="environment">The environment to be used by the underlying web host.</param>
         /// <param name="config">The <see cref="IConfiguration"/>; defaults to <see cref="AgentTester.BuildConfiguration{TStartup}(string?, string?)"/> where <c>null</c>.</param>
-        /// <param name="configureServices">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
-        internal AgentTesterServer(string? environmentVariablePrefix = null, string environment = AgentTester.DefaultEnvironment, IConfiguration? config = null, Action<WebHostBuilderContext, IServiceCollection>? configureServices = null)
+        /// <param name="services">An optional action to perform further <see cref="IServiceCollection"/> configuration.</param>
+        internal AgentTesterServer(string? environmentVariablePrefix = null, string environment = AgentTester.DefaultEnvironment, IConfiguration? config = null, Action<IServiceCollection>? services = null)
         {
+            var action = new Action<IServiceCollection>(sc =>
+            {
+                services?.Invoke(sc);
+                ReplaceEventPublisher(sc);
+            });
+
             var whb = new WebHostBuilder()
                 .UseEnvironment(environment)
-                .UseConfiguration(config ?? AgentTester.BuildConfiguration<TStartup>(environmentVariablePrefix, environment))
-                .UseStartup<TStartup>();
-
-            if (configureServices != null)
-                whb.ConfigureServices(configureServices);
+                .UseStartup<TStartup>()
+                .ConfigureTestServices(sc => ReplaceEventPublisher(sc))
+                .UseConfiguration(config ?? AgentTester.BuildConfiguration<TStartup>(environmentVariablePrefix, environment));
 
             TestServer = new TestServer(whb);
         }

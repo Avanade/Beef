@@ -212,6 +212,8 @@ namespace Beef.Demo.Test
         [Test]
         public void E110_Create()
         {
+            _agentTester.Prepare();
+
             var r = new Robot
             {
                 ModelNo = "T500",

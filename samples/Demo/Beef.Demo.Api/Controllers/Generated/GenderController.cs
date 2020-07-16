@@ -37,7 +37,7 @@ namespace Beef.Demo.Api.Controllers
         /// Initializes a new instance of the <see cref="GenderController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>
-        public GenderController(IGenderManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public GenderController(IGenderManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Gets the <see cref="Gender"/> entity that matches the selection criteria.

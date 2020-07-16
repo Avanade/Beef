@@ -38,7 +38,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="agent">The <see cref="IReferenceDataAgent"/>.</param>
         public ReferenceDataAgentProvider(IReferenceDataAgent agent)
         {
-            _agent = agent ?? throw new ArgumentNullException(nameof(agent));
+            _agent = Check.NotNull(agent, nameof(agent));
 
             _nameDict.Add(nameof(Country), typeof(RefDataNamespace.Country));
             _typeDict.Add(typeof(RefDataNamespace.Country), nameof(Country));

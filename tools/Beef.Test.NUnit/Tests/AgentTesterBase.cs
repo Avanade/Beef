@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Caching.Policy;
+using Beef.Events;
 using Beef.RefData;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
@@ -103,5 +104,15 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <returns>An <see cref="HttpClient"/> instance.</returns>
         public abstract HttpClient GetHttpClient();
+
+        /// <summary>
+        /// Replaces the <see cref="IEventPublisher"/> with the <see cref="ExpectEvent.EventPublisher"/> instance (as a singleton).
+        /// </summary>
+        /// <param name="sc">The <see cref="IServiceCollection"/>.</param>
+        protected static void ReplaceEventPublisher(IServiceCollection sc)
+        {
+            sc.Remove<IEventPublisher>();
+            sc.AddSingleton<IEventPublisher>(_ => ExpectEvent.EventPublisher);
+        }
     }
 }
