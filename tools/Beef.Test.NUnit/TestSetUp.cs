@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Caching.Policy;
 using Beef.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -23,19 +23,19 @@ namespace Beef.Test.NUnit
         private static bool _registeredSetUpInvoked;
         private static int _registeredSetUpCount;
 
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static TestSetUp()
-        {
-            RegisterGlobalLogger();
-            Reset();
-        }
+        ///// <summary>
+        ///// Static constructor.
+        ///// </summary>
+        //static TestSetUp()
+        //{
+        //    RegisterGlobalLogger();
+        //    Reset();
+        //}
 
-        /// <summary>
-        /// Execute the <see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/> and bind output to the console.
-        /// </summary>
-        public static void RegisterGlobalLogger() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
+        ///// <summary>
+        ///// Execute the <see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/> and bind output to the console.
+        ///// </summary>
+        //public static void RegisterGlobalLogger() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
 
         #region SetUp
 
@@ -44,7 +44,6 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="setUpIfAlreadyDone">Indicates whether to perform the setup if already done; defaults to <c>true</c>.</param>
         /// <param name="data">Optional data to be passed to the resgitered set up function.</param>
-        /// <remarks>This also invokes the <see cref="CachePolicyManager.ForceFlush"/> and <see cref="DependencyGroupAttribute.Refresh"/>.</remarks>
         public static void Reset(bool setUpIfAlreadyDone = true, object? data = null)
         {
             lock (_lock)
@@ -52,8 +51,7 @@ namespace Beef.Test.NUnit
                 if (!_registeredSetUpInvoked || setUpIfAlreadyDone)
                 {
                     ShouldContinueRunningTests = true;
-                    CachePolicyManager.ForceFlush();
-                    DependencyGroupAttribute.Refresh();
+                    //CachePolicyManager.ForceFlush();
                     _registeredSetUpData = data;
                     _registeredSetUpInvoked = false;
                 }
@@ -61,7 +59,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Registers the <paramref name="setUpFunc"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
+        /// Registers the synchronous <paramref name="setUpFunc"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
         /// </summary>
         /// <param name="setUpFunc">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
@@ -78,7 +76,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Registers the <paramref name="setUpFuncAsync"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
+        /// Registers the asynchronous <paramref name="setUpFuncAsync"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
         /// </summary>
         /// <param name="setUpFuncAsync">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
@@ -103,8 +101,8 @@ namespace Beef.Test.NUnit
             {
                 ShouldContinueRunningTestsAssert();
 
-                if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object? needsSetUp) && !(bool)needsSetUp)
-                    return;
+                //if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object? needsSetUp) && !(bool)needsSetUp)
+                //    return;
 
                 if (!_registeredSetUpInvoked)
                 {
@@ -127,14 +125,12 @@ namespace Beef.Test.NUnit
                             Logger.Default.Info("Invocation of registered set up action.");
                             Logger.Default.Info(new string('=', 80));
 
-                            var task = Task.Run(() => _registeredSetUpAsync.Invoke(_registeredSetUpCount++, _registeredSetUpData));
-                            task.Wait();
-
-                            ShouldContinueRunningTests = task.Result;
+                            ShouldContinueRunningTests = Task.Run(() => _registeredSetUpAsync.Invoke(_registeredSetUpCount++, _registeredSetUpData)).GetAwaiter().GetResult();
                             if (!ShouldContinueRunningTests)
                                 Assert.Fail("This RegisterSetUp function failed to execute successfully.");
                         }
                     }
+                    catch (AssertionException) { throw; }
 #pragma warning disable CA1031 // Do not catch general exception types; be-design, catches them all!
                     catch (Exception ex)
                     {

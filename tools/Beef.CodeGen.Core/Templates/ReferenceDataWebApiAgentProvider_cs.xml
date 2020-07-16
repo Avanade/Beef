@@ -36,19 +36,21 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     /// </summary>
     public class ReferenceDataAgentProvider : ]]><If Condition="Config.RefDataNamespace != null"><![CDATA[RefDataNamespace.]]></If><![CDATA[ReferenceData
     {
-        private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
-
-        private readonly ReferenceDataAgent _agent;
+        private readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
+        private readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
+        private readonly IReferenceDataAgent _agent;
         private readonly Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
 
         #region Ctor
         
         /// <summary>
-        /// Static constructor.
+        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
         /// </summary>
-        static ReferenceDataAgentProvider()
+        /// <param name="agent">The <see cref="IReferenceDataAgent"/>.</param>
+        public ReferenceDataAgentProvider(IReferenceDataAgent agent)
         {
+            _agent = agent ?? throw new ArgumentNullException(nameof(agent));
+
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
     <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
@@ -59,22 +61,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     </If>
     <![CDATA[            _nameDict.Add(nameof({{Entity.Name}}), typeof({{Entity.EntityName}}));
             _typeDict.Add(typeof({{Entity.EntityName}}), nameof({{Entity.Name}}));
-]]>
-  </Entity>
-  <![CDATA[        }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
-        /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public ReferenceDataAgentProvider(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            _agent = new ReferenceDataAgent(httpClient, beforeRequest);
-
-]]>
-  <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">
-    <![CDATA[            _cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
+            _cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
     <If Condition="Config.RefDataCache == null">
       <Then><![CDATA[ReferenceDataCache]]></Then>
       <Else><![CDATA[{{Config.RefDataCache}}]]></Else>
@@ -82,7 +69,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
     <![CDATA[<{{Entity.EntityCollectionName}}, {{Entity.EntityName}}>(() => _agent.{{Entity.Name}}GetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 ]]>
   </Entity>
-  <![CDATA[        }
+  <![CDATA[
+        }
 
         #endregion
 

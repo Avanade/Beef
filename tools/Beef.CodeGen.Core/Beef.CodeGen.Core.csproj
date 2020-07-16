@@ -37,7 +37,6 @@
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
-    <None Remove="Templates\EntityGrpcServiceAgent_cs.xml" />
     <None Remove="Templates\IEntityDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceData_cs.xml" />
@@ -75,11 +74,9 @@
     <EmbeddedResource Include="Templates\EntityDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\EntityData_cs.xml" />
     <EmbeddedResource Include="Templates\EntityManager_cs.xml" />
+    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
     <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityGrpcServiceAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiServiceAgent_cs.xml" />
     <EmbeddedResource Include="Templates\Entity_cs.xml" />
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
@@ -93,9 +90,8 @@
     <EmbeddedResource Include="Templates\ReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiServiceAgent_cs.xml" />
+    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceData_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.xml" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.xml" />

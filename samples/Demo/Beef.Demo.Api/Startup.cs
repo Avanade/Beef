@@ -36,12 +36,12 @@ namespace Beef.Demo.Api
             ValidationArgs.DefaultUseJsonNames = true;
 
             // Load the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
+            //CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+            //CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
 
             // Register the database.
             // Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
-            //Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
+            Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
 
             // Register the DocumentDb/CosmosDb client.
             //CosmosDb.Register(() =>
@@ -58,8 +58,8 @@ namespace Beef.Demo.Api
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
 
             // Configure the Service Agents from the configuration and register.
-            var sac = config.GetSection("BeefServiceAgents").Get<WebApiServiceAgentConfig>();
-            sac?.RegisterAll();
+            //var sac = config.GetSection("BeefServiceAgents").Get<WebApiServiceAgentConfig>();
+            //sac?.RegisterAll();
 
             // Set up the event publishing to event hubs.
             if (config.GetValue<bool>("EventHubPublishing"))
@@ -78,7 +78,7 @@ namespace Beef.Demo.Api
             var ccs = _config.GetSection("CosmosDb");
             services.AddScoped<Data.Database.IDatabase>(_ => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
                     .AddDbContext<EfDbContext>()
-                    .AddTransient<Data.EntityFrameworkCore.IEfDb, EfDb>()
+                    .AddScoped<Data.EntityFrameworkCore.IEfDb, EfDb>()
                     .AddSingleton<Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")))
                     .AddSingleton<ITestOData>(_ => new TestOData(new Uri(WebApiStartup.GetConnectionString(_config, "TestOData"))))
                     .AddSingleton<ITripOData>(_ => new TripOData(new Uri(WebApiStartup.GetConnectionString(_config, "TripOData"))));
@@ -92,6 +92,15 @@ namespace Beef.Demo.Api
             services.AddGeneratedManagerServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
+
+            // Cache policy management.
+            services.AddSingleton(_ =>
+            {
+                var cpm = new CachePolicyManager();
+                cpm.SetFromCachePolicyConfig(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+                cpm.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
+                return cpm;
+            });
 
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
@@ -122,12 +131,12 @@ namespace Beef.Demo.Api
             Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
 
             // Register the HttpClientCreate so it uses the factory.
-            WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
-            {
-                var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
-                hc.BaseAddress = rd.BaseAddress;
-                return hc;
-            });
+            //WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
+            //{
+            //    var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
+            //    hc.BaseAddress = rd.BaseAddress;
+            //    return hc;
+            //});
 
             // Override the exception handling.
             WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");

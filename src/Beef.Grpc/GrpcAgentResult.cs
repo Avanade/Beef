@@ -14,7 +14,7 @@ using System.Net;
 namespace Beef.Grpc
 {
     /// <summary>
-    /// Represents a result for the <see cref="GrpcServiceAgentBase{TClient}"/>.
+    /// Represents a result for the <see cref="GrpcAgentBase{TClient}"/>.
     /// </summary>
     public class GrpcAgentResult : IWebApiAgentResult
     {
@@ -166,7 +166,7 @@ namespace Beef.Grpc
         IWebApiAgentResult IWebApiAgentResult.ThrowOnError() => ThrowOnError();
 
         /// <summary>
-        /// Throws an <see cref="GrpcServiceAgentException"/> if the request was not successful (see <see cref="IsSuccess"/>).
+        /// Throws an <see cref="GrpcAgentException"/> if the request was not successful (see <see cref="IsSuccess"/>).
         /// </summary>
         /// <returns>The <see cref="WebApiAgentResult"/> instance to support fluent/chaining usage.</returns>
         public IWebApiAgentResult ThrowOnError()
@@ -206,12 +206,12 @@ namespace Beef.Grpc
             }
 
             // Throw the originating exception.
-            throw new GrpcServiceAgentException(Exception!.Message, Exception!);
+            throw new GrpcAgentException(Exception!.Message, Exception!);
         }
     }
 
     /// <summary>
-    /// Represents a result for the <see cref="GrpcServiceAgentBase{TClient}"/> with a <see cref="Value"/>.
+    /// Represents a result for the <see cref="GrpcAgentBase{TClient}"/> with a <see cref="Value"/>.
     /// </summary>
     public class GrpcAgentResult<T> : GrpcAgentResult, IWebApiAgentResult<T>
     {

@@ -1,4 +1,5 @@
-﻿using Beef.Demo.Common.Agents;
+﻿using Beef.Demo.Api;
+using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using NUnit.Framework;
@@ -10,35 +11,39 @@ namespace Beef.Demo.Test
     public class ContactTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Reset();
+        public void OneTimeSetUp() => AgentTester.Reset();
 
-        [Test, TestSetUp]
+        [Test]
         public void A110_Get()
         {
-            var r = AgentTester.Create<ContactAgent, Contact>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
-                .Run((a) => a.Agent.GetAsync(1.ToGuid()));
+                .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = AgentTester.Create<ContactAgent, Contact>()
+            r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
-                .Run((a) => a.Agent.GetAsync(1.ToGuid()));
+                .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A120_Update()
         {
-            var r = AgentTester.Create<ContactAgent, Contact>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Contact { Id = 1.ToGuid(), FirstName = "Jenny", LastName = "Cuthbert" })
-                .Run((a) => a.Agent.GetAsync(1.ToGuid()));
+                .Run(a => a.GetAsync(1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
@@ -46,28 +51,30 @@ namespace Beef.Demo.Test
             var v = r.Value;
             v.LastName += "X";
 
-            r = AgentTester.Create<ContactAgent, Contact>()
+            r = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
-                .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid()));
+                .Run(a => a.UpdateAsync(v, 1.ToGuid()));
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r.Response.Headers?.ETag?.Tag);
         }
 
-        [Test, TestSetUp]
+        [Test]
         public void A130_GetAll()
         {
-            var r = AgentTester.Create<ContactAgent, ContactCollectionResult>()
+            using var agentTester = AgentTester.CreateWaf<Startup>();
+
+            var r = agentTester.Test<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetAllAsync());
+                .Run(a => a.GetAllAsync());
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             var etag = r.Response.Headers?.ETag?.Tag;
 
-            r = AgentTester.Create<ContactAgent, ContactCollectionResult>()
+            r = agentTester.Test<ContactAgent, ContactCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetAllAsync());
+                .Run(a => a.GetAllAsync());
 
             Assert.NotNull(r.Response.Headers?.ETag?.Tag);
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
@@ -75,10 +82,10 @@ namespace Beef.Demo.Test
             var v = r.Value.Result[0];
             v.LastName += "X";
 
-            var r2 = AgentTester.Create<ContactAgent, Contact>()
+            var r2 = agentTester.Test<ContactAgent, Contact>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => v)
-                .Run((a) => a.Agent.UpdateAsync(v, v.Id));
+                .Run(a => a.UpdateAsync(v, v.Id));
 
             Assert.NotNull(r2.Response.Headers?.ETag?.Tag);
             Assert.AreNotEqual(etag, r2.Response.Headers?.ETag?.Tag);

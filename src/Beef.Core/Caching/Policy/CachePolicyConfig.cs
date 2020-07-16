@@ -15,8 +15,9 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Sets (configures) the <see cref="CachePolicyManager"/> using the <paramref name="config"/>.
         /// </summary>
+        /// <param name="manager">The <see cref="CachePolicyManager"/>.</param> 
         /// <param name="config">The <see cref="CachePolicyConfig"/>.</param>
-        internal static void SetCachePolicyManager(CachePolicyConfig config)
+        internal static void SetCachePolicyManager(CachePolicyManager manager, CachePolicyConfig config)
         {
             if (config == null)
                 return;
@@ -39,7 +40,7 @@ namespace Beef.Caching.Policy
                     var type = Type.GetType(pol.Policy) ?? throw new CachePolicyConfigException($"Policy '{pol.Name}' Type '{pol.Policy}' could not be loaded/instantiated.");
                     var policy = (ICachePolicy)Activator.CreateInstance(type);
                     LoadPolicyProperties(pol, type, policy);
-                    LoadCaches(pol, policy);
+                    LoadCaches(manager, pol, policy);
 
                     if (pol.IsDefault)
                     {
@@ -47,7 +48,7 @@ namespace Beef.Caching.Policy
                             throw new CachePolicyConfigException($"Policy '{pol.Name}' can not set DefaultPolicy where already set.");
 
                         isDefaultSet = true;
-                        CachePolicyManager.DefaultPolicy = policy;
+                        manager.DefaultPolicy = policy;
                     }
                 }
                 catch (CachePolicyConfigException) { throw; }
@@ -103,7 +104,7 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Loads the cache type and policy configurations.
         /// </summary>
-        private static void LoadCaches(CachePolicyConfigPolicy config, ICachePolicy policy)
+        private static void LoadCaches(CachePolicyManager manager, CachePolicyConfigPolicy config, ICachePolicy policy)
         {
             if (config.Caches == null)
                 return;
@@ -111,7 +112,7 @@ namespace Beef.Caching.Policy
             foreach (var cache in config.Caches)
             {
                 if (!string.IsNullOrEmpty(cache))
-                    CachePolicyManager.Set(cache, policy);
+                    manager.Set(cache, policy);
             }
         }
 

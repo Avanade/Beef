@@ -35,6 +35,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AgentTesterArgs.cs" />
+    <Compile Remove="EventSubscriberTester.cs" />
+    <Compile Remove="GrpcAgentTester.cs" />
+    <Compile Remove="TestEventSubscriberHost.cs" />
+    <Compile Remove="TestSetUp.cs" />
+    <Compile Remove="TestSetUpAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.66.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.5" />

@@ -38,7 +38,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     public class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
         private readonly IServiceProvider _provider;
-        private readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, IReferenceDataCache> _cacheDict = new Dictionary<Type, IReferenceDataCache>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
@@ -52,7 +52,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
   <Entity Condition="Entity.RefDataType != null and Entity.ExcludeDataSvc == false and Entity.ExcludeAll == false">
     <Set Name="Entity.EntityName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}" Otherwise="$RefDataNamespace.{{Entity.Name}}" />
     <Set Name="Entity.EntityCollectionName" Condition="Config.RefDataNamespace == null" Value="${{Entity.Name}}Collection" Otherwise="$RefDataNamespace.{{Entity.Name}}Collection" />
-    <![CDATA[            cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
+    <![CDATA[            _cacheDict.Add(typeof({{Entity.EntityName}}), new ]]>
     <If Condition="Config.RefDataCache == null">
       <Then><![CDATA[ReferenceDataCache]]></Then>
       <Else><![CDATA[{{Config.RefDataCache}}]]></Else>
@@ -77,10 +77,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         /// </summary>
         private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
         {
-            using (_provider.CreateScope())
-            {
-                return func(_provider.GetService<IReferenceDataData>());
-            }
+            using var scope = _provider.CreateScope();
+            return func(scope.ServiceProvider.GetService<IReferenceDataData>());
         }
 
         /// <summary>
@@ -90,14 +88,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
         public IReferenceDataCollection GetCollection(Type type)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            if (!cacheDict.ContainsKey(type))
+            if (_cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc))
+                return rdc.GetCollection();
+            else
                 throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
-
-            IReferenceDataCache rdc = (IReferenceDataCache)cacheDict[type];
-            return rdc.GetCollection();
         }
     }
 }

@@ -18,11 +18,9 @@
 
   <Generate Template="EntityWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Controllers" EntityScope="Common" HelpText="Api\Controllers" />
   <Generate Template="EntityWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" HelpText="Common\Agents" />
-  <Generate Template="EntityWebApiServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents\ServiceAgents" EntityScope="Common" HelpText="Common\Agents\ServiceAgents" />
 
   <Generate Template="Grpc_proto.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc" EntityScope="Common" HelpText="Common\Grpc" />
   <Generate Template="GrpcTransformers_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc" EntityScope="Common" HelpText="Common\Grpc" />
   <Generate Template="EntityGrpcService_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Grpc" EntityScope="Common" HelpText="Api\Grpc" />
   <Generate Template="EntityGrpcAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc" EntityScope="Common" HelpText="Common\Grpc" />
-  <Generate Template="EntityGrpcServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Grpc\ServiceAgents" EntityScope="Common" HelpText="Common\Grpc\ServiceAgents" />
 </Script>

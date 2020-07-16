@@ -36,17 +36,19 @@ namespace Beef.Demo.Business.Data
         private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
             // This is an example (illustrative) of executing an Agent from an API - this should be used for cross-domain calls only; otherwise, use database (performance).
-            var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
-            if (pf.Value == null)
-                throw new ValidationException($"Person from does not exist.");
+            // TODO: Add back in.
+            //var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
+            //if (pf.Value == null)
+            //    throw new ValidationException($"Person from does not exist.");
 
-            var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
-            if (pt.Value == null)
-                throw new ValidationException($"Person from does not exist.");
+            //var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
+            //if (pt.Value == null)
+            //    throw new ValidationException($"Person to does not exist.");
 
             // Pretend a merge actually occured.
 
-            return pt.Value;
+            //return pt.Value;
+            return await Task.FromResult((Person)null).ConfigureAwait(false);
         }
 
         private Task MarkOnImplementationAsync()

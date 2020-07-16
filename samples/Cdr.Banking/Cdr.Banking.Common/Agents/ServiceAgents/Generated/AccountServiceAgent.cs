@@ -52,7 +52,7 @@ namespace Cdr.Banking.Common.Agents.ServiceAgents
     /// <summary>
     /// Provides the Account Web API service agent.
     /// </summary>
-    public partial class AccountServiceAgent : WebApiServiceAgentBase<AccountServiceAgent>, IAccountServiceAgent
+    public partial class AccountServiceAgent : WebApiAgentBase<AccountServiceAgent>, IAccountServiceAgent
     {
         /// <summary>
         /// Static constructor.

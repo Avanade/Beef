@@ -37,7 +37,7 @@ namespace Cdr.Banking.Common.Agents.ServiceAgents
     /// <summary>
     /// Provides the Transaction Web API service agent.
     /// </summary>
-    public partial class TransactionServiceAgent : WebApiServiceAgentBase<TransactionServiceAgent>, ITransactionServiceAgent
+    public partial class TransactionServiceAgent : WebApiAgentBase<TransactionServiceAgent>, ITransactionServiceAgent
     {
         /// <summary>
         /// Static constructor.

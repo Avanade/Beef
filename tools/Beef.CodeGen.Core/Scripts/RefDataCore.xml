@@ -13,7 +13,6 @@
   <Generate Template="ReferenceDataProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" />
   <Generate Template="ReferenceDataWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}\Controllers" EntityScope="Common" />
   <Generate Template="ReferenceDataWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" />
-  <Generate Template="ReferenceDataWebApiServiceAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents\ServiceAgents" EntityScope="Common" />
   <Generate Template="ReferenceDataWebApiAgentProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Common\Agents" EntityScope="Common" />
 
   <Generate Template="ServiceCollectionExtensionsManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" HelpText="Business" RefData="ReferenceData" />

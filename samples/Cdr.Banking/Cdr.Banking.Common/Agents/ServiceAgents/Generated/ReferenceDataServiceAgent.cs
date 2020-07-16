@@ -83,7 +83,7 @@ namespace Cdr.Banking.Common.Agents.ServiceAgents
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API service agent.
     /// </summary>
-    public partial class ReferenceDataServiceAgent : WebApiServiceAgentBase<ReferenceDataServiceAgent>, IReferenceDataServiceAgent
+    public partial class ReferenceDataServiceAgent : WebApiAgentBase<ReferenceDataServiceAgent>, IReferenceDataServiceAgent
     {
         /// <summary>
         /// Static constructor.

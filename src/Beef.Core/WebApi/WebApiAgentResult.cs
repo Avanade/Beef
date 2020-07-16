@@ -9,7 +9,7 @@ using System.Net.Http;
 namespace Beef.WebApi
 {
     /// <summary>
-    /// Represents a result for the <see cref="WebApiServiceAgentBase"/>.
+    /// Represents a result for the <see cref="WebApiAgentBase"/>.
     /// </summary>
     public class WebApiAgentResult : IWebApiAgentResult
     {
@@ -119,7 +119,7 @@ namespace Beef.WebApi
     }
 
     /// <summary>
-    /// Represents a result for the <see cref="WebApiServiceAgentBase"/> with a deserialized (JSON) response <see cref="Value"/>.
+    /// Represents a result for the <see cref="WebApiAgentBase"/> with a deserialized (JSON) response <see cref="Value"/>.
     /// </summary>
     public class WebApiAgentResult<T> : WebApiAgentResult, IWebApiAgentResult<T>
     {

@@ -139,7 +139,7 @@ namespace Beef.RefData.Caching
         /// </summary>
         public bool IsExpired
         {
-            get => (_coll == null) ? true : GetPolicy().IsExpired;
+            get => (_coll == null) || GetPolicy().IsExpired;
         }
     }
 }

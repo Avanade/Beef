@@ -17,8 +17,8 @@ namespace Beef.Demo.Functions
             var config = builder.GetConfiguration<Startup>(environmentVariablePrefix: "Beef_");
 
             // Load the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
+            //CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+            //CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
 
             // Register the ReferenceData provider.
             // TODO: RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
