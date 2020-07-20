@@ -37,7 +37,7 @@ namespace Cdr.Banking.Api.Controllers
         /// Initializes a new instance of the <see cref="TransactionController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="ITransactionManager"/>.</param>
-        public TransactionController(ITransactionManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public TransactionController(ITransactionManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Get transaction for account.

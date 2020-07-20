@@ -40,7 +40,8 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="data">The <see cref="IContactData"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public ContactDataSvc(IContactData data, IEventPublisher evtPub, IRequestCache cache) { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); ContactDataSvcCtor(); }
+        public ContactDataSvc(IContactData data, IEventPublisher evtPub, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); ContactDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -89,7 +90,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Create").ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Contact.{__result.Id}", "Create").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
@@ -105,7 +106,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueEventAsync(__result, $"Demo.Contact.{__result.Id}", "Update").ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Contact.{__result.Id}", "Update").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
@@ -120,7 +121,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishEventAsync($"Demo.Contact.{id}", "Delete", id).ConfigureAwait(false);
+                await _evtPub.PublishAsync($"Demo.Contact.{id}", "Delete", id).ConfigureAwait(false);
                 _cache.Remove<Contact>(new UniqueKey(id));
             });
         }

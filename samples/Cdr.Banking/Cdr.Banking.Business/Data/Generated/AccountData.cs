@@ -48,7 +48,7 @@ namespace Cdr.Banking.Business.Data
         /// Initializes a new instance of the <see cref="AccountData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public AccountData(ICosmosDb cosmos) { _cosmos = cosmos ?? throw new ArgumentNullException(nameof(cosmos)); AccountDataCtor(); }
+        public AccountData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); AccountDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

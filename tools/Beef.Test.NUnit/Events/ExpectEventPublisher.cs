@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Beef.Test.NUnit
+namespace Beef.Test.NUnit.Events
 {
     /// <summary>
     /// Represents an <see cref="IEventPublisher"/> to record the published <see cref="Events"/>.

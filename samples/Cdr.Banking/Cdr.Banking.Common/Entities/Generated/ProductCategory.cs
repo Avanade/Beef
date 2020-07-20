@@ -22,6 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Product Category entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class ProductCategory : ReferenceDataBaseGuid
     {
         #region Operator

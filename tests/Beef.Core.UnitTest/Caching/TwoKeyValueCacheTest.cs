@@ -75,7 +75,7 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void PolicyManager()
         {
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
 
             var mtc = new TwoKeyValueCache<int, string, string>(
                 (key1) => { return (key1 == 99) ? (false, null, null) : (true, key1.ToString(), $"x{key1}x"); },
@@ -85,7 +85,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.IsTrue(mtc.TryGetByKey1(1, out string val));
             Assert.IsTrue(mtc.TryGetByKey2("2", out val));
 
-            var pa = CachePolicyManager.GetPolicies();
+            var pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             // Check the internal nocachepolicy.
@@ -126,6 +126,8 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void Concurrency()
         {
+            Policy.CachePolicyManagerTest.TestSetUp();
+
             // No way to effectively validate; console output needs to be reviewed.
 
             int key1Count = 0;

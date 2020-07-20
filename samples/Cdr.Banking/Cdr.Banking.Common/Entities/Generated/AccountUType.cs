@@ -22,6 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Account U Type entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class AccountUType : ReferenceDataBaseGuid
     {
         #region Operator

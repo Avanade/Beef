@@ -40,7 +40,8 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="data">The <see cref="IGenderData"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public GenderDataSvc(IGenderData data, IEventPublisher evtPub, IRequestCache cache) { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); GenderDataSvcCtor(); }
+        public GenderDataSvc(IGenderData data, IEventPublisher evtPub, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); GenderDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -76,7 +77,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
@@ -92,7 +93,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });

@@ -2,6 +2,7 @@
 
 using Beef.Caching;
 using Beef.Caching.Policy;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -10,10 +11,23 @@ namespace Beef.Core.UnitTest.Caching.Policy
     [TestFixture]
     public class CachePolicyManagerTest
     {
+        public static System.IServiceProvider TestSetUp()
+        {
+            var services = new ServiceCollection();
+            services.AddSingleton(_ => new CachePolicyManager());
+
+            var sp = services.BuildServiceProvider();
+
+            ExecutionContext.Reset(false);
+            ExecutionContext.SetCurrent(new ExecutionContext { ServiceProvider = sp });
+
+            return sp;
+        }
+
         [Test]
         public void UnregisterAndReuse()
         {
-            CachePolicyManager.Reset();
+            TestSetUp();
             var dsc = new DictionarySetCache<int, string>((data) => new KeyValuePair<int, string>[] { new KeyValuePair<int, string>(1, "1"), new KeyValuePair<int, string>(2, "2") }, "CachePolicyManagerTest");
 
             // Asserting will load the cache on first access.

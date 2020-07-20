@@ -21,8 +21,8 @@ namespace Cdr.Banking.Business
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedManagerServices(this IServiceCollection services)
         {
-            return services.AddTransient<IAccountManager, AccountManager>()
-                           .AddTransient<ITransactionManager, TransactionManager>();
+            return services.AddScoped<IAccountManager, AccountManager>()
+                           .AddScoped<ITransactionManager, TransactionManager>();
         }
     }
 }

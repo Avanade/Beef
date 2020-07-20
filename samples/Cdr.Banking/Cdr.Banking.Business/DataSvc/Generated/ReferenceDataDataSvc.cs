@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Beef;
 using Beef.Business;
 using Beef.RefData;
@@ -21,21 +23,33 @@ namespace Cdr.Banking.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public static class ReferenceDataDataSvc
+    public class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
-        private static readonly Dictionary<Type, object> cacheDict = new Dictionary<Type, object>();
+        private readonly IServiceProvider _provider;
+        private readonly Dictionary<Type, IReferenceDataCache> _cacheDict = new Dictionary<Type, IReferenceDataCache>();
 
         /// <summary>
-        /// Initializes static members of the <see cref="ReferenceDataDataSvc" /> class.
+        /// Initializes a new instance of the <see cref="ReferenceDataDataSvc" /> class.
         /// </summary>
-        static ReferenceDataDataSvc()
+        /// <param name="provider">The <see cref="IServiceProvider"/>.</param>
+        public ReferenceDataDataSvc(IServiceProvider provider)
         {
-            cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().OpenStatusGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().ProductCategoryGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().AccountUTypeGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().MaturityInstructionsGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().TransactionTypeGetAllAsync())));
-            cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => Factory.Create<IReferenceDataData>().TransactionStatusGetAllAsync())));
+            _provider = Check.NotNull(provider, nameof(provider));
+            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.OpenStatusGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.ProductCategoryGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.AccountUTypeGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.MaturityInstructionsGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.TransactionTypeGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => DataSvcInvoker.Default.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.TransactionStatusGetAllAsync()))));
+        }
+
+        /// <summary>
+        /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
+        /// </summary>
+        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        {
+            using var scope = _provider.CreateScope();
+            return func(scope.ServiceProvider.GetService<IReferenceDataData>());
         }
 
         /// <summary>
@@ -43,16 +57,12 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public static IReferenceDataCollection GetCollection(Type type)
+        public IReferenceDataCollection GetCollection(Type type)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            if (!cacheDict.ContainsKey(type))
+            if (_cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc))
+                return rdc.GetCollection();
+            else
                 throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
-
-            IReferenceDataCache rdc = (IReferenceDataCache)cacheDict[type];
-            return rdc.GetCollection();
         }
     }
 }

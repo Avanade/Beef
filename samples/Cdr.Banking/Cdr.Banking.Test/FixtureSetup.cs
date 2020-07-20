@@ -8,6 +8,7 @@ using Cdr.Banking.Api;
 using Cdr.Banking.Common.Entities;
 using Cdr.Banking.Business.Data;
 using Beef.WebApi;
+using Cdr.Banking.Common.Agents;
 
 namespace Cdr.Banking.Test
 {
@@ -20,12 +21,13 @@ namespace Cdr.Banking.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
                 // Setup and load cosmos once only.
                 if (count == 0)
                 {
-                    var config = AgentTester.Configuration.GetSection("CosmosDb");
+                    var config = AgentTester.BuildConfiguration<Startup>("Billing").GetSection("CosmosDb");
                     _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
                     _cosmosDb = new CosmosDb(new Cosmos.CosmosClient(config.GetValue<string>("EndPoint"), config.GetValue<string>("AuthKey")),
                         config.GetValue<string>("Database"), createDatabaseIfNotExists: true);
@@ -56,14 +58,13 @@ namespace Cdr.Banking.Test
                             UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                         }, 400).ConfigureAwait(false);
 
-                    await rdc.ImportValueRefDataBatchAsync<AccountTest>(ReferenceData.Current, "RefData.yaml").ConfigureAwait(false);
+                    await rdc.ImportValueRefDataBatchAsync<AccountTest, IReferenceData>("RefData.yaml").ConfigureAwait(false);
                 }
 
                 return true;
             });
 
-            AgentTester.TestServerStart<Startup>("Banking");
-            AgentTester.DefaultExpectNoEvents = true;
+            TestSetUp.DefaultExpectNoEvents = true;
 
             // TODO: Passing the username as an http header for all requests; this would be replaced with OAuth integration, etc.
             AgentTester.RegisterBeforeRequest(r => r.Headers.Add("cdr-user", Beef.ExecutionContext.Current.Username));

@@ -36,7 +36,7 @@ namespace Cdr.Banking.Business
         /// Initializes a new instance of the <see cref="TransactionManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>
-        public TransactionManager(ITransactionDataSvc dataService) { _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService)); TransactionManagerCtor(); }
+        public TransactionManager(ITransactionDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); TransactionManagerCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

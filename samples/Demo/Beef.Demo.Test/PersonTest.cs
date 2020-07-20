@@ -22,14 +22,14 @@ namespace Beef.Demo.Test
         private AgentTesterServer<Startup> _agentTester;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp() { AgentTester.Reset(); _agentTester = AgentTester.CreateServer<Startup>().ConfigureReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>(); }
+        public void OneTimeSetUp() { TestSetUp.Reset(); _agentTester = AgentTester.CreateServer<Startup>(); }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() => _agentTester.Dispose();
 
         #region Validators
 
-        [Test]
+        [Test, TestSetUp]
         public void A110_Validation_Null()
         {
             ExpectValidationException.Throws(
@@ -41,10 +41,10 @@ namespace Beef.Demo.Test
                 "Value is required.");
         }
 
-        [Test]
+        [Test, TestSetUp]
         public async Task A110_Validation_Empty()
         {
-            _agentTester.Prepare();
+            _agentTester.PrepareExecutionContext();
 
             await ExpectValidationException.ThrowsAsync(
                 () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()),
@@ -61,10 +61,10 @@ namespace Beef.Demo.Test
                 "Birthday is required.");
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A130_Validation_Invalid()
         {
-            _agentTester.Prepare();
+            _agentTester.PrepareExecutionContext();
 
             ExpectValidationException.Throws(
                 () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
@@ -75,7 +75,7 @@ namespace Beef.Demo.Test
                 "Birthday must be less than or equal to Today.");
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A140_Validation_ServiceAgentInvalid()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -90,7 +90,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A150_Validation_Detail_History_Invalid()
         {
             _agentTester.Test<PersonAgent, PersonDetail>()
@@ -110,7 +110,7 @@ namespace Beef.Demo.Test
                 }, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A160_Validation_Detail_History_Duplicate()
         {
             _agentTester.Test<PersonAgent, PersonDetail>()
@@ -126,7 +126,7 @@ namespace Beef.Demo.Test
 
         #region Get/GetDetail
 
-        [Test]
+        [Test, TestSetUp]
         public void B110_Get_NotFound()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -135,7 +135,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B120_Get_Found_No_Address()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -146,7 +146,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B130_Get_Found_With_Address()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -157,7 +157,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(3.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B140_Get_NotModified()
         {
             var p = _agentTester.Test<PersonAgent, Person>()
@@ -174,7 +174,7 @@ namespace Beef.Demo.Test
                 })).GetAsync(3.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B140_Get_NotModified_Modified()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -185,7 +185,7 @@ namespace Beef.Demo.Test
                 })).GetAsync(3.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B210_GetDetail_NotFound()
         {
             _agentTester.Test<PersonAgent, PersonDetail>()
@@ -194,7 +194,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetDetailAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B220_GetDetail_NoWorkHistory()
         {
             _agentTester.Test<PersonAgent, PersonDetail>()
@@ -205,7 +205,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetDetailAsync(1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B230_GetDetail_WithWorkHistory()
         {
             var pd = new PersonDetail
@@ -230,7 +230,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetDetailAsync(2.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B310_GetWithEf_NotFound()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -239,7 +239,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetWithEfAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B320_GetWithEf_Found_No_Address()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -250,7 +250,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetWithEfAsync(1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B320_GetWithEf_Found_With_Address()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -265,7 +265,7 @@ namespace Beef.Demo.Test
 
         #region GetAll/GetAll2
 
-        [Test]
+        [Test, TestSetUp]
         public void C110_GetAll_NoPaging()
         {
             var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
@@ -277,7 +277,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C110_GetAll_Paging()
         {
             var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
@@ -289,7 +289,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Jones", "Smith", }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C120_GetAll_PagingAndFieldFiltering()
         {
             var pa = PagingArgs.CreateSkipAndTake(1, 2);
@@ -305,7 +305,7 @@ namespace Beef.Demo.Test
             Assert.IsFalse(pcr.Value.Result.Any(x => x.Id != Guid.Empty));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C130_GetAll2()
         {
             var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
@@ -321,10 +321,10 @@ namespace Beef.Demo.Test
 
         #region GetByArgs/GetByArgsWithEf/GetDetailByArgs
 
-        [Test]
+        [Test, TestSetUp]
         public void D110_GetByArgs_NullArgs() => GetByArgs_NullArgs(false);
 
-        [Test]
+        [Test, TestSetUp]
         public void D210_GetByArgsWithEf_NullArgs() => GetByArgs_NullArgs(true);
 
         private void GetByArgs_NullArgs(bool useEf)
@@ -339,10 +339,10 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void D120_GetByArgs_EmptyArgs() => GetByArgs_EmptyArgs(false);
 
-        [Test]
+        [Test, TestSetUp]
         public void D220_GetByArgsWithEf_EmptyArgs() => GetByArgs_EmptyArgs(true);
 
         private void GetByArgs_EmptyArgs(bool useEf)
@@ -358,10 +358,10 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Browne", "Jones", "Smith", "Smithers" }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void D130_GetByArgs_Args_LastName() => GetByArgs_Args_LastName(false);
 
-        [Test]
+        [Test, TestSetUp]
         public void D230_GetByArgsWithEf_Args_LastName() => GetByArgs_Args_LastName(true);
 
         private void GetByArgs_Args_LastName(bool useEf)
@@ -377,10 +377,10 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Smith", "Smithers" }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void D140_GetByArgs_Args_FirstNameAndGender() => GetByArgs_Args_FirstNameAndGender(false);
 
-        [Test]
+        [Test, TestSetUp]
         public void D240_GetByArgsWithEf_Args_FirstNameAndGender() => GetByArgs_Args_FirstNameAndGender(true);
 
         private void GetByArgs_Args_FirstNameAndGender(bool useEf)
@@ -396,7 +396,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "Browne" }, pcr.Value.Result.Select(x => x.LastName).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void D310_GetDetailByArgs_LastName()
         {
             var args = new PersonArgs { LastName = "sm*" };
@@ -416,7 +416,7 @@ namespace Beef.Demo.Test
 
         #region Create
 
-        [Test]
+        [Test, TestSetUp]
         public void E110_Create()
         {
             var p = new Person
@@ -444,7 +444,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(p.Id));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void E120_Create_Duplicate()
         {
             var p = new Person
@@ -463,7 +463,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.CreateAsync(p));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void E130_Create_BadRequest()
         {
             var p = new Person
@@ -483,7 +483,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.CreateAsync(p));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void E210_CreateWithEf()
         {
             var p = new Person
@@ -511,7 +511,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetWithEfAsync(p.Id));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void E220_CreateWithEf_Duplicate()
         {
             var p = new Person
@@ -534,7 +534,7 @@ namespace Beef.Demo.Test
 
         #region Update
 
-        [Test]
+        [Test, TestSetUp]
         public void F110_Update_NotFound()
         {
             // Get an existing person.
@@ -549,7 +549,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, 404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F120_Update_Concurrency()
         {
             // Get an existing person.
@@ -561,10 +561,10 @@ namespace Beef.Demo.Test
             _agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
-                .Run(a => a.UpdateAsync(p, 1.ToGuid(), new WebApiRequestOptions { ETag = AgentTester.ConcurrencyErrorETag }));
+                .Run(a => a.UpdateAsync(p, 1.ToGuid(), new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the person with an invalid eTag.
-            p.ETag = AgentTester.ConcurrencyErrorETag;
+            p.ETag = TestSetUp.ConcurrencyErrorETag;
 
             _agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
@@ -572,7 +572,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F130_Update_Duplicate()
         {
             // Get an existing person.
@@ -589,7 +589,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F140_Update()
         {
             // Get an existing person.
@@ -638,7 +638,7 @@ namespace Beef.Demo.Test
             Assert.Null(p.Address);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F150_UpdateDetail()
         {
             // Get an existing person detail.
@@ -664,7 +664,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetDetailAsync(p.Id)).Value;
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F210_UpdateWithEF_NotFound()
         {
             // Get an existing person.
@@ -679,7 +679,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateWithEfAsync(p, 404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F220_UpdateWithEf_Concurrency()
         {
             // Get an existing person.
@@ -688,7 +688,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetWithEfAsync(1.ToGuid())).Value;
 
             // Try updating the person with an invalid eTag.
-            p.ETag = AgentTester.ConcurrencyErrorETag;
+            p.ETag = TestSetUp.ConcurrencyErrorETag;
 
             _agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
@@ -696,7 +696,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F230_UpdateWithEf_Duplicate()
         {
             // Get an existing person.
@@ -713,7 +713,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F240_UpdateWithEf()
         {
             // Get an existing person.
@@ -766,7 +766,7 @@ namespace Beef.Demo.Test
 
         #region Delete
 
-        [Test]
+        [Test, TestSetUp]
         public void G110_Delete_NotFound()
         {
             // Deleting a person that does not exist only reports success.
@@ -775,7 +775,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.DeleteAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void G120_Delete()
         {
             // Check person exists.
@@ -795,7 +795,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void G210_DeleteWithEf_NotFound()
         {
             // Deleting a person that does not exist only reports success.
@@ -804,7 +804,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.DeleteWithEfAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void G220_DeleteWithEf()
         {
             // Check person exists.
@@ -828,7 +828,7 @@ namespace Beef.Demo.Test
 
         #region Patch
 
-        [Test]
+        [Test, TestSetUp]
         public void H110_Patch_NotFound()
         {
             // Patch with an invalid identifier.
@@ -838,7 +838,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, JToken.Parse("{ \"firstName\": \"Barry\" }"), 404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void H120_Patch_Concurrency()
         {
             // Get an existing person.
@@ -852,10 +852,10 @@ namespace Beef.Demo.Test
                 .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
                     JToken.Parse("{ \"firstName\": \"Barry\" }"),
-                    3.ToGuid(), new WebApiRequestOptions { ETag = AgentTester.ConcurrencyErrorETag }));
+                    3.ToGuid(), new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void H130_Patch_MergePatch()
         {
             // Get an existing person.
@@ -891,7 +891,7 @@ namespace Beef.Demo.Test
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void H140_Patch_JsonPatch()
         {
             // Get an existing person.
@@ -918,7 +918,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(3.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void H150_PatchDetail_MergePatch_UniqueKeyCollection()
         {
             // Get an existing person detail.
@@ -952,7 +952,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new DateTime(2016, 04, 06), p.History[2].EndDate);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void H160_PatchDetail_MergePatch_Error()
         {
             // Get an existing person detail.
@@ -978,7 +978,7 @@ namespace Beef.Demo.Test
 
         #region Others
 
-        [Test]
+        [Test, TestSetUp]
         public void I110_Add()
         {
             // Do the 'Add' - which does nothing, just validates the passing of the data.
@@ -990,7 +990,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual("{\"firstName\":\"Gary\"}", res.Request.Content.ReadAsStringAsync().Result);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void I120_Mark()
         {
             _agentTester.Test<PersonAgent>()
@@ -1004,7 +1004,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.MarkAsync());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void I130_Null()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -1012,7 +1012,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetNullAsync("blah"));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void I140_Map()
         {
             _agentTester.Test<PersonAgent, MapCoordinates>()

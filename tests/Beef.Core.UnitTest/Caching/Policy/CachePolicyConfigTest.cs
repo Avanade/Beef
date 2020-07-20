@@ -10,6 +10,8 @@ namespace Beef.Core.UnitTest.Caching.Policy
         [Test]
         public void SetCachePolicyManager()
         {
+            Policy.CachePolicyManagerTest.TestSetUp();
+
             var cpc = new CachePolicyConfig
             {
                 Policies = new CachePolicyConfigPolicy[]
@@ -29,9 +31,9 @@ namespace Beef.Core.UnitTest.Caching.Policy
                 }
             };
 
-            CachePolicyManager.SetFromCachePolicyConfig(cpc);
+            CachePolicyManager.Current.SetFromCachePolicyConfig(cpc);
 
-            var pol = CachePolicyManager.Get("BlahX");
+            var pol = CachePolicyManager.Current.Get("BlahX");
 
             Assert.NotNull(pol);
             Assert.IsInstanceOf<SlidingCachePolicy>(pol);

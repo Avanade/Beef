@@ -21,8 +21,8 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
         {
-            return services.AddTransient<IAccountDataSvc, AccountDataSvc>()
-                           .AddTransient<ITransactionDataSvc, TransactionDataSvc>();
+            return services.AddScoped<IAccountDataSvc, AccountDataSvc>()
+                           .AddScoped<ITransactionDataSvc, TransactionDataSvc>();
         }
     }
 }

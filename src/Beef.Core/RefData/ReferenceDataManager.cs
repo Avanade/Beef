@@ -124,8 +124,8 @@ namespace Beef.RefData
             if (_providers.TryGetValue(providerType, out var provider))
                 return provider;
 
-            throw new ArgumentException($"Provider with Name '{providerType.FullName}' has not been registered (either using dependency injection (primary) or using the Register method (secondary)). " +
-                "For DI this indicates that the ExecutionContext.ServiceProvider property has not been set. For AgentTester this is likely because the AgentTester.TestSetup has not yet been invoked to set, this is needed.");
+            throw new ArgumentException($"Provider '{providerType.FullName}' has not been registered. Either register using dependency injection (primary) or using the Register method (secondary). " +
+                "For dependency injection this indicates that the ExecutionContext.ServiceProvider property has not been set; for testing this is likely because the PrepareExecutionContext has not yet been invoked to set.");
         }
 
         /// <summary>

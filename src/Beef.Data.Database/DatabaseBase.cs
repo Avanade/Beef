@@ -137,7 +137,7 @@ namespace Beef.Data.Database
         /// <param name="timestamp">The timestamp <see cref="DateTime"/> (where <c>null</c> the value will default to <see cref="DateTime.Now"/>).</param>
         /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
         /// <param name="userId">The unique user identifier.</param>
-        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null, Guid? userId = null)
+        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null, string? userId = null)
         {
             if (dbConnection == null)
                 throw new ArgumentNullException(nameof(dbConnection));
@@ -169,11 +169,11 @@ namespace Beef.Data.Database
                 cmd.Parameters.Add(p);
             }
 
-            if (userId.HasValue)
+            if (!string.IsNullOrEmpty(userId))
             {
                 p = cmd.CreateParameter();
                 p.ParameterName = "@" + DatabaseColumns.SessionContextUserId;
-                p.Value = userId.Value;
+                p.Value = userId;
                 cmd.Parameters.Add(p);
             }
 
@@ -181,7 +181,7 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?, Guid?)"/> using
+        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?, string?)"/> using
         /// <see cref="ExecutionContext.Username"/>, <see cref="ExecutionContext.Timestamp"/> and <see cref="ExecutionContext.TenantId"/>).
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>

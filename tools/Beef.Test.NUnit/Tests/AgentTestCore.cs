@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Events;
+using Beef.Test.NUnit.Events;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -34,13 +35,20 @@ namespace Beef.Test.NUnit.Tests
         protected AgentTestCore(AgentTesterBase agentTesterBase, string? username = null, object? args = null)
         {
             AgentTesterBase = agentTesterBase ?? throw new ArgumentNullException(nameof(agentTesterBase));
-            AgentTesterBase.Prepare(username ?? (ExecutionContext.HasCurrent ? ExecutionContext.Current.Username : null), args);
+            if (username == null || !ExecutionContext.HasCurrent)
+            {
+                if (username == null)
+                    AgentTesterBase.PrepareExecutionContext();
+                else
+                    AgentTesterBase.PrepareExecutionContext(username, args);
+            }
+
             ExecutionContext.Current.CorrelationId = CorrelationId;
 
             Args = args;
             Username = ExecutionContext.Current.Username;
 
-            if (AgentTester.DefaultExpectNoEvents)
+            if (TestSetUp.DefaultExpectNoEvents)
                 SetExpectNoEvents();
         }
 

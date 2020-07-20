@@ -24,8 +24,8 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            AgentTester.Reset(false);
-            _agentTester = AgentTester.CreateServer<Startup>().ConfigureReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>().Prepare();
+            TestSetUp.Reset(false);
+            _agentTester = AgentTester.CreateServer<Startup>();
             await CosmosOneTimeSetUp();
         }
 
@@ -54,7 +54,7 @@ namespace Beef.Demo.Test
                     UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                 }, 400);
 
-            await rdc.ImportValueRefDataBatchAsync<RobotTest>(ReferenceData.Current, "RefData.yaml");
+            await rdc.ImportValueRefDataBatchAsync<RobotTest, IReferenceData>("RefData.yaml");
         }
 
         [OneTimeTearDown]
@@ -69,7 +69,7 @@ namespace Beef.Demo.Test
 
         #region Get
 
-        [Test]
+        [Test, TestSetUp]
         public void B110_Get_NotFound()
         {
             _agentTester.Test<RobotAgent, Robot>()
@@ -78,7 +78,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B120_Get_Found()
         {
             _agentTester.Test<RobotAgent, Robot>()
@@ -89,7 +89,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B120_Get_Found_WithText()
         {
             _agentTester.Test<RobotAgent, Robot>()
@@ -100,7 +100,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid(), new Beef.WebApi.WebApiRequestOptions { UrlQueryString = "$text=true" }));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B130_Get_NotModified()
         {
             var v = _agentTester.Test<RobotAgent, Robot>()
@@ -118,7 +118,7 @@ namespace Beef.Demo.Test
                 //}).GetAsync(3.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B140_Get_NotModified_Modified()
         {
             _agentTester.Test<RobotAgent, Robot>()
@@ -134,7 +134,7 @@ namespace Beef.Demo.Test
 
         #region GetByArgs
 
-        [Test]
+        [Test, TestSetUp]
         public void C110_GetByArgs_All_NoPaging()
         {
             var rcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -146,7 +146,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "123456", "223456", "A45768", "B45768" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C120_GetByArgs_All_Paging()
         {
             var pcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -158,7 +158,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "223456", "A45768", }, pcr.Value.Result.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C130_GetByArgs_Filtered_NoPaging()
         {
             var rcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -170,7 +170,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C130_GetByArgs_Wildcard_NoPaging()
         {
             var rcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -182,7 +182,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "A45768", "B45768" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C140_GetByArgs_PowerSources_NoPaging()
         {
             var rcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -194,7 +194,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "123456", "223456" }, rcr.Value.Result.Select(x => x.SerialNo).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C150_GetByArgs_All_NoResult()
         {
             var rcr = _agentTester.Test<RobotAgent, RobotCollectionResult>()
@@ -209,10 +209,10 @@ namespace Beef.Demo.Test
 
         #region Create
 
-        [Test]
+        [Test, TestSetUp]
         public void E110_Create()
         {
-            _agentTester.Prepare();
+            _agentTester.PrepareExecutionContext();
 
             var r = new Robot
             {
@@ -239,9 +239,11 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(r.Id));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void E120_Create_Duplicate()
         {
+            _agentTester.PrepareExecutionContext();
+
             var r = new Robot
             {
                 ModelNo = "T500",
@@ -262,7 +264,7 @@ namespace Beef.Demo.Test
 
         #region Update
 
-        [Test]
+        [Test, TestSetUp]
         public void F110_Update_NotFound()
         {
             // Get an existing Robot.
@@ -278,7 +280,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F120_Update_Concurrency()
         {
             // Get an existing Robot.
@@ -287,7 +289,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Try updating the Robot with an invalid eTag.
-            v.ETag = AgentTester.ConcurrencyErrorETag;
+            v.ETag = TestSetUp.ConcurrencyErrorETag;
 
             _agentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
@@ -296,7 +298,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F130_Update_Duplicate()
         {
             // Get an existing Robot.
@@ -314,7 +316,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(v, 1.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void F140_Update()
         {
             // Get an existing Robot.
@@ -348,7 +350,7 @@ namespace Beef.Demo.Test
 
         #region Delete
 
-        [Test]
+        [Test, TestSetUp]
         public void G110_Delete_NotFound()
         {
             // Deleting a Robot that does not exist only reports success.
@@ -357,7 +359,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.DeleteAsync(404.ToGuid()));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void G120_Delete()
         {
             // Check Robot exists.

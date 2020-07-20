@@ -34,20 +34,20 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void PolicyManager()
         {
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
 
             var i = 0;
             var mtc = new KeyValueCache<int, string>((key) => { i++; return key.ToString(); }, "KeyValueCacheTest");
             Assert.IsNotNull(mtc.PolicyKey);
 
             var policy = new DailyCachePolicy();
-            CachePolicyManager.Set(mtc.PolicyKey, policy);
+            CachePolicyManager.Current.Set(mtc.PolicyKey, policy);
 
             var policy2 = mtc.GetPolicy();
             Assert.IsNotNull(policy2);
             Assert.AreSame(policy, policy2);
 
-            var pa = CachePolicyManager.GetPolicies();
+            var pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             // Check the internal nocachepolicy.
@@ -66,7 +66,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(1, i);
 
             // No new globally managed policies should have been created.
-            pa = CachePolicyManager.GetPolicies();
+            pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             // Check policy for item is DailyCachePolicy but has its own instance.
@@ -85,7 +85,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(1, i);
 
             // Force flush; should reload cache after.
-            CachePolicyManager.ForceFlush();
+            CachePolicyManager.Current.ForceFlush();
             s = mtc[1];
             Assert.AreEqual("1", s);
             Assert.AreEqual(2, i);
@@ -96,8 +96,9 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void Concurrency()
         {
+            Policy.CachePolicyManagerTest.TestSetUp();
+
             var l = new object();
-            CachePolicyManager.Reset();
             int i = 0;
             var mtc = new KeyValueCache<int, string>((key) => { lock (l) { i++; } TestContext.WriteLine($"GetValue {key} [{System.Threading.Thread.CurrentThread.ManagedThreadId}]"); System.Threading.Thread.Sleep(20); return key.ToString(); });
 

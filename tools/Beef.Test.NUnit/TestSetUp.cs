@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
-using Microsoft.Extensions.Configuration;
+using Beef.Entities;
+using Beef.RefData;
+using Beef.WebApi;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -12,150 +14,64 @@ using System.Threading.Tasks;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Orchestrates the set up for testing whilst also providing reusable utility methods.
+    /// Orchestrates the setup for testing; whilst also providing reusable utility methods.
     /// </summary>
     public sealed class TestSetUp
     {
         private static readonly object _lock = new object();
-        private static Func<int, object?, bool>? _registeredSetUp;
-        private static Func<int, object?, Task<bool>>? _registeredSetUpAsync;
-        private static object? _registeredSetUpData;
-        private static bool _registeredSetUpInvoked;
-        private static int _registeredSetUpCount;
-
-        ///// <summary>
-        ///// Static constructor.
-        ///// </summary>
-        //static TestSetUp()
-        //{
-        //    RegisterGlobalLogger();
-        //    Reset();
-        //}
-
-        ///// <summary>
-        ///// Execute the <see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/> and bind output to the console.
-        ///// </summary>
-        //public static void RegisterGlobalLogger() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
-
-        #region SetUp
+        private static Func<int, object?, bool>? _registeredSetup;
+        private static Func<int, object?, Task<bool>>? _registeredSetupAsync;
+        private static bool _registeredSetupInvoked;
+        private static object? _registeredSetupData;
+        private static int _registeredSetupCount;
+        private static bool _bypassSetup = false;
+        private static Type? _refServiceType;
+        private static Type? _refProviderType;
+        private static Type? _refAgentServiceType;
+        private static Type? _refAgentType;
+        private static Func<object?, string> _usernameConverter = (x) => x?.ToString()!;
+        private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername };
 
         /// <summary>
-        /// Reset (set up) the <see cref="TestSetUp"/> to a known initial state; will result in the <see cref="RegisterSetUp(Func{int, object, bool})">registered</see> set up function being executed.
+        /// Static constructor - binds the global logger (<see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/>) to <see cref="TestContext.Out"/>.
         /// </summary>
-        /// <param name="setUpIfAlreadyDone">Indicates whether to perform the setup if already done; defaults to <c>true</c>.</param>
-        /// <param name="data">Optional data to be passed to the resgitered set up function.</param>
-        public static void Reset(bool setUpIfAlreadyDone = true, object? data = null)
-        {
-            lock (_lock)
-            {
-                if (!_registeredSetUpInvoked || setUpIfAlreadyDone)
-                {
-                    ShouldContinueRunningTests = true;
-                    //CachePolicyManager.ForceFlush();
-                    _registeredSetUpData = data;
-                    _registeredSetUpInvoked = false;
-                }
-            }
-        }
+        static TestSetUp() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
+
+        #region Setup
 
         /// <summary>
-        /// Registers the synchronous <paramref name="setUpFunc"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
+        /// Registers the synchronous <paramref name="setup"/> that will be invoked each time that <see cref="Reset(bool, object)"/> is invoked to reset.
         /// </summary>
-        /// <param name="setUpFunc">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
+        /// <param name="setup">The setup function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
-        public static void RegisterSetUp(Func<int, object?, bool> setUpFunc)
+        public static void RegisterSetUp(Func<int, object?, bool> setup)
         {
             lock (_lock)
             {
-                if (_registeredSetUp != null)
+                if (_registeredSetup != null || _registeredSetupAsync != null)
                     throw new InvalidOperationException("The RegisterSetUp can only be invoked once.");
 
-                _registeredSetUp = setUpFunc;
-                _registeredSetUpAsync = null;
+                _registeredSetup = setup;
+                _registeredSetupAsync = null;
             }
         }
 
         /// <summary>
-        /// Registers the asynchronous <paramref name="setUpFuncAsync"/> that will be invoked once only (during the next <b>Run</b>) until <see cref="Reset(bool, object)"/> is invoked to reset.
+        /// Registers the asynchronous <paramref name="setupAsync"/> that will be invoked each time that <see cref="Reset(bool, object)"/> is invoked to reset.
         /// </summary>
-        /// <param name="setUpFuncAsync">The function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
+        /// <param name="setupAsync">The setup function to invoke. The first argument is the current count of invocations, and second is the optional data object. The return value is used to set
         /// <see cref="ShouldContinueRunningTests"/>.</param>
-        public static void RegisterSetUp(Func<int, object?, Task<bool>> setUpFuncAsync)
+        public static void RegisterSetUp(Func<int, object?, Task<bool>> setupAsync)
         {
             lock (_lock)
             {
-                if (_registeredSetUp != null)
+                if (_registeredSetup != null || _registeredSetupAsync != null)
                     throw new InvalidOperationException("The RegisterSetUp can only be invoked once.");
 
-                _registeredSetUpAsync = setUpFuncAsync;
-                _registeredSetUp = null;
+                _registeredSetupAsync = setupAsync;
+                _registeredSetup = null;
             }
         }
-
-        /// <summary>
-        /// Invokes the registered set up action.
-        /// </summary>
-        internal static void InvokeRegisteredSetUp()
-        {
-            lock (_lock)
-            {
-                ShouldContinueRunningTestsAssert();
-
-                //if (ExecutionContext.Current.Properties.TryGetValue("InvokeRegisteredSetUp", out object? needsSetUp) && !(bool)needsSetUp)
-                //    return;
-
-                if (!_registeredSetUpInvoked)
-                {
-                    try
-                    {
-                        if (_registeredSetUp != null)
-                        {
-                            Logger.Default.Info(null);
-                            Logger.Default.Info("Invocation of registered set up action.");
-                            Logger.Default.Info(new string('=', 80));
-
-                            ShouldContinueRunningTests = _registeredSetUp.Invoke(_registeredSetUpCount++, _registeredSetUpData);
-                            if (!ShouldContinueRunningTests)
-                                Assert.Fail("This RegisterSetUp function failed to execute successfully.");
-                        }
-
-                        if (_registeredSetUpAsync != null)
-                        {
-                            Logger.Default.Info(null);
-                            Logger.Default.Info("Invocation of registered set up action.");
-                            Logger.Default.Info(new string('=', 80));
-
-                            ShouldContinueRunningTests = Task.Run(() => _registeredSetUpAsync.Invoke(_registeredSetUpCount++, _registeredSetUpData)).GetAwaiter().GetResult();
-                            if (!ShouldContinueRunningTests)
-                                Assert.Fail("This RegisterSetUp function failed to execute successfully.");
-                        }
-                    }
-                    catch (AssertionException) { throw; }
-#pragma warning disable CA1031 // Do not catch general exception types; be-design, catches them all!
-                    catch (Exception ex)
-                    {
-                        ShouldContinueRunningTests = false;
-                        Logger.Default.Exception(ex, $"This RegisterSetUp function failed to execute successfully: {ex.Message}");
-                        Assert.Fail($"This RegisterSetUp function failed to execute successfully: {ex.Message}");
-                    }
-#pragma warning restore CA1031
-                    finally
-                    {
-                        _registeredSetUpInvoked = true;
-                        if (_registeredSetUp != null)
-                        {
-                            Logger.Default.Info(null);
-                            Logger.Default.Info(new string('=', 80));
-                            Logger.Default.Info(null);
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region ContinueRunning
 
         /// <summary>
         /// Indicates whether tests should continue running; otherwise, set to <c>false</c> for all other remaining tests to return inconclusive.
@@ -168,32 +84,227 @@ namespace Beef.Test.NUnit
         public static void ShouldContinueRunningTestsAssert()
         {
             if (!ShouldContinueRunningTests)
-                Assert.Inconclusive("This test cannot be executed as AgentTester.ShouldContinueRunningTests has been set to false.");
+                Assert.Inconclusive("This test cannot be executed as TestSetUp.ShouldContinueRunningTests has been set to false.");
         }
 
         /// <summary>
-        /// Checks whether the tests should continue running (sets <see cref="ShouldContinueRunningTests"/> to the passed value) post the current test.
+        /// Invokes the registered set up action.
         /// </summary>
-        /// <param name="shouldContinueRunningTests">Indicates whether tests should continue running; otherwise, set to <c>false</c> for all other remaining tests to return inclusive.</param>
-        /// <returns>The <paramref name="shouldContinueRunningTests"/> value.</returns>
-        public static bool ContinueRunning(bool shouldContinueRunningTests)
+        internal static void InvokeRegisteredSetUp()
         {
-            ShouldContinueRunningTests = shouldContinueRunningTests;
-            return shouldContinueRunningTests;
+            lock (_lock)
+            {
+                ShouldContinueRunningTestsAssert();
+                if (_bypassSetup)
+                    return;
+
+                if (!_registeredSetupInvoked && (_registeredSetup != null || _registeredSetupAsync != null))
+                {
+                    try
+                    {
+                        Logger.Default.Info(null);
+                        Logger.Default.Info("Invocation of registered set up action.");
+                        Logger.Default.Info(new string('=', 80));
+
+                        if (_registeredSetup != null)
+                            ShouldContinueRunningTests = _registeredSetup.Invoke(_registeredSetupCount++, _registeredSetupData);
+
+                        if (_registeredSetupAsync != null)
+                            ShouldContinueRunningTests = Task.Run(() => _registeredSetupAsync.Invoke(_registeredSetupCount++, _registeredSetupData)).GetAwaiter().GetResult();
+
+                        if (!ShouldContinueRunningTests)
+                            Assert.Fail("This RegisterSetUp function failed to execute successfully.");
+                    }
+                    catch (AssertionException) { throw; }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design, catches them all!
+                    catch (Exception ex)
+                    {
+                        ShouldContinueRunningTests = false;
+                        Logger.Default.Exception(ex, $"This RegisterSetUp function failed to execute successfully: {ex.Message}");
+                        Assert.Fail($"This RegisterSetUp function failed to execute successfully: {ex.Message}");
+                    }
+#pragma warning restore CA1031
+                    finally
+                    {
+                        _registeredSetupInvoked = true;
+                        Logger.Default.Info(null);
+                        Logger.Default.Info(new string('=', 80));
+                        Logger.Default.Info(null);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reset testing to a known initial state; will result in the <see cref="RegisterSetUp(Func{int, object, bool})">registered</see> set up function being executed.
+        /// </summary>
+        /// <param name="setUpIfAlreadyDone">Indicates whether to perform the setup if already done; defaults to <c>true</c>.</param>
+        /// <param name="data">Optional data to be passed to the resgitered set up function.</param>
+        public static void Reset(bool setUpIfAlreadyDone = true, object? data = null)
+        {
+            lock (_lock)
+            {
+                if (!_registeredSetupInvoked || setUpIfAlreadyDone)
+                {
+                    ShouldContinueRunningTests = true;
+                    _registeredSetupData = data;
+                    _registeredSetupInvoked = false;
+                    _bypassSetup = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reset testing to a known initial state; will <b>not</b> result in <see cref="RegisterSetUp(Func{int, object, bool})">registered</see> set up function being executed.
+        /// </summary>
+        public static void ResetNoSetup()
+        {
+            lock (_lock)
+            {
+                ShouldContinueRunningTests = true;
+                _registeredSetupData = null;
+                _bypassSetup = true;
+            }
         }
 
         #endregion
 
         /// <summary>
-        /// Creates a <see cref="Mock{T}"/> and updates the <see cref="Factory"/> (see <see cref="Factory.SetLocal{T}(T)"/>) with the mock instance.
+        /// Defines an <b>ETag</b> value that <i>should</i> result in a concurrency error.
         /// </summary>
-        /// <typeparam name="T">The type to mock.</typeparam>
-        /// <returns>The <see cref="Mock{T}"/> instance.</returns>
-        public static Mock<T> CreateMock<T>() where T : class
+        public const string ConcurrencyErrorETag = "ZZZZZZZZZZZZ";
+
+        /// <summary>
+        /// Defines the default environment as 'Development'.
+        /// </summary>
+        public const string DefaultEnvironment = "Development";
+
+        /// <summary>
+        /// Indicates whether to verify that no events were published as the default behaviour.
+        /// </summary>
+        public static bool DefaultExpectNoEvents { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default username (defaults to 'Anonymous').
+        /// </summary>
+        public static string DefaultUsername { get; set; } = "Anonymous";
+
+        /// <summary>
+        /// Sets the username converter function for when a non-string identifier is specified.
+        /// </summary>
+        /// <param name="converter">The converter function.</param>
+        /// <remarks>The <c>object</c> value is the user identifier.</remarks>
+        public static void SetUsernameConverter(Func<object?, string> converter) => _usernameConverter = converter ?? throw new ArgumentNullException(nameof(converter));
+
+        /// <summary>
+        /// Converts a username using the function defined by <see cref="SetUsernameConverter(Func{object?, string})"/>.
+        /// </summary>
+        /// <param name="input">The input user.</param>
+        /// <returns>The converted username.</returns>
+        public static string ConvertUsername(object? input) => _usernameConverter(input);
+
+        /// <summary>
+        /// Sets the <see cref="ExecutionContext"/> creator function for local (non Web API) context.
+        /// </summary>
+        /// <param name="creator">The creator function.</param>
+        public static void SetExecutionContextCreator(Func<string?, object?, ExecutionContext> creator) => _executionContextCreator = creator ?? throw new ArgumentNullException(nameof(creator));
+
+        /// <summary>
+        /// Creates an <see cref="ExecutionContext"/> using the function defined by <see cref="SetExecutionContextCreator(Func{string?, object?, ExecutionContext})"/>.
+        /// </summary>
+        /// <param name="username">The username; defaults to <see cref="DefaultUsername"/> where not specified.</param>
+        /// <param name="arg">An optional argument.</param>
+        /// <returns>The <see cref="ExecutionContext"/>.</returns>
+        public static ExecutionContext CreateExecutionContext(string? username, object? arg) => _executionContextCreator(username, arg);
+
+        /// <summary>
+        /// Sets up the default local <see cref="IReferenceDataProvider">reference data</see> provider <see cref="Type"/>s to enable <see cref="ConfigureDefaultLocalReferenceData(IServiceCollection)"/>.
+        /// </summary>
+        /// <typeparam name="TRefService">The <see cref="Type"/> of the <i>provider</i> service to add.</typeparam>
+        /// <typeparam name="TRefProvider">The <see cref="Type"/> of the <i>provider</i> implementation to use.</typeparam>
+        /// <typeparam name="TRefAgentService">The <see cref="Type"/> of the <i>agent</i> service to add.</typeparam>
+        /// <typeparam name="TRefAgent">The <see cref="Type"/> of the <i>agent</i> implementation to use.</typeparam>
+        /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
+        public static void SetDefaultLocalReferenceData<TRefService, TRefProvider, TRefAgentService, TRefAgent>()
+            where TRefService : class, IReferenceDataProvider where TRefProvider : class, TRefService
+            where TRefAgentService : class where TRefAgent : WebApiAgentBase, TRefAgentService
         {
-            var mock = new Mock<T>();
-            Factory.SetLocal<T>(mock.Object);
-            return mock;
+            _refServiceType = typeof(TRefService);
+            _refProviderType = typeof(TRefProvider);
+            _refAgentServiceType = typeof(TRefAgentService);
+            _refAgentType = typeof(TRefAgent);
+        }
+
+        /// <summary>
+        /// Configures the local <see cref="IReferenceDataProvider">reference data</see> provider as defined by <see cref="SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}"/>.
+        /// </summary>
+        /// <param name="service">The <see cref="IServiceCollection"/>.</param>
+        public static void ConfigureDefaultLocalReferenceData(IServiceCollection service)
+        {
+            if (service == null)
+                throw new ArgumentNullException(nameof(service));
+
+            if (_refServiceType == null)
+                return;
+
+            service.AddSingleton(_refServiceType, _refProviderType)
+                   .AddSingleton(_refAgentServiceType, _refAgentType);
+        }
+
+        /// <summary>
+        /// Gets a default <see cref="ComparisonConfig"/> instance used for the <see cref="AssertCompare{T}(T, T)"/>.
+        /// </summary>
+        public static ComparisonConfig GetDefaultComparisonConfig() => new ComparisonConfig
+        {
+            CompareStaticFields = false,
+            CompareStaticProperties = false,
+            CompareReadOnly = false,
+            CompareFields = false,
+            MaxDifferences = 100,
+            MaxMillisecondsDateDifference = 100
+        };
+
+        /// <summary>
+        /// Verifies that two values are equal by performing a deep property comparison using the <see cref="GetDefaultComparisonConfig"/>.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="actual">The actual value.</param>
+        public static void AssertCompare<T>(T expected, T actual) => AssertCompare(GetDefaultComparisonConfig(), expected, actual);
+
+        /// <summary>
+        /// Verifies that two values are equal by performing a deep property comparison using the specified <paramref name="comparisonConfig"/>.
+        /// </summary>
+        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
+        /// <param name="comparisonConfig">The <see cref="CompareLogic"/>.</param>
+        /// <param name="expected">The expected value.</param>
+        /// <param name="actual">The actual value.</param>
+        public static void AssertCompare<T>(ComparisonConfig comparisonConfig, T expected, T actual)
+        {
+            var cl = new CompareLogic(Check.NotNull(comparisonConfig, nameof(comparisonConfig)));
+            var cr = cl.Compare(expected, actual);
+            if (!cr.AreEqual)
+                Assert.Fail($"Expected vs Actual value mismatch: {cr.DifferencesString}");
+        }
+
+        /// <summary>
+        /// Infer additional members to ignore based on the <paramref name="valueType"/>.
+        /// </summary>
+        /// <param name="comparisonConfig">The <see cref="ComparisonConfig"/>.</param>
+        /// <param name="valueType">The value <see cref="Type"/>.</param>
+        internal static void InferAdditionalMembersToIgnore(ComparisonConfig comparisonConfig, Type valueType)
+        {
+            Check.NotNull(comparisonConfig, nameof(comparisonConfig));
+            Check.NotNull(valueType, nameof(valueType));
+
+            if (valueType.GetInterface(typeof(IUniqueKey).Name) != null)
+                comparisonConfig.MembersToIgnore.AddRange(new string[] { "UniqueKey", "HasUniqueKey", "UniqueKeyProperties" });
+
+            if (valueType.GetInterface(typeof(IChangeTrackingLogging).Name) != null)
+                comparisonConfig.MembersToIgnore.Add("ChangeTracking");
+
+            if (valueType.GetInterface(typeof(IEntityCollectionResult).Name) != null)
+                comparisonConfig.MembersToIgnore.AddRange(new string[] { "Paging", "ItemType" });
         }
 
         /// <summary>

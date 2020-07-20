@@ -13,12 +13,12 @@ namespace Beef.Demo.Test
         private AgentTesterServer<Startup> _agentTester;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp() { AgentTester.Reset(); _agentTester = AgentTester.CreateServer<Startup>(); }
+        public void OneTimeSetUp() { TestSetUp.Reset(); _agentTester = AgentTester.CreateServer<Startup>(); }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() => _agentTester.Dispose();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B110_Get_NotFound()
         {
             _agentTester.Test<TripPersonAgent, TripPerson>()
@@ -27,7 +27,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync("rando"));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B120_Get_Found()
         {
             var p = _agentTester.Test<TripPersonAgent, TripPerson>()
@@ -36,7 +36,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync("willieashmore")).Value;
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void C110_Create()
         {
             var p = new TripPerson { Id = "masm", FirstName = "Mary", LastName = "Smith" };
@@ -45,7 +45,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.CreateAsync(p));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D110_Update_NotFound()
         {
             var p = new TripPerson { Id = "willieashmore", FirstName = "WillieXXX", LastName = "AshmoreYYY" };
@@ -54,7 +54,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, "xyz"));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D120_Update()
         {
             var p = new TripPerson { Id = "willieashmore", FirstName = "Willie", LastName = "AshmoreYYY" };
@@ -64,7 +64,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, p.Id));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D120_Delete()
         {
             _agentTester.Test<TripPersonAgent>()

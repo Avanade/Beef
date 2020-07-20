@@ -1,5 +1,7 @@
 ﻿using Beef.Database.Core;
 using Beef.Demo.Api;
+using Beef.Demo.Common.Agents;
+using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using NUnit.Framework;
 using System.Reflection;
@@ -13,7 +15,8 @@ namespace Beef.Demo.Test
         public void OneTimeSetUp()
         {
             var config = AgentTester.BuildConfiguration<Startup>("Beef");
-            AgentTester.RegisterSetup(async (count, data) =>
+            TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
+            TestSetUp.RegisterSetUp(async (count, data) =>
             {
                 return await DatabaseExecutor.RunAsync(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 

@@ -6,23 +6,23 @@
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
 using Microsoft.Extensions.DependencyInjection;
+using Cdr.Banking.Common.Entities;
 
-namespace Cdr.Banking.Business.Data
+namespace Cdr.Banking.Business
 {
     /// <summary>
-    /// Provides the generated <b>Data</b>-layer services.
+    /// Provides the generated <b>Manager</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
-        /// Adds the generated <b>Data</b>-layer services.
+        /// Adds the generated <b>Manager</b>-layer services.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
+        public static IServiceCollection AddGeneratedReferenceDataManagerServices(this IServiceCollection services)
         {
-            return services.AddScoped<IAccountData, AccountData>()
-                           .AddScoped<ITransactionData, TransactionData>();
+            return services.AddSingleton<IReferenceData, ReferenceDataProvider>();
         }
     }
 }

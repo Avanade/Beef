@@ -17,12 +17,12 @@ namespace Beef.Demo.Test
         private AgentTesterServer<Startup> _agentTester;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp() { AgentTester.Reset(); _agentTester = AgentTester.CreateServer<Startup>(); }
+        public void OneTimeSetUp() { TestSetUp.Reset(); _agentTester = AgentTester.CreateServer<Startup>(); }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() => _agentTester.Dispose();
 
-        [Test]
+        [Test, TestSetUp]
         public void A010_DatabaseDeadlock_Retry()
         {
             int count = 0;

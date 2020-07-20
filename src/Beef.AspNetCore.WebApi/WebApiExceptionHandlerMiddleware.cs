@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,10 +14,11 @@ namespace Beef.AspNetCore.WebApi
     /// <summary>
     /// Provides a <b>Beef</b> oriented <see cref="Exception"/> handling middleware that is <see cref="IBusinessException"/> aware also enabling the exception response to be configured.
     /// </summary>
-    /// <remarks>Each <see cref="Exception"/> will be logged using the <see cref="Beef.Diagnostics.Logger"/>.</remarks>
     public class WebApiExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger _logger;
+        private readonly bool _includeUnhandledExceptionInResponse;
 
         /// <summary>
         /// Gets or sets the <see cref="HttpStatusCode"/> for an unhandled <see cref="Exception"/>.
@@ -29,17 +31,16 @@ namespace Beef.AspNetCore.WebApi
         public static string UnhandledExceptionMessage { get; set; } = "An unexpected internal server error has occurred.";
 
         /// <summary>
-        /// Indicates whether to include the unhandled <see cref="Exception"/> details in the response.
-        /// </summary>
-        public static bool IncludeUnhandledExceptionInResponse { get; set; } = false;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WebApiExceptionHandlerMiddleware"/>.
         /// </summary>
         /// <param name="next">The next <see cref="RequestDelegate"/>.</param>
-        public WebApiExceptionHandlerMiddleware(RequestDelegate next)
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        /// <param name="includeUnhandledExceptionInResponse">Indicates whether to include the unhandled <see cref="Exception"/> details in the response.</param>
+        public WebApiExceptionHandlerMiddleware(RequestDelegate next, ILogger logger, bool includeUnhandledExceptionInResponse = false)
         {
             _next = Check.NotNull(next, nameof(next));
+            _logger = Check.NotNull(logger, nameof(logger));
+            _includeUnhandledExceptionInResponse = includeUnhandledExceptionInResponse;
         }
 
         /// <summary>
@@ -60,8 +61,8 @@ namespace Beef.AspNetCore.WebApi
                 var ar = WebApiActionBase.CreateResultFromException(ac, ex);
                 if (ar == null)
                 {
-                    ar = new ObjectResult(IncludeUnhandledExceptionInResponse ? ex.ToString() : UnhandledExceptionMessage) { StatusCode = (int)UnhandledExceptionStatusCode };
-                    Beef.Diagnostics.Logger.Default.Exception(ex, UnhandledExceptionMessage);
+                    ar = new ObjectResult(_includeUnhandledExceptionInResponse ? ex.ToString() : UnhandledExceptionMessage) { StatusCode = (int)UnhandledExceptionStatusCode };
+                    _logger.LogCritical(ex, UnhandledExceptionMessage);
                 }
 
                 await ar.ExecuteResultAsync(ac).ConfigureAwait(false);

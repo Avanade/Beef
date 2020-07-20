@@ -75,6 +75,9 @@ namespace Beef.Demo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add the execution context.
+            services.AddBeefExecutionContext();
+
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = _config.GetSection("CosmosDb");
             services.AddScoped<Data.Database.IDatabase>(_ => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
@@ -107,7 +110,7 @@ namespace Beef.Demo.Api
                     return new NullEventPublisher();
             });
 
-            // Add other related services.
+            // Add beef request cache service.
             services.AddScoped<IRequestCache, RequestCache>();
 
             // Cache policy management.
@@ -147,17 +150,8 @@ namespace Beef.Demo.Api
             _logger = loggerFactory.CreateLogger("Logging");
             Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
 
-            // Register the HttpClientCreate so it uses the factory.
-            //WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
-            //{
-            //    var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
-            //    hc.BaseAddress = rd.BaseAddress;
-            //    return hc;
-            //});
-
             // Override the exception handling.
-            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
-            app.UseWebApiExceptionHandler();
+            app.UseWebApiExceptionHandler(_logger, config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Set up the health checks.
             app.UseHealthChecks("/health");

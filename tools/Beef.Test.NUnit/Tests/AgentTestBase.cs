@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Test.NUnit.Events;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;

@@ -8,36 +8,57 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using Cdr.Banking.Common.Entities;
-using Cdr.Banking.Common.Agents.ServiceAgents;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Common.Agents
 {
     /// <summary>
+    /// Defines the Account Web API agent.
+    /// </summary>
+    public partial interface IAccountAgent
+    {
+        /// <summary>
+        /// Get all accounts.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Get <see cref="AccountDetail"/>.
+        /// </summary>
+        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<AccountDetail>> GetDetailAsync(string? accountId, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Get <see cref="Account"/> <see cref="Balance"/>.
+        /// </summary>
+        /// <param name="accountId">The <see cref="Account"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Balance>> GetBalanceAsync(string? accountId, WebApiRequestOptions? requestOptions = null);
+    }
+
+    /// <summary>
     /// Provides the Account Web API agent.
     /// </summary>
-    public partial class AccountAgent : WebApiAgentBase, IAccountServiceAgent
+    public partial class AccountAgent : WebApiAgentBase, IAccountAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountAgent"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public AccountAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            AccountServiceAgent = Beef.Factory.Create<IAccountServiceAgent>(httpClient, beforeRequest);
-        }
-        
-        /// <summary>
-        /// Gets the underlyng <see cref="IAccountServiceAgent"/> instance.
-        /// </summary>
-        public IAccountServiceAgent AccountServiceAgent { get; private set; }
+        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
+        public AccountAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Get all accounts.
@@ -47,7 +68,10 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<AccountCollectionResult>> GetAccountsAsync(AccountArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-            => AccountServiceAgent.GetAccountsAsync(args, paging, requestOptions);
+        {
+            return GetCollectionResultAsync<AccountCollectionResult, AccountCollection, Account>("api/v1/banking/accounts", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<AccountArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
+        }
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
@@ -56,7 +80,10 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<AccountDetail>> GetDetailAsync(string? accountId, WebApiRequestOptions? requestOptions = null)
-            => AccountServiceAgent.GetDetailAsync(accountId, requestOptions);
+        {
+            return GetAsync<AccountDetail>("api/v1/banking/accounts/{accountId}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("accountId", accountId) });
+        }
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
@@ -65,7 +92,10 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Balance>> GetBalanceAsync(string? accountId, WebApiRequestOptions? requestOptions = null)
-            => AccountServiceAgent.GetBalanceAsync(accountId, requestOptions);
+        {
+            return GetAsync<Balance>("api/v1/banking/accounts/{accountId}/balance", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("accountId", accountId) });
+        }
     }
 }
 

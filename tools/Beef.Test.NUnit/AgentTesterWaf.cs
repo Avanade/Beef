@@ -25,8 +25,9 @@ namespace Beef.Test.NUnit
         /// Initializes a new instance of the <see cref="WebApplicationFactory{TStartup}"/> class enabling configuration of the <see cref="IWebHostBuilder"/>.
         /// </summary>
         /// <param name="configuration">The <see cref="IWebHostBuilder"/>.</param>
+        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Class has a Dispose method.")]
-        internal AgentTesterWaf(Action<IWebHostBuilder> configuration)
+        internal AgentTesterWaf(Action<IWebHostBuilder> configuration, bool configureLocalRefData = true) : base(configureLocalRefData)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -45,7 +46,8 @@ namespace Beef.Test.NUnit
         /// <b>API</b> <paramref name="services"/> to be configured/replaced (dependency injection).
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        internal AgentTesterWaf(Action<IServiceCollection>? services = null) : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc)))) { }
+        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
+        internal AgentTesterWaf(Action<IServiceCollection>? services = null, bool configureLocalRefData = true) : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), configureLocalRefData) { }
 
         /// <summary>
         /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="AgentTesterBase.LocalServiceProvider"/>).
@@ -70,12 +72,13 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Prepares the <see cref="ExecutionContext"/> and ensures that the <see cref="AgentTesterBase.LocalServiceProvider"/> scope is correctly configured.
+        /// Prepares (creates) the <see cref="ExecutionContext"/> and ensures that the <see cref="AgentTesterBase.LocalServiceProvider"/> scope is correctly configured.
         /// </summary>
-        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="AgentTester.DefaultUsername"/>).</param>
-        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext(string?, object?)"/>).</param>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUsername"/>).</param>
+        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="TestSetUp.CreateExecutionContext(string?, object?)"/>).</param>
         /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
-        public new AgentTesterWaf<TStartup> Prepare(string? username = null, object? args = null) { base.Prepare(username, args); return this; }
+        /// <remarks>The <see cref="ExecutionContext"/> must be created by the <see cref="AgentTesterServer{TStartup}"/> as the <see cref="ExecutionContext.ServiceProvider"/> must be set to <see cref="AgentTesterBase.LocalServiceProvider"/>.</remarks>
+        public new AgentTesterWaf<TStartup> PrepareExecutionContext(string? username = null, object? args = null) { base.PrepareExecutionContext(username, args); return this; }
 
         /// <summary>
         /// Gets an <see cref="HttpClient"/> instance.
@@ -84,11 +87,11 @@ namespace Beef.Test.NUnit
         public override HttpClient GetHttpClient() => WebApplicationFactory.CreateClient();
 
         /// <summary>
-        /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending (overrides the <see cref="AgentTester.SetBeforeRequest"/>).
+        /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending (overrides the <see cref="AgentTester.RegisterBeforeRequest"/>).
         /// </summary>
         /// <param name="beforeRequest">The before request action.</param>
         /// <returns>This instance to support fluent-style method-chaining.</returns>
-        public new AgentTesterWaf<TStartup> SetBeforeRequest(Action<HttpRequestMessage> beforeRequest) { base.SetBeforeRequest(beforeRequest); return this; }
+        public new AgentTesterWaf<TStartup> RegisterBeforeRequest(Action<HttpRequestMessage> beforeRequest) { base.RegisterBeforeRequest(beforeRequest); return this; }
 
         /// <summary>
         /// Gets the underlying <see cref="WebApplicationFactory{TStartup}"/>.
@@ -150,7 +153,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Create a new <see cref="AgentTest{TStartup, TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="AgentTester.ConvertUsername(object?)"/>).
+        /// Create a new <see cref="AgentTest{TStartup, TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="TestSetUp.ConvertUsername(object?)"/>).
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
@@ -158,11 +161,11 @@ namespace Beef.Test.NUnit
         /// <returns>An <see cref="AgentTest{TStartup, TAgent}"/> instance.</returns>
         public AgentTest<TStartup, TAgent> Test<TAgent>(object? userIdentifier, object? args = null) where TAgent : WebApiAgentBase
         {
-            return new AgentTest<TStartup, TAgent>(this, AgentTester.ConvertUsername(userIdentifier), args);
+            return new AgentTest<TStartup, TAgent>(this, TestSetUp.ConvertUsername(userIdentifier), args);
         }
 
         /// <summary>
-        /// Create a new <see cref="AgentTest{TStartup, TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="AgentTester.ConvertUsername(object?)"/>).
+        /// Create a new <see cref="AgentTest{TStartup, TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="TestSetUp.ConvertUsername(object?)"/>).
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
@@ -171,7 +174,7 @@ namespace Beef.Test.NUnit
         /// <returns>An <see cref="AgentTest{TStartup, TAgent, TValue}"/> instance</returns>
         public AgentTest<TStartup, TAgent, TValue> Test<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : WebApiAgentBase
         {
-            return new AgentTest<TStartup, TAgent, TValue>(this, AgentTester.ConvertUsername(userIdentifier), args);
+            return new AgentTest<TStartup, TAgent, TValue>(this, TestSetUp.ConvertUsername(userIdentifier), args);
         }
 
         #endregion
@@ -204,7 +207,7 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Create a new <see cref="GrpcAgentTest{TStartup, TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="AgentTester.ConvertUsername(object?)"/>).
+        /// Create a new <see cref="GrpcAgentTest{TStartup, TAgent}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="TestSetUp.ConvertUsername(object?)"/>).
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <param name="userIdentifier">The user identifier (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
@@ -212,11 +215,11 @@ namespace Beef.Test.NUnit
         /// <returns>An <see cref="GrpcAgentTest{TStartup, TResult}"/> instance.</returns>
         public GrpcAgentTest<TStartup, TAgent> TestGrpc<TAgent>(object? userIdentifier, object? args = null) where TAgent : GrpcAgentBase
         {
-            return new GrpcAgentTest<TStartup, TAgent>(this, AgentTester.ConvertUsername(userIdentifier), args);
+            return new GrpcAgentTest<TStartup, TAgent>(this, TestSetUp.ConvertUsername(userIdentifier), args);
         }
 
         /// <summary>
-        /// Create a new <see cref="GrpcAgentTest{TStartup, TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="AgentTester.ConvertUsername(object?)"/>).
+        /// Create a new <see cref="GrpcAgentTest{TStartup, TAgent, TValue}"/> for a named <paramref name="userIdentifier"/> (converted using <see cref="TestSetUp.ConvertUsername(object?)"/>).
         /// </summary>
         /// <typeparam name="TAgent">The <b>Agent</b> <see cref="Type"/>.</typeparam>
         /// <typeparam name="TValue">The response value <see cref="Type"/>.</typeparam>
@@ -225,7 +228,7 @@ namespace Beef.Test.NUnit
         /// <returns>An <see cref="GrpcAgentTest{TStartup, TAgent, TValue}"/> instance</returns>
         public GrpcAgentTest<TStartup, TAgent, TValue> TestGrpc<TAgent, TValue>(object userIdentifier, object? args = null) where TAgent : GrpcAgentBase
         {
-            return new GrpcAgentTest<TStartup, TAgent, TValue>(this, AgentTester.ConvertUsername(userIdentifier), args);
+            return new GrpcAgentTest<TStartup, TAgent, TValue>(this, TestSetUp.ConvertUsername(userIdentifier), args);
         }
 
         #endregion

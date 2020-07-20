@@ -208,7 +208,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
       <If Condition="System.Caching == true">
         <![CDATA[, IRequestCache cache]]>
       </If>
-      <![CDATA[) { _data = Check.NotNull(data, nameof(data)); ]]>
+      <![CDATA[)
+            { _data = Check.NotNull(data, nameof(data)); ]]>
       <If Condition="System.EventPublish == true">
         <![CDATA[_evtPub = Check.NotNull(evtPub, nameof(evtPub)); ]]>
       </If>
@@ -485,7 +486,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <![CDATA[Value]]>
               </If>
             </If>
-            <![CDATA[Event]]>
           </If>
           <![CDATA[Async(]]>
           <If Condition="Operation.EventSubject == null">

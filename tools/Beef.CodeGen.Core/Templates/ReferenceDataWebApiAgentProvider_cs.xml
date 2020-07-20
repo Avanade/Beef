@@ -49,7 +49,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Common.Agents
         /// <param name="agent">The <see cref="IReferenceDataAgent"/>.</param>
         public ReferenceDataAgentProvider(IReferenceDataAgent agent)
         {
-            _agent = Check.NotNull(agent, nameof(agent));
+            _agent = Beef.Check.NotNull(agent, nameof(agent));
 
 ]]>
   <Entity Condition="Entity.RefDataType != null and Entity.Abstract == false and Entity.EntityScope == 'Common'">

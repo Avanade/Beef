@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Events;
 using Beef.Grpc;
 using Beef.RefData;
-using Google.Protobuf;
 using KellermanSoftware.CompareNetObjects;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
@@ -26,7 +23,7 @@ namespace Beef.Test.NUnit.Tests
     [DebuggerStepThrough()]
     public class GrpcAgentTest<TStartup, TAgent, TValue> : GrpcAgentTestBase<TStartup> where TStartup : class where TAgent : GrpcAgentBase
     {
-        private readonly ComparisonConfig _comparisonConfig = AgentTester.GetDefaultComparisonConfig();
+        private readonly ComparisonConfig _comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
         private bool _isExpectNullValue;
         private Func<GrpcAgentTest<TStartup, TAgent, TValue>, TValue>? _expectValueFunc;
         private bool _isExpectCreatedBy;
@@ -372,7 +369,7 @@ namespace Beef.Test.NUnit.Tests
 
                 // Further configure the comparison configuration.
                 _comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
-                AgentTester.InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
+                TestSetUp.InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
 
                 // Perform the actual comparison.
                 var cl = new CompareLogic(_comparisonConfig);

@@ -11,9 +11,9 @@ namespace Beef.Demo.Test
     public class ContactTest
     {
         [OneTimeSetUp]
-        public void OneTimeSetUp() => AgentTester.Reset();
+        public void OneTimeSetUp() => TestSetUp.Reset();
 
-        [Test]
+        [Test, TestSetUp]
         public void A110_Get()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
@@ -35,7 +35,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(etag, r.Response.Headers?.ETag?.Tag);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A120_Update()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();
@@ -61,7 +61,7 @@ namespace Beef.Demo.Test
             Assert.AreNotEqual(etag, r.Response.Headers?.ETag?.Tag);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A130_GetAll()
         {
             using var agentTester = AgentTester.CreateWaf<Startup>();

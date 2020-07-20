@@ -22,8 +22,8 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public async Task OneTimeSetUp()
         {
-            AgentTester.Reset(false);
-            _tester = AgentTester.CreateServer<Startup>().ConfigureReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>().Prepare();
+            TestSetUp.Reset(false);
+            _tester = AgentTester.CreateServer<Startup>().PrepareExecutionContext();
 
             _robotTest = new RobotTest();
             await _robotTest.CosmosOneTimeSetUp();
@@ -36,10 +36,10 @@ namespace Beef.Demo.Test
             await _robotTest.OneTimeTearDown();
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A110_GetNamed_AllList()
         {
-            _tester.Prepare();
+            _tester.PrepareExecutionContext();
             var names = ReferenceData.Current.GetAllTypes().Select(x => x.Name).ToArray();
 
             var r = _tester.Test<ReferenceDataAgent>()
@@ -50,7 +50,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(names.Length, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A120_GetNamed_AllList_NotModified()
         {
             var r = _tester.Test<ReferenceDataAgent>()
@@ -70,7 +70,7 @@ namespace Beef.Demo.Test
                 })).GetNamedAsync(new string[] { nameof(ReferenceData.Gender), nameof(ReferenceData.Company) }));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A130_GetNamed_AllList_NotModified_Modified()
         {
             var r = _tester.Test<ReferenceDataAgent>()
@@ -84,7 +84,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(2, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A140_GetGender()
         {
             var rd = _tester.Test<ReferenceDataAgent, GenderCollection>()
@@ -95,7 +95,7 @@ namespace Beef.Demo.Test
             Assert.Greater(rd.AllList.Count, 0);
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A150_GetGender_NotModified()
         {
             var r = _tester.Test<ReferenceDataAgent, GenderCollection>()
@@ -118,7 +118,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GenderGetAllAsync(null, new Beef.WebApi.WebApiRequestOptions { ETag = vals.First() }));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A160_GetPowerSource_FilterByCodes()
         {
             var r = _tester.Test<ReferenceDataAgent, PowerSourceCollection>()
@@ -130,7 +130,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(2, r.Value.Count());
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A170_GetPowerSource_FilterByText()
         {
             var r = _tester.Test<ReferenceDataAgent, PowerSourceCollection>()
@@ -142,7 +142,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(1, r.Value.Count());
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A175_GetPowerSource_FilterByCodes_Inactive()
         {
             var r = _tester.Test<ReferenceDataAgent, PowerSourceCollection>()
@@ -162,7 +162,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(1, r.Value.Count());
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A180_GetByCodes()
         {
             var r = _tester.Test<ReferenceDataAgent>()
@@ -174,7 +174,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual("[{\"name\":\"Gender\",\"items\":[{\"code\":\"M\"},{\"code\":\"F\"}]},{\"name\":\"PowerSource\",\"items\":[{\"code\":\"E\"},{\"code\":\"F\"}]},{\"name\":\"EyeColor\",\"items\":[{\"code\":\"BLUE\"},{\"code\":\"BROWN\"},{\"code\":\"GREEN\"}]}]", r.Content);
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void A190_Get_NoContent()
         {
             var r = _tester.Test<ReferenceDataAgent>()

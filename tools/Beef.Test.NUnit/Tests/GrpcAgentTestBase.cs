@@ -2,6 +2,7 @@
 
 using Beef.Diagnostics;
 using Beef.Grpc;
+using Beef.Test.NUnit.Events;
 using Beef.WebApi;
 using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;

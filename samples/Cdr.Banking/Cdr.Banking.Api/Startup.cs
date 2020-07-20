@@ -1,21 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Reflection;
+﻿using Beef;
 using Beef.AspNetCore.WebApi;
+using Beef.Caching;
 using Beef.Caching.Policy;
-using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Validation;
-using Beef.WebApi;
+using Cdr.Banking.Business;
+using Cdr.Banking.Business.Data;
+using Cdr.Banking.Business.DataSvc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Cdr.Banking.Business;
-using Cdr.Banking.Business.DataSvc;
-using Cdr.Banking.Business.Data;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Reflection;
+using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Cdr.Banking.Api
 {
@@ -24,6 +25,7 @@ namespace Cdr.Banking.Api
     /// </summary>
     public class Startup
     {
+        private readonly IConfiguration _config;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -33,9 +35,10 @@ namespace Cdr.Banking.Api
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
         public Startup(IConfiguration config, ILoggerFactory loggerFactory)
         {
+            _config = config;
+
             // Use JSON property names in validation; and determine whether unhandled exception details are to be included in the response.
             ValidationArgs.DefaultUseJsonNames = true;
-            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
 
             // Add "page" and "page-size" to the supported paging query string parameters as defined by the CDR specification; and default the page size to 25 from config.
             WebApiQueryString.PagingArgsPageQueryStringNames.Add("page");
@@ -44,24 +47,9 @@ namespace Cdr.Banking.Api
 
             // Configure the logger.
             _logger = loggerFactory.CreateLogger("Logging");
-            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
 
-            // Configure the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-
-            // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
-
-            // Register the ReferenceData provider.
-            Beef.RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
-
-            // Register the "customised" execution context.
-            Beef.ExecutionContext.Register(() => new ExecutionContext());
+            //// Register the "customised" execution context.
+            //Beef.ExecutionContext.Register(() => new ExecutionContext());
         }
 
         /// <summary>
@@ -73,8 +61,29 @@ namespace Cdr.Banking.Api
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
+            // Add the "customised" execution context.
+            services.AddBeefExecutionContext(() => new Business.ExecutionContext());
+
             // Add the data sources as singletons for dependency injection requirements.
-            services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(CosmosDb.Default);
+            var ccs = _config.GetSection("CosmosDb");
+            services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")));
+
+            // Add beef request cache service.
+            services.AddScoped<IRequestCache, RequestCache>();
+
+            // Add beef cache policy management.
+            services.AddSingleton(_ =>
+            {
+                var cpm = new CachePolicyManager();
+                cpm.SetFromCachePolicyConfig(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+                cpm.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
+                return cpm;
+            });
+
+            // Add the generated reference data services for dependency injection requirements.
+            services.AddGeneratedReferenceDataManagerServices()
+                    .AddGeneratedReferenceDataDataSvcServices()
+                    .AddGeneratedReferenceDataDataServices();
 
             // Add the generated services for dependency injection requirements.
             services.AddGeneratedManagerServices()
@@ -103,19 +112,10 @@ namespace Cdr.Banking.Api
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="clientFactory">The <see cref="IHttpClientFactory"/>.</param>
-        public void Configure(IApplicationBuilder app, IHttpClientFactory clientFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            // Register the ServiceAgent HttpClientCreate (for cross-domain calls) so it uses the factory.
-            WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
-            {
-                var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
-                hc.BaseAddress = rd.BaseAddress;
-                return hc;
-            });
-
             // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler();
+            app.UseWebApiExceptionHandler(_logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();
@@ -131,7 +131,7 @@ namespace Cdr.Banking.Api
                 if (!hc.Request.Headers.TryGetValue("cdr-user", out var username) || username.Count != 1)
                     throw new Beef.AuthorizationException();
 
-                var bec = (ExecutionContext)ec;
+                var bec = (Business.ExecutionContext)ec;
 
                 switch (username[0])
                 {

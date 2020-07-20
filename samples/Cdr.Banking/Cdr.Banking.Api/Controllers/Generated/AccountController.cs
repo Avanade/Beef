@@ -37,7 +37,7 @@ namespace Cdr.Banking.Api.Controllers
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IAccountManager"/>.</param>
-        public AccountController(IAccountManager manager) => _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        public AccountController(IAccountManager manager) => _manager = Check.NotNull(manager, nameof(manager));
 
         /// <summary>
         /// Get all accounts.

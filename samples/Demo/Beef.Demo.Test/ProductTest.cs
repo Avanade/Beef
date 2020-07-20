@@ -14,12 +14,12 @@ namespace Beef.Demo.Test
         private AgentTesterServer<Startup> _agentTester;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp() { AgentTester.ResetNoSetup(); _agentTester = AgentTester.CreateServer<Startup>(); }
+        public void OneTimeSetUp() { TestSetUp.ResetNoSetup(); _agentTester = AgentTester.CreateServer<Startup>(); }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() => _agentTester.Dispose();
 
-        [Test]
+        [Test, TestSetUp]
         public void B110_Get_NotFound()
         {
             _agentTester.Test<ProductAgent, Product>()
@@ -28,7 +28,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(404));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void B120_Get()
         {
             _agentTester.Test<ProductAgent, Product>()
@@ -37,7 +37,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(1));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C110_GetByArgs_Null()
         {
             var pcr = _agentTester.Test<ProductAgent, ProductCollectionResult>()
@@ -48,7 +48,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(11, pcr?.Value?.Result?.Count);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C120_GetByArgs_Null_Paging()
         {
             var pcr = _agentTester.Test<ProductAgent, ProductCollectionResult>()
@@ -61,7 +61,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(11, pcr.Value.Paging.TotalCount);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C130_GetByArgs_Wildcard1()
         {
             var pcr = _agentTester.Test<ProductAgent, ProductCollectionResult>()
@@ -73,7 +73,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new string[] { "LCD HDTV", "Lemonade" }, pcr.Value.Result.Select(x => x.Name).ToArray());
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void C140_GetByArgs_Wildcard2()
         {
             var pcr = _agentTester.Test<ProductAgent, ProductCollectionResult>()

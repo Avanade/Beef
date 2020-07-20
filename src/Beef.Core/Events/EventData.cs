@@ -3,8 +3,6 @@
 using Beef.Entities;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Beef.Events
 {
@@ -105,6 +103,7 @@ namespace Beef.Events
                 TenantId = ExecutionContext.Current.TenantId;
                 Timestamp = ExecutionContext.Current.Timestamp;
                 Username = ExecutionContext.Current.Username;
+                UserId = ExecutionContext.Current.UserId;
             }
             else
                 Timestamp = Cleaner.Clean(DateTime.Now);
@@ -139,6 +138,12 @@ namespace Beef.Events
         /// </summary>
         [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Username { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique user identifier that initiated the event.
+        /// </summary>
+        [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? UserId { get; set; }
 
         /// <summary>
         /// Gets or sets the event timestamp.

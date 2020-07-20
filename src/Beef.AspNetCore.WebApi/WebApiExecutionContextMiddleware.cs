@@ -2,6 +2,7 @@
 
 using Beef.WebApi;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +10,11 @@ using System.Threading.Tasks;
 namespace Beef.AspNetCore.WebApi
 {
     /// <summary>
-    /// Provides an <see cref="ExecutionContext"/> handling middleware that enables additional configuration (<see cref="UpdateAction"/>) where required.
+    /// Provides an <see cref="ExecutionContext"/> handling middleware that creates (using dependency injection) and enables additional configuration (<see cref="UpdateAction"/>) where required.
     /// </summary>
-    /// <remarks>Performs an <see cref="ExecutionContext.Reset"/> passing <c>true</c> to renew. Where no <see cref="UpdateAction"/> has been specified then the <see cref="ExecutionContext.Username"/>
-    /// will be set to the <see cref="System.Security.Principal.IIdentity.Name"/> from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>.</remarks>
+    /// <remarks>Performs an <see cref="ExecutionContext.Reset"/> passing <c>false</c> to not renew. A new <see cref="ExecutionContext"/> is instantiated through dependency injection using the 
+    /// <see cref="HttpContext.RequestServices"/>. Where no <see cref="UpdateAction"/> has been specified then the <see cref="ExecutionContext.Username"/> will be set to the <see cref="System.Security.Principal.IIdentity.Name"/>
+    /// from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>.</remarks>
     public class WebApiExecutionContextMiddleware
     {
         private readonly RequestDelegate _next;
@@ -57,13 +59,18 @@ namespace Beef.AspNetCore.WebApi
         /// <returns>The <see cref="Task"/>.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
-            ExecutionContext.Reset(true);
-            var ec = ExecutionContext.Current;
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            var ec = context.RequestServices.GetService<ExecutionContext>();
             UpdateAction.Invoke(context, ec);
             ec.ServiceProvider = context.RequestServices;
 
             if (context.Request.Headers.TryGetValue(WebApiConsts.CorrelationIdHeaderName, out var val))
                 ec.CorrelationId = val.FirstOrDefault();
+
+            ExecutionContext.Reset(false);
+            ExecutionContext.SetCurrent(ec);
 
             await _next(context).ConfigureAwait(false);
         }

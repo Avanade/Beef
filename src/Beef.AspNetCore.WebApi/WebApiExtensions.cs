@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Beef.AspNetCore.WebApi
@@ -26,10 +27,12 @@ namespace Beef.AspNetCore.WebApi
         /// Adds <see cref="WebApiExceptionHandlerMiddleware"/> to the <see cref="IApplicationBuilder"/> request execution pipeline.
         /// </summary>
         /// <param name="builder">The <see cref="IApplicationBuilder"/>.</param>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        /// <param name="includeUnhandledExceptionInResponse">Indicates whether to include the unhandled <see cref="Exception"/> details in the response.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseWebApiExceptionHandler(this IApplicationBuilder builder, ILogger logger, bool includeUnhandledExceptionInResponse = false)
         {
-            return builder.UseMiddleware<WebApiExceptionHandlerMiddleware>();
+            return builder.UseMiddleware<WebApiExceptionHandlerMiddleware>(logger, includeUnhandledExceptionInResponse);
         }
     }
 }

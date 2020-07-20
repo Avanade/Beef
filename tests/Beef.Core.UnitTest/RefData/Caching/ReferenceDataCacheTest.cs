@@ -25,6 +25,8 @@ namespace Beef.Core.UnitTest.RefData.Caching
         [Test]
         public void Exercise()
         {
+            UnitTest.Caching.Policy.CachePolicyManagerTest.TestSetUp();
+
             var coll = new TestRdCollection
             {
                 new TestRd { Id = 1, Code = "A" },

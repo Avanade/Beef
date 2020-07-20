@@ -23,7 +23,7 @@ namespace Beef.Test.NUnit.Tests
     //[DebuggerStepThrough()]
     public class AgentTest<TStartup, TAgent, TValue> : AgentTestBase<TStartup> where TStartup : class where TAgent : WebApiAgentBase
     {
-        private readonly ComparisonConfig _comparisonConfig = AgentTester.GetDefaultComparisonConfig();
+        private readonly ComparisonConfig _comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
         private bool _isExpectNullValue;
         private Func<AgentTest<TStartup, TAgent, TValue>, TValue>? _expectValueFunc;
         private bool _isExpectCreatedBy;
@@ -365,7 +365,7 @@ namespace Beef.Test.NUnit.Tests
 
                 // Further configure the comparison configuration.
                 _comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
-                AgentTester.InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
+                TestSetUp.InferAdditionalMembersToIgnore(_comparisonConfig, typeof(TValue));
 
                 // Perform the actual comparison.
                 var cl = new CompareLogic(_comparisonConfig);

@@ -25,53 +25,45 @@ namespace Cdr.Banking.Common.Agents
     /// </summary>
     public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
     {
-        private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
-
-        private readonly ReferenceDataAgent _agent;
+        private readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
+        private readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
+        private readonly IReferenceDataAgent _agent;
         private readonly Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
 
         #region Ctor
         
         /// <summary>
-        /// Static constructor.
+        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
         /// </summary>
-        static ReferenceDataAgentProvider()
+        /// <param name="agent">The <see cref="IReferenceDataAgent"/>.</param>
+        public ReferenceDataAgentProvider(IReferenceDataAgent agent)
         {
+            _agent = Beef.Check.NotNull(agent, nameof(agent));
+
             _nameDict.Add(nameof(OpenStatus), typeof(RefDataNamespace.OpenStatus));
             _typeDict.Add(typeof(RefDataNamespace.OpenStatus), nameof(OpenStatus));
+            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => _agent.OpenStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(ProductCategory), typeof(RefDataNamespace.ProductCategory));
             _typeDict.Add(typeof(RefDataNamespace.ProductCategory), nameof(ProductCategory));
+            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => _agent.ProductCategoryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(AccountUType), typeof(RefDataNamespace.AccountUType));
             _typeDict.Add(typeof(RefDataNamespace.AccountUType), nameof(AccountUType));
+            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => _agent.AccountUTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(MaturityInstructions), typeof(RefDataNamespace.MaturityInstructions));
             _typeDict.Add(typeof(RefDataNamespace.MaturityInstructions), nameof(MaturityInstructions));
+            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => _agent.MaturityInstructionsGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(TransactionType), typeof(RefDataNamespace.TransactionType));
             _typeDict.Add(typeof(RefDataNamespace.TransactionType), nameof(TransactionType));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => _agent.TransactionTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(TransactionStatus), typeof(RefDataNamespace.TransactionStatus));
             _typeDict.Add(typeof(RefDataNamespace.TransactionStatus), nameof(TransactionStatus));
-        }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
-        /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public ReferenceDataAgentProvider(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            _agent = new ReferenceDataAgent(httpClient, beforeRequest);
-
-            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => _agent.OpenStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => _agent.ProductCategoryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => _agent.AccountUTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => _agent.MaturityInstructionsGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => _agent.TransactionTypeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
             _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => _agent.TransactionStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+
         }
 
         #endregion

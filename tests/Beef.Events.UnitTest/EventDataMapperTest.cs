@@ -9,10 +9,12 @@ namespace Beef.Events.UnitTest
     [TestFixture]
     public class EventDataMapperTest
     {
+        private readonly IEventPublisher _ep = new NullEventPublisher();
+
         [Test]
         public void SubjectOnly()
         {
-            var ed = EventData.CreateEvent("Subject");
+            var ed = EventData.CreateEvent(_ep, "Subject");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
@@ -31,7 +33,7 @@ namespace Beef.Events.UnitTest
         [Test]
         public void SubjectAndAction()
         {
-            var ed = EventData.CreateEvent("Subject", "Action");
+            var ed = EventData.CreateEvent(_ep, "Subject", "Action");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
@@ -52,7 +54,7 @@ namespace Beef.Events.UnitTest
         {
             var id = Guid.NewGuid();
 
-            var ed = EventData.CreateEvent("Subject", "Action", id);
+            var ed = EventData.CreateEvent(_ep, "Subject", "Action", id);
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
@@ -74,7 +76,7 @@ namespace Beef.Events.UnitTest
             var id = Guid.NewGuid();
             var no = 123;
 
-            var ed = EventData.CreateEvent("Subject", "Action", id, no);
+            var ed = EventData.CreateEvent(_ep, "Subject", "Action", id, no);
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);
@@ -103,7 +105,7 @@ namespace Beef.Events.UnitTest
         {
             var p = new Person { Id = Guid.NewGuid(), Name = "Caleb" };
 
-            var ed = EventData.CreateValueEvent(p, "Subject", "Action");
+            var ed = EventData.CreateValueEvent(_ep, p, "Subject", "Action");
             var eh = ed.ToEventHubsEventData();
             Assert.IsNotNull(eh);
             Assert.AreEqual("Subject", eh.Properties[EventDataMapper.SubjectPropertyName]);

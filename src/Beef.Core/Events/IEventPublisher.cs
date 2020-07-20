@@ -31,7 +31,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public Task PublishEventAsync(string subject, string? action = null) => PublishAsync(new EventData[] { EventData.CreateEvent(this, subject, action) });
+        Task PublishAsync(string subject, string? action = null);
 
         /// <summary>
         /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
@@ -40,7 +40,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public Task PublishEventAsync(string subject, string? action = null, params IComparable?[] key) => PublishAsync(new EventData[] { EventData.CreateEvent(this, subject, action, key) });
+        Task PublishAsync(string subject, string? action = null, params IComparable?[] key);
 
         /// <summary>
         /// Publishes an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
@@ -50,7 +50,7 @@ namespace Beef.Events
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public Task PublishValueEventAsync<T>(T value, string subject, string? action = null) where T : class => PublishAsync(new EventData[] { EventData.CreateValueEvent<T>(this, value, subject, action) });
+        Task PublishValueAsync<T>(T value, string subject, string? action = null) where T : class;
 
         /// <summary>
         /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
@@ -61,7 +61,7 @@ namespace Beef.Events
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public Task PublishValueEventAsync<T>(T value, string subject, string? action = null, params IComparable?[] key) => PublishAsync(new EventData[] { EventData.CreateValueEvent<T>(this, value, subject, action, key) });
+        Task PublishValueAsync<T>(T value, string subject, string? action = null, params IComparable?[] key);
 
         /// <summary>
         /// Publishes one of more <see cref="EventData"/> objects.

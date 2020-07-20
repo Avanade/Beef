@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
 using Cdr.Banking.Business.Data;
 using Cdr.Banking.Common.Entities;
@@ -24,6 +25,7 @@ namespace Cdr.Banking.Business.DataSvc
     public partial class AccountDataSvc : IAccountDataSvc
     {
         private readonly IAccountData _data;
+        private readonly IRequestCache _cache;
 
         /// <summary>
         /// Parameterless constructor is explictly not supported.
@@ -33,8 +35,10 @@ namespace Cdr.Banking.Business.DataSvc
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
         /// </summary>
-        /// <param name="dataService">The <see cref="IAccountData"/>.</param>
-        public AccountDataSvc(IAccountData data) { _data = data ?? throw new ArgumentNullException(nameof(data)); AccountDataSvcCtor(); }
+        /// <param name="data">The <see cref="IAccountData"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public AccountDataSvc(IAccountData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); AccountDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -66,11 +70,11 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out AccountDetail __val))
+                if (_cache.TryGetValue(__key, out AccountDetail __val))
                     return __val;
 
                 var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
@@ -85,11 +89,11 @@ namespace Cdr.Banking.Business.DataSvc
             return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue(__key, out Balance __val))
+                if (_cache.TryGetValue(__key, out Balance __val))
                     return __val;
 
                 var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }

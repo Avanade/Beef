@@ -6,10 +6,7 @@ using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Beef.Demo.Test
 {
@@ -24,7 +21,7 @@ namespace Beef.Demo.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            AgentTester.Reset(); 
+            TestSetUp.Reset(); 
             _agentTester = AgentTester.CreateServer<Startup>();
 
             _agentTester.Test<PersonAgent, Person>()
@@ -32,7 +29,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B110_Get_NotFound()
         {
             _agentTester.Test<PersonAgent, Person>()
@@ -40,7 +37,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B120_Get_FoundAndUpdate()
         {
             var pr = _agentTester.Test<PersonAgent, Person>()
@@ -62,7 +59,7 @@ namespace Beef.Demo.Test
                 Assert.Fail($"Unexpected status code: {r.StatusCode}");
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B130_CreateAndUpdateAndDelete()
         {
             var p = new Person
@@ -108,7 +105,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.DeleteAsync(p.Id));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void B140_GetByArgs()
         {
             var args = new PersonArgs { LastName = "sm*" };
@@ -123,64 +120,64 @@ namespace Beef.Demo.Test
                 .Run(a => a.GetByArgsAsync(args, requestOptions: new WebApiRequestOptions { ETag = etag }));
         }
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void C110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void C120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void C130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void C140_GetByArgs() => B140_GetByArgs();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void D140_GetByArgs() => B140_GetByArgs();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void E110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void E120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void E130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void E140_GetByArgs() => B140_GetByArgs();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void F110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void F120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void F130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void F140_GetByArgs() => B140_GetByArgs();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void G110_Get_NotFound() => B110_Get_NotFound();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void G120_Get_FoundAndUpdate() => B120_Get_FoundAndUpdate();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void G130_CreateAndUpdateAndDelete() => B130_CreateAndUpdateAndDelete();
 
-        [Test, Parallelizable]
+        [Test, TestSetUp, Parallelizable]
         public void G140_GetByArgs() => B140_GetByArgs();
     }
 }

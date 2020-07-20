@@ -37,10 +37,6 @@
   <ItemGroup>
     <Compile Remove="AgentTesterArgs.cs" />
     <Compile Remove="EventSubscriberTester.cs" />
-    <Compile Remove="GrpcAgentTester.cs" />
-    <Compile Remove="TestEventSubscriberHost.cs" />
-    <Compile Remove="TestSetUp.cs" />
-    <Compile Remove="TestSetUpAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>

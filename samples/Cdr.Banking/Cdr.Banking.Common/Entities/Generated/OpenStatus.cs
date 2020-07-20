@@ -22,6 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Open Status entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class OpenStatus : ReferenceDataBaseGuid
     {
         #region Constants

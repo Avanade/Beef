@@ -37,7 +37,8 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="data">The <see cref="IProductData"/>.</param>
         /// <param name="cache">The <see cref="IRequestCache"/>.</param>
-        public ProductDataSvc(IProductData data, IRequestCache cache) { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ProductDataSvcCtor(); }
+        public ProductDataSvc(IProductData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ProductDataSvcCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.

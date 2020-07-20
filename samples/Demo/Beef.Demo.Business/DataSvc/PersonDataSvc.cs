@@ -12,7 +12,7 @@ namespace Beef.Demo.Business.DataSvc
 
         private async Task MarkOnAfterAsync()
         {
-            await _evtPub.PublishValueEventAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
+            await _evtPub.PublishValueAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
         }
 
         private Task<int> DataSvcCustomOnImplementationAsync()

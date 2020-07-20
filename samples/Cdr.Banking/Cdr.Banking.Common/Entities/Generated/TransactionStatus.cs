@@ -22,6 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Transaction Status entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class TransactionStatus : ReferenceDataBaseGuid
     {
         #region Operator

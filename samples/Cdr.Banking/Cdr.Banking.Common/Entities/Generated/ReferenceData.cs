@@ -15,23 +15,17 @@ namespace Cdr.Banking.Common.Entities
     /// <summary>
     /// Provides a standard mechanism for accessing the <b>ReferenceData</b>. 
     /// </summary>
-    public abstract partial class ReferenceData : IReferenceDataProvider
+    public abstract partial class ReferenceData : IReferenceData
     {
-        private static ReferenceData? _current;
-
-        ///// <summary>
-        ///// Gets the current <see cref="ReferenceData"/> instance; uses the <see cref="ReferenceDataManager.Register(IReferenceDataProvider[])">registered</see> instance from the
-        ///// <see cref="ReferenceDataManager.GetProvider(string)"/> using the defined <see cref="IReferenceDataProvider.ProviderName"/>.
-        ///// </summary>
         /// <summary>
-        /// 
+        /// Gets the current <see cref="ReferenceData"/> instance.
         /// </summary>
-        public static ReferenceData Current => _current ?? (_current = (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(ReferenceData)));
+        public static ReferenceData Current => (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(IReferenceData));
 
         /// <summary>
-        /// Gets the unique provider name.
+        /// Gets the provider interface cref="Type"/> used for <see cref="ReferenceDataManager.GetProvider(Type)"/>. The value is <see cref="IReferenceData"/>.
         /// </summary>
-        public Type ProviderType => typeof(ReferenceData);
+        public Type ProviderType => typeof(IReferenceData);
 
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.

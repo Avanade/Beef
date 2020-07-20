@@ -7,22 +7,21 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Cdr.Banking.Business.Data
+namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>
-    /// Provides the generated <b>Data</b>-layer services.
+    /// Provides the generated <b>DataSvc</b>-layer services.
     /// </summary>
-    public static class ServiceCollectionsExtension
+    public static class ReferenceDataServiceCollectionsExtension
     {
         /// <summary>
-        /// Adds the generated <b>Data</b>-layer services.
+        /// Adds the generated <b>DataSvc</b>-layer services.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
+        public static IServiceCollection AddGeneratedReferenceDataDataSvcServices(this IServiceCollection services)
         {
-            return services.AddScoped<IAccountData, AccountData>()
-                           .AddScoped<ITransactionData, TransactionData>();
+            return services.AddSingleton<IReferenceDataDataSvc, ReferenceDataDataSvc>();
         }
     }
 }

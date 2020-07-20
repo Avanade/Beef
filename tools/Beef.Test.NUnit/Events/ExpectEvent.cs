@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Beef.Test.NUnit
+namespace Beef.Test.NUnit.Events
 {
     /// <summary>
     /// Represents the expect event logic that leverages the <see cref="ExpectEventPublisher"/>.
@@ -93,12 +93,12 @@ namespace Beef.Test.NUnit
                 var eVal = exp.GetValue();
                 var aVal = act.GetValue();
 
-                var comparisonConfig = AgentTester.GetDefaultComparisonConfig();
+                var comparisonConfig = TestSetUp.GetDefaultComparisonConfig();
                 comparisonConfig.AttributesToIgnore.AddRange(new Type[] { typeof(ReferenceDataInterfaceAttribute) });
 
                 var type = eVal?.GetType() ?? aVal?.GetType();
                 if (type != null)
-                    AgentTester.InferAdditionalMembersToIgnore(comparisonConfig, type);
+                    TestSetUp.InferAdditionalMembersToIgnore(comparisonConfig, type);
 
                 var cl = new CompareLogic(comparisonConfig);
                 var cr = cl.Compare(eVal, aVal);
@@ -132,7 +132,7 @@ namespace Beef.Test.NUnit
         public ExpectedEvent(EventData eventData) => EventData = eventData ?? throw new ArgumentNullException(nameof(eventData));
 
         /// <summary>
-        /// Gets or sets the <see cref="Events.EventData"/>.
+        /// Gets or sets the <see cref="Beef.Events.EventData"/>.
         /// </summary>
         public EventData EventData { get; }
 

@@ -3,6 +3,7 @@
 using Beef.Caching.Policy;
 using Beef.Events;
 using Beef.RefData;
+using Beef.Test.NUnit.Events;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -23,12 +24,16 @@ namespace Beef.Test.NUnit.Tests
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTesterBase"/> class.
         /// </summary>
-        protected AgentTesterBase()
+        /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
+        protected AgentTesterBase(bool configureLocalRefData = true)
         {
             _serviceCollection.AddSingleton(_ => new CachePolicyManager());
             _serviceCollection.AddTransient(_ => GetHttpClient());
             _serviceCollection.AddTransient(_ => GetBeforeRequest());
             _serviceCollection.AddTransient<IWebApiAgentArgs, WebApiAgentArgs>();
+
+            if (configureLocalRefData)
+                TestSetUp.ConfigureDefaultLocalReferenceData(_serviceCollection);
         }
 
         /// <summary>
@@ -68,27 +73,37 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Prepares the <see cref="ExecutionContext"/> and ensures that the <see cref="LocalServiceProvider"/> scope is correctly configured.
+        /// Prepares the <see cref="ExecutionContext"/> using the <see cref="TestSetUpAttribute"/> configuration, whilst also ensuring that the <see cref="LocalServiceProvider"/> scope is correctly configured.
         /// </summary>
-        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="AgentTester.DefaultUsername"/>).</param>
-        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="AgentTester.CreateExecutionContext"/> function).</param>
-        /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
-        public void Prepare(string? username = null, object? args = null)
+        public void PrepareExecutionContext()
         {
-            AgentTester.InvokeRegisteredSetUp();
-
             ExecutionContext.Reset(false);
-            var ec = AgentTester.CreateExecutionContext(username ?? AgentTester.DefaultUsername, args);
+            var ec = TestSetUp.CreateExecutionContext(TestSetUpAttribute.Username, TestSetUpAttribute.Args);
             ec.ServiceProvider = LocalServiceProvider;
             ExecutionContext.SetCurrent(ec);
         }
 
         /// <summary>
-        /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending (overrides the <see cref="AgentTester.SetBeforeRequest(Action{HttpRequestMessage})"/>).
+        /// Prepares the <see cref="ExecutionContext"/> using the specified <paramref name="username"/>, whilst also ensuring that the <see cref="LocalServiceProvider"/> scope is correctly configured.
+        /// </summary>
+        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUsername"/>).</param>
+        /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="TestSetUp.CreateExecutionContext"/> function).</param>
+        /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
+        /// <remarks>The <see cref="ExecutionContext"/> must be created by the <see cref="AgentTesterBase"/> as the <see cref="ExecutionContext.ServiceProvider"/> must be set to <see cref="LocalServiceProvider"/>.</remarks>
+        public void PrepareExecutionContext(string? username, object? args = null)
+        {
+            ExecutionContext.Reset(false);
+            var ec = TestSetUp.CreateExecutionContext(username ?? TestSetUp.DefaultUsername, args);
+            ec.ServiceProvider = LocalServiceProvider;
+            ExecutionContext.SetCurrent(ec);
+        }
+
+        /// <summary>
+        /// Registers the <see cref="Action{HttpRequestMessage}"/> to perform any additional processing of the request before sending (overrides the <see cref="AgentTester.RegisterBeforeRequest(Action{HttpRequestMessage})"/>).
         /// </summary>
         /// <param name="beforeRequest">The before request action.</param>
         /// <returns>This instance to support fluent-style method-chaining.</returns>
-        public void SetBeforeRequest(Action<HttpRequestMessage> beforeRequest)
+        public void RegisterBeforeRequest(Action<HttpRequestMessage> beforeRequest)
         {
             _beforeRequest = beforeRequest;
             _beforeRequestOverridden = true;

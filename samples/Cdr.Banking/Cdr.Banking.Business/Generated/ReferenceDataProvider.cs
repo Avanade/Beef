@@ -22,6 +22,14 @@ namespace Cdr.Banking.Business
     /// </summary>
     public class ReferenceDataProvider : RefDataNamespace.ReferenceData
     {
+        private readonly IReferenceDataDataSvc _dataService;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
+        public ReferenceDataProvider(IReferenceDataDataSvc dataService) => _dataService = Check.NotNull(dataService, nameof(dataService));
+    
         #region Collections
 
         /// <summary> 
@@ -61,7 +69,7 @@ namespace Cdr.Banking.Business
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public override IReferenceDataCollection this[Type type] => ReferenceDataDataSvc.GetCollection(type);
+        public override IReferenceDataCollection this[Type type] => _dataService.GetCollection(type);
         
         /// <summary>
         /// Prefetches all, or the list of <see cref="ReferenceDataBase"/> objects, where not already cached or expired.

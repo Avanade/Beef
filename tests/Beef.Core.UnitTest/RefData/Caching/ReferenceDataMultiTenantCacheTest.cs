@@ -75,14 +75,14 @@ namespace Beef.Core.UnitTest.RefData.Caching
         [Test]
         public void Exercise()
         {
-            CachePolicyManager.Reset();
-            ExecutionContext.Reset(false);
+            var sp = UnitTest.Caching.Policy.CachePolicyManagerTest.TestSetUp();
 
             int i = 0;
             var rdc = new ReferenceDataMultiTenantCache<TestRdCollection, TestRd>(() => { i++; return GetData(); });
 
             // Set an execution context.
-            ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1) });
+            ExecutionContext.Reset(false);
+            ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp });
 
             // Nothing loaded.
             Assert.AreEqual(0, i);
@@ -107,7 +107,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
 
             // Change the execution context.
             ExecutionContext.Reset(false);
-            ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2) });
+            ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp });
 
             // Now load new tenant.
             c = rdc.GetCollection();
@@ -135,40 +135,41 @@ namespace Beef.Core.UnitTest.RefData.Caching
         [Test]
         public void Concurrency()
         {
-            CachePolicyManager.Reset();
-            ExecutionContext.Reset(false);
+            var sp = UnitTest.Caching.Policy.CachePolicyManagerTest.TestSetUp();
 
             int i = 0;
             var rdc = new ReferenceDataMultiTenantCache<TestRdCollection, TestRd>(() => { i++; return GetData(); });
 
+            ExecutionContext.Reset(false);
+
             // Set an execution context.
             var tasks = new Task[10];
-            tasks[0] = Task.Run(() => Timer(0, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[1] = Task.Run(() => Timer(1, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[2] = Task.Run(() => Timer(2, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[3] = Task.Run(() => Timer(3, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[4] = Task.Run(() => Timer(4, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[5] = Task.Run(() => Timer(5, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[6] = Task.Run(() => Timer(6, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[7] = Task.Run(() => Timer(7, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[8] = Task.Run(() => Timer(8, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[9] = Task.Run(() => Timer(9, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[0] = Task.Run(() => Timer(0, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[1] = Task.Run(() => Timer(1, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[2] = Task.Run(() => Timer(2, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[3] = Task.Run(() => Timer(3, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[4] = Task.Run(() => Timer(4, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[5] = Task.Run(() => Timer(5, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[6] = Task.Run(() => Timer(6, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[7] = Task.Run(() => Timer(7, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[8] = Task.Run(() => Timer(8, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[9] = Task.Run(() => Timer(9, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
 
             Task.WaitAll(tasks);
 
             TestContext.WriteLine("ROUND TWO");
 
             tasks = new Task[10];
-            tasks[0] = Task.Run(() => Timer(0, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[1] = Task.Run(() => Timer(1, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[2] = Task.Run(() => Timer(2, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[3] = Task.Run(() => Timer(3, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[4] = Task.Run(() => Timer(4, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[5] = Task.Run(() => Timer(5, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[6] = Task.Run(() => Timer(6, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[7] = Task.Run(() => Timer(7, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[8] = Task.Run(() => Timer(8, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
-            tasks[9] = Task.Run(() => Timer(9, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09) }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[0] = Task.Run(() => Timer(0, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[1] = Task.Run(() => Timer(1, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[2] = Task.Run(() => Timer(2, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[3] = Task.Run(() => Timer(3, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[4] = Task.Run(() => Timer(4, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[5] = Task.Run(() => Timer(5, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[6] = Task.Run(() => Timer(6, GetGuid(1), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[7] = Task.Run(() => Timer(7, GetGuid(2), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[8] = Task.Run(() => Timer(8, GetGuid(08), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(08), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
+            tasks[9] = Task.Run(() => Timer(9, GetGuid(09), () => { ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(09), ServiceProvider = sp }); Assert.IsTrue(rdc.GetCollection().ActiveList.Count > 0); }));
 
             Task.WaitAll(tasks);
         }

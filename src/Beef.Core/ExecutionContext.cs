@@ -2,6 +2,8 @@
 
 using Beef.Diagnostics;
 using Beef.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,7 +26,7 @@ namespace Beef
         private static Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
 
         private IServiceProvider? _serviceProvider;
-        private Guid? _userId;
+        private string? _userId;
         private string? _username;
         private Guid? _tenantId;
         private string? _partitionKey;
@@ -36,7 +38,8 @@ namespace Beef
         private KeyOnlyDictionary<string>? _roles;
         private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
         private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
-        private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
+        //TODO: private readonly Lazy<ILogger> _logger = new Lazy<ILogger>(true);
+        // replace old logger with ILogger enablement.
 
         /// <summary>
         /// Gets the standard message for when changing an immutable value.
@@ -200,9 +203,9 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the user identifier. This value is immutable.
+        /// Gets or sets the unique user identifier. This value is immutable.
         /// </summary>
-        public Guid? UserId
+        public string? UserId
         {
             get => _userId;
 
@@ -350,90 +353,6 @@ namespace Beef
         /// </summary>
         public bool IsRefDataTextSerializationEnabled { get; set; }
 
-        #region Cache
-
-        /// <summary>
-        /// Gets the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to get.</param>
-        /// <param name="value">The cached value where found; otherwise, the default value for the <see cref="Type"/>.</param>
-        /// <returns><c>true</c> where found; otherwise, <c>false</c>.</returns>
-        public bool TryGetCacheValue<T>(UniqueKey key, out T value)
-        {
-            if (_caching.IsValueCreated && _caching.Value.TryGetValue(new Tuple<Type, UniqueKey>(typeof(T), key), out object val))
-            {
-                value = (T)val;
-                return true;
-            }
-
-            value = default!;
-            return false;
-        }
-
-        /// <summary>
-        /// Sets (adds or overrides) the cache value for the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to set.</param>
-        /// <param name="value">The value to set.</param>
-        public void CacheSet<T>(UniqueKey key, T value)
-        {
-            _caching.Value.AddOrUpdate(new Tuple<Type, UniqueKey>(typeof(T), key), value!, (x, y) => value!);
-        }
-
-        /// <summary>
-        /// Gets the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to get.</param>
-        /// <returns>The cached value where found; otherwise, the default value for the <see cref="Type"/>.</returns>
-        public T CacheGet<T>(UniqueKey key)
-        {
-            TryGetCacheValue(key, out T val);
-            return val;
-        }
-
-        /// <summary>
-        /// Removes the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to remove.</param>
-        /// <returns><c>true</c> where found and removed; otherwise, <c>false</c>.</returns>
-        public bool CacheRemove<T>(UniqueKey key)
-        {
-            if (_caching.IsValueCreated)
-                return _caching.Value.TryRemove(new Tuple<Type, UniqueKey>(typeof(T), key), out object _);
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Clears the cache for the specified <see cref="Type"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        public void CacheClear<T>()
-        {
-            if (!_caching.IsValueCreated)
-                return;
-
-            foreach (var item in _caching.Value.Where(x => x.Key.Item1 == typeof(T)).ToList())
-            {
-                _caching.Value.TryRemove(item.Key, out object val);
-            }
-        }
-
-        /// <summary>
-        /// Clears the cache for all <see cref="Type">types</see>.
-        /// </summary>
-        public void CacheClearAll()
-        {
-            if (_caching.IsValueCreated)
-                _caching.Value.Clear();
-        }
-
-        #endregion
-
         #region Security
 
         /// <summary>
@@ -553,6 +472,27 @@ namespace Beef
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Extensions methods for <see cref="ExecutionContext"/>.
+    /// </summary>
+    public static class ExecutionContextExtensions
+    {
+        /// <summary>
+        /// Adds a scoped service to instantiate a new <see cref="ExecutionContext"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
+        /// <returns>The <see cref="IServiceCollection"/>.</returns>
+        public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<ExecutionContext>? createExecutionContext = null)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.AddScoped(_ => createExecutionContext?.Invoke() ?? new ExecutionContext());
+            return services;
+        }
     }
 
     /// <summary>

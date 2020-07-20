@@ -51,7 +51,7 @@ namespace Cdr.Banking.Business.Data
         {
             // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
             var args = _accountMapper.CreateArgs("Account");
-            var val = (from a in CosmosDb.Default.Container(args).AsQueryable()
+            var val = (from a in _cosmos.Container(args).AsQueryable()
                         where a.Id == accountId
                         select new { a.Id, a.Balance }).SelectSingleOrDefault();
 
