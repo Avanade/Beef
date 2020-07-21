@@ -475,27 +475,6 @@ namespace Beef
     }
 
     /// <summary>
-    /// Extensions methods for <see cref="ExecutionContext"/>.
-    /// </summary>
-    public static class ExecutionContextExtensions
-    {
-        /// <summary>
-        /// Adds a scoped service to instantiate a new <see cref="ExecutionContext"/> instance.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
-        /// <returns>The <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<ExecutionContext>? createExecutionContext = null)
-        {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            services.AddScoped(_ => createExecutionContext?.Invoke() ?? new ExecutionContext());
-            return services;
-        }
-    }
-
-    /// <summary>
     /// Enables access to the <see cref="Originating"/> <see cref="ExecutionContext"/> and the ability to <see cref="SetExecutionContext"/> using a copy within the new executing thread context.
     /// </summary>
     public sealed class ExecutionContextFlow

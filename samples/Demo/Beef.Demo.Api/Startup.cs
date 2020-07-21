@@ -75,8 +75,10 @@ namespace Beef.Demo.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add the execution context.
-            services.AddBeefExecutionContext();
+            // Add the core beef services.
+            services.AddBeefExecutionContext()
+                    .AddBeefRequestCache()
+                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = _config.GetSection("CosmosDb");
@@ -98,29 +100,11 @@ namespace Beef.Demo.Api
                     .AddGeneratedDataServices();
 
             // Add event publishing.
-            services.AddSingleton<IEventPublisher>(_ =>
-            {
-                if (_config.GetValue<bool>("EventHubPublishing"))
-                {
-                    var ehc = EventHubClient.CreateFromConnectionString(_config.GetValue<string>("EventHubConnectionString"));
-                    ehc.RetryPolicy = RetryPolicy.Default;
-                    return new EventHubPublisher(ehc);
-                }
-                else
-                    return new NullEventPublisher();
-            });
-
-            // Add beef request cache service.
-            services.AddScoped<IRequestCache, RequestCache>();
-
-            // Cache policy management.
-            services.AddSingleton(_ =>
-            {
-                var cpm = new CachePolicyManager();
-                cpm.SetFromCachePolicyConfig(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-                cpm.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-                return cpm;
-            });
+            var ehcs = _config.GetValue<string>("EventHubConnectionString");
+            if (!string.IsNullOrEmpty(ehcs))
+                services.AddBeefEventHubEventPublisher(ehcs);
+            else
+                services.AddBeefNullEventPublisher();
 
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();

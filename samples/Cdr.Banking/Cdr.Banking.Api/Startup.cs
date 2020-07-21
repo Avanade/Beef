@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
-using System.Net.Http;
 using System.Reflection;
 using Cosmos = Microsoft.Azure.Cosmos;
 
@@ -47,9 +46,6 @@ namespace Cdr.Banking.Api
 
             // Configure the logger.
             _logger = loggerFactory.CreateLogger("Logging");
-
-            //// Register the "customised" execution context.
-            //Beef.ExecutionContext.Register(() => new ExecutionContext());
         }
 
         /// <summary>

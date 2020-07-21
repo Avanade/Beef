@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Subscribe
@@ -11,16 +10,6 @@ namespace Beef.Events.Subscribe
     /// </summary>
     public interface IEventSubscriber
     {
-        /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> template for the event required (can contain wildcard).
-        /// </summary>
-        string SubjectTemplate { get; }
-
-        /// <summary>
-        /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
-        /// </summary>
-        List<string> Actions { get; }
-
         /// <summary>
         /// Gets the <see cref="RunAsUser"/> option.
         /// </summary>

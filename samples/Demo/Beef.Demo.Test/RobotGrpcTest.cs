@@ -21,7 +21,7 @@ namespace Beef.Demo.Test
         public async Task OneTimeSetUp()
         {
             TestSetUp.Reset(false);
-            _agentTester = AgentTester.CreateServer<Startup>().PrepareExecutionContext();
+            _agentTester = AgentTester.CreateServer<Startup>("Beef");
             await _robotTest.CosmosOneTimeSetUp();
         }
 

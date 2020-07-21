@@ -22,7 +22,7 @@ namespace Beef.Demo.Test
         public void OneTimeSetUp()
         {
             TestSetUp.Reset(); 
-            _agentTester = AgentTester.CreateServer<Startup>();
+            _agentTester = AgentTester.CreateServer<Startup>("Beef");
 
             _agentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)

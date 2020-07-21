@@ -2,8 +2,6 @@
 
 using EventHubs = Microsoft.Azure.EventHubs;
 using System.Threading.Tasks;
-using System.Reflection;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace Beef.Events.Subscribe
@@ -13,28 +11,17 @@ namespace Beef.Events.Subscribe
     /// </summary>
     public class EventHubSubscriberHost : EventSubscriberHost
     {
-        private Func<IEventSubscriber, EventData, ExecutionContext>? _createFunc;
+        private Action<ExecutionContext, IEventSubscriber, EventData>? _updateExecutionContext;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="EventHubSubscriberHost"/> using the specified <paramref name="args"/>.
-        /// </summary>
-        /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        /// <returns>The <see cref="EventHubSubscriberHost"/>.</returns>
-        public static EventHubSubscriberHost Create(EventSubscriberHostArgs args) => new EventHubSubscriberHost(Check.NotNull(args, nameof(args)));
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="EventHubSubscriberHost"/> using the specified <paramref name="logger"/>.
-        /// </summary>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        /// <returns>The <see cref="EventHubSubscriberHost"/>.</returns>
-        public static EventHubSubscriberHost Create(ILogger logger) => new EventHubSubscriberHost(new EventSubscriberHostArgs(logger, Assembly.GetCallingAssembly()));
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventHubSubscriberHost"/>.
+        /// Initializes a new instance of the <see cref="EventHubSubscriberHost"/> with the specified <see cref="EventSubscriberHostArgs"/>.
         /// </summary>
         /// <param name="args">The optional <see cref="EventHubSubscriberHost"/>.</param>
-        private EventHubSubscriberHost(EventSubscriberHostArgs args) : base(args) 
+        public EventHubSubscriberHost(EventSubscriberHostArgs args) : base(args) 
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             if (args.AuditWriter == null)
                 args.AuditWriter = (result) => throw new EventSubscriberStopException(result);
         }
@@ -84,28 +71,29 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
-        /// Provides a means to override the creation of the <see cref="Beef.ExecutionContext"/>.
+        /// Provides a means to override the update of the <see cref="Beef.ExecutionContext"/>.
         /// </summary>
-        /// <param name="createFunc">The function to create the <see cref="Beef.ExecutionContext"/>.</param>
+        /// <param name="updateExecutionContext">The action to update the <see cref="Beef.ExecutionContext"/>.</param>
         /// <returns>The <see cref="EventHubSubscriberHost"/> instance to support fluent-style method chaining.</returns>
-        public EventHubSubscriberHost ExecutionContext(Func<IEventSubscriber, EventData, ExecutionContext> createFunc)
+        public EventHubSubscriberHost ExecutionContext(Action<ExecutionContext, IEventSubscriber, EventData> updateExecutionContext)
         {
-            _createFunc = createFunc;
+            _updateExecutionContext = updateExecutionContext;
             return this;
         }
 
         /// <summary>
-        /// Overrides the <see cref="EventSubscriberHost.CreateExecutionContext(IEventSubscriber, EventData)"/>.
+        /// Overrides the <see cref="EventSubscriberHost.UpdateExecutionContext(ExecutionContext, IEventSubscriber, EventData)"/>.
         /// </summary>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/> to update.</param>
         /// <param name="subscriber">The <see cref="IEventSubscriber"/> that will process the message.</param>
         /// <param name="event">The <see cref="EventData"/>.</param>
         /// <returns>The <see cref="ExecutionContext"/>.</returns>
-        protected override ExecutionContext CreateExecutionContext(IEventSubscriber subscriber, EventData @event)
+        protected override void UpdateExecutionContext(ExecutionContext executionContext, IEventSubscriber subscriber, EventData @event)
         {
-            if (_createFunc == null)
-                return base.CreateExecutionContext(subscriber, @event);
-
-            return _createFunc(subscriber, @event);
+            if (_updateExecutionContext == null)
+                base.UpdateExecutionContext(executionContext, subscriber, @event);
+            else
+                _updateExecutionContext(executionContext, subscriber, @event);
         }
 
         /// <summary>

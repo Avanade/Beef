@@ -14,7 +14,7 @@ namespace Beef.Demo.Test
         private AgentTesterServer<Startup> _agentTester;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp() { TestSetUp.ResetNoSetup(); _agentTester = AgentTester.CreateServer<Startup>(); }
+        public void OneTimeSetUp() { TestSetUp.ResetNoSetup(); _agentTester = AgentTester.CreateServer<Startup>("Beef"); }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() => _agentTester.Dispose();

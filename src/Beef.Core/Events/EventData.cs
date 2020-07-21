@@ -104,6 +104,7 @@ namespace Beef.Events
                 Timestamp = ExecutionContext.Current.Timestamp;
                 Username = ExecutionContext.Current.Username;
                 UserId = ExecutionContext.Current.UserId;
+                CorrelationId = ExecutionContext.Current.CorrelationId;
             }
             else
                 Timestamp = Cleaner.Clean(DateTime.Now);
@@ -142,7 +143,7 @@ namespace Beef.Events
         /// <summary>
         /// Gets or sets the unique user identifier that initiated the event.
         /// </summary>
-        [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("userid", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? UserId { get; set; }
 
         /// <summary>
@@ -150,6 +151,12 @@ namespace Beef.Events
         /// </summary>
         [JsonProperty("timestamp", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime? Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the correlation identifier.
+        /// </summary>
+        [JsonProperty("correlationId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string? CorrelationId { get; set; }
 
         /// <summary>
         /// Gets or sets the entity tag.

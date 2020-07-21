@@ -180,8 +180,8 @@ namespace Beef.Caching.Policy
         /// <summary>
         /// Starts the timer to manage the frequency in which expired caches will be flushed (see <see cref="CacheCoreBase.OnFlushCache"/>).
         /// </summary>
-        /// <param name="dueTime">The amount of time to delay before <see cref="Flush"/> is invoked.</param>
-        /// <param name="period">The time interval between invocations of <see cref="Flush"/>.</param>
+        /// <param name="dueTime">The amount of time to delay before <see cref="Flush"/> is invoked for the first time.</param>
+        /// <param name="period">The time interval between subsequent invocations of <see cref="Flush"/>.</param>
         /// <remarks>This can be called multiple times to change the timer values as required.</remarks>
         public void StartFlushTimer(TimeSpan dueTime, TimeSpan period)
         {
