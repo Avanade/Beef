@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.6
 - *Enhancement:* Updated the `WebJobsBuilderExtensions.GetConfiguration` to probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration), 2) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (using specified prefix), 4) `appsettings.{environment}.json`, 5) `appsettings.json`, 6) `webjobs.{environment}.json` (embedded resource), and 7) `webjobs.json` (embedded resource).
 

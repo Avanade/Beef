@@ -47,7 +47,7 @@ namespace Beef.Data.Database
 
                 default:
                     if (AlwaysCheckSqlDuplicateErrorNumbers && SqlDuplicateErrorNumbers.Contains(sex.Number))
-                       throw new DuplicateException(null, sex);
+                        throw new DuplicateException(null, sex);
 
                     break;
             }
@@ -70,7 +70,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors 
         /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
-        public static List<int> SqlTransientErrorNumbers { get; } = new List<int>(new int[] 
+        public static List<int> SqlTransientErrorNumbers { get; } = new List<int>(new int[]
         {
             -1, -2, 701, 1204, 1205, 1222, 8645, 8651, 30053, // https://stackoverflow.com/questions/4821668/what-is-good-c-sharp-coding-style-for-catching-sqlexception-and-retrying
             10928, 10929, 10053, 10054, 10060, 40540, 40143, 233, 64, // https://github.com/Azure/elastic-db-tools/blob/master/Src/ElasticScale.Client/ElasticScale.Common/TransientFaultHandling/Implementation/SqlDatabaseTransientErrorDetectionStrategy.cs
@@ -83,10 +83,12 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider (e.g. Microsoft.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        protected DatabaseBase(string connectionString, DbProviderFactory? provider = null)
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="DatabaseInvoker"/>.</param>
+        protected DatabaseBase(string connectionString, DbProviderFactory? provider = null, DatabaseInvoker? invoker = null)
         {
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
+            Invoker = invoker ?? DatabaseInvoker.Default;
 
             DataContextScope.RegisterContext(_identifier, () =>
             {
@@ -106,6 +108,11 @@ namespace Beef.Data.Database
         /// Gets the <see cref="DbProviderFactory"/>.
         /// </summary>
         public DbProviderFactory Provider { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseInvoker"/>.
+        /// </summary>
+        public DatabaseInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DatabaseWildcard"/> to enable wildcard replacement.

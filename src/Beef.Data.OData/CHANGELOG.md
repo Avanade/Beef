@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.x
 - *Enhancement:* Added `IOData` to support the likes of dependency injection.
 

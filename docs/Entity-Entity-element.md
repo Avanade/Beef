@@ -102,6 +102,8 @@ Attribute | Description
 -|-
 **`AutoImplement`** | Indicates that the implementation for the underlying [`Operations`](Entity-Operation-element.md) can be auto-implemented using the selected data source; options are `Database`, `EntityFramework`, `Cosmos` or `OData`. When selected some of the folllowing related attributes are also required (as documented). Additionally, the `AutoImplement` indicator must be selected for each **`Operation`** that is to be auto-implemented.
 `MapperAddStandardProperties` | Indicates that the AddStandardProperties method call is to be included for the `Mapper`. Defaults to `true`.
+`DataConstructor` | Specifies the access modifier for the generated constructor; options are `Public`, `Private` or `Protected`. Defaults to `Public`.
+`DataExtensions` | Indicates whether the extensions logic should be generated. Defaults to `false`.
 
 The following represents the corresponding **database** attributes:
 
@@ -153,6 +155,20 @@ Attribute | Description
 ---|---
 `DataSvcCaching` | Indicates whether ExecutionContext-based (request) caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness).
 `EventPublish` | Indicates whether to add logic to publish an event on the successful completion of the DataSvc layer invocation for a Create, Update or Delete. Uses `Config` value (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
+`DataSvcConstructor` | Specifies the access modifier for the generated constructor; options are `Public`, `Private` or `Protected`. Defaults to `Public`.
+`DataSvcExtensions` | Indicates whether the extensions logic should be generated. Defaults to `false`.
+
+</br>
+
+### Manager attributes
+
+The following represents the corresponding **Manager** attributes:
+
+Attribute | Description
+---|---
+
+`ManagerConstructor` | Specifies the access modifier for the generated constructor; options are `Public`, `Private` or `Protected`. Defaults to `Public`.
+`ManagerExtensions` | Indicates whether the extensions logic should be generated. Defaults to `false`.
 
 <br>
 
@@ -164,6 +180,7 @@ Attribute | Description
 ---|---
 **`WebApiRoutePrefix`** | Specifies the `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) URI for the entity and is extended when defining the underlying [`Operations`](Entity-Operation-element.md).
 **`WebApiAuthorize`** | Indicates whether the Web API controller should use the `Authorize` or `AllowAnonynous`. Uses `Config` value (inherits) where not specified; can be overridden at the [`Operation`](Entity-Operation-element.md) level also.
+`ControllerConstructor` | Specifies the access modifier for the generated constructor; options are `Public`, `Private` or `Protected`. Defaults to `Public`.
 
 The following represents the attributes for controlling (selecting) which specific code **artefacts** are to be generated; where none are specified all artefacts are implied:
 

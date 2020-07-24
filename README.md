@@ -202,8 +202,9 @@ The following are references to additional documentation (these are all accessib
   - [OrderBy element](./docs/Table-OrderBy-element.md)
   - [Execute element](./docs/Table-Execute-element.md)
 
-### Major versions
+### Major/significant versions
 
+- [v4.0](./docs/Dependency-injection-v4-0.md)
 - [v3.1](./docs/Upgrade-dotnet-core-v3-1.md)
 
 <br/>

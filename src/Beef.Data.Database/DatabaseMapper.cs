@@ -104,18 +104,6 @@ namespace Beef.Data.Database
     public class DatabaseMapper<TSrce> : EntitySrceMapper<TSrce>, IDatabaseMapper<TSrce> where TSrce : class, new()
     {
         /// <summary>
-        /// Creates an <see cref="DatabaseMapper{TSrce}"/> where properties are added manually.
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Please use DatabaseMapper.Create<TSrce>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static DatabaseMapper<TSrce> Create()
-#pragma warning restore CA1000
-        {
-            return new DatabaseMapper<TSrce>();
-        }
-
-        /// <summary>
         /// Adds a <see cref="DatabasePropertyMapper{TSrce, TSrceProperty}"/> to the mapper.
         /// </summary>
         /// <typeparam name="TSrceProperty">The source property <see cref="Type"/>.</typeparam>

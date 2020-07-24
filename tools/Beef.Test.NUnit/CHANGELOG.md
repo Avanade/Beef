@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.9
 - *Fixed:* The `EventSubscriberTester` was not outputting all messages to `Out`; was using `Progress` which generated confusing log output.
 - *Enhancement* Deprecated/obsoleted `AgentTester.StartupTestServer` and replaced with `AgentTester.TestServerStart` to align the configuration probing with `Beef.AspNetCore.WepApi.WebApiStartup.ConfigurationBuilder` for greater consistency.

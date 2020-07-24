@@ -1167,7 +1167,7 @@
             </xs:attribute>
             <xs:attribute name="DataSvcConstructor" use="optional">
               <xs:annotation>
-                <xs:documentation>Defines the access modifier for the generated for the Manager constructor. Default to 'Public'.</xs:documentation>
+                <xs:documentation>Defines the access modifier for the generated for the DataSvc constructor. Default to 'Public'.</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">
@@ -1179,7 +1179,7 @@
             </xs:attribute>
             <xs:attribute name="DataConstructor" use="optional">
               <xs:annotation>
-                <xs:documentation>Defines the access modifier for the generated for the Manager constructor. Default to 'Public'.</xs:documentation>
+                <xs:documentation>Defines the access modifier for the generated for the Data constructor. Default to 'Public'.</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">

@@ -68,18 +68,6 @@ namespace Beef.Validation
         private Action<ValidationContext<TEntity>>? _additional;
 
         /// <summary>
-        /// Creates an <see cref="Validator{TEntity}"/>.
-        /// </summary>
-        /// <returns>A <see cref="Validator{TEntity}"/>.</returns>
-        [Obsolete("Please use Validator.Create<TEntity>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static Validator<TEntity> Create()
-#pragma warning restore CA1000
-        {
-            return new Validator<TEntity>();
-        }
-
-        /// <summary>
         /// Validate the entity value with specified <see cref="ValidationArgs"/>.
         /// </summary>
         /// <param name="value">The entity value.</param>

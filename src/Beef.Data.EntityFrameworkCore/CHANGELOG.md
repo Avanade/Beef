@@ -2,8 +2,8 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.x
-- *Enhancement:* Added `IEfDb` and `IEfDbQuery` to support the likes of dependency injection.
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
 
 ## v3.1.4
 - *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)`.

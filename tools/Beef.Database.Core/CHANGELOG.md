@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.9
 - *Enhancement:* Added `useBeefDbo` option to the `DatabaseExecutor.RunAsync` to include the standard _Beef_ `dbo` schema objects. Avoids having to specify the `Beef.Database.Core` assembly.
 - *Fix:* Threading issue with the Insert or Merge of Yaml data process that has been resolved. Also updated to return the number of rows affected and output to the log.

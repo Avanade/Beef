@@ -389,7 +389,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 
         <Switch Value="Entity.DataConstructor">
           <Case Value="'Private'"><![CDATA[private]]></Case>
-          <Case Value="'Protected'"><![CDATA[protected]]></Case>
           <Default><![CDATA[public]]></Default>
         </Switch>
         <![CDATA[ {{Entity.Name}}Data(]]>

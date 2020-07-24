@@ -2,8 +2,8 @@
 
 Represents the **NuGet** versions.
 
-## v3.1.x
-- *Enhancement:* Added `IDatabase` to support the likes of dependency injection.
+## v4.0.1
+- *Enhancement:* Introduction of Dependency Injection support.
 
 ## v3.1.6
 - *Enhancement:* `DatabaseBase.DefaultDateTimeKind` replaced with (_breaking change_) `DatabaseBase.DateTimeTransform`, and defaults to `UseDefault`.
