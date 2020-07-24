@@ -81,7 +81,7 @@ namespace Beef.Events.Subscribe
         private EventSubscriberHostArgs(IServiceProvider serviceProvider, params Type[] eventSubscriberTypes)
         {
             ServiceProvider = Check.NotNull(serviceProvider, nameof(serviceProvider));
-            if (eventSubscriberTypes.Length == 0)
+            if (eventSubscriberTypes == null || eventSubscriberTypes.Length == 0)
                 throw new ArgumentException($"At least one event {nameof(IEventSubscriber)} must be specified to enable execution.", nameof(eventSubscriberTypes));
 
             _subscribers = new List<EventSubscriberConfig>();
@@ -108,7 +108,7 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Gets the <see cref="ILogger"/>.
         /// </summary>
-        public ILogger Logger => _logger ??= ServiceProvider.GetService<ILogger>();
+        public ILogger Logger => _logger ??= ServiceProvider.GetService<ILogger<EventSubscriberHost>>();
 
         /// <summary>
         /// Gets or sets the audit writer. This is invoked where the <see cref="Result"/> has a corresponding <see cref="ResultHandling"/> of <see cref="ResultHandling.ContinueWithAudit"/>.
@@ -121,7 +121,7 @@ namespace Beef.Events.Subscribe
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
         public EventSubscriberHostArgs UseLoggerForAuditing()
         {
-            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. Status: {result}'");
+            AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. {result}'");
             return this;
         }
 

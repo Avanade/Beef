@@ -109,7 +109,7 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Creates a <typeparamref name="TAgent"/> instance using the <see cref="AgentTesterBase.LocalServiceProvider"/> where found; otherwise, will instantiate directly.
+        /// Creates a <typeparamref name="TAgent"/> instance using the <see cref="TesterBase.LocalServiceProvider"/> where found; otherwise, will instantiate directly.
         /// </summary>
         /// <param name="args">The optional <see cref="IWebApiAgentArgs"/>; will default to <see cref="AgentTestCore{TStartup}.CreateAgentArgs"/>.</param>
         /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>

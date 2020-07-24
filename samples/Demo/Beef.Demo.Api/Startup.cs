@@ -1,5 +1,4 @@
 ﻿using Beef.AspNetCore.WebApi;
-using Beef.Caching;
 using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
@@ -7,18 +6,14 @@ using Beef.Demo.Business.DataSvc;
 using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Events;
-using Beef.Events.Publish;
 using Beef.Validation;
-using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Azure.EventHubs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
-using System.Net.Http;
 using System.Reflection;
 using Cosmos = Microsoft.Azure.Cosmos;
 
@@ -126,7 +121,7 @@ namespace Beef.Demo.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             var x = serviceProvider.GetService<Data.EntityFrameworkCore.IEfDb>();
 

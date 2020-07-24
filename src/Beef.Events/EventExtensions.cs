@@ -27,7 +27,7 @@ namespace Beef.Events
         /// </summary>
         /// <param name="builder">The <see cref="IFunctionsHostBuilder"/>.</param>
         /// <returns>The <see cref="IFunctionsHostBuilder"/>.</returns>
-        public static IWebJobsBuilder AddResilientEventHubs(this IWebJobsBuilder builder)
+        public static IWebJobsBuilder AddBeefResilientEventHubs(this IWebJobsBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
@@ -104,25 +104,44 @@ namespace Beef.Events
         /// <param name="builder">The <see cref="IFunctionsHostBuilder"/>.</param>
         /// <param name="embeddedFilePrefix">The embedded resource name prefix (defaults to "funcsettings").</param>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">Used where the <c>AZURE_FUNCTIONS_ENVIRONMENT</c> cannot be inferred.</param>
         /// <param name="configurationBuilder">Action to enable further configuration sources to be added.</param>
         /// <returns>The <see cref="IConfiguration"/> instance.</returns>
-        public static IConfiguration GetConfiguration<TStartup>(this IFunctionsHostBuilder builder, string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", Action<ConfigurationBuilder>? configurationBuilder = null)
+        public static IConfiguration GetBeefConfiguration<TStartup>(this IFunctionsHostBuilder builder, string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string? environment = "Development", Action<ConfigurationBuilder>? configurationBuilder = null)
+            where TStartup : class
+            => GetBeefConfiguration<TStartup>((builder ?? throw new ArgumentNullException(nameof(builder))).Services, environmentVariablePrefix, embeddedFilePrefix, environment, configurationBuilder);
+
+        /// <summary>
+        /// Gets (and builds on first access) the <see cref="IConfiguration"/>. 
+        /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
+        /// 2) User Secrets where hosting environment is development (see https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets), 3) environment variable (see <paramref name="environmentVariablePrefix"/>),
+        /// 4) local.settings.json, 5) funcsettings.{environment}.json (embedded resource), and 6) funcsettings.json (embedded resource). 
+        /// </summary>
+        /// <typeparam name="TStartup">The function startup <see cref="Type"/>.</typeparam>
+        /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="embeddedFilePrefix">The embedded resource name prefix (defaults to "funcsettings").</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
+        /// <param name="environment">Used where the <c>AZURE_FUNCTIONS_ENVIRONMENT</c> cannot be inferred.</param>
+        /// <param name="configurationBuilder">Action to enable further configuration sources to be added.</param>
+        /// <returns>The <see cref="IConfiguration"/> instance.</returns>
+        public static IConfiguration GetBeefConfiguration<TStartup>(this IServiceCollection serviceCollection, string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string? environment = "Development", Action<ConfigurationBuilder>? configurationBuilder = null)
             where TStartup : class
         {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
+            if (serviceCollection == null)
+                throw new ArgumentNullException(nameof(serviceCollection));
 
             // Get the current configuration.
-            var c = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
-            var hostingEnvironment = c.GetValue<string>("AZURE_FUNCTIONS_ENVIRONMENT");
+            var c = serviceCollection.BuildServiceProvider().GetService<IConfiguration>();
+            var hostingEnvironment = c?.GetValue<string>("AZURE_FUNCTIONS_ENVIRONMENT") ?? environment;
 
             var cb = new ConfigurationBuilder();
-            cb.AddConfiguration(c);
+            if (c != null)
+                cb.AddConfiguration(c);
 
             // Add additional configuration probes.
             cb.AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"{embeddedFilePrefix}.json", true, false)
-                .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"{embeddedFilePrefix}.{hostingEnvironment}.json", true, false)
-                .AddJsonFile("local.settings.json", true, true);
+              .AddJsonFile(new EmbeddedFileProvider(typeof(TStartup).Assembly), $"{embeddedFilePrefix}.{hostingEnvironment}.json", true, false)
+              .AddJsonFile("local.settings.json", true, true);
 
             if (string.IsNullOrEmpty(environmentVariablePrefix))
                 cb.AddEnvironmentVariables();
@@ -148,7 +167,7 @@ namespace Beef.Events
 
             // Build again and replace existing.
             config = cb.Build();
-            builder.Services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config));
+            serviceCollection.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), config));
             return config;
         }
     }

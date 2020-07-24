@@ -318,5 +318,25 @@ namespace Beef.Test.NUnit
             var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
             return logger;
         }
+
+        /// <summary>
+        /// Creates an <see cref="IServiceProvider"/> instance that also includes an <see cref="ILogger"/>; also sets up and configures <see cref="ExecutionContext.Current"/>.
+        /// </summary>
+        /// <param name="serviceCollection">An optional action to allow further additions to the underlying <see cref="IServiceCollection"/>.</param>
+        /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
+        /// <returns>An <see cref="IServiceProvider"/>.</returns>
+        public static IServiceProvider CreateServiceProvider(Action<IServiceCollection>? serviceCollection = null, Func<ExecutionContext>? createExecutionContext = null)
+        {
+            var services = new ServiceCollection();
+            services.AddLogging(configure => configure.AddConsole());
+            services.AddBeefExecutionContext(createExecutionContext);
+            serviceCollection?.Invoke(services);
+            var sp = services.BuildServiceProvider();
+            var ec = sp.GetService<ExecutionContext>();
+            ec.ServiceProvider = sp;
+            ExecutionContext.Reset(false);
+            ExecutionContext.SetCurrent(ec);
+            return sp;
+        }
     }
 }

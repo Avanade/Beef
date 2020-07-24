@@ -2,10 +2,7 @@
 
 using Beef.Diagnostics;
 using Beef.Entities;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -145,7 +142,7 @@ namespace Beef
             if (ec != null)
                 ec.DataContextScope?.Dispose();
 
-            _set((renew) ? _create() : null);
+            _set(renew ? _create() : null);
         }
 
         /// <summary>
@@ -187,7 +184,7 @@ namespace Beef
         public OperationType OperationType { get; set; } = OperationType.Unspecified;
 
         /// <summary>
-        /// Gets or sets the <see cref="IServiceProvider"/> that provides access to the service container.
+        /// Gets or sets the <see cref="IServiceProvider"/> that provides access to the configured service container. This value is immutable. <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
         /// </summary>
         public IServiceProvider? ServiceProvider
         {
@@ -268,7 +265,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable.
+        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable. <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
         /// </summary>
         public string? CorrelationId
         {

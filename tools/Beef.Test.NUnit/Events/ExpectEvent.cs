@@ -21,22 +21,24 @@ namespace Beef.Test.NUnit.Events
         public static ExpectEventPublisher EventPublisher { get; set; } = new ExpectEventPublisher();
 
         /// <summary>
-        /// Gets the events for the <see cref="System.Threading.AsyncLocal{T}"/>.
+        /// Gets the events for the <paramref name="correlationId"/>.
         /// </summary>
         /// <param name="correlationId">The correlation identifier.</param>
+        /// <param name="removeEvents">Indicates whether to also <see cref="ExpectEventPublisher.Remove(string?)"/> the events.</param>
         /// <returns>An <see cref="Beef.Events.EventData"/> array.</returns>
-        public static List<EventData> GetEvents(string? correlationId = null) => ExpectEventPublisher.GetEvents(correlationId);
+        public static List<EventData> GetEvents(string? correlationId = null, bool removeEvents = false) => ExpectEventPublisher.GetEvents(correlationId, removeEvents);
 
         /// <summary>
         /// Verifies that at least one event was published that matched the <paramref name="template"/> which may contain wildcards (<see cref="IEventPublisher.TemplateWildcard"/>) and optional <paramref name="action"/>.
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public static void IsPublished(string template, string? action = null)
+        /// <param name="correlationId">The correlation identifier.</param>
+        public static void IsPublished(string template, string? action = null, string? correlationId = null)
         {
             Check.NotEmpty(template, nameof(template));
 
-            var events = GetEvents();
+            var events = GetEvents(correlationId);
             if (events == null || events.Count == 0 || !events.Any(x => EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
                 Assert.Fail($"Event with a subject template '{template}' and Action '{action ?? "any"}' was expected and did not match one of the events published.");
         }
@@ -46,11 +48,12 @@ namespace Beef.Test.NUnit.Events
         /// </summary>
         /// <param name="template">The expected subject template (or fully qualified subject).</param>
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public static void IsNotPublished(string template, string? action = null)
+        /// <param name="correlationId">The correlation identifier.</param>
+        public static void IsNotPublished(string template, string? action = null, string? correlationId = null)
         {
             Check.NotEmpty(template, nameof(template));
 
-            var events = GetEvents();
+            var events = GetEvents(correlationId);
             if (events == null || events.Count == 0)
                 return;
 
@@ -63,13 +66,15 @@ namespace Beef.Test.NUnit.Events
         /// optionally define <see cref="EventData.Action"/>. Use <see cref="EventData{T}"/> where <see cref="EventData{T}.Value"/> comparisons are required (otherwise no comparison will occur). 
         /// Finally, the remaining <see cref="EventData"/> properties are not compared.
         /// </summary>
+        /// <param name="correlationId">The correlation identifier.</param>
         /// <param name="expectedEvents">The <see cref="ExpectedEvent"/> list.</param>
-        public static void ArePublished(List<ExpectedEvent> expectedEvents)
+        public static void ArePublished(List<ExpectedEvent> expectedEvents, string? correlationId = null)
         {
             if (expectedEvents == null)
                 throw new ArgumentNullException(nameof(expectedEvents));
 
-            var actualEvents = GetEvents();
+            var actualEvents = GetEvents(correlationId);
+
             if (actualEvents.Count != expectedEvents.Count)
                 Assert.Fail($"Expected {expectedEvents.Count} Event(s) to be published; there were {actualEvents.Count} published.");
 
@@ -110,9 +115,10 @@ namespace Beef.Test.NUnit.Events
         /// <summary>
         /// Verifies that no events were published.
         /// </summary>
-        public static void NonePublished()
+        /// <param name="correlationId">The correlation identifier.</param>
+        public static void NonePublished(string? correlationId = null)
         {
-            var events = GetEvents();
+            var events = GetEvents(correlationId);
             if (events == null || events.Count == 0)
                 return;
 
@@ -121,7 +127,7 @@ namespace Beef.Test.NUnit.Events
     }
 
     /// <summary>
-    /// Provides the configuration for the expected event (see <see cref="ExpectEvent.ArePublished(List{ExpectedEvent})"/>).
+    /// Provides the configuration for the expected event (see <see cref="ExpectEvent.ArePublished(List{ExpectedEvent}, string?)"/>).
     /// </summary>
     public class ExpectedEvent
     {

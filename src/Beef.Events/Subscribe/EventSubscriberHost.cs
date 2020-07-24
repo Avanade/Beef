@@ -231,7 +231,6 @@ namespace Beef.Events.Subscribe
             executionContext.Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username ?? SystemUsername : SystemUsername;
             executionContext.UserId = @event.UserId;
             executionContext.TenantId = @event.TenantId;
-            executionContext.CorrelationId = @event.CorrelationId;
         }
 
         /// <summary>
@@ -249,7 +248,7 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
-        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.
+        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the <see cref="Microsoft.Extensions.Logging.ILogger"/>.
         /// </summary>
         /// <param name="logger">The ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.</param>
         /// <param name="args">The Beef <see cref="LoggerArgs"/>.</param>
@@ -262,7 +261,11 @@ namespace Beef.Events.Subscribe
             switch (args.Type)
             {
                 case LogMessageType.Critical:
-                    logger.LogCritical(args.ToString());
+                    if (args.IsException)
+                        logger.LogCritical(args.Exception, args.ToString());
+                    else
+                        logger.LogCritical(args.ToString());
+
                     break;
 
                 case LogMessageType.Info:

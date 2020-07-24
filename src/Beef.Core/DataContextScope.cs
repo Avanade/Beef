@@ -88,8 +88,13 @@ namespace Beef
         /// </summary>
         public static DataContextScope? Current
         {
-            get { return ExecutionContext.Current.DataContextScope; }
-            internal set { ExecutionContext.Current.DataContextScope = value; }
+            get { return ExecutionContext.HasCurrent ? ExecutionContext.Current.DataContextScope : null; }
+
+            internal set 
+            { 
+                if (ExecutionContext.HasCurrent)
+                    ExecutionContext.Current.DataContextScope = value; 
+            }
         }
 
         /// <summary>

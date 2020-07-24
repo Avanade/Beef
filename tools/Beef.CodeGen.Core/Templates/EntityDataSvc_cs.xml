@@ -539,14 +539,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <If Condition="System.Index > 0"><![CDATA[,]]></If>
                 <![CDATA[
                     ]]>
-                <![CDATA[EventData.Create]]>
+                <![CDATA[_evtPub.Create]]>
                 <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                   <![CDATA[Value]]>
                 </If>
                 <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
                   <![CDATA[Value]]>
                 </If>
-                <![CDATA[Event(_evtPub, ]]>
+                <![CDATA[Event(]]>
                 <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                   <![CDATA[__result, ]]>
                 </If>

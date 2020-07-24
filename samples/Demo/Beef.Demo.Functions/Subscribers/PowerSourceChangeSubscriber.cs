@@ -1,6 +1,7 @@
 ﻿using Beef.Demo.Business;
 using Beef.Events;
 using Beef.Events.Subscribe;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -10,15 +11,19 @@ namespace Beef.Demo.Functions.Subscribers
     public class PowerSourceChangeSubscriber : EventSubscriber<string>
     {
         private readonly IRobotManager _mgr;
+        private readonly ILogger _log;
 
-        public PowerSourceChangeSubscriber(IRobotManager mgr)
+        public PowerSourceChangeSubscriber(IRobotManager mgr, ILogger<PowerSourceChangeSubscriber> log)
         {
             _mgr = Check.NotNull(mgr, nameof(mgr));
+            _log = Check.NotNull(log, nameof(log));
             DataNotFoundHandling = ResultHandling.ContinueWithAudit;
         }
 
         public override async Task<Result> ReceiveAsync(EventData<string> @event)
         {
+            _log.LogInformation("A trace message to prove it works!");
+
             if (@event.Key is Guid id)
             {
                 var robot = await _mgr.GetAsync(id);

@@ -216,7 +216,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
                 await _evtPub.PublishAsync(
-                    EventData.CreateValueEvent(_evtPub, __result, $"Demo.Person.{fromId}", "Merge", fromId, toId)).ConfigureAwait(false);
+                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "Merge", fromId, toId)).ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
@@ -396,7 +396,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync(
-                    EventData.CreateEvent(_evtPub, $"Demo.Person.{id}", "Delete", id)).ConfigureAwait(false);
+                    _evtPub.CreateEvent($"Demo.Person.{id}", "Delete", id)).ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });

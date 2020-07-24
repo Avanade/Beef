@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Test.NUnit.Events;
+using Beef.Test.NUnit.Logging;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
@@ -141,7 +142,7 @@ namespace Beef.Test.NUnit.Tests
 
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = ExpectEvent.GetEvents();
+            var events = ExpectEvent.GetEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else
@@ -149,6 +150,19 @@ namespace Beef.Test.NUnit.Tests
                 foreach (var e in events)
                 {
                     TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                }
+            }
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"LOGGING >");
+            var messages = CorrelationIdLogger.GetMessages(CorrelationId);
+            if (messages.Count == 0)
+                TestContext.Out.WriteLine("  None.");
+            else
+            {
+                foreach (var l in messages)
+                {
+                    TestContext.Out.WriteLine($"{l}");
                 }
             }
 
@@ -171,7 +185,7 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Creates a <typeparamref name="TAgent"/> instance using the <see cref="AgentTesterBase.LocalServiceProvider"/> where found; otherwise, will instantiate directly.
+        /// Creates a <typeparamref name="TAgent"/> instance using the <see cref="TesterBase.LocalServiceProvider"/> where found; otherwise, will instantiate directly.
         /// </summary>
         /// <param name="args">The optional <see cref="IWebApiAgentArgs"/>; will default to <see cref="AgentTestCore{TStartup}.CreateAgentArgs"/>.</param>
         /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>

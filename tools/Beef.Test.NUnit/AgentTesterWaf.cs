@@ -2,6 +2,7 @@
 
 using Beef.Grpc;
 using Beef.RefData;
+using Beef.Test.NUnit.Logging;
 using Beef.Test.NUnit.Tests;
 using Beef.WebApi;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +36,11 @@ namespace Beef.Test.NUnit
             var action = new Action<IWebHostBuilder>(whb =>
             {
                 configuration(whb);
-                whb.ConfigureServices(sc => ReplaceEventPublisher(sc));
+                whb.ConfigureServices(sc =>
+                {
+                    sc.AddLogging(configure => configure.AddCorrelationId());
+                    ReplaceEventPublisher(sc);
+                });
             }); 
 
             WebApplicationFactory = new WebApplicationFactory<TStartup>().WithWebHostBuilder(action);
@@ -50,14 +55,14 @@ namespace Beef.Test.NUnit
         internal AgentTesterWaf(Action<IServiceCollection>? services = null, bool configureLocalRefData = true) : this(new Action<IWebHostBuilder>(whb => whb.ConfigureTestServices(sc => services?.Invoke(sc))), configureLocalRefData) { }
 
         /// <summary>
-        /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="AgentTesterBase.LocalServiceProvider"/>).
+        /// Provides the opportunity to further configure the <i>local</i> (non-API) test <see cref="IServiceCollection"/> (see <see cref="TesterBase.LocalServiceProvider"/>).
         /// </summary>
         /// <param name="serviceCollection">The <see cref="IServiceCollection"/> action.</param>
         /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
         public new AgentTesterWaf<TStartup> ConfigureLocalServices(Action<IServiceCollection> serviceCollection) { base.ConfigureLocalServices(serviceCollection); return this; }
 
         /// <summary>
-        /// Adds the <see cref="IReferenceDataProvider">reference data</see> as a singleton to the <i>local</i> (non-API) <see cref="IServiceCollection"/> (see <see cref="AgentTesterBase.LocalServiceProvider"/>).
+        /// Adds the <see cref="IReferenceDataProvider">reference data</see> as a singleton to the <i>local</i> (non-API) <see cref="IServiceCollection"/> (see <see cref="TesterBase.LocalServiceProvider"/>).
         /// </summary>
         /// <typeparam name="TRefService">The <see cref="Type"/> of the service to add.</typeparam>
         /// <typeparam name="TRefProvider">The <see cref="Type"/> of the <i>provider</i> implementation to use.</typeparam>
@@ -72,12 +77,12 @@ namespace Beef.Test.NUnit
         }
 
         /// <summary>
-        /// Prepares (creates) the <see cref="ExecutionContext"/> and ensures that the <see cref="AgentTesterBase.LocalServiceProvider"/> scope is correctly configured.
+        /// Prepares (creates) the <see cref="ExecutionContext"/> and ensures that the <see cref="TesterBase.LocalServiceProvider"/> scope is correctly configured.
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="TestSetUp.DefaultUsername"/>).</param>
         /// <param name="args">Optional argument that will be passed into the creation of the <see cref="ExecutionContext"/> (via the <see cref="TestSetUp.CreateExecutionContext(string?, object?)"/>).</param>
         /// <returns>The <see cref="AgentTesterWaf{TStartup}"/> instance to support fluent/chaining usage.</returns>
-        /// <remarks>The <see cref="ExecutionContext"/> must be created by the <see cref="AgentTesterServer{TStartup}"/> as the <see cref="ExecutionContext.ServiceProvider"/> must be set to <see cref="AgentTesterBase.LocalServiceProvider"/>.</remarks>
+        /// <remarks>The <see cref="ExecutionContext"/> must be created by the <see cref="AgentTesterServer{TStartup}"/> as the <see cref="ExecutionContext.ServiceProvider"/> must be set to <see cref="TesterBase.LocalServiceProvider"/>.</remarks>
         public new AgentTesterWaf<TStartup> PrepareExecutionContext(string? username = null, object? args = null) { base.PrepareExecutionContext(username, args); return this; }
 
         /// <summary>

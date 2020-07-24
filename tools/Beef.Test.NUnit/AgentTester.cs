@@ -17,7 +17,7 @@ using System.Net.Http;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Provides the default capabilities for the <see cref="AgentTesterWaf{TStartup}"/>, <see cref="AgentTest{TStartup, TAgent}"/> and <see cref="AgentTest{TStartup, TAgent, TValue}"/>.
+    /// Provides the default testing capabilities for the <see cref="AgentTesterWaf{TStartup}"/>, <see cref="AgentTest{TStartup, TAgent}"/> and <see cref="AgentTest{TStartup, TAgent, TValue}"/>.
     /// </summary>
     public static class AgentTester
     {

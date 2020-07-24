@@ -36,7 +36,6 @@
 
   <ItemGroup>
     <Compile Remove="AgentTesterArgs.cs" />
-    <Compile Remove="EventSubscriberTester.cs" />
   </ItemGroup>
 
   <ItemGroup>

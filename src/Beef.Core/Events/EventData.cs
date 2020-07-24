@@ -13,39 +13,36 @@ namespace Beef.Events
     public class EventData : IETag
     {
         /// <summary>
-        /// Creates an <see cref="EventData"/> instance (with no <see cref="Key"/>.
+        /// Creates an <see cref="EventData"/> instance with no <see cref="Key"/>.
         /// </summary>
-        /// <param name="eventPublisher">The intended <see cref="IEventPublisher"/>.</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData CreateEvent(IEventPublisher eventPublisher, string subject, string? action = null) 
-            => new EventData { Subject = PrependPrefix(eventPublisher, Check.NotEmpty(subject, nameof(subject))), Action = action };
+        public static EventData CreateEvent(string subject, string? action = null) 
+            => new EventData { Subject = Check.NotEmpty(subject, nameof(subject)), Action = action };
 
         /// <summary>
         /// Creates an <see cref="EventData"/> instance with the specified <see cref="Key"/>.
         /// </summary>
-        /// <param name="eventPublisher">The intended <see cref="IEventPublisher"/>.</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData CreateEvent(IEventPublisher eventPublisher, string subject, string? action = null, params IComparable?[] key) 
-            => new EventData { Subject = PrependPrefix(eventPublisher, Check.NotEmpty(subject, nameof(subject))), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
+        public static EventData CreateEvent(string subject, string? action = null, params IComparable?[] key) 
+            => new EventData { Subject = Check.NotEmpty(subject, nameof(subject)), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
 
         /// <summary>
         /// Creates an <see cref="EventData"/> instance using the <paramref name="value"/> (infers the <see cref="Key"/> from either <see cref="IIdentifier"/> or <see cref="IUniqueKey"/>).
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="eventPublisher">The intended <see cref="IEventPublisher"/>.</param>
         /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData<T> CreateValueEvent<T>(IEventPublisher eventPublisher, T value, string subject, string? action = null) where T : class
+        public static EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null) where T : class
         {
             var ed = new EventData<T> { Value = Check.NotNull(value, nameof(value)) };
-            ed.Subject = PrependPrefix(eventPublisher, Check.NotEmpty(subject, nameof(subject)));
+            ed.Subject = Check.NotEmpty(subject, nameof(subject));
             ed.Action = action;
 
             switch (value)
@@ -78,19 +75,13 @@ namespace Beef.Events
         /// Creates an <see cref="EventData"/> instance with the specified <paramref name="value"/> <see cref="Key"/>.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="eventPublisher">The intended <see cref="IEventPublisher"/>.</param>
         /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
         /// <returns>The <see cref="EventData"/>.</returns>
-        public static EventData<T> CreateValueEvent<T>(IEventPublisher eventPublisher, T value, string subject, string? action = null, params IComparable?[] key) 
-            => new EventData<T> { Value = value, Subject = PrependPrefix(eventPublisher, Check.NotEmpty(subject, nameof(subject))), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
-
-        /// <summary>
-        /// Prepend the <see cref="IEventPublisher.EventSubjectPrefix"/> to the <paramref name="subject"/> where specified.
-        /// </summary>
-        private static string PrependPrefix(IEventPublisher eventPublisher, string subject) => string.IsNullOrEmpty(eventPublisher?.EventSubjectPrefix) ? subject : eventPublisher?.EventSubjectPrefix + eventPublisher?.PathSeparator + subject;
+        public static EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null, params IComparable?[] key) 
+            => new EventData<T> { Value = value, Subject = Check.NotEmpty(subject, nameof(subject)), Action = action, Key = key.Length == 1 ? (object?)key[0] : key };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventData"/> class defaulting the <see cref="TenantId"/> and <see cref="Timestamp"/> as applicable 

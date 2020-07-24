@@ -19,9 +19,16 @@ namespace Beef.Test.NUnit.Events
         /// Gets the events for the specified <paramref name="correlationId"/>.
         /// </summary>
         /// <param name="correlationId">The correlation identifier (defaults to <see cref="ExecutionContext.CorrelationId"/>).</param>
+        /// <param name="removeEvents">Indicates whether to also <see cref="Remove"/> the events.</param>
         /// <returns>An <see cref="Beef.Events.EventData"/> array.</returns>
-        public static List<EventData> GetEvents(string? correlationId = null) =>
-            _eventDict.TryGetValue(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var events) ? events : new List<EventData>();
+        public static List<EventData> GetEvents(string? correlationId = null, bool removeEvents = false)
+        {
+            var list = _eventDict.TryGetValue(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var events) ? events : new List<EventData>();
+            if (removeEvents)
+                Remove(correlationId);
+
+            return list;
+        }
 
         /// <summary>
         /// Removes the events for the specified <paramref name="correlationId"/>.

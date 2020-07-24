@@ -104,7 +104,7 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <returns>The corresponding <see cref="Task{TResult}"/>.</returns>
-        public WebApiAgentResult Run(Func<TAgent, Task<WebApiAgentResult>> func) => Task.Run(() => RunAsync(func)).Result;
+        public WebApiAgentResult Run(Func<TAgent, Task<WebApiAgentResult>> func) => Task.Run(() => RunAsync(func)).GetAwaiter().GetResult();
 
         /// <summary>
         /// Runs the <paramref name="func"/> with an automatically instantiated <typeparamref name="TAgent"/> asynchonously checking against the expected outcomes.
@@ -124,7 +124,7 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <returns>The corresponding <see cref="Task{TResult}"/>.</returns>
-        public WebApiAgentResult RunOverride(Func<Task<WebApiAgentResult>> func) => Task.Run(() => RunOverrideAsync(func)).Result;
+        public WebApiAgentResult RunOverride(Func<Task<WebApiAgentResult>> func) => Task.Run(() => RunOverrideAsync(func)).GetAwaiter().GetResult();
 
         /// <summary>
         /// Runs the <paramref name="func"/> where the agent is self-instantied and executed asynchonously checking against the expected outcomes.
