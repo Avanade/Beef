@@ -62,7 +62,7 @@ namespace Beef.AspNetCore.WebApi
                 if (ar == null)
                 {
                     ar = new ObjectResult(_includeUnhandledExceptionInResponse ? ex.ToString() : UnhandledExceptionMessage) { StatusCode = (int)UnhandledExceptionStatusCode };
-                    _logger.LogCritical(ex, UnhandledExceptionMessage);
+                    _logger.LogError(ex, UnhandledExceptionMessage);
                 }
 
                 await ar.ExecuteResultAsync(ac).ConfigureAwait(false);

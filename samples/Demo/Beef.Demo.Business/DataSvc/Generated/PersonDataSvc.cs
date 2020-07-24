@@ -47,6 +47,7 @@ namespace Beef.Demo.Business.DataSvc
         private Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
         private Func<Person?, string?, Task>? _getNullOnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
+        private Func<Task>? _throwErrorOnAfterAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Func<Person, Task>? _createWithEfOnAfterAsync;
         private Func<Person, Task>? _updateWithEfOnAfterAsync;
@@ -329,6 +330,18 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return __result;
+            });
+        }
+
+        /// <summary>
+        /// Throw Error.
+        /// </summary>
+        public Task ThrowErrorAsync()
+        {
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            {
+                await _data.ThrowErrorAsync().ConfigureAwait(false);
+                if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
             });
         }
 

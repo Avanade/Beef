@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Beef.Caching.Policy
         private readonly ConcurrentDictionary<string, ICacheCore> _registered = new ConcurrentDictionary<string, ICacheCore>();
         private Timer? _timer;
         private bool _disposed;
+        private ILogger? _logger;
 
         /// <summary>
         /// Gets a <see cref="TimeSpan"/> set to one minute.
@@ -60,6 +62,14 @@ namespace Beef.Caching.Policy
             ExecutionContext.HasCurrent && ExecutionContext.Current.ServiceProvider != null
                 ? (CachePolicyManager)ExecutionContext.Current.ServiceProvider.GetService(typeof(CachePolicyManager))
                 : throw new InvalidOperationException("CachePolicyManager.Current relies on ExecutionContext.Current.ServiceProvider to get/instantiate; this is not set.");
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        private ILogger Logger
+        {
+            get { lock (_lock) { return _logger ??= Beef.Diagnostics.Logger.Create<CachePolicyManager>(); } }
+        }
 
         /// <summary>
         /// Get or sets the default <see cref="ICachePolicy"/> for use when a policy has not previously been set for a <see cref="Type"/>.
@@ -192,7 +202,7 @@ namespace Beef.Caching.Policy
                 else
                     _timer.Change(dueTime, period);
 
-                Trace(() => Logger.Default.Trace($"CachePolicyManager FlushTimer was started."));
+                Trace(() => Logger.LogInformation($"FlushTimer was started."));
             }
         }
 
@@ -201,7 +211,7 @@ namespace Beef.Caching.Policy
         /// </summary>
         private void TimerElapsed(Object stateInfo)
         {
-            Trace(() => Logger.Default.Trace($"CachePolicyManager FlushTimer elapsed; initiating flush."));
+            Trace(() => Logger.LogInformation($"CachePolicyManager FlushTimer elapsed; initiating flush."));
             Flush();
         }
 
@@ -218,7 +228,7 @@ namespace Beef.Caching.Policy
                 _timer.Change(Timeout.Infinite, Timeout.Infinite);
                 _timer = null;
 
-                Trace(() => Logger.Default.Trace($"CachePolicyManager FlushTimer was stopped."));
+                Trace(() => Logger.LogInformation($"CachePolicyManager FlushTimer was stopped."));
             }
         }
 
@@ -251,7 +261,7 @@ namespace Beef.Caching.Policy
                     policy.Refresh();
                     cache.Value.Flush(ignoreExpiry);
 
-                    Trace(() => Logger.Default.Trace($"CachePolicyManager Flush '{cache.Key}' ({(ignoreExpiry ? "was forced" : "has expired")})."));
+                    Trace(() => Logger.LogInformation($"CachePolicyManager Flush '{cache.Key}' ({(ignoreExpiry ? "was forced" : "has expired")})."));
                 }
             }
         }

@@ -1021,6 +1021,14 @@ namespace Beef.Demo.Test
                 .Run(a => a.MapAsync(new MapArgs { Coordinates = new MapCoordinates { Longitude = 1.234m, Latitude = -6.789m } }));
         }
 
+        [Test, TestSetUp]
+        public void I150_ThrowError()
+        {
+            _agentTester.Test<PersonAgent>()
+                .ExpectStatusCode(HttpStatusCode.InternalServerError)
+                .Run(a => a.ThrowErrorAsync());
+        }
+
         #endregion
     }
 }

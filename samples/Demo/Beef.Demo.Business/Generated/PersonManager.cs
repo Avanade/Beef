@@ -102,6 +102,9 @@ namespace Beef.Demo.Business
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
 
+        private Func<Task>? _throwErrorOnBeforeAsync;
+        private Func<Task>? _throwErrorOnAfterAsync;
+
         private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getWithEfOnValidate;
         private Func<Guid, Task>? _getWithEfOnBeforeAsync;
@@ -539,6 +542,20 @@ namespace Beef.Demo.Business
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 Cleaner.CleanUp(__result);
                 return __result;
+            });
+        }
+
+        /// <summary>
+        /// Throw Error.
+        /// </summary>
+        public Task ThrowErrorAsync()
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
+                await _dataService.ThrowErrorAsync().ConfigureAwait(false);
+                if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
             });
         }
 

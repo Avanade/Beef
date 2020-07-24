@@ -127,6 +127,11 @@ namespace Beef.Demo.Business.Data
         Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging);
 
         /// <summary>
+        /// Throw Error.
+        /// </summary>
+        Task ThrowErrorAsync();
+
+        /// <summary>
         /// Gets the <see cref="Person"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

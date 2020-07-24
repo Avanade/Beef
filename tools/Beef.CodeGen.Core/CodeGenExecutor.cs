@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
-using Beef.Executors;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen
@@ -22,16 +21,24 @@ namespace Beef.CodeGen
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeGenExecutorArgs"/> class.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
         /// <param name="assemblies">The <see cref="Assemblies"/>.</param>
         /// <param name="parameters">The <see cref="Parameters"/>.</param>
-        public CodeGenExecutorArgs(IEnumerable<Assembly>? assemblies = null, Dictionary<string, string>? parameters = null)
+        public CodeGenExecutorArgs(ILogger logger, IEnumerable<Assembly>? assemblies = null, Dictionary<string, string>? parameters = null)
         {
+            Logger = Check.NotNull(logger, nameof(Logger));
+
             if (assemblies != null)
                 Assemblies.AddRange(assemblies);
 
             if (parameters != null)
                 Parameters = parameters;
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ILogger"/>.
+        /// </summary>
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration <see cref="FileInfo"/> (data source).
@@ -67,7 +74,7 @@ namespace Beef.CodeGen
     /// <summary>
     /// Represents the code generation executor.
     /// </summary>
-    public class CodeGenExecutor : ExecutorBase
+    public class CodeGenExecutor
     {
         private readonly CodeGenExecutorArgs _args;
         private int CreatedCount;
@@ -86,7 +93,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Executes the selected code generation.
         /// </summary>
-        protected override async Task OnRunAsync(ExecutorRunArgs args)
+        public async Task RunAsync()
         {
             try
             {
@@ -117,10 +124,6 @@ namespace Beef.CodeGen
                 // Execute each of the script instructions.
                 foreach (var scriptEle in xmlScript.Elements("Generate"))
                 {
-                    // As this can be long running, check and see if a stop has been initiated.
-                    if (State != ExecutionState.Running)
-                        return;
-
                     string? template = null;
                     string? outDir = null;
                     string? helpText = null;
@@ -145,7 +148,7 @@ namespace Beef.CodeGen
                     CreatedCount = 0;
                     UpdatedCount = 0;
                     NotChangedCount = 0;
-                    Logger.Default.Info("  Template: {0} {1}", template!, helpText == null ? string.Empty : $"({helpText})");
+                    _args.Logger.LogInformation("  Template: {0} {1}", template!, helpText == null ? string.Empty : $"({helpText})");
 
                     XElement xmlTemplate;
                     if (_args.TemplatePath != null)
@@ -168,13 +171,13 @@ namespace Beef.CodeGen
                     await gen.GenerateAsync(xmlTemplate).ConfigureAwait(false);
 
                     // Provide statistics.
-                    Logger.Default.Info("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
+                    _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
                 }
             }
             catch (CodeGenException gcex)
             {
-                Logger.Default.Error(gcex.Message);
-                Logger.Default.Info(string.Empty);
+                _args.Logger.LogError(gcex.Message);
+                _args.Logger.LogInformation(string.Empty);
             }
         }
 
@@ -249,13 +252,13 @@ namespace Beef.CodeGen
 
                 UpdatedCount++;
                 File.WriteAllText(fi.FullName, e.Content);
-                Logger.Default.Warning("    Updated -> {0}", fi.FullName.Substring(outputDir.Length));
+                _args.Logger.LogWarning("    Updated -> {0}", fi.FullName.Substring(outputDir.Length));
             }
             else
             {
                 CreatedCount++;
                 File.WriteAllText(fi.FullName, e.Content);
-                Logger.Default.Warning("    Created -> {0}", fi.FullName.Substring(outputDir.Length));
+                _args.Logger.LogWarning("    Created -> {0}", fi.FullName.Substring(outputDir.Length));
             }
         }
     }

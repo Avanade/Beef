@@ -2,8 +2,8 @@
 
 using Beef.CodeGen;
 using Beef.Diagnostics;
-using Beef.Executors;
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -31,6 +31,7 @@ namespace Beef.Database.Core
         private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Creates a new instance of the <see cref="DatabaseConsole"/>.
@@ -73,6 +74,8 @@ namespace Beef.Database.Core
 
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
+
+            Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
             App.OnValidate((ctx) => OnValidate());
             App.OnExecuteAsync((_) => RunRunAwayAsync());
@@ -125,25 +128,23 @@ namespace Beef.Database.Core
         /// <returns><b>Zero</b> indicates success; otherwise, unsucessful.</returns>
         public async Task<int> RunAsync(string[] args)
         {
-            SetupExecutionContext();
-
             try
             {
                 return await App.ExecuteAsync(args).ConfigureAwait(false);
             }
             catch (CommandParsingException cpex)
             {
-                Console.WriteLine(cpex.Message);
+                _logger.LogInformation(cpex.Message);
                 return -1;
             }
         }
 
         /// <summary>
-        /// Creates <see cref="ExecutionManager"/> and coordinates the run (overall execution).
+        /// Coordinates the run (overall execution).
         /// </summary>
         private async Task<int> RunRunAwayAsync() /* Inspired by https://www.youtube.com/watch?v=ikMiQZF-mAY */
         {
-            var args = new CodeGenExecutorArgs(_scriptAssemblies, CreateParamDict(_paramsOpt))
+            var args = new CodeGenExecutorArgs(_logger, _scriptAssemblies, CreateParamDict(_paramsOpt))
             {
                 ConfigFile = new FileInfo(_configOpt.Value()),
                 ScriptFile = new FileInfo(_scriptOpt.Value()),
@@ -153,53 +154,14 @@ namespace Beef.Database.Core
 
             WriteHeader(args);
 
-            using (var em = ExecutionManager.Create(() => new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray(), args)))
-            {
-                var sw = Stopwatch.StartNew();
+            var de = new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray(), args);
+            var sw = Stopwatch.StartNew();
 
-                await em.RunAsync().ConfigureAwait(false);
+            var result = await de.RunAsync().ConfigureAwait(false);
 
-                sw.Stop();
-                WriteFooter(sw);
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Set up the <see cref="ExecutionContext"/> including the log to console binding.
-        /// </summary>
-        private static void SetupExecutionContext()
-        {
-            if (!ExecutionContext.HasCurrent)
-                ExecutionContext.SetCurrent(new ExecutionContext());
-
-            if (!ExecutionContext.Current.HasLogger)
-            {
-                ExecutionContext.Current.RegisterLogger((largs) =>
-                {
-                    switch (largs.Type)
-                    {
-                        case LogMessageType.Critical:
-                        case LogMessageType.Error:
-                            ConsoleWriteLine(largs.ToString(), ConsoleColor.Red);
-                            break;
-
-                        case LogMessageType.Warning:
-                            ConsoleWriteLine(largs.ToString(), ConsoleColor.Yellow);
-                            break;
-
-                        case LogMessageType.Info:
-                            ConsoleWriteLine(largs.ToString());
-                            break;
-
-                        case LogMessageType.Debug:
-                        case LogMessageType.Trace:
-                            ConsoleWriteLine(largs.ToString(), ConsoleColor.Cyan);
-                            break;
-                    }
-                });
-            }
+            sw.Stop();
+            WriteFooter(sw);
+            return result ? 0 : -1;
         }
 
         /// <summary>
@@ -207,39 +169,21 @@ namespace Beef.Database.Core
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
-            Console.WriteLine(App.Description);
-            Console.WriteLine();
-            Console.WriteLine($"  Command = {_commandArg.ParsedValue}");
-            Console.WriteLine($"  ConnectionString = {_connectionStringArg.Value}");
-            CodeGenConsole.LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
+            _logger.LogInformation(App.Description);
+            _logger.LogInformation(string.Empty);
+            _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");
+            _logger.LogInformation($"  ConnectionString = {_connectionStringArg.Value}");
+            LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
         }
 
         /// <summary>
         /// Write the footer information.
         /// </summary>
-        private static void WriteFooter(Stopwatch sw)
+        private void WriteFooter(Stopwatch sw)
         {
-            Console.WriteLine();
-            Console.WriteLine($"Database complete [{sw.ElapsedMilliseconds}ms].");
-            Console.WriteLine();
-        }
-
-        /// <summary>
-        /// Writes the specified text to the console.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
-        {
-            if (string.IsNullOrEmpty(text))
-                Console.WriteLine();
-            else
-            {
-                var currColor = Console.ForegroundColor;
-                Console.ForegroundColor = foregroundColor ?? currColor;
-                Console.WriteLine(text);
-                Console.ForegroundColor = currColor;
-            }
+            _logger.LogInformation(string.Empty);
+            _logger.LogInformation($"Database complete [{sw.ElapsedMilliseconds}ms].");
+            _logger.LogInformation(string.Empty);
         }
     }
 }

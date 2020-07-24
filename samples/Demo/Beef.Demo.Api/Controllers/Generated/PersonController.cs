@@ -310,6 +310,18 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Throw Error.
+        /// </summary>
+        [HttpPost]
+        [Route("error")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult ThrowError()
+        {
+            return new WebApiPost(this, () => _manager.ThrowErrorAsync(),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
         /// Gets the <see cref="Person"/> entity that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

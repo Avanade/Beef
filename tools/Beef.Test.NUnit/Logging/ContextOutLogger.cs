@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;

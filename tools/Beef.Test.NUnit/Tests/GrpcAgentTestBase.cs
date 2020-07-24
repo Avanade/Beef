@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Grpc;
 using Beef.Test.NUnit.Events;
 using Beef.WebApi;
@@ -39,60 +38,60 @@ namespace Beef.Test.NUnit.Tests
                 throw new ArgumentNullException(nameof(result));
 
             // Log to output.
-            Logger.Default.Info("");
-            Logger.Default.Info("GRPC AGENT TESTER...");
-            Logger.Default.Info("");
-            Logger.Default.Info($"REQUEST >");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine("GRPC AGENT TESTER...");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"REQUEST >");
             if (!string.IsNullOrEmpty(Username))
-                Logger.Default.Info($"Username: {Username}");
+                TestContext.Out.WriteLine($"Username: {Username}");
 
-            Logger.Default.Info($"gRPC Request: {(result.Request == null ? "null" : $"{result.Request.CalculateSize()}bytes [JSON representation]")}");
+            TestContext.Out.WriteLine($"gRPC Request: {(result.Request == null ? "null" : $"{result.Request.CalculateSize()}bytes [JSON representation]")}");
             if (result.Request != null)
-                Logger.Default.Info(JsonConvert.SerializeObject(result.Request, Formatting.Indented));
+                TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Request, Formatting.Indented));
 
-            Logger.Default.Info("");
-            Logger.Default.Info($"RESPONSE >");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"RESPONSE >");
             if (result.Status.Detail == null)
-                Logger.Default.Info($"gRPC Status: {result.Status.StatusCode}");
+                TestContext.Out.WriteLine($"gRPC Status: {result.Status.StatusCode}");
             else
-                Logger.Default.Info($"gRPC Status: {result.Status.StatusCode} ({result.Status.Detail})");
+                TestContext.Out.WriteLine($"gRPC Status: {result.Status.StatusCode} ({result.Status.Detail})");
 
-            Logger.Default.Info($"HttpStatusCode: {result.HttpStatusCode} ({(int)result.HttpStatusCode})");
-            Logger.Default.Info($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
-            Logger.Default.Info($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
+            TestContext.Out.WriteLine($"HttpStatusCode: {result.HttpStatusCode} ({(int)result.HttpStatusCode})");
+            TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
+            TestContext.Out.WriteLine($"Messages: {(result.Messages == null || result.Messages.Count == 0 ? "none" : "")}");
 
             if (result.Messages != null && result.Messages.Count > 0)
             {
                 foreach (var m in result.Messages)
                 {
-                    Logger.Default.Info($" {m.Type}: {m.Text} {(m.Property == null ? "" : "(" + m.Property + ")")}");
+                    TestContext.Out.WriteLine($" {m.Type}: {m.Text} {(m.Property == null ? "" : "(" + m.Property + ")")}");
                 }
 
-                Logger.Default.Info(null);
+                TestContext.Out.WriteLine();
             }
 
             var bytes = (result.Response is IMessage respm) ? respm.CalculateSize() : 0;
 
-            Logger.Default.Info($"gRPC Response: {(result.Response == null ? "null" : $"{bytes}bytes [JSON representation]")}");
+            TestContext.Out.WriteLine($"gRPC Response: {(result.Response == null ? "null" : $"{bytes}bytes [JSON representation]")}");
             if (result.Response != null)
-                Logger.Default.Info(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
+                TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
-            Logger.Default.Info("");
-            Logger.Default.Info($"EVENTS PUBLISHED >");
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
             var events = ExpectEvent.GetEvents();
             if (events.Count == 0)
-                Logger.Default.Info("  None.");
+                TestContext.Out.WriteLine("  None.");
             else
             {
                 foreach (var e in events)
                 {
-                    Logger.Default.Info($"  Subject: {e.Subject}, Action: {e.Action}");
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
                 }
             }
 
-            Logger.Default.Info(null);
-            Logger.Default.Info(new string('=', 80));
-            Logger.Default.Info(null);
+            TestContext.Out.WriteLine();
+            TestContext.Out.WriteLine(new string('=', 80));
+            TestContext.Out.WriteLine();
 
             // Perform checks.
             if (_expectedStatusCode.HasValue && _expectedStatusCode != result.HttpStatusCode)

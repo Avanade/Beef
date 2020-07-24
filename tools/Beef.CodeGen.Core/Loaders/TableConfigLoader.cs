@@ -3,6 +3,7 @@
 using Beef.CodeGen.Entities;
 using Beef.Data.Database;
 using Beef.Diagnostics;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,6 +193,9 @@ namespace Beef.CodeGen.Loaders
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Adds the table columns.
+        /// </summary>
         private static void AddTableColumns(CodeGenConfig config, Table table)
         {
             if (CodeGenConfig.FindConfigList(config, "Column") != null)
@@ -236,6 +240,9 @@ namespace Beef.CodeGen.Loaders
                 config.Children.Add("Column", colList);
         }
 
+        /// <summary>
+        /// Exclude UDT columns.
+        /// </summary>
         private static void ExcludeUdtColumns(CodeGenConfig config)
         {
             var ecx = string.IsNullOrEmpty(config.GetAttributeValue<string>("UdtExcludeColumns")) ? new List<string>() : config.GetAttributeValue<string>("UdtExcludeColumns").Split(',').Select(x => x.Trim()).ToList();
@@ -253,9 +260,12 @@ namespace Beef.CodeGen.Loaders
             }
         }
 
+        /// <summary>
+        /// Load the known database table and columns.
+        /// </summary>
         private async Task LoadDatabaseAsync(string connString, string refDataSchema)
         {
-            Logger.Default.Info($"   Querying database: {connString}");
+            Logger.Create<TableConfigLoader>().LogInformation($"   Querying database: {connString}");
 
             using var db = new SqlServerDb(connString);
             using (db.SetBypassDataContextScopeDbConnection())
@@ -264,6 +274,9 @@ namespace Beef.CodeGen.Loaders
             }
         }
 
+        /// <summary>
+        /// SQL Server DB.
+        /// </summary>
         private class SqlServerDb : DatabaseBase
         {
             public SqlServerDb(string connectionString) : base(connectionString, Microsoft.Data.SqlClient.SqlClientFactory.Instance) { }

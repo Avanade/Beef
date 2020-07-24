@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Entities;
 using System;
 using System.Collections.Generic;
@@ -35,8 +34,6 @@ namespace Beef
         private KeyOnlyDictionary<string>? _roles;
         private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
         private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
-        //TODO: private readonly Lazy<ILogger> _logger = new Lazy<ILogger>(true);
-        // replace old logger with ILogger enablement.
 
         /// <summary>
         /// Gets the standard message for when changing an immutable value.
@@ -155,28 +152,6 @@ namespace Beef
         /// Gets or sets the current <see cref="Beef.DataContextScope"/>.
         /// </summary>
         internal DataContextScope? DataContextScope { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current <see cref="Beef.Diagnostics.Logger"/>.
-        /// </summary>
-        internal Logger? Logger { get; set; }
-
-        /// <summary>
-        /// Registers the <see cref="ExecutionContext"/> <see cref="Logger"/> instance (accessible via <see cref="Logger"/> <see cref="Logger.Default"/>).
-        /// </summary>
-        /// <param name="binder">The action that binds the logger to an underlying logging capability.</param>
-        public void RegisterLogger(Action<LoggerArgs> binder)
-        {
-            if (Logger != null)
-                throw new InvalidOperationException("A RegisterLogger has already been performed for the current ExecutionContext instance.");
-
-            Logger = new Logger(binder ?? throw new ArgumentNullException(nameof(binder)));
-        }
-
-        /// <summary>
-        /// Indicates whether a <see cref="RegisterLogger"/> has been performed for this <see cref="ExecutionContext"/> instance.
-        /// </summary>
-        public bool HasLogger => Logger != null;
 
         /// <summary>
         /// Gets or sets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
@@ -453,7 +428,6 @@ namespace Beef
         {
             return new ExecutionContext
             {
-                Logger = Logger,
                 OperationType = OperationType,
                 _serviceProvider = _serviceProvider,
                 _userId = _userId,

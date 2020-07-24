@@ -31,8 +31,8 @@ namespace Cdr.Banking.Api
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public Startup(IConfiguration config, ILoggerFactory loggerFactory)
+        /// <param name="logger">The <see cref="ILoggerFactory"/>.</param>
+        public Startup(IConfiguration config, ILogger<Startup> logger)
         {
             _config = config;
 
@@ -45,7 +45,7 @@ namespace Cdr.Banking.Api
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
 
             // Configure the logger.
-            _logger = loggerFactory.CreateLogger("Logging");
+            _logger = Check.NotNull(logger, nameof(logger));
         }
 
         /// <summary>

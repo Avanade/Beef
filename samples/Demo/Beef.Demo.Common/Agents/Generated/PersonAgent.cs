@@ -176,6 +176,13 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<PersonCollectionResult>> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Throw Error.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="Person"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -457,6 +464,17 @@ namespace Beef.Demo.Common.Agents
         {
             return GetCollectionResultAsync<PersonCollectionResult, PersonCollection, Person>("api/v1/persons/args", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<PersonArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
+        }
+
+        /// <summary>
+        /// Throw Error.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null)
+        {
+            return PostAsync("api/v1/persons/error", requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>

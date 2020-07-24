@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Beef.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Beef.Events.Publish
 {
@@ -75,7 +76,7 @@ namespace Beef.Events.Publish
 
         /// <summary>
         /// Invoked when the underlying <see cref="EventHubs.EventHubClient.SendAsync(EventHubs.EventData, string)"/> results in an unhandled <see cref="Exception"/>;
-        /// by default logs (<see cref="Logger.Exception(Exception)"/>) the <paramref name="exception"/> (in this case the events will <b>not</b> be published; i.e. they will be lost).
+        /// by default logs the <paramref name="exception"/> (in this case the events will <b>not</b> be published; i.e. they will be lost).
         /// </summary>
         /// <param name="events">The events that will be published.</param>
         /// <param name="partitionKey">The partition key (<see cref="GetPartitionKey(EventData[])"/>).</param>
@@ -86,7 +87,7 @@ namespace Beef.Events.Publish
                 throw new ArgumentNullException(nameof(exception));
 
             var subs = string.Join(", ", events.Select(x => x.Subject).Distinct().ToArray());
-            Logger.Default.Exception(exception, $"EventHub Publish for Subject(s) '{subs}' failed: {exception.Message}");
+            Logger.Create<EventHubPublisher>().LogError(exception, $"EventHub Publish for Subject(s) '{subs}' failed: {exception.Message}");
         }
     }
 }

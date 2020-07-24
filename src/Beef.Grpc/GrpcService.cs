@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using System;
@@ -63,9 +64,8 @@ namespace Beef.Grpc
             if (exception is IBusinessException)
                 ex = exception as IBusinessException;
 
-            if (ex == null && exception is AggregateException)
+            if (ex == null && exception is AggregateException aex)
             {
-                var aex = (AggregateException)exception;
                 if (aex.InnerExceptions.Count == 1 && aex.InnerException is IBusinessException)
                     ex = aex.InnerException as IBusinessException;
             }
@@ -74,7 +74,7 @@ namespace Beef.Grpc
             if (ex != null)
             {
                 if (ex.ShouldBeLogged)
-                    Beef.Diagnostics.Logger.Default.Exception(exception, UnhandledExceptionMessage);
+                    Diagnostics.Logger.Create<GrpcServiceBase>().LogError(exception, UnhandledExceptionMessage);
 
                 grpc.Status? status = ex.ErrorType switch
                 {
@@ -102,7 +102,7 @@ namespace Beef.Grpc
             }
 
             if (ex == null)
-                Beef.Diagnostics.Logger.Default.Exception(exception, UnhandledExceptionMessage);
+                Diagnostics.Logger.Create<GrpcServiceBase>().LogError(exception, UnhandledExceptionMessage);
 
             throw new grpc.RpcException(new grpc.Status(UnhandledExceptionStatusCode, IncludeUnhandledExceptionInResponse ? exception.ToString() : UnhandledExceptionMessage));
         }

@@ -123,7 +123,7 @@ namespace Beef.Events.Subscribe
                 UpdateExecutionContext(ec, subscriber, @event);
                 ec.ServiceProvider = Args.ServiceProvider;
                 ec.CorrelationId = @event.CorrelationId;
-                ExecutionContext.SetCurrent(BindLogger(ec));
+                ExecutionContext.SetCurrent(ec);
 
                 // Process the event.
                 return CheckResult(await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber);
@@ -192,7 +192,7 @@ namespace Beef.Events.Subscribe
             switch (result.ResultHandling ?? handling)
             {
                 case ResultHandling.ContinueWithLogging:
-                    Logger.Default.Warning(result.ToString());
+                    Logger.Create<EventSubscriberHost>().LogWarning(result.ToString());
                     break;
 
                 case ResultHandling.ContinueWithAudit:
@@ -231,63 +231,6 @@ namespace Beef.Events.Subscribe
             executionContext.Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username ?? SystemUsername : SystemUsername;
             executionContext.UserId = @event.UserId;
             executionContext.TenantId = @event.TenantId;
-        }
-
-        /// <summary>
-        /// Bind the logger to the execution context.
-        /// </summary>
-        private ExecutionContext BindLogger(ExecutionContext ec)
-        {
-            if (ec == null)
-                throw new EventSubscriberException("An ExecutionContext instance must be returned from CreateExecutionContext.");
-
-            if (!ec.HasLogger)
-                ec.RegisterLogger((largs) => BindLogger(Args.Logger, largs));
-
-            return ec;
-        }
-
-        /// <summary>
-        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the <see cref="Microsoft.Extensions.Logging.ILogger"/>.
-        /// </summary>
-        /// <param name="logger">The ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.</param>
-        /// <param name="args">The Beef <see cref="LoggerArgs"/>.</param>
-        /// <remarks>Redirects (binds) the Beef logger to the ASP.NET logger.</remarks>
-        private static void BindLogger(ILogger logger, LoggerArgs args)
-        {
-            Check.NotNull(logger, nameof(logger));
-            Check.NotNull(args, nameof(args));
-
-            switch (args.Type)
-            {
-                case LogMessageType.Critical:
-                    if (args.IsException)
-                        logger.LogCritical(args.Exception, args.ToString());
-                    else
-                        logger.LogCritical(args.ToString());
-
-                    break;
-
-                case LogMessageType.Info:
-                    logger.LogInformation(args.ToString());
-                    break;
-
-                case LogMessageType.Warning:
-                    logger.LogWarning(args.ToString());
-                    break;
-
-                case LogMessageType.Error:
-                    logger.LogError(args.ToString());
-                    break;
-
-                case LogMessageType.Debug:
-                    logger.LogDebug(args.ToString());
-                    break;
-
-                case LogMessageType.Trace:
-                    logger.LogTrace(args.ToString());
-                    break;
-            }
         }
     }
 }

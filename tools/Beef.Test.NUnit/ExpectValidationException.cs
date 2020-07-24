@@ -206,7 +206,7 @@ namespace Beef.Test.NUnit
             }
 
             if (sb.Length > 0)
-                Assert.Fail($"Messages mismatch:{System.Environment.NewLine}{sb.ToString()}");
+                Assert.Fail($"Messages mismatch:{System.Environment.NewLine}{sb}");
         }
     }
 }

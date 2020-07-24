@@ -2,12 +2,12 @@
 
 using System;
 
-namespace Beef.Test.NUnit.Logging
+namespace Beef.Diagnostics
 {
     /// <summary>
-    /// Represents the null scope for the loggers.
+    /// Represents a null scope for loggers.
     /// </summary>
-    internal class NullScope : IDisposable
+    public sealed class NullScope : IDisposable
     {
         /// <summary>
         /// Gets the default instance.

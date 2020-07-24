@@ -3,6 +3,7 @@
 using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.RefData;
+using Beef.Test.NUnit.Logging;
 using Beef.WebApi;
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,11 +32,6 @@ namespace Beef.Test.NUnit
         private static Type? _refAgentType;
         private static Func<object?, string> _usernameConverter = (x) => x?.ToString()!;
         private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername };
-
-        /// <summary>
-        /// Static constructor - binds the global logger (<see cref="Beef.Diagnostics.Logger.RegisterGlobal(Action{Diagnostics.LoggerArgs})"/>) to <see cref="TestContext.Out"/>.
-        /// </summary>
-        static TestSetUp() => Beef.Diagnostics.Logger.RegisterGlobal((largs) => TestContext.Out.WriteLine($"{largs}"));
 
         #region Setup
 
@@ -102,9 +98,9 @@ namespace Beef.Test.NUnit
                 {
                     try
                     {
-                        Logger.Default.Info(null);
-                        Logger.Default.Info("Invocation of registered set up action.");
-                        Logger.Default.Info(new string('=', 80));
+                        TestContext.Out.WriteLine();
+                        TestContext.Out.WriteLine("Invocation of registered set up action.");
+                        TestContext.Out.WriteLine(new string('=', 80));
 
                         if (_registeredSetup != null)
                             ShouldContinueRunningTests = _registeredSetup.Invoke(_registeredSetupCount++, _registeredSetupData);
@@ -120,16 +116,16 @@ namespace Beef.Test.NUnit
                     catch (Exception ex)
                     {
                         ShouldContinueRunningTests = false;
-                        Logger.Default.Exception(ex, $"This RegisterSetUp function failed to execute successfully: {ex.Message}");
+                        TestContext.Out.WriteLine($"This RegisterSetUp function failed to execute successfully: {ex.Message}{Environment.NewLine}{ex}");
                         Assert.Fail($"This RegisterSetUp function failed to execute successfully: {ex.Message}");
                     }
 #pragma warning restore CA1031
                     finally
                     {
                         _registeredSetupInvoked = true;
-                        Logger.Default.Info(null);
-                        Logger.Default.Info(new string('=', 80));
-                        Logger.Default.Info(null);
+                        TestContext.Out.WriteLine();
+                        TestContext.Out.WriteLine(new string('=', 80));
+                        TestContext.Out.WriteLine();
                     }
                 }
             }
@@ -314,7 +310,7 @@ namespace Beef.Test.NUnit
         public static ILogger CreateLogger()
         {
             var services = new ServiceCollection();
-            services.AddLogging(configure => configure.AddConsole());
+            services.AddLogging(configure => configure.AddTestContext());
             var logger = services.BuildServiceProvider().GetService<ILogger<TestSetUp>>();
             return logger;
         }
@@ -328,7 +324,7 @@ namespace Beef.Test.NUnit
         public static IServiceProvider CreateServiceProvider(Action<IServiceCollection>? serviceCollection = null, Func<ExecutionContext>? createExecutionContext = null)
         {
             var services = new ServiceCollection();
-            services.AddLogging(configure => configure.AddConsole());
+            services.AddLogging(configure => configure.AddTestContext());
             services.AddBeefExecutionContext(createExecutionContext);
             serviceCollection?.Invoke(services);
             var sp = services.BuildServiceProvider();

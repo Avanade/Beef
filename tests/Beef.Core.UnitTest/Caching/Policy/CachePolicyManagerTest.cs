@@ -2,6 +2,7 @@
 
 using Beef.Caching;
 using Beef.Caching.Policy;
+using Beef.Test.NUnit.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
         {
             var services = new ServiceCollection();
             services.AddSingleton(_ => new CachePolicyManager());
+            services.AddLogging(config => config.AddTestContext());
 
             var sp = services.BuildServiceProvider();
 

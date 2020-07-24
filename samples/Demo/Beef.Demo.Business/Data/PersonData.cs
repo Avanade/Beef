@@ -6,11 +6,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
+        private readonly ILogger _logger;
+
+        public PersonData(IDatabase db, IEfDb ef, ILogger<PersonData> logger) : this(db, ef) => _logger = Check.NotNull(logger, nameof(logger));
+
         partial void PersonDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
@@ -53,7 +58,7 @@ namespace Beef.Demo.Business.Data
 
         private Task MarkOnImplementationAsync()
         {
-            Beef.Diagnostics.Logger.Default.Warning("Mark operation implementation currently does not exist.");
+            _logger.LogWarning("Mark operation implementation currently does not exist.");
             return Task.CompletedTask;
         }
 
@@ -66,6 +71,12 @@ namespace Beef.Demo.Business.Data
         {
             if (ex is NotImplementedException)
                 throw new NotSupportedException();
+        }
+
+        private Task ThrowErrorOnImplementationAsync()
+        {
+            _logger.LogWarning("The data is beyond corrupt and we cannot continue.");
+            throw new InvalidOperationException("Data corruption error!");
         }
 
         private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)

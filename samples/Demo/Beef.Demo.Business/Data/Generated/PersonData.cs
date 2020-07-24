@@ -84,6 +84,8 @@ namespace Beef.Demo.Business.Data
         private Func<PersonCollectionResult, PersonArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Action<Exception>? _getByArgsWithEfOnException;
 
+        private Action<Exception>? _throwErrorOnException;
+
         private Func<Guid, IEfDbArgs, Task>? _getWithEfOnBeforeAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Action<Exception>? _getWithEfOnException;
@@ -113,7 +115,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public PersonData(IDatabase db, IEfDb ef) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); PersonDataCtor(); }
+        private PersonData(IDatabase db, IEfDb ef) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); PersonDataCtor(); }
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -339,6 +341,14 @@ namespace Beef.Demo.Business.Data
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _getByArgsWithEfOnException });
+        }
+
+        /// <summary>
+        /// Throw Error.
+        /// </summary>
+        public Task ThrowErrorAsync()
+        {
+            return DataInvoker.Default.InvokeAsync(this, () => ThrowErrorOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _throwErrorOnException });
         }
 
         /// <summary>

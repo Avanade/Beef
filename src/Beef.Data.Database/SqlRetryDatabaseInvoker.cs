@@ -2,6 +2,7 @@
 
 using Beef.Diagnostics;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace Beef.Data.Database
         /// </summary>
         private void LogRetryException(Exception ex, TimeSpan ts)
         {
-            Logger.Default.Warning($"Transient SQL Server Error '{((SqlException)ex).Number}' encountered; will retry in {ts.TotalMilliseconds}ms: {ex.Message}");
+            Logger.Create<SqlRetryDatabaseInvoker>().LogWarning($"Transient SQL Server Error '{((SqlException)ex).Number}' encountered; will retry in {ts.TotalMilliseconds}ms: {ex.Message}");
             ExceptionRetry?.Invoke(this, new SqlRetryDatabaseInvokerEventArgs((SqlException)ex));
         }
 

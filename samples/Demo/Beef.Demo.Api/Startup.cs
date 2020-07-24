@@ -121,13 +121,10 @@ namespace Beef.Demo.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IConfiguration config, ILogger<WebApiExceptionHandlerMiddleware> logger)
         {
-            var x = serviceProvider.GetService<Data.EntityFrameworkCore.IEfDb>();
-
             // Configure the logger.
-            _logger = loggerFactory.CreateLogger("Logging");
-            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
+            _logger = Check.NotNull(logger, nameof(logger));
 
             // Override the exception handling.
             app.UseWebApiExceptionHandler(_logger, config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
