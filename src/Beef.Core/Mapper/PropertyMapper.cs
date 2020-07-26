@@ -331,10 +331,10 @@ namespace Beef.Mapper
                 if ((!SrceComplexTypeReflector!.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
                     && (!DestComplexTypeReflector!.IsCollection || DestComplexTypeReflector.IsItemComplexType))
                 {
-                    var mapper = (IEntityMapperBase)typeof(EntityMapper<,>)
-                            .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
-                            .GetMethod("CreateAuto", BindingFlags.Public | BindingFlags.Static)
-                            .Invoke(null, new object[] { Array.Empty<string>() });
+                    var mapper = (IEntityMapperBase)typeof(EntityMapper)
+                        .GetMethod(nameof(EntityMapper.CreateAuto))
+                        .MakeGenericMethod(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
+                        .Invoke(null, new object[] { Array.Empty<string>() });
 
                     SetMapper(mapper);
                 }

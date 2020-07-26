@@ -64,7 +64,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 TransactionCollectionResult __result = new TransactionCollectionResult(paging);
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Transaction", __result.Paging!, new PartitionKey(accountId), onCreate: _onDataArgsCreate);

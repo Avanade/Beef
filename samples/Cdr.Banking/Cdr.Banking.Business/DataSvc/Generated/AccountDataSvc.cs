@@ -53,7 +53,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
                 return __result;
@@ -67,7 +67,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
                 if (_cache.TryGetValue(__key, out AccountDetail __val))
@@ -86,7 +86,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
                 if (_cache.TryGetValue(__key, out Balance __val))

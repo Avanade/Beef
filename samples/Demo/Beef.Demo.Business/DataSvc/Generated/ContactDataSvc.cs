@@ -54,7 +54,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await _data.GetAllAsync().ConfigureAwait(false);
                 return __result;
@@ -68,7 +68,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out Contact __val))
@@ -87,7 +87,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Contact"/> object.</returns>
         public Task<Contact> CreateAsync(Contact value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Contact.{__result.Id}", "Create").ConfigureAwait(false);
@@ -103,7 +103,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Contact"/> object.</returns>
         public Task<Contact> UpdateAsync(Contact value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Contact.{__result.Id}", "Update").ConfigureAwait(false);
@@ -118,7 +118,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ContactDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ContactDataSvc), async () => 
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.Contact.{id}", "Delete", id).ConfigureAwait(false);

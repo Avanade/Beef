@@ -391,7 +391,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         </If>
         <![CDATA[)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof({{Entity.Name}}DataSvc]]>
+            return DataSvcInvoker.Current.InvokeAsync(typeof({{Entity.Name}}DataSvc]]>
         <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
         <![CDATA[), async () => 
             {

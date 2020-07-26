@@ -11,8 +11,8 @@ using System.Threading;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Sets up the test. Initializes the <see cref="ExecutionContext"/> using <see cref="ExecutionContext.Reset(bool)"/> with <c>false</c> to ensure nothing is set. Also orchestrates whether the
-    /// registered setup is required to be invoked for the test.
+    /// Sets up the test by <see cref="ExecutionContext.Reset()">resetting</see> the <see cref="ExecutionContext"/> to ensure <c>null</c>; then orchestrates whether the 
+    /// <see cref="TestSetUp.RegisterSetUp(Func{int, object?, bool})">registered setup</see> is required to be invoked for the test.
     /// </summary>
     [DebuggerStepThrough()]
 #pragma warning disable CA1813 // Avoid unsealed attributes; by-design, needs to be inherited from.
@@ -92,7 +92,7 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    ExecutionContext.Reset(false);
+                    ExecutionContext.Reset();
 
                     context.CurrentResult = innerCommand.Execute(context);
                 }
@@ -114,8 +114,7 @@ namespace Beef.Test.NUnit
 #pragma warning restore CA1031
                 finally
                 {
-                    ExecutionContext.Reset(false);
-                    Factory.ResetLocal();
+                    ExecutionContext.Reset();
                 }
 
                 // Remove any extraneous assertion results as this clutters/confuses the output.
@@ -124,7 +123,6 @@ namespace Beef.Test.NUnit
                     context.CurrentResult.AssertionResults.RemoveAt(i);
                 }
 
-                ExecutionContext.Reset(false);
                 _username.Value = TestSetUp.DefaultUsername;
                 _args.Value = null;
                 return context.CurrentResult;

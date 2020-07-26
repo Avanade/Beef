@@ -114,12 +114,9 @@ namespace Beef.RefData
         {
             Check.NotNull(providerType, nameof(providerType));
 
-            if (ExecutionContext.HasCurrent && ExecutionContext.Current.ServiceProvider != null)
-            {
-                var service = ExecutionContext.Current.ServiceProvider.GetService(providerType);
-                if (service != null)
-                    return (IReferenceDataProvider)service;
-            }
+            var service = ExecutionContext.GetService(providerType);
+            if (service != null)
+                return (IReferenceDataProvider)service;
 
             if (_providers.TryGetValue(providerType, out var provider))
                 return provider;

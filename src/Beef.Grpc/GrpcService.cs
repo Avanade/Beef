@@ -191,7 +191,7 @@ namespace Beef.Grpc
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         protected Task ExecuteResultAsync(Func<Task> func)
         {
-            return GrpcInvoker.Default.InvokeAsync(this, () => ExecuteResultAsyncInternal(func),
+            return GrpcInvoker.Current.InvokeAsync(this, () => ExecuteResultAsyncInternal(func),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -203,7 +203,7 @@ namespace Beef.Grpc
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         protected Task<TResult> ExecuteResultAsync<TResult>(Func<Task<TResult>> func)
         {
-            return GrpcInvoker.Default.InvokeAsync(this, () => ExecuteResultAsyncInternal(func),
+            return GrpcInvoker.Current.InvokeAsync(this, () => ExecuteResultAsyncInternal(func),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 

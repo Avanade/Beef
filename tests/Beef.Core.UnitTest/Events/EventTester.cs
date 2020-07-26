@@ -36,7 +36,7 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishAsync_NoValueWithTemplate()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
             var tep = new TestEventPublisher();
@@ -60,7 +60,7 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_ValueIIdentifier()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
             var tep = new TestEventPublisher();
@@ -93,7 +93,7 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_ValueIUniqueKey()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
             var tep = new TestEventPublisher();
@@ -114,7 +114,7 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishAsync_SubjectAndAction()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
             var tep = new TestEventPublisher();
@@ -133,7 +133,7 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_WithKey()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
             var tep = new TestEventPublisher();

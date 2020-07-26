@@ -31,7 +31,7 @@ namespace Beef.Grpc
     /// <summary>
     /// Provides the base service agent (client) capabilites to <b>invoke gRPC</b> operations for a specified <typeparamref name="TClient"/>.
     /// </summary>
-    /// <remarks>Each <b>invoke</b> is wrapped by a <see cref="GrpcAgentInvoker{TClient}"/> to support additional logic where required.</remarks>
+    /// <remarks>Each <b>invoke</b> is wrapped by a <see cref="GrpcAgentInvoker"/> to support additional logic where required.</remarks>
     public abstract class GrpcAgentBase<TClient> : GrpcAgentBase where TClient : ClientBase<TClient>
     {
         /// <summary>
@@ -65,7 +65,7 @@ namespace Beef.Grpc
             if (requestOptions?.ETag != null)
                 throw new NotImplementedException();
 
-            return GrpcAgentInvoker<TClient>.Default.InvokeAsync(this, async () =>
+            return GrpcAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -100,7 +100,7 @@ namespace Beef.Grpc
             if (requestOptions?.ETag != null)
                 throw new NotImplementedException();
 
-            return GrpcAgentInvoker<TClient>.Default.InvokeAsync(this, async () =>
+            return GrpcAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -135,7 +135,7 @@ namespace Beef.Grpc
             if (requestOptions?.ETag != null)
                 throw new NotImplementedException();
 
-            return GrpcAgentInvoker<TClient>.Default.InvokeAsync(this, async () =>
+            return GrpcAgentInvoker.Current.InvokeAsync(this, async () =>
             {
                 try
                 {

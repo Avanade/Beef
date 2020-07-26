@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Grpc;
 using Beef.RefData;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ namespace Beef.Test.NUnit.Tests
             {
                 sc.AddTransient(_ => GetHttpClient());
                 sc.AddTransient(_ => GetBeforeRequest());
+                sc.AddBeefAgentServices();
+                sc.AddBeefGrpcAgentServices();
             });
         }
 

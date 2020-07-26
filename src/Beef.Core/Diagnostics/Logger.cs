@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -20,14 +19,9 @@ namespace Beef.Diagnostics
         public static ILogger? Default { get; set; }
 
         /// <summary>
-        /// Creates an <see cref="ILogger"/> leveraging the <see cref="ExecutionContext.ServiceProvider"/>.
+        /// Creates an <see cref="ILogger"/> leveraging the <see cref="ExecutionContext.GetService{T}(bool)"/>.
         /// </summary>
         public static ILogger Create<T>()
-        {
-            if (ExecutionContext.HasCurrent && ExecutionContext.Current.ServiceProvider != null)
-                return ExecutionContext.Current.ServiceProvider.GetService<ILogger<T>>() ?? throw new InvalidOperationException("A logger was unable to be instantiated via the ExecutionContext.ServiceProvider; please check your configuration.");
-            else
-                return Default ?? throw new InvalidOperationException("A logger was unable to be instantiated as there is no ExecutionContext.Current instance, or the ExecutionContext.Current instance has not been configured with a ServiceProvider to enable, or the Default logger has not been specified.");
-        }
+            => ExecutionContext.GetService<ILogger<T>>(false) ?? Default ?? throw new InvalidOperationException("A logger was unable to be instantiated as there is no ExecutionContext.Current instance, or the ExecutionContext.Current instance has not been configured with a ServiceProvider to enable, or finally the Default logger has not been specified.");
     }
 }

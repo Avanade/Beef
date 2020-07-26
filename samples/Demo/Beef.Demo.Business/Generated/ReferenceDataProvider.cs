@@ -98,11 +98,7 @@ namespace Beef.Demo.Business
                 }
             }
 
-            Beef.ExecutionContext.FlowSuppression(ecf =>
-            {
-                Parallel.ForEach(types, (type, _) => { ecf.SetExecutionContext(); var __ = this[type]; });
-            });
-
+            Parallel.ForEach(types, (type, _) => { var __ = this[type]; });
             return Task.CompletedTask;
         }
     }

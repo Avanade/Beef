@@ -59,7 +59,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 ContactCollectionResult __result = new ContactCollectionResult();
                 var __dataArgs = EfMapper.Default.CreateArgs();
@@ -75,7 +75,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 return await _ef.CreateAsync(__dataArgs, value).ConfigureAwait(false);
@@ -109,7 +109,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 return await _ef.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
@@ -122,7 +122,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
                 await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);

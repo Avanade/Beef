@@ -7,5 +7,5 @@ namespace Beef.Events.Publish
     /// <summary>
     /// The publisher (<see cref="EventHubs.EventHubClient.SendAsync(EventHubs.EventData, string)"/>) invoker. 
     /// </summary>
-    public class EventHubPublisherInvoker : InvokerBase<EventHubPublisherInvoker, object> { }
+    public class EventHubPublisherInvoker : InvokerBase<object> { }
 }

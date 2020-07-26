@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="DatabaseBase"/> invocations
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="DatabaseBase"/> invocations
     /// specifically exception handling (see <see cref="DatabaseBase.ExceptionHandler"/>).
     /// </summary>
-    public class DatabaseInvoker : InvokerBase<DatabaseInvoker, DatabaseBase>
+    public class DatabaseInvoker : InvokerBase<DatabaseBase>
     {
         #region NoResult
 

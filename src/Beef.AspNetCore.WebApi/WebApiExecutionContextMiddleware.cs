@@ -12,9 +12,9 @@ namespace Beef.AspNetCore.WebApi
     /// <summary>
     /// Provides an <see cref="ExecutionContext"/> handling middleware that creates (using dependency injection) and enables additional configuration (<see cref="UpdateAction"/>) where required.
     /// </summary>
-    /// <remarks>Performs an <see cref="ExecutionContext.Reset"/> passing <c>false</c> to not renew. A new <see cref="ExecutionContext"/> is instantiated through dependency injection using the 
-    /// <see cref="HttpContext.RequestServices"/>. Where no <see cref="UpdateAction"/> has been specified then the <see cref="ExecutionContext.Username"/> will be set to the <see cref="System.Security.Principal.IIdentity.Name"/>
-    /// from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>.</remarks>
+    /// <remarks>A new <see cref="ExecutionContext"/> <see cref="ExecutionContext.Current"/> is instantiated through dependency injection using the <see cref="HttpContext.RequestServices"/>.
+    /// <para>Where no <see cref="UpdateAction"/> has been specified then the <see cref="ExecutionContext.Username"/> will be set to the <see cref="System.Security.Principal.IIdentity.Name"/>
+    /// from the <see cref="HttpContext"/> <see cref="HttpContext.User"/>; otherwise, <see cref="DefaultUsername"/> where <c>null</c>.</para></remarks>
     public class WebApiExecutionContextMiddleware
     {
         private readonly RequestDelegate _next;
@@ -69,7 +69,7 @@ namespace Beef.AspNetCore.WebApi
             if (context.Request.Headers.TryGetValue(WebApiConsts.CorrelationIdHeaderName, out var val))
                 ec.CorrelationId = val.FirstOrDefault();
 
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             ExecutionContext.SetCurrent(ec);
 
             await _next(context).ConfigureAwait(false);

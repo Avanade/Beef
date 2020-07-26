@@ -52,7 +52,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Product?> GetAsync(int id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out Product __val))
@@ -72,7 +72,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;

@@ -125,7 +125,7 @@ namespace Beef.Data.Cosmos
         {
             var key = DbArgs.GetCosmosKey(keys);
 
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -166,7 +166,7 @@ namespace Beef.Data.Cosmos
         {
             Check.NotNull(value, nameof(value));
 
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
                 CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
@@ -192,7 +192,7 @@ namespace Beef.Data.Cosmos
         {
             Check.NotNull(value, nameof(value));
 
-            return await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
                 // Where supporting etag then use IfMatch for concurreny.
                 var ro = CosmosDb.GetItemRequestOptions(DbArgs);
@@ -231,7 +231,7 @@ namespace Beef.Data.Cosmos
         {
             var key = DbArgs.GetCosmosKey(keys);
 
-            await CosmosDbInvoker.Default.InvokeAsync(this, async () =>
+            await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {

@@ -442,7 +442,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 
 ]]>
         </If>
-        <![CDATA[            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+        <![CDATA[            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
 ]]>
         <![CDATA[                ExecutionContext.Current.OperationType = OperationType.]]>

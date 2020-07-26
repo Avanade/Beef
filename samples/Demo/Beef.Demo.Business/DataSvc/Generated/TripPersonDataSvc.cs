@@ -55,7 +55,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out TripPerson __val))
@@ -74,7 +74,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.TripPerson.{__result.Id}", "Create").ConfigureAwait(false);
@@ -90,7 +90,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.TripPerson.{__result.Id}", "Update").ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.TripPerson.{id}", "Delete", id).ConfigureAwait(false);

@@ -52,7 +52,7 @@ namespace Cdr.Banking.Business
         /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId, args);

@@ -88,7 +88,7 @@ namespace Beef.Data.Database
         {
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
-            Invoker = invoker ?? DatabaseInvoker.Default;
+            Invoker = invoker ?? new DatabaseInvoker();
 
             DataContextScope.RegisterContext(_identifier, () =>
             {

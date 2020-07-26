@@ -56,7 +56,7 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         public void PrepareExecutionContext()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var ec = TestSetUp.CreateExecutionContext(TestSetUpAttribute.Username, TestSetUpAttribute.Args);
             ec.ServiceProvider = LocalServiceProvider;
             ExecutionContext.SetCurrent(ec);
@@ -71,7 +71,7 @@ namespace Beef.Test.NUnit.Tests
         /// <remarks>The <see cref="ExecutionContext"/> must be created by the <see cref="AgentTesterBase"/> as the <see cref="ExecutionContext.ServiceProvider"/> must be set to <see cref="LocalServiceProvider"/>.</remarks>
         public void PrepareExecutionContext(string? username, object? args = null)
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var ec = TestSetUp.CreateExecutionContext(username ?? TestSetUp.DefaultUsername, args);
             ec.ServiceProvider = LocalServiceProvider;
             ExecutionContext.SetCurrent(ec);

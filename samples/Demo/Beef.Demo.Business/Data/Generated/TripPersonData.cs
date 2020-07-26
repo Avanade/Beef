@@ -53,7 +53,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
                 return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
                 return await _odata.CreateAsync(__dataArgs, value).ConfigureAwait(false);
@@ -87,7 +87,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
                 return await _odata.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
@@ -100,7 +100,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
                 await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);

@@ -48,7 +48,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
@@ -62,7 +62,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -83,7 +83,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
@@ -105,7 +105,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
@@ -124,7 +124,7 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);

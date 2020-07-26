@@ -88,7 +88,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private void ExecuteQuery(Action<IQueryable<TModel>> execute)
         {
-            EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
+            _db.Invoker.Invoke(this, () =>
             {
                 var dbSet = _db.DbContext.Set<TModel>();
                 execute((_query == null) ? dbSet : _query(dbSet));
@@ -100,7 +100,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private TResult ExecuteQuery<TResult>(Func<IQueryable<TModel>, TResult> execute)
         {
-            return EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
+            return _db.Invoker.Invoke(this, () =>
             {
                 var dbSet = _db.DbContext.Set<TModel>();
                 return execute((_query == null) ? dbSet : _query(dbSet));

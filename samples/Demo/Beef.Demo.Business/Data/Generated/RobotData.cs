@@ -62,7 +62,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
                 return await _cosmos.Container(__dataArgs).GetAsync(id).ConfigureAwait(false);
@@ -79,7 +79,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
                 return await _cosmos.Container(__dataArgs).CreateAsync(value).ConfigureAwait(false);
@@ -96,7 +96,7 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
                 return await _cosmos.Container(__dataArgs).UpdateAsync(value).ConfigureAwait(false);
@@ -109,7 +109,7 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", PartitionKey.None, onCreate: _onDataArgsCreate);
                 await _cosmos.Container(__dataArgs).DeleteAsync(id).ConfigureAwait(false);
@@ -124,7 +124,7 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 RobotCollectionResult __result = new RobotCollectionResult(paging);
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Items", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);

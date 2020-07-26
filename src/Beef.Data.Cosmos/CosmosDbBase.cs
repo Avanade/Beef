@@ -127,12 +127,15 @@ namespace Beef.Data.Cosmos
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
         /// <param name="throughput">The throughput (RU/S).</param>
-        protected CosmosDbBase(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400)
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="CosmosDbInvoker"/>.</param>
+        protected CosmosDbBase(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400, CosmosDbInvoker? invoker = null)
         {
             Client = Check.NotNull(client, nameof(client));
             Database = createDatabaseIfNotExists ?
                 Client.CreateDatabaseIfNotExistsAsync(databaseId, throughput ?? 400).Result.Database :
                 Client.GetDatabase(Check.NotEmpty(databaseId, nameof(databaseId)));
+
+            Invoker = invoker ?? new CosmosDbInvoker();
         }
 
         /// <summary>
@@ -144,6 +147,11 @@ namespace Beef.Data.Cosmos
         /// Gets the <see cref="Microsoft.Azure.Cosmos.Database"/>.
         /// </summary>
         public Database Database { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="CosmosDbInvoker"/>.
+        /// </summary>
+        public CosmosDbInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CosmosException"/> handler (by default set up to execute <see cref="ThrowTransformedDocumentClientException(CosmosException)"/>).

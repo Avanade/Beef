@@ -1,6 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Diagnostics;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Beef.RefData.Caching
@@ -36,14 +40,18 @@ namespace Beef.RefData.Caching
         /// <param name="owner">The owning <see cref="IReferenceDataCache{TColl, TItem}"/>.</param>
         /// <param name="loadCollection">The specified function to load the collection from the data repository.</param>
         /// <returns>The collection from the data repository.</returns>
-        public virtual Task<TColl> LoadAsync<TColl, TItem>(IReferenceDataCache<TColl, TItem> owner, Func<Task<TColl>> loadCollection)
+        public virtual async Task<TColl> LoadAsync<TColl, TItem>(IReferenceDataCache<TColl, TItem> owner, Func<Task<TColl>> loadCollection)
             where TColl : ReferenceDataCollectionBase<TItem>, IReferenceDataCollection, new()
             where TItem : ReferenceDataBase, new()
         {
             Check.NotNull(owner, nameof(owner));
             Check.NotNull(loadCollection, nameof(loadCollection));
 
-            return loadCollection();
+            var sw = Stopwatch.StartNew();
+            var coll = await loadCollection().ConfigureAwait(false);
+            sw.Stop();
+            Logger.Create<ReferenceDataCacheLoader>().LogInformation("ReferenceData Cache Type '{0}' loaded with {1} items on thread '{2}' in {3}ms.", typeof(TItem).Name, coll.Count, Thread.CurrentThread.ManagedThreadId, sw.ElapsedMilliseconds);
+            return coll;
         }
     }
 }

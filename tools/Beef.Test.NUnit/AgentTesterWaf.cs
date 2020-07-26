@@ -113,7 +113,7 @@ namespace Beef.Test.NUnit
             {
                 if (disposing)
                 {
-                    ExecutionContext.Reset(false);
+                    ExecutionContext.Reset();
                     WebApplicationFactory.Dispose();
                 }
 

@@ -8,10 +8,10 @@ using System.Transactions;
 namespace Beef.Business
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <b> business tier</b> invocations using
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <b> business tier</b> invocations using
     /// a <see cref="BusinessInvokerArgs"/> to enable <see cref="DataContextScopeOption"/> and <see cref="TransactionScope"/> options. 
     /// </summary>
-    public abstract class BusinessInvokerBase<TInvoker> : InvokerBase<TInvoker, BusinessInvokerArgs> where TInvoker : BusinessInvokerBase<TInvoker>, new()
+    public abstract class BusinessInvokerBase : InvokerBase<BusinessInvokerArgs>
     {
         #region NoResult
 
@@ -219,7 +219,7 @@ namespace Beef.Business
     }
 
     /// <summary>
-    /// Provides arguments for the <see cref="BusinessInvokerBase{TInvoker}"/>.
+    /// Provides arguments for the <see cref="BusinessInvokerBase"/>.
     /// </summary>
     public class BusinessInvokerArgs
     {

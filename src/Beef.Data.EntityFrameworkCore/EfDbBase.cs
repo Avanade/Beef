@@ -61,7 +61,23 @@ namespace Beef.Data.EntityFrameworkCore
         /// Initializes a new instance of the <see cref="EfDbBase{TDbContext}"/> class.
         /// </summary>
         /// <param name="dbContext">The <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.</param>
-        public EfDbBase(TDbContext dbContext) => DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="EfDbInvoker{TDbContext}"/>.</param>
+        public EfDbBase(TDbContext dbContext, EfDbInvoker<TDbContext>? invoker = null)
+        {
+            DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            Invoker = invoker ?? new EfDbInvoker<TDbContext>();
+        }
+
+        /// <summary>
+        /// Gets the underlying <typeparamref name="TDbContext"/> instance.
+        /// </summary>
+        /// <returns>The <typeparamref name="TDbContext"/> instance.</returns>
+        public TDbContext DbContext { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="EfDbInvoker{TDbContext}"/>.
+        /// </summary>
+        public EfDbInvoker<TDbContext> Invoker { get; private set; }
 
         /// <summary>
         /// Indicates whether a pre-read is performed on an <see cref="UpdateAsync{T, TModel}(EfDbArgs{T, TModel}, T)"/> to confirm existence and throw a corresponding
@@ -79,12 +95,6 @@ namespace Beef.Data.EntityFrameworkCore
         /// Gets or sets the <see cref="SqlException"/> handler (by default set up to execute <see cref="ThrowTransformedSqlException(SqlException)"/>).
         /// </summary>
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
-
-        /// <summary>
-        /// Gets the underlying <typeparamref name="TDbContext"/> instance.
-        /// </summary>
-        /// <returns>The <typeparamref name="TDbContext"/> instance.</returns>
-        public TDbContext DbContext { get; private set; }
 
         /// <summary>
         /// Invokes the <paramref name="action"/> whilst <see cref="DatabaseWildcard.Replace(string)">replacing</see> the <b>wildcard</b> characters when the <paramref name="with"/> is not <c>null</c>.
@@ -151,7 +161,7 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 return await FindAsync(getArgs, efKeys).ConfigureAwait(false);
             }, this).ConfigureAwait(false);
@@ -181,7 +191,7 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
                 DbContext.Add(model);
@@ -217,7 +227,7 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 if (OnUpdatePreReadForNotFound)
                 {
@@ -265,7 +275,7 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            await Invoker.InvokeAsync(this, async () =>
             {
                 // A pre-read is required to get the row version for concurrency.
                 var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);

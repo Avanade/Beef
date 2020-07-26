@@ -184,7 +184,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         public async Task<{{Entity.EntityCollectionName}}> {{Entity.Name}}GetAllAsync()
         {
             var __coll = new {{Entity.EntityCollectionName}}();
-            await DataInvoker.Default.InvokeAsync(this, async () => ]]>
+            await DataInvoker.Current.InvokeAsync(this, async () => ]]>
       <Set Name="Config.NewLine" Value="false" />
       <Switch Value="Entity.AutoImplement">
         <Case Value="'Database'">

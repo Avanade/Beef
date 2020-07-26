@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Business;
 using Beef.Caching;
 using Beef.Caching.Policy;
 using Beef.Events;
+using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -75,6 +77,34 @@ namespace Beef
                 throw new ArgumentNullException(nameof(services));
 
             return services.AddSingleton<IEventPublisher>(_ => new NullEventPublisher());
+        }
+
+        /// <summary>
+        /// Adds the required <i>Business</i> services.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefBusinessServices(this IServiceCollection services)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            return services.AddSingleton(_ => new ManagerInvoker())
+                           .AddSingleton(_ => new DataSvcInvoker())
+                           .AddSingleton(_ => new DataInvoker());
+        }
+
+        /// <summary>
+        /// Adds the required <i>Agent</i> (client-side) services.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefAgentServices(this IServiceCollection services)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            return services.AddSingleton(_ => new WebApiAgentInvoker());
         }
     }
 }

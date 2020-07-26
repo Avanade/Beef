@@ -41,7 +41,7 @@ namespace Beef.Data.OData
         /// </summary>
         private void ExecuteQuery(Action<IBoundClient<TModel>> execute)
         {
-            ODataInvoker.Default.Invoke(this, () =>
+            _odata.Invoker.Invoke(this, () =>
             {
                 var q = _odata.Client.For<TModel>(QueryArgs.CollectionName);
                 execute((_query == null) ? q : _query(q));
@@ -53,7 +53,7 @@ namespace Beef.Data.OData
         /// </summary>
         private TModel ExecuteQuery(Func<IBoundClient<TModel>, TModel> execute)
         {
-            return ODataInvoker.Default.Invoke(this, () =>
+            return _odata.Invoker.Invoke(this, () =>
             {
                 var q = _odata.Client.For<TModel>(QueryArgs.CollectionName);
                 return execute((_query == null) ? q : _query(q));

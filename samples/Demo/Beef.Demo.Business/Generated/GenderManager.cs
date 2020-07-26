@@ -49,7 +49,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -70,7 +70,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;

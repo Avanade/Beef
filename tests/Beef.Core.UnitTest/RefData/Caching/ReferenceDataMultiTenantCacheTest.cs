@@ -81,7 +81,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
             var rdc = new ReferenceDataMultiTenantCache<TestRdCollection, TestRd>(() => { i++; return GetData(); });
 
             // Set an execution context.
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(1), ServiceProvider = sp });
 
             // Nothing loaded.
@@ -106,7 +106,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
             Assert.IsFalse(rdc.IsExpired);
 
             // Change the execution context.
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             ExecutionContext.SetCurrent(new ExecutionContext { TenantId = GetGuid(2), ServiceProvider = sp });
 
             // Now load new tenant.
@@ -140,7 +140,7 @@ namespace Beef.Core.UnitTest.RefData.Caching
             int i = 0;
             var rdc = new ReferenceDataMultiTenantCache<TestRdCollection, TestRd>(() => { i++; return GetData(); });
 
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
 
             // Set an execution context.
             var tasks = new Task[10];

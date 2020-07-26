@@ -343,7 +343,7 @@ namespace Beef.Data.Database
         {
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.InvokeAsync(this, async () =>
+            return Database.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -369,7 +369,7 @@ namespace Beef.Data.Database
             DbDataReader? dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.InvokeAsync(this, async () => 
+            return Database.Invoker.InvokeAsync(this, async () => 
             {
                 try
                 {
@@ -402,7 +402,7 @@ namespace Beef.Data.Database
             DbDataReader? dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            await DatabaseInvoker.Default.InvokeAsync(this, async () =>
+            await Database.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {

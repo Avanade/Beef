@@ -82,7 +82,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public Task<Person> CreateAsync(Person value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
@@ -98,7 +98,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
@@ -114,7 +114,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out Person __val))
@@ -134,7 +134,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public Task<Person> UpdateAsync(Person value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -151,7 +151,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
@@ -165,7 +165,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
@@ -181,7 +181,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -197,7 +197,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -213,7 +213,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
                 await _evtPub.PublishAsync(
@@ -229,7 +229,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         public Task MarkAsync()
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
@@ -243,7 +243,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
@@ -258,7 +258,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out PersonDetail __val))
@@ -278,7 +278,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -294,7 +294,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="int"/>.</returns>
         public Task<int> DataSvcCustomAsync()
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
                 return __result;
@@ -308,7 +308,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person?"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetNullAsync(name).ConfigureAwait(false);
                 _cache.SetValue(__result?.UniqueKey ?? UniqueKey.Empty, __result);
@@ -325,7 +325,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -338,7 +338,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         public Task ThrowErrorAsync()
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
@@ -352,7 +352,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person?> GetWithEfAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out Person __val))
@@ -372,7 +372,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public Task<Person> CreateWithEfAsync(Person value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
@@ -389,7 +389,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Person"/> object.</returns>
         public Task<Person> UpdateWithEfAsync(Person value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -405,7 +405,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteWithEfAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync(

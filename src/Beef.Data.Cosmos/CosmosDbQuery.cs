@@ -59,7 +59,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         internal void ExecuteQuery(Action<IQueryable<TModel>> execute)
         {
-            CosmosDbInvoker.Default.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
+            _container.CosmosDb.Invoker.Invoke(this, () => ExecuteQueryInternal(execute), _container.CosmosDb);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Beef.Data.Cosmos
         /// </summary>
         internal TModel ExecuteQuery(Func<IQueryable<TModel>, TModel> execute)
         {
-            return CosmosDbInvoker.Default.Invoke(this, () =>
+            return _container.CosmosDb.Invoker.Invoke(this, () =>
             {
                 return execute(AsQueryable(false));
             }, _container.CosmosDb);

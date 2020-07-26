@@ -118,7 +118,7 @@ namespace Beef.Events.Subscribe
             try
             {
                 // Create and set the execution context for the event.
-                ExecutionContext.Reset(false);
+                ExecutionContext.Reset();
                 var ec = Args.ServiceProvider.GetService<ExecutionContext>();
                 UpdateExecutionContext(ec, subscriber, @event);
                 ec.ServiceProvider = Args.ServiceProvider;

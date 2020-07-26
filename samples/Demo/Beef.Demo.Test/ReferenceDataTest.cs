@@ -39,15 +39,12 @@ namespace Beef.Demo.Test
         [Test, TestSetUp, Parallelizable]
         public void A110_GetNamed_AllList()
         {
-            _tester.PrepareExecutionContext();
-            var names = ReferenceData.Current.GetAllTypes().Select(x => x.Name).ToArray();
-
             var r = _tester.Test<ReferenceDataAgent>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetNamedAsync(names));
+                .Run(a => a.GetNamedAsync(new string[] { nameof(ReferenceData.Country), nameof(ReferenceData.USState), nameof(ReferenceData.Gender), nameof(ReferenceData.EyeColor), nameof(ReferenceData.PowerSource), nameof(ReferenceData.Company) }));
 
             Assert.NotNull(r.Content);
-            Assert.AreEqual(names.Length, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
+            Assert.AreEqual(6, JObject.Parse("{ \"content\":" + r.Content + "}")["content"].Children().Count());
         }
 
         [Test, TestSetUp, Parallelizable]

@@ -635,7 +635,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
         </If>
 
         <!-- Code -->
-        <![CDATA[            return DataInvoker.Default.InvokeAsync]]>
+        <![CDATA[            return DataInvoker.Current.InvokeAsync]]>
         <If Condition="Operation.OperationType == 'Custom' or Operation.AutoImplement == 'None' or Entity.AutoImplement == null">
           <Then>
             <![CDATA[(this, () => {{Operation.Name}}OnImplementationAsync(]]>

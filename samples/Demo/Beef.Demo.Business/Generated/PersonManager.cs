@@ -153,7 +153,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
@@ -178,7 +178,7 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
@@ -202,7 +202,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -231,7 +231,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
@@ -258,7 +258,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
@@ -275,7 +275,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
@@ -294,7 +294,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -321,7 +321,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -348,7 +348,7 @@ namespace Beef.Demo.Business
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 Cleaner.CleanUp(fromId, toId);
@@ -373,7 +373,7 @@ namespace Beef.Demo.Business
         /// </summary>
         public Task MarkAsync()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
@@ -389,7 +389,7 @@ namespace Beef.Demo.Business
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -414,7 +414,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -443,7 +443,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
@@ -469,7 +469,7 @@ namespace Beef.Demo.Business
         /// <param name="person">The Person (see <see cref="Person"/>).</param>
         public Task AddAsync(Person? person)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await AddOnImplementationAsync(person).ConfigureAwait(false);
@@ -482,7 +482,7 @@ namespace Beef.Demo.Business
         /// <returns>A resultant <see cref="int"/>.</returns>
         public Task<int> DataSvcCustomAsync()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
@@ -500,7 +500,7 @@ namespace Beef.Demo.Business
         /// <returns>A resultant <see cref="Person?"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(name);
@@ -526,7 +526,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -550,7 +550,7 @@ namespace Beef.Demo.Business
         /// </summary>
         public Task ThrowErrorAsync()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
@@ -566,7 +566,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Person?> GetWithEfAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -594,7 +594,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
@@ -623,7 +623,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
@@ -649,7 +649,7 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteWithEfAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);

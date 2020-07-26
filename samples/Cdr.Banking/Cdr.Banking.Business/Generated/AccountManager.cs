@@ -51,7 +51,7 @@ namespace Cdr.Banking.Business
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -70,7 +70,7 @@ namespace Cdr.Banking.Business
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
@@ -89,7 +89,7 @@ namespace Cdr.Banking.Business
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);

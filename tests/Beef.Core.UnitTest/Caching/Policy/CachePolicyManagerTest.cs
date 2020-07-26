@@ -20,7 +20,7 @@ namespace Beef.Core.UnitTest.Caching.Policy
 
             var sp = services.BuildServiceProvider();
 
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             ExecutionContext.SetCurrent(new ExecutionContext { ServiceProvider = sp });
 
             return sp;

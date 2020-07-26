@@ -63,7 +63,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 AccountCollectionResult __result = new AccountCollectionResult(paging);
                 var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
@@ -79,7 +79,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None, onCreate: _onDataArgsCreate);
                 return await _cosmos.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
@@ -93,7 +93,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
+            return DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
         }
 
         /// <summary>

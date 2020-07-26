@@ -31,19 +31,22 @@ namespace Beef.Data.OData
         /// Initializes a new instance of the <see cref="ODataBase"/> class with a <paramref name="baseUri"/> automatically creating the <see cref="ClientSettings"/>.
         /// </summary>
         /// <param name="baseUri">The base <see cref="Uri"/> for the OData endpoint.</param>
-        protected ODataBase(Uri baseUri) : this(new Soc.ODataClientSettings(Check.NotNull(baseUri, nameof(baseUri)))) { }
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ODataInvoker"/>.</param>
+        protected ODataBase(Uri baseUri, ODataInvoker? invoker = null) : this(new Soc.ODataClientSettings(Check.NotNull(baseUri, nameof(baseUri))), invoker) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataBase"/> class with a <paramref name="clientSettings"/>.
         /// </summary>
         /// <param name="clientSettings">The <see cref="Soc.ODataClientSettings"/>.</param>
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ODataInvoker"/>.</param>
         /// <remarks><i>Note:</i> Overrides the <see cref="Soc.ODataClientSettings.IgnoreResourceNotFoundException"/> to <c>true</c> by design.</remarks>
-        protected ODataBase(Soc.ODataClientSettings clientSettings)
+        protected ODataBase(Soc.ODataClientSettings clientSettings, ODataInvoker? invoker = null)
         {
             ClientSettings = Check.NotNull(clientSettings, nameof(clientSettings));
             ClientSettings.IgnoreResourceNotFoundException = true;
             ClientSettings.PreferredUpdateMethod = Soc.ODataUpdateMethod.Patch;
             Client = new Soc.ODataClient(ClientSettings);
+            Invoker = invoker ?? new ODataInvoker();
         }
 
         /// <summary>
@@ -55,6 +58,11 @@ namespace Beef.Data.OData
         /// Gets the <see cref="Soc.ODataClientSettings"/>.
         /// </summary>
         public Soc.ODataClientSettings ClientSettings { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ODataInvoker"/>.
+        /// </summary>
+        public ODataInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ODataException"/> handler (by default set up to execute <see cref="ThrowTransformedODataException(Soc.WebRequestException)"/>).
@@ -94,7 +102,7 @@ namespace Beef.Data.OData
 
             var okeys = getArgs.GetODataKeys(keys);
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -129,7 +137,7 @@ namespace Beef.Data.OData
 
             // Note: ChangeLog is not updated (if it exists) as it is assumed the OData data source is responsible for this.
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
                 var created = await Client.For<TModel>(saveArgs.CollectionName).Set(model).InsertEntryAsync(true).ConfigureAwait(false);
@@ -155,7 +163,7 @@ namespace Beef.Data.OData
 
             // Note: ChangeLog is not updated (if it exists) as it is assumed the OData data source is responsible for this.
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(value);
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
@@ -180,7 +188,7 @@ namespace Beef.Data.OData
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
 
-            await ODataInvoker.Default.InvokeAsync(this, async () =>
+            await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(keys);
                 try

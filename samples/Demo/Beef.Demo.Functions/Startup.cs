@@ -21,7 +21,8 @@ namespace Beef.Demo.Functions
             // Add the core beef services.
             builder.Services.AddBeefExecutionContext()
                             .AddBeefRequestCache()
-                            .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+                            .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                            .AddBeefBusinessServices();
 
             // Add event subscriber host and auto-discovered subscribers.
             builder.Services.AddBeefEventHubSubscriberHost<Startup>();

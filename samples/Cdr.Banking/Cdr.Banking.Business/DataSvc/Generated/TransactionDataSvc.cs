@@ -51,7 +51,7 @@ namespace Cdr.Banking.Business.DataSvc
         /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(TransactionDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(TransactionDataSvc), async () => 
             {
                 var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
                 return __result;

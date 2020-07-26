@@ -56,12 +56,9 @@ namespace Beef.Caching.Policy
         public bool IsInternalTracingEnabled { get; set; } = false;
 
         /// <summary>
-        /// Gets the current <see cref="CachePolicyManager"/> (uses the <see cref="Beef.ExecutionContext.ServiceProvider"/> to get/instantiate).
+        /// Gets the current <see cref="CachePolicyManager"/> (uses the <see cref="ExecutionContext.GetService{T}"/> to get/instantiate).
         /// </summary>
-        public static CachePolicyManager Current =>
-            ExecutionContext.HasCurrent && ExecutionContext.Current.ServiceProvider != null
-                ? (CachePolicyManager)ExecutionContext.Current.ServiceProvider.GetService(typeof(CachePolicyManager))
-                : throw new InvalidOperationException("CachePolicyManager.Current relies on ExecutionContext.Current.ServiceProvider to get/instantiate; this is not set.");
+        public static CachePolicyManager Current => ExecutionContext.GetService<CachePolicyManager>();
 
         /// <summary>
         /// Gets the logger.

@@ -1,6 +1,5 @@
 ﻿using Beef;
 using Beef.AspNetCore.WebApi;
-using Beef.Caching;
 using Beef.Caching.Policy;
 using Beef.Entities;
 using Beef.Validation;
@@ -25,14 +24,12 @@ namespace Cdr.Banking.Api
     public class Startup
     {
         private readonly IConfiguration _config;
-        private readonly ILogger _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        /// <param name="logger">The <see cref="ILoggerFactory"/>.</param>
-        public Startup(IConfiguration config, ILogger<Startup> logger)
+        public Startup(IConfiguration config)
         {
             _config = config;
 
@@ -43,9 +40,6 @@ namespace Cdr.Banking.Api
             WebApiQueryString.PagingArgsPageQueryStringNames.Add("page");
             WebApiQueryString.PagingArgsTakeQueryStringNames.Add("page-size");
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
-
-            // Configure the logger.
-            _logger = Check.NotNull(logger, nameof(logger));
         }
 
         /// <summary>
@@ -57,15 +51,16 @@ namespace Cdr.Banking.Api
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            // Add the "customised" execution context.
-            services.AddBeefExecutionContext(() => new Business.ExecutionContext());
+            // Add the core beef services.
+            services.AddBeefExecutionContext(() => new Business.ExecutionContext())
+                    .AddBeefRequestCache()
+                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                    .AddBeefWebApiServices()
+                    .AddBeefBusinessServices();
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = _config.GetSection("CosmosDb");
             services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")));
-
-            // Add beef request cache service.
-            services.AddScoped<IRequestCache, RequestCache>();
 
             // Add beef cache policy management.
             services.AddSingleton(_ =>
@@ -108,10 +103,11 @@ namespace Cdr.Banking.Api
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        public void Configure(IApplicationBuilder app)
+        /// <param name="logger">The <see cref="ILogger"/>.</param>
+        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
             // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler(_logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
+            app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();

@@ -309,7 +309,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func)
         {
-            return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -348,7 +348,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         protected virtual Task ExecuteResultAsync<TResult>(ActionContext context, Func<Task<TResult>> func)
         {
-            return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -561,7 +561,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         public async override Task ExecuteResultAsync(ActionContext context)
         {
-            await WebApiControllerInvoker.Default.InvokeAsync(Controller, async () =>
+            await WebApiControllerInvoker.Current.InvokeAsync(Controller, async () =>
             {
                 try
                 {
@@ -894,10 +894,10 @@ namespace Beef.AspNetCore.WebApi
         public override Task ExecuteResultAsync(ActionContext context)
         {
             if (_updateFuncWithResult == null)
-                return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult!),
+                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncNoResult!),
                     memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
             else
-                return WebApiControllerInvoker.Default.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncWithResult),
+                return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, _updateFuncWithResult),
                     memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 

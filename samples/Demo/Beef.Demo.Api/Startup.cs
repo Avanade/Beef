@@ -3,9 +3,9 @@ using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
-using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.Events;
+using Beef.Grpc;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -31,40 +31,8 @@ namespace Beef.Demo.Api
             // Use JSON property names in validation.
             ValidationArgs.DefaultUseJsonNames = true;
 
-            // Load the cache policies.
-            //CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            //CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-
-            // Register the database.
-            // Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
-            Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
-
-            // Register the DocumentDb/CosmosDb client.
-            //CosmosDb.Register(() =>
-            //{
-            //    var cs = config.GetSection("CosmosDb");
-            //    return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            //});
-
-            // Register the test OData services.
-            //TestOData.Register(() => new TestOData(new Uri(WebApiStartup.GetConnectionString(config, "TestOData"))));
-            //TripOData.Register(() => new TripOData(new Uri(WebApiStartup.GetConnectionString(config, "TripOData"))));
-
             // Default the page size.
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
-
-            // Configure the Service Agents from the configuration and register.
-            //var sac = config.GetSection("BeefServiceAgents").Get<WebApiServiceAgentConfig>();
-            //sac?.RegisterAll();
-
-            // Set up the event publishing to event hubs.
-            //if (config.GetValue<bool>("EventHubPublishing"))
-            //{
-            //    var ehc = EventHubClient.CreateFromConnectionString(config.GetValue<string>("EventHubConnectionString"));
-            //    ehc.RetryPolicy = RetryPolicy.Default;
-            //    var ehp = new EventHubPublisher(ehc);
-            //    Event.Register((events) => ehp.Publish(events));
-            //}
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -73,7 +41,10 @@ namespace Beef.Demo.Api
             // Add the core beef services.
             services.AddBeefExecutionContext()
                     .AddBeefRequestCache()
-                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
+                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                    .AddBeefWebApiServices()
+                    .AddBeefGrpcServiceServices()
+                    .AddBeefBusinessServices();
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = _config.GetSection("CosmosDb");

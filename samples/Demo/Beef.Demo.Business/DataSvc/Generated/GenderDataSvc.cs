@@ -55,7 +55,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
                 if (_cache.TryGetValue(__key, out Gender __val))
@@ -74,7 +74,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
         public Task<Gender> CreateAsync(Gender value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
@@ -90,7 +90,7 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
         public Task<Gender> UpdateAsync(Gender value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);

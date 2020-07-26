@@ -50,7 +50,7 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
@@ -71,7 +71,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
@@ -93,7 +93,7 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
@@ -112,7 +112,7 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
@@ -132,7 +132,7 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
@@ -151,7 +151,7 @@ namespace Beef.Demo.Business
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);

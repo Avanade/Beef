@@ -330,7 +330,7 @@ namespace Beef.Test.NUnit
             var sp = services.BuildServiceProvider();
             var ec = sp.GetService<ExecutionContext>();
             ec.ServiceProvider = sp;
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             ExecutionContext.SetCurrent(ec);
             return sp;
         }
