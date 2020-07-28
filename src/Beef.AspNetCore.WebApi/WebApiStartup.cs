@@ -18,17 +18,26 @@ namespace Beef.AspNetCore.WebApi
     public static class WebApiStartup
     {
         /// <summary>
-        /// Builds (creates) the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the <see cref="ConfigurationBuilder"/>.
+        /// Creates the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the standardized <see cref="ConfigurationBuilder"/>.
+        /// </summary>
+        /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
+        /// <param name="args">The command line args.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with.</param>
+        /// <returns>The <see cref="IWebHost"/>.</returns>
+        public static IWebHostBuilder CreateWebHost<TStartup>(string[] args, string? environmentVariablePrefix = null) where TStartup : class =>
+            WebHost.CreateDefaultBuilder(args)
+                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, hostingContext.HostingEnvironment, environmentVariablePrefix))
+                   .UseStartup<TStartup>();
+
+        /// <summary>
+        /// Creates and builds the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the <see cref="ConfigurationBuilder"/>.
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="args">The command line args.</param>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with.</param>
         /// <returns>The <see cref="IWebHost"/>.</returns>
         public static IWebHost BuildWebHost<TStartup>(string[] args, string? environmentVariablePrefix = null) where TStartup : class =>
-            WebHost.CreateDefaultBuilder(args)
-                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, hostingContext.HostingEnvironment, environmentVariablePrefix))
-                   .UseStartup<TStartup>()
-                   .Build();
+            CreateWebHost<TStartup>(args, environmentVariablePrefix).Build();
 
         /// <summary>
         /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),

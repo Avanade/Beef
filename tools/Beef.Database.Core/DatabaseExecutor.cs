@@ -124,6 +124,8 @@ namespace Beef.Database.Core
         /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
         public DatabaseExecutor(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
         {
+            Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
+
             _command = command;
             _connectionString = Check.NotEmpty(connectionString, nameof(connectionString));
             _assemblies = assemblies;

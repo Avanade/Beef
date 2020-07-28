@@ -21,7 +21,9 @@ namespace Cdr.Banking.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            TestSetUp.DefaultEnvironmentVariablePrefix = "Billing";
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
+            TestSetUp.DefaultExpectNoEvents = true;
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
                 // Setup and load cosmos once only.
@@ -63,8 +65,6 @@ namespace Cdr.Banking.Test
 
                 return true;
             });
-
-            TestSetUp.DefaultExpectNoEvents = true;
 
             // TODO: Passing the username as an http header for all requests; this would be replaced with OAuth integration, etc.
             AgentTester.RegisterBeforeRequest(r => r.Headers.Add("cdr-user", Beef.ExecutionContext.Current.Username));

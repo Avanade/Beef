@@ -377,6 +377,21 @@ namespace Beef.Demo.Api.Controllers
             return new WebApiDelete(this, () => _manager.DeleteWithEfAsync(id),
                 operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent);
         }
+
+        /// <summary>
+        /// Patches the <see cref="Person"/> entity.
+        /// </summary>
+        /// <param name="value">The <see cref="JToken"/> value that contains the patch content for the entity.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The patched <see cref="Person"/> entity.</returns>
+        [HttpPatch()]
+        [Route("ef/{id}")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        public IActionResult PatchWithEf([FromBody] JToken value, Guid id)
+        {
+            return new WebApiPatch<Person>(this, value, () => _manager.GetAsync(id), (__value) => _manager.UpdateAsync(__value, id),
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        }
     }
 }
 

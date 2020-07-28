@@ -40,8 +40,8 @@ namespace Beef.Test.NUnit
         /// 4) appsettings.{environment}.json, 5) appsettings.json, 6) webapisettings.{environment}.json (embedded resource within <typeparamref name="TStartup"/> assembly), and 7) webapisettings.json (embedded resource within <typeparamref name="TStartup"/> assembly).
         /// </summary>
         /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied).</param>
-        /// <param name="environment">The environment to be used by the underlying web host.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with (will automatically add a trailing underscore where not supplied). Defaults to <see cref="TestSetUp.DefaultEnvironmentVariablePrefix"/></param>
+        /// <param name="environment">The environment to be used by the underlying web host. Defaults to <see cref="TestSetUp.DefaultEnvironment"/>.</param>
         /// <returns>The <see cref="IConfiguration"/>.</returns>
         public static IConfiguration BuildConfiguration<TStartup>(string? environmentVariablePrefix = null, string? environment = TestSetUp.DefaultEnvironment) where TStartup : class
         {
@@ -52,10 +52,11 @@ namespace Beef.Test.NUnit
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{environment}.json", true, true);
 
-            if (string.IsNullOrEmpty(environmentVariablePrefix))
+            var evp = string.IsNullOrEmpty(environmentVariablePrefix) ? TestSetUp.DefaultEnvironmentVariablePrefix : environmentVariablePrefix;
+            if (string.IsNullOrEmpty(evp))
                 cb.AddEnvironmentVariables();
             else
-                cb.AddEnvironmentVariables(environmentVariablePrefix.EndsWith("_", StringComparison.InvariantCulture) ? environmentVariablePrefix : environmentVariablePrefix + "_");
+                cb.AddEnvironmentVariables(evp.EndsWith("_", StringComparison.InvariantCulture) ? evp : evp + "_");
 
             var config = cb.Build();
             if (config.GetValue<bool>("UseUserSecrets"))

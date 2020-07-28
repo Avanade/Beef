@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Beef.AspNetCore.WebApi" Version="4.0.1" />
+    <PackageReference Include="Beef.Events" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.4.1" />
   </ItemGroup>

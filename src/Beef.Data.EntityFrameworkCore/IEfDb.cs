@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,5 +77,18 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="saveArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="keys">The key values.</param>
         Task DeleteAsync<T, TModel>(EfDbArgs<T, TModel> saveArgs, params IComparable[] keys) where T : class, new() where TModel : class, new();
+    }
+
+    /// <summary>
+    /// Provides the entity framework capabilities including the required <typeparamref name="TDbContext"/>.
+    /// </summary>
+    /// <typeparam name="TDbContext">The entity framework <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
+    public interface IEfDb<TDbContext> : IEfDb where TDbContext : DbContext
+    {
+        /// <summary>
+        /// Gets the underlying <typeparamref name="TDbContext"/> instance.
+        /// </summary>
+        /// <returns>The <typeparamref name="TDbContext"/> instance.</returns>
+        TDbContext DbContext { get; }
     }
 }

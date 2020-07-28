@@ -11,21 +11,14 @@ using System.Net;
 namespace Cdr.Banking.Test
 {
     [TestFixture, NonParallelizable]
-    public class AccountTest : IDisposable
+    public class AccountTest : UsingAgentTesterServer<Startup>
     {
-        private readonly AgentTesterServer<Startup> _agentTester = AgentTester.CreateServer<Startup>("Billing");
-
-        public void Dispose() => _agentTester.Dispose();
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Reset();
-
         #region GetAccounts
 
         [Test, TestSetUp("jessica")]
         public void B110_GetAccounts_User1()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
@@ -38,7 +31,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void B120_GetAccounts_User2()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
@@ -51,7 +44,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jason")]
         public void B130_GetAccounts_User3_None()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null)).Value;
 
@@ -63,7 +56,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void B140_GetAccounts_User4_Auth()
         {
-            _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetAccountsAsync(null));
         }
@@ -71,7 +64,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B210_GetAccounts_OpenStatus()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { OpenStatus = "OPEN" })).Value;
 
@@ -85,7 +78,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B220_GetAccounts_ProductCategory()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { ProductCategory = "CRED_AND_CHRG_CARDS" })).Value;
 
@@ -98,7 +91,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B230_GetAccounts_IsOwned()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = true })).Value;
 
@@ -111,7 +104,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B240_GetAccounts_NotIsOwned()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(new AccountArgs { IsOwned = false })).Value;
 
@@ -124,7 +117,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B310_GetAccounts_Page1()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(1, 2))).Value;
 
@@ -137,7 +130,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B320_GetAccounts_Page2()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(2, 2))).Value;
 
@@ -150,7 +143,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B330_GetAccounts_Page3()
         {
-            var v = _agentTester.Test<AccountAgent, AccountCollectionResult>()
+            var v = AgentTester.Test<AccountAgent, AccountCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAccountsAsync(null, PagingArgs.CreatePageAndSize(3, 2))).Value;
 
@@ -166,7 +159,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void C110_GetDetail_NotFound()
         {
-            _agentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetDetailAsync("00000000"));
         }
@@ -174,7 +167,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void C120_GetDetail_Found()
         {
-            _agentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new AccountDetail
                 {
@@ -196,7 +189,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void C130_GetDetail_Found_NoAuth()
         {
-            _agentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
@@ -204,7 +197,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void C140_GetDetail_NoAuth()
         {
-            _agentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
@@ -216,7 +209,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void D110_GetBalance_Found()
         {
-            var v = _agentTester.Test<AccountAgent, Balance>()
+            var v = AgentTester.Test<AccountAgent, Balance>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetBalanceAsync("12345678")).Value;
 
@@ -226,7 +219,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void D120_GetBalance_NotFound()
         {
-            _agentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }
@@ -235,7 +228,7 @@ namespace Cdr.Banking.Test
         public void D130_GetBalance_NotFound_Auth()
         {
             // Try with a known id that is valid for another user.
-            _agentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("12345678"));
         }
@@ -243,7 +236,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void D140_GetBalance_NoAuth()
         {
-            _agentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }

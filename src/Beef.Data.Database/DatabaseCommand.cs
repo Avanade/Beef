@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Beef.Mapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -354,7 +355,10 @@ namespace Beef.Data.Database
                 {
                     // Close the connection where specified in behavior.
                     if (behavior == CommandBehavior.CloseConnection)
+                    {
+                        Database.Logger.LogInformation("Database connection is being closed (CommandBehavior.CloseConnection).");
                         DbCommand.Connection.Close();
+                    }
 
                     DbCommand.Dispose();
                 }
@@ -420,7 +424,10 @@ namespace Beef.Data.Database
 
                     // Close the connection where specified in behavior.
                     if (behavior == CommandBehavior.CloseConnection)
+                    {
+                        Database.Logger.LogInformation("Database connection is being closed (CommandBehavior.CloseConnection).");
                         DbCommand.Connection.Close();
+                    }
 
                     DbCommand.Dispose();
                 }
@@ -440,6 +447,7 @@ namespace Beef.Data.Database
             // Where not open, we'll open and immediately close after the command has executed.
             if (dbCommand.Connection.State != ConnectionState.Open)
             {
+                Database.Logger.LogInformation("Database connection is being opened (setting CommandBehavior.CloseConnection).");
                 dbCommand.Connection.Open();
                 return CommandBehavior.CloseConnection;
             }

@@ -974,6 +974,42 @@ namespace Beef.Demo.Test
                 .Run(a => a.PatchDetailAsync(WebApiPatchOption.MergePatch, jt, 4.ToGuid(), new WebApiRequestOptions { ETag = p.ETag }));
         }
 
+        [Test, TestSetUp]
+        public void H210_PatchWithEF_MergePatch()
+        {
+            // Get an existing person.
+            var p = _agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(3.ToGuid())).Value;
+
+            p.FirstName = "Bob";
+            p.Address = new Address { Street = "Simpsons Road", City = "Bardon" };
+
+            // Try patching the person with an invalid eTag.
+            p = _agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectETag(p.ETag)
+                .ExpectChangeLogUpdated()
+                .ExpectValue(_ => p)
+                .Run(a => a.PatchWithEfAsync(WebApiPatchOption.MergePatch,
+                    JToken.Parse("{ \"firstName\": \"Bob\", \"address\": { \"street\": \"Simpsons Road\", \"city\": \"Bardon\" } }"),
+                    3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
+
+            // Check the person was patched properly.
+            p = _agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => p)
+                .Run(a => a.GetAsync(3.ToGuid())).Value;
+
+            // Try a re-patch with no changes.
+            p = _agentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => p)
+                .Run(a => a.PatchWithEfAsync(WebApiPatchOption.MergePatch,
+                    JToken.Parse("{ \"firstName\": \"Bob\", \"address\": { \"street\": \"Simpsons Road\", \"city\": \"Bardon\" } }"),
+                    3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
+        }
+
         #endregion
 
         #region Others

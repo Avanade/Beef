@@ -4,6 +4,7 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.RefData;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -20,7 +21,8 @@ namespace Beef.Data.Database
     {
         private Guid _identifier = Guid.NewGuid();
         private DbConnection? _connection;
-        private bool disposed;
+        private bool _disposed;
+        private ILogger? _logger;
 
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for the <see cref="SqlException"/> known list.
@@ -92,6 +94,7 @@ namespace Beef.Data.Database
 
             DataContextScope.RegisterContext(_identifier, () =>
             {
+                Logger.LogInformation("DataContextScope registered context initiated database connection create and open.");
                 var conn = CreateConnection(false);
                 conn.Open();
                 OnConnectionOpen(conn);
@@ -134,6 +137,11 @@ namespace Beef.Data.Database
         /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
         /// </summary>
         public string SessionContextStoredProcedure { get; set; } = "[dbo].[spSetSessionContext]";
+
+        /// <summary>
+        /// Gets the <see cref="ILogger"/>.
+        /// </summary>
+        internal ILogger Logger => _logger ??= Diagnostics.Logger.Create<DatabaseBase>();
 
         /// <summary>
         /// Sets the SQL session context using the specified values by invoking the <see cref="SessionContextStoredProcedure"/> using parameters named
@@ -222,12 +230,16 @@ namespace Beef.Data.Database
 
             if (!useDataContextScope || DataContextScope.Current == null)
             {
+                Logger.LogInformation("Creating database connection (not open)");
                 DbConnection conn = Provider.CreateConnection();
                 conn.ConnectionString = ConnectionString;
                 return conn;
             }
             else
+            {
+                Logger.LogInformation("Creating (getting) database connection from DataContextScope.");
                 return (DbConnection)DataContextScope.Current.GetContext(_identifier);
+            }
         }
 
         /// <summary>
@@ -301,7 +313,7 @@ namespace Beef.Data.Database
 
             var cmd = StoredProcedure(saveArgs.StoredProcedure);
             saveArgs.Mapper.GetKeyParams(cmd.Parameters, OperationTypes.Create, value);
-            cmd.Params<T>(value, saveArgs.Mapper.MapToDb, OperationTypes.Create);
+            cmd.Params(value, saveArgs.Mapper.MapToDb, OperationTypes.Create);
 
             if (saveArgs.Refresh)
             {
@@ -437,12 +449,12 @@ namespace Beef.Data.Database
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!_disposed)
             {
                 if (disposing)
                     DataContextScope.DeregisterContext(_identifier);
 
-                disposed = true;
+                _disposed = true;
             }
         }
 

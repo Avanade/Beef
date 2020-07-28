@@ -214,6 +214,16 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult> DeleteWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Patches the <see cref="Person"/> object.
+        /// </summary>
+        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
+        /// <param name="value">The JSON patch value.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> PatchWithEfAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null);
     }
 
     /// <summary>
@@ -529,6 +539,23 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult> DeleteWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null)
         {
             return DeleteAsync("api/v1/persons/ef/{id}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
+
+        /// <summary>
+        /// Patches the <see cref="Person"/> object.
+        /// </summary>
+        /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
+        /// <param name="value">The JSON patch value.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> PatchWithEfAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, value, requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
         }
     }

@@ -99,7 +99,7 @@ namespace Beef.Test.NUnit.Logging
             var id = ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null ? ExecutionContext.Current.CorrelationId : DefaultId;
 
             var timestamp = DateTime.Now;
-            message = $"{timestamp.ToString("yyyyMMdd-HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)}: {message} [{_name}]{(id == DefaultId ? "*" : "")}";
+            message = $"{timestamp.ToString("yyyyMMdd-HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)} {message} [{_name}]{(id == DefaultId ? "*" : "")}";
 
             if (exception != null)
                 message += Environment.NewLine + exception;

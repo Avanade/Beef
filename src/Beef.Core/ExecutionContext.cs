@@ -87,7 +87,10 @@ namespace Beef
                 return Current.ServiceProvider.GetService<T>() ??
                     (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but null was returned; this would indicate that the service has not been configured correctly.") : default(T)!);
 
-            throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+            if (throwExceptionOnNull)
+                throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+
+            return default!;
         }
 
         /// <summary>

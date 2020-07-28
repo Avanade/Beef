@@ -10,15 +10,8 @@ using System.Net;
 
 namespace Cdr.Banking.Test
 {
-    public class TransactionTest : IDisposable
+    public class TransactionTest : UsingAgentTesterServer<Startup>
     {
-        private readonly AgentTesterServer<Startup> _agentTester = AgentTester.CreateServer<Startup>("Billing");
-
-        public void Dispose() => _agentTester.Dispose();
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Reset();
-
         #region ArgsValidator
 
         [Test, TestSetUp]
@@ -93,7 +86,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B110_GetTransactions_FromDate()
         {
-            var v = _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) })).Value;
 
@@ -106,7 +99,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B120_GetTransactions_DateRange()
         {
-            var v = _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), ToDate = new DateTime(2019, 07, 01) })).Value;
 
@@ -119,7 +112,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B130_GetTransactions_MinAmount()
         {
-            var v = _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MinAmount = 0 })).Value;
 
@@ -132,7 +125,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B140_GetTransactions_MaxAmount()
         {
-            var v = _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MaxAmount = 0 })).Value;
 
@@ -145,7 +138,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void B150_GetTransactions_Text()
         {
-            var v = _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetTransactionsAsync("23456789", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), Text = "usb" })).Value;
 
@@ -158,7 +151,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void B160_GetTransactions_AccountAuth()
         {
-            _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+            AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }
@@ -166,7 +159,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void B170_GetTransactions_Auth()
         {
-           _agentTester.Test<TransactionAgent, TransactionCollectionResult>()
+           AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }

@@ -15,7 +15,7 @@ namespace Beef.Data.EntityFrameworkCore
     /// Represents the base class for encapsulating the database access layer using an entity framework <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
     /// </summary>
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public abstract class EfDbBase<TDbContext> : IEfDb where TDbContext : DbContext
+    public abstract class EfDbBase<TDbContext> : IEfDb<TDbContext> where TDbContext : DbContext
     {
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>

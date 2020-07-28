@@ -381,7 +381,7 @@ namespace Beef.Mapper
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
         bool IPropertySrceMapper<TSrce>.MapSrceToDestWhen(TSrce entity)
         {
-            return (_mapSrceToDestWhen == null) ? true : _mapSrceToDestWhen.Invoke(entity);
+            return (_mapSrceToDestWhen == null) || _mapSrceToDestWhen.Invoke(entity);
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace Beef.Mapper
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
         public bool MapDestToSrceWhen(TDest entity)
         {
-            return (_mapDestToSrceWhen == null) ? true : _mapDestToSrceWhen.Invoke(entity);
+            return (_mapDestToSrceWhen == null) || _mapDestToSrceWhen.Invoke(entity);
         }
 
         /// <summary>

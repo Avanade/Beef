@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Entities;
 using Beef.RefData;
 using Beef.Test.NUnit.Logging;
@@ -184,6 +183,11 @@ namespace Beef.Test.NUnit
         /// Gets or sets the default username (defaults to 'Anonymous').
         /// </summary>
         public static string DefaultUsername { get; set; } = "Anonymous";
+
+        /// <summary>
+        /// Gets the default environment variable prefix.
+        /// </summary>
+        public static string? DefaultEnvironmentVariablePrefix { get; set; }
 
         /// <summary>
         /// Sets the username converter function for when a non-string identifier is specified.

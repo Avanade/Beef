@@ -1,5 +1,7 @@
 ﻿using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
+using Beef.Data.Database;
+using Beef.Data.EntityFrameworkCore;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
@@ -15,7 +17,6 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using System.Reflection;
-using Cosmos = Microsoft.Azure.Cosmos;
 
 namespace Beef.Demo.Api
 {
@@ -47,11 +48,9 @@ namespace Beef.Demo.Api
                     .AddBeefBusinessServices();
 
             // Add the data sources as singletons for dependency injection requirements.
-            var ccs = _config.GetSection("CosmosDb");
-            services.AddScoped<Data.Database.IDatabase>(_ => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
-                    .AddDbContext<EfDbContext>()
-                    .AddScoped<Data.EntityFrameworkCore.IEfDb, EfDb>()
-                    .AddSingleton<Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")))
+            services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
+                    .AddBeefEntityFrameworkServices<EfDbContext, EfDb>()
+                    .AddBeefCosmosDbServices<CosmosDb>(_config.GetSection("CosmosDb"))
                     .AddSingleton<ITestOData>(_ => new TestOData(new Uri(WebApiStartup.GetConnectionString(_config, "TestOData"))))
                     .AddSingleton<ITripOData>(_ => new TripOData(new Uri(WebApiStartup.GetConnectionString(_config, "TripOData"))));
 
