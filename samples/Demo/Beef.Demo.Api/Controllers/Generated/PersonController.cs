@@ -228,7 +228,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetNoArgs()
         {
-            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetNoArgsAsync(),
+            return new WebApiGet<Person?>(this, () => _manager.GetNoArgsAsync(),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 

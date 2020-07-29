@@ -50,9 +50,6 @@ namespace Beef.Demo.Business.DataSvc
         {
             using var scope = _provider.CreateScope();
             return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
-            //T result = default;
-            //ExecutionContext.NewScope(async sp => result = await func(sp.GetService<IReferenceDataData>()).ConfigureAwait(false));
-            //return await Task.FromResult(result!);
         }
 
         /// <summary>

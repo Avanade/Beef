@@ -193,7 +193,10 @@ namespace Beef.CodeGen
             }
 
             if (_args.ExpectNoChange && (overallCreatedCount != 0 || overallUpdatedCount != 0))
+            {
+                _args.Logger.LogError("Unexpected changes detected; one or more files were created and/or updated.");
                 throw new CodeGenException("Unexpected changes detected; one or more files were created and/or updated.");
+            }
         }
 
         /// <summary>

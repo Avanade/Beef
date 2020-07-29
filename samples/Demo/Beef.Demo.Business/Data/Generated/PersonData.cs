@@ -73,6 +73,8 @@ namespace Beef.Demo.Business.Data
 
         private Action<Exception>? _mapOnException;
 
+        private Action<Exception>? _getNoArgsOnException;
+
         private Action<Exception>? _getDetailOnException;
 
         private Action<Exception>? _updateDetailOnException;
@@ -289,6 +291,15 @@ namespace Beef.Demo.Business.Data
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
             return DataInvoker.Current.InvokeAsync(this, () => MapOnImplementationAsync(args), new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public Task<Person?> GetNoArgsAsync()
+        {
+            return DataInvoker.Current.InvokeAsync(this, () => GetNoArgsOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _getNoArgsOnException });
         }
 
         /// <summary>

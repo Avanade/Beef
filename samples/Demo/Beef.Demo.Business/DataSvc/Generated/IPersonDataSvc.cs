@@ -98,6 +98,12 @@ namespace Beef.Demo.Business.DataSvc
         Task<MapCoordinates> MapAsync(MapArgs? args);
 
         /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        Task<Person?> GetNoArgsAsync();
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

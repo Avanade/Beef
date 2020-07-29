@@ -43,6 +43,7 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
         private Func<Task>? _markOnAfterAsync;
         private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+        private Func<Person?, Task>? _getNoArgsOnAfterAsync;
         private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
         private Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
         private Func<Person?, string?, Task>? _getNullOnAfterAsync;
@@ -247,6 +248,25 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
+                return __result;
+            });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public Task<Person?> GetNoArgsAsync()
+        {
+            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            {
+                var __key = new UniqueKey();
+                if (_cache.TryGetValue(__key, out Person __val))
+                    return __val;
+
+                var __result = await _data.GetNoArgsAsync().ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
+                if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
