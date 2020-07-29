@@ -17,9 +17,6 @@ using Beef.Entities;
 using Beef.Events;
 using Beef.Validation;
 using Microsoft.AspNetCore.Builder;
-#if (implement_cosmos)
-using Microsoft.Azure.Cosmos;
-#endif
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -78,7 +75,7 @@ namespace Company.AppName.Api
 #endif
 #if (implement_cosmos)
             // Add the beef cosmos services (singleton).
-            services..AddBeefCosmosDbServices<AppNameCosmosDb>(_config.GetSection("CosmosDb"));
+            services.AddBeefCosmosDbServices<AppNameCosmosDb>(_config.GetSection("CosmosDb"));
 
 #endif
             // Add the generated reference data services.

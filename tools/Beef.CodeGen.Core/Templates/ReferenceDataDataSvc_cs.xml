@@ -64,7 +64,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
       </Then>
       <Else>
-        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.{{Entity.Name}}GetAllAsync()))));
+        <![CDATA[{{Entity.EntityName}}>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.{{Entity.Name}}GetAllAsync()))));
 ]]>
       </Else>
     </If>
@@ -75,10 +75,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         /// <summary>
         /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
         /// </summary>
-        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        private async Task<T> GetDataAsync<T>(Func<IReferenceDataData, Task<T>> func)
         {
             using var scope = _provider.CreateScope();
-            return func(scope.ServiceProvider.GetService<IReferenceDataData>());
+            return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
         }
 
         /// <summary>

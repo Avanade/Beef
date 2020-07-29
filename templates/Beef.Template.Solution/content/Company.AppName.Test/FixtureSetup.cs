@@ -51,13 +51,14 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var config = AgentTester.BuildConfiguration<Startup>("Beef");
+            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.DefaultExpectNoEvents = true;
+            var config = AgentTester.BuildConfiguration<Startup>();
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
-                var cc = AgentTester.Configuration.GetSection("CosmosDb");
+                var cc = config.GetSection("CosmosDb");
                 _removeAfterUse = config.GetValue<bool>("RemoveAfterUse");
                 _cosmosDb = new AppNameCosmosDb(new Cosmos.CosmosClient(cc.GetValue<string>("EndPoint"), cc.GetValue<string>("AuthKey")), cc.GetValue<string>("Database"), createDatabaseIfNotExists: true);
 

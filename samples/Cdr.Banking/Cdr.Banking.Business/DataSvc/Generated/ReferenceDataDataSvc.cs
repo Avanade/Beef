@@ -35,21 +35,21 @@ namespace Cdr.Banking.Business.DataSvc
         public ReferenceDataDataSvc(IServiceProvider provider)
         {
             _provider = Check.NotNull(provider, nameof(provider));
-            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.OpenStatusGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.ProductCategoryGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.AccountUTypeGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.MaturityInstructionsGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.TransactionTypeGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.TransactionStatusGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.OpenStatus), new ReferenceDataCache<RefDataNamespace.OpenStatusCollection, RefDataNamespace.OpenStatus>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.OpenStatusGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.ProductCategory), new ReferenceDataCache<RefDataNamespace.ProductCategoryCollection, RefDataNamespace.ProductCategory>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.ProductCategoryGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.AccountUType), new ReferenceDataCache<RefDataNamespace.AccountUTypeCollection, RefDataNamespace.AccountUType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.AccountUTypeGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.MaturityInstructionsGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TransactionTypeGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TransactionStatusGetAllAsync()))));
         }
 
         /// <summary>
         /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
         /// </summary>
-        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        private async Task<T> GetDataAsync<T>(Func<IReferenceDataData, Task<T>> func)
         {
             using var scope = _provider.CreateScope();
-            return func(scope.ServiceProvider.GetService<IReferenceDataData>());
+            return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
         }
 
         /// <summary>

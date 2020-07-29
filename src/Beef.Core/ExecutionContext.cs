@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Beef
 {
@@ -66,14 +67,7 @@ namespace Beef
         /// <summary>
         /// Resets (clears) the <see cref="Current"/> <see cref="ExecutionContext"/>.
         /// </summary>
-        public static void Reset()
-        {
-            var ec = _get();
-            if (ec != null)
-                ec.DataContextScope?.Dispose();
-
-            _set(null);
-        }
+        public static void Reset() => _set(null);
 
         /// <summary>
         /// Gets the service of <see cref="Type"/> <typeparamref name="T"/> from the <see cref="Current"/> <see cref="ServiceProvider"/>.
@@ -116,11 +110,6 @@ namespace Beef
         /// </summary>
         /// <returns>The fully qualified username.</returns>
         public static string EnvironmentUsername => Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
-
-        /// <summary>
-        /// Gets or sets the current <see cref="Beef.DataContextScope"/>.
-        /// </summary>
-        internal DataContextScope? DataContextScope { get; set; }
 
         /// <summary>
         /// Gets or sets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
@@ -374,31 +363,73 @@ namespace Beef
 
         #endregion
 
-        #region Flow
+        #region NewScope
 
         /// <summary>
-        /// Executes the <paramref name="action"/> suppressing the flow of the <see cref="ExecutionContext"/> across asynchronous threads. Any threads created that need the <see cref="ExecutionContext"/>
-        /// should use the <see cref="ExecutionContextFlow.SetExecutionContext"/> which will copy the key properties of the originating <see cref="ExecutionContext"/> and set up a new 
-        /// <see cref="Current"/> for usage. <i>Note:</i> any new threads <b>must</b> be created from within the <paramref name="action"/>. <para><b>Warning:</b> this is an advanced feature and should only be
-        /// used where this specific capability is required.</para>
+        /// Executes the asynchronous <paramref name="func"/> suppressing the flow of the <see cref="ExecutionContext"/> via the underlying <see cref="AsyncLocal{T}"/> <see cref="Current"/> property orchestration;
+        /// whilst also <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)">creating a new scope</see> for the <see cref="ServiceProvider"/>. Note that the overarching invocation will occur synchronously.
+        /// <para><b>Warning:</b> this is an advanced feature and should only be used where this specific capability is required.</para>
         /// </summary>
-        /// <param name="action">The action to invoke with flow suppression.</param>
-        public static void FlowSuppression(Action<ExecutionContextFlow> action)
+        /// <param name="func">The asynchronous function to invoke within the new scope context.</param>
+        public static void NewScope(Func<IServiceProvider, Task> func)
         {
-            using var afc = System.Threading.ExecutionContext.SuppressFlow();
-            action?.Invoke(new ExecutionContextFlow(HasCurrent ? Current : null));
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (!HasCurrent || Current.ServiceProvider == null)
+                throw new InvalidOperationException("Can only be invoked where the ExecutionContext.Current has a value and the ServiceProvider property is not null.");
+
+            var fec = Current.NewScopeCopy();
+
+            using (var scope = Current.ServiceProvider.CreateScope())
+            using (System.Threading.ExecutionContext.SuppressFlow())
+            {
+                Task.Run(async () =>
+                {
+                    fec.ServiceProvider = scope.ServiceProvider;
+                    SetCurrent(fec);
+                    await func(scope.ServiceProvider).ConfigureAwait(false);
+                }).GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>
-        /// Creates a copy of the <see cref="ExecutionContext"/> with only those properties that can be easily shared across a new executing thread context.
+        /// Executes the asynchronous <paramref name="func"/> suppressing the flow of the <see cref="ExecutionContext"/> via the underlying <see cref="AsyncLocal{T}"/> <see cref="Current"/> property orchestration;
+        /// whilst also <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)">creating a new scope</see> for the <see cref="ServiceProvider"/>. Note that the overarching invocation will occur synchronously.
+        /// <para><b>Warning:</b> this is an advanced feature and should only be used where this specific capability is required.</para>
+        /// </summary>
+        /// <param name="func">The asynchronous function to invoke within the new scope context.</param>
+        public static T NewScope<T>(Func<IServiceProvider, Task<T>> func)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (!HasCurrent || Current.ServiceProvider == null)
+                throw new InvalidOperationException("Can only be invoked where the ExecutionContext.Current has a value and the ServiceProvider property is not null.");
+
+            var fec = Current.NewScopeCopy();
+
+            using (var scope = Current.ServiceProvider.CreateScope())
+            using (System.Threading.ExecutionContext.SuppressFlow())
+            {
+                return Task.Run(async () =>
+                {
+                    fec.ServiceProvider = scope.ServiceProvider;
+                    SetCurrent(fec);
+                    return await func(scope.ServiceProvider).ConfigureAwait(false);
+                }).GetAwaiter().GetResult();
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of the <see cref="ExecutionContext"/> with only those properties that should be shared; specifically ignoring the <see cref="ServiceProvider"/>.
         /// </summary>
         /// <returns>The new <see cref="ExecutionContext"/>.</returns>
-        internal ExecutionContext FlowCopy()
+        private ExecutionContext NewScopeCopy()
         {
             return new ExecutionContext
             {
                 OperationType = OperationType,
-                _serviceProvider = _serviceProvider,
                 _userId = _userId,
                 _username = _username,
                 _tenantId = _tenantId,
@@ -412,37 +443,5 @@ namespace Beef
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// Enables access to the <see cref="Originating"/> <see cref="ExecutionContext"/> and the ability to <see cref="SetExecutionContext"/> using a copy within the new executing thread context.
-    /// </summary>
-    public sealed class ExecutionContextFlow
-    {
-        private static readonly object _lock = new object();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionContextFlow"/> class.
-        /// </summary>
-        /// <param name="originating">The originating <see cref="ExecutionContext"/>.</param>
-        internal ExecutionContextFlow(ExecutionContext? originating) => Originating = originating;
-
-        /// <summary>
-        /// Gets the originating <see cref="ExecutionContext"/>.
-        /// </summary>
-        public ExecutionContext? Originating { get; }
-
-        /// <summary>
-        /// Sets the <see cref="ExecutionContext.Current"/> using a copy of the <see cref="Originating"/> <see cref="ExecutionContext"/>.
-        /// </summary>
-        public void SetExecutionContext()
-        {
-            lock (_lock)
-            {
-                ExecutionContext.Reset();
-                if (Originating != null)
-                    ExecutionContext.SetCurrent(Originating.FlowCopy());
-            }
-        }
     }
 }

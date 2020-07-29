@@ -5,7 +5,6 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
 using System;
-using System.Diagnostics;
 using System.Threading;
 
 namespace Beef.Test.NUnit
@@ -14,7 +13,7 @@ namespace Beef.Test.NUnit
     /// Sets up the test by <see cref="ExecutionContext.Reset()">resetting</see> the <see cref="ExecutionContext"/> to ensure <c>null</c>; then orchestrates whether the 
     /// <see cref="TestSetUp.RegisterSetUp(Func{int, object?, bool})">registered setup</see> is required to be invoked for the test.
     /// </summary>
-    [DebuggerStepThrough()]
+    //[DebuggerStepThrough()]
 #pragma warning disable CA1813 // Avoid unsealed attributes; by-design, needs to be inherited from.
     public class TestSetUpAttribute : PropertyAttribute, IWrapSetUpTearDown, ICommandWrapper
 #pragma warning restore CA1813
@@ -68,7 +67,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// The test command for the <see cref="TestSetUpAttribute"/>.
         /// </summary>
-        [DebuggerStepThrough()]
+        //[DebuggerStepThrough()]
         internal class ExecutionContextCommand : DelegatingTestCommand
         {
             private readonly bool _needsSetUp;
@@ -92,7 +91,10 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    ExecutionContext.Reset();
+                    if (context.CurrentTest?.Parent?.Fixture is IUsingAgentTesterServer uats)
+                        uats.AgentTester.PrepareExecutionContext();
+                    else
+                        ExecutionContext.Reset();
 
                     context.CurrentResult = innerCommand.Execute(context);
                 }

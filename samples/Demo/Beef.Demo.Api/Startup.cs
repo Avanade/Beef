@@ -1,5 +1,6 @@
 ﻿using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
+using Beef.Data.Cosmos;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
 using Beef.Demo.Business;

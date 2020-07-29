@@ -48,7 +48,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.OpenStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(OpenStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(OpenStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -59,7 +59,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
         {
             var __coll = new RefDataNamespace.ProductCategoryCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(ProductCategoryMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(ProductCategoryMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -70,7 +70,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.AccountUTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(AccountUTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(AccountUTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -81,7 +81,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
         {
             var __coll = new RefDataNamespace.MaturityInstructionsCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(MaturityInstructionsMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(MaturityInstructionsMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -92,7 +92,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionTypeCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionTypeMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -103,7 +103,7 @@ namespace Cdr.Banking.Business.Data
         public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionStatusCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(TransactionStatusMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 

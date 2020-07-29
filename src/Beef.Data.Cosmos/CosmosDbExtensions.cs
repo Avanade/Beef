@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Data.Cosmos;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Beef.Data.EntityFrameworkCore
+namespace Beef.Data.Cosmos
 {
     /// <summary>
     /// Enables the <b>Beef</b> database extension(s).

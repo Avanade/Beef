@@ -28,7 +28,7 @@ namespace Company.AppName.Business.Data
 
             // Uses the DB connection management from the database class - ensures DB connection pooling and required DB session context setting.
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer(_db.CreateConnection());
+                optionsBuilder.UseSqlServer(_db.GetConnection());
         }
 
         /// <summary>

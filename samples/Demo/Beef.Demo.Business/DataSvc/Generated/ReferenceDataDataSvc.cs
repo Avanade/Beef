@@ -35,21 +35,24 @@ namespace Beef.Demo.Business.DataSvc
         public ReferenceDataDataSvc(IServiceProvider provider)
         {
             _provider = Check.NotNull(provider, nameof(provider));
-            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.CountryGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.USStateGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.GenderGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.EyeColorGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.PowerSourceGetAllAsync()))));
-            _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetData(data => data.CompanyGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.CountryGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.USStateGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.GenderGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.EyeColorGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.PowerSourceGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.CompanyGetAllAsync()))));
         }
 
         /// <summary>
         /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
         /// </summary>
-        private Task<T> GetData<T>(Func<IReferenceDataData, Task<T>> func)
+        private async Task<T> GetDataAsync<T>(Func<IReferenceDataData, Task<T>> func)
         {
             using var scope = _provider.CreateScope();
-            return func(scope.ServiceProvider.GetService<IReferenceDataData>());
+            return await func(scope.ServiceProvider.GetService<IReferenceDataData>()).ConfigureAwait(false);
+            //T result = default;
+            //ExecutionContext.NewScope(async sp => result = await func(sp.GetService<IReferenceDataData>()).ConfigureAwait(false));
+            //return await Task.FromResult(result!);
         }
 
         /// <summary>

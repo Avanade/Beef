@@ -9,7 +9,7 @@ namespace Beef.Business
 {
     /// <summary>
     /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <b> business tier</b> invocations using
-    /// a <see cref="BusinessInvokerArgs"/> to enable <see cref="DataContextScopeOption"/> and <see cref="TransactionScope"/> options. 
+    /// a <see cref="BusinessInvokerArgs"/> to configure the <see cref="TransactionScope"/> and <see cref="BusinessInvokerArgs.ExceptionHandler">exception handling</see>. 
     /// </summary>
     public abstract class BusinessInvokerBase : InvokerBase<BusinessInvokerArgs>
     {
@@ -30,7 +30,6 @@ namespace Beef.Business
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
-            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
@@ -38,12 +37,8 @@ namespace Beef.Business
                 if (bia.IncludeTransactionScope)
                     txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
-                ctx = DataContextScope.Begin(bia.DataContextScopeOption);
-
                 action();
-
-                if (txn != null)
-                    txn.Complete();
+                txn?.Complete();
             }
             catch (Exception ex)
             {
@@ -52,12 +47,7 @@ namespace Beef.Business
             }
             finally
             {
-                if (ctx != null)
-                    ctx.Dispose();
-
-                if (txn != null)
-                    txn.Dispose();
-
+                txn?.Dispose();
                 ExecutionContext.Current.OperationType = ot;
             }
         }
@@ -77,7 +67,6 @@ namespace Beef.Business
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
-            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
@@ -85,12 +74,8 @@ namespace Beef.Business
                 if (bia.IncludeTransactionScope)
                     txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
-                ctx = DataContextScope.Begin(bia.DataContextScopeOption);
-
                 await func().ConfigureAwait(false);
-
-                if (txn != null)
-                    txn.Complete();
+                txn?.Complete();
             }
             catch (Exception ex)
             {
@@ -99,12 +84,7 @@ namespace Beef.Business
             }
             finally
             {
-                if (ctx != null)
-                    ctx.Dispose();
-
-                if (txn != null)
-                    txn.Dispose();
-
+                txn?.Dispose();
                 ExecutionContext.Current.OperationType = ot;
             }
         }
@@ -130,7 +110,6 @@ namespace Beef.Business
 
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
-            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
@@ -138,13 +117,8 @@ namespace Beef.Business
                 if (bia.IncludeTransactionScope)
                     txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
-                ctx = DataContextScope.Begin(bia.DataContextScopeOption);
-
                 var result = func();
-
-                if (txn != null)
-                    txn.Complete();
-
+                txn?.Complete();
                 return result;
             }
             catch (Exception ex)
@@ -154,12 +128,7 @@ namespace Beef.Business
             }
             finally
             {
-                if (ctx != null)
-                    ctx.Dispose();
-
-                if (txn != null)
-                    txn.Dispose();
-
+                txn?.Dispose();
                 ExecutionContext.Current.OperationType = ot;
             }
         }
@@ -181,7 +150,6 @@ namespace Beef.Business
 
             BusinessInvokerArgs bia = Check.NotNull(param ?? BusinessInvokerArgs.Default, nameof(param));
             TransactionScope? txn = null;
-            DataContextScope? ctx = null;
             OperationType ot = ExecutionContext.Current.OperationType;
 
             try
@@ -189,13 +157,8 @@ namespace Beef.Business
                 if (bia.IncludeTransactionScope)
                     txn = new TransactionScope(bia.TransactionScopeOption, TransactionScopeAsyncFlowOption.Enabled);
 
-                ctx = DataContextScope.Begin(bia.DataContextScopeOption);
-
                 var result = await func().ConfigureAwait(false);
-
-                if (txn != null)
-                    txn.Complete();
-
+                txn?.Complete();
                 return result;
             }
             catch (Exception ex)
@@ -205,12 +168,7 @@ namespace Beef.Business
             }
             finally
             {
-                if (ctx != null)
-                    ctx.Dispose();
-
-                if (txn != null)
-                    txn.Dispose();
-
+                txn?.Dispose();
                 ExecutionContext.Current.OperationType = ot;
             }
         }
@@ -224,27 +182,21 @@ namespace Beef.Business
     public class BusinessInvokerArgs
     {
         /// <summary>
-        /// Gets or sets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, and
-        /// <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// Gets or sets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>false</c>.
         /// </summary>
         public static BusinessInvokerArgs Default { get; set; } = new BusinessInvokerArgs();
 
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.RequiresNew"/>, 
-        /// <see cref="IncludeTransactionScope"/> is <c>true</c> and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.Suppress"/>.
+        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
+        /// and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.Suppress"/>.
         /// </summary>
-        public static BusinessInvokerArgs RequiresNewAndTransactionSuppress => new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.RequiresNew, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.Suppress };
+        public static BusinessInvokerArgs TransactionSuppress { get; } = new BusinessInvokerArgs { IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.Suppress };
 
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="DataContextScopeOption"/> is <see cref="DataContextScopeOption.UseExisting"/>, 
-        /// <see cref="IncludeTransactionScope"/> is <c>true</c> and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.RequiresNew"/>.
+        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
+        /// and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.RequiresNew"/>.
         /// </summary>
-        public static BusinessInvokerArgs UseExistingAndRequiresNew => new BusinessInvokerArgs { DataContextScopeOption = DataContextScopeOption.UseExisting, IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.RequiresNew };
-
-        /// <summary>
-        /// Gets or sets the <see cref="Beef.DataContextScopeOption"/>. Defaults to <see cref="DataContextScopeOption.UseExisting"/>.
-        /// </summary>
-        public DataContextScopeOption DataContextScopeOption { get; set; } = DataContextScopeOption.UseExisting;
+        public static BusinessInvokerArgs TransactionRequiresNew { get; } = new BusinessInvokerArgs { IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.RequiresNew };
 
         /// <summary>
         /// Indicates whether to wrap the invocation with a <see cref="TransactionScope"/> (see <see cref="TransactionScopeOption"/>). Defaults to <c>false</c>.

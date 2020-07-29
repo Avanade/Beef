@@ -41,8 +41,11 @@ namespace Beef.Test.NUnit.Logging
         /// Gets the messages for the specified <paramref name="correlationId"/> whilst also removing.
         /// </summary>
         /// <param name="correlationId">The correlation identifier (defaults to <see cref="ExecutionContext.CorrelationId"/>).</param>
+        /// <param name="includeDefaultIdInGetMessages">Indicates whether to include <see cref="DefaultId"/> messages in the response. Including can result in messages related to one request being reported
+        /// in another as there is no way to appropriately correlate. These will be messages that occur before the <see cref="ExecutionContext"/> has been set; therefore should be a limited to internal 
+        /// infrastructure messages that are likely less important in the test output log.</param>
         /// <returns>A messages <see cref="string"/> array.</returns>
-        public static List<string> GetMessages(string? correlationId = null)
+        public static List<string> GetMessages(string? correlationId = null, bool includeDefaultIdInGetMessages = false)
         {
             var list = new List<(DateTime, string)>();
 
@@ -56,9 +59,12 @@ namespace Beef.Test.NUnit.Logging
 
             if (_messageDict.TryRemove(DefaultId, out msgs))
             {
-                foreach (var m in msgs)
+                if (includeDefaultIdInGetMessages)
                 {
-                    list.Add(m);
+                    foreach (var m in msgs)
+                    {
+                        list.Add(m);
+                    }
                 }
             }
 
@@ -99,7 +105,7 @@ namespace Beef.Test.NUnit.Logging
             var id = ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null ? ExecutionContext.Current.CorrelationId : DefaultId;
 
             var timestamp = DateTime.Now;
-            message = $"{timestamp.ToString("yyyyMMdd-HH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)} {message} [{_name}]{(id == DefaultId ? "*" : "")}";
+            message = $"{timestamp.ToString("yyyy-MM-ddTHH:mm:ss.ffff", DateTimeFormatInfo.InvariantInfo)} {GetLogLevel(logLevel)}: {message} [{_name}]{(id == DefaultId ? "*" : "")}";
 
             if (exception != null)
                 message += Environment.NewLine + exception;
@@ -114,12 +120,12 @@ namespace Beef.Test.NUnit.Logging
         internal static string GetLogLevel(LogLevel level) =>
             level switch
             {
-                LogLevel.Critical => "*",
-                LogLevel.Error => "E",
-                LogLevel.Warning => "W",
-                LogLevel.Information => "I",
-                LogLevel.Trace => "T",
-                LogLevel.Debug => "D",
+                LogLevel.Critical => "Cri",
+                LogLevel.Error => "Err",
+                LogLevel.Warning => "Wrn",
+                LogLevel.Information => "Inf",
+                LogLevel.Trace => "Trc",
+                LogLevel.Debug => "Dbg",
                 _ => "?",
             };
     }

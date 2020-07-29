@@ -270,7 +270,10 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
           <![CDATA[await {{Entity.Name}}GetAll_OnImplementation(__coll).ConfigureAwait(false)]]>
         </Default>
       </Switch>
-      <![CDATA[, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+      <If Condition="Entity.AutoImplement == 'Database' or Entity.AutoImplement == 'EntityFramework'">
+        <![CDATA[, BusinessInvokerArgs.TransactionSuppress]]>
+      </If>
+      <![CDATA[).ConfigureAwait(false);
 ]]>
       <If Condition="Config.NewLine == true">
         <![CDATA[

@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace Beef.Diagnostics
 {
@@ -24,10 +25,12 @@ namespace Beef.Diagnostics
     }
 
     /// <summary>
-    /// Represents a logger where all messages are written to an internal (in-memory) list by correlation identifier.
+    /// Represents a logger where messages are written to the console.
     /// </summary>
     public sealed class ColoredConsoleLogger : ILogger
     {
+        private static readonly LogLevel[] _logLevels = new LogLevel[] { LogLevel.Information, LogLevel.Warning, LogLevel.Error, LogLevel.Critical };
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ColoredConsoleLogger"/> class.
         /// </summary>
@@ -38,7 +41,7 @@ namespace Beef.Diagnostics
         public IDisposable BeginScope<TState>(TState state) => NullScope.Default;
 
         /// <inheritdoc />
-        public bool IsEnabled(LogLevel logLevel) => true;
+        public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None && _logLevels.Contains(logLevel);
 
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

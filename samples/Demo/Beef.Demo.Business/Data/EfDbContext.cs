@@ -28,7 +28,7 @@ namespace Beef.Demo.Business.Data
 
             // Uses the DB connection management from the Database class - ensures DB connection management and required DB session context setting.
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer(_db.CreateConnection());
+                optionsBuilder.UseSqlServer(_db.GetConnection());
         }
 
         /// <summary>

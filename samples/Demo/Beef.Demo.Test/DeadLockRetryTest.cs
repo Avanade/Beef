@@ -12,26 +12,18 @@ using System.Threading.Tasks;
 namespace Beef.Demo.Test
 {
     [TestFixture, NonParallelizable]
-    public class DeadLockRetryTest
+    public class DeadLockRetryTest : UsingAgentTesterServer<Startup>
     {
-        private AgentTesterServer<Startup> _agentTester;
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp() { TestSetUp.Reset(); _agentTester = AgentTester.CreateServer<Startup>("Beef"); }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown() => _agentTester.Dispose();
-
         [Test, TestSetUp]
         public void A010_DatabaseDeadlock_Retry()
         {
             int count = 0;
             SqlRetryDatabaseInvoker.ExceptionRetry += (s, e) => { count++; Console.WriteLine(e.Exception.ToString()); };
 
-            var p1 = _agentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(1.ToGuid())).Value;
-            var p2 = _agentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(2.ToGuid())).Value;
+            var p1 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(1.ToGuid())).Value;
+            var p2 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(2.ToGuid())).Value;
 
-            var db = new Beef.Demo.Business.Data.Database(AgentTester.BuildConfiguration<Startup>()["ConnectionStrings:BeefDemo"]);
+            var db = new Beef.Demo.Business.Data.Database(BuildConfiguration()["ConnectionStrings:BeefDemo"]);
 
             var task1 = Task.Run(async () =>
             {
@@ -49,7 +41,7 @@ namespace Beef.Demo.Test
             {
                 Thread.Sleep(500);
                 p1.FirstName += "X";
-                var r1 = _agentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p1, p1.Id));
+                var r1 = AgentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p1, p1.Id));
                 Console.WriteLine($"Person {p1.Id} update status code: {r1.StatusCode}");
             });
 
@@ -57,7 +49,7 @@ namespace Beef.Demo.Test
             {
                 Thread.Sleep(750);
                 p2.FirstName += "X";
-                var r2 = _agentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p2, p2.Id));
+                var r2 = AgentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p2, p2.Id));
                 Console.WriteLine($"Person {p2.Id} update status code: {r2.StatusCode}");
             });
 

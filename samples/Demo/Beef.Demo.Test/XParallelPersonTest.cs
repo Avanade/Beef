@@ -14,25 +14,17 @@ namespace Beef.Demo.Test
     /// Fully parallelizable test; seeing how it performs (perf/stability) under load.
     /// </summary>
     [TestFixture, Parallelizable(ParallelScope.Children)]
-    public class XParallelPersonTest
+    public class XParallelPersonTest : UsingAgentTesterServer<Startup>
     {
-        private AgentTesterServer<Startup> _agentTester;
-
         [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            TestSetUp.Reset(); 
-            _agentTester = AgentTester.CreateServer<Startup>("Beef");
-
-            _agentTester.Test<PersonAgent, Person>()
-                .ExpectStatusCode(HttpStatusCode.NotFound)
-                .Run(a => a.GetAsync(404.ToGuid()));
-        }
+        public void OneTimeSetUp() => AgentTester.Test<PersonAgent, Person>()
+                                        .ExpectStatusCode(HttpStatusCode.NotFound)
+                                        .Run(a => a.GetAsync(404.ToGuid()));
 
         [Test, TestSetUp, Parallelizable]
         public void B110_Get_NotFound()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
@@ -40,13 +32,13 @@ namespace Beef.Demo.Test
         [Test, TestSetUp, Parallelizable]
         public void B120_Get_FoundAndUpdate()
         {
-            var pr = _agentTester.Test<PersonAgent, Person>()
+            var pr = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
-            pr.FirstName = pr.FirstName + "X";
+            pr.FirstName += "X";
 
-            var r = _agentTester.Test<PersonAgent, Person>()
+            var r = AgentTester.Test<PersonAgent, Person>()
                 .Run(a => a.UpdateAsync(pr, 1.ToGuid()));
 
             Assert.NotNull(r);
@@ -73,34 +65,34 @@ namespace Beef.Demo.Test
             };
 
             // Create a person.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .Run(a => a.CreateAsync(p)).Value;
 
             // Update a person.
-            p.LastName = p.LastName + "X";
+            p.LastName += "X";
             p.GenderSid = "F";
 
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.UpdateAsync(p, p.Id)).Value;
 
             // Get the person (not-modified).
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetAsync(p.Id, new WebApiRequestOptions { ETag = p.ETag }));
 
-            p.FirstName = p.FirstName + "X";
+            p.FirstName += "X";
 
             // Patch the person.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
                     JToken.Parse($"{{ \"firstName\": \"{p.FirstName}\", \"address\": {{ \"street\": \"Simpsons Road\", \"city\": \"Bardon\" }} }}"),
                     p.Id, new WebApiRequestOptions { ETag = p.ETag }));
 
             // Delete a person.
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(p.Id));
         }
@@ -109,13 +101,13 @@ namespace Beef.Demo.Test
         public void B140_GetByArgs()
         {
             var args = new PersonArgs { LastName = "sm*" };
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetByArgsAsync(args));
 
             var etag = pcr.Response.Headers.ETag.Tag;
 
-            _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
                 .Run(a => a.GetByArgsAsync(args, requestOptions: new WebApiRequestOptions { ETag = etag }));
         }

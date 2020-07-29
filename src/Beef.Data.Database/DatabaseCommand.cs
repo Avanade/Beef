@@ -442,12 +442,12 @@ namespace Beef.Data.Database
         {
             // Check if there is a connection and whether it is already open and set behavior accordingly.
             if (dbCommand.Connection == null)
-                dbCommand.Connection = Database.CreateConnection();
+                dbCommand.Connection = Database.GetConnection();
 
             // Where not open, we'll open and immediately close after the command has executed.
             if (dbCommand.Connection.State != ConnectionState.Open)
             {
-                Database.Logger.LogInformation("Database connection is being opened (setting CommandBehavior.CloseConnection).");
+                Database.Logger.LogDebug("The Command Connection is not Open, is being opened and will be set to automatic CloseConnection. DatabaseId: {0}", Database.DatabaseId);
                 dbCommand.Connection.Open();
                 return CommandBehavior.CloseConnection;
             }

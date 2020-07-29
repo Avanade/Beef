@@ -17,16 +17,8 @@ using System.Threading.Tasks;
 namespace Beef.Demo.Test
 {
     [TestFixture, NonParallelizable]
-    public class PersonTest
+    public class PersonTest : UsingAgentTesterServer<Startup>
     {
-        private AgentTesterServer<Startup> _agentTester;
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp() { TestSetUp.Reset(); _agentTester = AgentTester.CreateServer<Startup>("Beef"); }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown() => _agentTester.Dispose();
-
         #region Validators
 
         [Test, TestSetUp]
@@ -44,8 +36,6 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public async Task A110_Validation_Empty()
         {
-            _agentTester.PrepareExecutionContext();
-
             await ExpectValidationException.ThrowsAsync(
                 () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()),
                 "First Name is required.",
@@ -64,8 +54,6 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A130_Validation_Invalid()
         {
-            _agentTester.PrepareExecutionContext();
-
             ExpectValidationException.Throws(
                 () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
@@ -78,7 +66,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A140_Validation_ServiceAgentInvalid()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages(
@@ -93,7 +81,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A150_Validation_Detail_History_Invalid()
         {
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages(
@@ -113,7 +101,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A160_Validation_Detail_History_Duplicate()
         {
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages("History contains duplicates; Name value 'Google' specified more than once.")
@@ -129,7 +117,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B110_Get_NotFound()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetAsync(404.ToGuid()));
@@ -138,7 +126,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B120_Get_Found_No_Address()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -149,7 +137,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B130_Get_Found_With_Address()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -160,15 +148,15 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B140_Get_NotModified()
         {
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
             Assert.NotNull(p);
 
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(_agentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + p.ETag + "\""));
                 })).GetAsync(3.ToGuid()));
@@ -177,9 +165,9 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B140_Get_NotModified_Modified()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(_agentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"ABCDEFG\""));
                 })).GetAsync(3.ToGuid()));
@@ -188,7 +176,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B210_GetDetail_NotFound()
         {
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetDetailAsync(404.ToGuid()));
@@ -197,7 +185,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B220_GetDetail_NoWorkHistory()
         {
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -222,7 +210,7 @@ namespace Beef.Demo.Test
                     new WorkHistory { Name = "Telstra", StartDate = new DateTime(2015, 05, 23), EndDate = new DateTime(2016, 04, 06) } }
             };
 
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -233,7 +221,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B310_GetWithEf_NotFound()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetWithEfAsync(404.ToGuid()));
@@ -242,7 +230,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B320_GetWithEf_Found_No_Address()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -253,7 +241,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void B320_GetWithEf_Found_With_Address()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .IgnoreChangeLog()
                 .IgnoreETag()
@@ -268,7 +256,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void C110_GetAll_NoPaging()
         {
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync());
 
@@ -280,7 +268,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void C110_GetAll_Paging()
         {
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync(PagingArgs.CreateSkipAndTake(1, 2)));
 
@@ -295,7 +283,7 @@ namespace Beef.Demo.Test
             var pa = PagingArgs.CreateSkipAndTake(1, 2);
             var ro = new WebApiRequestOptions().Include("lastName", "firstName");
 
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAllAsync(pa, ro));
 
@@ -308,7 +296,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void C130_GetAll2()
         {
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAll2Async());
 
@@ -330,7 +318,7 @@ namespace Beef.Demo.Test
         private void GetByArgs_NullArgs(bool useEf)
         {
             // Test with null args.
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(null) : a.GetByArgsAsync(null));
 
@@ -349,7 +337,7 @@ namespace Beef.Demo.Test
         {
             // Test with null args.
             var args = new PersonArgs { };
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
@@ -368,7 +356,7 @@ namespace Beef.Demo.Test
         {
             // Test with null args.
             var args = new PersonArgs { LastName = "sm*" };
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
@@ -387,7 +375,7 @@ namespace Beef.Demo.Test
         {
             // Test with null args.
             var args = new PersonArgs { FirstName = "*a*", Genders = new RefData.ReferenceDataSidList<Gender, string>("F") };
-            var pcr = _agentTester.Test<PersonAgent, PersonCollectionResult>()
+            var pcr = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run((a) => useEf ? a.GetByArgsWithEfAsync(args) : a.GetByArgsAsync(args));
 
@@ -400,7 +388,7 @@ namespace Beef.Demo.Test
         public void D310_GetDetailByArgs_LastName()
         {
             var args = new PersonArgs { LastName = "sm*" };
-            var pdcr = _agentTester.Test<PersonAgent, PersonDetailCollectionResult>()
+            var pdcr = AgentTester.Test<PersonAgent, PersonDetailCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetDetailByArgsAsync(args, PagingArgs.CreateSkipAndTake(0, 2, true)));
 
@@ -429,7 +417,7 @@ namespace Beef.Demo.Test
             };
 
             // Create a person.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
@@ -438,7 +426,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.CreateAsync(p)).Value;
 
             // Check the person was created properly.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id));
@@ -457,7 +445,7 @@ namespace Beef.Demo.Test
             };
 
             // Try to create a person which will result in a duplicate.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
                 .Run(a => a.CreateAsync(p));
@@ -476,7 +464,7 @@ namespace Beef.Demo.Test
             };
 
             // Try to create a person which will result in a bad request.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages("Gender is invalid.")
@@ -496,7 +484,7 @@ namespace Beef.Demo.Test
             };
 
             // Create a person.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .ExpectChangeLogCreated()
                 .ExpectETag()
@@ -505,7 +493,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.CreateWithEfAsync(p)).Value;
 
             // Check the person was created properly.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetWithEfAsync(p.Id));
@@ -524,7 +512,7 @@ namespace Beef.Demo.Test
             };
 
             // Try to create a person which will result in a duplicate.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
                 .Run(a => a.CreateWithEfAsync(p));
@@ -538,12 +526,12 @@ namespace Beef.Demo.Test
         public void F110_Update_NotFound()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Update with an invalid identifier.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(ErrorType.NotFoundError)
                 .Run(a => a.UpdateAsync(p, 404.ToGuid()));
@@ -553,12 +541,12 @@ namespace Beef.Demo.Test
         public void F120_Update_Concurrency()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Try with an invalid If-Match value.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.UpdateAsync(p, 1.ToGuid(), new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
@@ -566,7 +554,7 @@ namespace Beef.Demo.Test
             // Try updating the person with an invalid eTag.
             p.ETag = TestSetUp.ConcurrencyErrorETag;
 
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.UpdateAsync(p, 1.ToGuid()));
@@ -576,14 +564,14 @@ namespace Beef.Demo.Test
         public void F130_Update_Duplicate()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Try updating the person which will result in a duplicate.
             p.UniqueCode = "C3456";
 
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
                 .Run(a => a.UpdateAsync(p, 1.ToGuid()));
@@ -593,7 +581,7 @@ namespace Beef.Demo.Test
         public void F140_Update()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
@@ -602,7 +590,7 @@ namespace Beef.Demo.Test
             p.LastName += "Y";
             p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
 
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(p.ETag)
@@ -611,7 +599,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, 1.ToGuid())).Value;
 
             // Check the person was updated properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
@@ -621,7 +609,7 @@ namespace Beef.Demo.Test
             // Remove the address and update again.
             p.Address = null;
 
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(p.ETag)
@@ -630,7 +618,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateAsync(p, 1.ToGuid())).Value;
 
             // Check the person was updated properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
@@ -642,14 +630,14 @@ namespace Beef.Demo.Test
         public void F150_UpdateDetail()
         {
             // Get an existing person detail.
-            var p = _agentTester.Test<PersonAgent, PersonDetail>()
+            var p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetDetailAsync(2.ToGuid())).Value;
 
             // Update the work history.
             p.History[0].StartDate = p.History[0].StartDate.AddDays(1);
 
-            p = _agentTester.Test<PersonAgent, PersonDetail>()
+            p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(p.ETag)
@@ -658,7 +646,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateDetailAsync(p, 2.ToGuid())).Value;
 
             // Check the person detail was updated properly.
-            p = _agentTester.Test<PersonAgent, PersonDetail>()
+            p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetDetailAsync(p.Id)).Value;
@@ -668,12 +656,12 @@ namespace Beef.Demo.Test
         public void F210_UpdateWithEF_NotFound()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             // Update with an invalid identifier.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(ErrorType.NotFoundError)
                 .Run(a => a.UpdateWithEfAsync(p, 404.ToGuid()));
@@ -683,14 +671,14 @@ namespace Beef.Demo.Test
         public void F220_UpdateWithEf_Concurrency()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetWithEfAsync(1.ToGuid())).Value;
 
             // Try updating the person with an invalid eTag.
             p.ETag = TestSetUp.ConcurrencyErrorETag;
 
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid()));
@@ -700,14 +688,14 @@ namespace Beef.Demo.Test
         public void F230_UpdateWithEf_Duplicate()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetWithEfAsync(1.ToGuid())).Value;
 
             // Try updating the person which will result in a duplicate.
             p.UniqueCode = "C3456";
 
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.Conflict)
                 .ExpectErrorType(ErrorType.DuplicateError)
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid()));
@@ -717,7 +705,7 @@ namespace Beef.Demo.Test
         public void F240_UpdateWithEf()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetWithEfAsync(1.ToGuid())).Value;
 
@@ -726,7 +714,7 @@ namespace Beef.Demo.Test
             p.LastName += "Y";
             p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
 
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(p.ETag)
@@ -735,7 +723,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid())).Value;
 
             // Check the person was updated properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetAsync(p.Id)).Value;
@@ -745,7 +733,7 @@ namespace Beef.Demo.Test
             // Remove the address and update again.
             p.Address = null;
 
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated()
                 .ExpectETag(p.ETag)
@@ -754,7 +742,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.UpdateWithEfAsync(p, 1.ToGuid())).Value;
 
             // Check the person was updated properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => p)
                 .Run(a => a.GetWithEfAsync(p.Id)).Value;
@@ -770,7 +758,7 @@ namespace Beef.Demo.Test
         public void G110_Delete_NotFound()
         {
             // Deleting a person that does not exist only reports success.
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(404.ToGuid()));
         }
@@ -779,17 +767,17 @@ namespace Beef.Demo.Test
         public void G120_Delete()
         {
             // Check person exists.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(1.ToGuid()));
 
             // Delete a person.
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteAsync(1.ToGuid()));
 
             // Check person no longer exists.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetAsync(1.ToGuid()));
@@ -799,7 +787,7 @@ namespace Beef.Demo.Test
         public void G210_DeleteWithEf_NotFound()
         {
             // Deleting a person that does not exist only reports success.
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteWithEfAsync(404.ToGuid()));
         }
@@ -808,17 +796,17 @@ namespace Beef.Demo.Test
         public void G220_DeleteWithEf()
         {
             // Check person exists.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetWithEfAsync(2.ToGuid()));
 
             // Delete a person.
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
                 .Run(a => a.DeleteWithEfAsync(2.ToGuid()));
 
             // Check person no longer exists.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetWithEfAsync(2.ToGuid()));
@@ -832,7 +820,7 @@ namespace Beef.Demo.Test
         public void H110_Patch_NotFound()
         {
             // Patch with an invalid identifier.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(ErrorType.NotFoundError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, JToken.Parse("{ \"firstName\": \"Barry\" }"), 404.ToGuid()));
@@ -842,12 +830,12 @@ namespace Beef.Demo.Test
         public void H120_Patch_Concurrency()
         {
             // Get an existing person.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid()));
 
             // Try patching the person with an invalid eTag.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
                 .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
@@ -859,7 +847,7 @@ namespace Beef.Demo.Test
         public void H130_Patch_MergePatch()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
@@ -867,7 +855,7 @@ namespace Beef.Demo.Test
             p.Address = new Address { Street = "Simpsons Road", City = "Bardon" };
 
             // Try patching the person with an invalid eTag.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectETag(p.ETag)
                 .ExpectChangeLogUpdated()
@@ -877,13 +865,13 @@ namespace Beef.Demo.Test
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
             // Check the person was patched properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
             // Try a re-patch with no changes.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch,
@@ -895,14 +883,14 @@ namespace Beef.Demo.Test
         public void H140_Patch_JsonPatch()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
             p.LastName = "Simons";
 
             // Try patching the person with an invalid eTag.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectETag(p.ETag)
                 .ExpectChangeLogUpdated()
@@ -912,7 +900,7 @@ namespace Beef.Demo.Test
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
             // Check the person was patched properly.
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
                 .Run(a => a.GetAsync(3.ToGuid()));
@@ -922,7 +910,7 @@ namespace Beef.Demo.Test
         public void H150_PatchDetail_MergePatch_UniqueKeyCollection()
         {
             // Get an existing person detail.
-            var p = _agentTester.Test<PersonAgent, PersonDetail>()
+            var p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
 
@@ -931,7 +919,7 @@ namespace Beef.Demo.Test
                 "{ \"name\": \"Microsoft\" }, " +
                 "{ \"name\": \"Google\", \"startDate\": \"2018-04-30T00:00:00\" } ] }");
 
-            p = _agentTester.Test<PersonAgent, PersonDetail>()
+            p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.PatchDetailAsync(WebApiPatchOption.MergePatch, jt, 4.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
@@ -956,7 +944,7 @@ namespace Beef.Demo.Test
         public void H160_PatchDetail_MergePatch_Error()
         {
             // Get an existing person detail.
-            var p = _agentTester.Test<PersonAgent, PersonDetail>()
+            var p = AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetDetailAsync(4.ToGuid())).Value;
 
@@ -965,7 +953,7 @@ namespace Beef.Demo.Test
                 "{ \"xxx\": \"Microsoft\" }, " +
                 "{ \"name\": \"Google\", \"startDate\": \"xxx\" } ] }");
 
-            _agentTester.Test<PersonAgent, PersonDetail>()
+            AgentTester.Test<PersonAgent, PersonDetail>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
                 .ExpectErrorType(ErrorType.ValidationError)
                 .ExpectMessages(
@@ -978,7 +966,7 @@ namespace Beef.Demo.Test
         public void H210_PatchWithEF_MergePatch()
         {
             // Get an existing person.
-            var p = _agentTester.Test<PersonAgent, Person>()
+            var p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
@@ -986,7 +974,7 @@ namespace Beef.Demo.Test
             p.Address = new Address { Street = "Simpsons Road", City = "Bardon" };
 
             // Try patching the person with an invalid eTag.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectETag(p.ETag)
                 .ExpectChangeLogUpdated()
@@ -996,13 +984,13 @@ namespace Beef.Demo.Test
                     3.ToGuid(), new WebApiRequestOptions { ETag = p.ETag })).Value;
 
             // Check the person was patched properly.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
                 .Run(a => a.GetAsync(3.ToGuid())).Value;
 
             // Try a re-patch with no changes.
-            p = _agentTester.Test<PersonAgent, Person>()
+            p = AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => p)
                 .Run(a => a.PatchWithEfAsync(WebApiPatchOption.MergePatch,
@@ -1018,7 +1006,7 @@ namespace Beef.Demo.Test
         public void I110_Add()
         {
             // Do the 'Add' - which does nothing, just validates the passing of the data.
-            var res = _agentTester.Test<PersonAgent>()
+            var res = AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.Created)
                 .Run(a => a.AddAsync(new Person { FirstName = "Gary" }));
 
@@ -1029,12 +1017,12 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void I120_Mark()
         {
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.Accepted)
                 .ExpectEvent("Demo.Mark", "Marked")
                 .Run(a => a.MarkAsync());
 
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.Accepted)
                 .ExpectEvent("Demo.Mark", "Marked", "Wahlberg")
                 .Run(a => a.MarkAsync());
@@ -1043,7 +1031,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void I130_Null()
         {
-            _agentTester.Test<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetNullAsync("blah"));
         }
@@ -1051,7 +1039,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void I140_Map()
         {
-            _agentTester.Test<PersonAgent, MapCoordinates>()
+            AgentTester.Test<PersonAgent, MapCoordinates>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new MapCoordinates { Longitude = 1.234m, Latitude = -6.789m })
                 .Run(a => a.MapAsync(new MapArgs { Coordinates = new MapCoordinates { Longitude = 1.234m, Latitude = -6.789m } }));
@@ -1060,7 +1048,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void I150_ThrowError()
         {
-            _agentTester.Test<PersonAgent>()
+            AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.InternalServerError)
                 .Run(a => a.ThrowErrorAsync());
         }

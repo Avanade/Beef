@@ -82,8 +82,8 @@ namespace Beef.Data.Database
                 throw new IndexOutOfRangeException("Index is not within the bounds of the underlying IDataRecord.FieldCount.");
 
             object dbVal = DataRecord.GetValue(index);
-            if (dbVal is DateTime)
-                dbVal = Cleaner.Clean((DateTime)dbVal, DatabaseCommand.Database.DateTimeTransform);
+            if (dbVal is DateTime datetime)
+                dbVal = Cleaner.Clean(datetime, DatabaseCommand.Database.DateTimeTransform);
 
             if (dbVal is DBNull)
                 return default!;

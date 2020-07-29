@@ -9,16 +9,15 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database
 {
     /// <summary>
-    /// Provides the database access layer capabilities.
+    /// Provides the database access layer capabilities (managed around a single connection).
     /// </summary>
-    public interface IDatabase
+    public interface IDatabase:  IDisposable
     {
         /// <summary>
-        /// Creates a <see cref="DbConnection"/>.
+        /// Gets the <see cref="DbConnection"/> (automatically creates and opens on first access, then closes when disposed).
         /// </summary>
-        /// <param name="useDataContextScope">Indicates whether to use the <see cref="DataContextScope"/>; defaults to <c>true</c>.</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        DbConnection CreateConnection(bool useDataContextScope = true);
+        /// <returns>The underlying <see cref="DbConnection"/>.</returns>
+        DbConnection GetConnection();
 
         /// <summary>
         /// Creates a stored procedure <see cref="DatabaseCommand"/>.

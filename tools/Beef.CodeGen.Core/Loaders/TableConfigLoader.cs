@@ -268,7 +268,6 @@ namespace Beef.CodeGen.Loaders
             Logger.Create<TableConfigLoader>().LogInformation($"   Querying database: {connString}");
 
             using var db = new SqlServerDb(connString);
-            using (db.SetBypassDataContextScopeDbConnection())
             {
                 _tables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema, false, false).ConfigureAwait(false);
             }

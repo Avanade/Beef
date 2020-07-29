@@ -16,10 +16,10 @@ namespace Beef.Data.Database
     /// <summary>
     /// Represents the base class for encapsulating the database access layer using old skool ADO.NET - because sometimes it is all you need, and it is super efficient.
     /// </summary>
-    /// <remarks>Provides automatic database connection management by leveraging the <see cref="DataContextScope"/>.</remarks>
-    public abstract class DatabaseBase : IDatabase, IDisposable
+    /// <remarks>Provides automatic database connection management opening on first use and closing on <see cref="Dispose(bool)"/>.</remarks>
+    public abstract class DatabaseBase : IDatabase
     {
-        private Guid _identifier = Guid.NewGuid();
+        private readonly object _lock = new object();
         private DbConnection? _connection;
         private bool _disposed;
         private ILogger? _logger;
@@ -91,15 +91,6 @@ namespace Beef.Data.Database
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
             Invoker = invoker ?? new DatabaseInvoker();
-
-            DataContextScope.RegisterContext(_identifier, () =>
-            {
-                Logger.LogInformation("DataContextScope registered context initiated database connection create and open.");
-                var conn = CreateConnection(false);
-                conn.Open();
-                OnConnectionOpen(conn);
-                return conn;
-            });
         }
 
         /// <summary>
@@ -142,6 +133,11 @@ namespace Beef.Data.Database
         /// Gets the <see cref="ILogger"/>.
         /// </summary>
         internal ILogger Logger => _logger ??= Diagnostics.Logger.Create<DatabaseBase>();
+
+        /// <summary>
+        /// Gets the unique database instance identifier.
+        /// </summary>
+        public Guid DatabaseId { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Sets the SQL session context using the specified values by invoking the <see cref="SessionContextStoredProcedure"/> using parameters named
@@ -207,38 +203,25 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Sets up the <see cref="DatabaseBase"/> to always use the <paramref name="connection"/> bypassing the <see cref="DataContextScope"/>.
+        /// Gets the <see cref="DbConnection"/> (automatically creates and opens on first access, then closes when disposed).
         /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> (where <c>null</c> it will create automatically bypassing the <see cref="DataContextScope"/>).</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        public DbConnection SetBypassDataContextScopeDbConnection(DbConnection? connection = null)
-        {
-            _connection = connection ?? CreateConnection(false);
-            return _connection;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="DbConnection"/>.
-        /// </summary>
-        /// <param name="useDataContextScope">Indicates whether to use the <see cref="DataContextScope"/>; defaults to <c>true</c>.</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        /// <remarks>Where <see cref="SetBypassDataContextScopeDbConnection"/> has been invoked this connection will always be returned; no new connection will be created.</remarks>
-        public DbConnection CreateConnection(bool useDataContextScope = true)
+        /// <returns>The underlying <see cref="DbConnection"/>.</returns>
+        public DbConnection GetConnection()
         {
             if (_connection != null)
                 return _connection;
 
-            if (!useDataContextScope || DataContextScope.Current == null)
+            lock (_lock)
             {
-                Logger.LogInformation("Creating database connection (not open)");
+                if (_connection != null)
+                    return _connection;
+
+                Logger.LogDebug("Creating and opening the database connection. DatabaseId: {0}", DatabaseId);
                 DbConnection conn = Provider.CreateConnection();
                 conn.ConnectionString = ConnectionString;
-                return conn;
-            }
-            else
-            {
-                Logger.LogInformation("Creating (getting) database connection from DataContextScope.");
-                return (DbConnection)DataContextScope.Current.GetContext(_identifier);
+                conn.Open();
+                OnConnectionOpen(conn);
+                return _connection = conn;
             }
         }
 
@@ -254,20 +237,14 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="storedProcedure">The stored procedure name.</param>
         /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        public DatabaseCommand StoredProcedure(string storedProcedure)
-        {
-            return new DatabaseCommand(this, storedProcedure, CommandType.StoredProcedure);
-        }
+        public DatabaseCommand StoredProcedure(string storedProcedure) => new DatabaseCommand(this, storedProcedure, CommandType.StoredProcedure);
 
         /// <summary>
         /// Creates a SQL statement <see cref="DatabaseCommand"/>.
         /// </summary>
         /// <param name="sqlStatement">The SQL statement.</param>
         /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        public DatabaseCommand SqlStatement(string sqlStatement)
-        {
-            return new DatabaseCommand(this, sqlStatement, CommandType.Text);
-        }
+        public DatabaseCommand SqlStatement(string sqlStatement) => new DatabaseCommand(this, sqlStatement, CommandType.Text);
 
         /// <summary>
         /// Creates a <see cref="DatabaseQuery{T}"/> to enable select-like capabilities.
@@ -275,10 +252,7 @@ namespace Beef.Data.Database
         /// <param name="queryArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="queryParams">The query <see cref="DatabaseParameters"/> delegate.</param>
         /// <returns>A <see cref="DatabaseQuery{T}"/>.</returns>
-        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new()
-        {
-            return new DatabaseQuery<T>(this, queryArgs, queryParams);
-        }
+        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new() => new DatabaseQuery<T>(this, queryArgs, queryParams);
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> mapping to <typeparamref name="T"/>.
@@ -452,7 +426,14 @@ namespace Beef.Data.Database
             if (!_disposed)
             {
                 if (disposing)
-                    DataContextScope.DeregisterContext(_identifier);
+                {
+                    if (_connection != null)
+                    {
+                        Logger.LogDebug("Closing and disposing the database connection. DatabaseId: {0}", DatabaseId);
+                        _connection.Close();
+                        _connection.Dispose();
+                    }
+                }
 
                 _disposed = true;
             }

@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.Data
             await DataInvoker.Current.InvokeAsync(this, async () => 
             {
                 await _db.GetRefDataAsync<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(__coll, "[Ref].[spCountryGetAll]", "CountryId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -72,7 +72,7 @@ namespace Beef.Demo.Business.Data
             await DataInvoker.Current.InvokeAsync(this, async () => 
             {
                 await _db.GetRefDataAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(__coll, "[Ref].[spUSStateGetAll]", "USStateId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -91,7 +91,7 @@ namespace Beef.Demo.Business.Data
                     item.AlternateName = dr.GetValue<string>("AlternateName");
                     item.TripCode = dr.GetValue<string>("TripCode");
                 });
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -103,7 +103,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -114,7 +114,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -125,7 +125,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
         {
             var __coll = new RefDataNamespace.CompanyCollection();
-            await DataInvoker.Current.InvokeAsync(this, async () => await CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false), BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => await CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false)).ConfigureAwait(false);
             return __coll;
         }
 
