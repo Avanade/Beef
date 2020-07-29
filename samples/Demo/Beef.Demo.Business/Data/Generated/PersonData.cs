@@ -70,6 +70,8 @@ namespace Beef.Demo.Business.Data
 
         private readonly Action<Exception>? _mapOnException;
 
+        private readonly Action<Exception>? _getNoArgsOnException;
+
         private readonly Action<Exception>? _getDetailOnException;
 
         private readonly Action<Exception>? _updateDetailOnException;
@@ -271,6 +273,16 @@ namespace Beef.Demo.Business.Data
         {
             return DataInvoker.Default.InvokeAsync(this, () => MapOnImplementationAsync(args),
                 new BusinessInvokerArgs { ExceptionHandler = _mapOnException });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public Task<Person?> GetNoArgsAsync()
+        {
+            return DataInvoker.Default.InvokeAsync(this, () => GetNoArgsOnImplementationAsync(),
+                new BusinessInvokerArgs { ExceptionHandler = _getNoArgsOnException });
         }
 
         /// <summary>

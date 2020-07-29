@@ -152,6 +152,14 @@ namespace Beef.Demo.Common.Agents
             => PersonServiceAgent.MapAsync(args, requestOptions);
 
         /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null)
+            => PersonServiceAgent.GetNoArgsAsync(requestOptions);
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

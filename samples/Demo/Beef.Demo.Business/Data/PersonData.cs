@@ -66,6 +66,11 @@ namespace Beef.Demo.Business.Data
                 throw new NotSupportedException();
         }
 
+        private Task<Person> GetNoArgsOnImplementationAsync()
+        {
+            return Task.FromResult(new Person { FirstName = "No", LastName = "Args" });
+        }
+
         private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)
         {
             var pdcr = new PersonDetailCollectionResult(new PagingResult(paging));

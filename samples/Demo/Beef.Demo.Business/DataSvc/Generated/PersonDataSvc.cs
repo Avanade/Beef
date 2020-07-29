@@ -37,6 +37,7 @@ namespace Beef.Demo.Business.DataSvc
         private static readonly Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
         private static readonly Func<Task>? _markOnAfterAsync;
         private static readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
+        private static readonly Func<Person?, Task>? _getNoArgsOnAfterAsync;
         private static readonly Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
         private static readonly Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
         private static readonly Func<Person?, string?, Task>? _getNullOnAfterAsync;
@@ -221,6 +222,25 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await Factory.Create<IPersonData>().MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
+                return __result;
+            });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public static Task<Person?> GetNoArgsAsync()
+        {
+            return DataSvcInvoker.Default.InvokeAsync(typeof(PersonDataSvc), async () => 
+            {
+                var __key = new UniqueKey();
+                if (ExecutionContext.Current.TryGetCacheValue<Person>(__key, out Person __val))
+                    return __val;
+
+                var __result = await Factory.Create<IPersonData>().GetNoArgsAsync().ConfigureAwait(false);
+                ExecutionContext.Current.CacheSet(__key, __result!);
+                if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }

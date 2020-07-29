@@ -124,6 +124,13 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         Task<WebApiAgentResult<MapCoordinates>> MapAsync(MapArgs? args, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -388,6 +395,17 @@ namespace Beef.Demo.Common.Agents.ServiceAgents
         {
             return base.PostAsync<MapCoordinates>("api/v1/persons/map", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<MapArgs?>("args", args, WebApiArgType.FromUriUseProperties) });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null)
+        {
+            return base.GetAsync<Person>("api/v1/persons/noargsforme", requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
         }
 
         /// <summary>

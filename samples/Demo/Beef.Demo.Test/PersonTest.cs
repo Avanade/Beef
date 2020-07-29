@@ -1016,6 +1016,15 @@ namespace Beef.Demo.Test
                 .Run((a) => a.Agent.MapAsync(new MapArgs { Coordinates = new MapCoordinates { Longitude = 1.234m, Latitude = -6.789m } }));
         }
 
+        [Test, TestSetUp]
+        public void I150_GetNoArgs()
+        {
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
+                .Run((a) => a.Agent.GetNoArgsAsync());
+        }
+
         #endregion
     }
 }

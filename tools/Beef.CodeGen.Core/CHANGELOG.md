@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.18
+- *Fixed:* Issue [63](https://github.com/Avanade/Beef/issues/63) fixed. The `OperationType="Get"` with no arguments will no longer result in errant code (non-compiling) being generated.
+
 ## v3.1.17
 - *Fixed:* Issue [57](https://github.com/Avanade/Beef/issues/57) fixed. The redundant `?? null` for the property set on an entity with a reference data collection has been removed.
 - *Fixed:* Tidied up the entity code-gen for the `Equals` method.

@@ -77,6 +77,9 @@ namespace Beef.Demo.Business
         private readonly Func<MapArgs?, Task>? _mapOnBeforeAsync;
         private readonly Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
 
+        private readonly Func<Task>? _getNoArgsOnBeforeAsync;
+        private readonly Func<Person?, Task>? _getNoArgsOnAfterAsync;
+
         private readonly Func<Guid, Task>? _getDetailOnPreValidateAsync;
         private readonly Action<MultiValidator, Guid>? _getDetailOnValidate;
         private readonly Func<Guid, Task>? _getDetailOnBeforeAsync;
@@ -381,6 +384,23 @@ namespace Beef.Demo.Business
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
                 var __result = await PersonDataSvc.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
+                Cleaner.Clean(__result);
+                return __result;
+            });
+        }
+
+        /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public Task<Person?> GetNoArgsAsync()
+        {
+            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getNoArgsOnBeforeAsync != null) await _getNoArgsOnBeforeAsync().ConfigureAwait(false);
+                var __result = await PersonDataSvc.GetNoArgsAsync().ConfigureAwait(false);
+                if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
                 Cleaner.Clean(__result);
                 return __result;
             });

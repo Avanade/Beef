@@ -206,6 +206,20 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Get no arguments.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> entity where found.</returns>
+        [HttpGet()]
+        [Route("noargsforme")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public IActionResult GetNoArgs()
+        {
+            return new WebApiGet<Person?>(this, () => Factory.Create<IPersonManager>().GetNoArgsAsync(),
+                operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
+        }
+
+        /// <summary>
         /// Gets the <see cref="PersonDetail"/> entity that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
