@@ -113,58 +113,35 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <![CDATA[        private Func<]]>
           <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}?]]></Else>
+              <Then><![CDATA[{{Entity.EntityName}}?, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}?, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityName}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Then><![CDATA[{{Entity.EntityName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'GetColl'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityCollectionResultName}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult]]></Else>
+              <Then><![CDATA[{{Entity.EntityCollectionResultName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-            <![CDATA[{{Operation.ReturnType}}]]>
+            <![CDATA[{{Operation.ReturnType}}, ]]>
           </If>
           <Parameter Condition="Parameter.LayerPassing == 'All'">
-            <If Condition="System.Index == 0">
-              <Then>
-                <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                  <![CDATA[, ]]>
-                </If>
-                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                  <![CDATA[, ]]>
-                </If>
-              </Then>
-              <Else>
-                <![CDATA[, ]]>
-              </Else>
-            </If>
             <![CDATA[{{Parameter.Type}}]]>
             <If Condition="Parameter.Nullable == true">
               <![CDATA[?]]>
             </If>
+            <![CDATA[, ]]>
           </Parameter>
           <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-            <Then>
-              <![CDATA[, PagingArgs?, ]]>
-            </Then>
-            <Else>
-              <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <Then><![CDATA[, ]]></Then>
-                <Else>
-                  <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                    <![CDATA[, ]]>
-                  </If>
-                </Else>
-              </If>
-            </Else>
+            <![CDATA[PagingArgs?, ]]>
+
           </If>
           <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
 ]]>

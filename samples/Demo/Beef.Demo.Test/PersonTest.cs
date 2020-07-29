@@ -1053,6 +1053,15 @@ namespace Beef.Demo.Test
                 .Run(a => a.ThrowErrorAsync());
         }
 
+        [Test, TestSetUp]
+        public void I150_GetNoArgs()
+        {
+            AgentTester.Create<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
+                .Run((a) => a.Agent.GetNoArgsAsync());
+        }
+
         #endregion
     }
 }

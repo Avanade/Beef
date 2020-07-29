@@ -101,31 +101,19 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             <![CDATA[        private Func<]]>
             <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
               <If Condition="Operation.ReturnType == 'void'">
-                <Then><![CDATA[{{Entity.EntityName}}]]></Then>
-                <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+                <Then><![CDATA[{{Entity.EntityName}}, ]]></Then>
+                <Else><![CDATA[{{Operation.ReturnType}}, ]]></Else>
               </If>
             </If>
             <Parameter>
-              <If Condition="System.Index > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <![CDATA[, ]]>
-              </If>
               <![CDATA[{{Parameter.Type}}]]>
               <If Condition="Parameter.Nullable == true">
                 <![CDATA[?]]>
               </If>
+              <![CDATA[, ]]>
             </Parameter>
             <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-              <Then>
-                <If Condition="Operation.ParameterCount > 0">
-                  <![CDATA[, ]]>
-                </If>
-                <![CDATA[PagingArgs?, ]]>
-              </Then>
-              <Else>
-                <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                  <![CDATA[, ]]>
-                </If>
-              </Else>
+              <![CDATA[PagingArgs?, ]]>
             </If>
             <![CDATA[Task>? {{Operation.PrivateName}}OnPreValidateAsync;
         private Action<MultiValidator]]>

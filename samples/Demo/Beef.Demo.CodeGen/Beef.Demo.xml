@@ -35,6 +35,7 @@
     <Operation Name="Map" Text="Get {{Person}} at specified {{MapCoordinates}}" OperationType="Custom" ReturnType="MapCoordinates" WebApiRoute="map" WebApiStatus="OK" WebApiOperationType="Read">
       <Parameter Name="Args" Type="MapArgs" />
     </Operation>
+    <Operation Name="GetNoArgs" Text="Get no arguments" OperationType="Get" WebApiRoute="noargsforme" AutoImplement="None" />
 
     <Operation Name="GetDetail" OperationType="Get" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
     <Operation Name="UpdateDetail" OperationType="Update" ValueType="PersonDetail" ReturnType="PersonDetail" Validator="PersonDetailValidator" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />

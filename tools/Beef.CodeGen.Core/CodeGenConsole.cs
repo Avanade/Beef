@@ -27,6 +27,7 @@ namespace Beef.CodeGen
         private readonly CommandOption _assembliesOpt;
         private readonly List<Assembly> _assemblies = new List<Assembly>();
         private readonly CommandOption _paramsOpt;
+        private readonly CommandOption _expectNoChange;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -70,6 +71,8 @@ namespace Beef.CodeGen
 
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
+
+            _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -138,6 +141,7 @@ namespace Beef.CodeGen
                 ScriptFile = new FileInfo(_scriptOpt.Value()),
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory),
+                ExpectNoChange = _expectNoChange.HasValue()
             };
 
             WriteHeader(args);
@@ -202,6 +206,7 @@ namespace Beef.CodeGen
 
                 args.Logger.LogInformation($"  Template = {args.TemplatePath?.FullName}");
                 args.Logger.LogInformation($"  Output = {args.OutputPath?.FullName}");
+                args.Logger.LogInformation($"  ExpectNoChange = {args.ExpectNoChange}");
             }
 
             args.Logger.LogInformation($"  Params{(args.Parameters.Count == 0 ? " = none" : ":")}");
