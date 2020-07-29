@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.19
+- *Enhancment:* Request [62](https://github.com/Avanade/Beef/issues/62) applied. Generate a non-zero exit code when detecting updated files if none are expected. E.g. if executing the code generation as part of build pipeline.
+
 ## v3.1.18
 - *Fixed:* Issue [63](https://github.com/Avanade/Beef/issues/63) fixed. The `OperationType="Get"` with no arguments will no longer result in errant code (non-compiling) being generated.
 
