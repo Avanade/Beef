@@ -62,6 +62,11 @@ namespace Beef.CodeGen
         /// Gets or sets dictionary of parameter name/value pairs.
         /// </summary>
         public Dictionary<string, string> Parameters { get; private set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Indicates whether the <i>code generator</i> is expecting to generate <i>no</i> changes; e.g. within in a build pipeline.
+        /// </summary>
+        public bool ExpectNoChange { get; internal set; }
     }
 
     /// <summary>
@@ -88,6 +93,9 @@ namespace Beef.CodeGen
         /// </summary>
         protected override async Task OnRunAsync(ExecutorRunArgs args)
         {
+            var overallCreatedCount = 0;
+            var overallUpdatedCount = 0;
+
             try
             {
                 XElement? xmlScript;
@@ -169,6 +177,10 @@ namespace Beef.CodeGen
 
                     // Provide statistics.
                     Logger.Default.Info("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
+
+                    // Keep track of overall counts.
+                    overallCreatedCount += CreatedCount;
+                    overallUpdatedCount += UpdatedCount;
                 }
             }
             catch (CodeGenException gcex)
@@ -176,6 +188,9 @@ namespace Beef.CodeGen
                 Logger.Default.Error(gcex.Message);
                 Logger.Default.Info(string.Empty);
             }
+
+            if (_args.ExpectNoChange && (overallCreatedCount != 0 || overallUpdatedCount != 0))
+                throw new CodeGenException("Unexpected changes detected; one or more files were created and/or updated.");
         }
 
         /// <summary>
