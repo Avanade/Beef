@@ -588,6 +588,7 @@ namespace Beef.Demo.Test
             // Update the person with an address.
             p.FirstName += "X";
             p.LastName += "Y";
+            p.Gender = "M";
             p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
 
             p = AgentTester.Test<PersonAgent, Person>()

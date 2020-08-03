@@ -120,12 +120,12 @@ namespace Beef.Test.NUnit.Logging
         internal static string GetLogLevel(LogLevel level) =>
             level switch
             {
-                LogLevel.Critical => "Cri",
-                LogLevel.Error => "Err",
-                LogLevel.Warning => "Wrn",
-                LogLevel.Information => "Inf",
-                LogLevel.Trace => "Trc",
-                LogLevel.Debug => "Dbg",
+                LogLevel.Critical => "Critical",
+                LogLevel.Error => "Error",
+                LogLevel.Warning => "Warning",
+                LogLevel.Information => "Info",
+                LogLevel.Trace => "Trace",
+                LogLevel.Debug => "Debug",
                 _ => "?",
             };
     }

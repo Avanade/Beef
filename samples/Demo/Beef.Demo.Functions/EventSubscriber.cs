@@ -17,6 +17,6 @@ namespace Beef.Demo.Functions
         }
 
         [FunctionName("EventSubscriber")]
-        public async Task Run([ResilientEventHubTrigger("BeefEventHub")] EventHubs.EventData @event) => await _subscriber.ReceiveAsync(@event);
+        public async Task Run([ResilientEventHubTrigger] EventHubs.EventData @event) => await _subscriber.ReceiveAsync(@event);
     }
 }

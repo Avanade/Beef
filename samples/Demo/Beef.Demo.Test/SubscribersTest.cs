@@ -15,7 +15,7 @@ namespace Beef.Demo.Test
     public class SubscribersTest : UsingAgentTesterServer<Api.Startup>
     {
         private readonly RobotTest _robotTest = new RobotTest();
-        private EventSubscriberTester<Startup> _subscriberTester = EventSubscriberTester.Create<Startup>();
+        private readonly EventSubscriberTester<Startup> _subscriberTester = EventSubscriberTester.Create<Startup>();
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();

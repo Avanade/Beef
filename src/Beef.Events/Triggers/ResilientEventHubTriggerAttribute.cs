@@ -18,7 +18,7 @@ namespace Beef.Events.Triggers
         /// Initializes a new instance of the <see cref="ResilientEventHubTriggerAttribute"/> class.
         /// </summary>)
         /// <param name="eventHubName">The Event hub name to listen on for messages.</param>
-        public ResilientEventHubTriggerAttribute(string eventHubName) => EventHubName = Check.NotNull(eventHubName, nameof(eventHubName));
+        public ResilientEventHubTriggerAttribute(string eventHubName = "%EventHubName%") => EventHubName = Check.NotNull(eventHubName, nameof(eventHubName));
 
         /// <summary>
         /// Gets the name of the event hub (defaults to "%EventHubName%").
