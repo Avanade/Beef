@@ -11,6 +11,14 @@
       <Set Name="System.EntityExclude" Value="true" />
     </If>
 
+    <!-- Only needs a DataSvc where specifically requested generation, or manager NOT custom. -->
+    <Set Name="System.RequiresDataSvc" Condition="Entity.ExcludeDataSvc == true and Entity.ExcludeIDataSvc == true" Value="false" Otherwise="true" />
+    <If Condition="System.RequiresDataSvc == false">
+      <Operation Condition="Operation.ManagerCustom == false">
+        <Set Name="System.RequiresDataSvc" Value="true" />
+      </Operation>
+    </If>
+
     <Entity Condition="System.EntityExclude == false and Entity.Name == System.EntityName" OutputFileName="{{Entity.Name}}Manager.cs">
       <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="${{Entity.Name}}&lt;T&gt;" />
       <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
@@ -82,9 +90,12 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
       <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
       <![CDATA[
     {
-        private readonly I{{Entity.Name}}DataSvc _dataService;
+]]>
+      <If Condition="System.RequiresDataSvc == true">
+        <![CDATA[        private readonly I{{Entity.Name}}DataSvc _dataService;
 
 ]]>
+      </If>
       <If Condition="Entity.ManagerExtensions == true">
         <!-- Private Funcs/Actions as Partial Methods do not support Async :-( -->
         <Set Name="System.EndRegion" Value="false"/>
@@ -168,56 +179,34 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         private Func<]]>
           <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityName}}?]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}?]]></Else>
+              <Then><![CDATA[{{Entity.EntityName}}?, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}?, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityName}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}]]></Else>
+              <Then><![CDATA[{{Entity.EntityName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'GetColl'">
             <If Condition="Operation.ReturnType == 'void'">
-              <Then><![CDATA[{{Entity.EntityCollectionResultName}}]]></Then>
-              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult]]></Else>
+              <Then><![CDATA[{{Entity.EntityCollectionResultName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult, ]]></Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-            <![CDATA[{{Operation.ReturnType}}]]>
+            <![CDATA[{{Operation.ReturnType}}, ]]>
           </If>
           <Parameter>
-            <If Condition="System.Index == 0">
-              <Then>
-                <If Condition="Operation.OperationType != 'Delete' and Operation.OperationType != 'Custom'">
-                  <![CDATA[, ]]>
-                </If>
-                <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                  <![CDATA[, ]]>
-                </If>
-              </Then>
-              <Else><![CDATA[, ]]></Else>
-            </If>
             <![CDATA[{{Parameter.Type}}]]>
             <If Condition="Parameter.Nullable == true">
               <![CDATA[?]]>
             </If>
+            <![CDATA[, ]]>
           </Parameter>
           <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-            <Then>
-              <![CDATA[, PagingArgs?, ]]>
-            </Then>
-            <Else>
-              <If Condition="Operation.ParameterCount > 0 or Operation.OperationType == 'GetColl' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-                <Then><![CDATA[, ]]></Then>
-                <Else>
-                  <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-                    <![CDATA[, ]]>
-                  </If>
-                </Else>
-              </If>
-            </Else>
+            <![CDATA[PagingArgs?, ]]>
           </If>
           <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
 ]]>
@@ -230,7 +219,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
         </If>
       </If>
-      <![CDATA[        /// <summary>
+      <If Condition="System.RequiresDataSvc == true">
+        <Then>
+          <![CDATA[        /// <summary>
         /// Parameterless constructor is explictly not supported.
         /// </summary>
         private {{Entity.Name}}Manager() => throw new NotSupportedException();
@@ -239,13 +230,31 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
-        ]]>
+]]>
+        </Then>
+        <Else>
+          <![CDATA[        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
+        /// </summary>
+]]>
+        </Else>
+      </If>
+      <![CDATA[        ]]>
       <Switch Value="Entity.ManagerConstructor">
         <Case Value="'Private'"><![CDATA[private]]></Case>
         <Case Value="'Protected'"><![CDATA[protected]]></Case>
         <Default><![CDATA[public]]></Default>
       </Switch>
-      <![CDATA[ {{Entity.Name}}Manager(I{{Entity.Name}}DataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Entity.Name}}ManagerCtor(); }
+      <![CDATA[ {{Entity.Name}}Manager(]]>
+      <If Condition="System.RequiresDataSvc == true">
+        <Then>
+          <![CDATA[I{{Entity.Name}}DataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Entity.Name}}ManagerCtor(); }]]>
+        </Then>
+        <Else>
+          <![CDATA[) => {{Entity.Name}}ManagerCtor();]]>
+        </Else>
+      </If>
+      <![CDATA[
 
         /// <summary>
         /// Enables additional functionality to be added to the constructor.
@@ -751,9 +760,15 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
           </Else>
         </If>
         <If Condition="Entity.ManagerExtensions == true and System.HasResult == true">
-          <![CDATA[                Cleaner.CleanUp(__result);
-                return __result;
+          <Then>
+          <![CDATA[                return Cleaner.Clean(__result);
 ]]>
+          </Then>
+          <Else>
+            <If Condition="Operation.OperationType == 'Custom' and System.HasResult == true">
+              <![CDATA[                return Cleaner.Clean(__result);
+]]>
+            </If>          </Else>
         </If>
         <![CDATA[            }]]>
         <If Condition="Operation.ManagerTransaction == true">

@@ -25,7 +25,8 @@ namespace Beef.Demo.Business
                            .AddScoped<IProductManager, ProductManager>()
                            .AddScoped<IRobotManager, RobotManager>()
                            .AddScoped<ITripPersonManager, TripPersonManager>()
-                           .AddScoped<IContactManager, ContactManager>();
+                           .AddScoped<IContactManager, ContactManager>()
+                           .AddScoped<IConfigManager, ConfigManager>();
         }
     }
 }

@@ -63,13 +63,7 @@ namespace Cdr.Banking.Api
             services.AddSingleton<Beef.Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")));
 
             // Add beef cache policy management.
-            services.AddSingleton(_ =>
-            {
-                var cpm = new CachePolicyManager();
-                cpm.SetFromCachePolicyConfig(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-                cpm.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-                return cpm;
-            });
+            services.AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>());
 
             // Add the generated reference data services for dependency injection requirements.
             services.AddGeneratedReferenceDataManagerServices()

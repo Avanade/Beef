@@ -73,6 +73,11 @@ namespace Beef.Demo.Business.Data
                 throw new NotSupportedException();
         }
 
+        private Task<Person> GetNoArgsOnImplementationAsync()
+        {
+            return Task.FromResult(new Person { FirstName = "No", LastName = "Args" });
+        }
+
         private Task ThrowErrorOnImplementationAsync()
         {
             _logger.LogWarning("The data is beyond corrupt and we cannot continue.");

@@ -80,7 +80,7 @@ namespace Beef.Demo.Business
         private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
 
         private Func<Task>? _getNoArgsOnBeforeAsync;
-        private Func<Person?Task>? _getNoArgsOnAfterAsync;
+        private Func<Person?, Task>? _getNoArgsOnAfterAsync;
 
         private Func<Guid, Task>? _getDetailOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getDetailOnValidate;
@@ -170,8 +170,7 @@ namespace Beef.Demo.Business
                 if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
                 var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -219,8 +218,7 @@ namespace Beef.Demo.Business
                 if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await _dataService.GetAsync(id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -249,8 +247,7 @@ namespace Beef.Demo.Business
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -267,8 +264,7 @@ namespace Beef.Demo.Business
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
                 var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -284,8 +280,7 @@ namespace Beef.Demo.Business
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -311,8 +306,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -338,8 +332,7 @@ namespace Beef.Demo.Business
                 if (_getDetailByArgsOnBeforeAsync != null) await _getDetailByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -366,8 +359,7 @@ namespace Beef.Demo.Business
                 if (_mergeOnBeforeAsync != null) await _mergeOnBeforeAsync(fromId, toId).ConfigureAwait(false);
                 var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -405,8 +397,7 @@ namespace Beef.Demo.Business
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
                 var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -422,8 +413,7 @@ namespace Beef.Demo.Business
                 if (_getNoArgsOnBeforeAsync != null) await _getNoArgsOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -448,8 +438,7 @@ namespace Beef.Demo.Business
                 if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -478,8 +467,7 @@ namespace Beef.Demo.Business
                 if (_updateDetailOnBeforeAsync != null) await _updateDetailOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -508,8 +496,7 @@ namespace Beef.Demo.Business
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -533,8 +520,7 @@ namespace Beef.Demo.Business
                 if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
                 var __result = await _dataService.GetNullAsync(name).ConfigureAwait(false);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -560,8 +546,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsWithEfOnBeforeAsync != null) await _getByArgsWithEfOnBeforeAsync(args, paging).ConfigureAwait(false);
                 var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -600,8 +585,7 @@ namespace Beef.Demo.Business
                 if (_getWithEfOnBeforeAsync != null) await _getWithEfOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -628,8 +612,7 @@ namespace Beef.Demo.Business
                 if (_createWithEfOnBeforeAsync != null) await _createWithEfOnBeforeAsync(value).ConfigureAwait(false);
                 var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 
@@ -658,8 +641,7 @@ namespace Beef.Demo.Business
                 if (_updateWithEfOnBeforeAsync != null) await _updateWithEfOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.CleanUp(__result);
-                return __result;
+                return Cleaner.Clean(__result);
             });
         }
 

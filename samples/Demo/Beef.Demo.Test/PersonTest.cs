@@ -1056,10 +1056,10 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void I150_GetNoArgs()
         {
-            AgentTester.Create<PersonAgent, Person>()
+            AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
-                .Run((a) => a.Agent.GetNoArgsAsync());
+                .Run(a => a.GetNoArgsAsync());
         }
 
         #endregion

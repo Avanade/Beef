@@ -8,7 +8,7 @@ using System;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Provides the underlying <see cref="AgentTester"/>.
+    /// Provides the underlying <see cref="AgentTester"/>. Enables the <see cref="TestSetUpAttribute"/> to automatically invoke the <see cref="TesterBase.PrepareExecutionContext(string?, object?)"/>.
     /// </summary>
     internal interface IUsingAgentTesterServer
     {

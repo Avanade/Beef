@@ -159,6 +159,10 @@
     <Property Name="LastName" Type="string" />
   </Entity>
 
+  <Entity Name="Config" WebApiRoutePrefix="api/v1/envvars" ExcludeEntity="true" ExcludeDataSvc="true" ExcludeIDataSvc="true" ExcludeData="true" ExcludeIData="true">
+    <Operation Name="GetEnvVars" OperationType="Custom" ManagerCustom="true" ReturnType="System.Collections.IDictionary" />
+  </Entity>
+
   <!-- Non EntityBase entity -->
   <Entity Name="PersonOther" Text="other {{Person}} without {{EntityBase}} capabilities" OmitEntityBase="true" Implements="IGuidIdentifier, IChangeLog, IETag" Collection="true" ExcludeAll="true">
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />
