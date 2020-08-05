@@ -35,8 +35,8 @@ $projectsToPublish = @(
 	"src\Beef.Grpc",
 	"tools\Beef.CodeGen.Core",
     "tools\Beef.Database.Core",
-    "tools\Beef.Test.NUnit",
-	"templates\Beef.Template.Solution")
+    "tools\Beef.Test.NUnit")
+#	"templates\Beef.Template.Solution")
 
 # Generate NuGet packages using dotnet pack.
 foreach ($project in $projectsToPublish) {

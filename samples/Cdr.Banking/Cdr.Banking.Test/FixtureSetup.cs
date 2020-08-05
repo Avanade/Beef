@@ -60,7 +60,7 @@ namespace Cdr.Banking.Test
                             UniqueKeyPolicy = new Cosmos.UniqueKeyPolicy { UniqueKeys = { new Cosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                         }, 400).ConfigureAwait(false);
 
-                    await rdc.ImportValueRefDataBatchAsync<AccountTest, IReferenceData>("RefData.yaml").ConfigureAwait(false);
+                    await rdc.ImportValueRefDataBatchAsync<AccountTest, ReferenceData>("RefData.yaml").ConfigureAwait(false);
                 }
 
                 return true;
