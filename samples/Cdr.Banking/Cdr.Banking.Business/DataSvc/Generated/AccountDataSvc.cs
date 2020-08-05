@@ -28,11 +28,6 @@ namespace Cdr.Banking.Business.DataSvc
         private readonly IRequestCache _cache;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private AccountDataSvc() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IAccountData"/>.</param>

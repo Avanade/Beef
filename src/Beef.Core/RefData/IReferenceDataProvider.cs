@@ -25,12 +25,6 @@ namespace Beef.RefData
 #pragma warning restore CA1043 
 
         /// <summary>
-        /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
-        /// </summary>
-        /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        Type[] GetAllTypes();
-
-        /// <summary>
         /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. 
         /// </summary>
         /// <param name="names">The list of <see cref="ReferenceDataBase"/> names.</param>

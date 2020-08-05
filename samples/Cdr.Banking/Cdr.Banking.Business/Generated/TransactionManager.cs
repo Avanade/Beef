@@ -28,11 +28,6 @@ namespace Cdr.Banking.Business
         private readonly ITransactionDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TransactionManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TransactionManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>

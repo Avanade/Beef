@@ -26,11 +26,6 @@ namespace Cdr.Banking.Business.DataSvc
         private readonly ITransactionData _data;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TransactionDataSvc() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TransactionDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="ITransactionData"/>.</param>

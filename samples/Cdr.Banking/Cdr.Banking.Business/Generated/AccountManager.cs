@@ -28,11 +28,6 @@ namespace Cdr.Banking.Business
         private readonly IAccountDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private AccountManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AccountManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IAccountDataSvc"/>.</param>

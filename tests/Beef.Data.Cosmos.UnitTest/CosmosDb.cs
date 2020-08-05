@@ -62,7 +62,7 @@ namespace Beef.Data.Cosmos.UnitTest
                     UniqueKeyPolicy = new AzCosmos.UniqueKeyPolicy { UniqueKeys = { new AzCosmos.UniqueKey { Paths = { "/type", "/value/code" } } } }
                 }, 400);
 
-            await rd.ImportValueRefDataBatchAsync<ReferenceDataProvider, IReferenceData>("RefData.yaml");
+            await rd.ImportValueRefDataBatchAsync<ReferenceDataProvider, ReferenceDataProvider>("RefData.yaml");
         }
 
         public CosmosDbContainer<Person1, Person1> Persons1 { get; private set; }
@@ -116,7 +116,7 @@ namespace Beef.Data.Cosmos.UnitTest
 
         public Type ProviderType => typeof(ReferenceDataProvider);
 
-        public Type[] GetAllTypes() => new Type[] { typeof(Gender) };
+        public static Type[] GetAllTypes() => new Type[] { typeof(Gender) };
 
         public GenderCollection Gender { get; } = new GenderCollection();
 

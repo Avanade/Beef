@@ -29,11 +29,6 @@ namespace Cdr.Banking.Api.Controllers
         private readonly IAccountManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private AccountController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IAccountManager"/>.</param>

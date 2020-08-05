@@ -100,7 +100,7 @@ namespace Beef.Data.Database
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected override Task WrapInvokeAsync(object caller, Func<Task> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
+            return CreateAsyncPolicy().ExecuteAsync(async () => await base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Beef.Data.Database
         /// <returns>The result.</returns>
         protected override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
+            return CreateAsyncPolicy().ExecuteAsync(async () => await base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber).ConfigureAwait(false));
         }
     }
 

@@ -24,30 +24,31 @@ namespace Beef
         /// <remarks>Use the <paramref name="createExecutionContext"/> function to instantiate a custom <see cref="ExecutionContext"/> (inherited) <see cref="Type"/> where required; otherwise, by default the <i>Beef</i>
         /// <see cref="ExecutionContext"/> will be used.
         /// </remarks>
-        public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<ExecutionContext>? createExecutionContext = null)
+        public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<IServiceProvider, ExecutionContext>? createExecutionContext = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddScoped(_ => createExecutionContext?.Invoke() ?? new ExecutionContext());
+            return services.AddScoped(sp => createExecutionContext?.Invoke(sp) ?? new ExecutionContext());
         }
 
         /// <summary>
         /// Adds a scoped service to instantiate a new <see cref="IRequestCache"/> <see cref="RequestCache"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="createRequestCache">The function to override the creation of the <see cref="IRequestCache"/> instance; defaults to <see cref="RequestCache"/> where not specified.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
         /// <remarks>The <see cref="IRequestCache"/> enables the short-lived request caching; intended to reduce data chattiness within the context of a request scope.</remarks>
-        public static IServiceCollection AddBeefRequestCache(this IServiceCollection services)
+        public static IServiceCollection AddBeefRequestCache(this IServiceCollection services, Func<IServiceProvider, IRequestCache>? createRequestCache = null)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddScoped<IRequestCache, RequestCache>();
+            return services.AddScoped<IRequestCache>(sp => createRequestCache?.Invoke(sp) ?? new RequestCache());
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance.
+        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance with the specified <paramref name="config"/>, <paramref name="flushDueTime"/> and <paramref name="flushPeriod"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="config">The optional <see cref="CachePolicyConfig"/>.</param>
@@ -69,6 +70,24 @@ namespace Beef
                 cpm.StartFlushTimer(flushDueTime ?? CachePolicyManager.TenMinutes, flushPeriod ?? CachePolicyManager.FiveMinutes);
                 return cpm;
             });
+        }
+
+        /// <summary>
+        /// Adds a singleton service to instantiate a new <see cref="CachePolicyManager"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="createCachePolicyManager">The function to create the <see cref="IRequestCache"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        /// <remarks>The <see cref="IRequestCache"/> enables the short-lived request caching; intended to reduce data chattiness within the context of a request scope.</remarks>
+        public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, Func<IServiceProvider, CachePolicyManager> createCachePolicyManager)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            if (createCachePolicyManager == null)
+                throw new ArgumentNullException(nameof(createCachePolicyManager));
+
+            return services.AddScoped(sp => createCachePolicyManager(sp));
         }
 
         /// <summary>

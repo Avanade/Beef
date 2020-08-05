@@ -18,7 +18,7 @@ namespace Beef.Demo.Test
         public void A010_DatabaseDeadlock_Retry()
         {
             int count = 0;
-            SqlRetryDatabaseInvoker.ExceptionRetry += (s, e) => { count++; Console.WriteLine(e.Exception.ToString()); };
+            SqlRetryDatabaseInvoker.ExceptionRetry += (s, e) => count++;
 
             var p1 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(1.ToGuid())).Value;
             var p2 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(2.ToGuid())).Value;

@@ -21,17 +21,12 @@ namespace Cdr.Banking.Common.Entities
         /// Gets the current <see cref="ReferenceData"/> instance.
         /// </summary>
         public static ReferenceData Current => (ReferenceData)ReferenceDataManager.Current.GetProvider(typeof(IReferenceData));
-
-        /// <summary>
-        /// Gets the provider interface cref="Type"/> used for <see cref="ReferenceDataManager.GetProvider(Type)"/>. The value is <see cref="IReferenceData"/>.
-        /// </summary>
-        public Type ProviderType => typeof(IReferenceData);
-
+        
         /// <summary>
         /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
         /// </summary>
         /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        public Type[] GetAllTypes() => new Type[] 
+        public static Type[] GetAllTypes() => new Type[] 
             {
                 typeof(OpenStatus),
                 typeof(ProductCategory),
@@ -41,6 +36,11 @@ namespace Cdr.Banking.Common.Entities
                 typeof(TransactionStatus)
             };
         
+        /// <summary>
+        /// Gets the provider interface cref="Type"/> used for <see cref="ReferenceDataManager.GetProvider(Type)"/>. The value is <see cref="IReferenceData"/>.
+        /// </summary>
+        public Type ProviderType => typeof(IReferenceData);
+
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>

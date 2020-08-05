@@ -52,7 +52,7 @@ namespace Cdr.Banking.Api
                 throw new ArgumentNullException(nameof(services));
 
             // Add the core beef services (including the customized ExecutionContext).
-            services.AddBeefExecutionContext(() => new Business.ExecutionContext())
+            services.AddBeefExecutionContext(_ => new Business.ExecutionContext())
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
                     .AddBeefWebApiServices()

@@ -126,12 +126,6 @@ namespace Beef.RefData
         }
 
         /// <summary>
-        /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>. This throws a <see cref="NotSupportedException"/>.
-        /// </summary>
-        /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        public Type[] GetAllTypes() => throw new NotSupportedException();
-
-        /// <summary>
         /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. This throws a <see cref="NotSupportedException"/>.
         /// </summary>
         /// <param name="names">The list of <see cref="ReferenceDataBase"/> names.</param>

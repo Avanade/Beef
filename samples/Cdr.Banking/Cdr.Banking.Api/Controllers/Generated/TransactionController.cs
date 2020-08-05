@@ -29,11 +29,6 @@ namespace Cdr.Banking.Api.Controllers
         private readonly ITransactionManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TransactionController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TransactionController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="ITransactionManager"/>.</param>
