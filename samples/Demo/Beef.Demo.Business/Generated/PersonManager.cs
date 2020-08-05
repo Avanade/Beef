@@ -132,11 +132,6 @@ namespace Beef.Demo.Business
         #endregion
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private PersonManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>

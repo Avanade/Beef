@@ -52,11 +52,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Grpc
         private readonly I{{Entity.Name}}Manager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private {{Entity.Name}}Service() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="{{Entity.Name}}Service"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="I{{Entity.Name}}Manager"/>.</param>

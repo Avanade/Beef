@@ -29,11 +29,6 @@ namespace Beef.Demo.Api.Controllers
         private readonly IRobotManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private RobotController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RobotController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>

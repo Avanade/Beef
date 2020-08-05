@@ -40,11 +40,6 @@ namespace Beef.Demo.Business.Data
         #endregion
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private RobotData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RobotData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>

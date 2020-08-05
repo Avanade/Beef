@@ -21,6 +21,9 @@ namespace Beef
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="createExecutionContext">The function to override the creation of the <see cref="ExecutionContext"/> instance to a custom <see cref="Type"/>; defaults to <see cref="ExecutionContext"/> where not specified.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        /// <remarks>Use the <paramref name="createExecutionContext"/> function to instantiate a custom <see cref="ExecutionContext"/> (inherited) <see cref="Type"/> where required; otherwise, by default the <i>Beef</i>
+        /// <see cref="ExecutionContext"/> will be used.
+        /// </remarks>
         public static IServiceCollection AddBeefExecutionContext(this IServiceCollection services, Func<ExecutionContext>? createExecutionContext = null)
         {
             if (services == null)
@@ -34,6 +37,7 @@ namespace Beef
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        /// <remarks>The <see cref="IRequestCache"/> enables the short-lived request caching; intended to reduce data chattiness within the context of a request scope.</remarks>
         public static IServiceCollection AddBeefRequestCache(this IServiceCollection services)
         {
             if (services == null)
@@ -50,6 +54,7 @@ namespace Beef
         /// <param name="flushDueTime">The optional amount of time to delay before <see cref="CachePolicyManager.Flush"/> is invoked for the first time (defaults to <see cref="CachePolicyManager.TenMinutes"/>).</param>
         /// <param name="flushPeriod">The optional time interval between subsequent invocations of <see cref="CachePolicyManager.Flush"/> (defaults to <see cref="CachePolicyManager.FiveMinutes"/>).</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        /// <remarks>The The <see cref="CachePolicyManager"/> enables the centralised management of <see cref="ICachePolicy"/> caches.</remarks>
         public static IServiceCollection AddBeefCachePolicyManager(this IServiceCollection services, CachePolicyConfig? config = null, TimeSpan? flushDueTime = null, TimeSpan? flushPeriod = null)
         {
             if (services == null)
@@ -80,7 +85,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Adds the required <i>Business</i> services.
+        /// Adds the required <i>Business</i> singleton services (being the <see cref="ManagerInvoker"/>, <see cref="DataSvcInvoker"/> and <see cref="DataInvoker"/>).
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
@@ -95,7 +100,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Adds the required <i>Agent</i> (client-side) services.
+        /// Adds the required <i>Agent</i> (client-side) services (being the <see cref="WebApiAgentInvoker"/>).
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>

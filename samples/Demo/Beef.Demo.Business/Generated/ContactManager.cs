@@ -27,11 +27,6 @@ namespace Beef.Demo.Business
         private readonly IContactDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ContactManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ContactManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>

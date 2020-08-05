@@ -27,11 +27,6 @@ namespace Beef.Demo.Business
         private readonly ITripPersonDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TripPersonManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="ITripPersonDataSvc"/>.</param>

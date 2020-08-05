@@ -24,11 +24,6 @@ namespace Beef.Demo.Api.Grpc
         private readonly IRobotManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private RobotService() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RobotService"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>

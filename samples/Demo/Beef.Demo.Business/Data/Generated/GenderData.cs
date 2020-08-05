@@ -30,11 +30,6 @@ namespace Beef.Demo.Business.Data
         private readonly IDatabase _db;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private GenderData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GenderData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>

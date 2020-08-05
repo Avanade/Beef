@@ -361,11 +361,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
 
       <If Condition="System.NeedsCtor == true">
         <![CDATA[        /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private {{Entity.Name}}Data() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="{{Entity.Name}}Data"/> class.
         /// </summary>
         ]]>
@@ -776,8 +771,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
                 ]]>
 
             <If Condition="System.AutoImplement == 'Database'">
-              <Set Name="System.DatabaseName" Condition="Entity.DatabaseName != null" Value="Entity.DatabaseName" Otherwise="Config.DatabaseName" />
-              <Set Name="System.DatabaseName" Condition="System.DatabaseName == null" Value="'Database'" />
               <If Condition="Operation.OperationType == 'Get'">
                 <If Condition="Entity.DataExtensions == true">
                   <Then><![CDATA[__result = ]]></Then>
@@ -839,8 +832,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'OData'">
-              <Set Name="System.ODataName" Condition="Entity.ODataName != null" Value="Entity.ODataName" Otherwise="Config.ODataName" />
-              <Set Name="System.ODataName" Condition="System.ODataName == null" Value="'OData'" />
               <If Condition="Operation.OperationType == 'Get'">
                 <If Condition="Entity.DataExtensions == true">
                   <Then><![CDATA[__result = ]]></Then>
@@ -903,8 +894,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'Cosmos'">
-              <Set Name="System.CosmosName" Condition="Entity.CosmosName != null" Value="Entity.CosmosName" Otherwise="Config.CosmosName" />
-              <Set Name="System.CosmosName" Condition="System.CosmosName == null" Value="'CosmosDb'" />
               <Set Name="System.DataCosmosValueContainer" Condition="Operation.DataCosmosValueContainer != null" Value="Operation.DataCosmosValueContainer" Otherwise="Entity.DataCosmosValueContainer" />
               <If Condition="Operation.OperationType == 'Get'">
                 <If Condition="Entity.DataExtensions == true">
@@ -976,8 +965,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.Data
               </If>
             </If>
             <If Condition="System.AutoImplement == 'EntityFramework'">
-              <Set Name="System.EntityFrameworkName" Condition="Entity.EntityFrameworkName != null" Value="Entity.EntityFrameworkName" Otherwise="Config.EntityFrameworkName" />
-              <Set Name="System.EntityFrameworkName" Condition="System.EntityFrameworkName == null" Value="'EfDb'" />
               <If Condition="Operation.OperationType == 'Get'">
                 <If Condition="Entity.DataExtensions == true">
                   <Then><![CDATA[__result = ]]></Then>

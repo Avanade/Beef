@@ -29,11 +29,6 @@ namespace Beef.Demo.Api.Controllers
         private readonly IProductManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ProductController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ProductController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IProductManager"/>.</param>

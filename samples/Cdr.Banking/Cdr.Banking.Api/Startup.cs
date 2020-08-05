@@ -51,7 +51,7 @@ namespace Cdr.Banking.Api
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            // Add the core beef services.
+            // Add the core beef services (including the customized ExecutionContext).
             services.AddBeefExecutionContext(() => new Business.ExecutionContext())
                     .AddBeefRequestCache()
                     .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())

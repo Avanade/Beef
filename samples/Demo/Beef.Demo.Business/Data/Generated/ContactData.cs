@@ -38,11 +38,6 @@ namespace Beef.Demo.Business.Data
         #endregion
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ContactData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ContactData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>

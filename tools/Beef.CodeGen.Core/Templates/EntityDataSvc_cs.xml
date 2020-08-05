@@ -155,11 +155,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         </If>
       </If>
       <![CDATA[        /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private {{Entity.Name}}DataSvc() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="{{Entity.Name}}DataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="I{{Entity.Name}}Data"/>.</param>

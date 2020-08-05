@@ -29,11 +29,6 @@ namespace Beef.Demo.Api.Controllers
         private readonly IConfigManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ConfigController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ConfigController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IConfigManager"/>.</param>

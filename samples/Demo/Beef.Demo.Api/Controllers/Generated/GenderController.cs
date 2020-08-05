@@ -29,11 +29,6 @@ namespace Beef.Demo.Api.Controllers
         private readonly IGenderManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private GenderController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GenderController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>

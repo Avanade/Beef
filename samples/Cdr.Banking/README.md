@@ -82,7 +82,7 @@ Also, any files that started with `Person` (being the demonstration entity) were
 The following code-generation files require configuration:
 - [`Cdr.Banking.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.xml) - this describes the entities, their properties and operations, to fulfil the aforementioned CDR Banking API endpoint and schema requirements.
 - [`Cdr.RefData.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.xml) - this describes the reference data entities, their properties, and corresponding get all (read) operation. These are defined seperately as different code-generation templates are used.
-- [`Cdr.Banking.DataModel.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.DataModel.xml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a basic model class is generated. 
+- [`Cdr.Banking.DataModel.xml`](./Cdr.Banking.CodeGen/Cdr.Banking.DataModel.xml) - this describes the Cosmos DB data models and their properties. These are logically seperated as only a _basic model_ class is generated. 
 
 Each of the files have comments added within to aid the reader as to purpose of the configuration. Otherwise, see the related entity-driven code-generation [documentation](../../tools/Beef.CodeGen.Core/README.md) for more information.
 
@@ -131,11 +131,11 @@ public class ExecutionContext : Beef.ExecutionContext
 
 The `ExecutionContext` is required to be configured for each and every request, this is performed within the API [`Startup.cs`](./Cdr.Banking.Api/Startup.cs).
 
-Firstly, the custom `ExecutionContext` instantiation must be registered within the `Startup` method.
+Firstly, the custom `ExecutionContext` instantiation must be registered within the `ConfigureServices` method.
 
 ``` csharp
-// Register the "customised" execution context.
-Beef.ExecutionContext.Register(() => new ExecutionContext());
+// Add the core beef services (including the customized ExecutionContext).
+services.AddBeefExecutionContext(() => new Business.ExecutionContext())
 ```
 
 Within the `Configure` method the User to Accounts mapping is performed. As stated previously in the earlier assumptions, the likes of an OAuth token would have previously been validated, then would either contain the list of Accounts, or these would be loaded from an appropriate data store into the `ExecutionContext`.
@@ -179,7 +179,7 @@ By defining holistically, it allows the capability to be added or maintained ind
 In this case, the filter will ensure that only Accounts that have been defined for the User can be accessed. 
 
 ``` csharp
-public class CosmosDb : CosmosDb<CosmosDb>
+public class CosmosDb : CosmosDbBase
 {
     public CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = null) : base(client, databaseId, createDatabaseIfNotExists, throughput)
     {
@@ -193,7 +193,7 @@ public class CosmosDb : CosmosDb<CosmosDb>
 
 ### Transaction-wide filtering
 
-For the Transaction, we have chosen the strategy to leverage the [`PartitionKey`](https://docs.microsoft.com/en-us/azure/cosmos-db/partitioning-overview) as a means to divide (and isolate) the Transactions to an owning Account.
+For the Transaction entity, we have chosen the strategy to leverage the [`PartitionKey`](https://docs.microsoft.com/en-us/azure/cosmos-db/partitioning-overview) as a means to divide (and isolate) the Transactions to an owning Account.
 
 In this instance, the onus is on the developer to set the `PartitionKey` appropriately before performing the underlying Cosmos DB operation.
 
@@ -240,7 +240,7 @@ private IQueryable<Model.Account> GetAccountsOnQuery(IQueryable<Model.Account> q
 
     // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
     var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args!.OpenStatus!.Code);
-    q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
+    q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args.ProductCategory!.Code);
 
     // With checking IsOwned a simple false check cannot be performed with Cosmos; assume "not IsDefined" is equivalent to false also. 
     if (args!.IsOwned == null)
@@ -315,7 +315,7 @@ private IQueryable<Model.Transaction> GetTransactionsOnQuery(IQueryable<Model.Tr
 
 ## Validation
 
-To minimise the bad request data, and meed the CDR functional requirements for the operation arguments, validation has been included.
+To minimise the bad request data, and meet the CDR functional requirements for the operation arguments, validation has been included.
 
 <br/>
 

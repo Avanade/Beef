@@ -28,11 +28,6 @@ namespace Beef.Demo.Business
         private readonly IRobotDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private RobotManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>

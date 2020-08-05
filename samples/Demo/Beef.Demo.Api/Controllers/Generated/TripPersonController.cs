@@ -29,11 +29,6 @@ namespace Beef.Demo.Api.Controllers
         private readonly ITripPersonManager _manager;
         
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TripPersonController() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="ITripPersonManager"/>.</param>

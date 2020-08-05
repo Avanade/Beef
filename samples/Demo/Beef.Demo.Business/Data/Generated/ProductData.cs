@@ -39,11 +39,6 @@ namespace Beef.Demo.Business.Data
         #endregion
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ProductData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ProductData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITestOData"/>.</param>

@@ -28,11 +28,6 @@ namespace Beef.Demo.Business
         private readonly IProductDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ProductManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ProductManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>

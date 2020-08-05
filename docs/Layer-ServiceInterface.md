@@ -2,7 +2,7 @@
 
 The *Service Interface* layer is the consumable API endpoint that hosts / encapsulates the underlying (reusable) [Logic layer](./Layer-Manager.md).
 
-This layer is code-generated and responsible for performing the [ASP.NET Core Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/) request / response handling, invoking the underlying business logic via a [`Manager`](Layer-Manager.md) class that is instantiated by the [`Factory`](../src/Beef.Core/Factory.cs) (enables a test mocking opportunity).
+This layer is code-generated and responsible for performing the [ASP.NET Core Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/) request / response handling, invoking the underlying business logic via a [`Manager`](Layer-Manager.md) class that is passed as an argument using dependency injection.
 
 <br>
 

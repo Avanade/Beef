@@ -27,11 +27,6 @@ namespace Beef.Demo.Business
         private readonly IGenderDataSvc _dataService;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private GenderManager() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GenderManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>

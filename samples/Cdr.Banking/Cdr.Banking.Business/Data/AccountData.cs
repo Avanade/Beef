@@ -31,7 +31,7 @@ namespace Cdr.Banking.Business.Data
                 return query;
 
             // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
-            var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args!.OpenStatus!.Code);
+            var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
             q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
 
             // With checking IsOwned a simple false check cannot be performed with Cosmos; assume "not IsDefined" is equivalent to false also. 

@@ -58,11 +58,6 @@ namespace Beef.Demo.Business.DataSvc
         #endregion
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private PersonDataSvc() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PersonDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IPersonData"/>.</param>

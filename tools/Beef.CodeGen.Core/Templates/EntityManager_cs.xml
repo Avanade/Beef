@@ -219,25 +219,13 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
 ]]>
         </If>
       </If>
+      <![CDATA[        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
+        /// </summary>
+]]>
       <If Condition="System.RequiresDataSvc == true">
-        <Then>
-          <![CDATA[        /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private {{Entity.Name}}Manager() => throw new NotSupportedException();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
-        /// </summary>
-        /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
+          <![CDATA[        /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
 ]]>
-        </Then>
-        <Else>
-          <![CDATA[        /// <summary>
-        /// Initializes a new instance of the <see cref="{{Entity.Name}}Manager"/> class.
-        /// </summary>
-]]>
-        </Else>
       </If>
       <![CDATA[        ]]>
       <Switch Value="Entity.ManagerConstructor">

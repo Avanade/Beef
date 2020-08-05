@@ -61,6 +61,8 @@ namespace Beef.Events.Publish
 #pragma warning restore CA1031 
             {
                 OnException(events, partitionKey, ex);
+                if (!SwallowException)
+                    throw;
             }
         }
 

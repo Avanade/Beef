@@ -31,11 +31,6 @@ namespace Beef.Demo.Business.Data
         private readonly ITripOData _odata;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private TripPersonData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITripOData"/>.</param>

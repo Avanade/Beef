@@ -30,11 +30,6 @@ namespace Beef.Demo.Business.DataSvc
         private readonly IRequestCache _cache;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ContactDataSvc() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ContactDataSvc"/> class.
         /// </summary>
         /// <param name="data">The <see cref="IContactData"/>.</param>
