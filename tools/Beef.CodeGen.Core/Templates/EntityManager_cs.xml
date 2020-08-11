@@ -224,7 +224,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         /// </summary>
 ]]>
       <If Condition="System.RequiresDataSvc == true">
-          <![CDATA[        /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
+        <![CDATA[        /// <param name="dataService">The <see cref="I{{Entity.Name}}DataSvc"/>.</param>
 ]]>
       </If>
       <![CDATA[        ]]>
@@ -697,6 +697,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
               <Else>
                 <If Condition="System.HasResult == true">
                   <![CDATA[)]]>
+                  <Set Name="System.HasResult" Value="false" />
                 </If>
                 <![CDATA[;
 ]]>
@@ -747,16 +748,9 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
             </If>
           </Else>
         </If>
-        <If Condition="Entity.ManagerExtensions == true and System.HasResult == true">
-          <Then>
+        <If Condition="System.HasResult == true">
           <![CDATA[                return Cleaner.Clean(__result);
 ]]>
-          </Then>
-          <Else>
-            <If Condition="Operation.OperationType == 'Custom' and System.HasResult == true">
-              <![CDATA[                return Cleaner.Clean(__result);
-]]>
-            </If>          </Else>
         </If>
         <![CDATA[            }]]>
         <If Condition="Operation.ManagerTransaction == true">

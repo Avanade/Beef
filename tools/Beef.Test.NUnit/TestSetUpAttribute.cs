@@ -91,7 +91,7 @@ namespace Beef.Test.NUnit
                     if (_needsSetUp)
                         TestSetUp.InvokeRegisteredSetUp();
 
-                    if (context.CurrentTest?.Parent?.Fixture is IUsingAgentTesterServer uats)
+                    if (context.CurrentTest?.Parent?.Fixture is ITestSetupPrepareExecutionContext uats)
                         uats.AgentTester.PrepareExecutionContext();
                     else
                         ExecutionContext.Reset();

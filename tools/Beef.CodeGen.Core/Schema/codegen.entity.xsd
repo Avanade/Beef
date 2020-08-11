@@ -1140,9 +1140,9 @@
                 <xs:documentation>Specifies whether the extensions should be generated for the Data code. Default to false.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="ControllerConstructor" use="optional">
+            <xs:attribute name="WebApiConstructor" use="optional">
               <xs:annotation>
-                <xs:documentation>Defines the access modifier for the generated for the Controller constructor. Default to 'Public'.</xs:documentation>
+                <xs:documentation>Defines the access modifier for the generated for the Web API Controller constructor. Default to 'Public'.</xs:documentation>
               </xs:annotation>
               <xs:simpleType>
                 <xs:restriction base="xs:string">

@@ -25,8 +25,6 @@ namespace Beef
         private string? _username;
         private Guid? _tenantId;
         private string? _partitionKey;
-        private string? _correlationId;
-        private string? _sessionCorrelationId;
         private DateTime _timestamp = Cleaner.Clean(DateTime.Now);
         private bool _timestampChanged;
         private PagingArgs? _pagingArgs;
@@ -198,36 +196,14 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable. <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
+        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
         /// </summary>
-        public string? CorrelationId
-        {
-            get { return _correlationId; }
-
-            set
-            {
-                if (_correlationId != null && value != _correlationId)
-                    throw new ArgumentException(ImmutableText);
-
-                _correlationId = value;
-            }
-        }
+        public string? CorrelationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the session correlation identifier (a unique identifier assigned to the session). This value is immutable.
+        /// Gets or sets the session correlation identifier (a unique identifier assigned to the session).
         /// </summary>
-        public string? SessionCorrelationId
-        {
-            get { return _sessionCorrelationId; }
-
-            set
-            {
-                if (_sessionCorrelationId != null && value != _sessionCorrelationId)
-                    throw new ArgumentException(ImmutableText);
-
-                _sessionCorrelationId = value;
-            }
-        }
+        public string? SessionCorrelationId { get; set; }
 
         /// <summary>
         /// Gets or sets the request timestamp (to enable consistent execution-related timestamping). This value is immutable.
@@ -434,8 +410,8 @@ namespace Beef
                 _username = _username,
                 _tenantId = _tenantId,
                 _partitionKey = _partitionKey,
-                _correlationId = _correlationId,
-                _sessionCorrelationId = _sessionCorrelationId,
+                CorrelationId = CorrelationId,
+                SessionCorrelationId = SessionCorrelationId,
                 _timestamp = _timestamp,
                 _pagingArgs = _pagingArgs,
                 _roles = _roles,

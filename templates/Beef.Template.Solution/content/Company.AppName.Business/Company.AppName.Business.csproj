@@ -5,13 +5,13 @@
   </PropertyGroup>
   <ItemGroup>
     <!--#if (implement_database || implement_entityframework) -->
-    <PackageReference Include="Beef.Data.Database" Version="4.0.1-alpha.20200805" />
+    <PackageReference Include="Beef.Data.Database" Version="4.0.1-alpha.20200811" />
     <!--#endif -->
     <!--#if (implement_entityframework) -->
-    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.0.1-alpha.20200805" />
+    <PackageReference Include="Beef.Data.EntityFrameworkCore" Version="4.0.1-alpha.20200811" />
     <!--#endif -->
     <!--#if (implement_cosmos) -->
-    <PackageReference Include="Beef.Data.Cosmos" Version="4.0.1-alpha.20200805" />
+    <PackageReference Include="Beef.Data.Cosmos" Version="4.0.1-alpha.20200811" />
     <!--#endif -->
   </ItemGroup>
   <ItemGroup>

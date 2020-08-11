@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents a temporary capability to rename XML attribute names with a new JSON property name. For the most part the names will not change other than PascalCase versus CamelCase.
+    /// Represents a temporary capability to rename XML attribute names with a new JSON property name. For the most part the names will not change other than PascalCase versus camelCase.
     /// </summary>
     internal static class XmlJsonRename
     {
@@ -27,7 +26,6 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper"),
             (ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom"),
             (ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper"),
-            (ConfigurationEntity.Entity, "ControllerConstructor", "webApiConstructor"),
 
             (ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
             (ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
@@ -55,7 +53,7 @@ namespace Beef.CodeGen.Config
         public static string GetJsonName(ConfigurationEntity entity, string xmlName)
         {
             var item = config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
-            return item.XmlName == null ? Beef.CodeGen.CodeGenerator.ToCamelCase(xmlName)! : item.JsonName;
+            return item.JsonName ?? (Beef.CodeGen.CodeGenerator.ToCamelCase(xmlName)!);
         }
 
         /// <summary>
@@ -64,7 +62,7 @@ namespace Beef.CodeGen.Config
         public static string GetXmlName(ConfigurationEntity entity, string jsonName)
         {
             var item = config.FirstOrDefault(x => x.Entity == entity && x.JsonName == jsonName);
-            return item.XmlName == null ? Beef.CodeGen.CodeGenerator.ToCamelCase(jsonName)! : item.JsonName;
+            return item.XmlName ?? (Beef.CodeGen.CodeGenerator.ToPascalCase(jsonName)!);
         }
     }
 

@@ -10,5 +10,10 @@ namespace Beef.Demo.Business
             Check.NotNull(value, nameof(value));
             return Task.CompletedTask;
         }
+
+        private Task<Person> ManagerCustomOnImplementationAsync()
+        {
+            return Task.FromResult<Person>(null);
+        }
     }
 }

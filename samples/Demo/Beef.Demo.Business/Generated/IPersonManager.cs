@@ -132,6 +132,12 @@ namespace Beef.Demo.Business
         Task<int> DataSvcCustomAsync();
 
         /// <summary>
+        /// Validate a Manager Custom generation.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        Task<Person?> ManagerCustomAsync();
+
+        /// <summary>
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>

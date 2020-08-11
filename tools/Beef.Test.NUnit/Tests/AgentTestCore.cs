@@ -35,7 +35,7 @@ namespace Beef.Test.NUnit.Tests
         protected AgentTestCore(AgentTesterBase agentTesterBase, string? username = null, object? args = null)
         {
             AgentTesterBase = agentTesterBase ?? throw new ArgumentNullException(nameof(agentTesterBase));
-            if (username == null || !ExecutionContext.HasCurrent)
+            if (!ExecutionContext.HasCurrent || ExecutionContext.Current.Username != username)
             {
                 if (username == null)
                     AgentTesterBase.PrepareExecutionContext();

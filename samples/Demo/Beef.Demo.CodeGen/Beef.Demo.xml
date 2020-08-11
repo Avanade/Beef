@@ -46,6 +46,7 @@
     </Operation>
 
     <Operation Name="DataSvcCustom" OperationType="Custom" Text="Validate a DataSvc Custom generation" ReturnType="int" DataSvcCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeWebApi="true" ExcludeWebApiAgent="true" />
+    <Operation Name="ManagerCustom" OperationType="Get" Text="Validate a Manager Custom generation" ManagerCustom="true" ExcludeIDataSvc="true" ExcludeDataSvc="true" ExcludeData="true" ExcludeIData="true" ExcludeWebApi="true" ExcludeWebApiAgent="true" />
     <Operation Name="GetNull" OperationType="Custom" ReturnType="Person?" WebApiRoute="null" WebApiMethod="HttpGet" WebApiAlternateStatus="NotFound">
       <Parameter Name="Name" Type="string" />
     </Operation>

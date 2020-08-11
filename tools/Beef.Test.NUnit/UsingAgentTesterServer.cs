@@ -8,30 +8,19 @@ using System;
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Provides the underlying <see cref="AgentTester"/>. Enables the <see cref="TestSetUpAttribute"/> to automatically invoke the <see cref="TesterBase.PrepareExecutionContext(string?, object?)"/>.
-    /// </summary>
-    internal interface IUsingAgentTesterServer
-    {
-        /// <summary>
-        /// Gets the underlying <see cref="AgentTesterBase"/>.
-        /// </summary>
-        AgentTesterBase AgentTester { get; }
-    }
-
-    /// <summary>
     /// Simplifies the testing using an <see cref="AgentTesterServer{TStartup}"/> using system-wide defaults. Automatically manages the instantiation and disposing through the one-time setup and tear-down.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Managed via the onetime tear down.")]
     [System.Diagnostics.DebuggerStepThrough]
-    public abstract class UsingAgentTesterServer<TStartup> : IUsingAgentTesterServer where TStartup : class
+    public abstract class UsingAgentTesterServer<TStartup> : ITestSetupPrepareExecutionContext where TStartup : class
     {
         private AgentTesterServer<TStartup>? _agentTester;
 
         /// <summary>
         /// Gets the underlying <see cref="AgentTesterBase"/>.
         /// </summary>
-        AgentTesterBase IUsingAgentTesterServer.AgentTester => AgentTester;
+        AgentTesterBase ITestSetupPrepareExecutionContext.AgentTester => AgentTester;
 
         /// <summary>
         /// Gets the underling <see cref="AgentTesterServer{TStartup}"/>.

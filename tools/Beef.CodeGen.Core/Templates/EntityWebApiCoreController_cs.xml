@@ -67,7 +67,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.{{Config.ApiName}}.Controllers
         /// </summary>
         /// <param name="manager">The <see cref="I{{Entity.Name}}Manager"/>.</param>
         ]]>
-      <Switch Value="Entity.ControllerConstructor">
+      <Switch Value="Entity.WebApiConstructor">
         <Case Value="'Private'"><![CDATA[private]]></Case>
         <Case Value="'Protected'"><![CDATA[protected]]></Case>
         <Default><![CDATA[public]]></Default>

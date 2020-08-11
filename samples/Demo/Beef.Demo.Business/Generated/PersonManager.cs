@@ -496,6 +496,20 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
+        /// Validate a Manager Custom generation.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        public Task<Person?> ManagerCustomAsync()
+        {
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Read;
+                var __result = await ManagerCustomOnImplementationAsync().ConfigureAwait(false);
+                return Cleaner.Clean(__result);
+            });
+        }
+
+        /// <summary>
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>

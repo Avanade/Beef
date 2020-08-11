@@ -130,7 +130,6 @@ namespace Beef.Test.NUnit
             {
                 if (disposing)
                 {
-                    ExecutionContext.Reset();
                     TestServer.Dispose();
                     _responseVersionHandler?.Dispose();
                 }
