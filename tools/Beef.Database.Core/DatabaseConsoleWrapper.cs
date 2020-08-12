@@ -36,7 +36,7 @@ namespace Beef.Database.Core
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = ".\\..", bool useBeefDbo = true)
+        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true)
         {
             return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo);
         }
@@ -50,7 +50,7 @@ namespace Beef.Database.Core
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = ".\\..", bool useBeefDbo = true)
+        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true)
         {
             return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo);
         }

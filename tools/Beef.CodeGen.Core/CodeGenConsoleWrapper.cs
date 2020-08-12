@@ -79,7 +79,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> instance.</returns>
-        public static CodeGenConsoleWrapper Create(string company, string appName, string apiName = "Api", string outDir = ".\\..")
+        public static CodeGenConsoleWrapper Create(string company, string appName, string apiName = "Api", string outDir = "./..")
         {
             return new CodeGenConsoleWrapper(new Assembly[] { Assembly.GetCallingAssembly() }, company, appName, apiName, outDir);
         }
@@ -93,7 +93,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <returns>The <see cref="CodeGenConsoleWrapper"/> instance.</returns>
-        public static CodeGenConsoleWrapper Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = ".\\..")
+        public static CodeGenConsoleWrapper Create(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = "./..")
         {
             return new CodeGenConsoleWrapper(assemblies, company, appName, apiName, outDir);
         }
@@ -106,7 +106,7 @@ namespace Beef.CodeGen
         /// <param name="apiName">The Web API name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="assemblies">Optional list of assemblies to probe for resources.</param>
-        private CodeGenConsoleWrapper(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = ".\\..")
+        private CodeGenConsoleWrapper(Assembly[] assemblies, string company, string appName, string apiName = "Api", string outDir = "./..")
         {
             Company = Check.NotEmpty(company, nameof(company));
             AppName = Check.NotEmpty(appName, nameof(appName));
