@@ -13,7 +13,7 @@
       <Set Name="Column.SkipAsInternal" Condition="Column.Name == 'TenantId' and Column.IsPrimaryKey == false" Value="true" />
     </Column>
 
-    <StoredProcedure Condition="StoredProcedure.Type == 'Get'" OutputFileName="sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}.sql" OutputDirName="{{Table.Schema}}\Stored Procedures">
+    <StoredProcedure Condition="StoredProcedure.Type == 'Get'" OutputFileName="sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}.sql" OutputDirName="{{Table.Schema}}/Stored Procedures">
       <![CDATA[CREATE PROCEDURE [{{Table.Schema}}].[sp{{Table.Name}}{{StoredProcedure.Name}}]
    ]]>
       <Column Condition="Column.IsPrimaryKey == true or Column.IsIdentity == true">

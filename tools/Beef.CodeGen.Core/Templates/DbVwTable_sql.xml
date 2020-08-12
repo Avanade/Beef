@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Template OutputGenDirName="Generated">
-  <Table Condition="Table.View == true" OutputFileName="vw{{Table.Name}}.sql" OutputDirName="{{Table.Schema}}\Views">
+  <Table Condition="Table.View == true" OutputFileName="vw{{Table.Name}}.sql" OutputDirName="{{Table.Schema}}/Views">
     <Set Name="System.IsDeleted" Value="false" />
     <Set Name="System.OrgUnitId" Value="false" />
     <Set Name="System.MultiTenancy" Value="false"/>
