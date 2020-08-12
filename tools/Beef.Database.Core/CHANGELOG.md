@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.10
+- *Fixed*: Issue [66](https://github.com/Avanade/Beef/issues/63) fixed. Changed the path separator to be `/` so that is compatible on Windows and Linux. By using `/` this matches the `Path.AltDirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.altdirectoryseparatorchar) for Windows and `Path.DirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.directoryseparatorchar) for Linux, making it universally compatible.
+
 ## v3.1.9
 - *Enhancement:* Added `useBeefDbo` option to the `DatabaseExecutor.RunAsync` to include the standard _Beef_ `dbo` schema objects. Avoids having to specify the `Beef.Database.Core` assembly.
 - *Fix:* Threading issue with the Insert or Merge of Yaml data process that has been resolved. Also updated to return the number of rows affected and output to the log.

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v3.1.20
+- *Fixed*: Issue [66](https://github.com/Avanade/Beef/issues/63) fixed. Changed the path separator to be `/` so that is compatible on Windows and Linux. By using `/` this matches the `Path.AltDirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.altdirectoryseparatorchar) for Windows and `Path.DirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.directoryseparatorchar) for Linux, making it universally compatible.
+
 ## v3.1.19
 - *Enhancment:* Request [62](https://github.com/Avanade/Beef/issues/62) applied. Generate a non-zero exit code when detecting updated files if none are expected. E.g. if executing the code generation as part of build pipeline.
 

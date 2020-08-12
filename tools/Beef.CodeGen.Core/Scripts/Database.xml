@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script LoaderType="Beef.CodeGen.Loaders.TableConfigLoader, Beef.CodeGen.Core">
-  <Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableUpsert_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableDelete_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableMerge_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbSpTableGetByArgs_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbVwTable_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbUdtTableList_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database\Schema" />
-  <Generate Template="DbTvpTable_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\" />
-  <Generate Template="DbEfTableModel_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" />
-  <Generate Template="DbEfModelBuilderExtensions_cs.xml" OutDir="{{Company}}.{{AppName}}.Business\Data" />
+  <Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableUpsert_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableDelete_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableMerge_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbSpTableGetByArgs_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbVwTable_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbUdtTableList_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate Template="DbTvpTable_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/" />
+  <Generate Template="DbEfTableModel_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
+  <Generate Template="DbEfModelBuilderExtensions_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
 </Script>

@@ -17,7 +17,7 @@
       <Set Name="Column.SkipAsInternal" Condition="Column.Name == 'TenantId' and Column.IsPrimaryKey == false" Value="true" />
     </Column>
 
-    <StoredProcedure Condition="StoredProcedure.Type == 'Upsert'" OutputFileName="sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}.sql" OutputDirName="{{Table.Schema}}\Stored Procedures">
+    <StoredProcedure Condition="StoredProcedure.Type == 'Upsert'" OutputFileName="sp{{Table.Name:ToPascalCase}}{{StoredProcedure.Name}}.sql" OutputDirName="{{Table.Schema}}/Stored Procedures">
       <![CDATA[CREATE PROCEDURE []]>
       <If Condition="StoredProcedure.Schema != null">
         <Then><![CDATA[{{StoredProcedure.Schema}}]]></Then>
