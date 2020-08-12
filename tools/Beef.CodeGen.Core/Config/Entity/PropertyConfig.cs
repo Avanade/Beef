@@ -9,7 +9,7 @@ namespace Beef.CodeGen.Config.Entity
     /// <summary>
     /// Represents the <b>Property</b> code-generation configuration.
     /// </summary>
-    [ClassSchema("Entity", Title = "The **Property** is used to define a property and its charateristics.", Description = "", Markdown = "")]
+    [ClassSchema("Property", Title = "The **Property** is used to define a property and its charateristics.", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     [CategorySchema("Property", Title = "Provides the **Property** configuration.")]
     [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
@@ -199,7 +199,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the property should use the underlying Reference Data mapping capabilities. 
         /// </summary>
         [JsonProperty("refDataMapping", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates whether the property should use the underlying Reference Data mapping capabilities. ",
+        [PropertySchema("RefData", Title = "Indicates whether the property should use the underlying Reference Data mapping capabilities.",
             Description = "Mapped properties are a special Reference Data property type that ensure value uniqueness; this allows the likes of additional to/from mappings to occur between systems where applicable.")]
         public bool? RefDataMapping { get; set; }
 

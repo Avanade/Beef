@@ -243,7 +243,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Operation", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true,
-            Description = "Only used for `Create` and `Update` operation types (`Operation.OperationType`) where not specified explicitly.")]
+            Description = "Only used for `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
         public string? Validator { get; set; }
 
         /// <summary>
@@ -293,11 +293,11 @@ namespace Beef.CodeGen.Config.Entity
         #region Data
 
         /// <summary>
-        /// Gets or sets the auto-implementation data source option. 
+        /// Gets or sets the data source auto-implementation option. 
         /// </summary>
         [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The auto-implementation data source option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData" },
-            Description = "Indicates that the implementation for the underlying `Operations` can be auto-implemented using the selected data source. When selected some of the related attributes are also required (as documented). " +
+        [PropertySchema("Data", Title = "The data source auto-implementation option.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "None" },
+            Description = "Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). " +
                           "Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.")]
         public string? AutoImplement { get; set; }
 
@@ -687,14 +687,6 @@ namespace Beef.CodeGen.Config.Entity
         #endregion
 
         /// <summary>
-        /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
-        /// </summary>
-        [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Consts` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
-        public List<ConstConfig>? Consts { get; set; }
-
-        /// <summary>
         /// Gets or sets the corresponding <see cref="PropertyConfig"/> collection.
         /// </summary>
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -709,6 +701,14 @@ namespace Beef.CodeGen.Config.Entity
         [PropertyCollectionSchema(Title = "The corresponding `Operation` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<OperationConfig>? Operations { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
+        /// </summary>
+        [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema(Title = "The corresponding `Consts` collection.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<ConstConfig>? Consts { get; set; }
 
         /// <summary>
         /// Gets or sets the formatted summary text.
@@ -751,6 +751,7 @@ namespace Beef.CodeGen.Config.Entity
             ImplementsAutoInfer = DefaultWhereNull(ImplementsAutoInfer, () => true);
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
+            AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
@@ -814,7 +815,7 @@ namespace Beef.CodeGen.Config.Entity
                     return $"ReferenceDataCollectionBase<{EntityName}>";
             });
 
-            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => "EntityCollectionResult");
+            CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
         /// <summary>

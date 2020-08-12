@@ -8,7 +8,7 @@ namespace Beef.CodeGen.Config
     /// <summary>
     /// Represents a temporary capability to rename XML attribute names with a new JSON property name. For the most part the names will not change other than PascalCase versus camelCase.
     /// </summary>
-    internal static class XmlJsonRename
+    public static class XmlJsonRename
     {
         private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
         {
@@ -69,13 +69,21 @@ namespace Beef.CodeGen.Config
     /// <summary>
     /// The code-generation configuration entity.
     /// </summary>
-    internal enum ConfigurationEntity
+    public enum ConfigurationEntity
     {
+        /// <summary>Not specified.</summary>
+        None,
+        /// <summary>Code-generation root configuration.</summary>
         CodeGen,
+        /// <summary>Entity configuration.</summary>
         Entity,
+        /// <summary>Const configuration.</summary>
         Const,
+        /// <summary>Property configuration.</summary>
         Property,
+        /// <summary>Operation configuration.</summary>
         Operation,
+        /// <summary>Parameter configuration.</summary>
         Parameter
     }
 }

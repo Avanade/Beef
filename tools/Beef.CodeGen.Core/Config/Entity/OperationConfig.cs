@@ -44,7 +44,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The text for use in comments.",
-            Description = "The `Text` will be defaulted for all the `OperationType` options with the exception of `Custom`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
+            Description = "The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}}).")]
         public string? Text { get; set; }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The name of the .NET Type that will perform the validation.", IsImportant = true,
-            Description = "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `OperationType` options `Create` or `Update`.")]
+            Description = "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.")]
         public string? Validator { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("valueType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The .NET value parameter `Type` for the operation.",
-            Description = "Defaults to the parent `Entity.Name` where the `OperationType` options are `Create` or `Update`.")]
+            Description = "Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Create` or `Update`.")]
         public string? ValueType { get; set; }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("returnType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The .NET return `Type` for the operation.",
-            Description = "Defaults to the parent `Entity.Name` where the `OperationType` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.")]
+            Description = "Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.")]
         public string? ReturnType { get; set; }
 
         /// <summary>
@@ -107,20 +107,12 @@ namespace Beef.CodeGen.Config.Entity
         #region Data
 
         /// <summary>
-        /// Indicates whether the data logic for the operation is to be auto-implemented.
+        /// Gets or sets the operation override for the `Entity.AutoImplement`.
         /// </summary>
         [JsonProperty("autoImplement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "Indicates whether the data logic for the operation is to be auto-implemented.", IsImportant = true,
-            Description = "The corresponding `Entity.AutoImplement` must be defined for this to enacted. Auto-implementation is applicable for all `OperationType` options with the exception of `Custom`.")]
-        public bool? AutoImplement { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database stored procedure name.
-        /// </summary>
-        [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The database stored procedure name used where the `Entity.AutoImplement` is `Database` and `Operation.AutoImplement` is `true`.",
-            Description = "Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.")]
-        public string? DatabaseStoredProc { get; set; }
+        [PropertySchema("Data", Title = "The operation override for the `Entity.AutoImplement`.", IsImportant = true, Options = new string[] { "Database", "EntityFramework", "Cosmos", "OData", "None" },
+            Description = "Defaults to `Entity.AutoImplement`. The corresponding `Entity.AutoImplement` must be defined for this to be enacted. Auto-implementation is applicable for all `Operation.Type` options with the exception of `Custom`.")]
+        public string? AutoImplement { get; set; }
 
         /// <summary>
         /// Gets or sets the override for the data entity <c>Mapper</c>.
@@ -131,10 +123,18 @@ namespace Beef.CodeGen.Config.Entity
         public string? DataEntityMapper { get; set; }
 
         /// <summary>
+        /// Gets or sets the database stored procedure name.
+        /// </summary>
+        [JsonProperty("databaseStoredProc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The database stored procedure name used where `Operation.AutoImplement` is `Database`.",
+            Description = "Defaults to `sp` + `Entity.Name` + `Operation.Name`; e.g. `spPersonCreate`.")]
+        public string? DatabaseStoredProc { get; set; }
+
+        /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> override.
         /// </summary>
         [JsonProperty("cosmosContainerId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The Cosmos `ContainerId` override used where `Entity.AutoImplement` is `Cosmos` and `Operation.AutoImplement` is `true`.",
+        [PropertySchema("Data", Title = "The Cosmos `ContainerId` override used where `Operation.AutoImplement` is `Cosmos`.",
             Description = "Overrides the `Entity.CosmosContainerId`.")]
         public string? CosmosContainerId { get; set; }
 
@@ -142,7 +142,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the C# code override to be used for setting the optional Cosmos <c>PartitionKey</c>.
         /// </summary>
         [JsonProperty("cosmosPartitionKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Entity.AutoImplement` is `Cosmos` and `Operation.AutoImplement` is `true`.",
+        [PropertySchema("Data", Title = "The C# code override to be used for setting the optional Cosmos `PartitionKey` used where `Operation.AutoImplement` is `Cosmos`.",
             Description = "Overrides the `Entity.CosmosPartitionKey`.")]
         public string? CosmosPartitionKey { get; set; }
 
@@ -196,7 +196,7 @@ namespace Beef.CodeGen.Config.Entity
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "The event subject template and corresponding event action pair (separated by a colon).",
             Description = "The event subject template defaults to `{AppName}.{Entity.Name}` plus each of the unique key placeholders comma separated; e.g. Domain.Entity.{id1},{id2}. " +
-            "The event action defaults to `WebApiOperationType` or `OperationType` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
+            "The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
             "E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.")]
         public string? EventSubject { get; set; }
 
@@ -216,31 +216,31 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("webApiMethod", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The HTTP Method for the operation.", IsImportant = true, Options = new string[] { "HttpGet", "HttpPost", "HttpPut", "HttpDelete" },
-            Description = "The value defaults as follows: `HttpGet` for `OperationType` value `Get` or `GetColl`, `HttpPost` for `OperationType` value `Create` or `Custom`, " +
-            "`HttpPut` for `OperationType` value `Update`, and `HttpDelete` for `OperationType` value `Delete`. An `OperationType` value `Patch` can not be specified and will always default to `HttpPatch`.")]
+            Description = "The value defaults as follows: `HttpGet` for `Operation.Type` value `Get` or `GetColl`, `HttpPost` for `Operation.Type` value `Create` or `Custom`, " +
+            "`HttpPut` for `Operation.Type` value `Update`, and `HttpDelete` for `Operation.Type` value `Delete`. An `Operation.Type` value `Patch` can not be specified and will always default to `HttpPatch`.")]
         public string? WebApiMethod { get; set; }
 
         /// <summary>
         /// Gets or sets the primary HTTP Status Code that will be returned for the operation where there is a non-null return value. 
         /// </summary>
         [JsonProperty("webApiStatus", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value. ", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound" },
-            Description = "The value defaults as follows: `OK` for `OperationType` value `Get`, `GetColl`, `Update`, `Delete` or `Custom`, `Created` for `OperationType` value `Create`.")]
+        [PropertySchema("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound" },
+            Description = "The value defaults as follows: `OK` for `Operation.Type` value `Get`, `GetColl`, `Update`, `Delete` or `Custom`, `Created` for `Operation.Type` value `Create`.")]
         public string? WebApiStatus { get; set; }
 
         /// <summary>
         /// Gets or sets the alternate HTTP Status Code that will be returned for the operation where there is a null return value. 
         /// </summary>
         [JsonProperty("webApiAlternateStatus", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value. ", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound", "ThrowException" },
-            Description = "The value defaults as follows: `NotFound` for `OperationType` value `Get`, `NoContent` for `OperationType` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.")]
+        [PropertySchema("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound", "ThrowException" },
+            Description = "The value defaults as follows: `NotFound` for `Operation.Type` value `Get`, `NoContent` for `Operation.Type` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.")]
         public string? WebApiAlternateStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) where the `OperationType` is `Custom` (i.e. can not be inferred).
+        /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).
         /// </summary>
         [JsonProperty("webApiOperationType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The `ExecutionContext.OperationType` (CRUD denotation)  where the `OperationType` is `Custom` (i.e. can not be inferred).", Options = new string[] { "Create", "Read", "Updated", "Delete", "Unspecified" },
+        [PropertySchema("WebApi", Title = "The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).", Options = new string[] { "Create", "Read", "Updated", "Delete", "Unspecified" },
             Description = "The default will be inferred where possible; otherwise, set to `Unspecified`.")]
         public string? WebApiOperationType { get; set; }
 
@@ -408,7 +408,7 @@ namespace Beef.CodeGen.Config.Entity
             }));
 
             PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
-            AutoImplement = Parent!.AutoImplement == null ? false : AutoImplement;
+            AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);

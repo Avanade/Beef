@@ -137,7 +137,7 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("Manager", Title = "The option that determines the layers in which the parameter is passed.", Options = new string[] { "All", "ToManagerSet", "ToManagerCollSet" },
             Description = "Defaults to `All`. To further describe, `All` passes the parameter through all layeys, `ToManagerSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` parameter, " +
             "`ToManagerCollSet` only passes the parameter to the `Manager` layer and overrides the same named property within the corresponding `value` collection parameter. " +
-            "Where using the `UniqueKey` option to automatically set `Parameters`, and the `OperationType` is `Create` or `Update` it will default to `ToManagerSet`.")]
+            "Where using the `UniqueKey` option to automatically set `Parameters`, and the `Operation.Type` is `Create` or `Update` it will default to `ToManagerSet`.")]
         public string? LayerPassing { get; set; }
 
         #endregion
