@@ -15,6 +15,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
     [CategorySchema("Manager", Title = "Provides the generic **Manager-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
+    [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
     public class ParameterConfig : ConfigBase<OperationConfig>
     {
         #region Key
@@ -158,6 +159,19 @@ namespace Beef.CodeGen.Config.Entity
         [JsonProperty("dataConverterIsGeneric", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Data", Title = "Indicates whether the data `Converter` is a generic class and will automatically use the corresponding property `Type` as the generic `T`.")]
         public bool? DataConverterIsGeneric { get; set; }
+
+        #endregion
+
+        #region WebApi
+
+
+        /// <summary>
+        /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
+        /// </summary>
+        [JsonProperty("webApiFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The option for how the parameter will be delcared within the Web API Controller.", Options = new string[] { "FromQuery", "FromBody", "FromRoute", "FromEntityProperties" },
+            Description = "Defaults to `FromQuery`; unless the parameter `Type` has also been defined as an `Entity` within the code-gen config file then it will default to `FromEntityProperties`. Specifies that the parameter will be declared with corresponding `FromQueryAttribute`, `FromBodyAttribute` or `FromRouteAttribute` for the Web API method. The `FromEntityProperties` will declare all properties of the `Entity` as query parameters.")]
+        public string? WebApiFrom { get; set; }
 
         #endregion
 

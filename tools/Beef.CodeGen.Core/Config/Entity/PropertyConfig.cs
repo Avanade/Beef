@@ -20,6 +20,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Cosmos", Title = "Provides the specific **Cosmos** configuration where `AutoImplement` is `Cosmos`.")]
     [CategorySchema("OData", Title = "Provides the specific **OData** configuration where `AutoImplement` is `OData`.")]
     [CategorySchema("Annotation", Title = "Provides additional property **Annotation** configuration.")]
+    [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     public class PropertyConfig : ConfigBase<EntityConfig>
     {
@@ -392,12 +393,23 @@ namespace Beef.CodeGen.Config.Entity
 
         #endregion
 
+        #region WebApi
+
+        /// <summary>
+        /// Gets or sets the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.
+        /// </summary>
+        [JsonProperty("webApiQueryStringConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
+        public string? WebApiQueryStringConverter { get; set; }
+
+        #endregion
+
         #region Grpc
 
         /// <summary>
         /// Gets or sets the unique (immutable) field number required to enable gRPC support.
         /// </summary>
-        [JsonProperty("grpc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("grpcFieldNo", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Grpc", Title = "The unique (immutable) field number required to enable gRPC support.", IsImportant = true)]
         public int? GrpcFieldNo { get; set; }
 

@@ -466,23 +466,31 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the corresponding OData entity model name required where <see cref="AutoImplement"/> is <c>OData</c>.
         /// </summary>
         [JsonProperty("odataEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The corresponding OData entity model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
+        [PropertySchema("OData", Title = "The corresponding OData entity model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
         public string? ODataEntity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the underlying OData collection name where <see cref="AutoImplement"/> is <c>OData</c>.
+        /// </summary>
+        [JsonProperty("odataCollectionName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("OData", Title = "The name of the underlying OData collection where `AutoImplement` is `OData`.", IsImportant = true,
+            Description = "The underlying `Simple.OData.Client` will attempt to infer.")]
+        public string? ODataCollectionName { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated OData <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("dataODataMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("odataMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("OData", Title = "The name of the `Mapper` that the generated OData `Mapper` inherits from.")]
-        public string? DataODataMapperInheritsFrom { get; set; }
+        public string? ODataMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom OData <c>Mapper</c> will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("dataODataCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("odataCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("OData", Title = "Indicates that a custom OData `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
-        public bool? DataODataCustomMapper { get; set; }
+        public bool? ODataCustomMapper { get; set; }
 
         #endregion
 

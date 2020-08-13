@@ -146,6 +146,14 @@ namespace Beef.CodeGen.Config.Entity
             Description = "Overrides the `Entity.CosmosPartitionKey`.")]
         public string? CosmosPartitionKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the override name of the underlying OData collection name where <see cref="OperationConfig.AutoImplement"/> is <c>OData</c>.
+        /// </summary>
+        [JsonProperty("odataCollectionName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("OData", Title = "The override name of the underlying OData collection where `Operation.AutoImplement` is `OData`.", IsImportant = true,
+            Description = "Overriddes the `Entity.ODataCollectionName`; otherwise, the underlying `Simple.OData.Client` will attempt to infer.")]
+        public string? ODataCollectionName { get; set; }
+
         #endregion
 
         #region Manager
@@ -240,9 +248,25 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).
         /// </summary>
         [JsonProperty("webApiOperationType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).", Options = new string[] { "Create", "Read", "Updated", "Delete", "Unspecified" },
+        [PropertySchema("WebApi", Title = "The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).", Options = new string[] { "Create", "Read", "Update", "Delete", "Unspecified" },
             Description = "The default will be inferred where possible; otherwise, set to `Unspecified`.")]
         public string? WebApiOperationType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
+        /// </summary>
+        [JsonProperty("patchGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
+            Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, class and method name (e.g. `XxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
+        public string? PatchGetOperation { get; set; }
+
+        /// <summary>
+        /// Gets or sets the override for the corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
+        /// </summary>
+        [JsonProperty("patchUpdateOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
+            Description = "Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, class and method name (e.g. `XxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
+        public string? PatchUpdateOperation { get; set; }
 
         #endregion
 
@@ -412,6 +436,7 @@ namespace Beef.CodeGen.Config.Entity
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
+            ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
             WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : "OK");
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
