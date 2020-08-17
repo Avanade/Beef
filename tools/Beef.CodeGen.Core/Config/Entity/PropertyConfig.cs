@@ -231,6 +231,14 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("Serialization", Title = "Indicates whether to emit the default value when serializing.")]
         public bool? SerializationEmitDefault { get; set; }
 
+        /// <summary>
+        /// Gets or sets the override JSON property name where outputting as a data model.
+        /// </summary>
+        [JsonProperty("dataModelJsonName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Serialization", Title = "The override JSON property name where outputting as a data model.",
+            Description = "Defaults to `JsonName` where not specified.")]
+        public string? DataModelJsonName { get; set; }
+
         #endregion
 
         #region Data
@@ -431,12 +439,32 @@ namespace Beef.CodeGen.Config.Entity
         public string? SummaryRefDataText { get; set; }
 
         /// <summary>
+        /// Gets the computed declared type.
+        /// </summary>
+        public string ComputedType
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(RefDataType))
+                    return CompareValue(Nullable, true) ? Type + "?" : Type!;
+
+                var rt = CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!;
+                return CompareValue(Nullable, true) ? rt + "?" : rt!;
+            }
+        }
+
+        /// <summary>
+        /// Gets the computed private name.
+        /// </summary>
+        public string ComputedPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "string");
-            Text = DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
+            Text = DefaultWhereNull(Text, () => Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) || Parent!.Parent!.Entities.Any(x => x.Name == Type) ? CodeGenerator.ToSeeComments(Name) : CodeGenerator.ToSentenceCase(Name));
             SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Get or sets the")} {Text}.");
             SummaryRefDataSid = CodeGenerator.ToComments($"Gets or sets the {Text} using the underlying Serialization Identifier (SID).");
             SummaryRefDataText = CodeGenerator.ToComments($"Gets the corresponding {Text} text (read-only where selected).");
@@ -449,8 +477,11 @@ namespace Beef.CodeGen.Config.Entity
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataName = DefaultWhereNull(DataName, () => Name);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
+            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type));
+            Immutable = DefaultWhereNull(Immutable, () => false);
 
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");

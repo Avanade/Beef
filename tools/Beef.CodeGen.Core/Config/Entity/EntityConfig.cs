@@ -702,6 +702,13 @@ namespace Beef.CodeGen.Config.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? Properties { get; set; }
 
+
+        /// <summary>
+        /// Gets the list of properties that are not inherited.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public PropertyConfig[] PropertiesNotInherited => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToArray();
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
@@ -737,6 +744,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the entity collection result name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
         public string? EntityCollectionResultName { get; set; }
+
+        /// <summary>
+        /// Indicates whether the entity (based on all configurations) should implement the <see cref="EntityBase"/> capabilties.
+        /// </summary>
+        public bool HasEntityBase => !(CompareValue(OmitEntityBase, true) || Parent!.IsDataModel);
 
         /// <summary>
         /// <inheritdoc/>

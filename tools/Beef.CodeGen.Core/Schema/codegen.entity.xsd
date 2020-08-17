@@ -176,6 +176,11 @@
                       <xs:documentation>Indicates whether to emit the default value when serializing.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="DataModelJsonName" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The override JSON property name where outputting as a data model. Defaults to `JsonName` where not specified.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="DataName" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The data name where Entity.AutoImplement is selected. Defaults to the property `Name`. Represents the column name for a `Database`, or the correspinding property name for the other options.</xs:documentation>

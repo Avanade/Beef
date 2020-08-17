@@ -25,7 +25,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Gets the username.
         /// </summary>
-        internal static string Username => _username.Value ?? TestSetUp.DefaultUsername;
+        internal static string Username => _username.Value ?? TestSetUp.DefaultUsername; 
 
         /// <summary>
         /// Gets the arguments.

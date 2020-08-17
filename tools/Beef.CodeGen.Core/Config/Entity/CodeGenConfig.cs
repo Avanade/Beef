@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Beef.CodeGen.Config.Entity
@@ -255,6 +256,61 @@ namespace Beef.CodeGen.Config.Entity
 
         #endregion
 
+        #region RuntimeParameters
+
+        /// <summary>
+        /// Gets the parameter overrides.
+        /// </summary>
+        public Dictionary<string, string> RuntimeParameters { get; internal set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Replaces the <see cref="RuntimeParameters"/> with the specified <paramref name="parameters"/> (copies values).
+        /// </summary>
+        /// <param name="parameters">The parameters to copy.</param>
+        public void ReplaceRuntimeParameters(Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+                return;
+
+            foreach (var p in parameters)
+            {
+                RuntimeParameters.Add(p.Key, p.Value);
+            }
+        }
+
+        /// <summary>
+        /// Gets the specified runtime parameter value.
+        /// </summary>
+        /// <param name="name">The parameter name.</param>
+        /// <param name="isRequired">Indicates whether the parameter is mandatory and therefore must exist and have non-<c>null</c> value.</param>
+        /// <returns>The runtime parameter value.</returns>
+        internal string? GetRuntimeParameter(string name, bool isRequired = false)
+        {
+            if ((!RuntimeParameters.TryGetValue(name, out var value) && isRequired) || (isRequired && string.IsNullOrEmpty(value)))
+                throw new CodeGenException($"Runtime parameter '{name}' was not found or had no value; this is required to function.");
+            else
+                return value;
+        }
+
+        /// <summary>
+        /// Gets the specified runtime parameter value as a <see cref="bool"/>.
+        /// </summary>
+        /// <param name="name">The parameter name.</param>
+        /// <returns>The runtime parameter value.</returns>
+        internal bool GetRuntimeBoolParameter(string name)
+        {
+            var val = GetRuntimeParameter(name);
+            if (string.IsNullOrEmpty(val))
+                return false;
+
+            if (bool.TryParse(val, out var value))
+                return value;
+
+            throw new CodeGenException($"Runtime parameter '{name}' must be a boolean; value '{val}' is invalid.");
+        }
+
+        #endregion
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="EntityConfig"/> collection.
         /// </summary>
@@ -264,19 +320,29 @@ namespace Beef.CodeGen.Config.Entity
         public List<EntityConfig>? Entities { get; set; }
 
         /// <summary>
-        /// Gets or sets the company name.
+        /// Gets the company name from the <see cref="RuntimeParameters"/>.
         /// </summary>
-        public string? Company { get; set; }
+        public string Company => GetRuntimeParameter("Company", true)!;
 
         /// <summary>
-        /// Gets or sets the application name.
+        /// Gets the application name from the <see cref="RuntimeParameters"/>.
         /// </summary>
-        public string? AppName { get; set; }
+        public string AppName => GetRuntimeParameter("AppName", true)!;
 
         /// <summary>
-        /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/>.
+        /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
-        public bool? IsDataModel { get; set; }
+        public string EntityScope => DefaultWhereNull(GetRuntimeParameter("EntityScope"), () => "Common")!;
+
+        /// <summary>
+        /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="RuntimeParameters"/>).
+        /// </summary>
+        public bool ModelFromEntity => GetRuntimeBoolParameter("ModelFromEntity");
+
+        /// <summary>
+        /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/> (from the <see cref="RuntimeParameters"/>).
+        /// </summary>
+        public bool IsDataModel => GetRuntimeBoolParameter("IsDataModel");
 
         /// <summary>
         /// <inheritdoc/>
@@ -292,6 +358,7 @@ namespace Beef.CodeGen.Config.Entity
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
+            JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
 
             if (Entities != null && Entities.Count > 0)
             {

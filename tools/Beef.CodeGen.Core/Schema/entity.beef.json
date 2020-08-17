@@ -724,6 +724,11 @@
                       "type": "boolean",
                       "title": "Indicates whether to emit the default value when serializing."
                     },
+                    "dataModelJsonName": {
+                      "type": "string",
+                      "title": "The override JSON property name where outputting as a data model.",
+                      "description": "Defaults to `JsonName` where not specified."
+                    },
                     "dataName": {
                       "type": "string",
                       "title": "The data name where Entity.AutoImplement is selected.",
