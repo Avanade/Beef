@@ -74,7 +74,7 @@ namespace Beef.CodeGen
 
             _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
 
-            _logger = Logger.Default ?? throw new InvalidOperationException("Logger.Default must have a valid instance.");
+            _logger = Logger.Default ?? new ColoredConsoleLogger(nameof(CodeGenConsole));
 
             App.OnExecuteAsync(async (_) =>
             {

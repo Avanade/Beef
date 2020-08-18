@@ -2,7 +2,7 @@
 
 Represents the **NuGet** versions.
 
-## v4.0.1
+## v4.1.1
 - *Enhancement:* Introduction of Dependency Injection support.
 
 ## v3.1.x
