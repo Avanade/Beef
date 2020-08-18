@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.14
 - *Fixed:* `CollectionRuleItem` updated to have an argument-less constructor where an item validator is not required. The existing constructor will now throw a `NullReferenceException` where no validator has been specified (intended to catch validators that have not been constructed correctly).
 

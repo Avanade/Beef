@@ -11,6 +11,27 @@
       <Set Name="System.EntityExclude" Value="true" />
     </If>
 
+    <Set Name="System.EventPublish" Value="false" />
+    <If Condition="Config.EventPublish == null or Config.EventPublish == true">
+      <If Condition="Entity.EventPublish == null or Entity.EventPublish == true">
+        <Operation>
+          <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'Delete'">
+            <Set Name="System.EventPublish" Value="true" />
+          </If>
+          <If Condition="Operation.EventPublish == true">
+            <Set Name="System.EventPublish" Value="true" />
+          </If>
+        </Operation>
+      </If>
+    </If>
+
+    <Set Name="System.Caching" Value="false" />
+    <If Condition="Entity.DataSvcCaching == null or Entity.DataSvcCaching == true">
+      <Operation Condition="Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update' or Operation.OperationType == 'Delete'">
+        <Set Name="System.Caching" Value="true" />
+      </Operation>
+    </If>
+
     <Entity Condition="System.EntityExclude == false and Entity.Name == System.EntityName" OutputFileName="{{Entity.Name}}DataSvc.cs">
       <Set Name="Entity.EntityName" Condition="Entity.GenericWithT != true" Value="Entity.Name" Otherwise="${{Entity.Name}}&lt;T&gt;" />
       <Set Name="Entity.EntityCollectionName" Condition="Entity.GenericWithT != true" Value="${{Entity.Name}}Collection" Otherwise="${{Entity.Name}}Collection&lt;T&gt;" />
@@ -20,7 +41,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -28,8 +49,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
-using Beef.Entities;
-using {{Config.Company}}.{{Config.AppName}}.Business.Data;
+]]>
+      <If Condition="System.Caching == true">
+        <![CDATA[using Beef.Caching;
+]]>
+      </If>
+      <![CDATA[using Beef.Entities;
+]]>
+      <If Condition="System.EventPublish == true">
+        <![CDATA[using Beef.Events;
+]]>
+      </If>
+      <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Business.Data;
 ]]>
       <If Condition="Config.EntityUsing == 'Business' or Config.EntityUsing == 'All'">
         <![CDATA[using {{Config.Company}}.{{Config.AppName}}.Business.Entities;
@@ -53,62 +84,118 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
     /// <summary>
     /// Provides the {{Entity.Text:ToComments}} data repository services.
     /// </summary>
-    public static partial class {{Entity.Name}}DataSvc]]>
+    public partial class {{Entity.Name}}DataSvc : I{{Entity.Name}}DataSvc]]>
       <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
       <![CDATA[
     {
+        private readonly I{{Entity.Name}}Data _data;
+]]>
+      <If Condition="System.EventPublish == true">
+        <![CDATA[        private readonly IEventPublisher _evtPub;
+]]>
+      </If>
+      <If Condition="System.Caching == true">
+        <![CDATA[        private readonly IRequestCache _cache;
+]]>
+      </If>
+      <![CDATA[
 ]]>
       <Set Name="System.EndRegion" Value="false"/>
-      <Operation Condition="Operation.ExcludeDataSvc == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch' and Operation.DataSvcCustom == false">
-        <If Condition="System.EndRegion == false">
-          <Set Name="System.EndRegion" Value="true"/>
-          <![CDATA[        #region Private
+      <If Condition="Entity.DataSvcExtensions == true">
+        <Operation Condition="Operation.ExcludeDataSvc == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch' and Operation.DataSvcCustom == false">
+          <If Condition="System.EndRegion == false">
+            <Set Name="System.EndRegion" Value="true"/>
+            <![CDATA[        #region Extensions
         #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
 ]]>
-        </If>
-        <![CDATA[        private static readonly Func<]]>
-        <If Condition="Operation.OperationType == 'Get'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityName}}?, ]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}?, ]]></Else>
           </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityName}}, ]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}, ]]></Else>
+          <![CDATA[        private Func<]]>
+          <If Condition="Operation.OperationType == 'Get'">
+            <If Condition="Operation.ReturnType == 'void'">
+              <Then><![CDATA[{{Entity.EntityName}}?, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}?, ]]></Else>
+            </If>
           </If>
-        </If>
-        <If Condition="Operation.OperationType == 'GetColl'">
-          <If Condition="Operation.ReturnType == 'void'">
-            <Then><![CDATA[{{Entity.EntityCollectionResultName}}, ]]></Then>
-            <Else><![CDATA[{{Operation.ReturnType}}CollectionResult, ]]></Else>
+          <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
+            <If Condition="Operation.ReturnType == 'void'">
+              <Then><![CDATA[{{Entity.EntityName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}, ]]></Else>
+            </If>
           </If>
-        </If>
-        <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
-          <![CDATA[{{Operation.ReturnType}}, ]]>
-        </If>
-        <Parameter Condition="Parameter.LayerPassing == 'All'">
-          <![CDATA[{{Parameter.Type}}]]>
-          <If Condition="Parameter.Nullable == true">
-            <![CDATA[?]]>
+          <If Condition="Operation.OperationType == 'GetColl'">
+            <If Condition="Operation.ReturnType == 'void'">
+              <Then><![CDATA[{{Entity.EntityCollectionResultName}}, ]]></Then>
+              <Else><![CDATA[{{Operation.ReturnType}}CollectionResult, ]]></Else>
+            </If>
           </If>
-          <![CDATA[, ]]>
-        </Parameter>
-        <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
-          <![CDATA[PagingArgs?, ]]>
-        </If>
-        <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
+          <If Condition="Operation.OperationType == 'Custom' and Operation.ReturnType != 'void'">
+            <![CDATA[{{Operation.ReturnType}}, ]]>
+          </If>
+          <Parameter Condition="Parameter.LayerPassing == 'All'">
+            <![CDATA[{{Parameter.Type}}]]>
+            <If Condition="Parameter.Nullable == true">
+              <![CDATA[?]]>
+            </If>
+            <![CDATA[, ]]>
+          </Parameter>
+          <If Condition="Operation.OperationType == 'GetColl' and Operation.PagingArgs == true">
+            <![CDATA[PagingArgs?, ]]>
+
+          </If>
+          <![CDATA[Task>? {{Operation.PrivateName}}OnAfterAsync;
 ]]>
-      </Operation>
-      <If Condition="System.EndRegion == true">
-        <![CDATA[
+        </Operation>
+        <If Condition="System.EndRegion == true">
+          <![CDATA[
         #pragma warning restore CS0649
         #endregion
 
 ]]>
+        </If>
       </If>
+      <![CDATA[        /// <summary>
+        /// Initializes a new instance of the <see cref="{{Entity.Name}}DataSvc"/> class.
+        /// </summary>
+        /// <param name="data">The <see cref="I{{Entity.Name}}Data"/>.</param>
+]]>
+      <If Condition="System.EventPublish == true">
+        <![CDATA[        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+]]>
+      </If>
+      <If Condition="System.Caching == true">
+        <![CDATA[        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+]]>
+      </If>
+      <![CDATA[        ]]>
+      <Switch Value="Entity.DataSvcConstructor">
+        <Case Value="'Private'"><![CDATA[private]]></Case>
+        <Case Value="'Protected'"><![CDATA[protected]]></Case>
+        <Default><![CDATA[public]]></Default>
+      </Switch>
+      <![CDATA[ {{Entity.Name}}DataSvc(I{{Entity.Name}}Data data]]>
+      <If Condition="System.EventPublish == true">
+        <![CDATA[, IEventPublisher evtPub]]>
+      </If>
+      <If Condition="System.Caching == true">
+        <![CDATA[, IRequestCache cache]]>
+      </If>
+      <![CDATA[)
+            { _data = Check.NotNull(data, nameof(data)); ]]>
+      <If Condition="System.EventPublish == true">
+        <![CDATA[_evtPub = Check.NotNull(evtPub, nameof(evtPub)); ]]>
+      </If>
+      <If Condition="System.Caching == true">
+        <![CDATA[_cache = Check.NotNull(cache, nameof(cache)); ]]>
+      </If>
+      <![CDATA[{{Entity.Name}}DataSvcCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void {{Entity.Name}}DataSvcCtor();
+
+]]>
       <Operation Condition="Operation.ExcludeDataSvc == false and Operation.ExcludeAll == false and Operation.OperationType != 'Patch'">
         <If Condition="System.Index > 0">
           <![CDATA[
@@ -199,11 +286,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>A {{Entity.EntityCollectionResultName:ToSeeComments}}.</returns>
-        public static Task<{{Entity.EntityCollectionResultName}}> {{Operation.Name}}Async(]]>
+        public Task<{{Entity.EntityCollectionResultName}}> {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>A <see cref="{{Operation.ReturnType}}CollectionResult"/>.</returns>
-        public static Task<{{Operation.ReturnType}}CollectionResult> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}CollectionResult> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>
@@ -211,11 +298,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>The selected {{Entity.EntityName:ToSeeComments}} object where found; otherwise, <c>null</c>.</returns>
-        public static Task<{{Entity.EntityName}}?> {{Operation.Name}}Async(]]>
+        public Task<{{Entity.EntityName}}?> {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>The selected {{Operation.ReturnType:ToSeeComments}} object where found; otherwise, <c>null</c>.</returns>
-        public static Task<{{Operation.ReturnType}}?> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}?> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>
@@ -223,11 +310,11 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
               <![CDATA[        /// <returns>A refreshed {{Entity.EntityName:ToSeeComments}} object.</returns>
-        public static Task<{{Entity.EntityName}}>]]>
+        public Task<{{Entity.EntityName}}>]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>A refreshed {{Operation.ReturnType:ToSeeComments}} object.</returns>
-        public static Task<{{Operation.ReturnType}}>]]>
+        public Task<{{Operation.ReturnType}}>]]>
             </Else>
           </If>
           <![CDATA[ {{Operation.Name}}Async(]]>
@@ -238,16 +325,16 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <![CDATA[ value]]>
         </If>
         <If Condition="Operation.OperationType == 'Delete'">
-          <![CDATA[        public static Task {{Operation.Name}}Async(]]>
+          <![CDATA[        public Task {{Operation.Name}}Async(]]>
         </If>
         <If Condition="Operation.OperationType == 'Custom'">
           <If Condition="Operation.ReturnType == 'void'">
             <Then>
-              <![CDATA[        public static Task {{Operation.Name}}Async(]]>
+              <![CDATA[        public Task {{Operation.Name}}Async(]]>
             </Then>
             <Else>
               <![CDATA[        /// <returns>{{Operation.ReturnText:ToComments}}</returns>
-        public static Task<{{Operation.ReturnType}}> {{Operation.Name}}Async(]]>
+        public Task<{{Operation.ReturnType}}> {{Operation.Name}}Async(]]>
             </Else>
           </If>
         </If>
@@ -276,7 +363,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         </If>
         <![CDATA[)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof({{Entity.Name}}DataSvc]]>
+            return DataSvcInvoker.Current.InvokeAsync(typeof({{Entity.Name}}DataSvc]]>
         <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
         <![CDATA[), async () => 
             {
@@ -293,14 +380,14 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
             <If Condition="Operation.ReturnType == null or Operation.ReturnType == 'void'">
               <Then>
                 <![CDATA[);
-                if (ExecutionContext.Current.TryGetCacheValue<{{Entity.EntityName}}>(__key, out {{Entity.EntityName}} __val))
+                if (_cache.TryGetValue(__key, out {{Entity.EntityName}} __val))
                     return __val;
 
                 ]]>
               </Then>
               <Else>
                 <![CDATA[);
-                if (ExecutionContext.Current.TryGetCacheValue<{{Operation.ReturnType}}>(__key, out {{Operation.ReturnType}} __val))
+                if (_cache.TryGetValue(__key, out {{Operation.ReturnType}} __val))
                     return __val;
 
                 ]]>
@@ -317,9 +404,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
         <![CDATA[await ]]>
         <If Condition="Operation.DataSvcCustom == false">
           <Then>
-            <![CDATA[Factory.Create<I{{Entity.Name}}Data]]>
-            <If Condition="Entity.GenericWithT == true"><![CDATA[<T>]]></If>
-            <![CDATA[>().{{Operation.Name}}Async(]]>
+            <![CDATA[_data.{{Operation.Name}}Async(]]>
           </Then>
           <Else>
             <![CDATA[{{Operation.Name}}OnImplementationAsync(]]>
@@ -363,7 +448,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <Set Name="System.GetFromArgs" Value="false" />
           </If>
-          <![CDATA[                await Beef.Events.Event.Publish]]>
+          <![CDATA[                await _evtPub.Publish]]>
           <If Condition="Operation.EventSubject == null">
             <If Condition="Operation.EventSubject == null">
               <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
@@ -373,7 +458,6 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <![CDATA[Value]]>
               </If>
             </If>
-            <![CDATA[Event]]>
           </If>
           <![CDATA[Async(]]>
           <If Condition="Operation.EventSubject == null">
@@ -427,7 +511,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
                 <If Condition="System.Index > 0"><![CDATA[,]]></If>
                 <![CDATA[
                     ]]>
-                <![CDATA[Beef.Events.EventData.Create]]>
+                <![CDATA[_evtPub.Create]]>
                 <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
                   <![CDATA[Value]]>
                 </If>
@@ -469,34 +553,34 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           <If Condition="Operation.OperationType == 'Get'">
             <If Condition="Operation.ReturnType == null or Operation.ReturnType == 'void'">
               <Then>
-                <![CDATA[                ExecutionContext.Current.CacheSet(__key, __result!);
+                <![CDATA[                _cache.SetValue(__key, __result!);
 ]]>
               </Then>
               <Else>
-                <![CDATA[                ExecutionContext.Current.CacheSet(__key, __result!);
+                <![CDATA[                _cache.SetValue(__key, __result!);
 ]]>
               </Else>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Custom'">
             <If Condition="Operation.ReturnType == Entity.Name">
-              <![CDATA[                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+              <![CDATA[                _cache.SetValue(__result.UniqueKey, __result);
 ]]>
             </If>
             <If Condition="Operation.ReturnType == '{{Entity.Name}}?'">
-              <![CDATA[                ExecutionContext.Current.CacheSet(__result?.UniqueKey ?? UniqueKey.Empty, __result);
+              <![CDATA[                _cache.SetValue(__result?.UniqueKey ?? UniqueKey.Empty, __result);
 ]]>
             </If>
           </If>
           <If Condition="Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <If Condition="Operation.ReturnType == null or Operation.ReturnType == 'void'">
               <Then>
-                <![CDATA[                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                <![CDATA[                _cache.SetValue(__result.UniqueKey, __result);
 ]]>
               </Then>
               <Else>
                 <If Condition="Operation.ReturnType == Operation.ValueType or Operation.ReturnType == Entity.EntityName">
-                  <![CDATA[                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
+                  <![CDATA[                _cache.SetValue(__result.UniqueKey, __result);
 ]]>
                 </If>
               </Else>
@@ -504,8 +588,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
           </If>
           <If Condition="Operation.OperationType == 'Delete'">
             <If Condition="Operation.ValueType == null or Operation.ValueType == 'void'">
-              <Then><![CDATA[                ExecutionContext.Current.CacheRemove<{{Entity.EntityName}}>(new UniqueKey(]]></Then>
-              <Else><![CDATA[                ExecutionContext.Current.CacheRemove<{{Operation.ValueType}}>(new UniqueKey(]]></Else>
+              <Then><![CDATA[                _cache.Remove<{{Entity.EntityName}}>(new UniqueKey(]]></Then>
+              <Else><![CDATA[                _cache.Remove<{{Operation.ValueType}}>(new UniqueKey(]]></Else>
             </If>
             <Parameter>
               <If Condition="System.Index != 0">
@@ -517,7 +601,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
 ]]>
           </If>
         </If>
-        <If Condition="Operation.DataSvcCustom == false">
+        <If Condition="Operation.DataSvcCustom == false and Entity.DataSvcExtensions == true">
           <![CDATA[                if ({{Operation.PrivateName}}OnAfterAsync != null) await {{Operation.PrivateName}}OnAfterAsync(]]>
           <If Condition="Operation.OperationType == 'GetColl' or Operation.OperationType == 'Get' or Operation.OperationType == 'Create' or Operation.OperationType == 'Update'">
             <![CDATA[__result]]>
@@ -580,7 +664,7 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business.DataSvc
       <![CDATA[    }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore]]>
     </Entity>
   </Entity>

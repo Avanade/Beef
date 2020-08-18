@@ -48,31 +48,6 @@ namespace Beef.Data.Cosmos
         where TModel : class, new()
     {
         /// <summary>
-        /// Creates an <see cref="EntityMapper{T, TModel}"/> automatically mapping the properties where they share the same name.
-        /// </summary>
-        /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
-        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        [Obsolete("Please use CosmosDbMapper.Create<T, TModel>(ignoreSrceProperties) instead.")]
-        public new static CosmosDbMapper<T, TModel> CreateAuto(params string[] ignoreSrceProperties)
-#pragma warning restore CA1000
-        {
-            return new CosmosDbMapper<T, TModel>(true, ignoreSrceProperties);
-        }
-
-        /// <summary>
-        /// Creates an <see cref="EntityMapper{T, TModel}"/> where properties are added manually.
-        /// </summary>
-        /// <returns>An <see cref="EntityMapper{T, TModel}"/>.</returns>
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        [Obsolete("Please use CosmosDbMapper.Create<T, TModel>(ignoreSrceProperties) instead.")]
-        public new static CosmosDbMapper<T, TModel> Create()
-#pragma warning restore CA1000
-        {
-            return new CosmosDbMapper<T, TModel>(false);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CosmosDbMapper{T, TModel}"/> class.
         /// </summary>
         /// <param name="autoMap">Indicates whether the two entities should automatically map where the properties share the same name.</param>
@@ -82,13 +57,16 @@ namespace Beef.Data.Cosmos
         /// <summary>
         /// Creates a <see cref="CosmosDbArgs{T, TModel}"/>.
         /// </summary>
-        /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null)
+        /// <param name="requestOptions">Optional <see cref="Microsoft.Azure.Cosmos.ItemRequestOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
+        /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PartitionKey? partitionKey = null, ItemRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>
@@ -97,11 +75,14 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
+        /// <param name="requestOptions">Optional <see cref="FeedOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingArgs paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>
@@ -110,11 +91,14 @@ namespace Beef.Data.Cosmos
         /// <param name="containerId">The <see cref="Container"/> identifier.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
         /// <param name="partitionKey">The <see cref="PartitionKey"/>.</param>
-        /// <param name="requestOptions">The optional <see cref="FeedOptions"/>.</param>
+        /// <param name="requestOptions">Optional <see cref="FeedOptions"/>.</param>
+        /// <param name="onCreate">Optional action to perform additional processing on the resulting <see cref="CosmosDbArgs{T, TModel}"/>.</param>
         /// <returns>A <see cref="CosmosDbArgs{T, TModel}"/>.</returns>
-        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null)
+        public CosmosDbArgs<T, TModel> CreateArgs(string containerId, PagingResult paging, PartitionKey? partitionKey = null, QueryRequestOptions? requestOptions = null, Action<ICosmosDbArgs>? onCreate = null)
         {
-            return new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            var dbArgs = new CosmosDbArgs<T, TModel>(this, containerId, partitionKey, paging, requestOptions);
+            onCreate?.Invoke(dbArgs);
+            return dbArgs;
         }
 
         /// <summary>

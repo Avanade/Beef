@@ -6,12 +6,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
-        public PersonData()
+        private readonly ILogger _logger;
+
+        public PersonData(IDatabase db, IEfDb ef, ILogger<PersonData> logger) : this(db, ef) => _logger = Check.NotNull(logger, nameof(logger));
+
+        partial void PersonDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
             _getByArgsWithEfOnQuery = GetByArgsWithEfOnQuery;
@@ -27,31 +32,33 @@ namespace Beef.Demo.Business.Data
 
         private IQueryable<EfModel.Person> GetByArgsWithEfOnQuery(IQueryable<EfModel.Person> q, PersonArgs args, IEfDbArgs efArgs)
         {
-            EfDb.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-            EfDb.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-            EfDb.With(args?.Genders, () => q = q.Where(x => args.Genders.ToGuidIdList().Contains(x.GenderId.Value)));
+            _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
+            _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
+            _ef.With(args?.Genders, () => q = q.Where(x => args.Genders.ToGuidIdList().Contains(x.GenderId.Value)));
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 
         private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
             // This is an example (illustrative) of executing an Agent from an API - this should be used for cross-domain calls only; otherwise, use database (performance).
-            var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
-            if (pf.Value == null)
-                throw new ValidationException($"Person from does not exist.");
+            // TODO: Add back in.
+            //var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
+            //if (pf.Value == null)
+            //    throw new ValidationException($"Person from does not exist.");
 
-            var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
-            if (pt.Value == null)
-                throw new ValidationException($"Person from does not exist.");
+            //var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
+            //if (pt.Value == null)
+            //    throw new ValidationException($"Person to does not exist.");
 
             // Pretend a merge actually occured.
 
-            return pt.Value;
+            //return pt.Value;
+            return await Task.FromResult((Person)null).ConfigureAwait(false);
         }
 
         private Task MarkOnImplementationAsync()
         {
-            Beef.Diagnostics.Logger.Default.Warning("Mark operation implementation currently does not exist.");
+            _logger.LogWarning("Mark operation implementation currently does not exist.");
             return Task.CompletedTask;
         }
 
@@ -71,11 +78,17 @@ namespace Beef.Demo.Business.Data
             return Task.FromResult(new Person { FirstName = "No", LastName = "Args" });
         }
 
+        private Task ThrowErrorOnImplementationAsync()
+        {
+            _logger.LogWarning("The data is beyond corrupt and we cannot continue.");
+            throw new InvalidOperationException("Data corruption error!");
+        }
+
         private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)
         {
             var pdcr = new PersonDetailCollectionResult(new PagingResult(paging));
 
-            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
+            await _db.StoredProcedure("[Demo].[spPersonGetDetailByArgs]")
                 .Params(p =>
                 {
                     p.ParamWithWildcard(args?.FirstName, DbMapper.Default[nameof(Person.FirstName)])
@@ -110,7 +123,7 @@ namespace Beef.Demo.Business.Data
             await GetAsync(id);
 
             System.Diagnostics.Debug.WriteLine($"Two, Thread: {System.Threading.Thread.CurrentThread.ManagedThreadId }");
-            await Database.Default.StoredProcedure("[Demo].[spPersonGetDetail]")
+            await _db.StoredProcedure("[Demo].[spPersonGetDetail]")
                 .Param(DbMapper.Default.GetParamName(nameof(PersonDetail.Id)), id)
                 .SelectQueryMultiSetAsync(
                     new MultiSetSingleArgs<Person>(PersonData.DbMapper.Default, (r) => { pd = new PersonDetail(); pd.CopyFrom(r); }, isMandatory: false),
@@ -123,7 +136,7 @@ namespace Beef.Demo.Business.Data
         {
             PersonDetail pd = null;
 
-            await Database.Default.StoredProcedure("[Demo].[spPersonUpdateDetail]")
+            await _db.StoredProcedure("[Demo].[spPersonUpdateDetail]")
                 .Params((p) => PersonData.DbMapper.Default.MapToDb(value, p, Mapper.OperationTypes.Update))
                 .TableValuedParam("@WorkHistoryList", WorkHistoryData.DbMapper.Default.CreateTableValuedParameter(value.History))
                 .ReselectRecordParam()
@@ -134,7 +147,7 @@ namespace Beef.Demo.Business.Data
             return pd;
         }
 
-        private Task<Person> GetNullOnImplementationAsync(string name)
+        private Task<Person> GetNullOnImplementationAsync(string _)
         {
             return Task.FromResult<Person>(null);
         }

@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
 using Cdr.Banking.Business.Data;
 using Cdr.Banking.Common.Entities;
@@ -21,17 +22,23 @@ namespace Cdr.Banking.Business.DataSvc
     /// <summary>
     /// Provides the Account data repository services.
     /// </summary>
-    public static partial class AccountDataSvc
+    public partial class AccountDataSvc : IAccountDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IAccountData _data;
+        private readonly IRequestCache _cache;
 
-        private static readonly Func<AccountCollectionResult, AccountArgs?, PagingArgs?, Task>? _getAccountsOnAfterAsync;
-        private static readonly Func<AccountDetail?, string?, Task>? _getDetailOnAfterAsync;
-        private static readonly Func<Balance?, string?, Task>? _getBalanceOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountDataSvc"/> class.
+        /// </summary>
+        /// <param name="data">The <see cref="IAccountData"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public AccountDataSvc(IAccountData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); AccountDataSvcCtor(); }
 
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void AccountDataSvcCtor();
 
         /// <summary>
         /// Get all accounts.
@@ -39,12 +46,11 @@ namespace Cdr.Banking.Business.DataSvc
         /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
-        public static Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
+        public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
-                var __result = await Factory.Create<IAccountData>().GetAccountsAsync(args, paging).ConfigureAwait(false);
-                if (_getAccountsOnAfterAsync != null) await _getAccountsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
+                var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
@@ -54,17 +60,16 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<AccountDetail?> GetDetailAsync(string? accountId)
+        public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue<AccountDetail>(__key, out AccountDetail __val))
+                if (_cache.TryGetValue(__key, out AccountDetail __val))
                     return __val;
 
-                var __result = await Factory.Create<IAccountData>().GetDetailAsync(accountId).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, accountId).ConfigureAwait(false);
+                var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
@@ -74,22 +79,21 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Balance?> GetBalanceAsync(string? accountId)
+        public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
             {
                 var __key = new UniqueKey(accountId);
-                if (ExecutionContext.Current.TryGetCacheValue<Balance>(__key, out Balance __val))
+                if (_cache.TryGetValue(__key, out Balance __val))
                     return __val;
 
-                var __result = await Factory.Create<IAccountData>().GetBalanceAsync(accountId).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getBalanceOnAfterAsync != null) await _getBalanceOnAfterAsync(__result, accountId).ConfigureAwait(false);
+                var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

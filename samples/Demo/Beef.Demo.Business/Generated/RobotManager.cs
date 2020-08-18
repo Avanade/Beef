@@ -25,36 +25,18 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class RobotManager : IRobotManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IRobotDataSvc _dataService;
 
-        private readonly Func<Guid, Task>? _getOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getOnValidate;
-        private readonly Func<Guid, Task>? _getOnBeforeAsync;
-        private readonly Func<Robot?, Guid, Task>? _getOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
+        private RobotManager(IRobotDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
 
-        private readonly Func<Robot, Task>? _createOnPreValidateAsync;
-        private readonly Action<MultiValidator, Robot>? _createOnValidate;
-        private readonly Func<Robot, Task>? _createOnBeforeAsync;
-        private readonly Func<Robot, Task>? _createOnAfterAsync;
-
-        private readonly Func<Robot, Guid, Task>? _updateOnPreValidateAsync;
-        private readonly Action<MultiValidator, Robot, Guid>? _updateOnValidate;
-        private readonly Func<Robot, Guid, Task>? _updateOnBeforeAsync;
-        private readonly Func<Robot, Guid, Task>? _updateOnAfterAsync;
-
-        private readonly Func<Guid, Task>? _deleteOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _deleteOnValidate;
-        private readonly Func<Guid, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
-
-        private readonly Func<RobotArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
-        private readonly Action<MultiValidator, RobotArgs?, PagingArgs?>? _getByArgsOnValidate;
-        private readonly Func<RobotArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
-        private readonly Func<RobotCollectionResult, RobotArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void RobotManagerCtor();
 
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
@@ -63,22 +45,15 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
-                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await RobotDataSvc.GetAsync(id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -91,22 +66,15 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
-                EntityBase.CleanUp(value);
-                if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
                     .Run().ThrowOnError();
 
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
-                var __result = await RobotDataSvc.CreateAsync(value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -120,23 +88,16 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
-                if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
                     .Run().ThrowOnError();
 
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await RobotDataSvc.UpdateAsync(value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -146,20 +107,15 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
-                EntityBase.CleanUp(id);
-                if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id).ConfigureAwait(false);
-                await RobotDataSvc.DeleteAsync(id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
 
@@ -171,22 +127,15 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
-                if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
-
+                Cleaner.CleanUp(args);
                 MultiValidator.Create()
                     .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
-                    .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await RobotDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
 
@@ -197,7 +146,7 @@ namespace Beef.Demo.Business
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);

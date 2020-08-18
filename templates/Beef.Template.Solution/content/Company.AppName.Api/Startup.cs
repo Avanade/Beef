@@ -1,24 +1,29 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
 using System.Reflection;
+using Beef;
 using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
-using Beef.Diagnostics;
-using Beef.Entities;
-using Beef.Validation;
-using Beef.WebApi;
-using Microsoft.AspNetCore.Builder;
 #if (implement_cosmos)
-using Microsoft.Azure.Cosmos;
+using Beef.Data.Cosmos;
 #endif
+#if (implement_database || implement_entityframework)
+using Beef.Data.Database;
+#endif
+#if (implement_entityframework)
+using Beef.Data.EntityFrameworkCore;
+#endif
+using Beef.Entities;
+using Beef.Events;
+using Beef.Validation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
 using Company.AppName.Business;
 using Company.AppName.Business.Data;
+using Company.AppName.Business.DataSvc;
 
 namespace Company.AppName.Api
 {
@@ -27,44 +32,19 @@ namespace Company.AppName.Api
     /// </summary>
     public class Startup
     {
-        private readonly ILogger _logger;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
-        public Startup(IConfiguration config, ILoggerFactory loggerFactory)
+        public Startup(IConfiguration config)
         {
-            // Use JSON property names in validation; default the page size and determine whether unhandled exception details are to be included in the response.
+            _config = Check.NotNull(config, nameof(config));
+
+            // Use JSON property names in validation and default the page size.
             ValidationArgs.DefaultUseJsonNames = true;
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
-            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
-
-            // Configure the logger.
-            _logger = loggerFactory.CreateLogger("Logging");
-            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
-
-            // Configure the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-
-#if (implement_database || implement_entityframework)
-            // Register the database.
-            AppNameDb.Register(() => new AppNameDb(WebApiStartup.GetConnectionString(config, "Database")));
-
-#endif
-#if (implement_cosmos)
-            // Register the DocumentDb/CosmosDb client.
-            AppNameCosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new AppNameCosmosDb(new CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
-
-#endif
-            // Register the ReferenceData provider.
-            Beef.RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
         }
 
         /// <summary>
@@ -73,7 +53,49 @@ namespace Company.AppName.Api
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add services; note Beef requires NewtonsoftJson.
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            // Add the core beef services.
+            services.AddBeefExecutionContext()
+                    .AddBeefRequestCache()
+                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                    .AddBeefWebApiServices()
+                    .AddBeefBusinessServices();
+
+#if (implement_database || implement_entityframework)
+            // Add the beef database services (scoped per request/connection).
+            services.AddBeefDatabaseServices(() => new AppNameDb(WebApiStartup.GetConnectionString(_config, "Database")));
+
+#endif
+#if (implement_entityframework)
+            // Add the beef entity framework services (scoped per request/connection).
+            services.AddBeefEntityFrameworkServices<AppNameEfDbContext, AppNameEfDb>();
+
+#endif
+#if (implement_cosmos)
+            // Add the beef cosmos services (singleton).
+            services.AddBeefCosmosDbServices<AppNameCosmosDb>(_config.GetSection("CosmosDb"));
+
+#endif
+            // Add the generated reference data services.
+            services.AddGeneratedReferenceDataManagerServices()
+                    .AddGeneratedReferenceDataDataSvcServices()
+                    .AddGeneratedReferenceDataDataServices();
+
+            // Add the generated entity services.
+            services.AddGeneratedManagerServices()
+                    .AddGeneratedDataSvcServices()
+                    .AddGeneratedDataServices();
+
+            // Add event publishing services.
+            var ehcs = _config.GetValue<string>("EventHubConnectionString");
+            if (!string.IsNullOrEmpty(ehcs))
+                services.AddBeefEventHubEventPublisher(ehcs);
+            else
+                services.AddBeefNullEventPublisher();
+
+            // Add additional services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddHealthChecks();
             services.AddHttpClient();
@@ -95,29 +117,21 @@ namespace Company.AppName.Api
         /// The configure method called by the runtime; use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="clientFactory">The <see cref="IHttpClientFactory"/>.</param>
-        public void Configure(IApplicationBuilder app, IHttpClientFactory clientFactory)
+        /// <param name="logger">The <see cref="ILogger{WebApiExceptionHandlerMiddleware}"/>.</param>
+        public void Configure(IApplicationBuilder app, ILogger<WebApiExceptionHandlerMiddleware> logger)
         {
-            // Register the ServiceAgent HttpClientCreate (for cross-domain calls) so it uses the factory.
-            WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
-            {
-                var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
-                hc.BaseAddress = rd.BaseAddress;
-                return hc;
-            });
-
             // Add exception handling to the pipeline.
-            app.UseWebApiExceptionHandler();
+            app.UseWebApiExceptionHandler(logger, _config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Add Swagger as a JSON endpoint and to serve the swagger-ui to the pipeline.
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Company.AppName"));
 
-            // Add health checks page to the pipeline.
-            app.UseHealthChecks("/health");
-
             // Add execution context set up to the pipeline.
             app.UseExecutionContext();
+
+            // Add health checks.
+            app.UseHealthChecks("/health");
 
             // Use controllers.
             app.UseRouting();

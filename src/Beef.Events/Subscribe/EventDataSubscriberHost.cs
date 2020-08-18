@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -13,24 +14,10 @@ namespace Beef.Events.Subscribe
     public class EventDataSubscriberHost : EventSubscriberHost
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="args"/>.
-        /// </summary>
-        /// <param name="args">The optional <see cref="EventSubscriberHostArgs"/>.</param>
-        /// <returns>The <see cref="EventDataSubscriberHost"/>.</returns>
-        public static EventDataSubscriberHost Create(EventSubscriberHostArgs args) => new EventDataSubscriberHost(args);
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="EventDataSubscriberHost"/> using the specified <paramref name="logger"/>.
-        /// </summary>
-        /// <param name="logger">The <see cref="ILogger"/>.</param>
-        /// <returns>The <see cref="EventHubSubscriberHost"/>.</returns>
-        public static EventDataSubscriberHost Create(ILogger logger) => new EventDataSubscriberHost(new EventSubscriberHostArgs(logger, Assembly.GetCallingAssembly()));
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="EventDataSubscriberHost"/>.
         /// </summary>
         /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
-        private EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
+        public EventDataSubscriberHost(EventSubscriberHostArgs args) : base(args) { }
 
         /// <summary>
         /// Indicates that multiple messages (<see cref="EventData"/>) can be processed.

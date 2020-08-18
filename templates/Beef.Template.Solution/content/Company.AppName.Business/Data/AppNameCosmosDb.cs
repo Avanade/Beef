@@ -4,9 +4,9 @@ using Microsoft.Azure.Cosmos;
 namespace Company.AppName.Business.Data
 {
     /// <summary>
-    /// Represents the <b>Test</b> DocumentDb/CosmosDb client.
+    /// Represents the <b>Company.AppName</b> DocumentDb/CosmosDb client.
     /// </summary>
-    public class AppNameCosmosDb : CosmosDb<AppNameCosmosDb>
+    public class AppNameCosmosDb : CosmosDbBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AppNameCosmosDb"/> class.

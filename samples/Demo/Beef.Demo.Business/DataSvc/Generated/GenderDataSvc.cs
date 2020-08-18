@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
@@ -21,34 +23,41 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Gender data repository services.
     /// </summary>
-    public static partial class GenderDataSvc
+    public partial class GenderDataSvc : IGenderDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IGenderData _data;
+        private readonly IEventPublisher _evtPub;
+        private readonly IRequestCache _cache;
 
-        private static readonly Func<Gender?, Guid, Task>? _getOnAfterAsync;
-        private static readonly Func<Gender, Task>? _createOnAfterAsync;
-        private static readonly Func<Gender, Task>? _updateOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenderDataSvc"/> class.
+        /// </summary>
+        /// <param name="data">The <see cref="IGenderData"/>.</param>
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public GenderDataSvc(IGenderData data, IEventPublisher evtPub, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); GenderDataSvcCtor(); }
 
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void GenderDataSvcCtor();
 
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Gender?> GetAsync(Guid id)
+        public Task<Gender?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Gender>(__key, out Gender __val))
+                if (_cache.TryGetValue(__key, out Gender __val))
                     return __val;
 
-                var __result = await Factory.Create<IGenderData>().GetAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
@@ -58,14 +67,13 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
-        public static Task<Gender> CreateAsync(Gender value)
+        public Task<Gender> CreateAsync(Gender value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
-                var __result = await Factory.Create<IGenderData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
+                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
         }
@@ -75,19 +83,18 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Gender"/> object.</param>
         /// <returns>A refreshed <see cref="Gender"/> object.</returns>
-        public static Task<Gender> UpdateAsync(Gender value)
+        public Task<Gender> UpdateAsync(Gender value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
             {
-                var __result = await Factory.Create<IGenderData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
+                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

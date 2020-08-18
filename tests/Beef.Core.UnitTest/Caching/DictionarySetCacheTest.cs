@@ -2,6 +2,8 @@
 
 using Beef.Caching;
 using Beef.Caching.Policy;
+using Beef.Test.NUnit;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -32,7 +34,7 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void PolicyManager()
         {
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
 
             var dsc = new DictionarySetCache<int, string>((data) => new KeyValuePair<int, string>[] { new KeyValuePair<int, string>(1, "1"), new KeyValuePair<int, string>(2, "2") });
             Assert.IsNotNull(dsc.PolicyKey);
@@ -44,16 +46,16 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(2, dsc.Count);
 
             var policy = new DailyCachePolicy();
-            CachePolicyManager.Set(dsc.PolicyKey, policy);
+            CachePolicyManager.Current.Set(dsc.PolicyKey, policy);
 
             var policy2 = dsc.GetPolicy();
             Assert.IsNotNull(policy2);
             Assert.AreSame(policy, policy2);
 
-            var pa = CachePolicyManager.GetPolicies();
+            var pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(1, pa.Length);
 
-            CachePolicyManager.ForceFlush();
+            CachePolicyManager.Current.ForceFlush();
             Assert.AreEqual(0, dsc.Count);
 
             Assert.IsTrue(dsc.ContainsKey(1));
@@ -65,12 +67,12 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void Flush()
         {
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
 
             using (var dsc = new DictionarySetCache<int, string>((data) => new KeyValuePair<int, string>[] { new KeyValuePair<int, string>(1, "1"), new KeyValuePair<int, string>(2, "2") }))
             {
                 var policy = new DailyCachePolicy();
-                CachePolicyManager.Set(dsc.PolicyKey, policy);
+                CachePolicyManager.Current.Set(dsc.PolicyKey, policy);
 
                 Assert.IsTrue(dsc.ContainsKey(1));
                 Assert.IsTrue(dsc.ContainsKey(2));

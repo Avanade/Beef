@@ -11,9 +11,9 @@ namespace Beef.RefData
     public interface IReferenceDataProvider
     {
         /// <summary>
-        /// Gets the unique provider name.
+        /// Gets the provider <see cref="Type"/>.
         /// </summary>
-        string ProviderName { get; }
+        Type ProviderType { get; }
 
 #pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design.
         /// <summary>
@@ -23,12 +23,6 @@ namespace Beef.RefData
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
         IReferenceDataCollection this[Type type] { get; }
 #pragma warning restore CA1043 
-
-        /// <summary>
-        /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
-        /// </summary>
-        /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        Type[] GetAllTypes();
 
         /// <summary>
         /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. 

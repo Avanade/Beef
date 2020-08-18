@@ -17,7 +17,7 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountData"/> class setting the required internal configurations.
         /// </summary>
-        public AccountData()
+        partial void AccountDataCtor()
         {
             _getAccountsOnQuery = GetAccountsOnQuery;   // Wire up the plug-in to enable filtering. 
         }
@@ -31,7 +31,7 @@ namespace Cdr.Banking.Business.Data
                 return query;
 
             // Where an argument value has been specified then add as a filter - the WhereWhen and WhereWith are enabled by Beef.
-            var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args!.OpenStatus!.Code);
+            var q = query.WhereWhen(!(args.OpenStatus == null) && args.OpenStatus != OpenStatus.All, x => x.OpenStatus == args.OpenStatus!.Code);
             q = q.WhereWith(args?.ProductCategory, x => x.ProductCategory == args!.ProductCategory!.Code);
 
             // With checking IsOwned a simple false check cannot be performed with Cosmos; assume "not IsDefined" is equivalent to false also. 
@@ -51,7 +51,7 @@ namespace Cdr.Banking.Business.Data
         {
             // Create an IQueryable for the 'Account' container, then select for the specified id just the balance property.
             var args = _accountMapper.CreateArgs("Account");
-            var val = (from a in CosmosDb.Default.Container(args).AsQueryable()
+            var val = (from a in _cosmos.Container(args).AsQueryable()
                         where a.Id == accountId
                         select new { a.Id, a.Balance }).SelectSingleOrDefault();
 

@@ -8,6 +8,7 @@
 using Beef.Demo.Business;
 using Beef.Grpc;
 using Grpc.Core;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using Beef.Demo.Common.Grpc;
@@ -20,6 +21,14 @@ namespace Beef.Demo.Api.Grpc
     /// </summary>
     public partial class RobotService : RobotGrpcService.RobotGrpcServiceBase
     {
+        private readonly IRobotManager _manager;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotService"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IRobotManager"/>.</param>
+        public RobotService(IRobotManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="Robot"/> entity that matches the selection criteria.
         /// </summary>
@@ -31,7 +40,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<Robot>(context, async () =>
             {
                 var __req = request ?? new RobotGetRequest();
-                var __result = await Factory.Create<IRobotManager>().GetAsync(Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
+                var __result = await _manager.GetAsync(Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
                 return Transformers.Robot.MapToDest(__result!)!;
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound).ExecuteAsync();
         }
@@ -47,7 +56,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<Robot>(context, async () =>
             {
                 var __req = request ?? new RobotCreateRequest();
-                var __result = await Factory.Create<IRobotManager>().CreateAsync(Transformers.Robot.MapToSrce(__req.Value)!);
+                var __result = await _manager.CreateAsync(Transformers.Robot.MapToSrce(__req.Value)!);
                 return Transformers.Robot.MapToDest(__result!)!;
             }, operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null).ExecuteAsync();
         }
@@ -63,7 +72,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<Robot>(context, async () =>
             {
                 var __req = request ?? new RobotUpdateRequest();
-                var __result = await Factory.Create<IRobotManager>().UpdateAsync(Transformers.Robot.MapToSrce(__req.Value)!, Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
+                var __result = await _manager.UpdateAsync(Transformers.Robot.MapToSrce(__req.Value)!, Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
                 return Transformers.Robot.MapToDest(__result!)!;
             }, operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null).ExecuteAsync();
         }
@@ -79,7 +88,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<Google.Protobuf.WellKnownTypes.Empty>(context, async () =>
             {
                 var __req = request ?? new RobotDeleteRequest();
-                await Factory.Create<IRobotManager>().DeleteAsync(Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
+                await _manager.DeleteAsync(Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
                 return new Google.Protobuf.WellKnownTypes.Empty();
             }, operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent, alternateStatusCode: null).ExecuteAsync();
         }
@@ -95,7 +104,7 @@ namespace Beef.Demo.Api.Grpc
             return new GrpcService<RobotCollectionResult>(context, async () =>
             {
                 var __req = request ?? new RobotGetByArgsRequest();
-                var __result = await Factory.Create<IRobotManager>().GetByArgsAsync(Transformers.RobotArgs.MapToSrce(__req.Args)!, __req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging));
+                var __result = await _manager.GetByArgsAsync(Transformers.RobotArgs.MapToSrce(__req.Args)!, __req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging));
                 return Transformers.RobotCollectionResult.MapToDest(__result!)!;
             }, operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent).ExecuteAsync();
         }

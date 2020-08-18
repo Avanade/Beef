@@ -9,12 +9,58 @@ using System.Linq;
 namespace Beef.Data.EntityFrameworkCore
 {
     /// <summary>
+    /// Provides the entity framework query capabilities.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TModel"></typeparam>
+    public interface IEfDbQuery<T, TModel> where T : class, new() where TModel : class
+    {
+        /// <summary>
+        /// Selects a single item.
+        /// </summary>
+        /// <returns>The single item.</returns>
+        T SelectSingle();
+
+        /// <summary>
+        /// Selects a single item or default.
+        /// </summary>
+        /// <returns>The single item or default.</returns>
+        T SelectSingleOrDefault();
+
+        /// <summary>
+        /// Selects first item.
+        /// </summary>
+        /// <returns>The first item.</returns>
+        T SelectFirst();
+
+        /// <summary>
+        /// Selects first item or default.
+        /// </summary>
+        /// <returns>The single item or default.</returns>
+        T SelectFirstOrDefault();
+
+        /// <summary>
+        /// Executes the query command creating a resultant collection.
+        /// </summary>
+        /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+        /// <returns>A resultant collection.</returns>
+        TColl SelectQuery<TColl>() where TColl : ICollection<T>, new();
+
+        /// <summary>
+        /// Executes a query adding to the passed collection.
+        /// </summary>
+        /// <typeparam name="TColl">The collection <see cref="Type"/>.</typeparam>
+        /// <param name="coll">The collection to add items to.</param>
+        void SelectQuery<TColl>(TColl coll) where TColl : ICollection<T>;
+    }
+
+    /// <summary>
     /// Encapsulates an Entity Framework query enabling all select-like capabilities.
     /// </summary>
     /// <typeparam name="T">The resultant <see cref="Type"/>.</typeparam>
     /// <typeparam name="TModel">The entity framework model <see cref="Type"/>.</typeparam>
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public class EfDbQuery<T, TModel, TDbContext> where T : class, new() where TModel : class, new() where TDbContext : DbContext, new()
+    public class EfDbQuery<T, TModel, TDbContext> : IEfDbQuery<T, TModel> where T : class, new() where TModel : class, new() where TDbContext : DbContext
     {
         private readonly EfDbBase<TDbContext> _db;
         private readonly Func<IQueryable<TModel>, IQueryable<TModel>>? _query;
@@ -42,10 +88,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private void ExecuteQuery(Action<IQueryable<TModel>> execute)
         {
-            EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
+            _db.Invoker.Invoke(this, () =>
             {
-                using var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs);
-                var dbSet = db.DbContext.Set<TModel>();
+                var dbSet = _db.DbContext.Set<TModel>();
                 execute((_query == null) ? dbSet : _query(dbSet));
             }, _db);
         }
@@ -55,10 +100,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// </summary>
         private TResult ExecuteQuery<TResult>(Func<IQueryable<TModel>, TResult> execute)
         {
-            return EfDbInvoker<TDbContext>.Default.Invoke(this, () =>
+            return _db.Invoker.Invoke(this, () =>
             {
-                using var db = new EfDbBase<TDbContext>.EfDbContextManager(QueryArgs);
-                var dbSet = db.DbContext.Set<TModel>();
+                var dbSet = _db.DbContext.Set<TModel>();
                 return execute((_query == null) ? dbSet : _query(dbSet));
             }, _db);
         }

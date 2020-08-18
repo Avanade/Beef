@@ -22,6 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Maturity Instructions entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class MaturityInstructions : ReferenceDataBaseGuid
     {
         #region Operator

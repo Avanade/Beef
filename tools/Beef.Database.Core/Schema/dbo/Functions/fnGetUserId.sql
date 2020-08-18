@@ -2,15 +2,15 @@
 
 CREATE FUNCTION [dbo].[fnGetUserId]
 (
-	@Override as uniqueidentifier = null
+	@Override as NVARCHAR(1024) = null
 )
-RETURNS uniqueidentifier
+RETURNS NVARCHAR(1024)
 AS
 BEGIN
-	DECLARE @UserId uniqueidentifier
+	DECLARE @UserId NVARCHAR(1024)
     IF @Override IS NULL
 	BEGIN
-		SET @UserId = CONVERT(uniqueidentifier, SESSION_CONTEXT(N'UserId'));
+		SET @UserId = CONVERT(NVARCHAR(1024), SESSION_CONTEXT(N'UserId'));
 	END
 	ELSE
 	BEGIN

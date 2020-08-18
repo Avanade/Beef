@@ -10,6 +10,7 @@ namespace Beef.Caching
     /// </summary>
     public abstract class CacheCoreBase : ICacheCore
     {
+        private CachePolicyManager? _cachePolicyManager;
         private readonly ICachePolicy? _policy;
         private bool _disposed;
 
@@ -37,8 +38,13 @@ namespace Beef.Caching
         protected CacheCoreBase(ICachePolicy policy)
         {
             _policy = policy ?? throw new ArgumentNullException(nameof(policy));
-            PolicyKey = $"{Guid.NewGuid().ToString()}__NOT_USED__";
+            PolicyKey = $"{Guid.NewGuid()}__NOT_USED__";
         }
+
+        /// <summary>
+        /// Gets the <see cref="Beef.Caching.Policy.CachePolicyManager"/>.
+        /// </summary>
+        protected CachePolicyManager CachePolicyManager => _cachePolicyManager ??= CachePolicyManager.Current;
 
         /// <summary>
         /// Gets the policy key used to determine the cache policy configuration (see <see cref="CachePolicyManager"/>).
@@ -120,14 +126,6 @@ namespace Beef.Caching
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Finalizer.
-        /// </summary>
-        ~CacheCoreBase()
-        {
-            Dispose(false);
         }
     }
 }

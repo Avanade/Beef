@@ -171,7 +171,7 @@ namespace Beef.RefData.Caching
         /// <returns><c>true</c> if the tenant exists; otherwise, <c>false</c>.</returns>
         public bool ContainsTenant(Guid tenantId)
         {
-            return (!_dict.TryGetValue(tenantId, out CacheValue<TColl> cv) || cv.Policy.HasExpired()) ? false : true;
+            return _dict.TryGetValue(tenantId, out CacheValue<TColl> cv) && !cv.Policy.HasExpired();
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Beef.RefData.Caching
             get
             {
                 var p = GetPolicyForTenant(GetTenantId());
-                return p == null ? true : p.IsExpired;
+                return p == null || p.IsExpired;
             }
         }
 

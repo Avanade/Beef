@@ -1,5 +1,6 @@
 ﻿using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
+using Beef.Demo.Functions;
 using Beef.Demo.Functions.Subscribers;
 using Beef.Events;
 using Beef.Events.Subscribe;
@@ -10,13 +11,14 @@ using System.Threading.Tasks;
 
 namespace Beef.Demo.Test
 {
-    [TestFixture()]
-    public class SubscribersTest
+    [TestFixture]
+    public class SubscribersTest : UsingAgentTesterServer<Api.Startup>
     {
         private readonly RobotTest _robotTest = new RobotTest();
+        private readonly EventSubscriberTester<Startup> _subscriberTester = EventSubscriberTester.Create<Startup>();
 
         [OneTimeSetUp]
-        public async Task OneTimeSetUp() => await _robotTest.OneTimeSetUp();
+        public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();
 
         [OneTimeTearDown]
         public async Task OneTimeTearDown() => await _robotTest.OneTimeTearDown();
@@ -24,47 +26,47 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A110_PowerSourceChangeSubscriber_NoUpdated()
         {
-            var r = AgentTester.Create<RobotAgent, Robot>()
+            var r = AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.Agent.GetAsync(1.ToGuid())).Value;
+                .Run(a => a.GetAsync(1.ToGuid())).Value;
 
-            EventSubscriberTester.Create<PowerSourceChangeSubscriber>()
+            _subscriberTester.Test<PowerSourceChangeSubscriber>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectNoEvents()
                 .Run(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
 
-            AgentTester.Create<RobotAgent, Robot>()
+            AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => r)
-                .Run(a => a.Agent.GetAsync(1.ToGuid()));
+                .Run(a => a.GetAsync(1.ToGuid()));
         }
 
         [Test, TestSetUp]
         public void A120_PowerSourceChangeSubscriber_Updated()
         {
-            var r = AgentTester.Create<RobotAgent, Robot>()
+            var r = AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.Agent.GetAsync(1.ToGuid())).Value;
+                .Run(a => a.GetAsync(1.ToGuid())).Value;
 
             r.PowerSourceSid = "N";
 
-            EventSubscriberTester.Create<PowerSourceChangeSubscriber>()
+            _subscriberTester.Test<PowerSourceChangeSubscriber>()
                 .ExpectResult(SubscriberStatus.Success)
                 .ExpectEvent($"Demo.Robot.{r.Id}", "Update")
                 .Run(EventData.CreateValueEvent(r.PowerSourceSid, $"Demo.Robot.{r.Id}", "PowerSourceChange", r.Id));
 
-            AgentTester.Create<RobotAgent, Robot>()
+            AgentTester.Test<RobotAgent, Robot>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectChangeLogUpdated("*")
                 .ExpectETag(r.ETag)
                 .ExpectValue(_ => r)
-                .Run(a => a.Agent.GetAsync(1.ToGuid()));
+                .Run(a => a.GetAsync(1.ToGuid()));
         }
 
         [Test, TestSetUp]
         public void A130_PowerSourceChangeSubscriber_NotFound()
         {
-            EventSubscriberTester.Create<PowerSourceChangeSubscriber>()
+            _subscriberTester.Test<PowerSourceChangeSubscriber>()
                 .ExpectResult(SubscriberStatus.DataNotFound)
                 .Run(EventData.CreateValueEvent("N", $"Demo.Robot.{404.ToGuid()}", "PowerSourceChange", 404.ToGuid()));
         }
@@ -72,7 +74,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A140_PowerSourceChangeSubscriber_InvalidData_Key()
         {
-            EventSubscriberTester.Create<PowerSourceChangeSubscriber>()
+            _subscriberTester.Test<PowerSourceChangeSubscriber>()
                 .ExpectResult(SubscriberStatus.InvalidData)
                 .Run(EventData.CreateValueEvent("N", $"Demo.Robot.Xyz", "PowerSourceChange", "Xyz"));
         }
@@ -80,7 +82,7 @@ namespace Beef.Demo.Test
         [Test, TestSetUp]
         public void A150_PowerSourceChangeSubscriber_InvalidData_Value()
         {
-            EventSubscriberTester.Create<PowerSourceChangeSubscriber>()
+            _subscriberTester.Test<PowerSourceChangeSubscriber>()
                 .ExpectResult(SubscriberStatus.InvalidData)
                 .Run(EventData.CreateValueEvent("!", $"Demo.Robot.{1.ToGuid()}", "PowerSourceChange", 1.ToGuid()));
         }

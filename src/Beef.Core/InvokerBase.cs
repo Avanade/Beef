@@ -10,18 +10,10 @@ namespace Beef
     /// <summary>
     /// Wraps an <b>Invoke</b> enabling standard functionality to be added to all invocations. 
     /// </summary>
-    /// <typeparam name="TInvoker">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
     /// <typeparam name="TParam">The optional parameter <see cref="Type"/> (for an <b>Invoke</b>).</typeparam>
     [DebuggerStepThrough()]
-    public abstract class InvokerBase<TInvoker, TParam> where TInvoker : InvokerBase<TInvoker, TParam>, new()
+    public abstract class InvokerBase<TParam> : Invoker
     {
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
-        /// <summary>
-        /// Gets or sets the default instance.
-        /// </summary>
-        public static InvokerBase<TInvoker, TParam> Default { get; set; } = new TInvoker();
-#pragma warning restore CA1000 
-
         #region NoResult
 
         /// <summary>

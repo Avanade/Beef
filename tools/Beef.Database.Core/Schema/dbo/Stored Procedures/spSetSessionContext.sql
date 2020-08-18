@@ -1,10 +1,10 @@
 ﻿-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 CREATE PROCEDURE [dbo].[spSetSessionContext]
-	@Timestamp as datetime = null,
-	@Username as nvarchar(1024) = null,
-	@TenantId as uniqueidentifier = null,
-	@UserId as uniqueidentifier = null
+	@Timestamp AS DATETIME = null,
+	@Username AS NVARCHAR(1024) = null,
+	@TenantId AS UNIQUEIDENTIFIER = null,
+	@UserId AS NVARCHAR(1024) = null
 AS
 BEGIN
 	IF @Timestamp IS NOT NULL

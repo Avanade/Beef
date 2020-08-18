@@ -1,78 +1,77 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Reflection;
-using Beef.AspNetCore.WebApi;
+﻿using Beef.AspNetCore.WebApi;
 using Beef.Caching.Policy;
+using Beef.Data.Cosmos;
+using Beef.Data.Database;
+using Beef.Data.EntityFrameworkCore;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
-using Beef.Diagnostics;
+using Beef.Demo.Business.DataSvc;
 using Beef.Entities;
+using Beef.Events;
+using Beef.Grpc;
 using Beef.Validation;
-using Beef.WebApi;
 using Microsoft.AspNetCore.Builder;
-using Cosmos = Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Beef.Events;
-using Beef.Events.Publish;
-using Microsoft.Azure.EventHubs;
 using Microsoft.OpenApi.Models;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace Beef.Demo.Api
 {
     public class Startup
     {
+        private readonly IConfiguration _config;
         private ILogger _logger;
 
         public Startup(IConfiguration config)
         {
+            _config = config;
+
             // Use JSON property names in validation.
             ValidationArgs.DefaultUseJsonNames = true;
 
-            // Load the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
-
-            // Register the ReferenceData provider.
-            RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
-
-            // Register the database.
-            Database.Register(() => new Database(WebApiStartup.GetConnectionString(config, "BeefDemo")));
-            Beef.Data.Database.DatabaseInvoker.Default = new Beef.Data.Database.SqlRetryDatabaseInvoker();
-
-            // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
-
-            // Register the test OData services.
-            TestOData.Register(() => new TestOData(new Uri(WebApiStartup.GetConnectionString(config, "TestOData"))));
-            TripOData.Register(() => new TripOData(new Uri(WebApiStartup.GetConnectionString(config, "TripOData"))));
-
             // Default the page size.
             PagingArgs.DefaultTake = config.GetValue<int>("BeefDefaultPageSize");
-
-            // Configure the Service Agents from the configuration and register.
-            var sac = config.GetSection("BeefServiceAgents").Get<WebApiServiceAgentConfig>();
-            sac?.RegisterAll();
-
-            // Set up the event publishing to event hubs.
-            if (config.GetValue<bool>("EventHubPublishing"))
-            {
-                var ehc = EventHubClient.CreateFromConnectionString(config.GetValue<string>("EventHubConnectionString"));
-                ehc.RetryPolicy = RetryPolicy.Default;
-                var ehp = new EventHubPublisher(ehc);
-                Event.Register((events) => ehp.Publish(events));
-            }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add the core beef services.
+            services.AddBeefExecutionContext()
+                    .AddBeefRequestCache()
+                    .AddBeefCachePolicyManager(_config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                    .AddBeefWebApiServices()
+                    .AddBeefGrpcServiceServices()
+                    .AddBeefBusinessServices();
+
+            // Add the data sources as singletons for dependency injection requirements.
+            services.AddBeefDatabaseServices(() => new Database(WebApiStartup.GetConnectionString(_config, "BeefDemo")))
+                    .AddBeefEntityFrameworkServices<EfDbContext, EfDb>()
+                    .AddBeefCosmosDbServices<CosmosDb>(_config.GetSection("CosmosDb"))
+                    .AddSingleton<ITestOData>(_ => new TestOData(new Uri(WebApiStartup.GetConnectionString(_config, "TestOData"))))
+                    .AddSingleton<ITripOData>(_ => new TripOData(new Uri(WebApiStartup.GetConnectionString(_config, "TripOData"))));
+
+            // Add the generated reference data services for dependency injection requirements.
+            services.AddGeneratedReferenceDataManagerServices()
+                    .AddGeneratedReferenceDataDataSvcServices()
+                    .AddGeneratedReferenceDataDataServices();
+
+            // Add the generated entity services for dependency injection requirements.
+            services.AddGeneratedManagerServices()
+                    .AddGeneratedDataSvcServices()
+                    .AddGeneratedDataServices();
+
+            // Add event publishing.
+            var ehcs = _config.GetValue<string>("EventHubConnectionString");
+            if (!string.IsNullOrEmpty(ehcs))
+                services.AddBeefEventHubEventPublisher(ehcs);
+            else
+                services.AddBeefNullEventPublisher();
+
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddGrpc();
@@ -93,23 +92,13 @@ namespace Beef.Demo.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IConfiguration config, ILoggerFactory loggerFactory, IHttpClientFactory clientFactory)
+        public void Configure(IApplicationBuilder app, IConfiguration config, ILogger<WebApiExceptionHandlerMiddleware> logger)
         {
             // Configure the logger.
-            _logger = loggerFactory.CreateLogger("Logging");
-            Logger.RegisterGlobal((largs) => WebApiStartup.BindLogger(_logger, largs));
-
-            // Register the HttpClientCreate so it uses the factory.
-            WebApiServiceAgentManager.RegisterHttpClientCreate((rd) =>
-            {
-                var hc = clientFactory.CreateClient(rd.BaseAddress.AbsoluteUri);
-                hc.BaseAddress = rd.BaseAddress;
-                return hc;
-            });
+            _logger = Check.NotNull(logger, nameof(logger));
 
             // Override the exception handling.
-            WebApiExceptionHandlerMiddleware.IncludeUnhandledExceptionInResponse = config.GetValue<bool>("BeefIncludeExceptionInInternalServerError");
-            app.UseWebApiExceptionHandler();
+            app.UseWebApiExceptionHandler(_logger, config.GetValue<bool>("BeefIncludeExceptionInInternalServerError"));
 
             // Set up the health checks.
             app.UseHealthChecks("/health");

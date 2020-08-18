@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Beef;
 using Beef.Business;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
@@ -24,6 +25,28 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
+        private readonly IDatabase _db;
+        private readonly IEfDb _ef;
+        private readonly ICosmosDb _cosmos;
+
+        /// <summary>
+        /// Parameterless constructor is explictly not supported.
+        /// </summary>
+        private ReferenceDataData() => throw new NotSupportedException();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
+        /// </summary>
+        /// <param name="db">The <see cref="IDatabase"/>.</param>
+        /// <param name="ef">The <see cref="IEfDb"/>.</param>
+        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
+        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); ReferenceDataDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ReferenceDataDataCtor();
+
         /// <summary>
         /// Gets all the <see cref="RefDataNamespace.Country"/> objects.
         /// </summary>
@@ -31,10 +54,10 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.CountryCollection> CountryGetAllAsync()
         {
             var __coll = new RefDataNamespace.CountryCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => 
+            await DataInvoker.Current.InvokeAsync(this, async () => 
             {
-                await Database.Default.GetRefDataAsync<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(__coll, "[Ref].[spCountryGetAll]", "CountryId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+                await _db.GetRefDataAsync<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(__coll, "[Ref].[spCountryGetAll]", "CountryId");
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -46,10 +69,10 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
         {
             var __coll = new RefDataNamespace.USStateCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => 
+            await DataInvoker.Current.InvokeAsync(this, async () => 
             {
-                await Database.Default.GetRefDataAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(__coll, "[Ref].[spUSStateGetAll]", "USStateId");
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+                await _db.GetRefDataAsync<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(__coll, "[Ref].[spUSStateGetAll]", "USStateId");
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -61,14 +84,14 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
         {
             var __coll = new RefDataNamespace.GenderCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => 
+            await DataInvoker.Current.InvokeAsync(this, async () => 
             {
-                await Database.Default.GetRefDataAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
+                await _db.GetRefDataAsync<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(__coll, "[Ref].[spGenderGetAll]", "GenderId", additionalProperties: (dr, item, fields) =>
                 {
                     item.AlternateName = dr.GetValue<string>("AlternateName");
                     item.TripCode = dr.GetValue<string>("TripCode");
                 });
-            }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
 
             return __coll;
         }
@@ -80,7 +103,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { EfDb.Default.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(EyeColorMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
             return __coll;
         }
 
@@ -91,7 +114,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => { CosmosDb.Default.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => { _cosmos.ValueQuery(PowerSourceMapper.CreateArgs("RefData")).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }).ConfigureAwait(false);
             return __coll;
         }
 
@@ -102,7 +125,7 @@ namespace Beef.Demo.Business.Data
         public async Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
         {
             var __coll = new RefDataNamespace.CompanyCollection();
-            await DataInvoker.Default.InvokeAsync(this, async () => await CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false), BusinessInvokerArgs.RequiresNewAndTransactionSuppress).ConfigureAwait(false);
+            await DataInvoker.Current.InvokeAsync(this, async () => await CompanyGetAll_OnImplementation(__coll).ConfigureAwait(false)).ConfigureAwait(false);
             return __coll;
         }
 

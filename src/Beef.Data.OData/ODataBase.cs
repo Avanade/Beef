@@ -9,69 +9,9 @@ using Soc = Simple.OData.Client;
 namespace Beef.Data.OData
 {
     /// <summary>
-    /// Extends <see cref="ODataBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities for <b>OData</b>.
-    /// </summary>
-    /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
-#pragma warning disable CA1724 // Namespace conflict; by-design, is a generic so will not clash.
-    public abstract class OData<TDefault> : ODataBase where TDefault : OData<TDefault>
-#pragma warning restore CA1724
-    {
-        private static readonly object _lock = new object();
-        private static TDefault? _default;
-        private static Func<TDefault>? _create;
-
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
-        /// <summary>
-        /// Registers the <see cref="Default"/> <see cref="ODataBase"/> instance.
-        /// </summary>
-        /// <param name="create">Function to create the <see cref="Default"/> instance.</param>
-        public static void Register(Func<TDefault> create)
-        {
-            lock (_lock)
-            {
-                if (_default != null)
-                    throw new InvalidOperationException("The Register method can only be invoked once.");
-
-                _create = create ?? throw new ArgumentNullException(nameof(create));
-            }
-        }
-
-        /// <summary>
-        /// Gets the current default <see cref="ODataBase"/> instance.
-        /// </summary>
-        public static TDefault Default
-        {
-            get
-            {
-                if (_default != null)
-                    return _default;
-
-                lock (_lock)
-                {
-                    if (_default != null)
-                        return _default;
-
-                    if (_create == null)
-                        throw new InvalidOperationException("The Register method must be invoked before this property can be accessed.");
-
-                    _default = _create() ?? throw new InvalidOperationException("The registered create function must create a default instance.");
-                    return _default;
-                }
-            }
-        }
-#pragma warning restore CA1000
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OData{TDefault}"/> class.
-        /// </summary>
-        /// <param name="baseUri">The base <see cref="Uri"/> for the OData endpoint.</param>
-        protected OData(Uri baseUri) : base(baseUri) { }
-    }
-
-    /// <summary>
     /// Represents the base class for <b>OData</b> access; being a lightweight direct <b>OData</b> access layer.
     /// </summary>
-    public abstract class ODataBase
+    public abstract class ODataBase : IOData
     {
         #region static
 
@@ -91,19 +31,22 @@ namespace Beef.Data.OData
         /// Initializes a new instance of the <see cref="ODataBase"/> class with a <paramref name="baseUri"/> automatically creating the <see cref="ClientSettings"/>.
         /// </summary>
         /// <param name="baseUri">The base <see cref="Uri"/> for the OData endpoint.</param>
-        protected ODataBase(Uri baseUri) : this(new Soc.ODataClientSettings(Check.NotNull(baseUri, nameof(baseUri)))) { }
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ODataInvoker"/>.</param>
+        protected ODataBase(Uri baseUri, ODataInvoker? invoker = null) : this(new Soc.ODataClientSettings(Check.NotNull(baseUri, nameof(baseUri))), invoker) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataBase"/> class with a <paramref name="clientSettings"/>.
         /// </summary>
         /// <param name="clientSettings">The <see cref="Soc.ODataClientSettings"/>.</param>
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="ODataInvoker"/>.</param>
         /// <remarks><i>Note:</i> Overrides the <see cref="Soc.ODataClientSettings.IgnoreResourceNotFoundException"/> to <c>true</c> by design.</remarks>
-        protected ODataBase(Soc.ODataClientSettings clientSettings)
+        protected ODataBase(Soc.ODataClientSettings clientSettings, ODataInvoker? invoker = null)
         {
             ClientSettings = Check.NotNull(clientSettings, nameof(clientSettings));
             ClientSettings.IgnoreResourceNotFoundException = true;
             ClientSettings.PreferredUpdateMethod = Soc.ODataUpdateMethod.Patch;
             Client = new Soc.ODataClient(ClientSettings);
+            Invoker = invoker ?? new ODataInvoker();
         }
 
         /// <summary>
@@ -115,6 +58,11 @@ namespace Beef.Data.OData
         /// Gets the <see cref="Soc.ODataClientSettings"/>.
         /// </summary>
         public Soc.ODataClientSettings ClientSettings { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ODataInvoker"/>.
+        /// </summary>
+        public ODataInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ODataException"/> handler (by default set up to execute <see cref="ThrowTransformedODataException(Soc.WebRequestException)"/>).
@@ -154,7 +102,7 @@ namespace Beef.Data.OData
 
             var okeys = getArgs.GetODataKeys(keys);
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -189,7 +137,7 @@ namespace Beef.Data.OData
 
             // Note: ChangeLog is not updated (if it exists) as it is assumed the OData data source is responsible for this.
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
                 var created = await Client.For<TModel>(saveArgs.CollectionName).Set(model).InsertEntryAsync(true).ConfigureAwait(false);
@@ -215,7 +163,7 @@ namespace Beef.Data.OData
 
             // Note: ChangeLog is not updated (if it exists) as it is assumed the OData data source is responsible for this.
 
-            return await ODataInvoker.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(value);
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
@@ -240,7 +188,7 @@ namespace Beef.Data.OData
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
 
-            await ODataInvoker.Default.InvokeAsync(this, async () =>
+            await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(keys);
                 try

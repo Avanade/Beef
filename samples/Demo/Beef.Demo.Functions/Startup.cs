@@ -1,37 +1,51 @@
 ﻿using Beef.Caching.Policy;
 using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
-using Beef.Events.WebJobs;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Hosting;
+using Beef.Demo.Business.DataSvc;
+using Beef.Events;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Cosmos = Microsoft.Azure.Cosmos;
 
-[assembly: WebJobsStartup(typeof(Beef.Demo.Functions.Startup))]
+[assembly: FunctionsStartup(typeof(Beef.Demo.Functions.Startup))]
 
 namespace Beef.Demo.Functions
 {
-    public class Startup : IWebJobsStartup
+    public class Startup : FunctionsStartup
     {
-        public void Configure(IWebJobsBuilder builder)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
-            var config = builder.GetConfiguration<Startup>(environmentVariablePrefix: "Beef_");
+            var config = builder.GetBeefConfiguration<Startup>("Beef_");
 
-            // Load the cache policies.
-            CachePolicyManager.SetFromCachePolicyConfig(config.GetSection("BeefCaching").Get<CachePolicyConfig>());
-            CachePolicyManager.StartFlushTimer(CachePolicyManager.TenMinutes, CachePolicyManager.FiveMinutes);
+            // Add the core beef services.
+            builder.Services.AddBeefExecutionContext()
+                            .AddBeefRequestCache()
+                            .AddBeefCachePolicyManager(config.GetSection("BeefCaching").Get<CachePolicyConfig>())
+                            .AddBeefBusinessServices();
 
-            // Register the ReferenceData provider.
-            RefData.ReferenceDataManager.Register(new ReferenceDataProvider());
+            // Add event subscriber host and auto-discovered subscribers.
+            builder.Services.AddBeefEventHubSubscriberHost<Startup>();
 
-            // Register the database.
-            Database.Register(() => new Database(config.GetConnectionString("BeefDemo")));
+            // Add the data sources as singletons for dependency injection requirements.
+            var ccs = config.GetSection("CosmosDb");
+            builder.Services.AddScoped<Data.Database.IDatabase>(_ => new Database(config.GetConnectionString("BeefDemo")))
+                            .AddDbContext<EfDbContext>()
+                            .AddScoped<Data.EntityFrameworkCore.IEfDb, EfDb>()
+                            .AddSingleton<Data.Cosmos.ICosmosDb>(_ => new CosmosDb(new Cosmos.CosmosClient(ccs.GetValue<string>("EndPoint"), ccs.GetValue<string>("AuthKey")), ccs.GetValue<string>("Database")));
 
-            // Register the DocumentDb/CosmosDb client.
-            CosmosDb.Register(() =>
-            {
-                var cs = config.GetSection("CosmosDb");
-                return new CosmosDb(new Microsoft.Azure.Cosmos.CosmosClient(cs.GetValue<string>("EndPoint"), cs.GetValue<string>("AuthKey")), cs.GetValue<string>("Database"));
-            });
+            // Add the generated reference data services for dependency injection requirements.
+            builder.Services.AddGeneratedReferenceDataManagerServices()
+                            .AddGeneratedReferenceDataDataSvcServices()
+                            .AddGeneratedReferenceDataDataServices();
+
+            // Add the generated entity services for dependency injection requirements.
+            builder.Services.AddGeneratedManagerServices()
+                            .AddGeneratedDataSvcServices()
+                            .AddGeneratedDataServices();
+
+            // Add event publishing.
+            builder.Services.AddBeefEventHubEventPublisher(config.GetValue<string>("EventHubConnectionString"));
         }
     }
 }

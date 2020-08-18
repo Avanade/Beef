@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.4
 - *Enhancement:* All references to `DateTime.Now` have been updated to `Cleaner.Clean(DateTime.Now)`.
 

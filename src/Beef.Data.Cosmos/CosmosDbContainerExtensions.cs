@@ -135,21 +135,19 @@ namespace Beef.Data.Cosmos
         /// Imports a batch (creates) of <see cref="CosmosDbValue{TModel}"/> <b>reference data</b> items specified within a <b>YAML</b> resource (see <see cref="Beef.Yaml.YamlConverter"/>) into the <see cref="Container"/>.
         /// </summary>
         /// <typeparam name="TResource">The <see cref="Type"/> to infer the <see cref="Assembly"/> to find manifest resources (see <see cref="Assembly.GetManifestResourceStream(string)"/>).</typeparam>
+        /// <typeparam name="TRefData">The <see cref="IReferenceDataProvider"/> concrete <see cref="Type"/> (requires static <c>GetAllTypes</c> method).</typeparam>
         /// <param name="container">The <see cref="Container"/>.</param>
-        /// <param name="refData">The <see cref="IReferenceDataProvider"/> to infer the underlying reference data types.</param>
         /// <param name="yamlResourceName">The YAML resource name (must reside in <c>Cosmos</c> folder within the <typeparamref name="TResource"/> <see cref="Assembly"/>).</param>
         /// <param name="partitionKey">The optional partition key; where not specified <see cref="PartitionKey.None"/> is used.</param>
         /// <param name="itemRequestOptions">The optional <see cref="ItemRequestOptions"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         /// <remarks>Each item is added individually and is not transactional. Also, the data is created using a <see cref="CosmosDbValue{ReferenceDataBase}"/> so that multiple reference data types
         /// can co-exist within the same collection.</remarks>
-        public static async Task ImportValueRefDataBatchAsync<TResource>(this Container container, IReferenceDataProvider refData, string yamlResourceName, Func<ReferenceDataBase, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null)
+        public static async Task ImportValueRefDataBatchAsync<TResource, TRefData>(this Container container, string yamlResourceName, Func<ReferenceDataBase, PartitionKey?>? partitionKey = null, ItemRequestOptions? itemRequestOptions = null)
+            where TRefData : class, IReferenceDataProvider
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
-
-            if (refData == null)
-                throw new ArgumentNullException(nameof(refData));
 
             if (string.IsNullOrEmpty(yamlResourceName))
                 throw new ArgumentNullException(nameof(yamlResourceName));
@@ -161,7 +159,7 @@ namespace Beef.Data.Cosmos
             var emi = typeof(CosmosDbContainerExtensions)
                 .GetMethods().Where(x => x.Name == nameof(CosmosDbContainerExtensions.ImportValueBatchAsync) && x.GetGenericArguments().Length == 1).Single();
 
-            foreach (var rdt in refData.GetAllTypes())
+            foreach (var rdt in GetAllTypes<TRefData>())
             {
                 var vals = (System.Collections.IEnumerable?)yt.GetMethod("Convert")?.MakeGenericMethod(rdt).Invoke(yc, new object[] { rdt.Name, true, true, true, null! });
                 if (vals != null)
@@ -171,6 +169,18 @@ namespace Beef.Data.Cosmos
                         await ((Task)r).ConfigureAwait(false);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets all the types for the reference data interface.
+        /// </summary>
+        private static Type[] GetAllTypes<TRefData>() where TRefData : IReferenceDataProvider
+        {
+            var mi = typeof(TRefData).GetMethod("GetAllTypes", BindingFlags.Public | BindingFlags.Static);
+            if (mi == null)
+                throw new InvalidOperationException($"The {typeof(TRefData).Name} Type must have a static 'GetAllTypes' method.");
+
+            return (Type[])(mi.Invoke(null, null) ?? Array.Empty<Type>());
         }
     }
 }

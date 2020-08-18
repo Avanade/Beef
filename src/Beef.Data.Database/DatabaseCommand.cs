@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Beef.Mapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -343,7 +344,7 @@ namespace Beef.Data.Database
         {
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.InvokeAsync(this, async () =>
+            return Database.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -354,7 +355,10 @@ namespace Beef.Data.Database
                 {
                     // Close the connection where specified in behavior.
                     if (behavior == CommandBehavior.CloseConnection)
+                    {
+                        Database.Logger.LogInformation("Database connection is being closed (CommandBehavior.CloseConnection).");
                         DbCommand.Connection.Close();
+                    }
 
                     DbCommand.Dispose();
                 }
@@ -369,7 +373,7 @@ namespace Beef.Data.Database
             DbDataReader? dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            return DatabaseInvoker.Default.InvokeAsync(this, async () => 
+            return Database.Invoker.InvokeAsync(this, async () => 
             {
                 try
                 {
@@ -402,7 +406,7 @@ namespace Beef.Data.Database
             DbDataReader? dr = null;
             CommandBehavior behavior = CommandBehavior.Default;
 
-            await DatabaseInvoker.Default.InvokeAsync(this, async () =>
+            await Database.Invoker.InvokeAsync(this, async () =>
             {
                 try
                 {
@@ -420,7 +424,10 @@ namespace Beef.Data.Database
 
                     // Close the connection where specified in behavior.
                     if (behavior == CommandBehavior.CloseConnection)
+                    {
+                        Database.Logger.LogInformation("Database connection is being closed (CommandBehavior.CloseConnection).");
                         DbCommand.Connection.Close();
+                    }
 
                     DbCommand.Dispose();
                 }
@@ -435,11 +442,12 @@ namespace Beef.Data.Database
         {
             // Check if there is a connection and whether it is already open and set behavior accordingly.
             if (dbCommand.Connection == null)
-                dbCommand.Connection = Database.CreateConnection();
+                dbCommand.Connection = Database.GetConnection();
 
             // Where not open, we'll open and immediately close after the command has executed.
             if (dbCommand.Connection.State != ConnectionState.Open)
             {
+                Database.Logger.LogDebug("The Command Connection is not Open, is being opened and will be set to automatic CloseConnection. DatabaseId: {0}", Database.DatabaseId);
                 dbCommand.Connection.Open();
                 return CommandBehavior.CloseConnection;
             }

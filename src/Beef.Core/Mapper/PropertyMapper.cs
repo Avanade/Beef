@@ -331,10 +331,10 @@ namespace Beef.Mapper
                 if ((!SrceComplexTypeReflector!.IsCollection || SrceComplexTypeReflector.IsItemComplexType)
                     && (!DestComplexTypeReflector!.IsCollection || DestComplexTypeReflector.IsItemComplexType))
                 {
-                    var mapper = (IEntityMapperBase)typeof(EntityMapper<,>)
-                            .MakeGenericType(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
-                            .GetMethod("CreateAuto", BindingFlags.Public | BindingFlags.Static)
-                            .Invoke(null, new object[] { Array.Empty<string>() });
+                    var mapper = (IEntityMapperBase)typeof(EntityMapper)
+                        .GetMethod(nameof(EntityMapper.CreateAuto))
+                        .MakeGenericMethod(new Type[] { SrceUnderlyingPropertyType, DestUnderlyingPropertyType })
+                        .Invoke(null, new object[] { Array.Empty<string>() });
 
                     SetMapper(mapper);
                 }
@@ -381,7 +381,7 @@ namespace Beef.Mapper
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
         bool IPropertySrceMapper<TSrce>.MapSrceToDestWhen(TSrce entity)
         {
-            return (_mapSrceToDestWhen == null) ? true : _mapSrceToDestWhen.Invoke(entity);
+            return (_mapSrceToDestWhen == null) || _mapSrceToDestWhen.Invoke(entity);
         }
 
         /// <summary>
@@ -402,7 +402,7 @@ namespace Beef.Mapper
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
         public bool MapDestToSrceWhen(TDest entity)
         {
-            return (_mapDestToSrceWhen == null) ? true : _mapDestToSrceWhen.Invoke(entity);
+            return (_mapDestToSrceWhen == null) || _mapDestToSrceWhen.Invoke(entity);
         }
 
         /// <summary>

@@ -7,36 +7,74 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Entities;
 using Beef.Grpc;
+using Beef.WebApi;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Common.Grpc.ServiceAgents;
+using proto = Beef.Demo.Common.Grpc.Proto;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Grpc
 {
     /// <summary>
-    /// Provides the Robot gRPC agent.
+    /// Defines the Robot gRPC agent.
     /// </summary>
-    public partial class RobotAgent : GrpcAgentBase, IRobotServiceAgent
+    public partial interface IRobotAgent
+    {
+        /// <summary>
+        /// Gets the <see cref="Robot"/> object that matches the selection criteria.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
+        Task<GrpcAgentResult<Robot>> GetAsync(Guid id, GrpcRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Creates the <see cref="Robot"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Robot"/> object.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
+        Task<GrpcAgentResult<Robot>> CreateAsync(Robot value, GrpcRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Updates the <see cref="Robot"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Robot"/> object.</param>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
+        Task<GrpcAgentResult<Robot>> UpdateAsync(Robot value, Guid id, GrpcRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Deletes the <see cref="Robot"/> object that matches the selection criteria.
+        /// </summary>
+        /// <param name="id">The <see cref="Robot"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
+        Task<GrpcAgentResult> DeleteAsync(Guid id, GrpcRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
+        /// </summary>
+        /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
+        /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
+        Task<GrpcAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, GrpcRequestOptions? requestOptions = null);
+    }
+
+    /// <summary>
+    /// Provides the Robot gRPC service agent.
+    /// </summary>
+    public partial class RobotAgent : GrpcAgentBase<proto.RobotGrpcService.RobotGrpcServiceClient>, IRobotAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotAgent"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="GrpcServiceAgentBase{TClient}.BeforeRequest"/>).</param>
-        public RobotAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            RobotServiceAgent = Beef.Factory.Create<IRobotServiceAgent>(httpClient, beforeRequest);
-        }
-        
-        /// <summary>
-        /// Gets the underlyng <see cref="IRobotServiceAgent"/> instance.
-        /// </summary>
-        public IRobotServiceAgent RobotServiceAgent { get; private set; }
+        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
+        public RobotAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
@@ -45,7 +83,10 @@ namespace Beef.Demo.Common.Grpc
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
         public Task<GrpcAgentResult<Robot>> GetAsync(Guid id, GrpcRequestOptions? requestOptions = null)
-            => RobotServiceAgent.GetAsync(id, requestOptions);
+        {
+            var __req = new proto.RobotGetRequest { Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
+            return InvokeAsync((c, o) => c.GetAsync(__req, o), __req, Transformers.Robot, requestOptions);
+        }
 
         /// <summary>
         /// Creates the <see cref="Robot"/> object.
@@ -54,7 +95,10 @@ namespace Beef.Demo.Common.Grpc
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
         public Task<GrpcAgentResult<Robot>> CreateAsync(Robot value, GrpcRequestOptions? requestOptions = null)
-            => RobotServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
+        {
+            var __req = new proto.RobotCreateRequest { Value = Transformers.Robot.MapToDest(Check.NotNull(value, nameof(value))) };
+            return InvokeAsync((c, o) => c.CreateAsync(__req, o), __req, Transformers.Robot, requestOptions);
+        }
 
         /// <summary>
         /// Updates the <see cref="Robot"/> object.
@@ -64,7 +108,10 @@ namespace Beef.Demo.Common.Grpc
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
         public Task<GrpcAgentResult<Robot>> UpdateAsync(Robot value, Guid id, GrpcRequestOptions? requestOptions = null)
-            => RobotServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
+        {
+            var __req = new proto.RobotUpdateRequest { Value = Transformers.Robot.MapToDest(Check.NotNull(value, nameof(value))), Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
+            return InvokeAsync((c, o) => c.UpdateAsync(__req, o), __req, Transformers.Robot, requestOptions);
+        }
 
         /// <summary>
         /// Deletes the <see cref="Robot"/> object that matches the selection criteria.
@@ -73,7 +120,10 @@ namespace Beef.Demo.Common.Grpc
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
         public Task<GrpcAgentResult> DeleteAsync(Guid id, GrpcRequestOptions? requestOptions = null)
-            => RobotServiceAgent.DeleteAsync(id, requestOptions);
+        {
+            var __req = new proto.RobotDeleteRequest { Id = Transformers.GuidToStringConverter.ConvertToDest(id) };
+            return InvokeAsync((c, o) => c.DeleteAsync(__req, o), __req, requestOptions);
+        }
 
         /// <summary>
         /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
@@ -83,7 +133,10 @@ namespace Beef.Demo.Common.Grpc
         /// <param name="requestOptions">The optional <see cref="GrpcRequestOptions"/>.</param>
         /// <returns>A <see cref="GrpcAgentResult"/>.</returns>
         public Task<GrpcAgentResult<RobotCollectionResult>> GetByArgsAsync(RobotArgs? args, PagingArgs? paging = null, GrpcRequestOptions? requestOptions = null)
-            => RobotServiceAgent.GetByArgsAsync(args, paging, requestOptions);
+        {
+            var __req = new proto.RobotGetByArgsRequest { Args = Transformers.RobotArgs.MapToDest(args), Paging = Transformers.PagingArgsToPagingArgsConverter.ConvertToDest(paging!) };
+            return InvokeAsync((c, o) => c.GetByArgsAsync(__req, o), __req, Transformers.RobotCollectionResult, requestOptions);
+        }
     }
 }
 

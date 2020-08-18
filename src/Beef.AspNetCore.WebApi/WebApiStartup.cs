@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace Beef.AspNetCore.WebApi
@@ -20,17 +18,26 @@ namespace Beef.AspNetCore.WebApi
     public static class WebApiStartup
     {
         /// <summary>
-        /// Builds (creates) the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the <see cref="ConfigurationBuilder"/>.
+        /// Creates the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the standardized <see cref="ConfigurationBuilder"/>.
+        /// </summary>
+        /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
+        /// <param name="args">The command line args.</param>
+        /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with.</param>
+        /// <returns>The <see cref="IWebHost"/>.</returns>
+        public static IWebHostBuilder CreateWebHost<TStartup>(string[] args, string? environmentVariablePrefix = null) where TStartup : class =>
+            WebHost.CreateDefaultBuilder(args)
+                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, hostingContext.HostingEnvironment, environmentVariablePrefix))
+                   .UseStartup<TStartup>();
+
+        /// <summary>
+        /// Creates and builds the <see cref="IWebHost"/> using the <see cref="WebHost.CreateDefaultBuilder(string[])"/> utilizing the <see cref="ConfigurationBuilder"/>.
         /// </summary>
         /// <typeparam name="TStartup">The API startup <see cref="Type"/>.</typeparam>
         /// <param name="args">The command line args.</param>
         /// <param name="environmentVariablePrefix">The prefix that the environment variables must start with.</param>
         /// <returns>The <see cref="IWebHost"/>.</returns>
         public static IWebHost BuildWebHost<TStartup>(string[] args, string? environmentVariablePrefix = null) where TStartup : class =>
-            WebHost.CreateDefaultBuilder(args)
-                   .ConfigureAppConfiguration((hostingContext, config) => ConfigurationBuilder<TStartup>(config, hostingContext.HostingEnvironment, environmentVariablePrefix))
-                   .UseStartup<TStartup>()
-                   .Build();
+            CreateWebHost<TStartup>(args, environmentVariablePrefix).Build();
 
         /// <summary>
         /// Builds the configuration probing; will probe in the following order: 1) Azure Key Vault (see https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration),
@@ -71,47 +78,6 @@ namespace Beef.AspNetCore.WebApi
                 var kvc = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(astp.KeyVaultTokenCallback));
                 configurationBuilder.AddAzureKeyVault($"https://{kvn}.vault.azure.net/", kvc, new DefaultKeyVaultSecretManager());
 #pragma warning restore CA2000
-            }
-        }
-
-        /// <summary>
-        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.
-        /// </summary>
-        /// <param name="logger">The ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.</param>
-        /// <param name="args">The Beef <see cref="LoggerArgs"/>.</param>
-        /// <remarks>Redirects (binds) the Beef logger to the ASP.NET logger.</remarks>
-        public static void BindLogger(ILogger logger, LoggerArgs args)
-        {
-            Check.NotNull(logger, nameof(logger));
-            Check.NotNull(args, nameof(args));
-
-#pragma warning disable CA1062 // Validate arguments of public methods; see Check above.
-            switch (args.Type)
-#pragma warning restore CA1062 
-            {
-                case LogMessageType.Critical:
-                    logger.LogCritical(args.ToString());
-                    break;
-
-                case LogMessageType.Info:
-                    logger.LogInformation(args.ToString());
-                    break;
-
-                case LogMessageType.Warning:
-                    logger.LogWarning(args.ToString());
-                    break;
-
-                case LogMessageType.Error:
-                    logger.LogError(args.ToString());
-                    break;
-
-                case LogMessageType.Debug:
-                    logger.LogDebug(args.ToString());
-                    break;
-
-                case LogMessageType.Trace:
-                    logger.LogTrace(args.ToString());
-                    break;
             }
         }
 

@@ -22,6 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the US State entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class USState : ReferenceDataBaseGuid
     {
         #region Operator

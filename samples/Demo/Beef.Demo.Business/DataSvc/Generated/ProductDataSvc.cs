@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
@@ -21,33 +22,39 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Product data repository services.
     /// </summary>
-    public static partial class ProductDataSvc
+    public partial class ProductDataSvc : IProductDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IProductData _data;
+        private readonly IRequestCache _cache;
 
-        private static readonly Func<Product?, int, Task>? _getOnAfterAsync;
-        private static readonly Func<ProductCollectionResult, ProductArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductDataSvc"/> class.
+        /// </summary>
+        /// <param name="data">The <see cref="IProductData"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public ProductDataSvc(IProductData data, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ProductDataSvcCtor(); }
 
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ProductDataSvcCtor();
 
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Product?> GetAsync(int id)
+        public Task<Product?> GetAsync(int id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Product>(__key, out Product __val))
+                if (_cache.TryGetValue(__key, out Product __val))
                     return __val;
 
-                var __result = await Factory.Create<IProductData>().GetAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
@@ -58,17 +65,16 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
-        public static Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
+        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
             {
-                var __result = await Factory.Create<IProductData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
+                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

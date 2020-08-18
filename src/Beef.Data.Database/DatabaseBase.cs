@@ -4,6 +4,7 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.RefData;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,10 +16,13 @@ namespace Beef.Data.Database
     /// <summary>
     /// Represents the base class for encapsulating the database access layer using old skool ADO.NET - because sometimes it is all you need, and it is super efficient.
     /// </summary>
-    /// <remarks>Provides automatic database connection management by leveraging the <see cref="DataContextScope"/>.</remarks>
-    public abstract class DatabaseBase
+    /// <remarks>Provides automatic database connection management opening on first use and closing on <see cref="Dispose(bool)"/>.</remarks>
+    public abstract class DatabaseBase : IDatabase
     {
+        private readonly object _lock = new object();
         private DbConnection? _connection;
+        private bool _disposed;
+        private ILogger? _logger;
 
         /// <summary>
         /// Transforms and throws the <see cref="IBusinessException"/> equivalent for the <see cref="SqlException"/> known list.
@@ -45,7 +49,7 @@ namespace Beef.Data.Database
 
                 default:
                     if (AlwaysCheckSqlDuplicateErrorNumbers && SqlDuplicateErrorNumbers.Contains(sex.Number))
-                       throw new DuplicateException(null, sex);
+                        throw new DuplicateException(null, sex);
 
                     break;
             }
@@ -68,7 +72,7 @@ namespace Beef.Data.Database
         /// </summary>
         /// <remarks>See https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors 
         /// and https://docs.microsoft.com/en-us/azure/sql-database/sql-database-develop-error-messages </remarks>
-        public static List<int> SqlTransientErrorNumbers { get; } = new List<int>(new int[] 
+        public static List<int> SqlTransientErrorNumbers { get; } = new List<int>(new int[]
         {
             -1, -2, 701, 1204, 1205, 1222, 8645, 8651, 30053, // https://stackoverflow.com/questions/4821668/what-is-good-c-sharp-coding-style-for-catching-sqlexception-and-retrying
             10928, 10929, 10053, 10054, 10060, 40540, 40143, 233, 64, // https://github.com/Azure/elastic-db-tools/blob/master/Src/ElasticScale.Client/ElasticScale.Common/TransientFaultHandling/Implementation/SqlDatabaseTransientErrorDetectionStrategy.cs
@@ -81,10 +85,12 @@ namespace Beef.Data.Database
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider (e.g. Microsoft.Data.SqlClient); defaults to <see cref="SqlClientFactory"/>.</param>
-        protected DatabaseBase(string connectionString, DbProviderFactory? provider = null)
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="DatabaseInvoker"/>.</param>
+        protected DatabaseBase(string connectionString, DbProviderFactory? provider = null, DatabaseInvoker? invoker = null)
         {
             ConnectionString = !string.IsNullOrEmpty(connectionString) ? connectionString : throw new ArgumentNullException(nameof(connectionString));
             Provider = provider ?? SqlClientFactory.Instance;
+            Invoker = invoker ?? new DatabaseInvoker();
         }
 
         /// <summary>
@@ -96,6 +102,11 @@ namespace Beef.Data.Database
         /// Gets the <see cref="DbProviderFactory"/>.
         /// </summary>
         public DbProviderFactory Provider { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseInvoker"/>.
+        /// </summary>
+        public DatabaseInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DatabaseWildcard"/> to enable wildcard replacement.
@@ -114,56 +125,126 @@ namespace Beef.Data.Database
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
 
         /// <summary>
-        /// Sets up the <see cref="DatabaseBase"/> to always use the <paramref name="connection"/> bypassing the <see cref="DataContextScope"/>.
+        /// Gets or sets the stored procedure name used by <see cref="SetSqlSessionContext(DbConnection)"/>; defaults to '[dbo].[spSetSessionContext]'.
         /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> (where <c>null</c> it will create automatically bypassing the <see cref="DataContextScope"/>).</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        public DbConnection SetBypassDataContextScopeDbConnection(DbConnection? connection = null)
+        public string SessionContextStoredProcedure { get; set; } = "[dbo].[spSetSessionContext]";
+
+        /// <summary>
+        /// Gets the <see cref="ILogger"/>.
+        /// </summary>
+        internal ILogger Logger => _logger ??= Diagnostics.Logger.Create<DatabaseBase>();
+
+        /// <summary>
+        /// Gets the unique database instance identifier.
+        /// </summary>
+        public Guid DatabaseId { get; } = Guid.NewGuid();
+
+        /// <summary>
+        /// Sets the SQL session context using the specified values by invoking the <see cref="SessionContextStoredProcedure"/> using parameters named
+        /// <see cref="DatabaseColumns.SessionContextUsername"/> and <see cref="DatabaseColumns.SessionContextTimestamp"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="timestamp">The timestamp <see cref="DateTime"/> (where <c>null</c> the value will default to <see cref="DateTime.Now"/>).</param>
+        /// <param name="tenantId">The tenant identifer (where <c>null</c> the value will not be used).</param>
+        /// <param name="userId">The unique user identifier.</param>
+        public void SetSqlSessionContext(DbConnection dbConnection, string username, DateTime? timestamp, Guid? tenantId = null, string? userId = null)
         {
-            _connection = connection ?? CreateConnection(false);
-            return _connection;
+            if (dbConnection == null)
+                throw new ArgumentNullException(nameof(dbConnection));
+
+            if (string.IsNullOrEmpty(SessionContextStoredProcedure))
+                throw new InvalidOperationException("The SessionContextStoredProcedure property must have a value.");
+
+            var cmd = dbConnection.CreateCommand();
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities; by-design, is a stored procedure command type.
+            cmd.CommandText = SessionContextStoredProcedure;
+#pragma warning restore CA2100
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            var p = cmd.CreateParameter();
+            p.ParameterName = "@" + DatabaseColumns.SessionContextUsername;
+            p.Value = username;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = "@" + DatabaseColumns.SessionContextTimestamp;
+            p.Value = timestamp ?? Entities.Cleaner.Clean(DateTime.Now);
+            cmd.Parameters.Add(p);
+
+            if (tenantId.HasValue)
+            {
+                p = cmd.CreateParameter();
+                p.ParameterName = "@" + DatabaseColumns.SessionContextTenantId;
+                p.Value = tenantId.Value;
+                cmd.Parameters.Add(p);
+            }
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                p = cmd.CreateParameter();
+                p.ParameterName = "@" + DatabaseColumns.SessionContextUserId;
+                p.Value = userId;
+                cmd.Parameters.Add(p);
+            }
+
+            cmd.ExecuteNonQuery();
         }
 
         /// <summary>
-        /// Creates a <see cref="DbConnection"/>.
+        /// Sets the SQL session context using the <see cref="ExecutionContext"/> (invokes <see cref="SetSqlSessionContext(DbConnection, string, DateTime?, Guid?, string?)"/> using
+        /// <see cref="ExecutionContext.Username"/>, <see cref="ExecutionContext.Timestamp"/> and <see cref="ExecutionContext.TenantId"/>).
         /// </summary>
-        /// <param name="useDataContextScope">Indicates whether to use the <see cref="DataContextScope"/>; defaults to <c>true</c>.</param>
-        /// <returns>A <see cref="DbConnection"/>.</returns>
-        /// <remarks>Where <see cref="SetBypassDataContextScopeDbConnection"/> has been invoked this connection will always be returned; no new connection will be created.</remarks>
-        public DbConnection CreateConnection(bool useDataContextScope = true)
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        public void SetSqlSessionContext(DbConnection dbConnection)
+        {
+            var ec = ExecutionContext.Current ?? throw new InvalidOperationException("The ExecutionContext.Current must have an instance to SetSqlSessionContext.");
+            SetSqlSessionContext(dbConnection, ec.Username, ec.Timestamp, ec.TenantId, ec.UserId);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DbConnection"/> (automatically creates and opens on first access, then closes when disposed).
+        /// </summary>
+        /// <returns>The underlying <see cref="DbConnection"/>.</returns>
+        public DbConnection GetConnection()
         {
             if (_connection != null)
                 return _connection;
 
-            if (!useDataContextScope || DataContextScope.Current == null)
+            lock (_lock)
             {
+                if (_connection != null)
+                    return _connection;
+
+                Logger.LogDebug("Creating and opening the database connection. DatabaseId: {0}", DatabaseId);
                 DbConnection conn = Provider.CreateConnection();
                 conn.ConnectionString = ConnectionString;
-                return conn;
+                conn.Open();
+                OnConnectionOpen(conn);
+                return _connection = conn;
             }
-            else
-                return (DbConnection)DataContextScope.Current.GetContext(this.GetType());
         }
+
+        /// <summary>
+        /// Occurs when a connection is opened before any corresponding data access is performed.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <remarks>This is where the <see cref="SetSqlSessionContext(DbConnection)"/> should be invoked; nothing is performed by default.</remarks>
+        public virtual void OnConnectionOpen(DbConnection dbConnection) { }
 
         /// <summary>
         /// Creates a stored procedure <see cref="DatabaseCommand"/>.
         /// </summary>
         /// <param name="storedProcedure">The stored procedure name.</param>
         /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        public DatabaseCommand StoredProcedure(string storedProcedure)
-        {
-            return new DatabaseCommand(this, storedProcedure, CommandType.StoredProcedure);
-        }
+        public DatabaseCommand StoredProcedure(string storedProcedure) => new DatabaseCommand(this, storedProcedure, CommandType.StoredProcedure);
 
         /// <summary>
         /// Creates a SQL statement <see cref="DatabaseCommand"/>.
         /// </summary>
         /// <param name="sqlStatement">The SQL statement.</param>
         /// <returns>A <see cref="DatabaseCommand"/>.</returns>
-        public DatabaseCommand SqlStatement(string sqlStatement)
-        {
-            return new DatabaseCommand(this, sqlStatement, CommandType.Text);
-        }
+        public DatabaseCommand SqlStatement(string sqlStatement) => new DatabaseCommand(this, sqlStatement, CommandType.Text);
 
         /// <summary>
         /// Creates a <see cref="DatabaseQuery{T}"/> to enable select-like capabilities.
@@ -171,10 +252,7 @@ namespace Beef.Data.Database
         /// <param name="queryArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="queryParams">The query <see cref="DatabaseParameters"/> delegate.</param>
         /// <returns>A <see cref="DatabaseQuery{T}"/>.</returns>
-        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new()
-        {
-            return new DatabaseQuery<T>(this, queryArgs, queryParams);
-        }
+        public DatabaseQuery<T> Query<T>(DatabaseArgs<T> queryArgs, Action<DatabaseParameters>? queryParams = null) where T : class, new() => new DatabaseQuery<T>(this, queryArgs, queryParams);
 
         /// <summary>
         /// Gets the entity for the specified <paramref name="keys"/> mapping to <typeparamref name="T"/>.
@@ -209,7 +287,7 @@ namespace Beef.Data.Database
 
             var cmd = StoredProcedure(saveArgs.StoredProcedure);
             saveArgs.Mapper.GetKeyParams(cmd.Parameters, OperationTypes.Create, value);
-            cmd.Params<T>(value, saveArgs.Mapper.MapToDb, OperationTypes.Create);
+            cmd.Params(value, saveArgs.Mapper.MapToDb, OperationTypes.Create);
 
             if (saveArgs.Refresh)
             {
@@ -309,7 +387,7 @@ namespace Beef.Data.Database
                         Text = !fields.Contains(DatabaseRefDataColumns.TextColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.TextColumnName].Index),
                         Description = !fields.Contains(DatabaseRefDataColumns.DescriptionColumnName) ? null : dr.GetValue<string>(fields[DatabaseRefDataColumns.DescriptionColumnName].Index),
                         SortOrder = !fields.Contains(DatabaseRefDataColumns.SortOrderColumnName) ? 0 : dr.GetValue<int>(fields[DatabaseRefDataColumns.SortOrderColumnName].Index),
-                        IsActive = !fields.Contains(DatabaseRefDataColumns.IsActiveColumnName) ? true : dr.GetValue<bool>(fields[DatabaseRefDataColumns.IsActiveColumnName].Index),
+                        IsActive = !fields.Contains(DatabaseRefDataColumns.IsActiveColumnName) || dr.GetValue<bool>(fields[DatabaseRefDataColumns.IsActiveColumnName].Index),
                         StartDate = !fields.Contains(DatabaseRefDataColumns.StartDateColumnName) ? null : dr.GetValue<DateTime?>(fields[DatabaseRefDataColumns.StartDateColumnName].Index),
                         EndDate = !fields.Contains(DatabaseRefDataColumns.EndDateColumnName) ? null : dr.GetValue<DateTime?>(fields[DatabaseRefDataColumns.EndDateColumnName].Index),
                         ETag = !fields.Contains(DatabaseRefDataColumns.ETagColumnName) ? null : dr.GetRowVersion(fields[DatabaseRefDataColumns.ETagColumnName].Index)
@@ -337,6 +415,37 @@ namespace Beef.Data.Database
                 list.AddRange(additionalDatasetRecords);
 
             await StoredProcedure(storedProcedure).SelectQueryMultiSetAsync(list.ToArray()).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="DatabaseBase"/> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_connection != null)
+                    {
+                        Logger.LogDebug("Closing and disposing the database connection. DatabaseId: {0}", DatabaseId);
+                        _connection.Close();
+                        _connection.Dispose();
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Closes and disposes the <see cref="DatabaseBase"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

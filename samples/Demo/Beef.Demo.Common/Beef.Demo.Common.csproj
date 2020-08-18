@@ -16,14 +16,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Agents\Generated\" />
-    <Folder Include="Agents\ServiceAgents\Generated\" />
+    <Folder Include="Agents\" />
+    <Folder Include="Agents\Generated" />
+    <Folder Include="Entities\" />
     <Folder Include="Entities\Generated\" />
-    <Folder Include="Grpc\ServiceAgents\" />
+    <Folder Include="Grpc\" />
+    <Folder Include="Grpc\Generated" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Tools" Version="2.29.0">
+    <PackageReference Include="Grpc.Tools" Version="2.30.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

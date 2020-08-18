@@ -1,58 +1,51 @@
-﻿using Beef.Demo.Common.Agents;
+﻿using Beef.Demo.Api;
+using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
 using NUnit.Framework;
-using System;
 using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace Beef.Demo.Test
 {
-    [TestFixture, Parallelizable(ParallelScope.Children)]
-    public class ProductTest
+    [TestFixture]
+    public class ProductTest : UsingAgentTesterServer<Startup>
     {
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            TestSetUp.Reset(false);
-        }
-
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void B110_Get_NotFound()
         {
-            AgentTester.Create<PersonAgent, Person>()
+            AgentTester.Test<ProductAgent, Product>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
-                .Run((a) => a.Agent.GetAsync(404.ToGuid()));
+                .Run(a => a.GetAsync(404));
         }
 
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void B120_Get()
         {
-            AgentTester.Create<ProductAgent, Product>()
+            AgentTester.Test<ProductAgent, Product>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue((t) => new Product { Id = 1, Name = "Milk", Description = "Low fat milk" })
-                .Run((a) => a.Agent.GetAsync(1));
+                .Run(a => a.GetAsync(1));
         }
 
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void C110_GetByArgs_Null()
         {
-            var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
+            var pcr = AgentTester.Test<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetByArgsAsync(null));
+                .Run(a => a.GetByArgsAsync(null));
 
             // Check 11 are returned.
             Assert.AreEqual(11, pcr?.Value?.Result?.Count);
         }
 
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void C120_GetByArgs_Null_Paging()
         {
-            var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
+            var pcr = AgentTester.Test<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetByArgsAsync(null, Entities.PagingArgs.CreateSkipAndTake(4, 2, true)));
+                .Run(a => a.GetByArgsAsync(null, Entities.PagingArgs.CreateSkipAndTake(4, 2, true)));
 
             // Check paging and total count.
             Assert.AreEqual(2, pcr?.Value?.Result?.Count);
@@ -60,24 +53,24 @@ namespace Beef.Demo.Test
             Assert.AreEqual(11, pcr.Value.Paging.TotalCount);
         }
 
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void C130_GetByArgs_Wildcard1()
         {
-            var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
+            var pcr = AgentTester.Test<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetByArgsAsync(new ProductArgs { Name = "l*" }));
+                .Run(a => a.GetByArgsAsync(new ProductArgs { Name = "l*" }));
 
             // Check 2 are returned.
             Assert.AreEqual(2, pcr?.Value?.Result?.Count);
             Assert.AreEqual(new string[] { "LCD HDTV", "Lemonade" }, pcr.Value.Result.Select(x => x.Name).ToArray());
         }
 
-        [Test, Parallelizable, TestSetUp(needsSetUp: false)]
+        [Test, TestSetUp]
         public void C140_GetByArgs_Wildcard2()
         {
-            var pcr = AgentTester.Create<ProductAgent, ProductCollectionResult>()
+            var pcr = AgentTester.Test<ProductAgent, ProductCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetByArgsAsync(new ProductArgs { Name = "l*", Description = "*er" }));
+                .Run(a => a.GetByArgsAsync(new ProductArgs { Name = "l*", Description = "*er" }));
 
             // Check 1 is returned.
             Assert.AreEqual(1, pcr?.Value?.Result?.Count);

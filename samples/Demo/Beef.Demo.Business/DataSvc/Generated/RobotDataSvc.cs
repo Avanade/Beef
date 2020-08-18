@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
 
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
+using Beef.Caching;
 using Beef.Entities;
+using Beef.Events;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
@@ -21,36 +23,41 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the Robot data repository services.
     /// </summary>
-    public static partial class RobotDataSvc
+    public partial class RobotDataSvc : IRobotDataSvc
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IRobotData _data;
+        private readonly IEventPublisher _evtPub;
+        private readonly IRequestCache _cache;
 
-        private static readonly Func<Robot?, Guid, Task>? _getOnAfterAsync;
-        private static readonly Func<Robot, Task>? _createOnAfterAsync;
-        private static readonly Func<Robot, Task>? _updateOnAfterAsync;
-        private static readonly Func<Guid, Task>? _deleteOnAfterAsync;
-        private static readonly Func<RobotCollectionResult, RobotArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RobotDataSvc"/> class.
+        /// </summary>
+        /// <param name="data">The <see cref="IRobotData"/>.</param>
+        /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
+        /// <param name="cache">The <see cref="IRequestCache"/>.</param>
+        public RobotDataSvc(IRobotData data, IEventPublisher evtPub, IRequestCache cache)
+            { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); RobotDataSvcCtor(); }
 
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void RobotDataSvcCtor();
 
         /// <summary>
         /// Gets the <see cref="Robot"/> object that matches the selection criteria.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
-        public static Task<Robot?> GetAsync(Guid id)
+        public Task<Robot?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
                 var __key = new UniqueKey(id);
-                if (ExecutionContext.Current.TryGetCacheValue<Robot>(__key, out Robot __val))
+                if (_cache.TryGetValue(__key, out Robot __val))
                     return __val;
 
-                var __result = await Factory.Create<IRobotData>().GetAsync(id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__key, __result!);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
+                var __result = await _data.GetAsync(id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result!);
                 return __result;
             });
         }
@@ -60,14 +67,13 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Robot"/> object.</param>
         /// <returns>A refreshed <see cref="Robot"/> object.</returns>
-        public static Task<Robot> CreateAsync(Robot value)
+        public Task<Robot> CreateAsync(Robot value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
+                var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Create").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
         }
@@ -77,14 +83,13 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="value">The <see cref="Robot"/> object.</param>
         /// <returns>A refreshed <see cref="Robot"/> object.</returns>
-        public static Task<Robot> UpdateAsync(Robot value)
+        public Task<Robot> UpdateAsync(Robot value)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await Beef.Events.Event.PublishValueEventAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
-                ExecutionContext.Current.CacheSet(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
+                var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Robot.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
         }
@@ -93,14 +98,13 @@ namespace Beef.Demo.Business.DataSvc
         /// Deletes the <see cref="Robot"/> object.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public static Task DeleteAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                await Factory.Create<IRobotData>().DeleteAsync(id).ConfigureAwait(false);
-                await Beef.Events.Event.PublishEventAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
-                ExecutionContext.Current.CacheRemove<Robot>(new UniqueKey(id));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
+                await _data.DeleteAsync(id).ConfigureAwait(false);
+                await _evtPub.PublishAsync($"Demo.Robot.{id}", "Delete", id).ConfigureAwait(false);
+                _cache.Remove<Robot>(new UniqueKey(id));
             });
         }
 
@@ -110,17 +114,16 @@ namespace Beef.Demo.Business.DataSvc
         /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
-        public static Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
+        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Default.InvokeAsync(typeof(RobotDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(typeof(RobotDataSvc), async () => 
             {
-                var __result = await Factory.Create<IRobotData>().GetByArgsAsync(args, paging).ConfigureAwait(false);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
+                var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;
             });
         }
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0005, IDE0044
 #nullable restore

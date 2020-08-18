@@ -68,7 +68,7 @@ namespace Beef.Entities
         public TColl Result
 #pragma warning restore CA2227
         {
-            get { return _result ?? (_result = new TColl()); }
+            get { return _result ??= new TColl(); }
             set { SetValue(ref _result, value ?? throw new ArgumentNullException(nameof(value)), false, false, ResultProperty); }
         }
 

@@ -1,147 +1,73 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Events;
 using Beef.Events.Subscribe;
-using NUnit.Framework;
+using Beef.Test.NUnit.Logging;
+using Beef.Test.NUnit.Tests;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Provides the <see cref="EventSubscriberBase">Event Subscriber</see> testing capabilities.
+    /// Manages the orchestration of the subscriber tester to execute one or more integration tests against. 
     /// </summary>
-    public class EventSubscriberTester
+    /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+    public class EventSubscriberTester<TStartup> : TesterBase where TStartup : class, new()
     {
-        private readonly EventSubscriberHostArgs _args;
-        private SubscriberStatus _expectedStatus;
-        private readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
-        private bool _expectedNonePublished;
-
-        /// <summary>
-        /// Create a new <see cref="EventSubscriberTester"/> for a <typeparamref name="TSubscriber"/>.
-        /// </summary>
-        /// <typeparam name="TSubscriber">The <see cref="EventSubscriberBase"/> that is expected to be executed.</typeparam>
-        /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
-        /// <returns>An <see cref="EventSubscriberTester"/> instance.</returns>
-        public static EventSubscriberTester Create<TSubscriber>(string? username = null) where TSubscriber : EventSubscriberBase, new()
-            => new EventSubscriberTester(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), new TSubscriber()).UseLoggerForAuditing(), username);
-
-        /// <summary>
-        /// Indicates whether to verify that no events were published as the default behaviour (see <see cref="EventSubscriberTester.ExpectNoEvents"/>).
-        /// </summary>
-        public static bool DefaultExpectNoEvents { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventSubscriberTester"/> class.
-        /// </summary>
-        private EventSubscriberTester(EventSubscriberHostArgs args, string? username = null)
+        private class Fhb : IFunctionsHostBuilder
         {
-            TestSetUp.InvokeRegisteredSetUp();
-            Beef.Test.NUnit.ExpectEvent.SetUp();
+            public Fhb(IServiceCollection services) => Services = services;
 
-            if (username != null || !ExecutionContext.HasCurrent)
-            {
-                ExecutionContext.Reset(false);
-                ExecutionContext.SetCurrent(AgentTester.CreateExecutionContext.Invoke(username ?? AgentTester.DefaultUsername, args));
-            }
-
-            _args = args;
-            _expectedNonePublished = DefaultExpectNoEvents;
+            public IServiceCollection Services { get; private set; }
         }
 
         /// <summary>
-        /// Verifies that the subscriber result has the specified <paramref name="status"/>.
+        /// Initializes a new instance of the <see cref="EventSubscriberTester{TStartup}"/> class.
         /// </summary>
-        /// <param name="status">The <see cref="SubscriberStatus"/>.</param>
-        /// <returns></returns>
-        public EventSubscriberTester ExpectResult(SubscriberStatus status)
+        public EventSubscriberTester() : base(false)
         {
-            _expectedStatus = status;
-            return this;
+            // TODO: Come back and revisit.
+            // string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string environment = TestSetUp.DefaultEnvironment, Action<ConfigurationBuilder>? configurationBuilder = null, Action<IServiceCollection>? services = null
+            //_serviceCollection.GetBeefConfiguration<TStartup>(environmentVariablePrefix, embeddedFilePrefix, environment, configurationBuilder);
+
+            var sc = new ServiceCollection();
+
+            var mi = typeof(TStartup).GetMethod("Configure", new Type[] { typeof(IFunctionsHostBuilder) });
+            if (mi == null)
+                throw new InvalidOperationException($"TStartup '{typeof(TStartup).Name}' must implement a 'Configure(IFunctionsHostBuilder)' method.");
+
+            mi.Invoke(new TStartup(), new object[] { new Fhb(sc) });
+
+            //services?.Invoke(_serviceCollection);
+            sc.AddLogging(configure => configure.AddCorrelationId());
+            ReplaceEventPublisher(sc);
+            ServiceProvider = sc.BuildServiceProvider();
         }
 
         /// <summary>
-        /// Verifies that the the event is published (in order specified). The expected event can use wildcards for <see cref="EventData.Subject"/> and optionally define
-        /// <see cref="EventData.Action"/>. No value comparison will occur. Finally, the remaining <see cref="EventData"/> properties are not compared.
+        /// Gets the <see cref="ServiceProvider"/>.
         /// </summary>
-        /// <param name="template">The expected subject template (or fully qualified subject).</param>
-        /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
-        public EventSubscriberTester ExpectEvent(string template, string action)
-        {
-            _expectedPublished.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
-            return this;
-        }
+        internal ServiceProvider ServiceProvider { get; private set; }
 
         /// <summary>
-        /// Verifies that no events were published.
+        /// Creates a new <see cref="EventSubscriberTest{TStartup, TSubscriber}"/> for the specified <typeparamref name="TSubscriber"/>.
         /// </summary>
-        public EventSubscriberTester ExpectNoEvents()
-        {
-            _expectedNonePublished = true;
-            return this;
-        }
+        /// <typeparam name="TSubscriber">The <see cref="IEventSubscriber"/> <see cref="Type"/> to test.</typeparam>
+        /// <returns>The <see cref="EventSubscriberTest{TStartup, TSubscriber}"/>.</returns>
+        public EventSubscriberTest<TStartup, TSubscriber> Test<TSubscriber>() where TSubscriber : IEventSubscriber => new EventSubscriberTest<TStartup, TSubscriber>(this);
+    }
 
+    /// <summary>
+    /// Provides the default testing capabilities for the <see cref="EventSubscriberTester{TStartup}"/>.
+    /// </summary>
+    public static class EventSubscriberTester
+    {
         /// <summary>
-        /// Runs the test for the <paramref name="event"/> checking against the expected outcomes.
+        /// Creates an <see cref="EventSubscriberTester{TStartup}"/> to manage the orchestration of one or more <see cref="EventSubscriberBase"/> integration tests against.
         /// </summary>
-        /// <param name="event">The <see cref="EventData"/>.</param>
-        public void Run(EventData @event) => Task.Run(() => RunAsync(@event)).GetAwaiter().GetResult();
-
-        /// <summary>
-        /// Runs the test for the <paramref name="event"/> asynchronously checking against the expected outcomes.
-        /// </summary>
-        /// <param name="event">The <see cref="EventData"/>.</param>
-        public async Task RunAsync(EventData @event)
-        {
-            if (@event == null)
-                throw new ArgumentNullException(nameof(@event));
-
-            // Execute the subscriber host.
-            var tesh = new TestEventSubscriberHost(_args);
-            var sw = Stopwatch.StartNew();
-            await tesh.ReceiveAsync(@event).ConfigureAwait(false);
-            sw.Stop();
-
-            // Check expectations.
-            if (!tesh.WasSubscribed)
-                Assert.Fail("The Subscriber did not Receive the event; check that the Subject and/or Action are as expected.");
-
-            // Log to output.
-            TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine("EVENT SUBSCRIBER TESTER...");
-            TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"SUBSCRIBER >");
-            TestContext.Out.WriteLine($"Elapsed (ms): {(sw == null ? "none" : sw.ElapsedMilliseconds.ToString(System.Globalization.CultureInfo.InvariantCulture))}");
-            TestContext.Out.WriteLine($"{tesh.Result?.ToMultiLineString()}");
-
-            TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = Beef.Test.NUnit.ExpectEvent.GetEvents();
-            if (events.Length == 0)
-                TestContext.Out.WriteLine("  None.");
-            else
-            {
-                foreach (var e in events)
-                {
-                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
-                }
-            }
-
-            TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine(new string('=', 80));
-            TestContext.Out.WriteLine("");
-
-            if (_expectedStatus != tesh.Result!.Status)
-                Assert.Fail($"Expected Status was '{_expectedStatus}'; actual was '{tesh.Result!.Status}'");
-
-            if (_expectedPublished.Count > 0)
-                Beef.Test.NUnit.ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());
-            else if (_expectedNonePublished)
-                Beef.Test.NUnit.ExpectEvent.NonePublished();
-        }
+        /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+        /// <returns>An <see cref="EventSubscriberTester{TStartup}"/> instance.</returns>
+        public static EventSubscriberTester<TStartup> Create<TStartup>() where TStartup : class, new() => new EventSubscriberTester<TStartup>();
     }
 }

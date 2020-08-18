@@ -28,27 +28,18 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TripPersonData : ITripPersonData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ITripOData _odata;
 
-        private readonly Func<string?, IODataArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<TripPerson?, string?, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TripPersonData"/> class.
+        /// </summary>
+        /// <param name="odata">The <see cref="ITripOData"/>.</param>
+        public TripPersonData(ITripOData odata) { _odata = Check.NotNull(odata, nameof(odata)); TripPersonDataCtor(); }
 
-        private readonly Func<TripPerson, IODataArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<TripPerson, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<TripPerson, IODataArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<TripPerson, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        private readonly Func<string?, IODataArgs, Task>? _deleteOnBeforeAsync;
-        private readonly Func<string?, Task>? _deleteOnAfterAsync;
-        private readonly Action<Exception>? _deleteOnException;
-
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TripPersonDataCtor();
 
         /// <summary>
         /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
@@ -57,15 +48,11 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                TripPerson? __result;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await TripOData.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await _odata.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -78,15 +65,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                TripPerson __result;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await TripOData.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                return await _odata.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -99,15 +82,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                TripPerson __result;
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await TripOData.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                return await _odata.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -116,13 +95,11 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                await TripOData.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
+                await _odata.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

@@ -27,23 +27,18 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class GenderData : IGenderData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IDatabase _db;
 
-        private readonly Func<Guid, IDatabaseArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Gender?, Guid, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenderData"/> class.
+        /// </summary>
+        /// <param name="db">The <see cref="IDatabase"/>.</param>
+        public GenderData(IDatabase db) { _db = Check.NotNull(db, nameof(db)); GenderDataCtor(); }
 
-        private readonly Func<Gender, IDatabaseArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<Gender, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<Gender, IDatabaseArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<Gender, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void GenderDataCtor();
 
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
@@ -52,15 +47,11 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Gender? __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderGet]");
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await _db.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -73,15 +64,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Gender __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                return await _db.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -94,15 +81,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Gender __result;
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await Database.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                return await _db.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

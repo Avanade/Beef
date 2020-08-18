@@ -149,31 +149,6 @@ namespace Beef.Mapper
         private IPropertyMapper<TSrce, TDest>[]? _uniqueKey;
 
         /// <summary>
-        /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> automatically mapping the properties where they share the same name.
-        /// </summary>
-        /// <param name="ignoreSrceProperties">An array of source property names to ignore.</param>
-        /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        [Obsolete("Please use EntityMapper.Create<TSrce, TDest>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static EntityMapper<TSrce, TDest> CreateAuto(params string[] ignoreSrceProperties)
-#pragma warning restore CA1000
-        {
-            return new EntityMapper<TSrce, TDest>(true, ignoreSrceProperties);
-        }
-
-        /// <summary>
-        /// Creates an <see cref="EntityMapper{TSrce, TDest}"/> where properties are added manually.
-        /// </summary>
-        /// <returns>An <see cref="EntityMapper{TSrce, TDest}"/>.</returns>
-        [Obsolete("Please use EntityMapper.Create<TSrce, TDest>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static EntityMapper<TSrce, TDest> Create()
-#pragma warning restore CA1000
-        {
-            return new EntityMapper<TSrce, TDest>(false);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="EntityMapper{TSrce, TDest}"/> class.
         /// </summary>
         /// <param name="autoMap">Indicates whether the two entities should automatically map where the properties share the same name.</param>

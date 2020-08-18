@@ -22,6 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Power Source entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class PowerSource : ReferenceDataBaseGuid
     {
         #region Privates

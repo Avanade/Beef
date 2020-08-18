@@ -22,6 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Gender entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+    [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class Gender : ReferenceDataBaseGuid
     {
         #region Privates

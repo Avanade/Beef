@@ -5,7 +5,6 @@ using Beef.Events;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Events
@@ -16,28 +15,35 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public void Match()
         {
-            Assert.IsFalse(Event.Match("domain.entity.123", "domain.entity.000"));
-            Assert.IsFalse(Event.Match("domain.ytitne.123", "domain.entity.123"));
-            Assert.IsFalse(Event.Match("domain.ytitne.*", "domain.entity.123"));
-            Assert.IsFalse(Event.Match("domain.entity.123.*", "domain.entity.123"));
+            Assert.IsFalse(EventSubjectMatcher.Match("*", ".", "domain.entity.123", "domain.entity.000"));
+            Assert.IsFalse(EventSubjectMatcher.Match("*", ".", "domain.ytitne.123", "domain.entity.123"));
+            Assert.IsFalse(EventSubjectMatcher.Match("*", ".", "domain.ytitne.*", "domain.entity.123"));
+            Assert.IsFalse(EventSubjectMatcher.Match("*", ".", "domain.entity.123.*", "domain.entity.123"));
 
-            Assert.IsTrue(Event.Match("domain.entity.123", "domain.entity.123"));
-            Assert.IsTrue(Event.Match("domain.entity.*", "domain.entity.123"));
-            Assert.IsTrue(Event.Match("domain.*.123", "domain.entity.123"));
-            Assert.IsTrue(Event.Match("domain.entity.*", "domain.entity.123.456"));
+            Assert.IsTrue(EventSubjectMatcher.Match("*", ".", "domain.entity.123", "domain.entity.123"));
+            Assert.IsTrue(EventSubjectMatcher.Match("*", ".", "domain.entity.*", "domain.entity.123"));
+            Assert.IsTrue(EventSubjectMatcher.Match("*", ".", "domain.*.123", "domain.entity.123"));
+            Assert.IsTrue(EventSubjectMatcher.Match("*", ".", "domain.entity.*", "domain.entity.123.456"));
+        }
+
+        private class TestEventPublisher : EventPublisherBase
+        {
+            public List<EventData> Events { get; } = new List<EventData>();
+
+            protected override Task PublishEventsAsync(params EventData[] events) { Events.AddRange(events); return Task.CompletedTask; }
         }
 
         [Test]
         public async Task PublishAsync_NoValueWithTemplate()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
-            EventData ed = null;
-            Event.RegisterReset();
-            Event.Register((x) => { ed = x[0]; return Task.CompletedTask; });
+            var tep = new TestEventPublisher();
 
-            await Event.PublishEventAsync("domain.entity.123", "create", 123).ConfigureAwait(false);
+            await tep.PublishAsync("domain.entity.123", "create", 123).ConfigureAwait(false);
+            Assert.AreEqual(1, tep.Events.Count);
+            var ed = tep.Events[0];
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -54,16 +60,15 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_ValueIIdentifier()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
-            EventData<Entity> ed = null;
-            Event.RegisterReset();
-            Event.Register((x) => { ed = (EventData<Entity>)x[0]; return Task.CompletedTask; });
-
+            var tep = new TestEventPublisher();
             var v = new Entity { Id = 123 };
 
-            await Event.PublishValueEventAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            await tep.PublishValueAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            Assert.AreEqual(1, tep.Events.Count);
+            var ed = (EventData<Entity>)tep.Events[0];
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -88,16 +93,15 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_ValueIUniqueKey()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
-            EventData<Entity2> ed = null;
-            Event.RegisterReset();
-            Event.Register((x) => { ed = (EventData<Entity2>)x[0]; return Task.CompletedTask; });
-
+            var tep = new TestEventPublisher();
             var v = new Entity2 { A = 123, B = "Abc" };
 
-            await Event.PublishValueEventAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            await tep.PublishValueAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            Assert.AreEqual(1, tep.Events.Count);
+            var ed = (EventData<Entity2>)tep.Events[0];
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -110,14 +114,14 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishAsync_SubjectAndAction()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
-            EventData ed = null;
-            Event.RegisterReset();
-            Event.Register((x) => { ed = x[0]; return Task.CompletedTask; });
+            var tep = new TestEventPublisher();
 
-            await Event.PublishEventAsync("domain.entity.123", "create").ConfigureAwait(false);
+            await tep.PublishAsync("domain.entity.123", "create").ConfigureAwait(false);
+            Assert.AreEqual(1, tep.Events.Count);
+            var ed = tep.Events[0];
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -129,14 +133,14 @@ namespace Beef.Core.UnitTest.Events
         [Test]
         public async Task PublishValueAsync_WithKey()
         {
-            ExecutionContext.Reset(false);
+            ExecutionContext.Reset();
             var start = Cleaner.Clean(DateTime.Now);
 
-            EventData<string> ed = null;
-            Event.RegisterReset();
-            Event.Register((x) => { ed = (EventData<string>)x[0]; return Task.CompletedTask; });
+            var tep = new TestEventPublisher();
 
-            await Event.PublishValueEventAsync("TESTER", "domain.entity.123", "create", 123).ConfigureAwait(false);
+            await tep.PublishValueAsync("TESTER", "domain.entity.123", "create", 123).ConfigureAwait(false);
+            Assert.AreEqual(1, tep.Events.Count);
+            var ed = (EventData<string>)tep.Events[0];
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -144,76 +148,6 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsTrue(ed.HasValue);
             Assert.IsTrue(ed.Timestamp >= start);
             Assert.AreEqual("TESTER", ed.Value);
-        }
-
-        [Test]
-        public void PublishValueAsync_RegisterMulti_Sync()
-        {
-            var reg1 = false;
-            var reg2 = false;
-
-            Event.RegisterReset();
-            Event.PublishSynchronously = true;
-            Event.Register((x) => { reg1 = true; return Task.CompletedTask; });
-            Event.Register((x) => { reg2 = true; return Task.CompletedTask; });
-
-            Event.PublishValueEventAsync("TESTER", "domain.entity.123", "create", 123).Wait();
-            Assert.IsTrue(reg1);
-            Assert.IsTrue(reg2);
-        }
-
-        [Test]
-        public void PublishValueAsync_RegisterMulti_Async()
-        {
-            var reg1 = false;
-            var reg2 = false;
-
-            Event.RegisterReset();
-            Event.PublishSynchronously = false;
-            Event.Register((x) => { reg1 = true; return Task.CompletedTask; });
-            Event.Register((x) => { reg2 = true; return Task.CompletedTask; });
-
-            Event.PublishValueEventAsync("TESTER", "domain.entity.123", "create", 123).Wait();
-            Assert.IsTrue(reg1);
-            Assert.IsTrue(reg2);
-        }
-
-        [Test]
-        public void PublishValueAsync_RegisterMulti_Sync_WithDelay()
-        {
-            var reg1 = false;
-            var reg2 = false;
-
-            Event.RegisterReset();
-            Event.PublishSynchronously = true;
-            Event.Register((x) => { reg1 = true; return Task.Delay(100); });
-            Event.Register((x) => { reg2 = true; return Task.Delay(100); });
-
-            var sw = Stopwatch.StartNew();
-            Event.PublishValueEventAsync("TESTER", "domain.entity.123", "create", 123).Wait();
-            sw.Stop();
-            Assert.IsTrue(reg1);
-            Assert.IsTrue(reg2);
-            Assert.IsTrue(sw.ElapsedMilliseconds >= 200);
-        }
-
-        [Test]
-        public void PublishValueAsync_RegisterMulti_Async_WithDelay()
-        {
-            var reg1 = false;
-            var reg2 = false;
-
-            Event.RegisterReset();
-            Event.PublishSynchronously = false;
-            Event.Register((x) => { reg1 = true; return Task.Delay(100); });
-            Event.Register((x) => { reg2 = true; return Task.Delay(100); });
-
-            var sw = Stopwatch.StartNew();
-            Event.PublishValueEventAsync("TESTER", "domain.entity.123", "create", 123).Wait();
-            sw.Stop();
-            Assert.IsTrue(reg1);
-            Assert.IsTrue(reg2);
-            Assert.IsTrue(sw.ElapsedMilliseconds < 200);
         }
 
         [Test]

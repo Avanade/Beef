@@ -9,9 +9,16 @@ namespace Company.AppName.Api
     public static class Program
     {
         /// <summary>
-        /// Main startup using the <i>Beef</i> <see cref="WebApiStartup"/> capability to build the host and underlying configuration probing.
+        /// Main startup.
         /// </summary>
         /// <param name="args">The startup arguments.</param>
-        public static void Main(string[] args) => WebApiStartup.BuildWebHost<Startup>(args, "AppName").Run();
+        public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
+
+        /// <summary>
+        /// Creates the <see cref="IWebHostBuilder"/> using the <i>Beef</i> <see cref="WebApiStartup"/> capability to create the host with the underlying configuration probing.
+        /// </summary>
+        /// <param name="args">The startup arguments.</param>
+        /// <returns>The <see cref="IWebHostBuilder"/>.</returns>
+        public static IWebHostBuilder CreateHostBuilder(string[] args) => WebApiStartup.CreateWebHost<Startup>(args, "AppName");
     }
 }

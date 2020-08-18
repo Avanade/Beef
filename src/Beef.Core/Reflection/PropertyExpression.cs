@@ -80,11 +80,11 @@ namespace Beef.Reflection
     }
 
     /// <summary>
-    /// Provides property <see cref="Expression"/> <see cref="Create(Expression{Func{TEntity, TProperty}}, bool)"/> capability.
+    /// Provides property <see cref="Expression"/> capability.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-    /// <remarks>The compiled expression (see <see cref="Create(Expression{Func{TEntity, TProperty}}, bool)"/>) is cached so all subsequent requests for the same <typeparamref name="TEntity"/> and
+    /// <remarks>The compiled expression is cached so all subsequent requests for the same <typeparamref name="TEntity"/> and
     /// <typeparamref name="TProperty"/> is optimised for performance.</remarks>
     public class PropertyExpression<TEntity, TProperty> : IPropertyExpression
     {
@@ -99,38 +99,6 @@ namespace Beef.Reflection
         private static readonly object _lock = new object();
 
         private readonly Func<TEntity, TProperty> _func;
-
-        /// <summary>
-        /// Gets the property name from the property expression.
-        /// </summary>
-        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <returns>The property name.</returns>
-        [Obsolete("Please use PropertyExpression.GetPropertyName<TSrce, TDest>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static string GetPropertyName(Expression<Func<TEntity, TProperty>> propertyExpression)
-#pragma warning restore CA1000
-        {
-            Check.NotNull(propertyExpression, nameof(propertyExpression));
-
-            if (propertyExpression.Body.NodeType != ExpressionType.MemberAccess)
-                throw new InvalidOperationException("Only Member access expressions are supported.");
-
-            return ((MemberExpression)propertyExpression.Body).Member.Name;
-        }
-
-        /// <summary>
-        /// Validates, creates and compiles the property expression; whilst also determinig the property friendly <see cref="Text"/>.
-        /// </summary>
-        /// <param name="propertyExpression">The <see cref="Expression"/> to reference the entity property.</param>
-        /// <param name="probeForJsonRefDataSidProperties">Indicates whether to probe for the <see cref="JsonPropertyAttribute"/> via alternate <c>Sid</c> or <c>Sids</c> properties as implemented for reference data.</param>
-        /// <returns>A <see cref="PropertyExpression{TEntity, TProperty}"/> which contains (in order) the compiled <see cref="System.Func{TEntity, TProperty}"/>, member name and resulting property text.</returns>
-        [Obsolete("Please use PropertyExpression.Create<TSrce, TDest>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static PropertyExpression<TEntity, TProperty> Create(Expression<Func<TEntity, TProperty>> propertyExpression, bool probeForJsonRefDataSidProperties = false)
-#pragma warning restore CA1000
-        {
-            return CreateInternal(Check.NotNull(propertyExpression, nameof(propertyExpression)), probeForJsonRefDataSidProperties);
-        }
 
         /// <summary>
         /// Validates, creates and compiles the property expression; whilst also determinig the property friendly <see cref="Text"/>.

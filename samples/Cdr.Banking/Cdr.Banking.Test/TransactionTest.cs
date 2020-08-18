@@ -1,4 +1,5 @@
 ﻿using Beef.Test.NUnit;
+using Cdr.Banking.Api;
 using Cdr.Banking.Business.Validation;
 using Cdr.Banking.Common.Agents;
 using Cdr.Banking.Common.Entities;
@@ -9,14 +10,11 @@ using System.Net;
 
 namespace Cdr.Banking.Test
 {
-    public class TransactionTest
+    public class TransactionTest : UsingAgentTesterServer<Startup>
     {
-        [OneTimeSetUp]
-        public void OneTimeSetUp() => TestSetUp.Reset();
-
         #region ArgsValidator
 
-        [Test]
+        [Test, TestSetUp]
         public void A110_ArgsValidator_Empty()
         {
             var ta = new TransactionArgs();
@@ -29,7 +27,7 @@ namespace Cdr.Banking.Test
             Assert.IsNull(ta.Text);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A120_ArgsValidator_ToDateOnly()
         {
             var ta = new TransactionArgs { ToDate = new DateTime(2020, 03, 01) };
@@ -42,7 +40,7 @@ namespace Cdr.Banking.Test
             Assert.IsNull(ta.Text);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A130_ArgsValidator_ValidSame()
         {
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 03, 01), MinAmount = 100m, MaxAmount = 100m, Text = "Best Buy" };
@@ -55,7 +53,7 @@ namespace Cdr.Banking.Test
             Assert.AreEqual("Best Buy", ta.Text);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A140_ArgsValidator_ValidDiff()
         {
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 04, 01), MinAmount = 100m, MaxAmount = 120m, Text = "Best Buy" };
@@ -68,7 +66,7 @@ namespace Cdr.Banking.Test
             Assert.AreEqual("Best Buy", ta.Text);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void A150_ArgsValidator_Invalid()
         {
             ExpectValidationException.Throws(() =>
@@ -88,9 +86,9 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B110_GetTransactions_FromDate()
         {
-            var v = AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) })).Value;
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -101,9 +99,9 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B120_GetTransactions_DateRange()
         {
-            var v = AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), ToDate = new DateTime(2019, 07, 01) })).Value;
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), ToDate = new DateTime(2019, 07, 01) })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -114,9 +112,9 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B130_GetTransactions_MinAmount()
         {
-            var v = AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MinAmount = 0 })).Value;
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MinAmount = 0 })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -127,9 +125,9 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void B140_GetTransactions_MaxAmount()
         {
-            var v = AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MaxAmount = 0 })).Value;
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), MaxAmount = 0 })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -140,9 +138,9 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void B150_GetTransactions_Text()
         {
-            var v = AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            var v = AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .Run((a) => a.Agent.GetTransactionsAsync("23456789", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), Text = "usb" })).Value;
+                .Run(a => a.GetTransactionsAsync("23456789", new TransactionArgs { FromDate = new DateTime(2019, 04, 01), Text = "usb" })).Value;
 
             Assert.IsNotNull(v);
             Assert.IsNotNull(v.Result);
@@ -153,17 +151,17 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void B160_GetTransactions_AccountAuth()
         {
-            AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+            AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }
 
         [Test, TestSetUp("john")]
         public void B170_GetTransactions_Auth()
         {
-           AgentTester.Create<TransactionAgent, TransactionCollectionResult>()
+           AgentTester.Test<TransactionAgent, TransactionCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
-                .Run((a) => a.Agent.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
+                .Run(a => a.GetTransactionsAsync("12345678", new TransactionArgs { FromDate = new DateTime(2019, 04, 01) }));
         }
 
         #endregion

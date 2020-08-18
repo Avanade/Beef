@@ -18,7 +18,7 @@ namespace Beef.Events.WebJobs
         /// <param name="builder">The <see cref="IWebJobsBuilder"/>.</param>
         public void Configure(IWebJobsBuilder builder)
         {
-            builder.AddResilientEventHubs();
+            builder.AddBeefResilientEventHubs();
         }
     }
 }

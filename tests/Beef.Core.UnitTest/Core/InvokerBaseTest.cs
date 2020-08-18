@@ -11,7 +11,7 @@ namespace Beef.Core.UnitTest.Core
     [TestFixture]
     public class InvokerBaseTest
     {
-        private class TestInvoker : InvokerBase<TestInvoker, object> 
+        private class TestInvoker : InvokerBase<object> 
         {
             public List<int> ThreadIds = new List<int>();
 

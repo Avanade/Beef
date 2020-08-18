@@ -21,11 +21,19 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Product</b> API functionality.
+    /// Provides the <b>Product</b> Web API functionality.
     /// </summary>
     [Route("api/v1/products")]
     public partial class ProductController : ControllerBase
     {
+        private readonly IProductManager _manager;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IProductManager"/>.</param>
+        public ProductController(IProductManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="Product"/> entity that matches the selection criteria.
         /// </summary>
@@ -37,7 +45,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(int id)
         {
-            return new WebApiGet<Product?>(this, () => Factory.Create<IProductManager>().GetAsync(id),
+            return new WebApiGet<Product?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -54,7 +62,7 @@ namespace Beef.Demo.Api.Controllers
         public IActionResult GetByArgs(string? name = default, string? description = default)
         {
             var args = new ProductArgs { Name = name, Description = description };
-            return new WebApiGet<ProductCollectionResult, ProductCollection, Product>(this, () => Factory.Create<IProductManager>().GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<ProductCollectionResult, ProductCollection, Product>(this, () => _manager.GetByArgsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
     }

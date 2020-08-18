@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 namespace Beef.Data.EntityFrameworkCore
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="EfDbBase{TDbContext}"/> invocations
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="EfDbBase{TDbContext}"/> invocations
     /// specifically exception handling (see <see cref="EfDbBase{TDbContext}.ExceptionHandler"/>).
     /// </summary>
-    public class EfDbInvoker<TDbContext> : InvokerBase<EfDbInvoker<TDbContext>, EfDbBase<TDbContext>> where TDbContext : DbContext, new()
+    public class EfDbInvoker<TDbContext> : InvokerBase<EfDbBase<TDbContext>> where TDbContext : DbContext
     {
         #region NoResult
 

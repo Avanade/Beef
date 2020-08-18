@@ -1,41 +1,36 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
 using Beef.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Beef
 {
     /// <summary>
-    /// Represents a thread-bound (request) execution context.
+    /// Represents a thread-bound (request) execution context using <see cref="AsyncLocal{ExecutionContext}"/>.
     /// </summary>
-    /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments. By default uses <see cref="AsyncLocal{T}"/>;
-    /// although, this can be overridden (see <see cref="Register(Func{ExecutionContext}, Func{ExecutionContext}, Action{ExecutionContext})"/>).</remarks>
+    /// <remarks>Used to house/pass context parameters and capabilities that are outside of the general operation arguments.</remarks>
     public class ExecutionContext : IETag
     {
-        private static readonly object _masterLock = new object();
-        private static Func<ExecutionContext> _create = () => new ExecutionContext();
         private static readonly AsyncLocal<ExecutionContext?> _asyncLocal = new AsyncLocal<ExecutionContext?>();
-        private static Func<ExecutionContext?> _get = () => _asyncLocal.Value;
-        private static Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
+        private static readonly Func<ExecutionContext?> _get = () => _asyncLocal.Value;
+        private static readonly Action<ExecutionContext?> _set = (ec) => _asyncLocal.Value = ec;
 
-        private Guid? _userId;
+        private IServiceProvider? _serviceProvider;
+        private string? _userId;
         private string? _username;
         private Guid? _tenantId;
         private string? _partitionKey;
-        private string? _correlationId;
-        private string? _sessionCorrelationId;
         private DateTime _timestamp = Cleaner.Clean(DateTime.Now);
         private bool _timestampChanged;
         private PagingArgs? _pagingArgs;
         private KeyOnlyDictionary<string>? _roles;
         private readonly Lazy<MessageItemCollection> _messages = new Lazy<MessageItemCollection>(true);
         private readonly Lazy<Dictionary<string, object>> _properties = new Lazy<Dictionary<string, object>>(true);
-        private readonly Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>> _caching = new Lazy<ConcurrentDictionary<Tuple<Type, UniqueKey>, object>>(true);
 
         /// <summary>
         /// Gets the standard message for when changing an immutable value.
@@ -43,47 +38,21 @@ namespace Beef
         public const string ImmutableText = "Value is immutable; cannot be changed once already set to a value.";
 
         /// <summary>
-        /// Gets or sets the current <see cref="ExecutionContext"/> for the executing thread graph (see <see cref="AsyncLocal{T}"/>).
+        /// Gets the current <see cref="ExecutionContext"/> for the executing thread graph (see <see cref="AsyncLocal{T}"/>).
         /// </summary>
-        public static ExecutionContext Current
-        {
-            get
-            {
-                var ec = _get();
-                if (ec != null)
-                    return ec;
-
-                lock (_masterLock)
-                {
-                    ec = _get();
-                    if (ec == null)
-                    {
-                        ec = _create();
-                        _set(ec);
-                    }
-
-                    return ec;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Indicates whether the <see cref="ExecutionContext"/> has been <see cref="Register(Func{ExecutionContext})">registered</see>.
-        /// </summary>
-        public static bool HasBeenRegistered { get; private set; } = false;
+        /// <exception cref="InvalidOperationException">An <see cref="InvalidOperationException"/> will be thrown where <see cref="HasCurrent"/> is <c>false</c>.</exception>
+        public static ExecutionContext Current => _get() ?? throw new InvalidOperationException("There is currently no ExecutionContext.Current instance; this must be set (SetCurrent) prior to access. Use ExecutionContext.HasCurrent to verify value and avoid this exception.");
 
         /// <summary>
         /// Indicates whether the <see cref="ExecutionContext"/> <see cref="Current"/> has a value.
         /// </summary>
-        public static bool HasCurrent
-        {
-            get { return _get() != null; }
-        }
+        public static bool HasCurrent => _get() != null;
 
         /// <summary>
         /// Sets the <see cref="Current"/> instance (only allowed where <see cref="HasCurrent"/> is <c>false</c>).
         /// </summary>
         /// <param name="executionContext">The <see cref="ExecutionContext"/> instance.</param>
+        /// <exception cref="InvalidOperationException">An <see cref="InvalidOperationException"/> will be thrown where <see cref="HasCurrent"/> is <c>true</c>.</exception>
         public static void SetCurrent(ExecutionContext executionContext)
         {
             Check.NotNull(executionContext, nameof(executionContext));
@@ -94,54 +63,44 @@ namespace Beef
         }
 
         /// <summary>
-        /// Registers the <see cref="ExecutionContext"/> <paramref name="create"/> function that is invoked when the <see cref="Current"/> instance is requested for the first time
-        /// (per thread/request context (see <see cref="AsyncLocal{T}"/>)).
+        /// Resets (clears) the <see cref="Current"/> <see cref="ExecutionContext"/>.
         /// </summary>
-        /// <param name="create">The <see cref="ExecutionContext"/> creation function.</param>
-        public static void Register(Func<ExecutionContext> create)
-        {
-            lock (_masterLock)
-            {
-                if (HasBeenRegistered)
-                    throw new InvalidOperationException("The Register method can only be invoked once.");
+        public static void Reset() => _set(null);
 
-                _create = create ?? throw new ArgumentNullException(nameof(create));
-                HasBeenRegistered = true;
-            }
+        /// <summary>
+        /// Gets the service of <see cref="Type"/> <typeparamref name="T"/> from the <see cref="Current"/> <see cref="ServiceProvider"/>.
+        /// </summary>
+        /// <typeparam name="T">The service <see cref="Type"/>.</typeparam>
+        /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
+        /// <returns>The corresponding instance.</returns>
+        public static T GetService<T>(bool throwExceptionOnNull = true)
+        {
+            if (HasCurrent && Current.ServiceProvider != null)
+                return Current.ServiceProvider.GetService<T>() ??
+                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but null was returned; this would indicate that the service has not been configured correctly.") : default(T)!);
+
+            if (throwExceptionOnNull)
+                throw new InvalidOperationException($"Attempted to get service '{typeof(T).Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+
+            return default!;
         }
 
         /// <summary>
-        /// Registers the <see cref="ExecutionContext"/> <paramref name="create"/> function that is invoked when the <see cref="Current"/> instance is requested for the first time
-        /// (where the per thread/request-style context is managed externally).
+        /// Gets the service of <see cref="Type"/> <paramref name="type"/> from the <see cref="Current"/> <see cref="ServiceProvider"/>.
         /// </summary>
-        /// <param name="create">The <see cref="ExecutionContext"/> creation function.</param>
-        /// <param name="get">The <see cref="ExecutionContext"/> get function.</param>
-        /// <param name="set">The <see cref="ExecutionContext"/> set function.</param>
-        public static void Register(Func<ExecutionContext> create, Func<ExecutionContext?> get, Action<ExecutionContext?> set)
+        /// <param name="type">The service <see cref="Type"/>.</param>
+        /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
+        /// <returns>The corresponding instance.</returns>
+        public static object? GetService(Type type, bool throwExceptionOnNull = true)
         {
-            lock (_masterLock)
-            {
-                if (_create != null)
-                    throw new InvalidOperationException("The Register method can only be invoked once.");
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
 
-                _create = create ?? throw new ArgumentNullException(nameof(create));
-                _get = get ?? throw new ArgumentNullException(nameof(get));
-                _set = set ?? throw new ArgumentNullException(nameof(set));
-                HasBeenRegistered = true;
-            }
-        }
+            if (HasCurrent && Current.ServiceProvider != null)
+                return Current.ServiceProvider.GetService(type) ??
+                    (throwExceptionOnNull ? throw new InvalidOperationException($"Attempted to get service '{type.Name}' but null was returned; this would indicate that the service has not been configured correctly.") : (object?)null);
 
-        /// <summary>
-        /// Resets (renews) the <see cref="Current"/> <see cref="ExecutionContext"/>.
-        /// </summary>
-        /// <param name="renew">Indicates whether the <see cref="Current"/> is immediately renewed (defaults to <c>true</c>).</param>
-        public static void Reset(bool renew = true)
-        {
-            var ec = _get();
-            if (ec != null)
-                ec.DataContextScope?.Dispose();
-
-            _set((renew) ? _create() : null);
+            throw new InvalidOperationException($"Attempted to get service '{type.Name}' but there is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
         }
 
         /// <summary>
@@ -151,41 +110,30 @@ namespace Beef
         public static string EnvironmentUsername => Environment.UserDomainName == null ? Environment.UserName : Environment.UserDomainName + "\\" + Environment.UserName;
 
         /// <summary>
-        /// Gets or sets the current <see cref="Beef.DataContextScope"/>.
-        /// </summary>
-        internal DataContextScope? DataContextScope { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current <see cref="Beef.Diagnostics.Logger"/>.
-        /// </summary>
-        internal Logger? Logger { get; set; }
-
-        /// <summary>
-        /// Registers the <see cref="ExecutionContext"/> <see cref="Logger"/> instance (accessible via <see cref="Logger"/> <see cref="Logger.Default"/>).
-        /// </summary>
-        /// <param name="binder">The action that binds the logger to an underlying logging capability.</param>
-        public void RegisterLogger(Action<LoggerArgs> binder)
-        {
-            if (Logger != null)
-                throw new InvalidOperationException("A RegisterLogger has already been performed for the current ExecutionContext instance.");
-
-            Logger = new Logger(binder ?? throw new ArgumentNullException(nameof(binder)));
-        }
-
-        /// <summary>
-        /// Indicates whether a <see cref="RegisterLogger"/> has been performed for this <see cref="ExecutionContext"/> instance.
-        /// </summary>
-        public bool HasLogger => Logger != null;
-
-        /// <summary>
         /// Gets or sets the operation type (defaults to <see cref="OperationType.Unspecified"/>).
         /// </summary>
         public OperationType OperationType { get; set; } = OperationType.Unspecified;
 
         /// <summary>
-        /// Gets or sets the user identifier. This value is immutable.
+        /// Gets or sets the <see cref="IServiceProvider"/> that provides access to the configured service container. This value is immutable. <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
         /// </summary>
-        public Guid? UserId
+        public IServiceProvider? ServiceProvider
+        {
+            get => _serviceProvider;
+
+            set
+            {
+                if (_serviceProvider != null && value != _serviceProvider)
+                    throw new ArgumentException(ImmutableText);
+
+                _serviceProvider = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the unique user identifier. This value is immutable.
+        /// </summary>
+        public string? UserId
         {
             get => _userId;
 
@@ -248,36 +196,14 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). This value is immutable.
+        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
         /// </summary>
-        public string? CorrelationId
-        {
-            get { return _correlationId; }
-
-            set
-            {
-                if (_correlationId != null && value != _correlationId)
-                    throw new ArgumentException(ImmutableText);
-
-                _correlationId = value;
-            }
-        }
+        public string? CorrelationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the session correlation identifier (a unique identifier assigned to the session). This value is immutable.
+        /// Gets or sets the session correlation identifier (a unique identifier assigned to the session).
         /// </summary>
-        public string? SessionCorrelationId
-        {
-            get { return _sessionCorrelationId; }
-
-            set
-            {
-                if (_sessionCorrelationId != null && value != _sessionCorrelationId)
-                    throw new ArgumentException(ImmutableText);
-
-                _sessionCorrelationId = value;
-            }
-        }
+        public string? SessionCorrelationId { get; set; }
 
         /// <summary>
         /// Gets or sets the request timestamp (to enable consistent execution-related timestamping). This value is immutable.
@@ -332,90 +258,6 @@ namespace Beef
         /// <see cref="Entities.EntityBasicBase.GetRefDataText(Func{RefData.ReferenceDataBase})"/> checks this value to determine whether the <i>text</i> should be retrieved.
         /// </summary>
         public bool IsRefDataTextSerializationEnabled { get; set; }
-
-        #region Cache
-
-        /// <summary>
-        /// Gets the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to get.</param>
-        /// <param name="value">The cached value where found; otherwise, the default value for the <see cref="Type"/>.</param>
-        /// <returns><c>true</c> where found; otherwise, <c>false</c>.</returns>
-        public bool TryGetCacheValue<T>(UniqueKey key, out T value)
-        {
-            if (_caching.IsValueCreated && _caching.Value.TryGetValue(new Tuple<Type, UniqueKey>(typeof(T), key), out object val))
-            {
-                value = (T)val;
-                return true;
-            }
-
-            value = default!;
-            return false;
-        }
-
-        /// <summary>
-        /// Sets (adds or overrides) the cache value for the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to set.</param>
-        /// <param name="value">The value to set.</param>
-        public void CacheSet<T>(UniqueKey key, T value)
-        {
-            _caching.Value.AddOrUpdate(new Tuple<Type, UniqueKey>(typeof(T), key), value!, (x, y) => value!);
-        }
-
-        /// <summary>
-        /// Gets the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to get.</param>
-        /// <returns>The cached value where found; otherwise, the default value for the <see cref="Type"/>.</returns>
-        public T CacheGet<T>(UniqueKey key)
-        {
-            TryGetCacheValue(key, out T val);
-            return val;
-        }
-
-        /// <summary>
-        /// Removes the cached value associated with the specified <see cref="Type"/> and key.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="key">The key of the value to remove.</param>
-        /// <returns><c>true</c> where found and removed; otherwise, <c>false</c>.</returns>
-        public bool CacheRemove<T>(UniqueKey key)
-        {
-            if (_caching.IsValueCreated)
-                return _caching.Value.TryRemove(new Tuple<Type, UniqueKey>(typeof(T), key), out object _);
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Clears the cache for the specified <see cref="Type"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        public void CacheClear<T>()
-        {
-            if (!_caching.IsValueCreated)
-                return;
-
-            foreach (var item in _caching.Value.Where(x => x.Key.Item1 == typeof(T)).ToList())
-            {
-                _caching.Value.TryRemove(item.Key, out object val);
-            }
-        }
-
-        /// <summary>
-        /// Clears the cache for all <see cref="Type">types</see>.
-        /// </summary>
-        public void CacheClearAll()
-        {
-            if (_caching.IsValueCreated)
-                _caching.Value.Clear();
-        }
-
-        #endregion
 
         #region Security
 
@@ -497,37 +339,79 @@ namespace Beef
 
         #endregion
 
-        #region Flow
+        #region NewScope
 
         /// <summary>
-        /// Executes the <paramref name="action"/> suppressing the flow of the <see cref="ExecutionContext"/> across asynchronous threads. Any threads created that need the <see cref="ExecutionContext"/>
-        /// should use the <see cref="ExecutionContextFlow.SetExecutionContext"/> which will copy the key properties of the originating <see cref="ExecutionContext"/> and set up a new 
-        /// <see cref="Current"/> for usage. <i>Note:</i> any new threads <b>must</b> be created from within the <paramref name="action"/>. <b>Warning:</b> this is an advanced feature and should only be
-        /// used where this specific capability is required.
+        /// Executes the asynchronous <paramref name="func"/> suppressing the flow of the <see cref="ExecutionContext"/> via the underlying <see cref="AsyncLocal{T}"/> <see cref="Current"/> property orchestration;
+        /// whilst also <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)">creating a new scope</see> for the <see cref="ServiceProvider"/>. Note that the overarching invocation will occur synchronously.
+        /// <para><b>Warning:</b> this is an advanced feature and should only be used where this specific capability is required.</para>
         /// </summary>
-        /// <param name="action">The action to invoke with flow suppression.</param>
-        public static void FlowSuppression(Action<ExecutionContextFlow> action)
+        /// <param name="func">The asynchronous function to invoke within the new scope context.</param>
+        public static void NewScope(Func<IServiceProvider, Task> func)
         {
-            using var afc = System.Threading.ExecutionContext.SuppressFlow();
-            action?.Invoke(new ExecutionContextFlow(HasCurrent ? Current : null));
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (!HasCurrent || Current.ServiceProvider == null)
+                throw new InvalidOperationException("Can only be invoked where the ExecutionContext.Current has a value and the ServiceProvider property is not null.");
+
+            var fec = Current.NewScopeCopy();
+
+            using (var scope = Current.ServiceProvider.CreateScope())
+            using (System.Threading.ExecutionContext.SuppressFlow())
+            {
+                Task.Run(async () =>
+                {
+                    fec.ServiceProvider = scope.ServiceProvider;
+                    SetCurrent(fec);
+                    await func(scope.ServiceProvider).ConfigureAwait(false);
+                }).GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>
-        /// Creates a copy of the <see cref="ExecutionContext"/> with only those properties that can be easily shared across a new executing thread context.
+        /// Executes the asynchronous <paramref name="func"/> suppressing the flow of the <see cref="ExecutionContext"/> via the underlying <see cref="AsyncLocal{T}"/> <see cref="Current"/> property orchestration;
+        /// whilst also <see cref="ServiceProviderServiceExtensions.CreateScope(IServiceProvider)">creating a new scope</see> for the <see cref="ServiceProvider"/>. Note that the overarching invocation will occur synchronously.
+        /// <para><b>Warning:</b> this is an advanced feature and should only be used where this specific capability is required.</para>
+        /// </summary>
+        /// <param name="func">The asynchronous function to invoke within the new scope context.</param>
+        public static T NewScope<T>(Func<IServiceProvider, Task<T>> func)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            if (!HasCurrent || Current.ServiceProvider == null)
+                throw new InvalidOperationException("Can only be invoked where the ExecutionContext.Current has a value and the ServiceProvider property is not null.");
+
+            var fec = Current.NewScopeCopy();
+
+            using (var scope = Current.ServiceProvider.CreateScope())
+            using (System.Threading.ExecutionContext.SuppressFlow())
+            {
+                return Task.Run(async () =>
+                {
+                    fec.ServiceProvider = scope.ServiceProvider;
+                    SetCurrent(fec);
+                    return await func(scope.ServiceProvider).ConfigureAwait(false);
+                }).GetAwaiter().GetResult();
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of the <see cref="ExecutionContext"/> with only those properties that should be shared; specifically ignoring the <see cref="ServiceProvider"/>.
         /// </summary>
         /// <returns>The new <see cref="ExecutionContext"/>.</returns>
-        internal ExecutionContext FlowCopy()
+        private ExecutionContext NewScopeCopy()
         {
             return new ExecutionContext
             {
-                Logger = Logger,
                 OperationType = OperationType,
                 _userId = _userId,
                 _username = _username,
                 _tenantId = _tenantId,
                 _partitionKey = _partitionKey,
-                _correlationId = _correlationId,
-                _sessionCorrelationId = _sessionCorrelationId,
+                CorrelationId = CorrelationId,
+                SessionCorrelationId = SessionCorrelationId,
                 _timestamp = _timestamp,
                 _pagingArgs = _pagingArgs,
                 _roles = _roles,
@@ -535,36 +419,5 @@ namespace Beef
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// Enables access to the <see cref="Originating"/> <see cref="ExecutionContext"/> and the ability to <see cref="SetExecutionContext"/> using a copy within the new executing thread context.
-    /// </summary>
-    public sealed class ExecutionContextFlow
-    {
-        private static readonly object _lock = new object();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecutionContextFlow"/> class.
-        /// </summary>
-        /// <param name="originating">The originating <see cref="ExecutionContext"/>.</param>
-        internal ExecutionContextFlow(ExecutionContext? originating) => Originating = originating;
-
-        /// <summary>
-        /// Gets the originating <see cref="ExecutionContext"/>.
-        /// </summary>
-        public ExecutionContext? Originating { get; }
-
-        /// <summary>
-        /// Sets the <see cref="ExecutionContext.Current"/> using a copy of the <see cref="Originating"/> <see cref="ExecutionContext"/>.
-        /// </summary>
-        public void SetExecutionContext()
-        {
-            lock (_lock)
-            {
-                if (Originating != null && !ExecutionContext.HasCurrent)
-                    ExecutionContext.SetCurrent(Originating.FlowCopy());
-            }
-        }
     }
 }

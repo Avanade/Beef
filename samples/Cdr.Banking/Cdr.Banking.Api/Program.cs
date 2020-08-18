@@ -12,6 +12,13 @@ namespace Cdr.Banking.Api
         /// Main startup.
         /// </summary>
         /// <param name="args">The startup arguments.</param>
-        public static void Main(string[] args) => WebApiStartup.BuildWebHost<Startup>(args, "Banking").Run();
+        public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
+
+        /// <summary>
+        /// Creates the <see cref="IWebHostBuilder"/>.
+        /// </summary>
+        /// <param name="args">The startup arguments.</param>
+        /// <returns>The <see cref="IWebHostBuilder"/>.</returns>
+        public static IWebHostBuilder CreateHostBuilder(string[] args) => WebApiStartup.CreateWebHost<Startup>(args, "Banking");
     }
 }

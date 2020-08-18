@@ -17,11 +17,17 @@ namespace Company.AppName.Business.Data
 {
     public partial class PersonData
     {
-        public PersonData()
+        /// <summary>
+        /// Bind the implementation(s) to the corresponding extension(s) for invocation.
+        /// </summary>
+        partial void PersonDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
         }
 
+        /// <summary>
+        /// Performs the query filtering.
+        /// </summary>
 #if (implement_database)
         private void GetByArgsOnQuery(DatabaseParameters p, PersonArgs? args, IDatabaseArgs dbArgs)
         {
@@ -33,9 +39,9 @@ namespace Company.AppName.Business.Data
 #if (implement_entityframework)
         private IQueryable<EfModel.Person> GetByArgsOnQuery(IQueryable<EfModel.Person> q, PersonArgs? args, IEfDbArgs efArgs)
         {
-            AppNameEfDb.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
-            AppNameEfDb.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
-            AppNameEfDb.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
+            _ef.WithWildcard(args?.FirstName, (w) => q = q.Where(x => EF.Functions.Like(x.FirstName, w)));
+            _ef.WithWildcard(args?.LastName, (w) => q = q.Where(x => EF.Functions.Like(x.LastName, w)));
+            _ef.With(args?.Genders, () => q = q.Where(x => args!.Genders!.ToCodeList().Contains(x.GenderCode)));
             return q.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
         }
 #endif

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>3.1.6</Version>
+    <Version>4.1.1</Version>
     <Authors>Beef Developers</Authors>
     <Company>Avanade</Company>
     <Description>Business Entity Execution Framework (Beef) Events framework.</Description>
@@ -28,15 +28,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.7" />
+    <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.2.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventHubs" Version="4.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.6" />
     <PackageReference Include="Polly" Version="7.2.1" />
   </ItemGroup>
 
@@ -52,6 +52,10 @@
 
   <ItemGroup>
     <None Include="..\..\docs\images\Logo256x256.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="WebJobs\" />
   </ItemGroup>
 
 </Project>

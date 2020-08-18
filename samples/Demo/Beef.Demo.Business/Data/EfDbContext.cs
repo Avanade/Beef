@@ -1,4 +1,5 @@
-﻿using Beef.Demo.Business.Data.EfModel;
+﻿using Beef.Data.Database;
+using Beef.Demo.Business.Data.EfModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beef.Demo.Business.Data
@@ -8,6 +9,15 @@ namespace Beef.Demo.Business.Data
     /// </summary>
     public class EfDbContext : DbContext
     {
+        private readonly IDatabase _db;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EfDbContext"/> class.
+        /// </summary>
+        /// <param name="options">The <see cref="DbContextOptions{EfDbContext}"/>.</param>
+        /// <param name="db"></param>
+        public EfDbContext(DbContextOptions<EfDbContext> options, IDatabase db) : base(options) => _db = db;
+
         /// <summary>
         /// Overrides the <see cref="DbContext.OnConfiguring(DbContextOptionsBuilder)"/> to leverage the <see cref="Beef.Demo.Business.Data.Database"/> connection management.
         /// </summary>
@@ -18,7 +28,7 @@ namespace Beef.Demo.Business.Data
 
             // Uses the DB connection management from the Database class - ensures DB connection management and required DB session context setting.
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer(Beef.Demo.Business.Data.Database.Default.CreateConnection());
+                optionsBuilder.UseSqlServer(_db.GetConnection());
         }
 
         /// <summary>

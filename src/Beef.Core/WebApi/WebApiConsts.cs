@@ -53,5 +53,10 @@ namespace Beef.WebApi
         /// Gets the header name for the messages.
         /// </summary>
         public const string MessagesHeaderName = "x-messages";
+
+        /// <summary>
+        /// Gets the header name for the <see cref="ExecutionContext.CorrelationId"/>.
+        /// </summary>
+        public const string CorrelationIdHeaderName = "x-correlation-id";
     }
 }

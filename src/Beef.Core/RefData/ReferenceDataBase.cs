@@ -565,7 +565,7 @@ namespace Beef.RefData
             if (value == null)
                 return 0;
             else
-                return (value.Id != null && value.Id is int) ? (int)value.Id : 0;
+                return (value.Id != null && value.Id is int id) ? id : 0;
         }
 
         /// <summary>
@@ -578,7 +578,7 @@ namespace Beef.RefData
             if (value == null)
                 return null;
             else
-                return (value.Id != null && value.Id is int) ? (int)value.Id : 0;
+                return (value.Id != null && value.Id is int id) ? id : 0;
         }
 
         /// <summary>
@@ -591,7 +591,7 @@ namespace Beef.RefData
             if (value == null)
                 return Guid.Empty;
             else
-                return (value.Id != null && value.Id is Guid) ? (Guid)value.Id : Guid.Empty;
+                return (value.Id != null && value.Id is Guid id) ? id : Guid.Empty;
         }
 
         /// <summary>
@@ -604,7 +604,7 @@ namespace Beef.RefData
             if (value == null)
                 return null;
             else
-                return (value.Id != null && value.Id is Guid) ? (Guid)value.Id : Guid.Empty;
+                return (value.Id != null && value.Id is Guid id) ? id : Guid.Empty;
         }
 #pragma warning restore CA2225
 

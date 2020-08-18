@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Beef.RefData
@@ -14,12 +15,12 @@ namespace Beef.RefData
     /// This is required as <b>Entity</b> classes should contain no implementation specific logic, such as database access, etc. This enables the <b>ReferenceData</b> access logic to be seperated from
     /// the implementation. This ensures that the <b>ReferenceData</b> follows the same pattern of using <c>Manager</c>, <c>DataSvc</c> and <c>Data</c> layering for the implementation logic.
     /// <para>This also enables there to be multiple implementations; for example the loading and caching could be different on the external consumer channel versus the internal application tier.</para> 
-    /// <para>The <see cref="Register"/> must be invoked to set the providing implementation(s) before accessing the <see cref="Current"/> instance.</para>
+    /// <para>The <see cref="Register"/> enables overridding of the <c>provider</c> where the default <see cref="ExecutionContext.ServiceProvider"/> (i.e. dependency injection) is not configured.</para>
     /// </remarks>
     public sealed class ReferenceDataManager : IReferenceDataProvider
     {
-        private static readonly ConcurrentDictionary<string, IReferenceDataProvider> _providers = new ConcurrentDictionary<string, IReferenceDataProvider>();
-        private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _itemProviders = new ConcurrentDictionary<Type, IReferenceDataProvider>();
+        private static readonly ConcurrentDictionary<Type, IReferenceDataProvider> _providers = new ConcurrentDictionary<Type, IReferenceDataProvider>();
+        private static readonly ConcurrentDictionary<Type, Type> _refEntityToInterface = new ConcurrentDictionary<Type, Type>();
 
         [ThreadStatic()]
         private static ReferenceDataContext? _context;
@@ -35,14 +36,8 @@ namespace Beef.RefData
 
             foreach (var provider in refDataProviders.Where(p => p != null))
             {
-                if (!_providers.TryAdd(provider.ProviderName, provider))
-                    throw new ArgumentException($"Provider with Name '{provider.ProviderName}' has already been registered.");
-
-                foreach (var type in provider.GetAllTypes())
-                {
-                    if (!_itemProviders.TryAdd(type, provider))
-                        throw new ArgumentException($"Item Type '{type.Name}' has already been registered.");
-                }
+                if (!_providers.TryAdd(provider.ProviderType, provider))
+                    throw new ArgumentException($"Provider Type '{provider.ProviderType.FullName}' has already been registered.");
             }
         }
 
@@ -72,9 +67,9 @@ namespace Beef.RefData
         private ReferenceDataManager() { }
 
         /// <summary>
-        /// Gets the unique provider name.
+        /// Gets the provider <see cref="Type"/>.
         /// </summary>
-        string IReferenceDataProvider.ProviderName => typeof(ReferenceDataManager).FullName;
+        Type IReferenceDataProvider.ProviderType => typeof(ReferenceDataManager);
 
 #pragma warning disable CA1043 // Use Integral Or String Argument For Indexers; by-design, Type indexer seems perfectly reasonable.
         /// <summary>
@@ -88,11 +83,16 @@ namespace Beef.RefData
             get
             {
                 Check.NotNull(type, nameof(type));
+                var interfaceType = _refEntityToInterface.GetOrAdd(type, rdt =>
+                {
+                    var rdi = type.GetCustomAttribute<ReferenceDataInterfaceAttribute>();
+                    if (rdi == null || !rdi.InterfaceType.IsInterface)
+                        throw new ArgumentException($"Type '{type.Name}' must have the ReferenceDataInterfaceAttribute assigned and the InterfaceType property is an interface.");
 
-                if (_itemProviders.TryGetValue(type, out var provider))
-                    return provider[type];
+                    return rdi.InterfaceType;
+                });
 
-                throw new ArgumentException($"Type '{type.Name}' has not been configured within the registered providers.");
+                return GetProvider(interfaceType)[type];
             }
         }
 
@@ -105,42 +105,32 @@ namespace Beef.RefData
 
 #pragma warning disable CA1822 // Mark members as static; by-design.
         /// <summary>
-        /// Gets the <see cref="Register(IReferenceDataProvider[])">registered</see> <see cref="IReferenceDataProvider"/> for the specified <paramref name="providerName"/>.
+        /// Gets the <see cref="Register(IReferenceDataProvider[])">registered</see> <see cref="IReferenceDataProvider"/> for the specified <paramref name="providerType"/>.
         /// </summary>
-        /// <param name="providerName">The <see cref="IReferenceDataProvider.ProviderName"/>.</param>
+        /// <param name="providerType">The <see cref="IReferenceDataProvider.ProviderType"/>.</param>
         /// <returns>The <see cref="IReferenceDataProvider"/> instance.</returns>
-        public IReferenceDataProvider GetProvider(string providerName)
+        public IReferenceDataProvider GetProvider(Type providerType)
 #pragma warning restore CA1822
         {
-            Check.NotNull(providerName, nameof(providerName));
-            if (_providers.TryGetValue(providerName, out var provider))
+            Check.NotNull(providerType, nameof(providerType));
+
+            var service = ExecutionContext.GetService(providerType);
+            if (service != null)
+                return (IReferenceDataProvider)service;
+
+            if (_providers.TryGetValue(providerType, out var provider))
                 return provider;
 
-            throw new ArgumentException($"Provider with Name '{providerName}' has not been registered.");
+            throw new ArgumentException($"Provider '{providerType.FullName}' has not been registered. Either register using dependency injection (primary) or using the Register method (secondary). " +
+                "For dependency injection this indicates that the ExecutionContext.ServiceProvider property has not been set; for testing this is likely because the PrepareExecutionContext has not yet been invoked to set.");
         }
 
         /// <summary>
-        /// Gets all the underlying <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.
-        /// </summary>
-        /// <returns>An array of the <see cref="ReferenceDataBase"/> <see cref="Type">types</see>.</returns>
-        public Type[] GetAllTypes() => _itemProviders.Keys.ToArray();
-
-        /// <summary>
-        /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects.
+        /// Prefetches all of the named <see cref="ReferenceDataBase"/> objects. This throws a <see cref="NotSupportedException"/>.
         /// </summary>
         /// <param name="names">The list of <see cref="ReferenceDataBase"/> names.</param>
         /// <remarks>Note for implementers; should only fetch where not already cached or expired. This is provided to improve performance for consuming applications to reduce the overhead of
         /// making multiple individual invocations, i.e. reduces chattiness across a potentially high-latency connection.</remarks>
-        public async Task PrefetchAsync(params string[] names)
-        {
-            var tasks = new Task[_providers.Count];
-            var i = 0;
-            foreach (var provider in _providers.Values)
-            {
-                tasks[i++] = provider.PrefetchAsync(names);
-            }
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
+        public Task PrefetchAsync(params string[] names) => throw new NotSupportedException();
     }
 }

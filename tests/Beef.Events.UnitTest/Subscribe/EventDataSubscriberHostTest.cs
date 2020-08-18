@@ -1,5 +1,6 @@
 ﻿using Beef.Events.Subscribe;
 using Beef.Test.NUnit;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace Beef.Events.UnitTest.Subscribe
     [TestFixture]
     public class EventDataSubscriberHostTest
     {
+        [EventSubscriber("Test.Blah.*", "create", "update")]
         public class TestSub : EventSubscriber
         {
             private readonly bool _throw;
@@ -16,7 +18,6 @@ namespace Beef.Events.UnitTest.Subscribe
             public TestSub() : this(RunAsUser.Originating) { }
 
             public TestSub(RunAsUser runAsUser = RunAsUser.Originating, bool @throw = false, UnhandledExceptionHandling unhandledExceptionHandling = UnhandledExceptionHandling.Continue) 
-                : base("Test.Blah.*", "create", "update")
             {
                 _throw = @throw;
                 RunAsUser = runAsUser;
@@ -39,6 +40,7 @@ namespace Beef.Events.UnitTest.Subscribe
             public string Username { get; set; }
         }
 
+        [EventSubscriber("Test.Blah.*", "create", "update")]
         public class TestSubS : EventSubscriber<string>
         {
             private readonly bool _throw;
@@ -46,7 +48,6 @@ namespace Beef.Events.UnitTest.Subscribe
             public TestSubS() : this(RunAsUser.Originating) { }
 
             public TestSubS(RunAsUser runAsUser = RunAsUser.Originating, bool @throw = false, UnhandledExceptionHandling unhandledExceptionHandling = UnhandledExceptionHandling.Continue)
-                : base("Test.Blah.*", "create", "update")
             {
                 _throw = @throw;
                 RunAsUser = runAsUser;
@@ -72,12 +73,18 @@ namespace Beef.Events.UnitTest.Subscribe
             public string Value { get; set; }
         }
 
+        private EventDataSubscriberHost CreateTestHost<T>(Func<T> create) where T : class
+        {
+            var sp = TestSetUp.CreateServiceProvider(sc => sc.AddTransient(_ => create()));
+            return new EventDataSubscriberHost(EventSubscriberHostArgs.Create(sp, typeof(T)).UseLoggerForAuditing());
+        }
+
         [Test]
         public async Task A110_Unknown_Subject()
         {
             var ts = new TestSub();
             var ed = new EventData { Subject = "Other.Something", Action = "CREATE", Username = "TestUser" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsFalse(ts.MessageReceived);
         }
@@ -87,7 +94,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSub();
             var ed = new EventData { Subject = "Test.Blah.123", Action = "OTHER", Username = "TestUser" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsFalse(ts.MessageReceived);
         }
@@ -97,7 +104,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSub(RunAsUser.Originating);
             var ed = new EventData { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
             Assert.AreEqual("TestUser", ts.Username);
@@ -109,7 +116,7 @@ namespace Beef.Events.UnitTest.Subscribe
             EventSubscriberHost.SystemUsername = "SystemUser";
             var ts = new TestSub(RunAsUser.System);
             var ed = new EventData { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
             Assert.AreEqual("SystemUser", ts.Username);
@@ -120,7 +127,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSub(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.Continue);
             var ed = new EventData { Subject = "Test.Blah.123", Action = "UPDATE", Username = "TestUser" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
         }
@@ -133,7 +140,7 @@ namespace Beef.Events.UnitTest.Subscribe
 
             try
             {
-                await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+                await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
             catch (DivideByZeroException)
             {
@@ -149,7 +156,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSubS();
             var ed = new EventData<string> { Subject = "Other.Something", Action = "CREATE", Username = "TestUser", Value = "TEST" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsFalse(ts.MessageReceived);
         }
@@ -159,7 +166,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSubS();
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "OTHER", Username = "TestUser", Value = "TEST" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsFalse(ts.MessageReceived);
         }
@@ -169,7 +176,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSubS(RunAsUser.Originating);
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser", Value = "TEST" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
             Assert.AreEqual("TestUser", ts.Username);
@@ -183,7 +190,7 @@ namespace Beef.Events.UnitTest.Subscribe
             EventSubscriberHost.SystemUsername = "SystemUser";
             var ts = new TestSubS(RunAsUser.System);
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "UPDATE", Username = "TestUser", Value = "TEST" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
             Assert.AreEqual("SystemUser", ts.Username);
@@ -196,7 +203,7 @@ namespace Beef.Events.UnitTest.Subscribe
         {
             var ts = new TestSubS(@throw: true, unhandledExceptionHandling: UnhandledExceptionHandling.Continue);
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser", Value = "TEST" };
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+            await CreateTestHost(() => ts).ReceiveAsync(ed);
 
             Assert.IsTrue(ts.MessageReceived);
             Assert.AreEqual("TEST", ts.Value);
@@ -211,7 +218,7 @@ namespace Beef.Events.UnitTest.Subscribe
 
             try
             {
-                await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), ts).UseLoggerForAuditing()).ReceiveAsync(ed);
+                await CreateTestHost(() => ts).ReceiveAsync(ed);
             }
             catch (DivideByZeroException)
             {
@@ -228,24 +235,29 @@ namespace Beef.Events.UnitTest.Subscribe
         public void C110_TooManySubjectSubscribers()
         {
             var ed = new EventData<string> { Subject = "Test.Blah.123", Action = "CREATE", Username = "TestUser", Value = "TEST" };
+            var sp = TestSetUp.CreateServiceProvider();
 
             ExpectException.Throws<EventSubscriberException>(
                 "There are 2 IEventSubscriber instances subscribing to Subject 'Test.Blah.123' and Action 'CREATE'; there must be only a single subscriber.",
-                async () => await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), new TestSub(), new TestSubS()).UseLoggerForAuditing()).ReceiveAsync(ed));
+                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(sp, typeof(TestSub), typeof(TestSubS)).UseLoggerForAuditing()).ReceiveAsync(ed));
         }
 
         [Test]
         public void C120_DoNotAllowMultipleMessages()
         {
+            var sp = TestSetUp.CreateServiceProvider();
+
             ExpectException.Throws<EventSubscriberException>(
                 "The EventDataSubscriberHost does not AllowMultipleMessages; there were 2 event messages.",
-                async () => await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), new TestSub()).UseLoggerForAuditing()).ReceiveAsync(new EventData(), new EventData()));
+                async () => await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(sp, typeof(TestSub)).UseLoggerForAuditing()).ReceiveAsync(new EventData(), new EventData()));
         }
 
         [Test]
         public async Task C130_AllowMultipleMessages()
         {
-            await EventDataSubscriberHost.Create(new EventSubscriberHostArgs(TestSetUp.CreateLogger(), new TestSub()).UseLoggerForAuditing()).AllowMultipleMessages().ReceiveAsync(new EventData { Subject = "X" }, new EventData { Subject = "X" });
+            var sp = TestSetUp.CreateServiceProvider();
+
+            await new EventDataSubscriberHost(EventSubscriberHostArgs.Create(sp, typeof(TestSub)).UseLoggerForAuditing()).AllowMultipleMessages().ReceiveAsync(new EventData { Subject = "X" }, new EventData { Subject = "X" });
         }
     }
 }

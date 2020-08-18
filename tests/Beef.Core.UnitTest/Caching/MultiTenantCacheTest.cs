@@ -19,8 +19,8 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void CreateAndGetWithInstanceFlush()
         {
-            CachePolicyManager.IsInternalTracingEnabled = true;
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
+            CachePolicyManager.Current.IsInternalTracingEnabled = true;
 
             // Initialize the cache.
             var mtc = new MultiTenantCache<KeyValueCache<int, string>>((g, p) =>
@@ -32,7 +32,7 @@ namespace Beef.Core.UnitTest.Caching
             }, "MultiTenantCacheTest");
 
             // Check the internal nocachepolicy.
-            var pa = CachePolicyManager.GetPolicies();
+            var pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(1, pa.Length);
             Assert.IsTrue(pa[0].Key.StartsWith("MultiTenantCacheTest_"));
             Assert.IsInstanceOf(typeof(NoCachePolicy), pa[0].Value);
@@ -53,7 +53,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(1, mtc.Count);
 
             // No new PolicyManager policies should be created.
-            pa = CachePolicyManager.GetPolicies();
+            pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             // Check the second tenant.
@@ -84,8 +84,8 @@ namespace Beef.Core.UnitTest.Caching
         [Test]
         public void CreateAndGetWithForceFlush()
         {
-            CachePolicyManager.IsInternalTracingEnabled = true;
-            CachePolicyManager.Reset();
+            Policy.CachePolicyManagerTest.TestSetUp();
+            CachePolicyManager.Current.IsInternalTracingEnabled = true;
 
             // Initialize the cache.
             var mtc = new MultiTenantCache<KeyValueCache<int, string>>((g, p) =>
@@ -96,7 +96,7 @@ namespace Beef.Core.UnitTest.Caching
                     return new KeyValueCache<int, string>(p, (k) => "X" + k.ToString());
             }, "MultiTenantCacheTest");
 
-            var pa = CachePolicyManager.GetPolicies();
+            var pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(1, pa.Length);
 
             // Check the internal nocachepolicy.
@@ -116,7 +116,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(1, mtc.Count);
 
             // Check the default policy for type.
-            pa = CachePolicyManager.GetPolicies();
+            pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             var p1 = pa.Where(x => x.Key == "MultiTenantCacheTest").SingleOrDefault();
@@ -130,11 +130,11 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(2, mtc.Count);
 
             // No new PolicyManager policies should be created.
-            pa = CachePolicyManager.GetPolicies();
+            pa = CachePolicyManager.Current.GetPolicies();
             Assert.AreEqual(2, pa.Length);
 
             // Flush the cache - nothing should happen as they never expire.
-            CachePolicyManager.Flush();
+            CachePolicyManager.Current.Flush();
             Assert.AreEqual(2, mtc.Count);
 
             // Remove a tenant.
@@ -145,7 +145,7 @@ namespace Beef.Core.UnitTest.Caching
             Assert.AreEqual(0, kvc2.Count);
 
             // Force flush the cache - should be removed.
-            CachePolicyManager.ForceFlush();
+            CachePolicyManager.Current.ForceFlush();
             Assert.IsFalse(mtc.Contains(ToGuid(1)));
             Assert.IsFalse(mtc.Contains(ToGuid(2)));
             Assert.AreEqual(0, mtc.Count);

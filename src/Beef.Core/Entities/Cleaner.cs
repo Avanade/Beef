@@ -198,13 +198,19 @@ namespace Beef.Entities
         }
 
         /// <summary>
-        /// Cleans a value where it implements <see cref="ICleanUp"/>.
+        /// Cleans one or more values where they implement <see cref="ICleanUp"/>.
         /// </summary>
-        /// <param name="value">The value to clean.</param>
-        public static void CleanUp(object value)
+        /// <param name="values">The values to clean.</param>
+        public static void CleanUp(params object?[] values)
         {
-            if (value != null && value is ICleanUp)
-                ((ICleanUp)value).CleanUp();
+            if (values != null)
+            {
+                foreach (object? o in values)
+                {
+                    if (o != null && o is ICleanUp value)
+                        value.CleanUp();
+                }
+            }
         }
 
         /// <summary>

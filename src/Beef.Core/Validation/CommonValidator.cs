@@ -29,21 +29,6 @@ namespace Beef.Validation
     public class CommonValidator<T> : PropertyRuleBase<ValidationValue<T>, T>
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="CommonValidator{T}"/>.
-        /// </summary>
-        /// <param name="validator">An action with the <see cref="CommonValidator{T}"/>.</param>
-        /// <returns>The <see cref="CommonValidator{T}"/>.</returns>
-        [Obsolete("Please use CommonValidator.Create<TEntity>() instead.")]
-#pragma warning disable CA1000 // TODO: Do not declare static members on generic types; is now obsolete; to be removed at a later date.
-        public static CommonValidator<T> Create(Action<CommonValidator<T>> validator)
-#pragma warning restore CA1000
-        {
-            var cv = new CommonValidator<T>();
-            validator?.Invoke(cv);
-            return cv;
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CommonValidator{T}"/>.
         /// </summary>
         internal CommonValidator() : base("Common") { }

@@ -31,11 +31,6 @@ namespace Beef.Data.EntityFrameworkCore
         /// Indicates whether the data should be refreshed (reselected where applicable) after a <b>save</b> operation (defaults to <c>true</c>).
         /// </summary>
         bool Refresh { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
-        /// </summary>
-        DbContext? DbContext { get; }
     }
 
     /// <summary>
@@ -49,34 +44,21 @@ namespace Beef.Data.EntityFrameworkCore
         /// Initializes a new instance of the <see cref="EfDbArgs{T, TModel}"/> class with a <paramref name="mapper"/>.
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
-        /// <param name="dbContext">The <see cref="Microsoft.EntityFrameworkCore.DbContext"/> where overridding automatic default.</param>
-        public EfDbArgs(IEntityMapper<T, TModel> mapper, DbContext? dbContext = null)
-        {
-            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            DbContext = dbContext;
-        }
+        public EfDbArgs(IEntityMapper<T, TModel> mapper) => Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EfDbArgs{T, TModel}"/> class with a <paramref name="mapper"/> and <paramref name="paging"/>.
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="dbContext">The <see cref="Microsoft.EntityFrameworkCore.DbContext"/> where overridding automatic default.</param>
-        public EfDbArgs(IEntityMapper<T, TModel> mapper, PagingArgs paging, DbContext? dbContext = null)
-            : this(mapper, new PagingResult(paging ?? throw new ArgumentNullException(nameof(paging))), dbContext)
-        {
-        }
+        public EfDbArgs(IEntityMapper<T, TModel> mapper, PagingArgs paging) : this(mapper, new PagingResult(paging ?? throw new ArgumentNullException(nameof(paging)))) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EfDbArgs{T, TModel}"/> class with a <paramref name="mapper"/> and <paramref name="paging"/>.
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        /// <param name="dbContext">The <see cref="Microsoft.EntityFrameworkCore.DbContext"/> where overridding automatic default.</param>
-        public EfDbArgs(IEntityMapper<T, TModel> mapper, PagingResult paging, DbContext? dbContext = null) : this(mapper, dbContext)
-        {
-            Paging = paging ?? throw new ArgumentNullException(nameof(paging));
-        }
+        public EfDbArgs(IEntityMapper<T, TModel> mapper, PagingResult paging) : this(mapper) => Paging = paging ?? throw new ArgumentNullException(nameof(paging));
 
         /// <summary>
         /// Gets the <see cref="IEntityMapper"/>.
@@ -103,10 +85,5 @@ namespace Beef.Data.EntityFrameworkCore
         /// is dependent on <see cref="SaveChanges"/> being performed.
         /// </summary>
         public bool Refresh { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
-        /// </summary>
-        public DbContext? DbContext { get; set; }
     }
 }

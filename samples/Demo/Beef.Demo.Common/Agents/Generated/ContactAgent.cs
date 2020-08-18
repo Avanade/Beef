@@ -8,36 +8,72 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Common.Agents.ServiceAgents;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
+    /// Defines the Contact Web API agent.
+    /// </summary>
+    public partial interface IContactAgent
+    {
+        /// <summary>
+        /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
+        /// </summary>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<ContactCollectionResult>> GetAllAsync(WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Gets the <see cref="Contact"/> object that matches the selection criteria.
+        /// </summary>
+        /// <param name="id">The <see cref="Contact"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Contact>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Creates the <see cref="Contact"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Contact"/> object.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Contact>> CreateAsync(Contact value, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Updates the <see cref="Contact"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Contact"/> object.</param>
+        /// <param name="id">The <see cref="Contact"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Contact>> UpdateAsync(Contact value, Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Deletes the <see cref="Contact"/> object that matches the selection criteria.
+        /// </summary>
+        /// <param name="id">The <see cref="Contact"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+    }
+
+    /// <summary>
     /// Provides the Contact Web API agent.
     /// </summary>
-    public partial class ContactAgent : WebApiAgentBase, IContactServiceAgent
+    public partial class ContactAgent : WebApiAgentBase, IContactAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactAgent"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public ContactAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            ContactServiceAgent = Beef.Factory.Create<IContactServiceAgent>(httpClient, beforeRequest);
-        }
-        
-        /// <summary>
-        /// Gets the underlyng <see cref="IContactServiceAgent"/> instance.
-        /// </summary>
-        public IContactServiceAgent ContactServiceAgent { get; private set; }
+        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
+        public ContactAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
@@ -45,7 +81,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<ContactCollectionResult>> GetAllAsync(WebApiRequestOptions? requestOptions = null)
-            => ContactServiceAgent.GetAllAsync(requestOptions);
+        {
+            return GetCollectionResultAsync<ContactCollectionResult, ContactCollection, Contact>("api/v1/contacts", requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
+        }
 
         /// <summary>
         /// Gets the <see cref="Contact"/> object that matches the selection criteria.
@@ -54,7 +93,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Contact>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-            => ContactServiceAgent.GetAsync(id, requestOptions);
+        {
+            return GetAsync<Contact>("api/v1/contacts/{id}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
 
         /// <summary>
         /// Creates the <see cref="Contact"/> object.
@@ -63,7 +105,13 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Contact>> CreateAsync(Contact value, WebApiRequestOptions? requestOptions = null)
-            => ContactServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return PostAsync<Contact>("api/v1/contacts", value, requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
+        }
 
         /// <summary>
         /// Updates the <see cref="Contact"/> object.
@@ -73,7 +121,13 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Contact>> UpdateAsync(Contact value, Guid id, WebApiRequestOptions? requestOptions = null)
-            => ContactServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return PutAsync<Contact>("api/v1/contacts/{id}", value, requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
 
         /// <summary>
         /// Deletes the <see cref="Contact"/> object that matches the selection criteria.
@@ -82,7 +136,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult> DeleteAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-            => ContactServiceAgent.DeleteAsync(id, requestOptions);
+        {
+            return DeleteAsync("api/v1/contacts/{id}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
     }
 }
 

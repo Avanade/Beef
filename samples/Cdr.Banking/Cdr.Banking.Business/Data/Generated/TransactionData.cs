@@ -28,18 +28,27 @@ namespace Cdr.Banking.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TransactionData : ITransactionData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ICosmosDb _cosmos;
 
-        private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        private readonly Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, ICosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
-        private readonly Func<string?, TransactionArgs?, ICosmosDbArgs, Task>? _getTransactionsOnBeforeAsync;
-        private readonly Func<TransactionCollectionResult, string?, TransactionArgs?, Task>? _getTransactionsOnAfterAsync;
-        private readonly Action<Exception>? _getTransactionsOnException;
+        private Action<ICosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, ICosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
 
-        #pragma warning restore CS0649
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionData"/> class.
+        /// </summary>
+        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
+        public TransactionData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); TransactionDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void TransactionDataCtor();
 
         /// <summary>
         /// Get transaction for account.
@@ -50,16 +59,13 @@ namespace Cdr.Banking.Business.Data
         /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 TransactionCollectionResult __result = new TransactionCollectionResult(paging);
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Transaction", __result.Paging!, new PartitionKey(accountId));
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getTransactionsOnBeforeAsync != null) await _getTransactionsOnBeforeAsync(accountId, args, __dataArgs).ConfigureAwait(false);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getTransactionsOnQuery == null ? q : _getTransactionsOnQuery(q, accountId, args, __dataArgs)).SelectQuery<TransactionCollection>();
-                if (_getTransactionsOnAfterAsync != null) await _getTransactionsOnAfterAsync(__result, accountId, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getTransactionsOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Transaction", __result.Paging!, new PartitionKey(accountId), onCreate: _onDataArgsCreate);
+                __result.Result = _cosmos.Container(__dataArgs).Query(q => _getTransactionsOnQuery?.Invoke(q, accountId, args, __dataArgs) ?? q).SelectQuery<TransactionCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

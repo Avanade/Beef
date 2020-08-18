@@ -15,7 +15,7 @@ namespace Beef.Data.EntityFrameworkCore
     /// Represents the base class for encapsulating the database access layer using an entity framework <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
     /// </summary>
     /// <typeparam name="TDbContext">The <see cref="DbContext"/> <see cref="Type"/>.</typeparam>
-    public abstract class EfDbBase<TDbContext> where TDbContext : DbContext, new()
+    public abstract class EfDbBase<TDbContext> : IEfDb<TDbContext> where TDbContext : DbContext
     {
 #pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
         /// <summary>
@@ -58,6 +58,28 @@ namespace Beef.Data.EntityFrameworkCore
 #pragma warning restore CA1000
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="EfDbBase{TDbContext}"/> class.
+        /// </summary>
+        /// <param name="dbContext">The <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.</param>
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="EfDbInvoker{TDbContext}"/>.</param>
+        public EfDbBase(TDbContext dbContext, EfDbInvoker<TDbContext>? invoker = null)
+        {
+            DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            Invoker = invoker ?? new EfDbInvoker<TDbContext>();
+        }
+
+        /// <summary>
+        /// Gets the underlying <typeparamref name="TDbContext"/> instance.
+        /// </summary>
+        /// <returns>The <typeparamref name="TDbContext"/> instance.</returns>
+        public TDbContext DbContext { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="EfDbInvoker{TDbContext}"/>.
+        /// </summary>
+        public EfDbInvoker<TDbContext> Invoker { get; private set; }
+
+        /// <summary>
         /// Indicates whether a pre-read is performed on an <see cref="UpdateAsync{T, TModel}(EfDbArgs{T, TModel}, T)"/> to confirm existence and throw a corresponding
         /// <see cref="NotFoundException"/> where not found. Otherwise, where not found a <see cref="ConcurrencyException"/> will be thrown. The pre-read requires an additional
         /// database keyed-read and therefore has a minor performance impact as a result.
@@ -75,10 +97,36 @@ namespace Beef.Data.EntityFrameworkCore
         public Action<SqlException> ExceptionHandler { get; set; } = (sex) => ThrowTransformedSqlException(sex);
 
         /// <summary>
-        /// Creates a <typeparamref name="TDbContext"/> instance (it is up to the consumer to <see cref="DbContext.Dispose"/> when finished).
+        /// Invokes the <paramref name="action"/> whilst <see cref="DatabaseWildcard.Replace(string)">replacing</see> the <b>wildcard</b> characters when the <paramref name="with"/> is not <c>null</c>.
         /// </summary>
-        /// <returns>A new <typeparamref name="TDbContext"/> instance.</returns>
-        public TDbContext CreateDbContext() => new TDbContext();
+        /// <param name="with">The value with which to verify.</param>
+        /// <param name="action">The <see cref="Action"/> to invoke when there is a valid <paramref name="with"/> value; passed the database specific wildcard value.</param>
+        public void WithWildcard(string? with, Action<string> action)
+        {
+            if (with != null)
+            {
+                with = Wildcard.Replace(with);
+                if (with != null)
+                    action?.Invoke(with);
+            }
+        }
+
+        /// <summary>
+        /// Invokes the <paramref name="action"/> when the <paramref name="with"/> is not the default value for the <see cref="Type"/>.
+        /// </summary>
+        /// <typeparam name="T">The with value <see cref="Type"/>.</typeparam>
+        /// <param name="with">The value with which to verify.</param>
+        /// <param name="action">The <see cref="Action"/> to invoke when there is a valid <paramref name="with"/> value.</param>
+        public void With<T>(T with, Action action)
+        {
+            if (Comparer<T>.Default.Compare(with, default) != 0 && Comparer<T>.Default.Compare(with, default) != 0)
+            {
+                if (!(with is string) && with is System.Collections.IEnumerable ie && !ie.GetEnumerator().MoveNext())
+                    return;
+
+                action?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Creates an <see cref="EfDbQuery{T, TModel, TDbContext}"/> to enable select-like capabilities.
@@ -88,7 +136,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// <param name="queryArgs">The <see cref="EfDbArgs{T, TModel}"/>.</param>
         /// <param name="query">The function to further define the query.</param>
         /// <returns>A <see cref="EfDbQuery{T, TModel, TDbContext}"/>.</returns>
-        public EfDbQuery<T, TModel, TDbContext> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
+        public IEfDbQuery<T, TModel> Query<T, TModel>(EfDbArgs<T, TModel> queryArgs, Func<IQueryable<TModel>, IQueryable<TModel>>? query = null) where T : class, new() where TModel : class, new()
         {
             return new EfDbQuery<T, TModel, TDbContext>(this, queryArgs, query);
         }
@@ -113,10 +161,9 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = getArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            using var db = new EfDbContextManager(getArgs);
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
-                return await FindAsync(db, getArgs, efKeys).ConfigureAwait(false);
+                return await FindAsync(getArgs, efKeys).ConfigureAwait(false);
             }, this).ConfigureAwait(false);
         }
 
@@ -144,14 +191,13 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.CreatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
-            using var db = new EfDbContextManager(saveArgs);
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
-                db.DbContext.Add(model);
+                DbContext.Add(model);
 
                 if (saveArgs.SaveChanges)
-                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                    await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
                 return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
@@ -181,8 +227,7 @@ namespace Beef.Data.EntityFrameworkCore
                 cl.ChangeLog.UpdatedDate = ExecutionContext.HasCurrent ? ExecutionContext.Current.Timestamp : Cleaner.Clean(DateTime.Now);
             }
 
-            using var db = new EfDbContextManager(saveArgs);
-            return await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            return await Invoker.InvokeAsync(this, async () =>
             {
                 if (OnUpdatePreReadForNotFound)
                 {
@@ -194,20 +239,20 @@ namespace Beef.Data.EntityFrameworkCore
                         efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
                     }
 
-                    var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                    var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                     if (em == null)
                         throw new NotFoundException();
 
                     // Remove the entity from the tracker before we attempt to update; otherwise, will use existing rowversion and concurrency will not work as expected.
-                    db.DbContext.Remove(em);
-                    db.DbContext.ChangeTracker.AcceptAllChanges();
+                    DbContext.Remove(em);
+                    DbContext.ChangeTracker.AcceptAllChanges();
                 }
 
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
-                db.DbContext.Update(model);
+                DbContext.Update(model);
 
                 if (saveArgs.SaveChanges)
-                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                    await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
 
                 return (saveArgs.Refresh) ? saveArgs.Mapper.MapToSrce(model, Mapper.OperationTypes.Get)! : value;
             }, this).ConfigureAwait(false);
@@ -230,18 +275,17 @@ namespace Beef.Data.EntityFrameworkCore
                 efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(keys[i], Mapper.OperationTypes.Unspecified)!;
             }
 
-            using var db = new EfDbContextManager(saveArgs);
-            await EfDbInvoker<TDbContext>.Default.InvokeAsync(this, async () =>
+            await Invoker.InvokeAsync(this, async () =>
             {
                 // A pre-read is required to get the row version for concurrency.
-                var em = (TModel)await db.DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                 if (em == null)
                     return;
 
-                db.DbContext.Remove(em);
+                DbContext.Remove(em);
 
                 if (saveArgs.SaveChanges)
-                    await db.DbContext.SaveChangesAsync(true).ConfigureAwait(false);
+                    await DbContext.SaveChangesAsync(true).ConfigureAwait(false);
             }, this).ConfigureAwait(false);
         }
 
@@ -272,50 +316,13 @@ namespace Beef.Data.EntityFrameworkCore
         /// <summary>
         /// Performs the EF select single (find).
         /// </summary>
-        private static async Task<T> FindAsync<T, TModel>(EfDbContextManager db, EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
+        private async Task<T> FindAsync<T, TModel>(EfDbArgs<T, TModel> args, object[] keys) where T : class, new() where TModel : class, new()
         {
-            var model = await db.DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
+            var model = await DbContext.FindAsync<TModel>(keys).ConfigureAwait(false);
             if (model == default)
                 return default!;
             else
                 return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the EF entity must not result in a null value.");
-        }
-
-        /// <summary>
-        /// Manages the <see cref="DbContext"/> lifecycle.
-        /// </summary>
-        internal class EfDbContextManager : IDisposable
-        {
-            private readonly bool _closeAndDispose = false;
-
-            /// <summary>
-            /// Initialize a new instance of the <see cref="EfDbContextManager"/> class.
-            /// </summary>
-            /// <param name="args">The <see cref="IEfDbArgs"/>.</param>
-            internal EfDbContextManager(IEfDbArgs args)
-            {
-                if (args != null && args.DbContext != null)
-                    DbContext = (TDbContext)args.DbContext;
-                else
-                {
-                    _closeAndDispose = true;
-                    DbContext = new TDbContext();
-                }
-            }
-
-            /// <summary>
-            /// Gets the <see cref="DbContext"/>.
-            /// </summary>
-            public TDbContext DbContext { get; private set; }
-
-            /// <summary>
-            /// Release the allocated resources (if any).
-            /// </summary>
-            public void Dispose()
-            {
-                if (_closeAndDispose)
-                    DbContext.Dispose();
-            }
         }
     }
 }

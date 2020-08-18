@@ -3,13 +3,14 @@
 namespace Company.AppName.Business.Data
 {
     /// <summary>
-    /// Represents the <b>Beef.Demo</b> database using Entity Framework.
+    /// Represents the <b>Company.AppName</b> database using Entity Framework.
     /// </summary>
-    public class AppNameEfDb : EfDb<AppNameEfDbContext, AppNameEfDb>
+    public class AppNameEfDb : EfDbBase<AppNameEfDbContext>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AppNameEfDb"/> class.
         /// </summary>
-        public AppNameEfDb() => OnUpdatePreReadForNotFound = true;
+        /// <param name="dbContext">The entity framework database context.</param>
+        public AppNameEfDb(AppNameEfDbContext dbContext) : base(dbContext) => OnUpdatePreReadForNotFound = true;
     }
 }

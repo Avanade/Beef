@@ -111,6 +111,15 @@ namespace Beef.RefData
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ReferenceDataSidList{TItem, TSid}"/> class with a list of <b>Serialization Identifiers</b> (SIDs).
+        /// </summary>
+        /// <param name="sids">The list of <b>Serialization Identifiers</b> (SIDs).</param>
+        public ReferenceDataSidList(params TSid[] sids)
+        {
+            _sids = new List<TSid>(sids);
+        }
+
+        /// <summary>
         /// Gets the underlying <b>Serialization Identifier</b> (SID) list.
         /// </summary>
         /// <returns>The underlying <b>Serialization Identifier</b> (SID) list.</returns>

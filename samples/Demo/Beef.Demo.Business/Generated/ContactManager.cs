@@ -24,34 +24,18 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class ContactManager : IContactManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IContactDataSvc _dataService;
 
-        private readonly Func<Task>? _getAllOnBeforeAsync;
-        private readonly Func<ContactCollectionResult, Task>? _getAllOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
+        public ContactManager(IContactDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
 
-        private readonly Func<Guid, Task>? _getOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _getOnValidate;
-        private readonly Func<Guid, Task>? _getOnBeforeAsync;
-        private readonly Func<Contact?, Guid, Task>? _getOnAfterAsync;
-
-        private readonly Func<Contact, Task>? _createOnPreValidateAsync;
-        private readonly Action<MultiValidator, Contact>? _createOnValidate;
-        private readonly Func<Contact, Task>? _createOnBeforeAsync;
-        private readonly Func<Contact, Task>? _createOnAfterAsync;
-
-        private readonly Func<Contact, Guid, Task>? _updateOnPreValidateAsync;
-        private readonly Action<MultiValidator, Contact, Guid>? _updateOnValidate;
-        private readonly Func<Contact, Guid, Task>? _updateOnBeforeAsync;
-        private readonly Func<Contact, Guid, Task>? _updateOnAfterAsync;
-
-        private readonly Func<Guid, Task>? _deleteOnPreValidateAsync;
-        private readonly Action<MultiValidator, Guid>? _deleteOnValidate;
-        private readonly Func<Guid, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ContactManagerCtor();
 
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
@@ -59,14 +43,10 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync().ConfigureAwait(false);
-                var __result = await ContactDataSvc.GetAllAsync().ConfigureAwait(false);
-                if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
             });
         }
 
@@ -77,22 +57,15 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
-                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await ContactDataSvc.GetAsync(id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -105,22 +78,15 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
-                EntityBase.CleanUp(value);
-                if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)))
-                    .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
                     .Run().ThrowOnError();
 
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value).ConfigureAwait(false);
-                var __result = await ContactDataSvc.CreateAsync(value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -134,23 +100,16 @@ namespace Beef.Demo.Business
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
 
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
-                EntityBase.CleanUp(value, id);
-                if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(value);
                 MultiValidator.Create()
                     .Add(value.Validate(nameof(value)))
-                    .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
                     .Run().ThrowOnError();
 
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
-                var __result = await ContactDataSvc.UpdateAsync(value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
@@ -160,20 +119,15 @@ namespace Beef.Demo.Business
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
-                EntityBase.CleanUp(id);
-                if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _deleteOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id).ConfigureAwait(false);
-                await ContactDataSvc.DeleteAsync(id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
+                await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
     }

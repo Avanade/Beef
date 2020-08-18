@@ -1,10 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.WebApi;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Moq.Language;
 using Moq.Language.Flow;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -63,6 +65,21 @@ namespace Beef.Test.NUnit
         public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, TEntity entity, HttpStatusCode statusCode = HttpStatusCode.OK) where TMock : class
         {
             return mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage(statusCode), entity));
+        }
+
+        /// <summary>
+        /// Removes all items from the <see cref="IServiceCollection"/> for the specified <typeparamref name="TService"/>.
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <returns><c>true</c> if item was successfully removed; otherwise, <c>false</c>. Also returns <c>false</c> if item was not found.</returns>
+        public static bool Remove<TService>(this IServiceCollection services) where TService : class
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(TService));
+            return descriptor != null && services.Remove(descriptor);
         }
     }
 }

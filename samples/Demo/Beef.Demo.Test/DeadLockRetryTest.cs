@@ -1,4 +1,5 @@
 ﻿using Beef.Data.Database;
+using Beef.Demo.Api;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Test.NUnit;
@@ -11,32 +12,28 @@ using System.Threading.Tasks;
 namespace Beef.Demo.Test
 {
     [TestFixture, NonParallelizable]
-    public class DeadLockRetryTest
+    public class DeadLockRetryTest : UsingAgentTesterServer<Startup>
     {
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            TestSetUp.Reset();
-        }
-
         [Test, TestSetUp]
         public void A010_DatabaseDeadlock_Retry()
         {
             int count = 0;
-            SqlRetryDatabaseInvoker.ExceptionRetry += (s, e) => { count++; Console.WriteLine(e.Exception.ToString()); };
+            SqlRetryDatabaseInvoker.ExceptionRetry += (s, e) => count++;
 
-            var p1 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(1.ToGuid())).Value;
-            var p2 = AgentTester.Create<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run((a) => a.Agent.GetDetailAsync(2.ToGuid())).Value;
+            var p1 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(1.ToGuid())).Value;
+            var p2 = AgentTester.Test<PersonAgent, PersonDetail>().ExpectStatusCode(HttpStatusCode.OK).Run(a => a.GetDetailAsync(2.ToGuid())).Value;
+
+            var db = new Beef.Demo.Business.Data.Database(BuildConfiguration()["ConnectionStrings:BeefDemo"]);
 
             var task1 = Task.Run(async () =>
             {
-                await Beef.Demo.Business.Data.Database.Default.SqlStatement(
+                await db.SqlStatement(
                     @"begin transaction
-select * from Demo.WorkHistory with (tablock, holdlock)
-waitfor delay '00:00:02'
-select * from Demo.Person with (tablock, holdlock)
-waitfor delay '00:00:04'
-commit transaction"
+            select * from Demo.WorkHistory with (tablock, holdlock)
+            waitfor delay '00:00:02'
+            select * from Demo.Person with (tablock, holdlock)
+            waitfor delay '00:00:04'
+            commit transaction"
                     ).NonQueryAsync();
             });
 
@@ -44,7 +41,7 @@ commit transaction"
             {
                 Thread.Sleep(500);
                 p1.FirstName += "X";
-                var r1 = AgentTester.Create<PersonAgent, PersonDetail>().Run((a) => a.Agent.UpdateDetailAsync(p1, p1.Id));
+                var r1 = AgentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p1, p1.Id));
                 Console.WriteLine($"Person {p1.Id} update status code: {r1.StatusCode}");
             });
 
@@ -52,7 +49,7 @@ commit transaction"
             {
                 Thread.Sleep(750);
                 p2.FirstName += "X";
-                var r2 = AgentTester.Create<PersonAgent, PersonDetail>().Run((a) => a.Agent.UpdateDetailAsync(p2, p2.Id));
+                var r2 = AgentTester.Test<PersonAgent, PersonDetail>().Run(a => a.UpdateDetailAsync(p2, p2.Id));
                 Console.WriteLine($"Person {p2.Id} update status code: {r2.StatusCode}");
             });
 

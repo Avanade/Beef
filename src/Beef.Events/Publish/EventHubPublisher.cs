@@ -6,29 +6,41 @@ using System.Threading.Tasks;
 using Beef.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Beef.Events.Publish
 {
     /// <summary>
-    /// <see cref="Publish(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
+    /// <see cref="PublishEventsAsync(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
     /// </summary>
-    public class EventHubPublisher
+    public class EventHubPublisher : EventPublisherBase
     {
         private readonly EventHubs.EventHubClient _client;
+        private readonly EventHubPublisherInvoker _invoker;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventHubPublisher"/> using the specified <see cref="EventHubs.EventHubClient"/> (consider setting the underlying
         /// <see cref="EventHubs.ClientEntity.RetryPolicy"/>) to allow for transient errors).
         /// </summary>
         /// <param name="client">The <see cref="EventHubs.EventHubClient"/>.</param>
-        public EventHubPublisher(EventHubs.EventHubClient client) => _client = Check.NotNull(client, nameof(client));
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="EventHubPublisherInvoker"/>.</param>
+        public EventHubPublisher(EventHubs.EventHubClient client, EventHubPublisherInvoker? invoker = null)
+        {
+            _client = Check.NotNull(client, nameof(client));
+            _invoker = invoker ?? new EventHubPublisherInvoker();
+        }
+
+        /// <summary>
+        /// Indicates whether any <see cref="Exception"/> thrown during the publish should be swallowed (e.g. log and continue processing).
+        /// </summary>
+        public bool SwallowException { get; set; }
 
         /// <summary>
         /// Publishes the <paramref name="events"/>.
         /// </summary>
         /// <param name="events">The <see cref="EventData"/> instances.</param>
         /// <returns>The corresponding <see cref="Task"/>.</returns>
-        public async Task Publish(EventData[] events)
+        protected override async Task PublishEventsAsync(params EventData[] events)
         {
             if (events == null || events.Length == 0)
                 return;
@@ -42,13 +54,15 @@ namespace Beef.Events.Publish
 
             try
             {
-                await EventHubPublisherInvoker.Default.InvokeAsync(this, async () => await _client.SendAsync(eventHubEvents, partitionKey).ConfigureAwait(false)).ConfigureAwait(false);
+                await _invoker.InvokeAsync(this, async () => await _client.SendAsync(eventHubEvents, partitionKey).ConfigureAwait(false)).ConfigureAwait(false);
             }
 #pragma warning disable CA1031 // Do not catch general exception types; by-design, is a catch all.
             catch (Exception ex)
 #pragma warning restore CA1031 
             {
                 OnException(events, partitionKey, ex);
+                if (!SwallowException)
+                    throw;
             }
         }
 
@@ -70,7 +84,7 @@ namespace Beef.Events.Publish
 
         /// <summary>
         /// Invoked when the underlying <see cref="EventHubs.EventHubClient.SendAsync(EventHubs.EventData, string)"/> results in an unhandled <see cref="Exception"/>;
-        /// by default logs (<see cref="Logger.Exception(Exception)"/>) the <paramref name="exception"/> (in this case the events will <b>not</b> be published; i.e. they will be lost).
+        /// by default logs the <paramref name="exception"/> (in this case the events will <b>not</b> be published; i.e. they will be lost).
         /// </summary>
         /// <param name="events">The events that will be published.</param>
         /// <param name="partitionKey">The partition key (<see cref="GetPartitionKey(EventData[])"/>).</param>
@@ -81,7 +95,7 @@ namespace Beef.Events.Publish
                 throw new ArgumentNullException(nameof(exception));
 
             var subs = string.Join(", ", events.Select(x => x.Subject).Distinct().ToArray());
-            Logger.Default.Exception(exception, $"EventHub Publish for Subject(s) '{subs}' failed: {exception.Message}");
+            Logger.Create<EventHubPublisher>().LogError(exception, $"EventHub Publish for Subject(s) '{subs}' failed: {exception.Message}");
         }
     }
 }

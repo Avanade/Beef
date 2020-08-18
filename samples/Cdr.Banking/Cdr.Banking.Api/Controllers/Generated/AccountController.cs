@@ -21,11 +21,19 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Account</b> API functionality.
+    /// Provides the <b>Account</b> Web API functionality.
     /// </summary>
     [Route("api/v1/banking/accounts")]
     public partial class AccountController : ControllerBase
     {
+        private readonly IAccountManager _manager;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IAccountManager"/>.</param>
+        public AccountController(IAccountManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+
         /// <summary>
         /// Get all accounts.
         /// </summary>
@@ -40,7 +48,7 @@ namespace Cdr.Banking.Api.Controllers
         public IActionResult GetAccounts([FromQuery(Name = "product-category")] string? productCategory = default, [FromQuery(Name = "open-status")] string? openStatus = default, [FromQuery(Name = "is-owned")] bool? isOwned = default)
         {
             var args = new AccountArgs { ProductCategorySid = productCategory, OpenStatusSid = openStatus, IsOwned = isOwned };
-            return new WebApiGet<AccountCollectionResult, AccountCollection, Account>(this, () => Factory.Create<IAccountManager>().GetAccountsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
+            return new WebApiGet<AccountCollectionResult, AccountCollection, Account>(this, () => _manager.GetAccountsAsync(args, WebApiQueryString.CreatePagingArgs(this)),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 
@@ -55,7 +63,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetDetail(string? accountId)
         {
-            return new WebApiGet<AccountDetail?>(this, () => Factory.Create<IAccountManager>().GetDetailAsync(accountId),
+            return new WebApiGet<AccountDetail?>(this, () => _manager.GetDetailAsync(accountId),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -70,7 +78,7 @@ namespace Cdr.Banking.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetBalance(string? accountId)
         {
-            return new WebApiGet<Balance?>(this, () => Factory.Create<IAccountManager>().GetBalanceAsync(accountId),
+            return new WebApiGet<Balance?>(this, () => _manager.GetBalanceAsync(accountId),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
     }

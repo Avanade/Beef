@@ -2,6 +2,7 @@
 
 using Beef.Diagnostics;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using Polly;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Beef.Data.Database
     /// A <see cref="DatabaseInvoker"/> for <b>Microsoft SQL Server</b> that uses <b>Polly</b> to perform an exponential retry where a transient error (see <see cref="TransientErrorNumbers"/>) occurs.
     /// </summary>
     /// <remarks>
-    /// A retry is attempted using an exponential (2 seconds ^ n / 2) backoff strategy with a 100 ms jitter to add a level of randomness (values would be: 1s, 2s, 4s, 8s, ...). The 
+    /// A retry is attempted using a 250ms backoff strategy (e.g. 0ms, 250ms, 500ms, 750ms, 1000ms) with a 100ms jitter to add a further level of randomness. The 
     /// <see cref="MaxRetries"/> defines how many retries are performed before failing and allowing the error to bubble up and out.
     /// </remarks>
     public class SqlRetryDatabaseInvoker : DatabaseInvoker
@@ -63,14 +64,14 @@ namespace Beef.Data.Database
         /// <summary>
         /// Calculates the retry timespan.
         /// </summary>
-        private static TimeSpan CalcRetryTimeSpan(int count) => TimeSpan.FromSeconds(Math.Pow(2, count) / 2) + TimeSpan.FromMilliseconds(_jitterer.Next(0, 100));
+        private static TimeSpan CalcRetryTimeSpan(int count) => TimeSpan.FromMilliseconds((count * 1000) / 4) + TimeSpan.FromMilliseconds(_jitterer.Next(0, 100));
 
         /// <summary>
         /// Logs the retry exception as a warning.
         /// </summary>
         private void LogRetryException(Exception ex, TimeSpan ts)
         {
-            Logger.Default.Warning($"Transient SQL Server Error '{((SqlException)ex).Number}' encountered; will retry in {ts.TotalMilliseconds}ms: {ex.Message}");
+            Logger.Create<SqlRetryDatabaseInvoker>().LogWarning($"Transient SQL Server Error '{((SqlException)ex).Number}' encountered; will retry in {ts.TotalMilliseconds}ms: {ex.Message}");
             ExceptionRetry?.Invoke(this, new SqlRetryDatabaseInvokerEventArgs((SqlException)ex));
         }
 
@@ -99,7 +100,7 @@ namespace Beef.Data.Database
         /// <param name="lineNumber">The line number in the source file at which the method is called.</param>
         protected override Task WrapInvokeAsync(object caller, Func<Task> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
+            return CreateAsyncPolicy().ExecuteAsync(async () => await base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber).ConfigureAwait(false));
         }
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace Beef.Data.Database
         /// <returns>The result.</returns>
         protected override Task<TResult> WrapInvokeAsync<TResult>(object caller, Func<Task<TResult>> func, DatabaseBase? param = null, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = 0)
         {
-            return CreateAsyncPolicy().ExecuteAsync(() => base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber));
+            return CreateAsyncPolicy().ExecuteAsync(async () => await base.WrapInvokeAsync(caller, func, param, memberName, filePath, lineNumber).ConfigureAwait(false));
         }
     }
 

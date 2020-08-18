@@ -1,16 +1,14 @@
-﻿using Beef.Demo.Business.Data;
-using Beef.Demo.Common.Entities;
+﻿using Beef.Demo.Common.Entities;
+using Beef.Test.NUnit;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Beef.Demo.Test
 {
     [TestFixture]
     public class EntityTest
     {
-        [Test]
+        [Test, TestSetUp]
         public void ChangeTracking_EntitySubPropertyTracking()
         {
             var p = new Person
@@ -29,7 +27,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new System.Collections.Specialized.StringCollection { "City" }, p.Address.ChangeTracking);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void ChangeTracking_EntityCollectionTracking()
         {
             var pc = new PersonCollection();
@@ -70,7 +68,7 @@ namespace Beef.Demo.Test
             Assert.IsFalse(p.IsChangeTracking);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void ChangeTracking_EntitySubCollectionTracking()
         {
             var wh = new WorkHistory { Name = "Avanade" };
@@ -90,7 +88,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(new System.Collections.Specialized.StringCollection { "History" }, pd.ChangeTracking);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void CopyFrom_SubEntityNull()
         {
             var pf = new PersonDetail();
@@ -102,7 +100,7 @@ namespace Beef.Demo.Test
             Assert.IsNull(pt.Address);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void CopyFrom_SubEntityCopy()
         {
             var pf = new PersonDetail { Address = new Address { City = "Bardon" } };
@@ -130,7 +128,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual("Ashgrove", pt.Address.City);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void CopyFrom_SubEntityCollClone()
         {
             var pf = new PersonDetail { History = new WorkHistoryCollection { new WorkHistory { Name = "Blah" } } };
@@ -150,7 +148,7 @@ namespace Beef.Demo.Test
             Assert.AreEqual(pf.History, pt.History);
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void Equality()
         {
             var g = Guid.NewGuid();
@@ -224,7 +222,7 @@ namespace Beef.Demo.Test
             Assert.IsTrue(p1.Equals(p3));
         }
 
-        [Test]
+        [Test, TestSetUp]
         public void HashCode()
         {
             var g = Guid.NewGuid();

@@ -27,32 +27,26 @@ namespace Beef.Demo.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class ContactData : IContactData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IEfDb _ef;
 
-        private readonly Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
-        private readonly Func<IEfDbArgs, Task>? _getAllOnBeforeAsync;
-        private readonly Func<ContactCollectionResult, Task>? _getAllOnAfterAsync;
-        private readonly Action<Exception>? _getAllOnException;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        private readonly Func<Guid, IEfDbArgs, Task>? _getOnBeforeAsync;
-        private readonly Func<Contact?, Guid, Task>? _getOnAfterAsync;
-        private readonly Action<Exception>? _getOnException;
+        private Func<IQueryable<EfModel.Contact>, IEfDbArgs, IQueryable<EfModel.Contact>>? _getAllOnQuery;
 
-        private readonly Func<Contact, IEfDbArgs, Task>? _createOnBeforeAsync;
-        private readonly Func<Contact, Task>? _createOnAfterAsync;
-        private readonly Action<Exception>? _createOnException;
-
-        private readonly Func<Contact, IEfDbArgs, Task>? _updateOnBeforeAsync;
-        private readonly Func<Contact, Task>? _updateOnAfterAsync;
-        private readonly Action<Exception>? _updateOnException;
-
-        private readonly Func<Guid, IEfDbArgs, Task>? _deleteOnBeforeAsync;
-        private readonly Func<Guid, Task>? _deleteOnAfterAsync;
-        private readonly Action<Exception>? _deleteOnException;
-
-        #pragma warning restore CS0649
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactData"/> class.
+        /// </summary>
+        /// <param name="ef">The <see cref="IEfDb"/>.</param>
+        public ContactData(IEfDb ef) { _ef = Check.NotNull(ef, nameof(ef)); ContactDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ContactDataCtor();
 
         /// <summary>
         /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
@@ -60,15 +54,13 @@ namespace Beef.Demo.Business.Data
         /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 ContactCollectionResult __result = new ContactCollectionResult();
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(__dataArgs).ConfigureAwait(false);
-                __result.Result = EfDb.Default.Query(__dataArgs, q => _getAllOnQuery == null ? q : _getAllOnQuery(q, __dataArgs)).SelectQuery<ContactCollection>();
-                if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getAllOnException });
+                __result.Result = _ef.Query(__dataArgs, q => _getAllOnQuery?.Invoke(q, __dataArgs) ?? q).SelectQuery<ContactCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -78,15 +70,11 @@ namespace Beef.Demo.Business.Data
         /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Contact? __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.GetAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getOnException });
+                return await _ef.GetAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -99,15 +87,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Contact __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_createOnBeforeAsync != null) await _createOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.CreateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _createOnException });
+                return await _ef.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -120,15 +104,11 @@ namespace Beef.Demo.Business.Data
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                Contact __result;
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
-                __result = await EfDb.Default.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+                return await _ef.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -137,13 +117,11 @@ namespace Beef.Demo.Business.Data
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id, __dataArgs).ConfigureAwait(false);
-                await EfDb.Default.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            }, new BusinessInvokerArgs { ExceptionHandler = _deleteOnException });
+                await _ef.DeleteAsync(__dataArgs, id).ConfigureAwait(false);
+            });
         }
 
         /// <summary>

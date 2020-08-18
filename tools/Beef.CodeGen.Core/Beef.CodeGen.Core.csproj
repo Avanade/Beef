@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>3.1.20</Version>
+    <Version>4.1.1</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -37,7 +37,12 @@
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
-    <None Remove="Templates\EntityGrpcServiceAgent_cs.xml" />
+    <None Remove="Templates\IEntityDataSvc_cs.xml" />
+    <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
+    <None Remove="Templates\IReferenceData_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsData_cs.xml" />
+    <None Remove="Templates\ServiceCollectionExtensionsManager_cs.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,26 +74,29 @@
     <EmbeddedResource Include="Templates\EntityDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\EntityData_cs.xml" />
     <EmbeddedResource Include="Templates\EntityManager_cs.xml" />
+    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
     <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityGrpcServiceAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiServiceAgent_cs.xml" />
     <EmbeddedResource Include="Templates\Entity_cs.xml" />
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
     <EmbeddedResource Include="Templates\Grpc_proto.xml" />
+    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\IEntityData_cs.xml" />
     <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />
+    <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiServiceAgent_cs.xml" />
+    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.xml" />
+    <EmbeddedResource Include="Templates\IReferenceData_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +105,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
   </ItemGroup>
 
   <ItemGroup>

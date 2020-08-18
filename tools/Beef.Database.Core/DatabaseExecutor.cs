@@ -4,10 +4,10 @@ using Beef.CodeGen;
 using Beef.Data.Database;
 using Beef.Database.Core.Sql;
 using Beef.Diagnostics;
-using Beef.Executors;
 using DbUp;
 using DbUp.Engine;
 using DbUp.Engine.Output;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -23,7 +23,9 @@ namespace Beef.Database.Core
     /// <summary>
     /// Represents the database executor.
     /// </summary>
-    public class DatabaseExecutor : ExecutorBase
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+    public class DatabaseExecutor
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
     {
         /// <summary>
         /// Gets or sets the <b>Migrations</b> scripts namespace part name.
@@ -45,17 +47,22 @@ namespace Beef.Database.Core
         private readonly Assembly[] _assemblies;
         private readonly List<string> _namespaces = new List<string>();
         private readonly CodeGenExecutorArgs _codeGenArgs;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Represents a DbUp to Beef Logger sink.
         /// </summary>
         private class LoggerSink : IUpgradeLog
         {
-            public void WriteError(string format, params object[] args) => Logger.Default.Error(format, args);
+            private readonly ILogger _logger;
 
-            public void WriteInformation(string format, params object[] args) => Logger.Default.Info(format, args);
+            public LoggerSink(ILogger logger) => _logger = Check.NotNull(logger, nameof(logger));
 
-            public void WriteWarning(string format, params object[] args) => Logger.Default.Warning(format, args);
+            public void WriteError(string format, params object[] args) => _logger.LogError(format, args);
+
+            public void WriteInformation(string format, params object[] args) => _logger.LogInformation(format, args);
+
+            public void WriteWarning(string format, params object[] args) => _logger.LogWarning(format, args);
         }
 
         /// <summary>
@@ -72,7 +79,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Represents the Database being upgraded.
         /// </summary>
-        private class Db : Database<Db>
+        private class Db : DatabaseBase
         {
             public Db(string cs) : base(cs) { }
         }
@@ -90,9 +97,8 @@ namespace Beef.Database.Core
         /// <returns>The return code; zero equals success.</returns>
         public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
         {
-            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, codeGenArgs));
-            await em.RunAsync().ConfigureAwait(false);
-            return HandleRunResult(em);
+            var de = new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, codeGenArgs);
+            return await de.RunAsync().ConfigureAwait(false) ? 0 : -1;
         }
 
         /// <summary>
@@ -105,20 +111,8 @@ namespace Beef.Database.Core
         /// <returns>The return code; zero equals success.</returns>
         public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, params Assembly[] assemblies)
         {
-            using var em = ExecutionManager.Create(() => new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, null!));
-            await em.RunAsync().ConfigureAwait(false);
-            return HandleRunResult(em);
-        }
-
-        /// <summary>
-        /// Handles the execution manager run result.
-        /// </summary>
-        private static int HandleRunResult(ExecutionManager em)
-        {
-            if (em.HadExecutionException)
-                throw new InvalidOperationException($"Database executor failed with an unhandled exception: {em.ExecutionException!.Message}", em.ExecutionException);
-
-            return em.LastExecutor == null ? -1 : em.LastExecutor.ReturnCode;
+            var de = new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, null!);
+            return await de.RunAsync().ConfigureAwait(false) ? 0 : -1;
         }
 
         /// <summary>
@@ -130,53 +124,57 @@ namespace Beef.Database.Core
         /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
         public DatabaseExecutor(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
         {
+            Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
+
             _command = command;
             _connectionString = Check.NotEmpty(connectionString, nameof(connectionString));
             _assemblies = assemblies;
+            _logger = new ColoredConsoleLogger(nameof(DatabaseExecutor));
 
             Check.IsFalse(_command.HasFlag(DatabaseExecutorCommand.CodeGen) && codeGenArgs == null, nameof(codeGenArgs), "The code generation arguments must be provided when the 'command' includes 'CodeGen'.");
-            _codeGenArgs = codeGenArgs ?? new CodeGenExecutorArgs();
+            _codeGenArgs = codeGenArgs ?? new CodeGenExecutorArgs(_logger);
             if (_codeGenArgs != null && !_codeGenArgs.Parameters.ContainsKey("ConnectionString"))
                 _codeGenArgs.Parameters.Add("ConnectionString", _connectionString);
 
             _db = new Db(_connectionString);
 
             _assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
-            ReturnCode = -1;
         }
 
         /// <summary>
         /// Execute the database upgrade.
         /// </summary>
-        protected override async Task OnRunAsync(ExecutorRunArgs args)
+        public async Task<bool> RunAsync()
         {
-            var ls = new LoggerSink();
+            var ls = new LoggerSink(_logger);
 
             if (_command.HasFlag(DatabaseExecutorCommand.Drop))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB DROP: Checking database existence and dropping where found...");
-                await TimeExecutionAsync(() => { DropDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false);
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB DROP: Checking database existence and dropping where found...");
+                if (!await TimeExecutionAsync(() => { DropDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
+                    return false;
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.Create))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB CREATE: Checking database existence and creating where not found...");
-                await TimeExecutionAsync(() => { EnsureDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false);
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB CREATE: Checking database existence and creating where not found...");
+                if (!await TimeExecutionAsync(() => { EnsureDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
+                    return false;
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.Migrate))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB MIGRATE: Migrating the database...");
-                Logger.Default.Info($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{MigrationsNamespace}.*.sql")))}");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB MIGRATE: Migrating the database...");
+                _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{MigrationsNamespace}.*.sql")))}");
 
                 DatabaseUpgradeResult? result = null;
-                await TimeExecutionAsync(() =>
+                if (!await TimeExecutionAsync(() =>
                 {
                     result = DeployChanges.To
                         .SqlDatabase(_connectionString)
@@ -187,86 +185,97 @@ namespace Beef.Database.Core
                         .PerformUpgrade();
 
                     return Task.FromResult(result.Successful);
-                }).ConfigureAwait(false);
+                }).ConfigureAwait(false))
+                    return false;
 
                 if (!result!.Successful)
                 {
-                    Logger.Default.Exception(result.Error);
-                    return;
+                    _logger.LogError(result.Error, result.Error.Message);
+                    return false;
                 }
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.CodeGen))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB CODEGEN: Code-gen database objects...");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
                 CodeGenConsole.LogCodeGenExecutionArgs(_codeGenArgs);
 
                 if (!await TimeExecutionAsync(async () =>
                 {
-                    var em = ExecutionManager.Create(() => new CodeGenExecutor(_codeGenArgs));
-                    await em.RunAsync().ConfigureAwait(false);
-                    return em.StopExecutor?.Exception == null;
+                    var cge = new CodeGenExecutor(_codeGenArgs);
+                    await cge.RunAsync().ConfigureAwait(false);
+                    return true;
                 }).ConfigureAwait(false))
                 {
-                    return;
+                    return false;
                 }
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.Schema))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB SCHEMA: Drops and creates the database objects...");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB SCHEMA: Drops and creates the database objects...");
 
                 if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync(new string[] { "dbo", "Ref" })).ConfigureAwait(false))
-                    return;
+                    return false;
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.Reset))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB RESET: Resets database by dropping data from all tables...");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB RESET: Resets database by dropping data from all tables...");
 
                 if (!await TimeExecutionAsync(() => DeleteAllAndResetAsync()).ConfigureAwait(false))
-                    return;
+                    return false;
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.Data))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB DATA: Insert or merge the embedded YAML data...");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB DATA: Insert or merge the embedded YAML data...");
 
                 if (!await TimeExecutionAsync(() => InsertOrMergeYamlDataAsync()).ConfigureAwait(false))
-                    return;
+                    return false;
             }
 
             if (_command.HasFlag(DatabaseExecutorCommand.ScriptNew))
             {
-                Logger.Default.Info(string.Empty);
-                Logger.Default.Info(new string('-', 80));
-                Logger.Default.Info("DB SCRIPTNEW: Creating a new SQL script from embedded template...");
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+                _logger.LogInformation("DB SCRIPTNEW: Creating a new SQL script from embedded template...");
 
                 if (!await TimeExecutionAsync(() => CreateScriptNewAsync()).ConfigureAwait(false))
-                    return;
+                    return false;
             }
 
-            ReturnCode = 0;
+            return true;
         }
 
         /// <summary>
         /// Times the execution and reports result.
         /// </summary>
-        private static async Task<bool> TimeExecutionAsync(Func<Task<bool>> action)
+        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action)
         {
-            var sw = Stopwatch.StartNew();
-            var result = await action().ConfigureAwait(false);
-            sw.Stop();
-            Logger.Default.Info($"Complete [{sw.ElapsedMilliseconds}ms].");
-            return result;
+            try
+            {
+                var sw = Stopwatch.StartNew();
+                var result = await action().ConfigureAwait(false);
+                sw.Stop();
+                _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms].");
+                return result;
+            }
+#pragma warning disable CA1031 // Do not catch general exception types; by-design.
+            catch (Exception ex)
+#pragma warning restore CA1031 
+            {
+                _logger.LogError(ex, ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -318,7 +327,7 @@ namespace Beef.Database.Core
             // See if there are any files out there (recently generated).
             if (_codeGenArgs?.OutputPath != null)
             {
-                Logger.Default.Info($"Probing for files: '{_codeGenArgs.OutputPath.FullName}*.sql'");
+                _logger.LogInformation($"Probing for files: '{_codeGenArgs.OutputPath.FullName}*.sql'");
                 foreach (var ns in _namespaces)
                 {
                     var di = new DirectoryInfo(Path.Combine(_codeGenArgs.OutputPath.FullName, ns, SchemaNamespace));
@@ -330,7 +339,7 @@ namespace Beef.Database.Core
                             var sor = SqlObjectReader.Read(fi.OpenRead());
                             if (!sor.IsValid)
                             {
-                                Logger.Default.Error($"SQL object '{name}' is not considered valid: {sor.ErrorMessage}");
+                                _logger.LogError($"SQL object '{name}' is not considered valid: {sor.ErrorMessage}");
                                 return false;
                             }
 
@@ -346,7 +355,7 @@ namespace Beef.Database.Core
             }
 
             // Parse all resources and get ready for the SQL code gen.
-            Logger.Default.Info($"Probing for embedded resources: {string.Join(", ", GetNamespacesWithSuffix($"{SchemaNamespace}.*.sql"))}");
+            _logger.LogInformation($"Probing for embedded resources: {string.Join(", ", GetNamespacesWithSuffix($"{SchemaNamespace}.*.sql"))}");
             foreach (var ass in _assemblies)
             {
                 foreach (var name in ass.GetManifestResourceNames())
@@ -363,7 +372,7 @@ namespace Beef.Database.Core
                     var sor = SqlObjectReader.Read(ass.GetManifestResourceStream(name)!);
                     if (!sor.IsValid)
                     {
-                        Logger.Default.Error($"SQL object '{name}' is not considered valid: {sor.ErrorMessage}");
+                        _logger.LogError($"SQL object '{name}' is not considered valid: {sor.ErrorMessage}");
                         return false;
                     }
 
@@ -378,7 +387,7 @@ namespace Beef.Database.Core
 
             if (list.Count == 0)
             {
-                Logger.Default.Info($"Nothing found.");
+                _logger.LogInformation($"Nothing found.");
                 return true;
             }
 
@@ -423,17 +432,17 @@ namespace Beef.Database.Core
         /// <summary>
         /// Wraps the SQL statement(s) and reports success or failure.
         /// </summary>
-        private static async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text)
+        private async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text)
         {
             try
             {
-                Logger.Default.Info($"Executing {text}");
+                _logger.LogInformation($"Executing {text}");
                 await func().ConfigureAwait(false);
                 return true;
             }
             catch (DbException dex)
             {
-                Logger.Default.Error($"Execution failed with: {dex.Message}");
+                _logger.LogError(dex, $"Execution failed with: {dex.Message}");
                 return false;
             }
         }
@@ -454,11 +463,11 @@ namespace Beef.Database.Core
         private async Task<bool> InsertOrMergeYamlDataAsync()
         {
             // Get all the database table schema information.
-            Logger.Default.Info($"Querying database for all existing table and column configurations...");
+            _logger.LogInformation($"Querying database for all existing table and column configurations...");
             await SqlDataUpdater.RegisterDatabaseAsync(_db, "Ref").ConfigureAwait(false);
 
             // Parse all resources and get ready for the SQL code gen.
-            Logger.Default.Info($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{DataNamespace}.*.yaml")))}");
+            _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{DataNamespace}.*.yaml")))}");
             foreach (var ass in _assemblies)
             {
                 foreach (var name in ass.GetManifestResourceNames())
@@ -466,17 +475,17 @@ namespace Beef.Database.Core
                     if (!_namespaces.Any(x => name.StartsWith(x + $".{DataNamespace}.", StringComparison.InvariantCulture) && name.EndsWith(".yaml", StringComparison.InvariantCulture)))
                         continue;
 
-                    Logger.Default.Info($"Parsing and executing: {name}");
+                    _logger.LogInformation($"Parsing and executing: {name}");
                     var sdm = SqlDataUpdater.ReadYaml(ass.GetManifestResourceStream(name)!);
                     await sdm.GenerateSqlAsync((a) =>
                     {
-                        Logger.Default.Info("");
-                        Logger.Default.Info($"Executing: {a.OutputFileName} ->");
-                        Logger.Default.Info(a.Content);
+                        _logger.LogInformation("");
+                        _logger.LogInformation($"Executing: {a.OutputFileName} ->");
+                        _logger.LogInformation(a.Content);
                         if (a.Content != null)
                         {
                             var rows = _db.SqlStatement(a.Content).ScalarAsync<int>().GetAwaiter().GetResult();
-                            Logger.Default.Info($"Result: {rows} rows affected.");
+                            _logger.LogInformation($"Result: {rows} rows affected.");
                         }
                     }).ConfigureAwait(false);
                 }
@@ -515,7 +524,7 @@ namespace Beef.Database.Core
                 await cg.GenerateAsync(System.Xml.Linq.XElement.Load(st)).ConfigureAwait(false);
             }
 
-            Logger.Default.Info($"Script file created: {fi.FullName}");
+            _logger.LogInformation($"Script file created: {fi.FullName}");
             return true;
         }
     }

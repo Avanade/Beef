@@ -154,6 +154,11 @@ namespace Beef.Validation
         public bool ShallowValidation { get; }
 
         /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> from the <see cref="ExecutionContext.ServiceProvider"/>.
+        /// </summary>
+        public IServiceProvider ServiceProvider => (ExecutionContext.HasCurrent ? ExecutionContext.Current.ServiceProvider : null) ?? throw new InvalidOperationException("There is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+
+        /// <summary>
         /// Throws a <see cref="ValidationException"/> where an error was found (and optionally if warnings).
         /// </summary>
         public void ThrowOnError(bool includeWarnings = false)

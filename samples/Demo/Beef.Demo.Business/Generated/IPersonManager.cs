@@ -132,6 +132,12 @@ namespace Beef.Demo.Business
         Task<int> DataSvcCustomAsync();
 
         /// <summary>
+        /// Validate a Manager Custom generation.
+        /// </summary>
+        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        Task<Person?> ManagerCustomAsync();
+
+        /// <summary>
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
@@ -145,6 +151,11 @@ namespace Beef.Demo.Business
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
         Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging);
+
+        /// <summary>
+        /// Throw Error.
+        /// </summary>
+        Task ThrowErrorAsync();
 
         /// <summary>
         /// Gets the <see cref="Person"/> object that matches the selection criteria.

@@ -4,9 +4,14 @@ using System;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
+    /// Provides the <b>Test</b> OData capabilities.
+    /// </summary>
+    public interface ITestOData : IOData { }
+
+    /// <summary>
     /// Represents the <b>Test</b> OData endpoint.
     /// </summary>
-    public class TestOData : OData<TestOData>
+    public class TestOData : ODataBase, ITestOData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TestOData"/> class.

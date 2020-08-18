@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 namespace Beef.Data.OData
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="ODataBase"/> invocations
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="ODataBase"/> invocations
     /// specifically exception handling (see <see cref="ODataBase.ExceptionHandler"/>).
     /// </summary>
-    public class ODataInvoker : InvokerBase<ODataInvoker, ODataBase>
+    public class ODataInvoker : InvokerBase<ODataBase>
     {
         #region NoResult
 

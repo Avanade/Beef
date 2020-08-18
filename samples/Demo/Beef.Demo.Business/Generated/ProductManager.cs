@@ -25,21 +25,18 @@ namespace Beef.Demo.Business
     /// </summary>
     public partial class ProductManager : IProductManager
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly IProductDataSvc _dataService;
 
-        private readonly Func<int, Task>? _getOnPreValidateAsync;
-        private readonly Action<MultiValidator, int>? _getOnValidate;
-        private readonly Func<int, Task>? _getOnBeforeAsync;
-        private readonly Func<Product?, int, Task>? _getOnAfterAsync;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProductManager"/> class.
+        /// </summary>
+        /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>
+        public ProductManager(IProductDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ProductManagerCtor(); }
 
-        private readonly Func<ProductArgs?, PagingArgs?, Task>? _getByArgsOnPreValidateAsync;
-        private readonly Action<MultiValidator, ProductArgs?, PagingArgs?>? _getByArgsOnValidate;
-        private readonly Func<ProductArgs?, PagingArgs?, Task>? _getByArgsOnBeforeAsync;
-        private readonly Func<ProductCollectionResult, ProductArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
-
-        #pragma warning restore CS0649
-        #endregion
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void ProductManagerCtor();
 
         /// <summary>
         /// Gets the <see cref="Product"/> object that matches the selection criteria.
@@ -48,22 +45,15 @@ namespace Beef.Demo.Business
         /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Product?> GetAsync(int id)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(id);
-                if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
-
+                Cleaner.CleanUp(id);
                 MultiValidator.Create()
                     .Add(id.Validate(nameof(id)).Mandatory())
-                    .Additional((__mv) => _getOnValidate?.Invoke(__mv, id))
                     .Run().ThrowOnError();
 
-                if (_getOnBeforeAsync != null) await _getOnBeforeAsync(id).ConfigureAwait(false);
-                var __result = await ProductDataSvc.GetAsync(id).ConfigureAwait(false);
-                if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
@@ -75,22 +65,15 @@ namespace Beef.Demo.Business
         /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Default.InvokeAsync(this, async () =>
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                EntityBase.CleanUp(args);
-                if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
-
+                Cleaner.CleanUp(args);
                 MultiValidator.Create()
                     .Add(args.Validate(nameof(args)).Entity(ProductArgsValidator.Default))
-                    .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .Run().ThrowOnError();
 
-                if (_getByArgsOnBeforeAsync != null) await _getByArgsOnBeforeAsync(args, paging).ConfigureAwait(false);
-                var __result = await ProductDataSvc.GetByArgsAsync(args, paging).ConfigureAwait(false);
-                if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
-                Cleaner.Clean(__result);
-                return __result;
+                return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
     }

@@ -21,11 +21,19 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Gender</b> API functionality.
+    /// Provides the <b>Gender</b> Web API functionality.
     /// </summary>
     [Route("api/v1/demo/ref/genders")]
     public partial class GenderController : ControllerBase
     {
+        private readonly IGenderManager _manager;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GenderController"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="IGenderManager"/>.</param>
+        public GenderController(IGenderManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+
         /// <summary>
         /// Gets the <see cref="Gender"/> entity that matches the selection criteria.
         /// </summary>
@@ -37,7 +45,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
         {
-            return new WebApiGet<Gender?>(this, () => Factory.Create<IGenderManager>().GetAsync(id),
+            return new WebApiGet<Gender?>(this, () => _manager.GetAsync(id),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 
@@ -51,7 +59,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Gender value)
         {
-            return new WebApiPost<Gender>(this, () => Factory.Create<IGenderManager>().CreateAsync(WebApiActionBase.Value(value)),
+            return new WebApiPost<Gender>(this, () => _manager.CreateAsync(WebApiActionBase.Value(value)),
                 operationType: OperationType.Create, statusCode: HttpStatusCode.Created, alternateStatusCode: null);
         }
 
@@ -66,7 +74,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Gender value, Guid id)
         {
-            return new WebApiPut<Gender>(this, () => Factory.Create<IGenderManager>().UpdateAsync(WebApiActionBase.Value(value), id),
+            return new WebApiPut<Gender>(this, () => _manager.UpdateAsync(WebApiActionBase.Value(value), id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
     }

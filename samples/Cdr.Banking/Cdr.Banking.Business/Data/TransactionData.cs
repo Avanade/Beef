@@ -1,19 +1,16 @@
 ﻿using Beef;
 using Beef.Data.Cosmos;
 using Cdr.Banking.Common.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Cdr.Banking.Business.Data
 {
     public partial class TransactionData
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionData"/> class setting the required internal configurations.
+        /// Wires up the extensions.
         /// </summary>
-        public TransactionData()
+        partial void TransactionDataCtor()
         {
             _getTransactionsOnQuery = GetTransactionsOnQuery;
         }

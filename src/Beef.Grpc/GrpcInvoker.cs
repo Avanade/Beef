@@ -3,7 +3,13 @@
 namespace Beef.Grpc
 {
     /// <summary>
-    /// Adds capabilities (wraps) an <see cref="InvokerBase{TInvoker, TParam}"/> enabling standard functionality to be added to all <see cref="GrpcServiceBase"/> invocations.
+    /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="GrpcServiceBase"/> invocations.
     /// </summary>
-    public class GrpcInvoker : InvokerBase<GrpcInvoker, GrpcServiceBase?> { }
+    public class GrpcInvoker : InvokerBase<GrpcServiceBase?>
+    {
+        /// <summary>
+        /// Gets the current configured instance (see <see cref="ExecutionContext.ServiceProvider"/>).
+        /// </summary>
+        public static GrpcInvoker Current => GetCurrentInstance<GrpcInvoker>(false) ?? new GrpcInvoker();
+    }
 }

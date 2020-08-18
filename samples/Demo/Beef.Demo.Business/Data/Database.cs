@@ -6,14 +6,14 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Represents the <b>Beef.Demo</b> database.
     /// </summary>
-    public class Database : Database<Database>
+    public class Database : DatabaseBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Database{T}"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="provider">The optional data provider.</param>
-        public Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider) { }
+        public Database(string connectionString, DbProviderFactory provider = null) : base(connectionString, provider, new SqlRetryDatabaseInvoker()) { }
 
         /// <summary>
         /// Set the SQL Session Context when the connection is opened.

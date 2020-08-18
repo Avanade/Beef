@@ -6,7 +6,7 @@ namespace Beef.Demo.Business.Data
 {
     public partial class RobotData
     {
-        public RobotData()
+        partial void RobotDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
         }

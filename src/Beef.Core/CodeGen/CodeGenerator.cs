@@ -61,7 +61,10 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            return char.ToLower(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
+            if (text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase))
+                return $"{char.ToLower(text[0], CultureInfo.InvariantCulture)}{char.ToLower(text[1], CultureInfo.InvariantCulture)}{text.Substring(2)}";
+            else
+                return char.ToLower(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
         }
 
         /// <summary>
@@ -87,7 +90,10 @@ namespace Beef.CodeGen
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            return char.ToUpper(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
+            if (text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase))
+                return $"{char.ToUpper(text[0], CultureInfo.InvariantCulture)}{char.ToUpper(text[1], CultureInfo.InvariantCulture)}{text.Substring(2)}";
+            else
+                return char.ToUpper(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
         }
 
         /// <summary>
@@ -101,7 +107,7 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
+            s = SpecialCaseHandling(s);
             return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s.Substring(1); // Make sure the first character is always upper case.
         }
 
@@ -116,7 +122,7 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
+            s = SpecialCaseHandling(s);
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "_", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
 #pragma warning restore CA1308 
@@ -133,10 +139,24 @@ namespace Beef.CodeGen
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = s.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
+            s = SpecialCaseHandling(s);
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "-", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
 #pragma warning restore CA1308 
+        }
+
+        /// <summary>
+        /// Special cas handling.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private static string SpecialCaseHandling(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = text.Replace("E Tag", "ETag", StringComparison.InvariantCulture); // Special case where we will put back together.
+            return s.Replace("O Data", "OData", StringComparison.InvariantCulture); // Special case where we will put back together.
         }
 
         /// <summary>

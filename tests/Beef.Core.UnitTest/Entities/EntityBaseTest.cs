@@ -92,7 +92,6 @@ namespace Beef.Core.UnitTest.Entities
                 a.Text = now.ToLongDateString();
                 a.Now = now;
                 a.Time = now;
-                Cleaner.CleanUp(a);
             });
         }
     }

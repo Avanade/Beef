@@ -15,6 +15,8 @@ namespace Beef.Core.UnitTest.Business
         [Test]
         public async Task InvokeAsync_SameThreadValue()
         {
+            ExecutionContext.Reset();
+            ExecutionContext.SetCurrent(new ExecutionContext());
             var threadIds = new List<int> { Thread.CurrentThread.ManagedThreadId };
 
             var di = new DataInvoker();
@@ -28,6 +30,8 @@ namespace Beef.Core.UnitTest.Business
         [Test]
         public async Task InvokeAsync_SameThreadNoValue()
         {
+            ExecutionContext.Reset();
+            ExecutionContext.SetCurrent(new ExecutionContext());
             var threadIds = new List<int> { Thread.CurrentThread.ManagedThreadId };
 
             var di = new DataInvoker();

@@ -25,53 +25,45 @@ namespace Beef.Demo.Common.Agents
     /// </summary>
     public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
     {
-        private static readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
-
-        private readonly ReferenceDataAgent _agent;
+        private readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
+        private readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
+        private readonly IReferenceDataAgent _agent;
         private readonly Dictionary<Type, object> _cacheDict = new Dictionary<Type, object>();
 
         #region Ctor
         
         /// <summary>
-        /// Static constructor.
+        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
         /// </summary>
-        static ReferenceDataAgentProvider()
+        /// <param name="agent">The <see cref="IReferenceDataAgent"/>.</param>
+        public ReferenceDataAgentProvider(IReferenceDataAgent agent)
         {
+            _agent = Beef.Check.NotNull(agent, nameof(agent));
+
             _nameDict.Add(nameof(Country), typeof(RefDataNamespace.Country));
             _typeDict.Add(typeof(RefDataNamespace.Country), nameof(Country));
+            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => _agent.CountryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(USState), typeof(RefDataNamespace.USState));
             _typeDict.Add(typeof(RefDataNamespace.USState), nameof(USState));
+            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(Gender), typeof(RefDataNamespace.Gender));
             _typeDict.Add(typeof(RefDataNamespace.Gender), nameof(Gender));
+            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(EyeColor), typeof(RefDataNamespace.EyeColor));
             _typeDict.Add(typeof(RefDataNamespace.EyeColor), nameof(EyeColor));
+            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(PowerSource), typeof(RefDataNamespace.PowerSource));
             _typeDict.Add(typeof(RefDataNamespace.PowerSource), nameof(PowerSource));
+            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
             _nameDict.Add(nameof(Company), typeof(RefDataNamespace.Company));
             _typeDict.Add(typeof(RefDataNamespace.Company), nameof(Company));
-        }
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceDataAgentProvider"/> class.
-        /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public ReferenceDataAgentProvider(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            _agent = new ReferenceDataAgent(httpClient, beforeRequest);
-
-            _cacheDict.Add(typeof(RefDataNamespace.Country), new ReferenceDataCache<RefDataNamespace.CountryCollection, RefDataNamespace.Country>(() => _agent.CountryGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.Gender), new ReferenceDataCache<RefDataNamespace.GenderCollection, RefDataNamespace.Gender>(() => _agent.GenderGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.EyeColor), new ReferenceDataCache<RefDataNamespace.EyeColorCollection, RefDataNamespace.EyeColor>(() => _agent.EyeColorGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
-            _cacheDict.Add(typeof(RefDataNamespace.PowerSource), new ReferenceDataCache<RefDataNamespace.PowerSourceCollection, RefDataNamespace.PowerSource>(() => _agent.PowerSourceGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+
         }
 
         #endregion

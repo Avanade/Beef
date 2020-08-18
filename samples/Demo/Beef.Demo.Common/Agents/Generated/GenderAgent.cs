@@ -8,36 +8,57 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Common.Agents.ServiceAgents;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
+    /// Defines the Gender Web API agent.
+    /// </summary>
+    public partial interface IGenderAgent
+    {
+        /// <summary>
+        /// Gets the <see cref="Gender"/> object that matches the selection criteria.
+        /// </summary>
+        /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Creates the <see cref="Gender"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Gender"/> object.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
+        /// Updates the <see cref="Gender"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Gender"/> object.</param>
+        /// <param name="id">The <see cref="Gender"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions? requestOptions = null);
+    }
+
+    /// <summary>
     /// Provides the Gender Web API agent.
     /// </summary>
-    public partial class GenderAgent : WebApiAgentBase, IGenderServiceAgent
+    public partial class GenderAgent : WebApiAgentBase, IGenderAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderAgent"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public GenderAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            GenderServiceAgent = Beef.Factory.Create<IGenderServiceAgent>(httpClient, beforeRequest);
-        }
-        
-        /// <summary>
-        /// Gets the underlyng <see cref="IGenderServiceAgent"/> instance.
-        /// </summary>
-        public IGenderServiceAgent GenderServiceAgent { get; private set; }
+        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
+        public GenderAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the <see cref="Gender"/> object that matches the selection criteria.
@@ -46,7 +67,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null)
-            => GenderServiceAgent.GetAsync(id, requestOptions);
+        {
+            return GetAsync<Gender>("api/v1/demo/ref/genders/{id}", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
 
         /// <summary>
         /// Creates the <see cref="Gender"/> object.
@@ -55,7 +79,13 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions? requestOptions = null)
-            => GenderServiceAgent.CreateAsync(Check.NotNull(value, nameof(value)), requestOptions);
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return PostAsync<Gender>("api/v1/demo/ref/genders", value, requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
+        }
 
         /// <summary>
         /// Updates the <see cref="Gender"/> object.
@@ -65,7 +95,13 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions? requestOptions = null)
-            => GenderServiceAgent.UpdateAsync(Check.NotNull(value, nameof(value)), id, requestOptions);
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            return PutAsync<Gender>("api/v1/demo/ref/genders/{id}", value, requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+        }
     }
 }
 

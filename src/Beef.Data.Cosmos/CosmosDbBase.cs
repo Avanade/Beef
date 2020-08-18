@@ -12,71 +12,9 @@ using Microsoft.Azure.Cosmos;
 namespace Beef.Data.Cosmos
 {
     /// <summary>
-    /// Extends <see cref="CosmosDbBase"/> adding <see cref="Register"/> and <see cref="Default"/> capabilities for <b>CosmosDb/DocumentDb</b>.
-    /// </summary>
-    /// <typeparam name="TDefault">The <see cref="Default"/> <see cref="Type"/>.</typeparam>
-    public abstract class CosmosDb<TDefault> : CosmosDbBase where TDefault : CosmosDb<TDefault>
-    {
-        private static readonly object _lock = new object();
-        private static TDefault? _default;
-        private static Func<TDefault>? _create;
-
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, is ok.
-        /// <summary>
-        /// Registers the <see cref="Default"/> <see cref="CosmosDbBase"/> instance.
-        /// </summary>
-        /// <param name="create">Function to create the <see cref="Default"/> instance.</param>
-        public static void Register(Func<TDefault> create)
-        {
-            lock (_lock)
-            {
-                if (_default != null)
-                    throw new InvalidOperationException("The Register method can only be invoked once.");
-
-                _create = create ?? throw new ArgumentNullException(nameof(create));
-            }
-        }
-
-        /// <summary>
-        /// Gets the current default <see cref="CosmosDbBase"/> instance.
-        /// </summary>
-        public static TDefault Default
-        {
-            get
-            {
-                if (_default != null)
-                    return _default;
-
-                lock (_lock)
-                {
-                    if (_default != null)
-                        return _default;
-
-                    if (_create == null)
-                        throw new InvalidOperationException("The Register method must be invoked before this property can be accessed.");
-
-                    _default = _create() ?? throw new InvalidOperationException("The registered create function must create a default instance.");
-                    return _default;
-                }
-            }
-        }
-#pragma warning restore CA1000
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CosmosDb{TDefault}"/> class.
-        /// </summary>
-        /// <param name="client">The <see cref="CosmosClient"/>.</param>
-        /// <param name="databaseId">The database identifier.</param>
-        /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
-        /// <param name="throughput">The throughput (RU/S).</param>
-        protected CosmosDb(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400) 
-            : base(client, databaseId, createDatabaseIfNotExists, throughput) { }
-    }
-
-    /// <summary>
     /// Represents the base class for <b>CosmosDb/DocumentDb</b> access; being a lightweight direct <b>CosmosDb/DocumentDb</b> access layer.
     /// </summary>
-    public abstract class CosmosDbBase
+    public abstract class CosmosDbBase : ICosmosDb
     {
         private Action<RequestOptions>? _updateRequestOptionsAction;
         private Action<QueryRequestOptions>? _updateQueryRequestOptionsAction;
@@ -189,12 +127,15 @@ namespace Beef.Data.Cosmos
         /// <param name="databaseId">The database identifier.</param>
         /// <param name="createDatabaseIfNotExists">Indicates whether the database shoould be created if it does not exist.</param>
         /// <param name="throughput">The throughput (RU/S).</param>
-        protected CosmosDbBase(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400)
+        /// <param name="invoker">Enables the <see cref="Invoker"/> to be overridden; defaults to <see cref="CosmosDbInvoker"/>.</param>
+        protected CosmosDbBase(CosmosClient client, string databaseId, bool createDatabaseIfNotExists = false, int? throughput = 400, CosmosDbInvoker? invoker = null)
         {
             Client = Check.NotNull(client, nameof(client));
             Database = createDatabaseIfNotExists ?
                 Client.CreateDatabaseIfNotExistsAsync(databaseId, throughput ?? 400).Result.Database :
                 Client.GetDatabase(Check.NotEmpty(databaseId, nameof(databaseId)));
+
+            Invoker = invoker ?? new CosmosDbInvoker();
         }
 
         /// <summary>
@@ -206,6 +147,11 @@ namespace Beef.Data.Cosmos
         /// Gets the <see cref="Microsoft.Azure.Cosmos.Database"/>.
         /// </summary>
         public Database Database { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="CosmosDbInvoker"/>.
+        /// </summary>
+        public CosmosDbInvoker Invoker { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CosmosException"/> handler (by default set up to execute <see cref="ThrowTransformedDocumentClientException(CosmosException)"/>).

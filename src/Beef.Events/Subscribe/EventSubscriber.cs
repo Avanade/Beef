@@ -1,37 +1,16 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Subscribe
 {
     /// <summary>
-    /// Provides the shared/base capabilities for an <see cref="EventData"/> subscriber with no corresponding value.
+    /// Provides the shared/base capabilities for an <see cref="EventData"/> subscriber with no corresponding value. Note that the inheriting/implementing class <b>must</b> also be decorated with the
+    /// <see cref="EventSubscriberAttribute"/> to specify the corresponding <see cref="EventSubscriberAttribute.SubjectTemplate"/> and <see cref="EventSubscriberAttribute.Actions"/>.
     /// </summary>
     public abstract class EventSubscriberBase : IEventSubscriber
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventSubscriberBase"/> class.
-        /// </summary>
-        /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
-        protected EventSubscriberBase(string subjectTemplate, params string[] actions)
-        {
-            SubjectTemplate = Check.NotEmpty(subjectTemplate, nameof(subjectTemplate));
-            Actions = new List<string>(actions);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="EventData.Subject"/> template for the event required (subscribing to).
-        /// </summary>
-        public string SubjectTemplate { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="EventData.Action"/>(s); where none specified this indicates all.
-        /// </summary>
-        public List<string> Actions { get; private set; }
-
         /// <summary>
         /// Determines the <see cref="Subscribe.RunAsUser"/>; defaults to <see cref="RunAsUser.Originating"/>.
         /// </summary>
@@ -71,17 +50,12 @@ namespace Beef.Events.Subscribe
     }
 
     /// <summary>
-    /// Provides the base capabilities for an <see cref="EventData"/> subscriber with no corresponding value.
+    /// Provides the base capabilities for an <see cref="EventData"/> subscriber with no corresponding value. Note that the inheriting/implementing class <b>must</b> also be decorated with the
+    /// <see cref="EventSubscriberAttribute"/> to specify the corresponding <see cref="EventSubscriberAttribute.SubjectTemplate"/> and <see cref="EventSubscriberAttribute.Actions"/>.
     /// </summary>
+    /// <remarks></remarks>
     public abstract class EventSubscriber : EventSubscriberBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventSubscriber"/> class.
-        /// </summary>
-        /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
-        protected EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
-
         /// <summary>
         /// Gets the value <see cref="Type"/>; always <c>null</c> as there will not be one.
         /// </summary>
@@ -96,18 +70,12 @@ namespace Beef.Events.Subscribe
     }
 
     /// <summary>
-    /// Provides the base capabilities for an <see cref="EventData"/> subscriber with a typed <typeparamref name="T"/> value.
+    /// Provides the base capabilities for an <see cref="EventData"/> subscriber with a typed <typeparamref name="T"/> value. Note that the inheriting/implementing class <b>must</b> also be decorated with the
+    /// <see cref="EventSubscriberAttribute"/> to specify the corresponding <see cref="EventSubscriberAttribute.SubjectTemplate"/> and <see cref="EventSubscriberAttribute.Actions"/>.
     /// </summary>
     /// <typeparam name="T">The <see cref="EventData{T}"/> <see cref="Type"/>.</typeparam>
     public abstract class EventSubscriber<T> : EventSubscriberBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventSubscriber"/> class.
-        /// </summary>
-        /// <param name="subjectTemplate">The <see cref="EventData.Subject"/> template for the event required (can contain wildcard).</param>
-        /// <param name="actions">The <see cref="Beef.Events.EventData.Action"/>(s); where none specified this indicates all.</param>
-        protected EventSubscriber(string subjectTemplate, params string[] actions) : base(subjectTemplate, actions) { }
-
         /// <summary>
         /// Gets the value <see cref="Type"/>.
         /// </summary>

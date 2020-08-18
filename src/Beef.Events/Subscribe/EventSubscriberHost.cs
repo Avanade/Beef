@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Beef.Events.Subscribe
@@ -64,6 +64,16 @@ namespace Beef.Events.Subscribe
         public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
 
         /// <summary>
+        /// Gets or sets the subject path seperator <see cref="string"/> (see <see cref="IEventPublisher.PathSeparator"/>).
+        /// </summary>
+        public string SubjectPathSeparator { get; set; } = ".";
+
+        /// <summary>
+        /// Gets or sets the subject template wildcard <see cref="string"/> (see <see cref="IEventPublisher.TemplateWildcard"/>).
+        /// </summary>
+        public string SubjectTemplateWildcard { get; set; } = "*";
+
+        /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
         /// </summary>
         /// <param name="subject">The event subject.</param>
@@ -82,8 +92,7 @@ namespace Beef.Events.Subscribe
                 return CheckResult(Result.InvalidEventData(null, "EventData is invalid; Subject is required."), null, null, null);
 
             // Match a subscriber to the subject + template supplied.
-            var subscribers = Args.EventSubscribers.Where(r => Event.Match(r.SubjectTemplate, subject) && (r.Actions == null || r.Actions.Count == 0 || r.Actions.Contains(action, StringComparer.InvariantCultureIgnoreCase))).ToArray();
-            var subscriber = subscribers.Length == 1 ? subscribers[0] : subscribers.Length == 0 ? (IEventSubscriber?)null : throw new EventSubscriberException($"There are {subscribers.Length} {nameof(IEventSubscriber)} instances subscribing to Subject '{subject}' and Action '{action}'; there must be only a single subscriber.");
+            var subscriber = Args.CreateEventSubscriber(SubjectTemplateWildcard, SubjectPathSeparator, subject, action);
             if (subscriber == null)
                 return CheckResult(Result.NotSubscribed(), subject, action, null);
 
@@ -108,9 +117,15 @@ namespace Beef.Events.Subscribe
 
             try
             {
-                // Set the execution context.
-                ExecutionContext.Reset(false);
-                ExecutionContext.SetCurrent(BindLogger(CreateExecutionContext(subscriber, @event)));
+                // Create and set the execution context for the event.
+                ExecutionContext.Reset();
+                var ec = Args.ServiceProvider.GetService<ExecutionContext>();
+                UpdateExecutionContext(ec, subscriber, @event);
+                ec.ServiceProvider = Args.ServiceProvider;
+                ec.CorrelationId = @event.CorrelationId;
+                ExecutionContext.SetCurrent(ec);
+
+                // Process the event.
                 return CheckResult(await subscriber.ReceiveAsync(@event).ConfigureAwait(false), subject, action, subscriber);
             }
             catch (InvalidEventDataException iedex) { return CheckResult(Result.InvalidEventData(iedex), subject, action, subscriber); }
@@ -177,7 +192,7 @@ namespace Beef.Events.Subscribe
             switch (result.ResultHandling ?? handling)
             {
                 case ResultHandling.ContinueWithLogging:
-                    Logger.Default.Warning(result.ToString());
+                    Logger.Create<EventSubscriberHost>().LogWarning(result.ToString());
                     break;
 
                 case ResultHandling.ContinueWithAudit:
@@ -194,76 +209,28 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
-        /// Creates the <see cref="ExecutionContext"/> for processing the <paramref name="event"/> setting the username based on the <see cref="IEventSubscriber"/> <see cref="IEventSubscriber.RunAsUser"/>.
+        /// Updates the <see cref="ExecutionContext"/> for processing the <paramref name="event"/> setting the username based on the <see cref="IEventSubscriber"/> <see cref="IEventSubscriber.RunAsUser"/>.
         /// </summary>
+        /// <param name="executionContext">The <see cref="ExecutionContext"/> to update.</param>
         /// <param name="subscriber">The <see cref="IEventSubscriber"/> that will process the message.</param>
         /// <param name="event">The <see cref="EventData"/>.</param>
-        /// <returns>The <see cref="ExecutionContext"/>.</returns>
         /// <remarks>When overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.</remarks>
 #pragma warning disable CA1716 // Identifiers should not match keywords; by-design, is the best name.
-        protected virtual ExecutionContext CreateExecutionContext(IEventSubscriber subscriber, EventData @event)
+        protected virtual void UpdateExecutionContext(ExecutionContext executionContext, IEventSubscriber subscriber, EventData @event)
 #pragma warning restore CA1716 
         {
+            if (executionContext == null)
+                throw new ArgumentNullException(nameof(executionContext));
+
             if (subscriber == null)
                 throw new ArgumentNullException(nameof(subscriber));
 
             if (@event == null)
                 throw new ArgumentNullException(nameof(@event));
 
-            return new ExecutionContext { Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username ?? SystemUsername : SystemUsername, TenantId = @event.TenantId };
-        }
-
-        /// <summary>
-        /// Bind the logger to the execution context.
-        /// </summary>
-        private ExecutionContext BindLogger(ExecutionContext ec)
-        {
-            if (ec == null)
-                throw new EventSubscriberException("An ExecutionContext instance must be returned from CreateExecutionContext.");
-
-            if (!ec.HasLogger)
-                ec.RegisterLogger((largs) => BindLogger(Args.Logger, largs));
-
-            return ec;
-        }
-
-        /// <summary>
-        /// Binds (redirects) Beef <see cref="Beef.Diagnostics.Logger"/> to the ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.
-        /// </summary>
-        /// <param name="logger">The ASP.NET Core <see cref="Microsoft.Extensions.Logging.ILogger"/>.</param>
-        /// <param name="args">The Beef <see cref="LoggerArgs"/>.</param>
-        /// <remarks>Redirects (binds) the Beef logger to the ASP.NET logger.</remarks>
-        private static void BindLogger(ILogger logger, LoggerArgs args)
-        {
-            Check.NotNull(logger, nameof(logger));
-            Check.NotNull(args, nameof(args));
-
-            switch (args.Type)
-            {
-                case LogMessageType.Critical:
-                    logger.LogCritical(args.ToString());
-                    break;
-
-                case LogMessageType.Info:
-                    logger.LogInformation(args.ToString());
-                    break;
-
-                case LogMessageType.Warning:
-                    logger.LogWarning(args.ToString());
-                    break;
-
-                case LogMessageType.Error:
-                    logger.LogError(args.ToString());
-                    break;
-
-                case LogMessageType.Debug:
-                    logger.LogDebug(args.ToString());
-                    break;
-
-                case LogMessageType.Trace:
-                    logger.LogTrace(args.ToString());
-                    break;
-            }
+            executionContext.Username = subscriber.RunAsUser == RunAsUser.Originating ? @event.Username ?? SystemUsername : SystemUsername;
+            executionContext.UserId = @event.UserId;
+            executionContext.TenantId = @event.TenantId;
         }
     }
 }

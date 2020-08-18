@@ -28,24 +28,27 @@ namespace Cdr.Banking.Business.Data
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountData : IAccountData
     {
-        #region Private
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
+        private readonly ICosmosDb _cosmos;
 
-        private readonly Action<ICosmosDbArgs>? _onDataArgsCreate;
+        #region Extensions
+        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
-        private readonly Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
-        private readonly Func<AccountArgs?, ICosmosDbArgs, Task>? _getAccountsOnBeforeAsync;
-        private readonly Func<AccountCollectionResult, AccountArgs?, Task>? _getAccountsOnAfterAsync;
-        private readonly Action<Exception>? _getAccountsOnException;
+        private Action<ICosmosDbArgs>? _onDataArgsCreate;
+        private Func<IQueryable<Model.Account>, AccountArgs?, ICosmosDbArgs, IQueryable<Model.Account>>? _getAccountsOnQuery;
 
-        private readonly Func<string?, ICosmosDbArgs, Task>? _getDetailOnBeforeAsync;
-        private readonly Func<AccountDetail?, string?, Task>? _getDetailOnAfterAsync;
-        private readonly Action<Exception>? _getDetailOnException;
-
-        private readonly Action<Exception>? _getBalanceOnException;
-
-        #pragma warning restore CS0649
+        #pragma warning restore CS0649, IDE0044
         #endregion
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountData"/> class.
+        /// </summary>
+        /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
+        public AccountData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); AccountDataCtor(); }
+
+        /// <summary>
+        /// Enables additional functionality to be added to the constructor.
+        /// </summary>
+        partial void AccountDataCtor();
 
         /// <summary>
         /// Get all accounts.
@@ -55,16 +58,13 @@ namespace Cdr.Banking.Business.Data
         /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 AccountCollectionResult __result = new AccountCollectionResult(paging);
-                var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getAccountsOnBeforeAsync != null) await _getAccountsOnBeforeAsync(args, __dataArgs).ConfigureAwait(false);
-                __result.Result = CosmosDb.Default.Container(__dataArgs).Query(q => _getAccountsOnQuery == null ? q : _getAccountsOnQuery(q, args, __dataArgs)).SelectQuery<AccountCollection>();
-                if (_getAccountsOnAfterAsync != null) await _getAccountsOnAfterAsync(__result, args).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getAccountsOnException });
+                var __dataArgs = CosmosMapper.Default.CreateArgs("Account", __result.Paging!, PartitionKey.None, onCreate: _onDataArgsCreate);
+                __result.Result = _cosmos.Container(__dataArgs).Query(q => _getAccountsOnQuery?.Invoke(q, args, __dataArgs) ?? q).SelectQuery<AccountCollection>();
+                return await Task.FromResult(__result).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -74,16 +74,11 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return DataInvoker.Default.InvokeAsync(this, async () =>
+            return DataInvoker.Current.InvokeAsync(this, async () =>
             {
-                AccountDetail? __result;
-                var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None);
-                _onDataArgsCreate?.Invoke(__dataArgs);
-                if (_getDetailOnBeforeAsync != null) await _getDetailOnBeforeAsync(accountId, __dataArgs).ConfigureAwait(false);
-                __result = await CosmosDb.Default.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
-                if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, accountId).ConfigureAwait(false);
-                return __result;
-            }, new BusinessInvokerArgs { ExceptionHandler = _getDetailOnException });
+                var __dataArgs = AccountDetailData.CosmosMapper.Default.CreateArgs("Account", PartitionKey.None, onCreate: _onDataArgsCreate);
+                return await _cosmos.Container(__dataArgs).GetAsync(accountId).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -93,8 +88,7 @@ namespace Cdr.Banking.Business.Data
         /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataInvoker.Default.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId),
-                new BusinessInvokerArgs { ExceptionHandler = _getBalanceOnException });
+            return DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
         }
 
         /// <summary>

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.1
+- *Enhancement:* Introduction of Dependency Injection support.
+
 ## v3.1.20
 - *Fixed*: Issue [66](https://github.com/Avanade/Beef/issues/63) fixed. Changed the path separator to be `/` so that is compatible on Windows and Linux. By using `/` this matches the `Path.AltDirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.altdirectoryseparatorchar) for Windows and `Path.DirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.directoryseparatorchar) for Linux, making it universally compatible.
 

@@ -8,36 +8,42 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Beef;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
 using Cdr.Banking.Common.Entities;
-using Cdr.Banking.Common.Agents.ServiceAgents;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Common.Agents
 {
     /// <summary>
+    /// Defines the Transaction Web API agent.
+    /// </summary>
+    public partial interface ITransactionAgent
+    {
+        /// <summary>
+        /// Get transaction for account.
+        /// </summary>
+        /// <param name="accountId">The Account Id.</param>
+        /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
+        /// <param name="paging">The <see cref="PagingArgs"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null);
+    }
+
+    /// <summary>
     /// Provides the Transaction Web API agent.
     /// </summary>
-    public partial class TransactionAgent : WebApiAgentBase, ITransactionServiceAgent
+    public partial class TransactionAgent : WebApiAgentBase, ITransactionAgent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionAgent"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> (where overridding the default value).</param>
-        /// <param name="beforeRequest">The <see cref="Action{HttpRequestMessage}"/> to invoke before the <see cref="HttpRequestMessage">Http Request</see> is made (see <see cref="WebApiServiceAgentBase.BeforeRequest"/>).</param>
-        public TransactionAgent(HttpClient? httpClient = null, Action<HttpRequestMessage>? beforeRequest = null)
-        {
-            TransactionServiceAgent = Beef.Factory.Create<ITransactionServiceAgent>(httpClient, beforeRequest);
-        }
-        
-        /// <summary>
-        /// Gets the underlyng <see cref="ITransactionServiceAgent"/> instance.
-        /// </summary>
-        public ITransactionServiceAgent TransactionServiceAgent { get; private set; }
+        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
+        public TransactionAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Get transaction for account.
@@ -48,7 +54,10 @@ namespace Cdr.Banking.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TransactionCollectionResult>> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging = null, WebApiRequestOptions? requestOptions = null)
-            => TransactionServiceAgent.GetTransactionsAsync(accountId, args, paging, requestOptions);
+        {
+            return GetCollectionResultAsync<TransactionCollectionResult, TransactionCollection, Transaction>("api/v1/banking/accounts/{accountId}/transactions", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<string?>("accountId", accountId), new WebApiArg<TransactionArgs?>("args", args, WebApiArgType.FromUriUseProperties), new WebApiPagingArgsArg("paging", paging) });
+        }
     }
 }
 
