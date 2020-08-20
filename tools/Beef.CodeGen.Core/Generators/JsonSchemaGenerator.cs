@@ -60,7 +60,7 @@ namespace Beef.CodeGen.Builders
                 if (jpa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? Beef.CodeGen.CodeGenerator.ToCamelCase(pi.Name)!;
+                var name = jpa.PropertyName ??StringConversion.ToCamelCase(pi.Name)!;
                 jtw.WritePropertyName(name);
                 jtw.WriteStartObject();
 
@@ -70,7 +70,7 @@ namespace Beef.CodeGen.Builders
                     jtw.WritePropertyName("type");
                     jtw.WriteValue(GetJsonType(pi));
                     jtw.WritePropertyName("title");
-                    jtw.WriteValue(psa.Title ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!);
+                    jtw.WriteValue(psa.Title ??StringConversion.ToSentenceCase(name)!);
                     if (psa.Description != null)
                     {
                         jtw.WritePropertyName("description");
@@ -100,7 +100,7 @@ namespace Beef.CodeGen.Builders
                     jtw.WritePropertyName("type");
                     jtw.WriteValue("array");
                     jtw.WritePropertyName("title");
-                    jtw.WriteValue(pcsa.Title ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!);
+                    jtw.WriteValue(pcsa.Title ??StringConversion.ToSentenceCase(name)!);
                     if (pcsa.Description != null)
                     {
                         jtw.WritePropertyName("description");

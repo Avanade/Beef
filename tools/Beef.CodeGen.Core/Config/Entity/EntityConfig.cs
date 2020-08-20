@@ -31,7 +31,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Model", Title = "Provides the data **Model** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
-    public class EntityConfig : ConfigBase<CodeGenConfig>
+    public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
         #region Key
 
@@ -458,7 +458,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the .NET OData interface name used where `AutoImplement` is `OData`.
         /// </summary>
         [JsonProperty("odataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.", 
+        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.",
             Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).")]
         public string? ODataName { get; set; }
 
@@ -702,12 +702,17 @@ namespace Beef.CodeGen.Config.Entity
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? Properties { get; set; }
 
-
         /// <summary>
-        /// Gets the list of properties that are not inherited.
+        /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
-        public PropertyConfig[] PropertiesNotInherited => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToArray();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that form the unique key.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
@@ -726,24 +731,29 @@ namespace Beef.CodeGen.Config.Entity
         public List<ConstConfig>? Consts { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => CodeGenerator.ToComments($"Represents the {Text} entity.");
 
         /// <summary>
-        /// Gets or sets the entity name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityName { get; set; }
+        public string? EntityName => !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}<T>";
 
         /// <summary>
-        /// Gets or sets the entity collection name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity collection name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityCollectionName { get; set; }
+        public string? EntityCollectionName => !GenericWithT.HasValue || !GenericWithT.Value ? $"{Name}Collection" : $"{Name}Collection<T>";
 
         /// <summary>
-        /// Gets or sets the entity collection result name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity collection result name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityCollectionResultName { get; set; }
+        public string? EntityCollectionResultName => !GenericWithT.HasValue || !GenericWithT.Value ? $"{Name}CollectionResult" : $"{Name}CollectionResult<T>";
+
+        /// <summary>
+        /// Gets the <see cref="Name"/> formatted as see comments.
+        /// </summary>
+        public string? EntityNameSeeComments => CodeGenerator.ToSeeComments(Name);
 
         /// <summary>
         /// Indicates whether the entity (based on all configurations) should implement the <see cref="EntityBase"/> capabilties.
@@ -755,16 +765,11 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            EntityName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}<T>";
-            EntityCollectionName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}Collection<T>";
-            EntityCollectionResultName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}CollectionResult<T>";
-
-            Text = DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
-            SummaryText = CodeGenerator.ToComments($"Represents the {Text} entity.");
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
-            PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => CodeGenerator.ToCamelCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
@@ -848,7 +853,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var constant in Consts)
             {
-                constant.Prepare(this);
+                constant.Prepare(Root!, this);
             }
         }
 
@@ -874,7 +879,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var property in Properties)
             {
-                property.Prepare(this);
+                property.Prepare(Root!, this);
             }
         }
 
@@ -922,7 +927,7 @@ namespace Beef.CodeGen.Config.Entity
             // Prepare each operations.
             foreach (var operation in Operations)
             {
-                operation.Prepare(this);
+                operation.Prepare(Root!, this);
             }
         }
 

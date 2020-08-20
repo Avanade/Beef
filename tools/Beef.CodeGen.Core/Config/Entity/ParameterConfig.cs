@@ -16,7 +16,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Manager", Title = "Provides the generic **Manager-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
-    public class ParameterConfig : ConfigBase<OperationConfig>
+    public class ParameterConfig : ConfigBase<CodeGenConfig, OperationConfig>
     {
         #region Key
 
@@ -188,10 +188,10 @@ namespace Beef.CodeGen.Config.Entity
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
-            Text = DefaultWhereNull(Text, () => pc == null ? CodeGenerator.ToSentenceCase(Name) : pc.Text);
+            Text = DefaultWhereNull(Text, () => pc == null ? StringConversion.ToSentenceCase(Name) : pc.Text);
             SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
-            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? CodeGenerator.ToPrivateCase(Name) : pc.Name);
-            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? CodeGenerator.ToCamelCase(Name) : pc.ArgumentName);
+            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
+            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);

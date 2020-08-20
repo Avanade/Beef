@@ -18,27 +18,25 @@ namespace Beef.Events.Subscribe
         private ILogger? _logger;
 
         /// <summary>
-        /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <paramref name="serviceProvider"/> and <paramref name="subscribersAssembly"/>.
+        /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <typeparamref name="TStartup"/> (to infer the underlying subscribers <see cref="Assembly"/>).
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
-        /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
+        /// <typeparam name="TStartup">The startup class whereby all the subscribers reside.</typeparam>
         /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
-        public static EventSubscriberHostArgs Create(IServiceProvider serviceProvider, Assembly subscribersAssembly) => new EventSubscriberHostArgs(serviceProvider, subscribersAssembly);
+        public static EventSubscriberHostArgs Create<TStartup>() where TStartup : class => Create(typeof(TStartup).Assembly);
 
         /// <summary>
-        /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <paramref name="serviceProvider"/> and <paramref name="eventSubscriberTypes"/>.
+        /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified  <paramref name="subscribersAssembly"/>.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+        /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
+        /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
+        public static EventSubscriberHostArgs Create(Assembly subscribersAssembly) => new EventSubscriberHostArgs(subscribersAssembly);
+
+        /// <summary>
+        /// Creates an <see cref="EventSubscriberHostArgs"/> using the specified <paramref name="eventSubscriberTypes"/>.
+        /// </summary>
         /// <param name="eventSubscriberTypes">One or more <see cref="IEventSubscriber"/> types.</param>
         /// <returns>A <see cref="EventSubscriberHostArgs"/>.</returns>
-        public static EventSubscriberHostArgs Create(IServiceProvider serviceProvider, params Type[] eventSubscriberTypes) => new EventSubscriberHostArgs(serviceProvider, eventSubscriberTypes);
-
-        /// <summary>
-        /// Gets all the subscriber types from the specified <paramref name="subscribersAssembly"/>.
-        /// </summary>
-        /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
-        /// <returns>An array of subscriber types.</returns>
-        public static Type[] GetSubscriberTypes(Assembly subscribersAssembly) => GetSubscriberConfig(subscribersAssembly ?? throw new ArgumentNullException(nameof(subscribersAssembly))).Select(x => x.EventSubscriberType).ToArray();
+        public static EventSubscriberHostArgs Create(params Type[] eventSubscriberTypes) => new EventSubscriberHostArgs(eventSubscriberTypes);
 
         /// <summary>
         /// Gets all the subscriber configuration from the specified assembly.
@@ -62,11 +60,9 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="subscribersAssembly"/>.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="subscribersAssembly">The <see cref="Assembly"/> where the <see cref="IEventSubscriber"/> types are defined.</param>
-        private EventSubscriberHostArgs(IServiceProvider serviceProvider, Assembly subscribersAssembly)
+        private EventSubscriberHostArgs(Assembly subscribersAssembly)
         {
-            ServiceProvider = Check.NotNull(serviceProvider, nameof(serviceProvider));
             _subscribers = GetSubscriberConfig(subscribersAssembly ?? throw new ArgumentNullException(nameof(subscribersAssembly)));
 
             if (_subscribers.Count == 0)
@@ -76,11 +72,9 @@ namespace Beef.Events.Subscribe
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberHostArgs"/> with a specified <paramref name="eventSubscriberTypes"/>.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="eventSubscriberTypes">One or more <see cref="IEventSubscriber"/> types.</param>
-        private EventSubscriberHostArgs(IServiceProvider serviceProvider, params Type[] eventSubscriberTypes)
+        private EventSubscriberHostArgs(params Type[] eventSubscriberTypes)
         {
-            ServiceProvider = Check.NotNull(serviceProvider, nameof(serviceProvider));
             if (eventSubscriberTypes == null || eventSubscriberTypes.Length == 0)
                 throw new ArgumentException($"At least one event {nameof(IEventSubscriber)} must be specified to enable execution.", nameof(eventSubscriberTypes));
 
@@ -101,9 +95,129 @@ namespace Beef.Events.Subscribe
         }
 
         /// <summary>
+        /// Uses (sets) the <see cref="ServiceProvider"/> (this will be automatically set by <i>Beef</i>).
+        /// </summary>
+        /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
+        /// <returns>he <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs UseServiceProvider(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = Check.NotNull(serviceProvider, nameof(serviceProvider));
+            return this;
+        }
+
+        /// <summary>
         /// Gets the <see cref="IServiceProvider"/>.
         /// </summary>
-        public IServiceProvider ServiceProvider { get; private set; }
+        public IServiceProvider? ServiceProvider { get; private set; }
+
+        /// <summary>
+        /// Indicates whether multiple messages (<see cref="EventData"/>) can be processed (where supported); default is <c>false</c>.
+        /// </summary>
+        public bool AreMultipleMessagesSupported { get; set; } = false;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ContinueSilent"/>.
+        /// </summary>
+        public ResultHandling NotSubscribedHandling { get; set; } = ResultHandling.ContinueSilent;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// </summary>
+        public ResultHandling DataNotFoundHandling { get; set; } = ResultHandling.Stop;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// </summary>
+        public ResultHandling InvalidEventDataHandling { get; set; } = ResultHandling.Stop;
+
+        /// <summary>
+        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
+        /// </summary>
+        public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
+
+        /// <summary>
+        /// Gets or sets the subject path seperator <see cref="string"/> (see <see cref="IEventPublisher.PathSeparator"/>).
+        /// </summary>
+        public string SubjectPathSeparator { get; set; } = ".";
+
+        /// <summary>
+        /// Gets or sets the subject template wildcard <see cref="string"/> (see <see cref="IEventPublisher.TemplateWildcard"/>).
+        /// </summary>
+        public string SubjectTemplateWildcard { get; set; } = "*";
+
+        /// <summary>
+        /// Gets the action that overrides the update of the <see cref="Beef.ExecutionContext"/>.
+        /// </summary>
+        internal Action<ExecutionContext, IEventSubscriber, EventData>? UpdateExecutionContext { get; private set; }
+
+        /// <summary>
+        /// Sets the <see cref="AreMultipleMessagesSupported"/> value to <b>true</b>.
+        /// </summary>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs AllowMultipleMessages()
+        {
+            AreMultipleMessagesSupported = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="InvalidEventDataHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs InvalidEventData(ResultHandling handling)
+        {
+            InvalidEventDataHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="NotSubscribedHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs NotSubscribed(ResultHandling handling)
+        {
+            NotSubscribedHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="DataNotFoundHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs DataNotFound(ResultHandling handling)
+        {
+            DataNotFoundHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="InvalidDataHandling"/> value.
+        /// </summary>
+        /// <param name="handling">The <see cref="ResultHandling"/> value.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (to support fluent-style method chaining).</returns>
+        public EventSubscriberHostArgs InvalidData(ResultHandling handling)
+        {
+            InvalidDataHandling = handling;
+            return this;
+        }
+
+        /// <summary>
+        /// Provides a means to override the update of the <see cref="Beef.ExecutionContext"/> (is created by using the <see cref="ExecutionContext.ServiceProvider"/> as instantiated by 
+        /// <see cref="Beef.ServiceExtensions.AddBeefExecutionContext(IServiceCollection, Func{IServiceProvider, ExecutionContext}?)"/>). The default will update the <see cref="ExecutionContext.Username"/>,
+        /// <see cref="ExecutionContext.UserId"/> and <see cref="ExecutionContext.TenantId"/>.
+        /// </summary>
+        /// <param name="updateExecutionContext">The action to update the <see cref="Beef.ExecutionContext"/>.</param>
+        /// <returns>The <see cref="EventSubscriberHostArgs"/> instance to support fluent-style method chaining.</returns>
+        /// <remarks><b>Note:</b> when overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.
+        /// <para><b>Note:</b> that the <see cref="ExecutionContext.ServiceProvider"/> and <see cref="ExecutionContext.CorrelationId"/> are set directly by <i>Beef</i>.</para></remarks>
+        public EventSubscriberHostArgs ExecutionContext(Action<ExecutionContext, IEventSubscriber, EventData> updateExecutionContext)
+        {
+            UpdateExecutionContext = Check.NotNull(updateExecutionContext, nameof(updateExecutionContext));
+            return this;
+        }
 
         /// <summary>
         /// Gets the <see cref="ILogger"/>.
@@ -116,7 +230,7 @@ namespace Beef.Events.Subscribe
         public Action<Result>? AuditWriter { get; set; }
 
         /// <summary>
-        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/>; this should only be used in testing situations.
+        /// Uses (sets) the <see cref="AuditWriter"/> to write the audit information to the <see cref="ILogger"/>; <b>note:</b> this should only be used in testing situations.
         /// </summary>
         /// <returns>The <see cref="EventSubscriberHostArgs"/> instance (for fluent-style method chaining).</returns>
         public EventSubscriberHostArgs UseLoggerForAuditing()
@@ -124,6 +238,12 @@ namespace Beef.Events.Subscribe
             AuditWriter = (result) => Logger.LogWarning($"Subscriber '{result.Subscriber?.GetType()?.Name}' unsuccessful; Event skipped. {result}'");
             return this;
         }
+
+        /// <summary>
+        /// Gets a list (array) of all the subscriber <see cref="Type"/>s.
+        /// </summary>
+        /// <returns>A list (array) of all the subscriber <see cref="Type"/>s.</returns>
+        public Type[] GetSubscriberTypes() => _subscribers.Select(x => x.EventSubscriberType).ToArray();
 
         /// <summary>
         /// Finds and creates the <see cref="IEventSubscriber"/> where found for the <paramref name="subject"/> and <paramref name="action"/>.
@@ -146,8 +266,8 @@ namespace Beef.Events.Subscribe
             if (type == null)
                 return null;
 
-            return (IEventSubscriber)ServiceProvider.GetService(type) 
-                ?? throw new InvalidOperationException($"Subscriber {type.Name} was unable to be instantiated through the ServiceProvider; please ensure correctly configured.");
+            return (IEventSubscriber)(ServiceProvider?.GetService(type) 
+                ?? throw new InvalidOperationException($"Subscriber {type.Name} was unable to be instantiated through the ServiceProvider; please ensure correctly configured."));
         }
 
         /// <summary>

@@ -37,12 +37,12 @@ namespace Beef.Validation
         /// Initializes a new instance of the <see cref="PropertyRuleBase{TEntity, TProperty}"/> class.
         /// </summary>
         /// <param name="name">The property name.</param>
-        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="Beef.CodeGen.CodeGenerator.ToSentenceCase(string)"/>).</param>
+        /// <param name="text">The friendly text name used in validation messages (defaults to <paramref name="name"/> as <see cref="StringConversion.ToSentenceCase(string)"/>).</param>
         /// <param name="jsonName">The JSON property name (defaults to <paramref name="name"/>).</param>
         protected PropertyRuleBase(string name, LText? text = null, string? jsonName = null)
         {
             Name = Check.NotEmpty(name, nameof(name));
-            Text = text ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(Name)!;
+            Text = text ?? StringConversion.ToSentenceCase(Name)!;
             JsonName = string.IsNullOrEmpty(jsonName) ? Name : jsonName;
         }
 

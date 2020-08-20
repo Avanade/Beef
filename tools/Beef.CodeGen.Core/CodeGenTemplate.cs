@@ -141,7 +141,7 @@ namespace Beef.CodeGen
                         break;
 
                     default:
-                        throw new CodeGenException($"Unexpected XML Node Type '{xml.NodeType}' encountered: '{xml.ToString()}' - '{xml.Parent.ToString()}'.");
+                        throw new CodeGenException($"Unexpected XML Node Type '{xml.NodeType}' encountered: '{xml}' - '{xml.Parent}'.");
                 }
             }
 
@@ -178,7 +178,7 @@ namespace Beef.CodeGen
             {
                 var val = GetValue(isOutputNewOnly, config);
                 if (val != null)
-                    _eventArgs.IsOutputNewOnly = val is bool ? (bool)val : throw new CodeGenException($"'IsOutputNewOnly' attribute value '{isOutputNewOnly}' does not result in a boolean value.");
+                    _eventArgs.IsOutputNewOnly = val is bool boolean ? boolean : throw new CodeGenException($"'IsOutputNewOnly' attribute value '{isOutputNewOnly}' does not result in a boolean value.");
             }
 
             _eventArgs.IsOutputNewOnly = false;
@@ -257,7 +257,7 @@ namespace Beef.CodeGen
                     ExecuteXml(elseXml, config);
             }
             catch (CodeGenException) { throw; }
-            catch (Exception ex) { throw new CodeGenException($"If/Then/Else element is invalid ({ex.Message}): {xmlCon.ToString()}."); }
+            catch (Exception ex) { throw new CodeGenException($"If/Then/Else element is invalid ({ex.Message}): {xmlCon}."); }
         }
 
         /// <summary>
@@ -342,8 +342,8 @@ namespace Beef.CodeGen
             object? lVal = GetValue(stmt[0], config);
             if (stmt.Count == 1)
             {
-                if (lVal is bool)
-                    return (bool)lVal;
+                if (lVal is bool blval)
+                    return blval;
 
                 if (lVal is string slVal)
                 {
@@ -376,13 +376,13 @@ namespace Beef.CodeGen
             if (lVal != null || rVal != null)
             {
                 if (lVal is bool || rVal is bool)
-                    res = Comparer<bool>.Default.Compare((bool)Convert.ChangeType(lVal, typeof(bool), CultureInfo.InvariantCulture), (bool)Convert.ChangeType(rVal, typeof(bool), CultureInfo.InvariantCulture));
+                    res = Comparer<bool>.Default.Compare((bool)Convert.ChangeType(lVal, typeof(bool), CultureInfo.InvariantCulture)!, (bool)Convert.ChangeType(rVal, typeof(bool), CultureInfo.InvariantCulture)!);
                 else if (lVal is decimal || rVal is decimal)
-                    res = Comparer<decimal>.Default.Compare((decimal)Convert.ChangeType(lVal, typeof(decimal), CultureInfo.InvariantCulture), (decimal)Convert.ChangeType(rVal, typeof(decimal), CultureInfo.InvariantCulture));
+                    res = Comparer<decimal>.Default.Compare((decimal)Convert.ChangeType(lVal, typeof(decimal), CultureInfo.InvariantCulture)!, (decimal)Convert.ChangeType(rVal, typeof(decimal), CultureInfo.InvariantCulture)!);
                 else if (lVal is int || rVal is int)
-                    res = Comparer<int>.Default.Compare((int)Convert.ChangeType(lVal, typeof(int), CultureInfo.InvariantCulture), (int)Convert.ChangeType(rVal, typeof(int), CultureInfo.InvariantCulture));
+                    res = Comparer<int>.Default.Compare((int)Convert.ChangeType(lVal, typeof(int), CultureInfo.InvariantCulture)!, (int)Convert.ChangeType(rVal, typeof(int), CultureInfo.InvariantCulture)!);
                 else
-                    res = Comparer<string>.Default.Compare((string)Convert.ChangeType(lVal, typeof(string), CultureInfo.InvariantCulture), (string)Convert.ChangeType(rVal, typeof(string), CultureInfo.InvariantCulture));
+                    res = Comparer<string>.Default.Compare((string)Convert.ChangeType(lVal, typeof(string), CultureInfo.InvariantCulture)!, (string)Convert.ChangeType(rVal, typeof(string), CultureInfo.InvariantCulture)!);
             }
 
             switch (stmt[1].ToUpperInvariant())
@@ -522,15 +522,15 @@ namespace Beef.CodeGen
                 "TOLOWERCASE" => value.ToLowerInvariant(),
 #pragma warning restore CA1308
                 "TOUPPERCASE" => value.ToUpperInvariant(),
-                "TOPRIVATECASE" => CodeGenerator.ToPrivateCase(value),
-                "TOARGUMENTCASE" => CodeGenerator.ToCamelCase(value),
-                "TOSENTENCECASE" => CodeGenerator.ToSentenceCase(value),
-                "TOPASCALCASE" => CodeGenerator.ToPascalCase(value),
-                "TOCAMELCASE" => CodeGenerator.ToCamelCase(value),
-                "TOSNAKECASE" => CodeGenerator.ToSnakeCase(value),
-                "TOKEBABCASE" => CodeGenerator.ToKebabCase(value),
-                "TOPASTTENSE" => CodeGenerator.ToPastTense(value),
-                "TOPLURAL" => CodeGenerator.ToPlural(value),
+                "TOPRIVATECASE" => StringConversion.ToPrivateCase(value),
+                "TOARGUMENTCASE" => StringConversion.ToCamelCase(value),
+                "TOSENTENCECASE" => StringConversion.ToSentenceCase(value),
+                "TOPASCALCASE" => StringConversion.ToPascalCase(value),
+                "TOCAMELCASE" => StringConversion.ToCamelCase(value),
+                "TOSNAKECASE" => StringConversion.ToSnakeCase(value),
+                "TOKEBABCASE" => StringConversion.ToKebabCase(value),
+                "TOPASTTENSE" => StringConversion.ToPastTense(value),
+                "TOPLURAL" => StringConversion.ToPlural(value),
                 "TOCOMMENTS" => CodeGenerator.ToComments(value),
                 "TOSEECOMMENTS" => CodeGenerator.ToSeeComments(value),
                 _ => TransformCommand(transform!, value!, config)
@@ -573,9 +573,9 @@ namespace Beef.CodeGen
             decimal dlval = 0m;
             if (lval != null)
             {
-                if (lval is decimal)
-                    dlval = (decimal)lval;
-                else if (!(lval is string) || !decimal.TryParse((string)lval, out dlval))
+                if (lval is decimal dlvalx)
+                    dlval = dlvalx;
+                else if (!(lval is string slval) || !decimal.TryParse(slval, out dlval))
                     throw new CodeGenException($"Increment 'Name' attribute value '{lval}' is not a valid decimal", xml.ToString());
             }
 
@@ -586,9 +586,9 @@ namespace Beef.CodeGen
                 object? rval = GetValue(value, config);
                 if (rval != null)
                 {
-                    if (rval is decimal)
-                        drval = (decimal)rval;
-                    else if (!(rval is string) || !decimal.TryParse((string)rval, out drval))
+                    if (rval is decimal drvalx)
+                        drval = drvalx;
+                    else if (!(rval is string srval) || !decimal.TryParse(srval, out drval))
                         throw new CodeGenException($"Increment 'Value' attribute value '{rval}' is not a valid decimal", xml.ToString());
                 }
             }
@@ -713,7 +713,7 @@ namespace Beef.CodeGen
         {
             CodeGenConfig val = GetConfig(name, config, out string propertyName);
             var oval = GetValue(value, config);
-            string? sval = (oval == null) ? null : ((oval is bool) ? ((bool)oval ? "true" : "false") : oval.ToString());
+            string? sval = (oval == null) ? null : ((oval is bool boval) ? (boval ? "true" : "false") : oval.ToString());
             val.AttributeUpdate(propertyName, TemplateReplace(sval, config));
         }
 

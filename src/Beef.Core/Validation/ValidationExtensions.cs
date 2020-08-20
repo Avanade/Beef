@@ -772,7 +772,7 @@ namespace Beef.Validation
         /// <remarks>For example a value of 'VarNameDB' would return 'Var Name DB'.</remarks>
         public static string? ToSentenceCase(this string? value)
         {
-            return Beef.CodeGen.CodeGenerator.ToSentenceCase(value);
+            return StringConversion.ToSentenceCase(value);
         }
 
         #endregion

@@ -85,7 +85,7 @@ namespace Beef.CodeGen.Generators
                 if (psa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? Beef.CodeGen.CodeGenerator.ToCamelCase(pi.Name)!;
+                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
                 var xp = new XElement(ns + "attribute",
                     new XAttribute("name", XmlJsonRename.GetXmlName(ce, name)),
                     new XAttribute("use", psa.IsMandatory ? "required" : "optional"));
@@ -129,6 +129,6 @@ namespace Beef.CodeGen.Generators
         /// Gets the documentation text.
         /// </summary>
         private static string GetDocumentation(string name, PropertySchemaAttribute psa) =>
-            psa.Description == null ? (psa.Title ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!) : $"{psa.Title ?? Beef.CodeGen.CodeGenerator.ToSentenceCase(name)!} {psa.Description}";
+            psa.Description == null ? (psa.Title ?? StringConversion.ToSentenceCase(name)!) : $"{psa.Title ?? StringConversion.ToSentenceCase(name)!} {psa.Description}";
     }
 }

@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.2
+- *Enhancement:* The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-gen engine.
+- *Enhancement:* The `CodeGen` namespace from `Beef.Core` has been moved relocated. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`).
+
 ## v4.1.1
 - *Enhancement:* Introduction of Dependency Injection support.
 

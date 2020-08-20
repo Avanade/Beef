@@ -182,10 +182,10 @@ namespace Beef.CodeGen
             Check.NotNull(config, nameof(config));
             Check.NotNull(name, nameof(name));
 
-            if (config.Name == name)
+            if (config?.Name == name)
                 return config;
 
-            if (config.Parent == null)
+            if (config?.Parent == null)
                 return null;
             else
                 return FindConfig(config.Parent, name);
@@ -203,9 +203,9 @@ namespace Beef.CodeGen
             Check.NotNull(name, nameof(name));
 
             // Search children for named list.
-            if (config.Children != null)
+            if (config?.Children != null)
             {
-                foreach (KeyValuePair<string, List<CodeGenConfig>> kvp in config.Children)
+                foreach (KeyValuePair<string, List<CodeGenConfig>> kvp in config!.Children)
                 {
                     if (kvp.Key == name)
                         return kvp.Value;
@@ -213,7 +213,7 @@ namespace Beef.CodeGen
             }
 
             // Search the parent for named list.
-            if (config.Parent == null)
+            if (config?.Parent == null)
                 return null;
             else
                 return FindConfigList(config.Parent, name);
@@ -232,7 +232,7 @@ namespace Beef.CodeGen
 
             List<CodeGenConfig> list = new List<CodeGenConfig>();
 
-            if (config.Children != null)
+            if (config?.Children != null)
             {
                 foreach (KeyValuePair<string, List<CodeGenConfig>> kvp in config.Children)
                 {

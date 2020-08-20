@@ -20,7 +20,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
-    public class OperationConfig : ConfigBase<EntityConfig>
+    public class OperationConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         #region Key
 
@@ -410,7 +410,7 @@ namespace Beef.CodeGen.Config.Entity
                 _ => null
             });
 
-            Text = DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
+            Text = DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
             SummaryText = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type switch
             {
                 "Get" => $"Gets the specified {{{{{ReturnType}}}}}.",
@@ -431,7 +431,7 @@ namespace Beef.CodeGen.Config.Entity
                 _ => "???"
             }));
 
-            PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
@@ -512,7 +512,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var parameter in Parameters)
             {
-                parameter.Prepare(this);
+                parameter.Prepare(Root!, this);
             }
         }
     }

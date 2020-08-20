@@ -53,7 +53,7 @@ namespace Beef.CodeGen.Config
         public static string GetJsonName(ConfigurationEntity entity, string xmlName)
         {
             var item = config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
-            return item.JsonName ?? (Beef.CodeGen.CodeGenerator.ToCamelCase(xmlName)!);
+            return item.JsonName ?? (StringConversion.ToCamelCase(xmlName)!);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Beef.CodeGen.Config
         public static string GetXmlName(ConfigurationEntity entity, string jsonName)
         {
             var item = config.FirstOrDefault(x => x.Entity == entity && x.JsonName == jsonName);
-            return item.XmlName ?? (Beef.CodeGen.CodeGenerator.ToPascalCase(jsonName)!);
+            return item.XmlName ?? (StringConversion.ToPascalCase(jsonName)!);
         }
     }
 

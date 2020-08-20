@@ -3,6 +3,7 @@ using Beef.Demo.Business;
 using Beef.Demo.Business.Data;
 using Beef.Demo.Business.DataSvc;
 using Beef.Events;
+using Beef.Events.Subscribe;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ namespace Beef.Demo.Functions
                             .AddBeefBusinessServices();
 
             // Add event subscriber host and auto-discovered subscribers.
-            builder.Services.AddBeefEventHubSubscriberHost<Startup>();
+            builder.Services.AddBeefEventHubSubscriberHost(EventSubscriberHostArgs.Create<Startup>());
 
             // Add the data sources as singletons for dependency injection requirements.
             var ccs = config.GetSection("CosmosDb");

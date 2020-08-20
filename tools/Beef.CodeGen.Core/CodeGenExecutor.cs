@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Diagnostics;
+using Beef.CodeGen.Config;
+using Beef.CodeGen.Converters;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +12,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using YamlDotNet.Serialization;
 
 namespace Beef.CodeGen
 {
@@ -77,6 +80,58 @@ namespace Beef.CodeGen
     }
 
     /// <summary>
+    /// The script arguments.
+    /// </summary>
+    public class CodeGenScriptArgs
+    {
+        /// <summary>
+        /// Gets or sets the code-gen <see cref="Type"/>.
+        /// </summary>
+        public string? GenType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file name.
+        /// </summary>
+        public string? FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        public string? Template { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output directory.
+        /// </summary>
+        public string? OutDir { get; set; }
+
+        /// <summary>
+        /// Gets or sets the help text.
+        /// </summary>
+        public string? HelpText { get; set; }
+
+        /// <summary>
+        /// Gets the other parameters (not specifically defined).
+        /// </summary>
+        public Dictionary<string, string> OtherParameters { get; } = new Dictionary<string, string>();
+    }
+
+    /// <summary>
+    /// Provides the configuration type selection.
+    /// </summary>
+    public enum ConfigType
+    {
+        /// <summary>
+        /// Represents the <b>Entity</b> configuration.
+        /// </summary>
+        Entity,
+
+        /// <summary>
+        /// Represents the <b>Database</b> configuration.
+        /// </summary>
+        Database,
+    }
+
+    /// <summary>
     /// Represents the code generation executor.
     /// </summary>
     public class CodeGenExecutor
@@ -105,78 +160,52 @@ namespace Beef.CodeGen
 
             try
             {
-                XElement? xmlScript;
-                if (_args.ScriptFile!.Exists)
+                // Load the script configuration.
+                var (scripts, loaders, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
+
+                ConfigBase? cfg = null;
+                if (configType == ConfigType.Entity)
                 {
-                    using var fs = File.OpenText(_args.ScriptFile.FullName);
-                    xmlScript = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                }
-                else
-                {
-                    xmlScript = await ResourceManager.GetScriptContentXmlAsync(_args.ScriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
+                    cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
+                    cfg.Prepare(cfg, cfg);
                 }
 
-                if (xmlScript?.Name != "Script")
-                    throw new CodeGenException("The Script XML file must have a root element named 'Script'.");
-
-                if (!xmlScript.Elements("Generate").Any())
-                    throw new CodeGenException("The Script XML file must have at least a single 'Generate' element.");
-
-                // Create the code generator instance.
+                // Create the "legacy" code generator instance.
                 string? outputDir = null;
 
                 using var cfs = File.OpenText(_args.ConfigFile!.FullName);
-                var gen = CodeGenerator.Create(await XElement.LoadAsync(cfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false), GetLoaders(xmlScript));
+                var gen = CodeGenerator.Create(await XElement.LoadAsync(cfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false), loaders);
                 gen.CodeGenerated += (sender, e) => { CodeGenerated(outputDir!, e); };
 
                 // Execute each of the script instructions.
-                foreach (var scriptEle in xmlScript.Elements("Generate"))
+                foreach (var script in scripts)
                 {
-                    string? template = null;
-                    string? outDir = null;
-                    string? helpText = null;
-                    var otherParameters = new Dictionary<string, string>();
-                    foreach (var att in scriptEle.Attributes())
-                    {
-                        switch (att.Name.LocalName)
-                        {
-                            case "Template": template = att.Value; break;
-                            case "OutDir": outDir = att.Value; break;
-                            case "HelpText": helpText = att.Value; break;
-                            default: otherParameters.Add(att.Name.LocalName, att.Value); break;
-                        }
-                    }
-
-                    // Manage the parameters.
-                    gen.ClearParameters();
-                    gen.CopyParameters(_args.Parameters);
-                    gen.CopyParameters(otherParameters);
-
-                    // Log progress.
-                    CreatedCount = 0;
-                    UpdatedCount = 0;
                     NotChangedCount = 0;
-                    _args.Logger.LogInformation("  Template: {0} {1}", template!, helpText == null ? string.Empty : $"({helpText})");
+                    UpdatedCount = 0;
+                    CreatedCount = 0;
+                    
+                    // Log progress.
+                    _args.Logger.LogInformation("  Template: {0} {1}", script.Template!, script.HelpText == null ? string.Empty : $"({script.HelpText})");
 
-                    XElement xmlTemplate;
-                    if (_args.TemplatePath != null)
+                    // Get the template contents.
+                    var template = await GetTemplateContentsAsync(script).ConfigureAwait(false);
+
+                    if (script.GenType != null)
                     {
-                        var fi = new FileInfo(Path.Combine(_args.TemplatePath.FullName, template!));
-                        if (!fi.Exists)
-                            throw new CodeGenException($"The Template XML file '{fi.FullName}' does not exist.");
-
-                        using var fs = File.OpenText(fi.FullName);
-                        xmlTemplate = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
+                        // Execute the new+improved handlebars-based code-gen.
                     }
                     else
                     {
-                        xmlTemplate = await ResourceManager.GetTemplateContentXmlAsync(template!, _args.Assemblies.ToArray()).ConfigureAwait(false) ??
-                            throw new CodeGenException($"The Template XML resource '{template}' does not exist.");
-                    }
+                        // Execute the legacy custom code-gen (being slowly deprecated).
+                        gen.ClearParameters();
+                        gen.CopyParameters(_args.Parameters);
+                        gen.CopyParameters(script.OtherParameters);
 
-                    // Execute the code generation itself.
-                    outputDir = Path.Combine(_args.OutputPath!.FullName, SubstituteOutputDir(outDir!));
-                    await gen.GenerateAsync(xmlTemplate).ConfigureAwait(false);
+                        outputDir = Path.Combine(_args.OutputPath!.FullName, SubstituteOutputDir(script.OutDir!));
+
+                        using var sr = new StringReader(template);
+                        await gen.GenerateAsync(XElement.Load(sr, LoadOptions.None)).ConfigureAwait(false);
+                    }
 
                     // Provide statistics.
                     _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
@@ -200,20 +229,58 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Handle the output directory substitution.
+        /// Load the code-gen scripts configuration.
         /// </summary>
-        private string SubstituteOutputDir(string outputDir)
+        private async Task<(List<CodeGenScriptArgs>, List<ICodeGenConfigLoader>, ConfigType)> LoadScriptConfigAsync()
         {
-            var dir = outputDir;
-            foreach (var p in _args.Parameters)
+            var list = new List<CodeGenScriptArgs>();
+
+            // Load the script XML content.
+            XElement xmlScript;
+            if (_args.ScriptFile!.Exists)
             {
-                dir = dir.Replace("{{" + p.Key + "}}", p.Value, StringComparison.InvariantCultureIgnoreCase);
+                using var fs = File.OpenText(_args.ScriptFile.FullName);
+                xmlScript = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
+            }
+            else
+            {
+                var c = await ResourceManager.GetScriptContentAsync(_args.ScriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
+                if (c == null)
+                    throw new CodeGenException("The Script XML does not exist.");
+
+                xmlScript = XElement.Parse(c);
             }
 
-            if (dir.Contains("{{", StringComparison.InvariantCultureIgnoreCase) || dir.Contains("}}", StringComparison.InvariantCultureIgnoreCase))
-                throw new CodeGenException($"Unhandled substitution characters have been found in the Script OutDir {dir}.");
+            if (xmlScript?.Name != "Script")
+                throw new CodeGenException("The Script XML file must have a root element named 'Script'.");
 
-            return dir;
+            if (!xmlScript.Elements("Generate").Any())
+                throw new CodeGenException("The Script XML file must have at least a single 'Generate' element.");
+
+            foreach (var scriptEle in xmlScript.Elements("Generate"))
+            {
+                var args = new CodeGenScriptArgs();
+                foreach (var att in scriptEle.Attributes())
+                {
+                    switch (att.Name.LocalName)
+                    {
+                        case "GenType": args.GenType = att.Value; break;
+                        case "FileName": args.FileName = att.Value; break;
+                        case "Template": args.Template = att.Value; break;
+                        case "OutDir": args.OutDir = att.Value; break;
+                        case "HelpText": args.HelpText = att.Value; break;
+                        default: args.OtherParameters.Add(att.Name.LocalName, att.Value); break;
+                    }
+                }
+
+                list.Add(args);
+            }
+
+            var ct = xmlScript.Attribute("ConfigType")?.Value ?? throw new CodeGenException("The Script XML file must have an attribute named 'ConfigType' within the root 'Script' element.");
+            if (Enum.TryParse<ConfigType>(ct, true, out var configType))
+                return (list, GetLoaders(xmlScript), configType);
+
+            throw new CodeGenException($"The Script XML file attribute named 'ConfigType' has an invalid value '{ct}'.");
         }
 
         /// <summary>
@@ -238,6 +305,78 @@ namespace Beef.CodeGen
             }
 
             throw new CodeGenException($"The Script XML 'LoaderType' does not implement 'ICodeGenConfigGetLoaders': {lt}.");
+        }
+
+        /// <summary>
+        /// Loads the configuration file.
+        /// </summary>
+        private async Task<ConfigBase> LoadConfigFileAsync(ConfigType configType)
+        {
+            try
+            {
+                switch (_args.ConfigFile!.Extension.ToUpperInvariant())
+                {
+                    case ".XML":
+                        using (var xfs = _args.ConfigFile!.OpenRead())
+                        {
+                            var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
+                            var yaml = configType == ConfigType.Entity ? XmlToYamlConverter.ConvertEntityXmlToYaml(xml) : throw new NotImplementedException();
+
+                            using var sr = new StringReader(yaml);
+                            var yml = new DeserializerBuilder().Build().Deserialize(sr);
+                            var json = new SerializerBuilder().JsonCompatible().Build().Serialize(yml!);
+
+                            using var jsr = new StringReader(json);
+                            using var jr = new JsonTextReader(jsr);
+                            var js = JsonSerializer.Create();
+                            return CheckNotNull(js.Deserialize(jr, configType == ConfigType.Entity ? typeof(Config.Entity.CodeGenConfig) : throw new NotImplementedException()));
+                        }
+
+                    case ".YAML": throw new NotImplementedException();
+                    case ".JSON": throw new NotImplementedException();
+                    default: throw new CodeGenException($"The Config file '{_args.ConfigFile!.FullName}' is not a supported file type.");
+                }
+            }
+            catch (CodeGenException) { throw; }
+            catch (Exception ex) { throw new CodeGenException($"The contents of the Config File {_args.ConfigFile!.Name} are not valid.", ex); }
+        }
+
+        /// <summary>
+        /// Checks not null and converts type.
+        /// </summary>
+        private ConfigBase CheckNotNull(object? val) => (ConfigBase)(val ?? throw new CodeGenException($"The contents of the Config File {_args.ConfigFile!.Name} are not valid."));
+
+        /// <summary>
+        /// Gets the template contents.
+        /// </summary>
+        private async Task<string> GetTemplateContentsAsync(CodeGenScriptArgs script)
+        {
+            if (_args.TemplatePath == null)
+                return await ResourceManager.GetTemplateContentAsync(script.Template!, _args.Assemblies.ToArray()).ConfigureAwait(false) ??
+                    throw new CodeGenException($"The Template embedded resource '{script.Template}' does not exist.");
+
+            var fi = new FileInfo(Path.Combine(_args.TemplatePath.FullName, script.Template!));
+            if (!fi.Exists)
+                throw new CodeGenException($"The Template file '{fi.FullName}' does not exist.");
+
+            return await File.ReadAllTextAsync(fi.FullName, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Handle the output directory substitution.
+        /// </summary>
+        private string SubstituteOutputDir(string outputDir)
+        {
+            var dir = outputDir;
+            foreach (var p in _args.Parameters)
+            {
+                dir = dir.Replace("{{" + p.Key + "}}", p.Value, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            if (dir.Contains("{{", StringComparison.InvariantCultureIgnoreCase) || dir.Contains("}}", StringComparison.InvariantCultureIgnoreCase))
+                throw new CodeGenException($"Unhandled substitution characters have been found in the Script OutDir {dir}.");
+
+            return dir;
         }
 
         /// <summary>

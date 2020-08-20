@@ -31,17 +31,17 @@ namespace Beef.CodeGen.Loaders
             if (config.Attributes.ContainsKey("Property"))
                 UpdateConfigFromProperty(config, config.Attributes["Property"]!);
 
-            config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
-            config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
+            config.AttributeAdd("PrivateName", StringConversion.ToPrivateCase(config.Attributes["Name"]));
+            config.AttributeAdd("ArgumentName", StringConversion.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("Type", "string");
             config.AttributeAdd("LayerPassing", "All");
 
             if (config.GetAttributeValue<string>("RefDataType") != null)
-                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], StringConversion.ToSentenceCase(config.Attributes["Name"])));
             else if (CodeGenConfig.SystemTypes.Contains(config.Attributes["Type"]!))
-                config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
+                config.AttributeAdd("Text", StringConversion.ToSentenceCase(config.Attributes["Name"]));
             else
-                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], CodeGenerator.ToSentenceCase(config.Attributes["Name"])));
+                config.AttributeAdd("Text", string.Format(System.Globalization.CultureInfo.InvariantCulture, "{1} (see {{{{{0}}}}})", config.Attributes["Type"], StringConversion.ToSentenceCase(config.Attributes["Name"])));
 
             config.AttributeUpdate("Text", config.Attributes["Text"]);
 

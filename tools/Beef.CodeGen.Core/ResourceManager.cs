@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Beef.CodeGen
 {
@@ -27,15 +26,14 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Gets the <b>Resource</b> content XML from the <paramref name="assemblies"/> until found.
+        /// Gets the <b>Script</b> content from the <paramref name="assemblies"/> until found.
         /// </summary>
         /// <param name="name">The resource name.</param>
         /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
-        /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static async Task<XElement?> GetResourceContentXmlAsync(string name, params Assembly[] assemblies)
+        /// <returns>The resource content where found; otherwise, <c>null</c>.</returns>
+        public static Task<string?> GetScriptContentAsync(string name, params Assembly[] assemblies)
         {
-            var c = await GetResourceContentAsync(name, "Resources", assemblies).ConfigureAwait(false);
-            return (c == null) ? null : XElement.Parse(c);
+            return GetResourceContentAsync(name, "Scripts", assemblies);
         }
 
         /// <summary>
@@ -50,44 +48,13 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
-        /// Gets the <b>Template</b> content XML from the <paramref name="assemblies"/> until found.
+        /// Gets the specified resource content from the <paramref name="assemblies"/> until found.
         /// </summary>
         /// <param name="name">The resource name.</param>
-        /// <param name="assemblies">assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
-        /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static async Task<XElement?> GetTemplateContentXmlAsync(string name, params Assembly[] assemblies)
-        {
-            var c = await GetResourceContentAsync(name, "Templates", assemblies).ConfigureAwait(false);
-            return (c == null) ? null : XElement.Parse(c);
-        }
-
-        /// <summary>
-        /// Gets the <b>Template</b> content from the <paramref name="assemblies"/> until found.
-        /// </summary>
-        /// <param name="name">The resource name.</param>
-        /// <param name="assemblies">Assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
+        /// <param name="resourceType">The resource type.</param>
+        /// <param name="assemblies">The assemblies to use to probe for the assembly resource; will check this assembly also (no need to specify).</param>
         /// <returns>The resource content where found; otherwise, <c>null</c>.</returns>
-        public static Task<string?> GetScriptContentAsync(string name, params Assembly[] assemblies)
-        {
-            return GetResourceContentAsync(name, "Scripts", assemblies);
-        }
-
-        /// <summary>
-        /// Gets the <b>Template</b> content XML from the <paramref name="assemblies"/> until found.
-        /// </summary>
-        /// <param name="name">The resource name.</param>
-        /// <param name="assemblies">assemblies to use to probe for assembly resource; will check this assembly also (no need to specify).</param>
-        /// <returns>The resource content XML where found; otherwise, <c>null</c>.</returns>
-        public static async Task<XElement?> GetScriptContentXmlAsync(string name, params Assembly[] assemblies)
-        {
-            var c = await GetResourceContentAsync(name, "Scripts", assemblies).ConfigureAwait(false);
-            return (c == null) ? null : XElement.Parse(c);
-        }
-
-        /// <summary>
-        /// Gets the specified resource content.
-        /// </summary>
-        private static async Task<string?> GetResourceContentAsync(string name, string resourceType, params Assembly[] assemblies)
+        public static async Task<string?> GetResourceContentAsync(string name, string resourceType, params Assembly[] assemblies)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));

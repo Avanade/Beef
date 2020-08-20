@@ -22,7 +22,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Annotation", Title = "Provides additional property **Annotation** configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    public class PropertyConfig : ConfigBase<EntityConfig>
+    public class PropertyConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         #region Key
 
@@ -424,24 +424,29 @@ namespace Beef.CodeGen.Config.Entity
         #endregion
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Get or sets the")} {Text}.");
 
         /// <summary>
-        /// Gets or sets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
+        /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
-        public string? SummaryRefDataSid { get; set; }
+        public string? SummaryRefDataSid => CodeGenerator.ToComments($"Gets or sets the {Text} using the underlying Serialization Identifier (SID).");
 
         /// <summary>
-        /// Gets or sets the formatted summary text for the Reference Data Text property.
+        /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText { get; set; }
+        public string? SummaryRefDataText => CodeGenerator.ToComments($"Gets the corresponding {Text} text (read-only where selected).");
+
+        /// <summary>
+        /// Gets the <see cref="Name"/> formatted as see comments.
+        /// </summary>
+        public string? PropertyNameSeeComments => CodeGenerator.ToSeeComments(Name);
 
         /// <summary>
         /// Gets the computed declared type.
         /// </summary>
-        public string ComputedType
+        public string PropertyType
         {
             get
             {
@@ -454,9 +459,19 @@ namespace Beef.CodeGen.Config.Entity
         }
 
         /// <summary>
+        /// Gets the computed property name.
+        /// </summary>
+        public string PropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : Name! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
+        /// Gets the computed argument name.
+        /// </summary>
+        public string PropertyArgumentName => string.IsNullOrEmpty(RefDataType) ? ArgumentName! : ArgumentName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
         /// Gets the computed private name.
         /// </summary>
-        public string ComputedPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+        public string PropertyPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
 
         /// <summary>
         /// <inheritdoc/>
@@ -464,12 +479,9 @@ namespace Beef.CodeGen.Config.Entity
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "string");
-            Text = DefaultWhereNull(Text, () => Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) || Parent!.Parent!.Entities.Any(x => x.Name == Type) ? CodeGenerator.ToSeeComments(Name) : CodeGenerator.ToSentenceCase(Name));
-            SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Get or sets the")} {Text}.");
-            SummaryRefDataSid = CodeGenerator.ToComments($"Gets or sets the {Text} using the underlying Serialization Identifier (SID).");
-            SummaryRefDataText = CodeGenerator.ToComments($"Gets the corresponding {Text} text (read-only where selected).");
-            PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => CodeGenerator.ToCamelCase(Name));
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) || Parent!.Parent!.Entities.Any(x => x.Name == Type) ? CodeGenerator.ToSeeComments(Name) : StringConversion.ToSentenceCase(Name)));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
@@ -483,6 +495,8 @@ namespace Beef.CodeGen.Config.Entity
             IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type));
             Immutable = DefaultWhereNull(Immutable, () => false);
 
+            BubblePropertyChanged = CompareValue(IsEntity, false) || RefDataType != null ? false : BubblePropertyChanged;
+
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
         }
@@ -492,7 +506,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private string GenerateDisplayName()
         {
-            var dn = CodeGenerator.ToSentenceCase(Name)!;
+            var dn = StringConversion.ToSentenceCase(Name)!;
             var parts = dn.Split(' ');
             if (parts.Length == 1)
                 return (parts[0] == "Id") ? "Identifier" : dn;

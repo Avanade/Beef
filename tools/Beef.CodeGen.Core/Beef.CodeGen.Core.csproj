@@ -37,6 +37,7 @@
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
+    <None Remove="Templates\Entity_cs.hb" />
     <None Remove="Templates\IEntityDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceData_cs.xml" />
@@ -77,6 +78,7 @@
     <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
     <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
+    <EmbeddedResource Include="Templates\Entity_cs.hb" />
     <EmbeddedResource Include="Templates\Entity_cs.xml" />
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
@@ -100,6 +102,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Handlebars.Net" Version="1.10.1" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>

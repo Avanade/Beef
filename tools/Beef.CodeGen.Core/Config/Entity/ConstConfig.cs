@@ -10,7 +10,7 @@ namespace Beef.CodeGen.Config.Entity
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Const", Title = "The **Const** is used to define an constant value for an `Entity`.", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    public class ConstConfig : ConfigBase<EntityConfig>
+    public class ConstConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// Gets or sets the unique constant name.
@@ -45,7 +45,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
+            DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
             SummaryText = $"Represents a {Text} constant value.";
         }
     }

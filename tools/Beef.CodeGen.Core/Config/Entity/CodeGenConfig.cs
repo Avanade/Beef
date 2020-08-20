@@ -2,7 +2,6 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
 namespace Beef.CodeGen.Config.Entity
@@ -18,7 +17,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("DataSvc", Title = "Provides the **Data Services-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    public class CodeGenConfig : ConfigBase<object>
+    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
         #region RefData
 
@@ -364,7 +363,7 @@ namespace Beef.CodeGen.Config.Entity
             {
                 foreach (var entity in Entities)
                 {
-                    entity.Prepare(this);
+                    entity.Prepare(Root!, this);
                 }
             }
         }
