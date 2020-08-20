@@ -426,7 +426,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Get or sets the")} {Text}.");
+        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.

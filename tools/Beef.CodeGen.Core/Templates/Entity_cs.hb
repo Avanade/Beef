@@ -51,7 +51,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
 {{#ifval RefDataType}}
     [ReferenceDataInterface(typeof(IReferenceData))]
 {{/ifval}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{Inherits}}{{#ifval Implements}}, {{Implements}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{EntityInherits}}{{#ifval Implements}}, {{Implements}}{{/ifval}}
     {
 {{! ===== Privates ===== }}
 {{#each CoreProperties}}
@@ -320,7 +320,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
             if (from == null)
                 throw new ArgumentNullException(nameof(from));
 
-            CopyFrom(({{Inherits}})from);
+            CopyFrom(({{EntityInherits}})from);
   {{#each CoreProperties}}
     {{#if IsEntity}}
             CopyOrClone(from.{{PropertyName}}, {{PropertyName}});
@@ -384,7 +384,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
             get
             {
 {{#ifnull IsInitialOverride}}
-  {{#ifne Inherits 'EntityBase'}}
+  {{#ifne EntityInherits 'EntityBase'}}
                 if (!base.IsInitial)
                     return false;
 
@@ -440,7 +440,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public partial class {{EntityCollectionName}} : {{{CollectionInherits}}}
+    public partial class {{EntityCollectionName}} : {{{EntityCollectionInherits}}}
     {
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionName}}} class.

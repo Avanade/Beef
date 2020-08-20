@@ -7,7 +7,7 @@ using System.Linq;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the <b>entity model</b> code generator; where the <see cref="EntityConfig.DataModel"/> is <c>true</c>.
+    /// Represents the <b>entity model</b> code generator; where the <see cref="EntityConfig.OmitEntityBase"/> is <c>false</c>.
     /// </summary>
     public class EntityModelCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
     {
@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.DataModel)).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.OmitEntityBase)).AsEnumerable();
     }
 }

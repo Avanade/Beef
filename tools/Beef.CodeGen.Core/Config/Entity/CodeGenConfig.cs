@@ -17,7 +17,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("DataSvc", Title = "Provides the **Data Services-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
+    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig
     {
         #region RefData
 
@@ -273,7 +273,10 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var p in parameters)
             {
-                RuntimeParameters.Add(p.Key, p.Value);
+                if (RuntimeParameters.ContainsKey(p.Key))
+                    RuntimeParameters[p.Key] = p.Value;
+                else
+                    RuntimeParameters.Add(p.Key, p.Value);
             }
         }
 

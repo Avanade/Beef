@@ -756,9 +756,14 @@ namespace Beef.CodeGen.Config.Entity
         public string? EntityNameSeeComments => CodeGenerator.ToSeeComments(Name);
 
         /// <summary>
-        /// Indicates whether the entity (based on all configurations) should implement the <see cref="EntityBase"/> capabilties.
+        /// Gets or sets the computed entity inherits.
         /// </summary>
-        public bool HasEntityBase => !(CompareValue(OmitEntityBase, true) || Parent!.IsDataModel);
+        public string? EntityInherits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed entity collection inherits.
+        /// </summary>
+        public string? EntityCollectionInherits { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -816,7 +821,8 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private void InferInherits()
         {
-            Inherits = DefaultWhereNull(Inherits, () =>
+            EntityInherits = Inherits;
+            EntityInherits = DefaultWhereNull(EntityInherits, () =>
             {
                 if (!CompareNullOrValue(OmitEntityBase, false))
                     return null;
@@ -829,17 +835,16 @@ namespace Beef.CodeGen.Config.Entity
                 };
             });
 
-            CollectionInherits = DefaultWhereNull(CollectionInherits, () =>
+            EntityCollectionInherits = CollectionInherits;
+            EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
             {
-                if (!CompareNullOrValue(OmitEntityBase, false))
-                    return $"List<{EntityName}>";
-
                 if (RefDataType == null)
                     return CompareValue(CollectionKeyed, true) ? $"EntityBaseKeyedCollection<UniqueKey, {EntityName}>" : $"EntityBaseCollection<{EntityName}>";
                 else
                     return $"ReferenceDataCollectionBase<{EntityName}>";
             });
 
+            CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
             CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
@@ -936,7 +941,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private void InferImplements()
         {
-            if (!ImplementsAutoInfer.HasValue || !ImplementsAutoInfer.Value)
+            if (ImplementsAutoInfer.HasValue && !ImplementsAutoInfer.Value)
                 return;
 
             var implements = new List<string>();
@@ -945,13 +950,13 @@ namespace Beef.CodeGen.Config.Entity
                 foreach (var str in Implements!.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
                     var txt = str?.Trim();
-                    if (string.IsNullOrEmpty(txt))
+                    if (!string.IsNullOrEmpty(txt))
                         implements.Add(txt!);
                 }
             }
 
             var i = 0;
-            var id = Properties.FirstOrDefault(x => x.Name == "Id" && (!x.Inherited.HasValue || !x.Inherited.Value) && x.UniqueKey.HasValue && x.UniqueKey.Value);
+            var id = Properties.FirstOrDefault(x => x.Name == "Id" && (!x.Inherited.HasValue || !x.Inherited.Value));
             if (id != null)
             {
                 var iid = id.Type switch

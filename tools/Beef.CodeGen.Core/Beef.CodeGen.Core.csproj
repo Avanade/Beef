@@ -41,6 +41,7 @@
     <None Remove="Templates\IEntityDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceData_cs.xml" />
+    <None Remove="Templates\Model_cs.hb" />
     <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
     <None Remove="Templates\ServiceCollectionExtensionsData_cs.xml" />
     <None Remove="Templates\ServiceCollectionExtensionsManager_cs.xml" />
@@ -88,6 +89,7 @@
     <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.xml" />
+    <EmbeddedResource Include="Templates\Model_cs.hb" />
     <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.xml" />

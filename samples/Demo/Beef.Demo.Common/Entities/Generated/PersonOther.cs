@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -47,14 +45,14 @@ namespace Beef.Demo.Common.Entities
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
+        /// Gets or sets the Change Log.
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
-    } 
+    }
 
     /// <summary>
-    /// Represents a <see cref="PersonOther"/> collection.
+    /// Represents the <see cref="PersonOther"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PersonOtherCollection : List<PersonOther> { }

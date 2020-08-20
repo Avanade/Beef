@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Product entity.
+    /// Represents the Product model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Product
@@ -39,7 +37,7 @@ namespace Beef.Demo.Business.Data.Model
         /// </summary>
         [JsonProperty("description", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Description { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

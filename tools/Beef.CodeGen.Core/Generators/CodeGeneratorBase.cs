@@ -42,6 +42,14 @@ namespace Beef.CodeGen.Generators
         /// Gets or sets the output generated directory name (defaults to <c>Generated</c>).
         /// </summary>
         public string? OutputGenDirName { get; set; } = "Generated";
+
+        /// <summary>
+        /// Performs the code generation.
+        /// </summary>
+        /// <param name="templateContents">The template <c>handlebars.js</c> contents.</param>
+        /// <param name="config">The root <see cref="ConfigBase"/>.</param>
+        /// <param name="codeGenerated">The action that is invoked when a output has been successfully generated.</param>
+        public abstract void Generate(string templateContents, ConfigBase config, Action<CodeGeneratorEventArgs> codeGenerated);
     }
 
     /// <summary>
@@ -57,6 +65,14 @@ namespace Beef.CodeGen.Generators
         /// <param name="config">The root configuration.</param>
         /// <returns>The selected <typeparamref name="TGenConfig"/>.</returns>
         protected abstract IEnumerable<TGenConfig> SelectGenConfig(TRootConfig config);
+
+        /// <summary>
+        /// Performs the code generation.
+        /// </summary>
+        /// <param name="templateContents">The template <c>handlebars.js</c> contents.</param>
+        /// <param name="config">The root <see cref="ConfigBase"/>.</param>
+        /// <param name="codeGenerated">The action that is invoked when a output has been successfully generated.</param>
+        public override void Generate(string templateContents, ConfigBase config, Action<CodeGeneratorEventArgs> codeGenerated) => Generate(templateContents, (TRootConfig)config, codeGenerated);
 
         /// <summary>
         /// Performs the code generation.

@@ -8,15 +8,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Person entity.
+    /// Represents the Person model.
     /// </summary>
     public partial class Person
     {
@@ -34,7 +32,7 @@ namespace Beef.Demo.Business.Data.Model
         /// Gets or sets the Last Name.
         /// </summary>
         public string? LastName { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

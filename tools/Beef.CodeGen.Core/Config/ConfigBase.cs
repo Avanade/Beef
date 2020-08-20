@@ -1,10 +1,27 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
-using System.Runtime.ConstrainedExecution;
+using System.Collections.Generic;
 
 namespace Beef.CodeGen.Config
 {
+    /// <summary>
+    /// Enables the root configuration capabilities.
+    /// </summary>
+    public interface IRootConfig
+    {
+        /// <summary>
+        /// Gets the parameter overrides.
+        /// </summary>
+        Dictionary<string, string> RuntimeParameters { get; }
+
+        /// <summary>
+        /// Replaces the <see cref="RuntimeParameters"/> with the specified <paramref name="parameters"/> (copies values).
+        /// </summary>
+        /// <param name="parameters">The parameters to copy.</param>
+        void ReplaceRuntimeParameters(Dictionary<string, string> parameters);
+    }
+
     /// <summary>
     /// Provides base configuration capabilities.
     /// </summary>

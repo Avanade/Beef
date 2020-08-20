@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.Config;
 using Beef.CodeGen.Converters;
+using Beef.CodeGen.Generators;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -193,6 +194,14 @@ namespace Beef.CodeGen
                     if (script.GenType != null)
                     {
                         // Execute the new+improved handlebars-based code-gen.
+                        ((IRootConfig)cfg!).ReplaceRuntimeParameters(_args.Parameters);
+                        ((IRootConfig)cfg).ReplaceRuntimeParameters(script.OtherParameters);
+
+                        var gt = Type.GetType(script.GenType) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be loaded.");
+                        var cg = (CodeGeneratorBase)(Activator.CreateInstance(gt) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be instantiated."));
+                        cg.OutputFileName = script.FileName;
+                        cg.OutputDirName = script.OutDir;
+                        cg.Generate(template, cfg, e => CodeGenerated(_args.OutputPath!.FullName, e));
                     }
                     else
                     {

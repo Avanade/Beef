@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Beef.Demo.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Robot entity.
+    /// Represents the Robot model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Robot : IGuidIdentifier, IETag, IChangeLog
@@ -59,14 +57,14 @@ namespace Beef.Demo.Business.Data.Model
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
+        /// Gets or sets the Change Log.
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
-    } 
+    }
 
     /// <summary>
-    /// Represents a <see cref="Robot"/> collection.
+    /// Represents the <see cref="Robot"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class RobotCollection : List<Robot> { }

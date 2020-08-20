@@ -10,10 +10,6 @@
 {{! ===== Using ===== }}
 using System;
 using System.Collections.Generic;
-{{#unless Parent.IsDataModel}}
-using System.ComponentModel.DataAnnotations;
-{{/unless}}
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 {{#ifeq JsonSerializer 'Newtonsoft'}}
@@ -35,6 +31,7 @@ using {{Parent.Company}}.{{Parent.AppName}}.Common.Entities;
     {{/ifeq}}
   {{/ifeq}}
 {{/unless}}
+
 {{! ===== Class ===== }}
 namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Business.Data.Model{{else}}{{Parent.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}{{/if}}
 {
@@ -60,9 +57,6 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
       {{/unless}}
     {{/ifeq}}
     {{#unless IsDataModel}}
-      {{#ifval DisplayName}}
-        [Display(Name="{{DisplayName}}")]
-      {{/ifval}}
       {{#ifval Annotation1}}
         {{Annotation1}}
       {{/ifval}}
@@ -74,6 +68,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
       {{/ifval}}
     {{/unless}}
         public {{PropertyType}} {{Name}} { get; set; }
+{{/each}}
     }
 {{! ===== Collection ===== }}
 {{#if Collection}}
@@ -82,7 +77,8 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public partial class {{EntityCollectionName}} : List{{{EntityName}}} { }
+    public partial class {{EntityCollectionName}} : {{{CollectionInherits}}} { }
+{{/if}}
 }
 
 #pragma warning restore CA2227, CA1819
