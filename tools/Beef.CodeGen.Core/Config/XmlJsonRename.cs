@@ -26,7 +26,7 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper"),
             (ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom"),
             (ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper"),
-
+ 
             (ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
             (ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
             (ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),

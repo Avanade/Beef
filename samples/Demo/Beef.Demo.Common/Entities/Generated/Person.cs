@@ -22,7 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Person entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Person : EntityBase, IETag, IChangeLog, IGuidIdentifier, IEquatable<Person>
+    public partial class Person : EntityBase, IGuidIdentifier, IETag, IChangeLog, IEquatable<Person>
     {
         #region Privates
 
@@ -46,12 +46,12 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Identifier")]
         public Guid Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, false, nameof(Id)); 
+            set => SetValue(ref _id, value, false, false, nameof(Id));
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Beef.Demo.Common.Entities
         public string? FirstName
         {
             get => _firstName;
-            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName)); 
+            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName));
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Beef.Demo.Common.Entities
         public string? LastName
         {
             get => _lastName;
-            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName)); 
+            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Beef.Demo.Common.Entities
         public string? UniqueCode
         {
             get => _uniqueCode;
-            set => SetValue(ref _uniqueCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(UniqueCode)); 
+            set => SetValue(ref _uniqueCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(UniqueCode));
         }
 
         /// <summary>
@@ -148,22 +148,21 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         [JsonProperty("birthday", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Birthday")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime Birthday
         {
             get => _birthday;
-            set => SetValue(ref _birthday, value, false, DateTimeTransform.DateOnly, nameof(Birthday)); 
+            set => SetValue(ref _birthday, value, false, DateTimeTransform.DateOnly, nameof(Birthday));
         }
 
         /// <summary>
-        /// Gets or sets the Address (see <see cref="Address"/>).
+        /// Gets or sets the Address (see <see cref="Common.Entities.Address"/>).
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Address")]
         public Address? Address
         {
             get => _address;
-            set => SetValue(ref _address, value, false, true, nameof(Address)); 
+            set => SetValue(ref _address, value, false, true, nameof(Address));
         }
 
         /// <summary>
@@ -174,24 +173,24 @@ namespace Beef.Demo.Common.Entities
         public string? ETag
         {
             get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag)); 
+            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
         }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Change Log")]
         public ChangeLog? ChangeLog
         {
             get => _changeLog;
-            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog)); 
+            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
         }
 
         #endregion
 
         #region IChangeTracking
-          
+
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
         /// </summary>
@@ -215,8 +214,8 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="Person"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -226,20 +225,17 @@ namespace Beef.Demo.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
         public static UniqueKey CreateUniqueKey(Guid id) => new UniqueKey(id);
-          
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Id"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Id);
 
         #endregion
@@ -251,37 +247,31 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Person val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Person val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Person"/> is equal to the current <see cref="Person"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Person? obj)
+        /// <param name="value">The <see cref="Person"/> to compare with the current <see cref="Person"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Person"/> is equal to the current <see cref="Person"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Person? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(FirstName, obj.FirstName)
-                && Equals(LastName, obj.LastName)
-                && Equals(UniqueCode, obj.UniqueCode)
-                && Equals(GenderSid, obj.GenderSid)
-                && Equals(EyeColorSid, obj.EyeColorSid)
-                && Equals(Birthday, obj.Birthday)
-                && Equals(Address, obj.Address)
-                && Equals(ETag, obj.ETag)
-                && Equals(ChangeLog, obj.ChangeLog);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(FirstName, value.FirstName)
+                && Equals(LastName, value.LastName)
+                && Equals(UniqueCode, value.UniqueCode)
+                && Equals(GenderSid, value.GenderSid)
+                && Equals(EyeColorSid, value.EyeColorSid)
+                && Equals(Birthday, value.Birthday)
+                && Equals(Address, value.Address)
+                && Equals(ETag, value.ETag)
+                && Equals(ChangeLog, value.ChangeLog);
         }
 
         /// <summary>
@@ -301,9 +291,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (Person? a, Person? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Person"/>.
+        /// Returns the hash code for the <see cref="Person"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Person"/>.</returns>
+        /// <returns>The hash code for the <see cref="Person"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -321,7 +311,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -340,8 +330,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Person"/> to copy from.</param>
         public void CopyFrom(Person from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -357,9 +347,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -396,7 +386,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -427,31 +417,27 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Person from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Person"/> collection.
+    /// Represents the <see cref="Person"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PersonCollection : EntityBaseCollection<Person>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonCollection"/> class.
         /// </summary>
-        public PersonCollection(){ }
+        public PersonCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="PersonCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Person"/> entities.</param>
         public PersonCollection(IEnumerable<Person> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="PersonCollection"/>.
         /// </summary>
@@ -459,31 +445,29 @@ namespace Beef.Demo.Common.Entities
         public override object Clone()
         {
             var clone = new PersonCollection();
-            foreach (Person item in this)
+            foreach (var item in this)
             {
                 clone.Add((Person)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="PersonCollectionResult"/> to a <see cref="PersonCollection"/>.
+        /// An implicit cast from the <see cref="PersonCollectionResult"/> to a corresponding <see cref="PersonCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="PersonCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="PersonCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator PersonCollection(PersonCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="Person"/> collection result.
+    /// Represents the <see cref="Person"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class PersonCollectionResult : EntityCollectionResult<PersonCollection, Person>
@@ -494,7 +478,7 @@ namespace Beef.Demo.Common.Entities
         public PersonCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="PersonCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public PersonCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -517,6 +501,8 @@ namespace Beef.Demo.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

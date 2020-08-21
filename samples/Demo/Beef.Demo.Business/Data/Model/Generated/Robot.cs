@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.Data.Model
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log.
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }

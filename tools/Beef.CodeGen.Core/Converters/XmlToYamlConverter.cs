@@ -67,7 +67,7 @@ namespace Beef.CodeGen.Converters
         /// </summary>
         private static (ConfigurationEntity entity, Type type, string name) GetConfigInfo(string? name) => name switch
         {
-            "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(CodeGenConfig), ""),
+            "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(Config.Entity.CodeGenConfig), ""),
             "Entity" => (ConfigurationEntity.Entity, typeof(EntityConfig), "entities"),
             "Property" => (ConfigurationEntity.Property, typeof(PropertyConfig), "properties"),
             "Operation" => (ConfigurationEntity.Operation, typeof(OperationConfig), "operations"),

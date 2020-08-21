@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Entity" LoaderType="Beef.CodeGen.Loaders.EntityConfigLoader, Beef.CodeGen.Core">
-  <!--<Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Entities" EntityScope="Common" HelpText="Common/Entities" />-->
-  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common/Entities" />
-  <Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Entities" EntityScope="Business" HelpText="Business/Entities" />
-  <!--<Generate Template="Entity_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data/Model" ModelFromEntity="true" IsDataModel="true" HelpText="Business/Data/Model" />-->
-  <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" HelpText="EntityModelCodeGenerator: Common/Entities" />
-  
+  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Entities" EntityScope="Business" HelpText="EntityCodeGenerator: Business|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityModelCodeGenerator: Common|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Business" HelpText="EntityModelCodeGenerator: Business|Entities" />
+
   <Generate Template="IEntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" HelpText="Business/Data" />
   <Generate Template="EntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" HelpText="Business/Data" />
   <Generate Template="IEntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" HelpText="Business/DataSvc" />

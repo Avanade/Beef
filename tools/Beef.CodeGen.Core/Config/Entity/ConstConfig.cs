@@ -24,7 +24,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The C# code for the constant value.", IsMandatory = true, IsImportant = true,
-            Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
+            Description = "The code generation will ensure it is delimited correctly to output correctly formed C# code.")]
         public string? Value { get; set; }
 
         /// <summary>
@@ -36,9 +36,14 @@ namespace Beef.CodeGen.Config.Entity
         public string? Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => $"Represents a {Text} constant value.";
+
+        /// <summary>
+        /// Gets the value formatted for code output.
+        /// </summary>
+        public string? FormattedValue => CompareValue(Value, "int") ? Value : (CompareValue(Value, "Guid") ? $"new Guid(\"{Value}\")" : $"\"{Value}\"");
 
         /// <summary>
         /// <inheritdoc/>
@@ -46,7 +51,6 @@ namespace Beef.CodeGen.Config.Entity
         protected override void Prepare()
         {
             DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
-            SummaryText = $"Represents a {Text} constant value.";
         }
     }
 }

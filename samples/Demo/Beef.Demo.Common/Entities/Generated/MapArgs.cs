@@ -33,7 +33,7 @@ namespace Beef.Demo.Common.Entities
         #region Properties
 
         /// <summary>
-        /// Gets or sets the Coordinates (see <see cref="MapCoordinates"/>).
+        /// Gets or sets the Coordinates (see <see cref="Common.Entities.MapCoordinates"/>).
         /// </summary>
         [JsonProperty("coordinates", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Coordinates")]
@@ -41,7 +41,30 @@ namespace Beef.Demo.Common.Entities
         public MapCoordinates? Coordinates
         {
             get => _coordinates;
-            set => SetValue(ref _coordinates, value, false, false, nameof(Coordinates)); 
+            set => SetValue(ref _coordinates, value, false, true, nameof(Coordinates));
+        }
+
+        #endregion
+
+        #region IChangeTracking
+
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+            Coordinates?.AcceptChanges();
+            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+            Coordinates?.TrackChanges();
+            base.TrackChanges();
         }
 
         #endregion
@@ -53,28 +76,22 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is MapArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is MapArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="MapArgs"/> is equal to the current <see cref="MapArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(MapArgs? obj)
+        /// <param name="value">The <see cref="MapArgs"/> to compare with the current <see cref="MapArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="MapArgs"/> is equal to the current <see cref="MapArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(MapArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Coordinates, obj.Coordinates);
+            return base.Equals((object)value)
+                && Equals(Coordinates, value.Coordinates);
         }
 
         /// <summary>
@@ -94,9 +111,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (MapArgs? a, MapArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="MapArgs"/>.
+        /// Returns the hash code for the <see cref="MapArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="MapArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="MapArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -105,7 +122,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -124,17 +141,17 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="MapArgs"/> to copy from.</param>
         public void CopyFrom(MapArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
-            Coordinates = from.Coordinates;
+            Coordinates = CopyOrClone(from.Coordinates, Coordinates);
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -162,7 +179,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -184,7 +201,7 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(MapArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

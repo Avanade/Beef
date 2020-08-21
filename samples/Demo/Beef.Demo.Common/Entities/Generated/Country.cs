@@ -33,10 +33,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="Country"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Country(Guid id)
-        {
-            return ConvertFromId<Country>(id);
-        }
+        public static implicit operator Country(Guid id) => ConvertFromId<Country>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="Country"/>.
@@ -44,13 +41,10 @@ namespace Beef.Demo.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="Country"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Country(string? code)
-        {
-            return ConvertFromCode<Country>(code);
-        }
+        public static implicit operator Country(string? code) => ConvertFromCode<Country>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -69,16 +63,16 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Country"/> to copy from.</param>
         public void CopyFrom(Country from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -105,7 +99,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -130,29 +124,29 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Country from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Country"/> collection.
+    /// Represents the <see cref="Country"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class CountryCollection : ReferenceDataCollectionBase<Country>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="CountryCollection"/> class.
         /// </summary>
-        public CountryCollection(){ }
+        public CountryCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CountryCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="CountryCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Country"/> entities.</param>
         public CountryCollection(IEnumerable<Country> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

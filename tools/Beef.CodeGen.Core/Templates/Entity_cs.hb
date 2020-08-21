@@ -51,19 +51,37 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
 {{#ifval RefDataType}}
     [ReferenceDataInterface(typeof(IReferenceData))]
 {{/ifval}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{EntityInherits}}{{#ifval Implements}}, {{Implements}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}} : {{{EntityInherits}}}{{#ifval EntityImplements}}, {{{EntityImplements}}}{{/ifval}}
     {
+{{! ===== Constants ===== }}
+{{#each Consts}}
+  {{#if @first}}
+        #region Constants
+
+  {{/if}}
+        /// <summary>
+        /// {{{SummaryText}}}
+        /// </summary>
+        public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
+  {{#if @last}}
+
+        #endregion
+
+  {{/if}}
+{{/each}}
 {{! ===== Privates ===== }}
-{{#each CoreProperties}}
+{{#each PrivateProperties}}
   {{#if @first}}
         #region Privates
 
   {{/if}}
-        private {{PropertyType}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
+        private {{{PrivateType}}} {{PropertyPrivateName}}{{#ifval Default}} = {{Default}}{{/ifval}};
   {{#ifval RefDataType}}
-    {{#if RefDataText}}
+    {{#unless RefDataList}}
+      {{#if RefDataText}}
         private string? {{PrivateName}}Text;
-    {{/if}}
+      {{/if}}
+    {{/unless}}
   {{/ifval}}
   {{#if @last}}
 
@@ -82,29 +100,31 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// {{{SummaryRefDataSid}}}
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-      {{#unless IgnoreSerialization}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if EmitDefaultValue}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+      {{#unless SerializationIgnore}}
+        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#ifval DisplayName}}
         [Display(Name="{{DisplayName}}")]
     {{/ifval}}
-        public {{PropertyType}} {{PropertyName}}
+        public {{{PrivateType}}} {{PropertyName}}
         {
             get => {{PropertyPrivateName}};
             set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
         }
-    {{#unless IgnoreSerialization}}
-      {{#if RefDataText}}
+    {{#unless SerializationIgnore}}
+      {{#unless RefDataList}}
+        {{#if RefDataText}}
 
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
         {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore]
+        [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         {{/ifeq}}
         public string? {{Name}}Text { get => {{PrivateName}}Text ?? GetRefDataText(() => {{Name}}); set => {{PrivateName}}Text = value; }
-      {{/if}}
+        {{/if}}
+      {{/unless}}
     {{/unless}}
 
         /// <summary>
@@ -124,13 +144,13 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         {{Annotation3}}
     {{/ifval}}
     {{#if RefDataList}}
-        public ReferenceDataSidList<{{PropertyType}}, {{RefDataType}}>? {{Name}}
+        public ReferenceDataSidList<{{{Type}}}, {{RefDataType}}>? {{Name}}
         {
-            get => new ReferenceDataSidList<{{PropertyType}}, {{RefDataType}}>(ref {{PropertyPrivateName}});
+            get => new ReferenceDataSidList<{{{Type}}}, {{RefDataType}}>(ref {{PropertyPrivateName}});
             set => SetValue(ref {{PropertyPrivateName}}, value?.ToSidList(), {{lower Immutable}}, false, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});
         }
     {{else}}
-        public {{PropertyType}} {{Name}}
+        public {{{PropertyType}}} {{Name}}
         {
             get => {{PropertyPrivateName}};
             set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, false, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}}); 
@@ -142,8 +162,8 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// {{{SummaryText}}}
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-      {{#unless IgnoreSerialization}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if EmitDefaultValue}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+      {{#unless SerializationIgnore}}
+        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#ifval DisplayName}}
@@ -161,11 +181,11 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
     {{#ifval Annotation3}}
         {{Annotation3}}
     {{/ifval}}
-        public {{PropertyType}} {{Name}}
+        public {{{PropertyType}}} {{Name}}
         {
   {{#if RefDataMapping}}
             get => GetMapping<string>(nameof({{Name}}));
-            set => { var _{{PropertyPrivateName}} = GetMapping<{{PropertyType}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); };
+            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
   {{else}}
             get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}};
             set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#ifeq Type 'string'}}StringTrim.{{StringTrim}}, StringTransform.{{StringTransform}}{{else}}{{#ifeq Type 'DateTime'}}DateTimeTransform.{{DateTimeTransform}}{{else}}{{lower BubblePropertyChanged}}{{/ifeq}}{{/ifeq}}, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});
@@ -178,9 +198,40 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
 
   {{/if}}
 {{/each}}
+{{! ===== IChangeTracking ===== }}
+{{#ifne EntityProperties.Count 0}}
+        #region IChangeTracking
+
+        /// <summary>
+        /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        /// <remarks>Ends and commits the entity changes (see <see cref="EntityBase.EndEdit"/>).</remarks>
+        public override void AcceptChanges()
+        {
+{{#each EntityProperties}}
+            {{Name}}?.AcceptChanges();
+{{/each}}
+            base.AcceptChanges();
+        }
+
+        /// <summary>
+        /// Determines that until <see cref="AcceptChanges"/> is invoked property changes are to be logged (see <see cref="EntityBase.ChangeTracking"/>).
+        /// </summary>
+        public override void TrackChanges()
+        {
+{{#each EntityProperties}}
+            {{Name}}?.TrackChanges();
+{{/each}}
+            base.TrackChanges();
+        }
+
+        #endregion
+
+{{/ifne}}
 {{! ===== UniqueKey ===== }}
-{{#ifne UniqueKeyProperties.Count 0}}
-        #region UniqueKey
+{{#unless RefDataType}}
+  {{#ifne UniqueKeyProperties.Count 0}}
+        #region IUniqueKey
 
         /// <summary>
         /// Indicates whether the {{{EntityNameSeeComments}}} has a <see cref="UniqueKey"/> value.
@@ -199,7 +250,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
   {{#each UniqueKeyProperties}}
         /// <param name="{{ArgumentName}}">The {{{PropertyNameSeeComments}}}.</param>
   {{/each}}
-        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyType}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
+        public static UniqueKey CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyType}}} {{PropertyArgumentName}}{{/each}}) => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyArgumentName}}{{/each}});
 
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
@@ -208,7 +259,8 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
 
         #endregion
 
-{{/ifne}}
+  {{/ifne}}
+{{/unless}}
 {{! ===== Operator ===== }}
 {{#ifval RefDataType}}
   {{#unless Abstract}}
@@ -243,23 +295,23 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj) => (!(obj is {{{EntityName}}} val)) ? false : Equals(val);
+        public override bool Equals(object? obj) => obj is {{{EntityName}}} val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified {{{EntityNameSeeComments}}} is equal to the current {{{EntityNameSeeComments}}} by comparing the values of all the properties.
         /// </summary>
         /// <param name="value">The {{{EntityNameSeeComments}}} to compare with the current {{{EntityNameSeeComments}}}.</param>
         /// <returns><c>true</c> if the specified {{{EntityNameSeeComments}}} is equal to the current {{{EntityNameSeeComments}}}; otherwise, <c>false</c>.</returns>
-        public bool Equals({{Entity.EntityName}}? value)
+        public bool Equals({{EntityName}}? value)
         {
             if (value == null)
                 return false;
             else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)value{{#ifeq CoreProperties.Count 0}});{{/ifeq}}
+            return base.Equals((object)value){{#ifeq CoreProperties.Count 0}};{{/ifeq}}
   {{#each CoreProperties}}
-                && Equals({{PropertyName}}, value.{{PropertyName}}){{#if @last}});{{/if}}
+                && Equals({{PropertyName}}, value.{{PropertyName}}){{#if @last}};{{/if}}
   {{/each}}
         }
 
@@ -280,7 +332,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         public static bool operator != ({{{EntityName}}}? a, {{{EntityName}}}? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the {{{EntityNameSeeComments}}}.
+        /// Returns the hash code for the {{{EntityNameSeeComments}}}.
         /// </summary>
         /// <returns>The hash code for the {{{EntityNameSeeComments}}}.</returns>
         public override int GetHashCode()
@@ -298,7 +350,6 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
   {{/each}}
 {{/unless}}
 {{! ===== ICopyFrom ===== }}
-{{#unless RefDataType}}
         #region ICopyFrom
     
         /// <summary>
@@ -323,7 +374,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
             CopyFrom(({{EntityInherits}})from);
   {{#each CoreProperties}}
     {{#if IsEntity}}
-            CopyOrClone(from.{{PropertyName}}, {{PropertyName}});
+            {{PropertyName}} = CopyOrClone(from.{{PropertyName}}, {{PropertyName}});
     {{else}}
             {{PropertyName}} = from.{{PropertyName}};
     {{/if}}
@@ -334,10 +385,8 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
 
         #endregion
 
-{{/unless}}
 {{! ===== ICloneable ===== }}
-{{#unless RefDataType}}
-  {{#unless Abstract}}
+{{#unless Abstract}}
         #region ICloneable
         
         /// <summary>
@@ -353,7 +402,6 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         
         #endregion
         
-  {{/unless}}
 {{/unless}}
 {{! ===== ICleanUp ===== }}
         #region ICleanUp
@@ -391,13 +439,11 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
   {{/ifne}}
   {{#each CoreProperties}}
     {{#unless ExcludeCleanUp}}
-      {{#unless Immutable}}
                 {{#if @first}}return{{else}}    &&{{/if}} Cleaner.IsInitial({{PropertyName}}){{#if @last}};{{/if}}
-      {{/unless}}
     {{/unless}}
   {{/each}}
   {{#ifeq CoreProperties.Count 0}}
-                    return true;
+                return true;
   {{/ifeq}}
 {{else}}
                 return {{IsInitialOverride}};
@@ -440,18 +486,18 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public partial class {{EntityCollectionName}} : {{{EntityCollectionInherits}}}
+    public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     {
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionName}}} class.
         /// </summary>
-        public {{EntityCollectionName}}(){{#ifval RefDataSortOrder}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifval}}{ }
+        public {{{EntityCollectionName}}}(){{#ifne RefDataSortOrder 'SortOrder'}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifne}} { }
 
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionName}}} class with an entities range.
         /// </summary>
         /// <param name="entities">The {{{EntityNameSeeComments}}} entities.</param>
-        public {{EntityCollectionName}}(IEnumerable<{{{EntityName}}}> entities){{#ifval RefDataSortOrder}} : base(ReferenceDataSortOrder.{{RefDataSortOrder}}){{/ifval}} => AddRange(entities);
+        public {{{EntityCollectionName}}}(IEnumerable<{{{EntityName}}}> entities){{#ifne RefDataSortOrder 'SortOrder'}} : this(){{/ifne}} => AddRange(entities);
   {{#if CollectionKeyed}}
 
         /// <summary>
@@ -467,15 +513,14 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <returns>A deep copy of the {{{seecomments EntityCollectionName}}}.</returns>
         public override object Clone()
         {
-            var clone = new {{EntityCollectionName}}();
+            var clone = new {{{EntityCollectionName}}}();
             foreach (var item in this)
             {
-                clone.Add(({EntityName}})item.Clone());
+                clone.Add(({{EntityName}})item.Clone());
             }
                 
             return clone;
         }
-        
   {{/ifnull}}
   {{#if CollectionResult}}
 
@@ -485,8 +530,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <param name="result">The {{{seecomments EntityCollectionResultName}}}.</param>
         /// <returns>The corresponding {{{seecomments EntityCollectionName}}}.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator {{EntityCollectionName}}({{EntityCollectionResultName}} result) => result?.Result!;
-
+        public static implicit operator {{{EntityCollectionName}}}({{{EntityCollectionResultName}}} result) => result?.Result!;
   {{/if}}
     }
 
@@ -501,25 +545,25 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
     /// Represents the {{{EntityNameSeeComments}}} collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public class {{EntityCollectionResultName}} : {{{CollectionResultInherits}}}
+    public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
     {
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class.
         /// </summary>
-        public {{EntityCollectionResultName}} { }
+        public {{{EntityCollectionResultName}}}() { }
         
         /// <summary>
         /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{EntityCollectionResultName}}(PagingArgs? paging) : base(paging) { }
+        public {{{EntityCollectionResultName}}}(PagingArgs? paging) : base(paging) { }
         
         /// <summary>
-        /// Initializes a new instance of the {{{EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
+        /// Initializes a new instance of the {{{seecomments EntityCollectionResultName}}} class with a <paramref name="collection"/> of items to add.
         /// </summary>
         /// <param name="collection">A collection containing items to add.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        public {{EntityCollectionResultName}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
+        public {{{EntityCollectionResultName}}}(IEnumerable<{{{EntityName}}}> collection, PagingArgs? paging = null) : base(paging) => Result.AddRange(collection);
         
         /// <summary>
         /// Creates a deep copy of the {{{seecomments EntityCollectionResultName}}}.
@@ -527,11 +571,12 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <returns>A deep copy of the {{{seecomments EntityCollectionResultName}}}.</returns>
         public override object Clone()
         {
-            var clone = new {{EntityCollectionResultName}}();
+            var clone = new {{{EntityCollectionResultName}}}();
             clone.CopyFrom(this);
             return clone;
         }
     }
+
     #endregion
 {{/if}}
 }

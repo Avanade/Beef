@@ -41,7 +41,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
 {{#ifeq JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval Inherits}} : {{Inherits}}{{/ifval}}{{#ifval Implements}}{{#ifval Inherits}}, {{else}} : {{/ifval}}{{Implements}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval Inherits}} : {{{Inherits}}}{{/ifval}}{{#ifval Implements}}{{#ifval Inherits}}, {{else}} : {{/ifval}}{{{Implements}}}{{/ifval}}
     {
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}
@@ -52,8 +52,8 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
         /// {{{SummaryText}}}
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
-      {{#unless IgnoreSerialization}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if EmitDefaultValue}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+      {{#unless SerializationIgnore}}
+        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#unless IsDataModel}}
@@ -67,7 +67,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
         {{Annotation3}}
       {{/ifval}}
     {{/unless}}
-        public {{PropertyType}} {{Name}} { get; set; }
+        public {{{PropertyType}}} {{Name}} { get; set; }
 {{/each}}
     }
 {{! ===== Collection ===== }}
@@ -77,7 +77,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public partial class {{EntityCollectionName}} : {{{CollectionInherits}}} { }
+    public partial class {{{EntityCollectionName}}} : {{{CollectionInherits}}} { }
 {{/if}}
 }
 

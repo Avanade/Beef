@@ -431,12 +431,14 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
-        public string? SummaryRefDataSid => CodeGenerator.ToComments($"Gets or sets the {Text} using the underlying Serialization Identifier (SID).");
+        public string? SummaryRefDataSid => CompareValue(RefDataList, true)
+            ? CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
+            : CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText => CodeGenerator.ToComments($"Gets the corresponding {Text} text (read-only where selected).");
+        public string? SummaryRefDataText => CodeGenerator.ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
@@ -444,9 +446,16 @@ namespace Beef.CodeGen.Config.Entity
         public string? PropertyNameSeeComments => CodeGenerator.ToSeeComments(Name);
 
         /// <summary>
-        /// Gets the computed declared type.
+        /// Gets the computed declared property type.
         /// </summary>
-        public string PropertyType
+        public string PropertyType => string.IsNullOrEmpty(RefDataType) 
+            ? PrivateType 
+            : (CompareValue(RefDataList, true) ? $"ReferenceDataSidList<{Type}, {RefDataType}>?" : CompareValue(Nullable, true) ? Type + "?" : Type!);
+
+        /// <summary>
+        /// Gets the computed declared private type.
+        /// </summary>
+        public string PrivateType
         {
             get
             {
@@ -479,7 +488,32 @@ namespace Beef.CodeGen.Config.Entity
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "string");
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) || Parent!.Parent!.Entities.Any(x => x.Name == Type) ? CodeGenerator.ToSeeComments(Name) : StringConversion.ToSentenceCase(Name)));
+            if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                RefDataType = DefaultWhereNull(RefDataType, () => "string");
+
+            if (RefDataType != null && !Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                Type = $"RefDataNamespace.{Type}";
+
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            {
+                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+
+                if (Type == "ChangeLog")
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Beef.Entities." + Type)})";
+
+                var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+                if (ent != null)
+                {
+                    if (ent.EntityScope == null || ent.EntityScope == "Common")
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                    else
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                }
+
+                return StringConversion.ToSentenceCase(Name);
+            }));
+
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
@@ -489,16 +523,13 @@ namespace Beef.CodeGen.Config.Entity
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataName = DefaultWhereNull(DataName, () => Name);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
-            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type));
+            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => false);
-
-            BubblePropertyChanged = CompareValue(IsEntity, false) || RefDataType != null ? false : BubblePropertyChanged;
-
-            if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                RefDataType = DefaultWhereNull(RefDataType, () => "string");
+            BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
         }
 
         /// <summary>

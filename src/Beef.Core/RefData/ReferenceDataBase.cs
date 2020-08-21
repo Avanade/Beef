@@ -82,7 +82,7 @@ namespace Beef.RefData
         private DateTime? _endDate;
         private string? _etag;
         private ChangeLog? _changeLog;
-        private Dictionary<string, IComparable>? _mappings;
+        private Dictionary<string, object?>? _mappings;
 
         /// <summary>
         /// Validates the identifier (see <see cref="Id"/>) <see cref="Type"/>.
@@ -293,12 +293,12 @@ namespace Beef.RefData
         /// <summary>
         /// Gets the mapping dictionary.
         /// </summary>
-        internal Dictionary<string, IComparable> Mappings
+        internal Dictionary<string, object?> Mappings
         {
             get
             {
                 if (_mappings == null)
-                    _mappings = new Dictionary<string, IComparable>();
+                    _mappings = new Dictionary<string, object?>();
 
                 return _mappings;
             }
@@ -341,7 +341,7 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <remarks>A <paramref name="value"/> with the default value will not be set; assumed in this case that no mapping exists.</remarks>
-        protected internal void SetMapping<T>(string name, T value) where T : IComparable
+        protected internal void SetMapping<T>(string name, T value)
         {
             if (Comparer<T>.Default.Compare(value, default!) == 0)
                 return;
@@ -358,12 +358,12 @@ namespace Beef.RefData
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="name">The mapping name.</param>
         /// <returns>The mapping value where found; otherwise, the corresponding default value.</returns>
-        public T GetMapping<T>(string name) where T : IComparable
+        public T GetMapping<T>(string name)
         {
-            if (!HasMappings || !Mappings.TryGetValue(name, out IComparable value))
+            if (!HasMappings || !Mappings.TryGetValue(name, out var value))
                 return default!;
 
-            return (T)value;
+            return (T)value!;
         }
 
         /// <summary>
@@ -373,14 +373,13 @@ namespace Beef.RefData
         /// <param name="name">The mapping name.</param>
         /// <param name="value">The mapping value.</param>
         /// <returns><c>true</c> indicates that the name exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetMapping<T>(string name, out T value) where T : IComparable
+        public bool TryGetMapping<T>(string name, out T value)
         {
-            IComparable val = default(T)!;
-            value = (T)val;
-            if (!HasMappings || !Mappings.TryGetValue(name, out val))
+            value = default!;
+            if (!HasMappings || !Mappings.TryGetValue(name, out var val))
                 return false;
 
-            value = (T)val;
+            value = (T)val!;
             return true;
         }
 

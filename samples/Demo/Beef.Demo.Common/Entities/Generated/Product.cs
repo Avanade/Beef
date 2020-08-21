@@ -22,7 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Product entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Product : EntityBase, IEquatable<Product>
+    public partial class Product : EntityBase, IIntIdentifier, IEquatable<Product>
     {
         #region Privates
 
@@ -42,7 +42,7 @@ namespace Beef.Demo.Common.Entities
         public int Id
         {
             get => _id;
-            set => SetValue(ref _id, value, true, false, nameof(Id)); 
+            set => SetValue(ref _id, value, true, false, nameof(Id));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Beef.Demo.Common.Entities
         public string? Name
         {
             get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name)); 
+            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name));
         }
 
         /// <summary>
@@ -64,13 +64,13 @@ namespace Beef.Demo.Common.Entities
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description)); 
+            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description));
         }
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="Product"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -80,20 +80,17 @@ namespace Beef.Demo.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
         public static UniqueKey CreateUniqueKey(int id) => new UniqueKey(id);
-          
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Id"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Id);
 
         #endregion
@@ -105,30 +102,24 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Product val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Product val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Product"/> is equal to the current <see cref="Product"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Product? obj)
+        /// <param name="value">The <see cref="Product"/> to compare with the current <see cref="Product"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Product"/> is equal to the current <see cref="Product"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Product? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(Name, obj.Name)
-                && Equals(Description, obj.Description);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(Name, value.Name)
+                && Equals(Description, value.Description);
         }
 
         /// <summary>
@@ -148,9 +139,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (Product? a, Product? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Product"/>.
+        /// Returns the hash code for the <see cref="Product"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Product"/>.</returns>
+        /// <returns>The hash code for the <see cref="Product"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -161,7 +152,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -180,8 +171,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Product"/> to copy from.</param>
         public void CopyFrom(Product from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -190,9 +181,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -221,7 +212,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -230,7 +221,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(Name)
+                return Cleaner.IsInitial(Id)
+                    && Cleaner.IsInitial(Name)
                     && Cleaner.IsInitial(Description);
             }
         }
@@ -244,31 +236,27 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Product from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Product"/> collection.
+    /// Represents the <see cref="Product"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class ProductCollection : EntityBaseCollection<Product>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductCollection"/> class.
         /// </summary>
-        public ProductCollection(){ }
+        public ProductCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProductCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="ProductCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Product"/> entities.</param>
         public ProductCollection(IEnumerable<Product> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="ProductCollection"/>.
         /// </summary>
@@ -276,31 +264,29 @@ namespace Beef.Demo.Common.Entities
         public override object Clone()
         {
             var clone = new ProductCollection();
-            foreach (Product item in this)
+            foreach (var item in this)
             {
                 clone.Add((Product)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="ProductCollectionResult"/> to a <see cref="ProductCollection"/>.
+        /// An implicit cast from the <see cref="ProductCollectionResult"/> to a corresponding <see cref="ProductCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="ProductCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="ProductCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator ProductCollection(ProductCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="Product"/> collection result.
+    /// Represents the <see cref="Product"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class ProductCollectionResult : EntityCollectionResult<ProductCollection, Product>
@@ -311,7 +297,7 @@ namespace Beef.Demo.Common.Entities
         public ProductCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProductCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="ProductCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public ProductCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -334,6 +320,8 @@ namespace Beef.Demo.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

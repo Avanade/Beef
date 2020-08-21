@@ -42,7 +42,7 @@ namespace Beef.Demo.Common.Entities
         public string? ModelNo
         {
             get => _modelNo;
-            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo)); 
+            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo
         {
             get => _serialNo;
-            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo)); 
+            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Beef.Demo.Common.Entities
         public ReferenceDataSidList<RefDataNamespace.PowerSource, string>? PowerSources
         {
             get => new ReferenceDataSidList<RefDataNamespace.PowerSource, string>(ref _powerSourcesSids);
-            set => SetValue(ref _powerSourcesSids, value?.ToSidList(), false, false, nameof(PowerSources)); 
+            set => SetValue(ref _powerSourcesSids, value?.ToSidList(), false, false, nameof(PowerSources));
         }
 
         #endregion
@@ -87,30 +87,24 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is RobotArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is RobotArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="RobotArgs"/> is equal to the current <see cref="RobotArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(RobotArgs? obj)
+        /// <param name="value">The <see cref="RobotArgs"/> to compare with the current <see cref="RobotArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="RobotArgs"/> is equal to the current <see cref="RobotArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(RobotArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(ModelNo, obj.ModelNo)
-                && Equals(SerialNo, obj.SerialNo)
-                && Equals(PowerSourcesSids, obj.PowerSourcesSids);
+            return base.Equals((object)value)
+                && Equals(ModelNo, value.ModelNo)
+                && Equals(SerialNo, value.SerialNo)
+                && Equals(PowerSourcesSids, value.PowerSourcesSids);
         }
 
         /// <summary>
@@ -130,9 +124,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (RobotArgs? a, RobotArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="RobotArgs"/>.
+        /// Returns the hash code for the <see cref="RobotArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="RobotArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="RobotArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -143,7 +137,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -162,8 +156,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="RobotArgs"/> to copy from.</param>
         public void CopyFrom(RobotArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             ModelNo = from.ModelNo;
@@ -172,9 +166,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -204,7 +198,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -228,7 +222,7 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(RobotArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

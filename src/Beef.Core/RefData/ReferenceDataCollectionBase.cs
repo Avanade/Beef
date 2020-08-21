@@ -110,7 +110,7 @@ namespace Beef.RefData
         private struct MappingsKey
         {
             public string Name;
-            public IComparable Value;
+            public object? Value;
         }
 
         #endregion

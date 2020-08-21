@@ -42,7 +42,7 @@ namespace Beef.Demo.Common.Entities
         public string? FirstName
         {
             get => _firstName;
-            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName)); 
+            set => SetValue(ref _firstName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(FirstName));
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Beef.Demo.Common.Entities
         public string? LastName
         {
             get => _lastName;
-            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName)); 
+            set => SetValue(ref _lastName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(LastName));
         }
 
         /// <summary>
@@ -68,14 +68,14 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
-        /// Gets or sets the Genders (see <see cref="Gender"/>).
+        /// Gets or sets the Genders (see <see cref="RefDataNamespace.Gender"/>).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Display(Name="Genders")]
-        public ReferenceDataSidList<Gender, string>? Genders
+        public ReferenceDataSidList<RefDataNamespace.Gender, string>? Genders
         {
-            get => new ReferenceDataSidList<Gender, string>(ref _gendersSids);
-            set => SetValue(ref _gendersSids, value?.ToSidList(), false, false, nameof(Genders)); 
+            get => new ReferenceDataSidList<RefDataNamespace.Gender, string>(ref _gendersSids);
+            set => SetValue(ref _gendersSids, value?.ToSidList(), false, false, nameof(Genders));
         }
 
         #endregion
@@ -87,30 +87,24 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is PersonArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is PersonArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="PersonArgs"/> is equal to the current <see cref="PersonArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(PersonArgs? obj)
+        /// <param name="value">The <see cref="PersonArgs"/> to compare with the current <see cref="PersonArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="PersonArgs"/> is equal to the current <see cref="PersonArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(PersonArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(FirstName, obj.FirstName)
-                && Equals(LastName, obj.LastName)
-                && Equals(GendersSids, obj.GendersSids);
+            return base.Equals((object)value)
+                && Equals(FirstName, value.FirstName)
+                && Equals(LastName, value.LastName)
+                && Equals(GendersSids, value.GendersSids);
         }
 
         /// <summary>
@@ -130,9 +124,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (PersonArgs? a, PersonArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="PersonArgs"/>.
+        /// Returns the hash code for the <see cref="PersonArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="PersonArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="PersonArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -143,7 +137,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -162,8 +156,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="PersonArgs"/> to copy from.</param>
         public void CopyFrom(PersonArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             FirstName = from.FirstName;
@@ -172,9 +166,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -204,7 +198,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -228,7 +222,7 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(PersonArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

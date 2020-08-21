@@ -1012,7 +1012,7 @@ namespace Beef.Demo.Test
                 .Run(a => a.AddAsync(new Person { FirstName = "Gary" }));
 
             // Make sure the content (body) is as expected.
-            Assert.AreEqual("{\"firstName\":\"Gary\"}", res.Request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual("{\"id\":\"00000000-0000-0000-0000-000000000000\",\"firstName\":\"Gary\"}", res.Request.Content.ReadAsStringAsync().Result);
         }
 
         [Test, TestSetUp]

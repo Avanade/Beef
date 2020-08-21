@@ -126,6 +126,14 @@ namespace Beef.CodeGen.Config.Entity
             Description = "Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.")]
         public string? RefDataSortOrder { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Reference Data <c>ToString</c> composite <see cref="Beef.RefData.ReferenceDataBase.StringFormat"/>.
+        /// </summary>
+        [JsonProperty("refDataStringFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("RefData", Title = "The Reference Data `ToString` composite format.",
+            Description = "The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.")]
+        public string? RefDataStringFormat { get; set; }
+
         #endregion
 
         #region Entity
@@ -703,16 +711,28 @@ namespace Beef.CodeGen.Config.Entity
         public List<PropertyConfig>? Properties { get; set; }
 
         /// <summary>
+        /// Gets the list of private properties to be implemented (that are not inherited).
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<PropertyConfig>? PrivateProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToList();
+
+        /// <summary>
         /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
-        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToList();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are sub-entities.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
@@ -764,6 +784,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the computed entity collection inherits.
         /// </summary>
         public string? EntityCollectionInherits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed entity inherits.
+        /// </summary>
+        public string? EntityImplements { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -956,7 +981,7 @@ namespace Beef.CodeGen.Config.Entity
             }
 
             var i = 0;
-            var id = Properties.FirstOrDefault(x => x.Name == "Id" && (!x.Inherited.HasValue || !x.Inherited.Value));
+            var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
             if (id != null)
             {
                 var iid = id.Type switch
@@ -971,13 +996,18 @@ namespace Beef.CodeGen.Config.Entity
                     implements.Insert(i++, iid);
             }
 
-            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string") && !implements.Contains("IETag"))
+            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)) && !implements.Contains("IETag"))
                 implements.Insert(i++, "IETag");
 
-            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog") && !implements.Contains("IChangeLog"))
+            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)) && !implements.Contains("IChangeLog"))
                 implements.Insert(i++, "IChangeLog");
 
             Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
+
+            if (RefDataType == null)
+                implements.Add($"IEquatable<{EntityName}>");
+
+            EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
         }
     }
 }
