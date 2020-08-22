@@ -20,7 +20,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the TripPerson business functionality.
+    /// Provides the <see cref="TripPerson"/> business functionality.
     /// </summary>
     public partial class TripPersonManager : ITripPersonManager
     {
@@ -32,16 +32,13 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="ITripPersonDataSvc"/>.</param>
         public TripPersonManager(ITripPersonDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); TripPersonManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TripPersonManagerCtor();
+        partial void TripPersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found; otherwise, <c>null</c>.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -57,10 +54,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Creates the <see cref="TripPerson"/> object.
+        /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -70,7 +67,6 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
                 MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
@@ -78,11 +74,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="TripPerson"/> object.
+        /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value, string? id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -93,7 +89,6 @@ namespace Beef.Demo.Business
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
@@ -101,7 +96,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Deletes the <see cref="TripPerson"/> object.
+        /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)

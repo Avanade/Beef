@@ -37,8 +37,11 @@
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
+    <None Remove="Templates\EntityManager_cs.hb" />
     <None Remove="Templates\Entity_cs.hb" />
-    <None Remove="Templates\IEntityDataSvc_cs.xml" />
+    <None Remove="Templates\IEntityDataSvc_cs.hb" />
+    <None Remove="Templates\IEntityData_cs.hb" />
+    <None Remove="Templates\IEntityManager_cs.hb" />
     <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
     <None Remove="Templates\IReferenceData_cs.xml" />
     <None Remove="Templates\Model_cs.hb" />
@@ -84,9 +87,10 @@
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
     <EmbeddedResource Include="Templates\Grpc_proto.xml" />
-    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\IEntityData_cs.xml" />
-    <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
+    <EmbeddedResource Include="Templates\IEntityData_cs.hb" />
+    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.hb" />
+    <EmbeddedResource Include="Templates\EntityManager_cs.hb" />
+    <EmbeddedResource Include="Templates\IEntityManager_cs.hb" />
     <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.xml" />
     <EmbeddedResource Include="Templates\Model_cs.hb" />

@@ -17,23 +17,23 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Defines the Product business functionality.
+    /// Defines the <see cref="Product"/> business functionality.
     /// </summary>
     public partial interface IProductManager
     {
         /// <summary>
-        /// Gets the <see cref="Product"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Product"/>.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
-        /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Product"/> where found; otherwise, <c>null</c>.</returns>
         Task<Product?> GetAsync(int id);
 
         /// <summary>
-        /// Gets the <see cref="Product"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="ProductCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
         Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging);
     }
 }

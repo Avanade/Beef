@@ -20,7 +20,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Contact business functionality.
+    /// Provides the <see cref="Contact"/> business functionality.
     /// </summary>
     public partial class ContactManager : IContactManager
     {
@@ -32,15 +32,12 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
         public ContactManager(IContactDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void ContactManagerCtor();
+        partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="ContactCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -51,10 +48,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Contact"/> where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -70,10 +67,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Creates the <see cref="Contact"/> object.
+        /// Creates a new <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>A refreshed <see cref="Contact"/>.</returns>
         public Task<Contact> CreateAsync(Contact value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -83,7 +80,6 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
                 MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
@@ -91,11 +87,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="Contact"/> object.
+        /// Updates an existing <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
+        /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <returns>A refreshed <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -106,7 +102,6 @@ namespace Beef.Demo.Business
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)))
                     .Run().ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
@@ -114,7 +109,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Deletes the <see cref="Contact"/> object.
+        /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)

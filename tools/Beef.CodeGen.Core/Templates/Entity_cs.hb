@@ -18,29 +18,29 @@ using Beef.RefData;
 {{#ifeq JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
 {{/ifeq}}
-{{#if Parent.UsingNamespace1}}
-using {{Parent.UsingNamespace1}};
+{{#if Root.UsingNamespace1}}
+using {{Root.UsingNamespace1}};
 {{/if}}
-{{#if Parent.UsingNamespace2}}
-using {{Parent.UsingNamespace2}};
+{{#if Root.UsingNamespace2}}
+using {{Root.UsingNamespace2}};
 {{/if}}
-{{#if Parent.UsingNamespace3}}
-using {{Parent.UsingNamespace3}};
+{{#if Root.UsingNamespace3}}
+using {{Root.UsingNamespace3}};
 {{/if}}
-{{#ifeq Parent.EntityUsing 'Common' 'All'}}
+{{#ifeq Root.EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
-using {{Parent.Company}}.{{Parent.AppName}}.Common.Entities;
+using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
   {{/ifeq}}
 {{/ifeq}}
-{{#ifval Parent.RefDataNamespace}}
-using RefDataNamespace = {{Parent.RefDataNamespace}};
+{{#ifval Root.RefDataNamespace}}
+using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
-{{#ifval Parent.RefDataBusNamespace}}
-using RefDataBusNamespace = {{Parent.RefDataBusNamespace}};
+{{#ifval Root.RefDataBusNamespace}}
+using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
 {{! ===== Class ===== }}
-namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
     /// <summary>
     /// Represents the {{{Text}}} entity.
@@ -62,7 +62,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-        public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
+        public const {{Root.ConstType}} {{Name}} = {{{FormattedValue}}};
   {{#if @last}}
 
         #endregion
@@ -99,7 +99,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <summary>
         /// {{{SummaryRefDataSid}}}
         /// </summary>
-    {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
         [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
@@ -119,7 +119,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <summary>
         /// {{{SummaryRefDataText}}}
         /// </summary>
-        {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+        {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonProperty("{{JsonName}}Text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         {{/ifeq}}
         public string? {{Name}}Text { get => {{PrivateName}}Text ?? GetRefDataText(() => {{Name}}); set => {{PrivateName}}Text = value; }
@@ -161,7 +161,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{Parent.EntityScope}}.Entities{
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-    {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
         [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}

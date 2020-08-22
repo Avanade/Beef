@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.Validation;
 using Beef.Demo.Business.DataSvc;
+using Beef.Demo.Business.Validation;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Robot business functionality.
+    /// Provides the <see cref="Robot"/> business functionality.
     /// </summary>
     public partial class RobotManager : IRobotManager
     {
@@ -33,16 +33,13 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
         private RobotManager(IRobotDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void RobotManagerCtor();
+        partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Robot"/> where found; otherwise, <c>null</c>.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -58,10 +55,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Creates the <see cref="Robot"/> object.
+        /// Creates a new <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <param name="value">The <see cref="Robot"/>.</param>
+        /// <returns>A refreshed <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -79,11 +76,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="Robot"/> object.
+        /// Updates an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
+        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <returns>A refreshed <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -102,7 +99,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Deletes the <see cref="Robot"/> object.
+        /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id)
@@ -120,11 +117,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
+        /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>

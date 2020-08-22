@@ -438,7 +438,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText => CodeGenerator.ToComments($"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).");
+        public string? SummaryRefDataText => $"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).";
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.

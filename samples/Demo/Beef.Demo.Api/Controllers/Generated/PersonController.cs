@@ -279,7 +279,7 @@ namespace Beef.Demo.Api.Controllers
         [HttpPost]
         [Route("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public IActionResult Add([FromBody] Person? person)
+        public IActionResult Add([FromBody] Person person)
         {
             return new WebApiPost(this, () => _manager.AddAsync(person),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Created);

@@ -43,7 +43,8 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId"),
             (ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
 
-            (ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric")
+            (ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric"),
+            (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode"),
 
         });
 

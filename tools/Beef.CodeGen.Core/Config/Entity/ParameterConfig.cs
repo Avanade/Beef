@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -120,9 +121,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
         /// </summary>
-        [JsonProperty("validatorFluent", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("validatorCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).")]
-        public string? ValidatorFluent { get; set; }
+        public string? ValidatorCode { get; set; }
 
         /// <summary>
         /// Indicates whether a <see cref="ValidationException"/> should be thrown when the parameter value has its default value (null, zero, etc).
@@ -176,9 +177,24 @@ namespace Beef.CodeGen.Config.Entity
         #endregion
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Indicates whether the parameter is the auto-added value.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public bool? IsValueArg { get; set; }
+
+        /// <summary>
+        /// Indicates whether the parameter is the auto-enabled <see cref="PagingArgs"/>.
+        /// </summary>
+        public bool? IsPagingArgs { get; set; } 
+
+        /// <summary>
+        /// Gets the formatted summary text.
+        /// </summary>
+        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+
+        /// <summary>
+        /// Gets the computed declared parameter type.
+        /// </summary>
+        public string? ParameterType => CompareValue(Nullable, true) ? $"{Type}?" : Type;
 
         /// <summary>
         /// <inheritdoc/>
@@ -188,8 +204,23 @@ namespace Beef.CodeGen.Config.Entity
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
-            Text = DefaultWhereNull(Text, () => pc == null ? StringConversion.ToSentenceCase(Name) : pc.Text);
-            SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            {
+                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+
+                var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+                if (ent != null)
+                {
+                    if (ent.EntityScope == null || ent.EntityScope == "Common")
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                    else
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                }
+
+                return StringConversion.ToSentenceCase(Name);
+            }));
+
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);

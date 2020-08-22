@@ -20,7 +20,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Config business functionality.
+    /// Provides the <see cref="Config"/> business functionality.
     /// </summary>
     public partial class ConfigManager : IConfigManager
     {
@@ -29,10 +29,7 @@ namespace Beef.Demo.Business
         /// </summary>
         public ConfigManager() => ConfigManagerCtor();
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void ConfigManagerCtor();
+        partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get Env Vars.
@@ -43,8 +40,7 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
-                var __result = await GetEnvVarsOnImplementationAsync().ConfigureAwait(false);
-                return Cleaner.Clean(__result);
+                return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
             });
         }
     }

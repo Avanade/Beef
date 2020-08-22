@@ -15,28 +15,28 @@ using Beef.Entities;
 {{#ifeq JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
 {{/ifeq}}
-{{#unless Parent.IsDataModel}}
-  {{#if Parent.UsingNamespace1}}
-using {{Parent.UsingNamespace1}};
+{{#unless Root.IsDataModel}}
+  {{#if Root.UsingNamespace1}}
+using {{Root.UsingNamespace1}};
   {{/if}}
-  {{#if Parent.UsingNamespace2}}
-using {{Parent.UsingNamespace2}};
+  {{#if Root.UsingNamespace2}}
+using {{Root.UsingNamespace2}};
   {{/if}}
-  {{#if Parent.UsingNamespace3}}
-using {{Parent.UsingNamespace3}};
+  {{#if Root.UsingNamespace3}}
+using {{Root.UsingNamespace3}};
   {{/if}}
-  {{#ifeq Parent.EntityUsing 'Common' 'All'}}
+  {{#ifeq Root.EntityUsing 'Common' 'All'}}
     {{#ifeq EntityScope 'Business'}}
-using {{Parent.Company}}.{{Parent.AppName}}.Common.Entities;
+using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
     {{/ifeq}}
   {{/ifeq}}
 {{/unless}}
 
 {{! ===== Class ===== }}
-namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Business.Data.Model{{else}}{{Parent.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}{{/if}}
+namespace {{Root.Company}}.{{Root.AppName}}.{{#if Root.IsDataModel}}Business.Data.Model{{else}}{{Root.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}{{/if}}
 {
     /// <summary>
-    /// Represents the {{{Text}}} {{#if Parent.IsDataModel}}model{{else}}entity{{/if}}.
+    /// Represents the {{{Text}}} {{#if Root.IsDataModel}}model{{else}}entity{{/if}}.
     /// </summary>
 {{#ifeq JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -51,7 +51,7 @@ namespace {{Parent.Company}}.{{Parent.AppName}}.{{#if Parent.IsDataModel}}Busine
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-    {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
         [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}

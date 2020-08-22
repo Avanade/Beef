@@ -163,7 +163,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="person">The Person (see <see cref="Person"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult> AddAsync(Person? person, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Get Null.
@@ -463,10 +463,10 @@ namespace Beef.Demo.Common.Agents
         /// <param name="person">The Person (see <see cref="Person"/>).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult> AddAsync(Person? person, WebApiRequestOptions? requestOptions = null)
+        public Task<WebApiAgentResult> AddAsync(Person person, WebApiRequestOptions? requestOptions = null)
         {
             return PostAsync("api/v1/persons/fromBody", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<Person?>("person", person, WebApiArgType.FromBody) });
+                args: new WebApiArg[] { new WebApiArg<Person>("person", person, WebApiArgType.FromBody) });
         }
 
         /// <summary>

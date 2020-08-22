@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -20,6 +21,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class OperationConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         #region Key
@@ -56,18 +58,18 @@ namespace Beef.CodeGen.Config.Entity
         public string? Validator { get; set; }
 
         /// <summary>
-        /// Indicates that the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters. 
+        /// Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters. 
         /// </summary>
         [JsonProperty("uniqueKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates that the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters.", IsImportant = true,
+        [PropertySchema("Key", Title = "Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters.", IsImportant = true,
             Description = "This simplifies the specification of these properties versus having to declare each specifically.")]
         public bool? UniqueKey { get; set; }
 
         /// <summary>
-        /// Indicates that a PagingArgs argument is to be added to the operation to enable paging related logic.
+        /// Indicates whether a PagingArgs argument is to be added to the operation to enable paging related logic.
         /// </summary>
         [JsonProperty("pagingArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates that a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.", IsImportant = true)]
+        [PropertySchema("Key", Title = "Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.", IsImportant = true)]
         public bool? PagingArgs { get; set; }
 
         /// <summary>
@@ -79,12 +81,20 @@ namespace Beef.CodeGen.Config.Entity
         public string? ValueType { get; set; }
 
         /// <summary>
-        /// Gets or sets the .NET value parameter <see cref="System.Type"/> for the operation.
+        /// Gets or sets the .NET return <see cref="System.Type"/> for the operation.
         /// </summary>
         [JsonProperty("returnType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The .NET return `Type` for the operation.",
             Description = "Defaults to the parent `Entity.Name` where the `Operation.Type` options are `Get`, `GetColl`, `Create` or `Update`; otherwise, defaults to `void`.")]
         public string? ReturnType { get; set; }
+
+        /// <summary>
+        /// Indicates whether the <see cref="ReturnType"/> is nullable for the operation.
+        /// </summary>
+        [JsonProperty("returnTypeNullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "Indicates whether the `ReturnType` is nullable for the operation.",
+            Description = "This is only applicable for an `Operation.Type` of `Custom`.")]
+        public bool? ReturnTypeNullable { get; set; }
 
         /// <summary>
         /// Gets or sets the text for use in comments to describe the <see cref="ReturnType"/>.
@@ -380,19 +390,61 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("parameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Parameter` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ParameterConfig>? Parameters { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the <see cref="ParameterConfig"/> collection filtered for data access.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public List<ParameterConfig>? DataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
+        /// </summary>
+        public List<ParameterConfig>? ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) ||  x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
+        /// </summary>
+        public List<ParameterConfig>? ValueLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
+        /// </summary>
+        public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
+        /// </summary>
+        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !CompareValue(x.IsPagingArgs, true)).ToList();
+
+        /// <summary>
+        /// Gets the formatted summary text.
+        /// </summary>
+        public string? SummaryText => Text + ".";
+
+        /// <summary>
+        /// Gets the return type including nullability (where specified).
+        /// </summary>
+        public string OperationReturnType => CompareValue(ReturnTypeNullable, true) ? ReturnType + "?" : ReturnType!;
+
+        /// <summary>
+        /// Gets the <see cref="Task"/> <see cref="ReturnType"/>
+        /// </summary>
+        public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
+
+        /// <summary>
+        /// Indicates whether the operation is returning a vale.
+        /// </summary>
+        public bool HasReturnValue => ReturnType != "void";
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
+            if (ReturnType != null && Type == "GetColl")
+                ReturnType += "CollectionResult";
+
             ReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Get" => Parent!.EntityName,
@@ -403,6 +455,14 @@ namespace Beef.CodeGen.Config.Entity
                 _ => "void"
             });
 
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => false);
+            if (ReturnType == "void")
+                ReturnTypeNullable = false;
+            else if (Type == "Get")
+                ReturnTypeNullable = true;
+            else if (Type != "Custom")
+                ReturnTypeNullable = false;
+
             ValueType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Create" => Parent!.EntityName,
@@ -410,28 +470,28 @@ namespace Beef.CodeGen.Config.Entity
                 _ => null
             });
 
-            Text = DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
-            SummaryText = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type switch
-            {
-                "Get" => $"Gets the specified {{{{{ReturnType}}}}}.",
-                "GetColl" => $"Gets the {{{{{ReturnType}}}}} that includes the items that match the selection criteria.",
-                "Create" => $"Creates a new {{{{{ValueType}}}}}.",
-                "Update" => $"Updates an existing {{{{{ValueType}}}}}.",
-                "Delete" => $"Deletes the specified {{{{{Parent!.EntityName}}}}}",
-                _ => Text
-            }));
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type switch
+                {
+                    "Get" => $"Gets the specified {{{{{ReturnType}}}}}",
+                    "GetColl" => $"Gets the {{{{{ReturnType}}}}} that includes the items that match the selection criteria",
+                    "Create" => $"Creates a new {{{{{ValueType}}}}}",
+                    "Update" => $"Updates an existing {{{{{ValueType}}}}}",
+                    "Delete" => $"Deletes the specified {{{{{Parent!.EntityName}}}}}",
+                    _ => StringConversion.ToSentenceCase(Name)
+                }));
 
             ReturnText = CodeGenerator.ToComments(DefaultWhereNull(ReturnText, () => Type switch
             {
-                "Get" => $"The selected {{{{{ReturnType}}}}} where found; otherwise, <c>null</c>.",
+                "Get" => $"The selected {{{{{ReturnType}}}}} where found; otherwise, <c>null</c>",
                 "GetColl" => $"The {{{{{ReturnType}}}}}",
-                "Create" => $"A refreshed {{{{{ReturnType}}}}}.",
-                "Update" => $"A refreshed {{{{{ReturnType}}}}}.",
+                "Create" => $"A refreshed {{{{{ReturnType}}}}}",
+                "Update" => $"A refreshed {{{{{ReturnType}}}}}",
                 "Delete" => null,
-                _ => "???"
-            }));
+                _ => $"A resultant {{{{{ReturnType}}}}}"
+            })) + ".";
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
@@ -489,7 +549,7 @@ namespace Beef.CodeGen.Config.Entity
         }
 
         /// <summary>
-        /// Prepares the properties.
+        /// Prepares the parameters.
         /// </summary>
         private void PrepareParameters()
         {
@@ -498,17 +558,19 @@ namespace Beef.CodeGen.Config.Entity
 
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
-
             if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = Parent!.Name, Text = $"{{{{{Parent.Name}}}}}", IsMandatory = true});
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true });
 
             if (UniqueKey.HasValue && UniqueKey.Value)
             {
                 foreach (var pc in Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value))
                 {
-                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, IsMandatory = !isCreateUpdate, LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
+                    Parameters.Insert(i++, new ParameterConfig { Name = pc.Name, Text = pc.Text, IsMandatory = new string[] { "Get", "Delete" }.Contains(Type), LayerPassing = isCreateUpdate ? "ToManagerSet" : "All", Property = pc.Name });
                 }
             }
+
+            if (Type == "GetColl" && CompareValue(PagingArgs, true))
+                Parameters.Add(new ParameterConfig { Name = "Paging", Type = "PagingArgs", Text = "{{PagingArgs}}", IsPagingArgs = true });
 
             foreach (var parameter in Parameters)
             {

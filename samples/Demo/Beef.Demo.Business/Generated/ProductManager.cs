@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.Validation;
 using Beef.Demo.Business.DataSvc;
+using Beef.Demo.Business.Validation;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Product business functionality.
+    /// Provides the <see cref="Product"/> business functionality.
     /// </summary>
     public partial class ProductManager : IProductManager
     {
@@ -33,16 +33,13 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>
         public ProductManager(IProductDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ProductManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void ProductManagerCtor();
+        partial void ProductManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Product"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Product"/>.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
-        /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Product"/> where found; otherwise, <c>null</c>.</returns>
         public Task<Product?> GetAsync(int id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -58,11 +55,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Product"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="ProductCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>

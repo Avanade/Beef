@@ -31,6 +31,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Model", Title = "Provides the data **Model** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
         #region Key
@@ -707,31 +708,26 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Property` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? Properties { get; set; }
 
         /// <summary>
         /// Gets the list of private properties to be implemented (that are not inherited).
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? PrivateProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToList();
 
         /// <summary>
         /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
         /// Gets the list of properties that form the unique key.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
 
         /// <summary>
         /// Gets the list of properties that are sub-entities.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
 
         /// <summary>
@@ -739,15 +735,38 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Operation` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<OperationConfig>? Operations { get; set; }
+
+        /// <summary>
+        /// Gets the IEntityManager <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Type != "Patch").ToList();
+
+        /// <summary>
+        /// Gets the EntityManager <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? ManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false) && x.Type != "Patch").ToList();
+
+        /// <summary>
+        /// Gets the EntityManager <see cref="OperationConfig"/> collection where the manager is not custom.
+        /// </summary>
+        public List<OperationConfig>? ManagerAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false) && x.Type != "Patch" && CompareNullOrValue(x.ManagerCustom, false)).ToList();
+
+        /// <summary>
+        /// Gets the IEntityDataSvc <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IDataSvcOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Type != "Patch").ToList();
+
+        /// <summary>
+        /// Gets the IEntityData <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IDataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Type != "Patch").ToList();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
         /// </summary>
         [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Consts` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ConstConfig>? Consts { get; set; }
 
         /// <summary>
@@ -789,6 +808,16 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityImplements { get; set; }
+
+        /// <summary>
+        /// Inidicates whether any of the operations use validators.
+        /// </summary>
+        public bool UsesValidators => Validator != null || Operations.Any(x => x.Validator != null || x.Parameters.Any(y => y.Validator != null));
+
+        /// <summary>
+        /// Indicates whether at least one operation needs a DataSvc.
+        /// </summary>
+        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations.Any(x => CompareNullOrValue(x.ManagerCustom, false));
 
         /// <summary>
         /// <inheritdoc/>
