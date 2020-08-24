@@ -165,9 +165,12 @@ namespace Beef.CodeGen
                 var (scripts, loaders, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
 
                 ConfigBase? cfg = null;
+                IRootConfig? rcfg = null;
                 if (configType == ConfigType.Entity)
                 {
                     cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
+                    rcfg = (IRootConfig)cfg;
+                    rcfg.ReplaceRuntimeParameters(_args.Parameters);
                     cfg.Prepare(cfg, cfg);
                 }
 
@@ -194,14 +197,15 @@ namespace Beef.CodeGen
                     if (script.GenType != null)
                     {
                         // Execute the new+improved handlebars-based code-gen.
-                        ((IRootConfig)cfg!).ReplaceRuntimeParameters(_args.Parameters);
-                        ((IRootConfig)cfg).ReplaceRuntimeParameters(script.OtherParameters);
+                        rcfg!.ResetRuntimeParameters();
+                        rcfg!.ReplaceRuntimeParameters(_args.Parameters);
+                        rcfg!.ReplaceRuntimeParameters(script.OtherParameters);
 
                         var gt = Type.GetType(script.GenType) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be loaded.");
                         var cg = (CodeGeneratorBase)(Activator.CreateInstance(gt) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be instantiated."));
                         cg.OutputFileName = script.FileName;
                         cg.OutputDirName = script.OutDir;
-                        cg.Generate(template, cfg, e => CodeGenerated(_args.OutputPath!.FullName, e));
+                        cg.Generate(template, cfg!, e => CodeGenerated(_args.OutputPath!.FullName, e));
                     }
                     else
                     {

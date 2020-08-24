@@ -281,6 +281,11 @@ namespace Beef.CodeGen.Config.Entity
         }
 
         /// <summary>
+        /// Resets the runtime parameters.
+        /// </summary>
+        public void ResetRuntimeParameters() => RuntimeParameters.Clear();
+
+        /// <summary>
         /// Gets the specified runtime parameter value.
         /// </summary>
         /// <param name="name">The parameter name.</param>

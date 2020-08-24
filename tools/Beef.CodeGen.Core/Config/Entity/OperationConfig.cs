@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Events;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -213,7 +214,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "The event subject template and corresponding event action pair (separated by a colon).",
-            Description = "The event subject template defaults to `{AppName}.{Entity.Name}` plus each of the unique key placeholders comma separated; e.g. Domain.Entity.{id1},{id2}. " +
+            Description = "The event subject template defaults to `{AppName}.{Entity.Name}` plus each of the unique key placeholders comma separated; e.g. `Domain.Entity.{id1},{id2}`. " +
             "The event action defaults to `WebApiOperationType` or `Operation.Type` where not specified. Multiple events can be raised by specifying more than one subject/action pair separated by a semicolon. " +
             "E.g. `Demo.Person.{id}:Create;Demo.Other.{id}:Update`.")]
         public string? EventSubject { get; set; }
@@ -398,6 +399,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<ParameterConfig>? DataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase)).ToList();
 
         /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection filtered for data access without value.
+        /// </summary>
+        public List<ParameterConfig>? ValueLessDataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && CompareNullOrValue(x.IsValueArg, false)).ToList();
+
+        /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
         /// </summary>
         public List<ParameterConfig>? ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) ||  x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
@@ -418,6 +424,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !CompareValue(x.IsPagingArgs, true)).ToList();
 
         /// <summary>
+        /// Gets the list of events derived from the <see cref="EventSubject"/>.
+        /// </summary>
+        public List<EventData> Events { get; } = new List<EventData>();
+
+        /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
         public string? SummaryText => Text + ".";
@@ -436,6 +447,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the operation is returning a vale.
         /// </summary>
         public bool HasReturnValue => ReturnType != "void";
+
+        /// <summary>
+        /// Indicates whether the operation supports caching.
+        /// </summary>
+        public bool SupportsCaching => new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type);
 
         /// <summary>
         /// <inheritdoc/>
@@ -497,7 +513,7 @@ namespace Beef.CodeGen.Config.Entity
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
-            EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+
             WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : "OK");
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
             {
@@ -528,6 +544,17 @@ namespace Beef.CodeGen.Config.Entity
                 _ => "Unspecified"
             });
 
+            EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+            EventSubject = DefaultWhereNull(EventSubject, () => Type switch
+            {
+                "Create" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
+                "Update" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
+                "Delete" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
+                _ => null
+            });
+
+            PrepareEvents();
+
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true));
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
@@ -538,6 +565,9 @@ namespace Beef.CodeGen.Config.Entity
             ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, true));
             ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, true));
 
+            if (Type == "Patch")
+                ExcludeIData = ExcludeData = ExcludeIDataSvc = ExcludeDataSvc = ExcludeIManager = ExcludeManager = true;
+
             PrepareParameters();
 
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
@@ -547,6 +577,17 @@ namespace Beef.CodeGen.Config.Entity
                 _ => string.Join(",", Parameters.Select(x => x.ArgumentName))
             });
         }
+
+        /// <summary>
+        /// Converts the event action.
+        /// </summary>
+        private string ConvertEventAction(string action) => Root!.EventActionFormat switch
+        {
+            "UpperCase" => action.ToUpperInvariant(),
+            "PastTense" => StringConversion.ToPastTense(action)!,
+            "PastTenseUpperCase" => StringConversion.ToPastTense(action)!.ToUpperInvariant(),
+            _ => action
+        };
 
         /// <summary>
         /// Prepares the parameters.
@@ -575,6 +616,28 @@ namespace Beef.CodeGen.Config.Entity
             foreach (var parameter in Parameters)
             {
                 parameter.Prepare(Root!, this);
+            }
+        }
+
+        /// <summary>
+        /// Prepares the <see cref="Events"/>.
+        /// </summary>
+        private void PrepareEvents()
+        {
+            if (string.IsNullOrEmpty(EventSubject) || CompareNullOrValue(Parent!.EventPublish, false))
+                return;
+
+            foreach (var @event in EventSubject!.Split(";", StringSplitOptions.RemoveEmptyEntries))
+            {
+                var ed = new EventData();
+                var parts = @event.Split(":");
+                if (parts.Length > 0)
+                    ed.Subject = parts[0];
+
+                if (parts.Length > 1)
+                    ed.Action = parts[1];
+
+                Events.Add(ed);
             }
         }
     }

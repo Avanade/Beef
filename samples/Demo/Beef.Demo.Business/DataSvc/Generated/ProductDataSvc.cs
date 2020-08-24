@@ -20,7 +20,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Product data repository services.
+    /// Provides the <see cref="Product"/> data repository services.
     /// </summary>
     public partial class ProductDataSvc : IProductDataSvc
     {
@@ -35,39 +35,36 @@ namespace Beef.Demo.Business.DataSvc
         public ProductDataSvc(IProductData data, IRequestCache cache)
             { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); ProductDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void ProductDataSvcCtor();
+        partial void ProductDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Product"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Product"/>.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
-        /// <returns>The selected <see cref="Product"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Product"/> where found; otherwise, <c>null</c>.</returns>
         public Task<Product?> GetAsync(int id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Product __val))
+                if (_cache.TryGetValue(__key, out Product? __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Gets the <see cref="Product"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="ProductCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="ProductArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="ProductCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
         public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(ProductDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 return __result;

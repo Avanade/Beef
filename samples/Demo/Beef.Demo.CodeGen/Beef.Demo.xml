@@ -26,7 +26,7 @@
       <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />
     </Operation>
 
-    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" WebApiOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:Merge" >
+    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" WebApiOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:MergeFrom;Demo.Person.{toId}:MergeTo" >
       <Parameter Name="FromId" Text="from {{Person}} identifier" Type="Guid" IsMandatory="true"  />
       <Parameter Name="ToId" Text="to {{Person}} identifier" Type="Guid" IsMandatory="true" ValidatorFluent="CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!)" />
     </Operation>

@@ -21,7 +21,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Trip Person data repository services.
+    /// Provides the <see cref="TripPerson"/> data repository services.
     /// </summary>
     public partial class TripPersonDataSvc : ITripPersonDataSvc
     {
@@ -38,38 +38,35 @@ namespace Beef.Demo.Business.DataSvc
         public TripPersonDataSvc(ITripPersonData data, IEventPublisher evtPub, IRequestCache cache)
             { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); TripPersonDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TripPersonDataSvcCtor();
+        partial void TripPersonDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found; otherwise, <c>null</c>.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out TripPerson __val))
+                if (_cache.TryGetValue(__key, out TripPerson? __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Creates the <see cref="TripPerson"/> object.
+        /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.TripPerson.{__result.Id}", "Create").ConfigureAwait(false);
@@ -79,13 +76,13 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Updates the <see cref="TripPerson"/> object.
+        /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.TripPerson.{__result.Id}", "Update").ConfigureAwait(false);
@@ -95,12 +92,12 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Deletes the <see cref="TripPerson"/> object.
+        /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(TripPersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.TripPerson.{id}", "Delete", id).ConfigureAwait(false);

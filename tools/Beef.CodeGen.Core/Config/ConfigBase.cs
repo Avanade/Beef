@@ -20,6 +20,11 @@ namespace Beef.CodeGen.Config
         /// </summary>
         /// <param name="parameters">The parameters to copy.</param>
         void ReplaceRuntimeParameters(Dictionary<string, string> parameters);
+
+        /// <summary>
+        /// Resets the runtime parameters.
+        /// </summary>
+        void ResetRuntimeParameters();
     }
 
     /// <summary>
