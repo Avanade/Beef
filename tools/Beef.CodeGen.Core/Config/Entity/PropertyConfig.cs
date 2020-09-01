@@ -316,17 +316,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.",
             Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? DataEntityFrameworkMapper { get; set; }
+        public string? EntityFrameworkMapper { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.")]
-        public bool? DataEntityFrameworkIgnore { get; set; }
+        public bool? EntityFrameworkIgnore { get; set; }
 
         #endregion
 
@@ -483,6 +483,16 @@ namespace Beef.CodeGen.Config.Entity
         public string PropertyPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
 
         /// <summary>
+        /// Gets the computed data mapper property name.
+        /// </summary>
+        public string DataMapperPropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : CompareNullOrValue(DataConverter, "ReferenceDataCodeConverter") ? PropertyName : Name!;
+
+        /// <summary>
+        /// Gets the data converter C# code.
+        /// </summary>
+        public string DataConverterCode => string.IsNullOrEmpty(DataConverter) ? "" : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -525,11 +535,20 @@ namespace Beef.CodeGen.Config.Entity
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
-            DataName = DefaultWhereNull(DataName, () => Name);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
             IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => false);
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
+
+            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
+            if (!string.IsNullOrEmpty(DataConverter) && (DataConverter.EndsWith("{T}", StringComparison.InvariantCulture) || DataConverter.EndsWith("<T>", StringComparison.InvariantCulture)))
+            {
+                DataConverterIsGeneric = true;
+                DataConverter = DataConverter![0..^3];
+            }
+
+            if (CompareValue(RefDataType, "string") && CompareValue(DataConverter, "ReferenceDataCodeConverter"))
+                DataConverter = null;
         }
 
         /// <summary>

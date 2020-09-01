@@ -17,29 +17,29 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Defines the Gender data access.
+    /// Defines the <see cref="Gender"/> data access.
     /// </summary>
     public partial interface IGenderData
     {
         /// <summary>
-        /// Gets the <see cref="Gender"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Gender"/> where found; otherwise, <c>null</c>.</returns>
         Task<Gender?> GetAsync(Guid id);
 
         /// <summary>
-        /// Creates the <see cref="Gender"/> object.
+        /// Creates a new <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>A refreshed <see cref="Gender"/>.</returns>
         Task<Gender> CreateAsync(Gender value);
 
         /// <summary>
-        /// Updates the <see cref="Gender"/> object.
+        /// Updates an existing <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>A refreshed <see cref="Gender"/>.</returns>
         Task<Gender> UpdateAsync(Gender value);
     }
 }

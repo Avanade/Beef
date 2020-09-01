@@ -145,7 +145,7 @@
   </Entity>
   
   <!-- ODATA CRUD -->
-  <Entity Name="TripPerson" Implements="IStringIdentifier" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/tripPeople" Get="true" Create="true" Update="true" Delete="true" AutoImplement="OData" ODataName="TripOData" ODataEntity="Model.Person" ODataCollectionName="Persons">
+  <Entity Name="TripPerson" Implements="IStringIdentifier" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/tripPeople" Get="true" Create="true" Update="true" Delete="true" AutoImplement="OData" ODataName="TripOData" ODataEntity="Model.Person">
     <Property Name="Id" Text="{{TripPerson}} identifier (username)" Type="string" UniqueKey="true" DataName="UserName" />
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />

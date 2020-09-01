@@ -22,7 +22,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Provides the Contact data access.
+    /// Provides the <see cref="Contact"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class ContactData : IContactData
@@ -41,17 +41,15 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="ContactData"/> class.
         /// </summary>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        public ContactData(IEfDb ef) { _ef = Check.NotNull(ef, nameof(ef)); ContactDataCtor(); }
+        public ContactData(IEfDb ef)
+            { _ef = Check.NotNull(ef, nameof(ef)); ContactDataCtor(); }
+
+        partial void ContactDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
+        /// Gets the <see cref="ContactCollectionResult"/> that includes the items that match the selection criteria.
         /// </summary>
-        partial void ContactDataCtor();
-
-        /// <summary>
-        /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
-        /// </summary>
-        /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -64,10 +62,10 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Contact"/> where found; otherwise, <c>null</c>.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -78,41 +76,35 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Creates the <see cref="Contact"/> object.
+        /// Creates a new <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>A refreshed <see cref="Contact"/>.</returns>
         public Task<Contact> CreateAsync(Contact value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _ef.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="Contact"/> object.
+        /// Updates an existing <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>A refreshed <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = EfMapper.Default.CreateArgs();
-                return await _ef.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _ef.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Deletes the <see cref="Contact"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         public Task DeleteAsync(Guid id)
@@ -125,7 +117,7 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Contact"/> entity and Entity Framework <see cref="EfModel.Contact"/> property mapping.
+        /// Provides the <see cref="Contact"/> and Entity Framework <see cref="EfModel.Contact"/> property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<Contact, EfModel.Contact, EfMapper>
@@ -142,10 +134,7 @@ namespace Beef.Demo.Business.Data
                 EfMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="EfMapper"/> constructor to be extended.
-            /// </summary>
-            partial void EfMapperCtor();
+            partial void EfMapperCtor(); // Enables the EfMapper constructor to be extended.
         }
     }
 }

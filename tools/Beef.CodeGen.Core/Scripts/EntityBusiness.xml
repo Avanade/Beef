@@ -6,10 +6,10 @@
   <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityModelCodeGenerator: Common|Entities" />
   <Generate GenType="Beef.CodeGen.Generators.EntityModelCodeGenerator" Template="Model_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Business" HelpText="EntityModelCodeGenerator: Business|Entities" />
 
-  <Generate Template="IEntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
-  <Generate Template="EntityData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
-  <Generate Template="IEntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" />
-  <Generate Template="EntityDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" />
-  <Generate Template="IEntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" />
-  <Generate Template="EntityManager_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" />
+  <Generate GenType="Beef.CodeGen.Generators.IEntityDataCodeGenerator" Template="IEntityData_cs.hb" FileName="I{{Name}}Data.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data" HelpText="IEntityDataCodeGenerator: Business|Data" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityDataCodeGenerator" Template="EntityData_cs.hb" FileName="{{Name}}Data.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data" HelpText="EntityDataCodeGenerator: Business|Data" />
+  <Generate GenType="Beef.CodeGen.Generators.IEntityDataSvcCodeGenerator" Template="IEntityDataSvc_cs.hb" FileName="I{{Name}}DataSvc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/DataSvc" HelpText="IEntityDataSvcCodeGenerator: Business|DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityDataSvcCodeGenerator" Template="EntityDataSvc_cs.hb" FileName="{{Name}}DataSvc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/DataSvc" HelpText="EntityDataSvcCodeGenerator: Business|DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.IEntityManagerCodeGenerator" Template="IEntityManager_cs.hb" FileName="I{{Name}}Manager.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business" HelpText="IEntityManagerCodeGenerator: Business" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityManagerCodeGenerator" Template="EntityManager_cs.hb" FileName="{{Name}}Manager.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business" HelpText="EntityManagerCodeGenerator: Business" />
 </Script>

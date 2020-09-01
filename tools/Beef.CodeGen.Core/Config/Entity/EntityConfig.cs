@@ -2,6 +2,7 @@
 
 using Beef.Caching;
 using Beef.Entities;
+using HandlebarsDotNet;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -390,18 +391,18 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Entity Framework <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "The name of the `Mapper  that the generated Entity Framework `Mapper` inherits from.",
             Description = "Defaults to `Model.{Name}`; i.e. an entity with the same name in the `Model` namespace.")]
-        public string? DataEntityFrameworkMapperInheritsFrom { get; set; }
+        public string? EntityFrameworkMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
-        public bool? DataEntityFrameworkCustomMapper { get; set; }
+        public bool? EntityFrameworkCustomMapper { get; set; }
 
         #endregion
 
@@ -622,11 +623,12 @@ namespace Beef.CodeGen.Config.Entity
         public bool? ExcludeIData { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Data</c> class (<c>XxxData.cs</c>).
+        /// Gets or sets the option to exclude the creation of the <c>Data</c> class (<c>XxxData.cs</c>).
         /// </summary>
         [JsonProperty("excludeData", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Data` class (`XxxData.cs`).")]
-        public bool? ExcludeData { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the creation of the `Data` class (`XxxData.cs`).", Options = new string[] { "No", "Yes", "Mapper" },
+            Description = "Defaults to `No` indicating _not_ to exlude. A value of `Yes` indicates to exclude all output; alternatively, `Mapper` indicates to at least output the corresponding `Mapper` class.")]
+        public string? ExcludeData { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the creation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
@@ -731,6 +733,26 @@ namespace Beef.CodeGen.Config.Entity
         public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
 
         /// <summary>
+        /// Gets the list of properties that are to be used for database mapping.
+        /// </summary>
+        public List<PropertyConfig>? DatabaseMapperProperties => Properties!.Where(x => CompareNullOrValue(x.DatabaseIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => CompareNullOrValue(x.EntityFrameworkIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
         [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -768,14 +790,19 @@ namespace Beef.CodeGen.Config.Entity
         public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
 
         /// <summary>
+        /// Gets the DataSvc constructor parameters.
+        /// </summary>
+        public List<ParameterConfig> DataSvcConstructorParameters { get; } = new List<ParameterConfig>();
+
+        /// <summary>
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
         /// </summary>
         public List<OperationConfig>? IDataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIData, false)).ToList();
 
         /// <summary>
-        /// Gets the DataSvc constructor parameters.
+        /// Gets the IEntityData <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<ParameterConfig> DataSvcConstructorParameters { get; } = new List<ParameterConfig>();
+        public List<OperationConfig>? DataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeData, false)).ToList();
 
         /// <summary>
         /// Gets the Data constructor parameters.
@@ -842,12 +869,37 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => !(CompareValue(ExcludeData, true) && CompareValue(ExcludeIData, true)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+        public bool RequiresData => (CompareValue(ExcludeData, "None") && CompareValue(ExcludeIData, true)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event. 
         /// </summary>
         public bool SupportsEvents => Operations.Any(x => x.Events.Count > 0);
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'Database'.
+        /// </summary>
+        public bool UsesDatabase => AutoImplement == "Database" || Operations.Any(x => x.AutoImplement == "Database");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'EntityFramework'.
+        /// </summary>
+        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || Operations.Any(x => x.AutoImplement == "EntityFramework");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'Cosmos'.
+        /// </summary>
+        public bool UsesCosmos => AutoImplement == "Cosmos" || Operations.Any(x => x.AutoImplement == "Cosmos");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'OData'.
+        /// </summary>
+        public bool UsesOData => AutoImplement == "OData" || Operations.Any(x => x.AutoImplement == "OData");
+
+        /// <summary>
+        /// Indicates whether the data extensions section is required.
+        /// </summary>
+        public bool DataExtensionsRequired => CompareValue(DataExtensions, true) || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
 
         /// <summary>
         /// <inheritdoc/>
@@ -867,14 +919,14 @@ namespace Beef.CodeGen.Config.Entity
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
-            DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
+            DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
-            EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName);
+            EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
             EntityFrameworkEntity = DefaultWhereNull(EntityFrameworkEntity, () => $"Model.{Name}");
-            CosmosName = DefaultWhereNull(CosmosName, () => Parent!.CosmosName);
+            CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
             CosmosEntity = DefaultWhereNull(CosmosEntity, () => $"Model.{Name}");
-            CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "ParitionKey.None");
-            ODataName = DefaultWhereNull(ODataName, () => Parent!.ODataName);
+            CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
+            ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             ODataEntity = DefaultWhereNull(ODataEntity, () => $"Model.{Name}");
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcConstructor = DefaultWhereNull(DataSvcConstructor, () => "Public");
@@ -884,7 +936,7 @@ namespace Beef.CodeGen.Config.Entity
             WebApiConstructor = DefaultWhereNull(WebApiConstructor, () => "Public");
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
-            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true));
+            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? "Yes" : "No");
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeIManager = DefaultWhereNull(ExcludeIManager, () => CompareValue(ExcludeAll, true));
@@ -900,6 +952,11 @@ namespace Beef.CodeGen.Config.Entity
             InferImplements();
             PrepareConstructors();
         }
+
+        /// <summary>
+        /// Interface-ise the name; i.e. prefix with an 'I'.
+        /// </summary>
+        private static string? InterfaceiseName(string? name) => string.IsNullOrEmpty(name) || (name.StartsWith("I", StringComparison.Ordinal) && name.Length >= 2 && char.IsUpper(name[1])) ? name : "I" + name;
 
         /// <summary>
         /// Infers the <see cref="Inherits"/>, <see cref="CollectionInherits"/> and <see cref="CollectionResultInherits"/> values.
@@ -958,7 +1015,7 @@ namespace Beef.CodeGen.Config.Entity
             if (RefDataType != null)
             {
                 var i = 0;
-                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{Name}}} identifier", Type = RefDataType, UniqueKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
+                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, UniqueKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
                 AddInheritedProperty("Code", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("Text", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool" });
@@ -1079,17 +1136,34 @@ namespace Beef.CodeGen.Config.Entity
             oc.Prepare(Root!, this);
 
             if (RequiresData)
-                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
+                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
 
             if (SupportsEvents)
                 DataSvcConstructorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
-                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
+                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
             else 
                 DataSvcCaching = false;
 
             foreach (var ctor in DataSvcConstructorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
+
+            if (UsesDatabase)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
+
+            if (UsesEntityFramework)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
+
+            if (UsesCosmos)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
+
+            if (UsesOData)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            foreach (var ctor in DataConstructorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }

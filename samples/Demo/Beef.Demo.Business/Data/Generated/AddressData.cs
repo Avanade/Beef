@@ -22,13 +22,14 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Provides the Address data access.
+    /// Provides the <see cref="Address"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AddressData
     {
+
         /// <summary>
-        /// Provides the <see cref="Address"/> entity and database property mapping.
+        /// Provides the <see cref="Address"/> property and database column mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<Address, DbMapper>
@@ -44,10 +45,7 @@ namespace Beef.Demo.Business.Data
                 DbMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="DbMapper"/> constructor to be extended.
-            /// </summary>
-            partial void DbMapperCtor();
+            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
         }
     }
 }

@@ -197,6 +197,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? ParameterType => CompareValue(Nullable, true) ? $"{Type}?" : Type;
 
         /// <summary>
+        /// Gets the parameter argument using the specified converter.
+        /// </summary>
+        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{ParameterType}>" : "")}.Default.ConvertToDest({ArgumentName})";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()

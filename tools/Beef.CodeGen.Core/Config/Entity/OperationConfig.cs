@@ -401,7 +401,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for data access without value.
         /// </summary>
-        public List<ParameterConfig>? ValueLessDataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && CompareNullOrValue(x.IsValueArg, false)).ToList();
+        public List<ParameterConfig>? ValueLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="DataParameters"/> without the paging parameter.
+        /// </summary>
+        public List<ParameterConfig>? PagingLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="DataParameters"/> without the value and paging parameters.
+        /// </summary>
+        public List<ParameterConfig>? CoreDataParameters => ValueLessDataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
@@ -414,7 +424,7 @@ namespace Beef.CodeGen.Config.Entity
         public List<ParameterConfig>? ValueLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
 
         /// <summary>
-        /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
+        /// Gets the <see cref="ParameterConfig"/> collection without the paging parameter.
         /// </summary>
         public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
 
@@ -452,6 +462,21 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the operation supports caching.
         /// </summary>
         public bool SupportsCaching => new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type);
+
+        /// <summary>
+        /// Gets or sets the data arguments.
+        /// </summary>
+        public ParameterConfig? DataArgs { get; set; }
+
+        /// <summary>
+        /// Indicates whether the data entity mapper is to be created for the entity.
+        /// </summary>
+        public bool DataEntityMapperCreate { get; set; }
+
+        /// <summary>
+        /// Gets the Cosmos PartitionKey as C# code.
+        /// </summary>
+        public string CosmosPartitionKeyCode => CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? CosmosPartitionKey : $"new PartitionKey({CosmosPartitionKey})";
 
         /// <summary>
         /// <inheritdoc/>
@@ -509,6 +534,19 @@ namespace Beef.CodeGen.Config.Entity
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
+            if (Type == "Custom")
+                AutoImplement = "None";
+
+            DataEntityMapperCreate = string.IsNullOrEmpty(DataEntityMapper);
+            DataEntityMapper = DefaultWhereNull(DataEntityMapper, () => AutoImplement switch
+            {
+                "Database" => "DbMapper",
+                "EntityFramework" => "EfMapper",
+                "Cosmos" => "CosmosMapper",
+                "OData" => "ODataMapper",
+                _ => null
+            });
+
             DatabaseStoredProc = DefaultWhereNull(DatabaseStoredProc, () => $"sp{Parent!.Name}{Name}");
             CosmosContainerId = DefaultWhereNull(CosmosContainerId, () => Parent!.CosmosContainerId);
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
@@ -576,6 +614,8 @@ namespace Beef.CodeGen.Config.Entity
                 "Custom" => "",
                 _ => string.Join(",", Parameters.Select(x => x.ArgumentName))
             });
+
+            PrepareData();
         }
 
         /// <summary>
@@ -639,6 +679,38 @@ namespace Beef.CodeGen.Config.Entity
 
                 Events.Add(ed);
             }
+        }
+
+        /// <summary>
+        /// Prepares for the data access.
+        /// </summary>
+        private void PrepareData()
+        {
+            DataArgs = new ParameterConfig { PrivateName = "__dataArgs" };
+            switch (AutoImplement)
+            {
+                case "Database":
+                    DataArgs.Name = "_db";
+                    DataArgs.Type = "IDatabaseArgs";
+                    break;
+
+                case "EntityFramework":
+                    DataArgs.Name = "_ef";
+                    DataArgs.Type = "IEfDbArgs";
+                    break;
+
+                case "Cosmos":
+                    DataArgs.Name = "_cosmos";
+                    DataArgs.Type = "ICosmosDbArgs";
+                    break;
+
+                case "OData":
+                    DataArgs.Name = "_odata";
+                    DataArgs.Type = "IODataArgs";
+                    break;
+            }
+
+            DataArgs.Prepare(Root!, this);
         }
     }
 }

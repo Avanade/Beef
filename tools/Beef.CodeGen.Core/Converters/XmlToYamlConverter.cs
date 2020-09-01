@@ -170,7 +170,10 @@ namespace Beef.CodeGen.Converters
                 if (needsComma)
                     args.Writer.Write(", ");
 
-                var val = att.Value;
+                var val = XmlJsonRename.GetJsonValue(ce, att.Name.LocalName, att.Value);
+                if (val == null)
+                    continue;
+
                 if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"' }) >= 0)
                     val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
 

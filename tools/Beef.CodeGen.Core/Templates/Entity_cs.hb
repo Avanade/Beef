@@ -62,7 +62,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
         /// <summary>
         /// {{{SummaryText}}}
         /// </summary>
-        public const {{Root.ConstType}} {{Name}} = {{{FormattedValue}}};
+        public const {{Parent.ConstType}} {{Name}} = {{{FormattedValue}}};
   {{#if @last}}
 
         #endregion
