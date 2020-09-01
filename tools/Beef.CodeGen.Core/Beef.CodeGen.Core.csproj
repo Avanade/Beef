@@ -82,7 +82,6 @@
     <EmbeddedResource Include="Templates\EntityData_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityWebApiController_cs.hbs" />
-    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
     <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
     <EmbeddedResource Include="Templates\Entity_cs.hbs" />

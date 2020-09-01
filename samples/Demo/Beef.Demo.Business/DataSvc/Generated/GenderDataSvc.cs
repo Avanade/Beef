@@ -44,7 +44,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Gender"/> where found.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
@@ -63,7 +63,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>A refreshed <see cref="Gender"/>.</returns>
+        /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Gender> CreateAsync(Gender value)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
@@ -79,7 +79,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Updates an existing <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>A refreshed <see cref="Gender"/>.</returns>
+        /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Gender> UpdateAsync(Gender value)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>

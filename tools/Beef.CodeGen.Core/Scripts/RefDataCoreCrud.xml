@@ -28,7 +28,6 @@
   <Generate Template="ServiceCollectionExtensionsDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" HelpText="Business/DataSvc" RefData="ReferenceData" />
   <Generate Template="ServiceCollectionExtensionsData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" HelpText="Business/Data" RefData="ReferenceData" />
 
-  <Generate Template="EntityWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}/Controllers" EntityScope="Common" />
-
+  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator" Template="EntityWebApiController_cs.hbs" FileName="{{Name}}Controller.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}/Controllers" EntityScope="Common" HelpText="EntityWebApiControllerCodeGenerator: Api/Controllers" />
   <Generate Template="EntityWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Agents" EntityScope="Common" />
 </Script>

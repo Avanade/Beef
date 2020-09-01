@@ -30,7 +30,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="GenderManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IGenderDataSvc"/>.</param>
-        public GenderManager(IGenderDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); GenderManagerCtor(); }
+        public GenderManager(IGenderDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); GenderManagerCtor(); }
 
         partial void GenderManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -38,17 +39,14 @@ namespace Beef.Demo.Business
         /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Gender"/> where found.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
@@ -57,7 +55,7 @@ namespace Beef.Demo.Business
         /// Creates a new <see cref="Gender"/>.
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
-        /// <returns>A refreshed <see cref="Gender"/>.</returns>
+        /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Gender> CreateAsync(Gender value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -66,9 +64,6 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Run().ThrowOnError();
-
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
@@ -78,7 +73,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Gender"/>.</returns>
+        /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Gender> UpdateAsync(Gender value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -88,9 +83,6 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Run().ThrowOnError();
-
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }

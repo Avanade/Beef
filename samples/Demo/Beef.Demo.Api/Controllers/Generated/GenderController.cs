@@ -21,26 +21,30 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Gender</b> Web API functionality.
+    /// Provides the <see cref="Gender"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/demo/ref/genders")]
     public partial class GenderController : ControllerBase
     {
         private readonly IGenderManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IGenderManager"/>.</param>
-        public GenderController(IGenderManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public GenderController(IGenderManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); GenderControllerCtor(); }
+
+        partial void GenderControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Gender"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="Gender"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
@@ -50,12 +54,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Creates the <see cref="Gender"/> entity.
+        /// Creates a new <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> entity.</param>
-        /// <returns>The created <see cref="Gender"/> entity.</returns>
-        [HttpPost()]
-        [Route("")]
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>The created <see cref="Gender"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Gender value)
         {
@@ -64,13 +68,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="Gender"/> entity.
+        /// Updates an existing <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> entity.</param>
+        /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The updated <see cref="Gender"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}")]
+        /// <returns>The updated <see cref="Gender"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Gender value, Guid id)
         {
