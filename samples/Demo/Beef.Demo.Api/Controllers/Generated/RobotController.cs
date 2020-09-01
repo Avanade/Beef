@@ -21,26 +21,30 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Robot</b> Web API functionality.
+    /// Provides the <see cref="Robot"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/robots")]
     public partial class RobotController : ControllerBase
     {
         private readonly IRobotManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
-        public RobotController(IRobotManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public RobotController(IRobotManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); RobotControllerCtor(); }
+
+        partial void RobotControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="Robot"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
@@ -50,12 +54,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Creates the <see cref="Robot"/> entity.
+        /// Creates a new <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> entity.</param>
-        /// <returns>The created <see cref="Robot"/> entity.</returns>
-        [HttpPost()]
-        [Route("")]
+        /// <param name="value">The <see cref="Robot"/>.</param>
+        /// <returns>The created <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Robot value)
         {
@@ -64,13 +68,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="Robot"/> entity.
+        /// Updates an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> entity.</param>
+        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The updated <see cref="Robot"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}")]
+        /// <returns>The updated <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Robot value, Guid id)
         {
@@ -79,13 +83,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Patches the <see cref="Robot"/> entity.
+        /// Patches an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> value that contains the patch content for the entity.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The patched <see cref="Robot"/> entity.</returns>
-        [HttpPatch()]
-        [Route("{id}")]
+        /// <returns>The patched <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
+        [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
         {
@@ -94,11 +98,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes the <see cref="Robot"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        [HttpDelete()]
-        [Route("{id}")]
+        [AllowAnonymous]
+        [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {
@@ -107,14 +111,14 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="modelNo">The Model number.</param>
         /// <param name="serialNo">The Unique serial number.</param>
         /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
-        /// <returns>A <see cref="RobotCollection"/>.</returns>
-        [HttpGet()]
-        [Route("")]
+        /// <returns>The <see cref="RobotCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("")]
         [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetByArgs([FromQuery(Name = "model-no")] string? modelNo = default, [FromQuery(Name = "serial-no")] string? serialNo = default, [FromQuery(Name = "power-sources")] List<string>? powerSources = default)
@@ -129,8 +133,8 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
-        [HttpPost]
-        [Route("{id}/powerSource/{powerSource}")]
+        [AllowAnonymous]
+        [HttpPost("{id}/powerSource/{powerSource}")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult RaisePowerSourceChange(Guid id, string? powerSource)
         {

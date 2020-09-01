@@ -41,7 +41,7 @@ namespace Beef.Demo.Business.DataSvc
         partial void ContactDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="ContactCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
         public Task<ContactCollectionResult> GetAllAsync()
@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Contact"/> where found.</returns>
         public Task<Contact?> GetAsync(Guid id)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
@@ -76,7 +76,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Creates a new <see cref="Contact"/>.
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <returns>A refreshed <see cref="Contact"/>.</returns>
+        /// <returns>The created <see cref="Contact"/>.</returns>
         public Task<Contact> CreateAsync(Contact value)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
@@ -92,7 +92,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Updates an existing <see cref="Contact"/>.
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
-        /// <returns>A refreshed <see cref="Contact"/>.</returns>
+        /// <returns>The updated <see cref="Contact"/>.</returns>
         public Task<Contact> UpdateAsync(Contact value)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>

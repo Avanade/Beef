@@ -407,7 +407,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.
         /// </summary>
         [JsonProperty("webApiQueryStringConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
+        [PropertySchema("WebApi", Title = "The `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
         public string? WebApiQueryStringConverter { get; set; }
 
         #endregion
@@ -439,6 +439,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
         public string? SummaryRefDataText => $"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).";
+
+        /// <summary>
+        /// Gets the formatted summary text when used in a parameter context.
+        /// </summary>
+        public string? ParameterSummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
@@ -491,6 +496,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the data converter C# code.
         /// </summary>
         public string DataConverterCode => string.IsNullOrEmpty(DataConverter) ? "" : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+
+        /// <summary>
+        /// Gets the WebAPI parameter type.
+        /// </summary>
+        public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? (string.IsNullOrEmpty(WebApiQueryStringConverter) ? Type! : "string") : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
 
         /// <summary>
         /// <inheritdoc/>

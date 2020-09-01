@@ -43,7 +43,7 @@ namespace Beef.Demo.Business.Data
         /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -57,7 +57,7 @@ namespace Beef.Demo.Business.Data
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
+        /// <returns>The created <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -71,7 +71,7 @@ namespace Beef.Demo.Business.Data
         /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
+        /// <returns>The updated <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>

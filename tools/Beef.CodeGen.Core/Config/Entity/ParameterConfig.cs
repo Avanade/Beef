@@ -179,17 +179,18 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether the parameter is the auto-added value.
         /// </summary>
-        public bool? IsValueArg { get; set; }
+        public bool IsValueArg { get; set; }
 
         /// <summary>
         /// Indicates whether the parameter is the auto-enabled <see cref="PagingArgs"/>.
         /// </summary>
-        public bool? IsPagingArgs { get; set; } 
+        public bool IsPagingArgs { get; set; } 
 
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" ? CodeGenerator.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            : CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the computed declared parameter type.
@@ -197,9 +198,19 @@ namespace Beef.CodeGen.Config.Entity
         public string? ParameterType => CompareValue(Nullable, true) ? $"{Type}?" : Type;
 
         /// <summary>
+        /// Gets the WebApi parameter type.
+        /// </summary>
+        public string WebApiParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : string.IsNullOrEmpty(RefDataType) ? ParameterType! : (CompareValue(Nullable, true) ? $"{RefDataType}?" : RefDataType!);
+
+        /// <summary>
         /// Gets the parameter argument using the specified converter.
         /// </summary>
         public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{ParameterType}>" : "")}.Default.ConvertToDest({ArgumentName})";
+
+        /// <summary>
+        /// Gets or sets the related entity.
+        /// </summary>
+        public EntityConfig? RelatedEntity { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -209,15 +220,15 @@ namespace Beef.CodeGen.Config.Entity
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
+            RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
             Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                     return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
 
-                var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
-                if (ent != null)
+                if (RelatedEntity != null)
                 {
-                    if (ent.EntityScope == null || ent.EntityScope == "Common")
+                    if (RelatedEntity.EntityScope == null || RelatedEntity.EntityScope == "Common")
                         return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
                     else
                         return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
@@ -233,6 +244,7 @@ namespace Beef.CodeGen.Config.Entity
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
+            WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))

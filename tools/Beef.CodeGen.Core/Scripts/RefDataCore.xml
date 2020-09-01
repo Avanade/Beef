@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Entity" LoaderType="Beef.CodeGen.Loaders.EntityConfigLoader, Beef.CodeGen.Core">
-  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common|Entities" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hb" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Entities" EntityScope="Business" HelpText="EntityCodeGenerator: Business|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Entities" EntityScope="Business" HelpText="EntityCodeGenerator: Business|Entities" />
 
   <Generate Template="IReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Entities" />
   <Generate Template="ReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Entities" />

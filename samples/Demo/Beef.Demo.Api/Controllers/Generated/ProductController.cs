@@ -21,26 +21,30 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Product</b> Web API functionality.
+    /// Provides the <see cref="Product"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/products")]
     public partial class ProductController : ControllerBase
     {
         private readonly IProductManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IProductManager"/>.</param>
-        public ProductController(IProductManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public ProductController(IProductManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); ProductControllerCtor(); }
+
+        partial void ProductControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Product"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Product"/>.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
-        /// <returns>The selected <see cref="Product"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="Product"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(int id)
@@ -50,13 +54,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Product"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="name">The Name.</param>
         /// <param name="description">The Description.</param>
-        /// <returns>A <see cref="ProductCollection"/>.</returns>
-        [HttpGet()]
-        [Route("")]
+        /// <returns>The <see cref="ProductCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("")]
         [ProducesResponseType(typeof(ProductCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetByArgs(string? name = default, string? description = default)

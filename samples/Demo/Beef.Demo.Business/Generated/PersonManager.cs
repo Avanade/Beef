@@ -144,7 +144,7 @@ namespace Beef.Demo.Business
         /// Creates a new <see cref="Person"/>.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
-        /// <returns>A refreshed <see cref="Person"/>.</returns>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -194,7 +194,7 @@ namespace Beef.Demo.Business
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -220,7 +220,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Person"/>.</returns>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -245,7 +245,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
@@ -262,7 +262,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
@@ -278,7 +278,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
@@ -304,7 +304,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetailCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
@@ -393,7 +393,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Get no arguments.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetNoArgsAsync()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -410,7 +410,7 @@ namespace Beef.Demo.Business
         /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -436,7 +436,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="PersonDetail"/>.</returns>
+        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -492,7 +492,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Validate a Manager Custom generation.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> ManagerCustomAsync()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -523,7 +523,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
@@ -566,7 +566,7 @@ namespace Beef.Demo.Business
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetWithEfAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -591,7 +591,7 @@ namespace Beef.Demo.Business
         /// Creates a new <see cref="Person"/>.
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
-        /// <returns>A refreshed <see cref="Person"/>.</returns>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateWithEfAsync(Person value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -619,7 +619,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Person"/>.</returns>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();

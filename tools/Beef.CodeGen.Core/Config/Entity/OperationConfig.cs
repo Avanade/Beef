@@ -268,7 +268,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("patchGetOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
-            Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, class and method name (e.g. `XxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
+            Description = "Defaults to `Get`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
         public string? PatchGetOperation { get; set; }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("patchUpdateOperation", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The corresponding `Update` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.",
-            Description = "Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, class and method name (e.g. `XxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
+            Description = "Defaults to `Update`. Specify either just the method name (e.g. `OperationName`) or, interface and method name (e.g. `IXxxManager.OperationName`) to be invoked where in a different `YyyManager.OperationName`.")]
         public string? PatchUpdateOperation { get; set; }
 
         #endregion
@@ -426,17 +426,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
         /// </summary>
-        public List<ParameterConfig>? ValueLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
+        public List<ParameterConfig>? ValueLessParameters => Parameters!.Where(x => !x.IsValueArg).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the paging parameter.
         /// </summary>
-        public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+        public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => !x.IsPagingArgs).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
         /// </summary>
-        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !CompareValue(x.IsPagingArgs, true)).ToList();
+        public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
 
         /// <summary>
         /// Gets the list of events derived from the <see cref="EventSubject"/>.
@@ -457,6 +457,16 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/>
         /// </summary>
         public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
+
+        /// <summary>
+        /// Gets or sets the base return type.
+        /// </summary>
+        public string? BaseReturnType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebAPI return text.
+        /// </summary>
+        public string? WebApiReturnText { get; set; }
 
         /// <summary>
         /// Indicates whether the operation is returning a vale.
@@ -484,10 +494,24 @@ namespace Beef.CodeGen.Config.Entity
         public string CosmosPartitionKeyCode => CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? CosmosPartitionKey : $"new PartitionKey({CosmosPartitionKey})";
 
         /// <summary>
+        /// Gets or sets the PATCH Get variable.
+        /// </summary>
+        public string? PatchGetVariable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the PATCH Update variable.
+        /// </summary>
+        public string? PatchUpdateVariable { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
+            BaseReturnType = DefaultWhereNull(ReturnType, () => Parent!.EntityName);
+            if (BaseReturnType!.EndsWith("?", StringComparison.InvariantCulture))
+                BaseReturnType = BaseReturnType[0..^1];
+
             if (ReturnType != null && Type == "GetColl")
                 ReturnType += "CollectionResult";
 
@@ -497,6 +521,7 @@ namespace Beef.CodeGen.Config.Entity
                 "GetColl" => Parent!.EntityCollectionResultName,
                 "Create" => Parent!.EntityName,
                 "Update" => Parent!.EntityName,
+                "Patch" => Parent!.EntityName,
                 "Delete" => "void",
                 _ => "void"
             });
@@ -513,28 +538,33 @@ namespace Beef.CodeGen.Config.Entity
             {
                 "Create" => Parent!.EntityName,
                 "Update" => Parent!.EntityName,
+                "Patch" => Parent!.EntityName,
                 _ => null
             });
 
             Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type switch
                 {
                     "Get" => $"Gets the specified {{{{{ReturnType}}}}}",
-                    "GetColl" => $"Gets the {{{{{ReturnType}}}}} that includes the items that match the selection criteria",
+                    "GetColl" => $"Gets the {{{{{ReturnType}}}}} that contains the items that match the selection criteria",
                     "Create" => $"Creates a new {{{{{ValueType}}}}}",
                     "Update" => $"Updates an existing {{{{{ValueType}}}}}",
+                    "Patch" => $"Patches an existing {{{{{ValueType}}}}}",
                     "Delete" => $"Deletes the specified {{{{{Parent!.EntityName}}}}}",
                     _ => StringConversion.ToSentenceCase(Name)
                 }));
 
             ReturnText = CodeGenerator.ToComments(DefaultWhereNull(ReturnText, () => Type switch
             {
-                "Get" => $"The selected {{{{{ReturnType}}}}} where found; otherwise, <c>null</c>",
+                "Get" => $"The selected {{{{{ReturnType}}}}} where found",
                 "GetColl" => $"The {{{{{ReturnType}}}}}",
-                "Create" => $"A refreshed {{{{{ReturnType}}}}}",
-                "Update" => $"A refreshed {{{{{ReturnType}}}}}",
+                "Create" => $"The created {{{{{ReturnType}}}}}",
+                "Update" => $"The updated {{{{{ReturnType}}}}}",
+                "Patch" => $"The patched {{{{{ReturnType}}}}}",
                 "Delete" => null,
                 _ => $"A resultant {{{{{ReturnType}}}}}"
             })) + ".";
+
+            WebApiReturnText = Type == "GetColl" ? CodeGenerator.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
@@ -557,7 +587,7 @@ namespace Beef.CodeGen.Config.Entity
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
 
-            WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : "OK");
+            WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : (HasReturnValue ? "OK" : "NoContent"));
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
             {
                 "Create" => "HttpPost",
@@ -571,10 +601,11 @@ namespace Beef.CodeGen.Config.Entity
             {
                 "Get" => "NotFound",
                 "GetColl" => "NoContent",
-                "Create" => "NoContent",
-                "Update" => "NoContent",
-                "Delete" => "NoContent",
-                _ => "ThrowException"
+                "Create" => "ThrowException",
+                "Update" => "ThrowException",
+                "Patch" => "ThrowException",
+                "Delete" => "ThrowException",
+                _ => HasReturnValue ? "NoContent" : "ThrowException"
             });
 
             WebApiOperationType = DefaultWhereNull(WebApiOperationType, () => Type switch
@@ -583,6 +614,7 @@ namespace Beef.CodeGen.Config.Entity
                 "GetColl" => "Read",
                 "Create" => "Create",
                 "Update" => "Update",
+                "Patch" => "Update",
                 "Delete" => "Delete",
                 _ => "Unspecified"
             });
@@ -617,8 +649,31 @@ namespace Beef.CodeGen.Config.Entity
             {
                 "GetColl" => "",
                 "Custom" => "",
-                _ => string.Join(",", Parameters.Select(x => x.ArgumentName))
+                _ => string.Join(",", Parameters.Where(x => !x.IsValueArg && !x.IsPagingArgs).Select(x => $"{{{x.ArgumentName}}}"))
             });
+
+            if (Type == "Patch")
+            {
+                PatchGetOperation = DefaultWhereNull(PatchGetOperation, () => "Get");
+                var parts = string.IsNullOrEmpty(PatchGetOperation) ? Array.Empty<string>() : PatchGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
+                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0].Substring(1));
+                if (parts.Length > 1)
+                {
+                    PatchGetOperation = parts[1];
+                    if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
+                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0].Substring(1), Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                }
+
+                PatchUpdateOperation = DefaultWhereNull(PatchUpdateOperation, () => "Update");
+                parts = string.IsNullOrEmpty(PatchUpdateOperation) ? Array.Empty<string>() : PatchUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
+                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0].Substring(1));
+                if (parts.Length > 1)
+                {
+                    PatchUpdateOperation = parts[1];
+                    if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
+                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0].Substring(1), Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                }
+            }
 
             PrepareData();
         }
@@ -645,7 +700,7 @@ namespace Beef.CodeGen.Config.Entity
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
             if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true });
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
 
             if (UniqueKey.HasValue && UniqueKey.Value)
             {

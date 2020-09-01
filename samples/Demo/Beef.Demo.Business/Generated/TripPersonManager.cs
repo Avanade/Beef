@@ -39,7 +39,7 @@ namespace Beef.Demo.Business
         /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -55,7 +55,7 @@ namespace Beef.Demo.Business
         /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
+        /// <returns>The created <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -73,7 +73,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>A refreshed <see cref="TripPerson"/>.</returns>
+        /// <returns>The updated <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value, string? id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();

@@ -810,6 +810,16 @@ namespace Beef.CodeGen.Config.Entity
         public List<ParameterConfig> DataConstructorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
+        /// Gets the EntityController <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? WebApiOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApi, false)).ToList();
+
+        /// <summary>
+        /// Gets the WebApi Contructor parameters.
+        /// </summary>
+        public List<ParameterConfig> WebApiConstructorParameters { get; } = new List<ParameterConfig>();
+
+        /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
         /// </summary>
         [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -860,6 +870,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Inidicates whether any of the operations use validators.
         /// </summary>
         public bool UsesValidators => Validator != null || Operations.Any(x => x.Validator != null || x.Parameters.Any(y => y.Validator != null));
+
+        /// <summary>
+        /// Indicates whether at least one operation needs a Manager.
+        /// </summary>
+        public bool RequiresManager => !(CompareValue(ExcludeManager, true) && CompareValue(ExcludeIManager, true));
 
         /// <summary>
         /// Indicates whether at least one operation needs a DataSvc.
@@ -1132,6 +1147,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private void PrepareConstructors()
         {
+            // DataSvc constructors.
             var oc = new OperationConfig();
             oc.Prepare(Root!, this);
 
@@ -1151,6 +1167,7 @@ namespace Beef.CodeGen.Config.Entity
                 ctor.Prepare(Root!, oc);
             }
 
+            // Data constructors.
             if (UsesDatabase)
                 DataConstructorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
 
@@ -1164,6 +1181,15 @@ namespace Beef.CodeGen.Config.Entity
                 DataConstructorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
 
             foreach (var ctor in DataConstructorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
+
+            // WebAPI contstructors.
+            if (RequiresManager)
+                WebApiConstructorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
+
+            foreach (var ctor in WebApiConstructorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }

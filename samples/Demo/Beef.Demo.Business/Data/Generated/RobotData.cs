@@ -52,7 +52,7 @@ namespace Beef.Demo.Business.Data
         /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Robot"/> where found.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -66,7 +66,7 @@ namespace Beef.Demo.Business.Data
         /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <returns>A refreshed <see cref="Robot"/>.</returns>
+        /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -80,7 +80,7 @@ namespace Beef.Demo.Business.Data
         /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
-        /// <returns>A refreshed <see cref="Robot"/>.</returns>
+        /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -104,7 +104,7 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets the <see cref="RobotCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>

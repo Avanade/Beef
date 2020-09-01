@@ -177,6 +177,9 @@ namespace Beef.CodeGen.Converters
                 if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"' }) >= 0)
                     val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
 
+                if (string.Compare(val, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
+                    val = $"'{val}'";
+
                 args.Writer.Write($"{jname}: {val}");
 
                 if (args.Indent > 0)

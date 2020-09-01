@@ -21,26 +21,30 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>TripPerson</b> Web API functionality.
+    /// Provides the <see cref="TripPerson"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/tripPeople")]
     public partial class TripPersonController : ControllerBase
     {
         private readonly ITripPersonManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TripPersonController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="ITripPersonManager"/>.</param>
-        public TripPersonController(ITripPersonManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public TripPersonController(ITripPersonManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); TripPersonControllerCtor(); }
+
+        partial void TripPersonControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="TripPerson"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(string? id)
@@ -50,12 +54,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Creates the <see cref="TripPerson"/> entity.
+        /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> entity.</param>
-        /// <returns>The created <see cref="TripPerson"/> entity.</returns>
-        [HttpPost()]
-        [Route("")]
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>The created <see cref="TripPerson"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] TripPerson value)
         {
@@ -64,13 +68,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="TripPerson"/> entity.
+        /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> entity.</param>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The updated <see cref="TripPerson"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}")]
+        /// <returns>The updated <see cref="TripPerson"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] TripPerson value, string? id)
         {
@@ -79,11 +83,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes the <see cref="TripPerson"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        [HttpDelete()]
-        [Route("{id}")]
+        [AllowAnonymous]
+        [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(string? id)
         {

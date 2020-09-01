@@ -21,24 +21,29 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Config</b> Web API functionality.
+    /// Provides the <see cref="Config"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/envvars")]
     public partial class ConfigController : ControllerBase
     {
         private readonly IConfigManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IConfigManager"/>.</param>
-        public ConfigController(IConfigManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public ConfigController(IConfigManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); ConfigControllerCtor(); }
+
+        partial void ConfigControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        [HttpPost]
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetEnvVars()

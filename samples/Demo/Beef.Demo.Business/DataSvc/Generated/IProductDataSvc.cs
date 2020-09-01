@@ -25,11 +25,11 @@ namespace Beef.Demo.Business.DataSvc
         /// Gets the specified <see cref="Product"/>.
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
-        /// <returns>The selected <see cref="Product"/> where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Product"/> where found.</returns>
         Task<Product?> GetAsync(int id);
 
         /// <summary>
-        /// Gets the <see cref="ProductCollectionResult"/> that includes the items that match the selection criteria.
+        /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
