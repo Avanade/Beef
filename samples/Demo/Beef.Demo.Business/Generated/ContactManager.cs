@@ -30,7 +30,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ContactManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IContactDataSvc"/>.</param>
-        public ContactManager(IContactDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
+        public ContactManager(IContactDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); ContactManagerCtor(); }
 
         partial void ContactManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -58,10 +59,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
@@ -79,9 +77,6 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Run().ThrowOnError();
-
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
@@ -101,9 +96,6 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Run().ThrowOnError();
-
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
@@ -118,10 +110,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }

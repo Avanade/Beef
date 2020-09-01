@@ -396,27 +396,32 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for data access.
         /// </summary>
-        public List<ParameterConfig>? DataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase)).ToList();
+        public List<ParameterConfig> DataParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase)).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for data access without value.
         /// </summary>
-        public List<ParameterConfig>? ValueLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
+        public List<ParameterConfig> ValueLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsValueArg, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="DataParameters"/> without the paging parameter.
         /// </summary>
-        public List<ParameterConfig>? PagingLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+        public List<ParameterConfig> PagingLessDataParameters => DataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="DataParameters"/> without the value and paging parameters.
         /// </summary>
-        public List<ParameterConfig>? CoreDataParameters => ValueLessDataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
+        public List<ParameterConfig> CoreDataParameters => ValueLessDataParameters!.Where(x => CompareNullOrValue(x.IsPagingArgs, false)).ToList();
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
         /// </summary>
-        public List<ParameterConfig>? ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) ||  x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) ||  x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+
+        /// <summary>
+        /// Indicates whether there is only a single parameter to be validated.
+        /// </summary>
+        public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count == 1; 
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.

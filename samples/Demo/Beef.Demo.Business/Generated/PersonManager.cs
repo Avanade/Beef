@@ -135,7 +135,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        public PersonManager(IPersonDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
+        public PersonManager(IPersonDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
 
         partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -382,10 +383,6 @@ namespace Beef.Demo.Business
                 Cleaner.CleanUp(args);
                 if (_mapOnPreValidateAsync != null) await _mapOnPreValidateAsync(args).ConfigureAwait(false);
 
-                MultiValidator.Create()
-                    .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
-                    .Run().ThrowOnError();
-
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
                 var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
@@ -517,10 +514,6 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(name);
                 if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name).ConfigureAwait(false);
-
-                MultiValidator.Create()
-                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name))
-                    .Run().ThrowOnError();
 
                 if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
                 var __result = await _dataService.GetNullAsync(name).ConfigureAwait(false);

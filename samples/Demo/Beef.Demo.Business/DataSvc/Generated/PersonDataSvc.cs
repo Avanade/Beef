@@ -306,12 +306,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <returns>A resultant <see cref="int"/>.</returns>
         public Task<int> DataSvcCustomAsync()
-        {
-            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
-            {
-                return await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
-            });
-        }
+            => DataSvcInvoker.Current.InvokeAsync(this, () => DataSvcCustomOnImplementationAsync());
 
         /// <summary>
         /// Get Null.

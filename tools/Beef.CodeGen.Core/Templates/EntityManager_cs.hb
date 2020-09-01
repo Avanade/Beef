@@ -64,7 +64,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
         /// </summary>
 {{#if RequiresDataSvc}}
         /// <param name="dataService">The <see cref="I{{Name}}DataSvc"/>.</param>
-        {{lower ManagerConstructor}} {{Name}}Manager(I{{Name}}DataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Name}}ManagerCtor(); }
+        {{lower ManagerConstructor}} {{Name}}Manager(I{{Name}}DataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Name}}ManagerCtor(); }
 {{else}}
         {{lower ManagerConstructor}} {{Name}}Manager() => {{Name}}ManagerCtor();
 {{/if}}
@@ -119,18 +120,24 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
 
       {{/ifne}}
     {{/if}}
-    {{#ifne PagingLessParameters.Count 0}}
+    {{#ifne ValidateParameters.Count 0}}
+      {{#if SingleValidateParameters}}
+        {{#each ValidateParameters}}
+                {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.Run().ThrowOnError();
+        {{/each}}
+      {{else}}
                 MultiValidator.Create()
-      {{#each ValidateParameters}}
+        {{#each ValidateParameters}}
                     .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
-      {{/each}}
-      {{#if Parent.ManagerExtensions}}
-        {{#ifne Parameters.Count 0}}
+        {{/each}}
+        {{#if Parent.ManagerExtensions}}
+          {{#ifne Parameters.Count 0}}
                     .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv, {{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}))
-        {{/ifne}}
-      {{/if}}
+          {{/ifne}}
+        {{/if}}
                     .Run().ThrowOnError();
 
+      {{/if}}
     {{/ifne}}
     {{#if Parent.ManagerExtensions}}
                 if ({{PrivateName}}OnBeforeAsync != null) await {{PrivateName}}OnBeforeAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);

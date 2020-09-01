@@ -82,12 +82,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
         public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ParameterType}} {{ArgumentName}}{{/each}})
+  {{#if DataSvcCustom}}
+            => DataSvcInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+  {{else}}
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
-  {{#if DataSvcCustom}}
-                {{#if HasReturnValue}}return {{/if}}await {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}).ConfigureAwait(false);
-  {{else}}
     {{#if SupportsCaching}}
       {{#ifeq Type 'Get'}}
                 var __key = new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
@@ -126,9 +126,9 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
       {{#if HasReturnValue}}
                 return __result;
       {{/if}}
-  {{/if}}
-            }{{#if DataSVcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+            }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
         }
+  {{/if}}
 {{/each}}
     }
 }

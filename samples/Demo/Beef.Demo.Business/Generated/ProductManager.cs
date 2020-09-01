@@ -31,7 +31,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ProductManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IProductDataSvc"/>.</param>
-        public ProductManager(IProductDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ProductManagerCtor(); }
+        public ProductManager(IProductDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); ProductManagerCtor(); }
 
         partial void ProductManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -46,10 +47,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
@@ -66,10 +64,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(ProductArgsValidator.Default))
-                    .Run().ThrowOnError();
-
+                args.Validate(nameof(args)).Entity(ProductArgsValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }

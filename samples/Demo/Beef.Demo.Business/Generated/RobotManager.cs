@@ -31,7 +31,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
-        private RobotManager(IRobotDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
+        private RobotManager(IRobotDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
 
         partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -46,10 +47,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
@@ -67,10 +65,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Run().ThrowOnError();
-
+                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
@@ -90,10 +85,7 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Run().ThrowOnError();
-
+                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
@@ -108,10 +100,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
@@ -128,10 +117,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
-                    .Run().ThrowOnError();
-
+                args.Validate(nameof(args)).Entity(RobotArgsValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }
