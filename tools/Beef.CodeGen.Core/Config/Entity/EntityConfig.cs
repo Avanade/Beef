@@ -854,7 +854,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? EntityNameSeeComments => CodeGenerator.ToSeeComments(Name);
+        public string? EntityNameSeeComments => CompareValue(ExcludeEntity, true) ? $"<b>{Name}</b>" : CodeGenerator.ToSeeComments(Name);
 
         /// <summary>
         /// Gets or sets the computed entity inherits.

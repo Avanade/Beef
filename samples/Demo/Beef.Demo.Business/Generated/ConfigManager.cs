@@ -20,7 +20,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the <see cref="Config"/> business functionality.
+    /// Provides the <b>Config</b> business functionality.
     /// </summary>
     public partial class ConfigManager : IConfigManager
     {

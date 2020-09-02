@@ -21,7 +21,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <see cref="Config"/> Web API functionality.
+    /// Provides the <b>Config</b> Web API functionality.
     /// </summary>
     [AllowAnonymous]
     [Route("api/v1/envvars")]

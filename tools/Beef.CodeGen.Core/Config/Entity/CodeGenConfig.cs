@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -327,6 +328,21 @@ namespace Beef.CodeGen.Config.Entity
         public List<EntityConfig>? Entities { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
+        /// </summary>
+        public List<EntityConfig>? IManagerEntities => Entities.Where(x => (!x.ExcludeIManager.HasValue || !x.ExcludeIManager.Value) && x.Operations!.Count > 0).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
+        /// </summary>
+        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => (!x.ExcludeIDataSvc.HasValue || !x.ExcludeIDataSvc.Value) && x.Operations!.Count > 0).ToList();
+ 
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
+        /// </summary>
+        public List<EntityConfig>? IDataEntities => Entities.Where(x => (!x.ExcludeIData.HasValue || !x.ExcludeIData.Value) && x.Operations!.Count > 0).ToList();
+
+        /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.
         /// </summary>
         public string Company => GetRuntimeParameter("Company", true)!;
@@ -355,6 +371,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/> (from the <see cref="RuntimeParameters"/>).
         /// </summary>
         public bool IsDataModel => GetRuntimeBoolParameter("IsDataModel");
+
+        /// <summary>
+        /// Indicates whether the intended code generation is explicitly for Reference Data.
+        /// </summary>
+        public bool IsRefData => GetRuntimeBoolParameter("IsRefData");
 
         /// <summary>
         /// <inheritdoc/>

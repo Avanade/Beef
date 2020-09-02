@@ -19,7 +19,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Common.Agents
 {
     /// <summary>
-    /// Defines the <see cref="Config"/> Web API agent.
+    /// Defines the <b>Config</b> Web API agent.
     /// </summary>
     public partial interface IConfigAgent
     {
@@ -32,7 +32,7 @@ namespace Beef.Demo.Common.Agents
     }
 
     /// <summary>
-    /// Provides the <see cref="Config"/> Web API agent.
+    /// Provides the <b>Config</b> Web API agent.
     /// </summary>
     public partial class ConfigAgent : WebApiAgentBase, IConfigAgent
     {
