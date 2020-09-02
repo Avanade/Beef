@@ -815,6 +815,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<OperationConfig>? WebApiOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApi, false)).ToList();
 
         /// <summary>
+        /// Gets the EntityAgent <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? WebApiAgentOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApiAgent, false)).ToList();
+
+        /// <summary>
         /// Gets the WebApi Contructor parameters.
         /// </summary>
         public List<ParameterConfig> WebApiConstructorParameters { get; } = new List<ParameterConfig>();

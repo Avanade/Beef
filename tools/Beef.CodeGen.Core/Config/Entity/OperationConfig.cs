@@ -434,6 +434,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<ParameterConfig>? PagingLessParameters => Parameters!.Where(x => !x.IsPagingArgs).ToList();
 
         /// <summary>
+        /// Gets the <see cref="ParameterConfig"/> collection without the value and paging parameter.
+        /// </summary>
+        public List<ParameterConfig>? CoreParameters => ValueLessParameters!.Where(x => !x.IsPagingArgs).ToList();
+
+        /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without parameters that do not need cleaning.
         /// </summary>
         public List<ParameterConfig>? CleanerParameters => Parameters!.Where(x => !x.LayerPassing!.StartsWith("ToManager", StringComparison.OrdinalIgnoreCase) && !x.IsPagingArgs).ToList();
@@ -454,9 +459,14 @@ namespace Beef.CodeGen.Config.Entity
         public string OperationReturnType => CompareValue(ReturnTypeNullable, true) ? ReturnType + "?" : ReturnType!;
 
         /// <summary>
-        /// Gets the <see cref="Task"/> <see cref="ReturnType"/>
+        /// Gets the <see cref="Task"/> <see cref="ReturnType"/>.
         /// </summary>
         public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
+
+        /// <summary>
+        /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
+        /// </summary>
+        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<WebApiAgentResult<{ReturnType}>>" : "Task<WebApiAgentResult>";
 
         /// <summary>
         /// Gets or sets the base return type.
@@ -472,6 +482,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the operation is returning a vale.
         /// </summary>
         public bool HasReturnValue => ReturnType != "void";
+
+        /// <summary>
+        /// Indicates whether there is a value operation.
+        /// </summary>
+        public bool HasValue => Parameters.Any(x => x.IsValueArg);
 
         /// <summary>
         /// Indicates whether the operation supports caching.

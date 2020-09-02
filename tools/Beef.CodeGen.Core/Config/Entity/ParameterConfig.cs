@@ -203,6 +203,16 @@ namespace Beef.CodeGen.Config.Entity
         public string WebApiParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : string.IsNullOrEmpty(RefDataType) ? ParameterType! : (CompareValue(Nullable, true) ? $"{RefDataType}?" : RefDataType!);
 
         /// <summary>
+        /// Gets the WebApi Agent parameter type.
+        /// </summary>
+        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : ParameterType!;
+
+        /// <summary>
+        /// Gets the <see cref="WebApiFrom"/> for use in an Agent.
+        /// </summary>
+        public string? WebApiAgentFrom => WebApiFrom switch { "FromBody" => "FromBody", "FromEntityProperties" => "FromUriUseProperties", _ => null };
+
+        /// <summary>
         /// Gets the parameter argument using the specified converter.
         /// </summary>
         public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{ParameterType}>" : "")}.Default.ConvertToDest({ArgumentName})";

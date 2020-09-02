@@ -40,6 +40,7 @@
     <None Remove="Templates\EntityData_cs.hbs" />
     <None Remove="Templates\EntityGrpcAgent_cs.xml" />
     <None Remove="Templates\EntityManager_cs.hbs" />
+    <None Remove="Templates\EntityWebApiAgent_cs.hbs" />
     <None Remove="Templates\EntityWebApiController_cs.hbs" />
     <None Remove="Templates\Entity_cs.hbs" />
     <None Remove="Templates\IEntityDataSvc_cs.hbs" />
@@ -81,9 +82,9 @@
     <EmbeddedResource Include="Templates\DbVwTable_sql.xml" />
     <EmbeddedResource Include="Templates\EntityData_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityWebApiController_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
     <EmbeddedResource Include="Templates\Entity_cs.hbs" />
     <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
     <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
