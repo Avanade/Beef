@@ -383,6 +383,11 @@ namespace Beef.CodeGen.Config.Entity
         public bool IsRefData => GetRuntimeBoolParameter("IsRefData");
 
         /// <summary>
+        /// Gets the reference data specific properties.
+        /// </summary>
+        public RefDataConfig? RefData { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -407,6 +412,9 @@ namespace Beef.CodeGen.Config.Entity
                     entity.Prepare(Root!, this);
                 }
             }
+
+            RefData = new RefDataConfig();
+            RefData.Prepare(Root!, this);
         }
     }
 }

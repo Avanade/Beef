@@ -47,9 +47,11 @@
     <None Remove="Templates\IEntityData_cs.hbs" />
     <None Remove="Templates\IEntityManager_cs.hbs" />
     <None Remove="Templates\IReferenceDataDataSvc_cs.hbs" />
+    <None Remove="Templates\IReferenceDataData_cs.hb" />
     <None Remove="Templates\IReferenceData_cs.hbs" />
     <None Remove="Templates\Model_cs.hbs" />
     <None Remove="Templates\ReferenceDataDataSvc_cs.hbs" />
+    <None Remove="Templates\ReferenceDataData_cs.hb" />
     <None Remove="Templates\ReferenceDataProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
     <None Remove="Templates\ReferenceDataWebApiAgent_cs.hbs" />
@@ -99,8 +101,9 @@
     <EmbeddedResource Include="Templates\IEntityDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityManager_cs.hbs" />
     <EmbeddedResource Include="Templates\IEntityManager_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataData_cs.hb" />
+    <EmbeddedResource Include="Templates\IReferenceDataData_cs.hb" />
     <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.hbs" />
-    <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />
     <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\Model_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataData_cs.xml" />

@@ -18,7 +18,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the other <see cref="Person"/> without <see cref="EntityBase"/> capabilities entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PersonOther : IGuidIdentifier, IChangeLog, IETag
+    public partial class PersonOther : IGuidIdentifier, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier.

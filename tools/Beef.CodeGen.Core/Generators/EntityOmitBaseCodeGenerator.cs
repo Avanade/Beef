@@ -7,9 +7,9 @@ using System.Linq;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the <b>entity model</b> code generator; where the <see cref="EntityConfig.DataModel"/> is <c>true</c>.
+    /// Represents the omit base <b>entity</b> code generator; where the <see cref="EntityConfig.OmitEntityBase"/> is <c>true</c>.
     /// </summary>
-    public class EntityModelCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
+    public class EntityOmitBaseCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.DataModel)).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.OmitEntityBase) && x.EntityScope == x.Root!.EntityScope).AsEnumerable();
     }
 }

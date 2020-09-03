@@ -10,7 +10,7 @@
     <Const Name="Male" Value="M"/>
   </Entity>
   <Entity Name="EyeColor" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/eyeColors" AutoImplement="EntityFramework" DatabaseSchema="Ref" EntityFrameworkEntity="EfModel.EyeColor" />
-  <Entity Name="PowerSource" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/powerSources" AutoImplement="Cosmos" CosmosContainerId="RefData">
+  <Entity Name="PowerSource" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/powerSources" AutoImplement="Cosmos" CosmosContainerId="RefData" DataModel="true">
     <Property Name="AdditionalInfo" Type="string" />
   </Entity>
   <Entity Name="Company" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/companies">

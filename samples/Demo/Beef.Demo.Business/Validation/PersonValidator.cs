@@ -24,7 +24,7 @@ namespace Beef.Demo.Business.Validation
             Property(x => x.LastName).Mandatory().Common(CommonValidators.Text);
             Property(x => x.Gender).Mandatory().IsValid();
             Property(x => x.EyeColor).IsValid();
-            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "Today");
+            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.Now, _ => "Today");
             Property(x => x.Address).Entity(_addressValidator);
         }
     }

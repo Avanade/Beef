@@ -473,6 +473,11 @@ namespace Beef.CodeGen.Config.Entity
         }
 
         /// <summary>
+        /// Gets or sets the declared type including nullability.
+        /// </summary>
+        public string? DeclaredType { get; set; } 
+
+        /// <summary>
         /// Gets the computed property name.
         /// </summary>
         public string PropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : Name! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
@@ -495,7 +500,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the data converter C# code.
         /// </summary>
-        public string DataConverterCode => string.IsNullOrEmpty(DataConverter) ? "" : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+
+        /// <summary>
+        /// Gets the data converter C# code for reference data data access.
+        /// </summary>
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default.ConvertToSrce(";
 
         /// <summary>
         /// Gets the WebAPI parameter type.
@@ -513,6 +523,8 @@ namespace Beef.CodeGen.Config.Entity
 
             if (RefDataType != null && !Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 Type = $"RefDataNamespace.{Type}";
+
+            DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
 
             Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
             {

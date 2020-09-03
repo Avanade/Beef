@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
+{{#ifval RefDataType}}
+using Beef.RefData.Model;
+{{/ifval}}
 {{#ifeq JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
 {{/ifeq}}
@@ -41,7 +44,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{#if Root.IsDataModel}}Business.Dat
 {{#ifeq JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval Inherits}} : {{{Inherits}}}{{/ifval}}{{#ifval Implements}}{{#ifval Inherits}}, {{else}} : {{/ifval}}{{{Implements}}}{{/ifval}}
+    public {{#if Abstract}}abstract {{/if}}partial class {{{EntityName}}}{{#ifval ModelInherits}} : {{{ModelInherits}}}{{/ifval}}{{#ifval ModelImplements}}{{#ifval ModelInherits}}, {{else}} : {{/ifval}}{{{ModelImplements}}}{{/ifval}}
     {
 {{! ===== Properties ===== }}
 {{#each CoreProperties}}

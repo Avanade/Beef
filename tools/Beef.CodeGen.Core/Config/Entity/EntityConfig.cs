@@ -862,6 +862,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? EntityInherits { get; set; }
 
         /// <summary>
+        /// Gets or sets the computed model inherits.
+        /// </summary>
+        public string? ModelInherits { get; set; }
+
+        /// <summary>
         /// Gets or sets the computed entity collection inherits.
         /// </summary>
         public string? EntityCollectionInherits { get; set; }
@@ -870,6 +875,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the computed entity inherits.
         /// </summary>
         public string? EntityImplements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed model inherits.
+        /// </summary>
+        public string? ModelImplements { get; set; }
 
         /// <summary>
         /// Inidicates whether any of the operations use validators.
@@ -994,18 +1004,19 @@ namespace Beef.CodeGen.Config.Entity
         private void InferInherits()
         {
             EntityInherits = Inherits;
-            EntityInherits = DefaultWhereNull(EntityInherits, () =>
+            EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                if (!CompareNullOrValue(OmitEntityBase, false))
-                    return null;
-
-                return RefDataType switch
-                {
-                    "int" => "ReferenceDataBaseInt",
-                    "Guid" => "ReferenceDataBaseGuid",
-                    _ => "EntityBase"
-                };
+                "int" => "ReferenceDataBaseInt",
+                "Guid" => "ReferenceDataBaseGuid",
+                _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
             });
+
+            ModelInherits = RefDataType switch
+            {
+                "int" => "ReferenceDataBaseInt",
+                "Guid" => "ReferenceDataBaseGuid",
+                _ => null
+            };
 
             EntityCollectionInherits = CollectionInherits;
             EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
@@ -1117,6 +1128,8 @@ namespace Beef.CodeGen.Config.Entity
                 return;
 
             var implements = new List<string>();
+            var modelImplements = new List<string>();
+
             if (Implements != null)
             {
                 foreach (var str in Implements!.Split(",", StringSplitOptions.RemoveEmptyEntries))
@@ -1139,22 +1152,29 @@ namespace Beef.CodeGen.Config.Entity
                     _ => "IIdentifier",
                 };
 
-                if (!implements.Contains(iid))
-                    implements.Insert(i++, iid);
+                implements.Insert(i, iid);
+                modelImplements.Insert(i++, iid);
             }
 
-            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)) && !implements.Contains("IETag"))
-                implements.Insert(i++, "IETag");
+            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i, "IETag");
+                modelImplements.Insert(i++, "IETag");
+            }
 
-            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)) && !implements.Contains("IChangeLog"))
-                implements.Insert(i++, "IChangeLog");
+            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i, "IChangeLog");
+                modelImplements.Insert(i++, "IChangeLog");
+            }
 
-            Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
+            //Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
 
             if (RefDataType == null)
                 implements.Add($"IEquatable<{EntityName}>");
 
-            EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
+            EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());
+            ModelImplements = modelImplements.Count == 0 ? null : string.Join(", ", modelImplements.GroupBy(x => x).Select(y => y.First()).ToArray());
         }
 
         /// <summary>
