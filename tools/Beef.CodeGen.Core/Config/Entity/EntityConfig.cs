@@ -922,6 +922,16 @@ namespace Beef.CodeGen.Config.Entity
         public bool DataExtensionsRequired => CompareValue(DataExtensions, true) || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
 
         /// <summary>
+        /// Gets the reference data qualified Entity name.
+        /// </summary>
+        public string RefDataQualifiedEntityCollectionName => RefDataQualifiedEntityName + "Collection";
+
+        /// <summary>
+        /// Gets the reference data qualified Entity name.
+        /// </summary>
+        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamesapce" : "RefDataNamespace")}.{Name}";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()

@@ -23,7 +23,7 @@ namespace Beef.Demo.Common.Agents
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding Web API agent.
     /// </summary>
-    public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
+    public partial class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
     {
         private readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
         private readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
@@ -64,50 +64,53 @@ namespace Beef.Demo.Common.Agents
             _typeDict.Add(typeof(RefDataNamespace.Company), nameof(Company));
             _cacheDict.Add(typeof(RefDataNamespace.Company), new ReferenceDataCache<RefDataNamespace.CompanyCollection, RefDataNamespace.Company>(() => _agent.CompanyGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
+            ReferenceDataAgentProviderCtor();
         }
+
+        partial void ReferenceDataAgentProviderCtor(); // Enables the ReferenceDataAgentProvider constructor to be extended.
 
         #endregion
 
         #region Collections
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.CountryCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CountryCollection"/>.</returns>
         public override RefDataNamespace.CountryCollection Country => (RefDataNamespace.CountryCollection)this[typeof(RefDataNamespace.Country)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
         public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.GenderCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
         public override RefDataNamespace.GenderCollection Gender => (RefDataNamespace.GenderCollection)this[typeof(RefDataNamespace.Gender)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.EyeColorCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
         public override RefDataNamespace.EyeColorCollection EyeColor => (RefDataNamespace.EyeColorCollection)this[typeof(RefDataNamespace.EyeColor)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.PowerSourceCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
         public override RefDataNamespace.PowerSourceCollection PowerSource => (RefDataNamespace.PowerSourceCollection)this[typeof(RefDataNamespace.PowerSource)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.CompanyCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
         public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
 
         #endregion
-  
+
         #region This/GetCache/PrefetchAsync
     
         /// <summary>

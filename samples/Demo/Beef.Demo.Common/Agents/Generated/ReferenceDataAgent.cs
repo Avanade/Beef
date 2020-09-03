@@ -23,7 +23,7 @@ namespace Beef.Demo.Common.Agents
     public partial interface IReferenceDataAgent
     {
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Country"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -31,7 +31,7 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.CountryCollection>> CountryGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.USState"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -39,7 +39,7 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Gender"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -47,7 +47,7 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.GenderCollection>> GenderGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -55,7 +55,7 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.EyeColorCollection>> EyeColorGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -63,7 +63,7 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.PowerSourceCollection>> PowerSourceGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Company"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -92,7 +92,7 @@ namespace Beef.Demo.Common.Agents
         public ReferenceDataAgent(IWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Country"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -101,7 +101,7 @@ namespace Beef.Demo.Common.Agents
             GetAsync<RefDataNamespace.CountryCollection>("api/v1/demo/ref/countries", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.USState"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -110,7 +110,7 @@ namespace Beef.Demo.Common.Agents
             GetAsync<RefDataNamespace.USStateCollection>("api/v1/demo/ref/usStates", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Gender"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -119,7 +119,7 @@ namespace Beef.Demo.Common.Agents
             GetAsync<RefDataNamespace.GenderCollection>("api/v1/demo/ref/genders", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -128,7 +128,7 @@ namespace Beef.Demo.Common.Agents
             GetAsync<RefDataNamespace.EyeColorCollection>("api/v1/demo/ref/eyeColors", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -137,7 +137,7 @@ namespace Beef.Demo.Common.Agents
             GetAsync<RefDataNamespace.PowerSourceCollection>("api/v1/demo/ref/powerSources", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> objects that match the filter arguments.
+        /// Gets all of the <see cref="RefDataNamespace.Company"/> items that match the filter arguments.
         /// </summary>
         /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
@@ -148,7 +148,7 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
-        /// <param name="names">The list of reference data names.</param>
+        /// <param name="names">The optional list of reference data names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         /// <remarks>The reference data objects will need to be manually extracted from the corresponding response content.</remarks>

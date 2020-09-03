@@ -5,9 +5,8 @@
 #nullable enable
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
-using Beef.RefData;
 using System;
-
+using Beef.RefData;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.DataSvc
@@ -15,7 +14,7 @@ namespace Beef.Demo.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public interface IReferenceDataDataSvc
+    public partial interface IReferenceDataDataSvc
     {
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.

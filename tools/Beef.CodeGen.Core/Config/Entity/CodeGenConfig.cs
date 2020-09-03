@@ -39,9 +39,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
-        [JsonProperty("refDataWebApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.", IsImportant = true)]
-        public string? RefDataWebApiRoutePrefix { get; set; }
+        public string? RefDataWebApiRoute { get; set; }
 
         /// <summary>
         /// Gets or sets the cache used for the ReferenceData providers.
@@ -330,17 +330,22 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
         /// </summary>
-        public List<EntityConfig>? IManagerEntities => Entities.Where(x => (!x.ExcludeIManager.HasValue || !x.ExcludeIManager.Value) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IManagerEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => (!x.ExcludeIDataSvc.HasValue || !x.ExcludeIDataSvc.Value) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
  
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataEntities => Entities.Where(x => (!x.ExcludeIData.HasValue || !x.ExcludeIData.Value) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for Reference Data.  
+        /// </summary>
+        public List<EntityConfig>? RefDataEntities => Entities.Where(x => !string.IsNullOrEmpty(x.RefDataType) && CompareNullOrValue(x.Abstract, false)).ToList();
 
         /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.

@@ -4,16 +4,16 @@
   <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common|Entities" />
   <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Entities" EntityScope="Business" HelpText="EntityCodeGenerator: Business|Entities" />
 
-  <Generate Template="IReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Entities" />
-  <Generate Template="ReferenceData_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="IReferenceData_cs.hbs" FileName="IReferenceData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" IsRefData="true" HelpText="RootEntityCodeGenerator: Common|Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceData_cs.hbs" FileName="ReferenceData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Entities" IsRefData="true" HelpText="RootEntityCodeGenerator: Common|Entities" />
   <Generate Template="IReferenceDataData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
   <Generate Template="ReferenceDataData_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
-  <Generate Template="IReferenceDataDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" />
-  <Generate Template="ReferenceDataDataSvc_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" />
-  <Generate Template="ReferenceDataProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Business" />
-  <Generate Template="ReferenceDataWebApiCoreController_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}/Controllers" EntityScope="Common" />
-  <Generate Template="ReferenceDataWebApiAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Agents" EntityScope="Common" />
-  <Generate Template="ReferenceDataWebApiAgentProvider_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Agents" EntityScope="Common" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="IReferenceDataDataSvc_cs.hbs" FileName="IReferenceDataDataSvc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/DataSvc" IsRefData="true" HelpText="RootEntityCodeGenerator: Business|DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceDataDataSvc_cs.hbs" FileName="ReferenceDataDataSvc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/DataSvc" IsRefData="true" HelpText="RootEntityCodeGenerator: Business|DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceDataProvider_cs.hbs" FileName="ReferenceDataProvider.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business" IsRefData="true" HelpText="RootEntityCodeGenerator: Business" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceDataWebApiController_cs.hbs" FileName="ReferenceDataController.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}/Controllers" IsRefData="true" HelpText="RootEntityCodeGenerator: Api|Controllers" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceDataWebApiAgent_cs.hbs" FileName="ReferenceDataAgent.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Agents" IsRefData="true" HelpText="RootEntityCodeGenerator: Common|Agents" />
+  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ReferenceDataWebApiAgentProvider_cs.hbs" FileName="ReferenceDataAgentProvider.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Agents" IsRefData="true" HelpText="RootEntityCodeGenerator: Common|Agents" />
 
   <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ServiceCollectionExtensionsManager_cs.hbs" FileName="ReferenceDataServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business" IsRefData="true" HelpText="RootEntityCodeGenerator: Business" />
   <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ServiceCollectionExtensionsDataSvc_cs.hbs" FileName="ReferenceDataServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" IsRefData="true" HelpText="RootEntityCodeGenerator: Business|DataSvc" />

@@ -14,7 +14,6 @@ namespace Beef.CodeGen.Config
     {
         private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> _config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
         {
-            (ConfigurationEntity.CodeGen, "WebApiRoutePrefix", "refDataWebApiRoutePrefix"),
             (ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
             (ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter"),
 

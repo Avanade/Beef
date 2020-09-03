@@ -24,14 +24,16 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     public partial class ReferenceDataController : ControllerBase
     {
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.Country"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.Country"/> collection.</returns>
+        /// <returns>A RefDataNamespace.Country collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/countries")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Country>), (int)HttpStatusCode.OK)]
@@ -41,11 +43,12 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.USState"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.USState"/> collection.</returns>
+        /// <returns>A RefDataNamespace.USState collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/usStates")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
@@ -55,11 +58,12 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.Gender"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.Gender"/> collection.</returns>
+        /// <returns>A RefDataNamespace.Gender collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/genders")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
@@ -69,11 +73,12 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.EyeColor"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.EyeColor"/> collection.</returns>
+        /// <returns>A RefDataNamespace.EyeColor collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/eyeColors")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.EyeColor>), (int)HttpStatusCode.OK)]
@@ -83,11 +88,12 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.PowerSource"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.PowerSource"/> collection.</returns>
+        /// <returns>A RefDataNamespace.PowerSource collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/powerSources")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PowerSource>), (int)HttpStatusCode.OK)]
@@ -97,11 +103,12 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.Company"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.Company"/> collection.</returns>
+        /// <returns>A RefDataNamespace.Company collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref/companies")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Company>), (int)HttpStatusCode.OK)]
@@ -111,9 +118,10 @@ namespace Beef.Demo.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/demo/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/demo/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]

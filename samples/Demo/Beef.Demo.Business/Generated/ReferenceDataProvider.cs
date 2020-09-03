@@ -20,7 +20,7 @@ namespace Beef.Demo.Business
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding data services.
     /// </summary>
-    public class ReferenceDataProvider : RefDataNamespace.ReferenceData
+    public partial class ReferenceDataProvider : RefDataNamespace.ReferenceData
     {
         private readonly IReferenceDataDataSvc _dataService;
         
@@ -28,8 +28,10 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="ReferenceDataProvider"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IReferenceDataDataSvc"/>.</param>
-        public ReferenceDataProvider(IReferenceDataDataSvc dataService) => _dataService = Check.NotNull(dataService, nameof(dataService));
-    
+        public ReferenceDataProvider(IReferenceDataDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); ReferenceDataProviderCtor(); }
+
+        partial void ReferenceDataProviderCtor(); // Enables the ReferenceDataProvider constructor to be extended.
+        
         #region Collections
 
         /// <summary> 
@@ -63,7 +65,7 @@ namespace Beef.Demo.Business
         public override RefDataNamespace.CompanyCollection Company => (RefDataNamespace.CompanyCollection)this[typeof(RefDataNamespace.Company)];
 
         #endregion
-  
+
         /// <summary>
         /// Gets the <see cref="IReferenceDataCollection"/> for the associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.
         /// </summary>
