@@ -90,8 +90,31 @@ namespace Beef.CodeGen.Generators
             Handlebars.RegisterHelper("lower", (writer, context, parameters) => writer.WriteSafeString(parameters.FirstOrDefault()?.ToString()?.ToLowerInvariant() ?? ""));
 #pragma warning restore CA1308
 
+            // Converts a value to camelcase.
+            Handlebars.RegisterHelper("camel", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToCamelCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
+
+            // Converts a value to pascalcase.
+            Handlebars.RegisterHelper("pascal", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPascalCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
+
             // Converts a value to the c# '<see cref="value"/>' comments equivalent.
             Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(Beef.CodeGen.CodeGenerator.ToSeeComments(parameters.FirstOrDefault()?.ToString())));
+
+            // Adds a value to a value.
+            Handlebars.RegisterHelper("add", (writer, context, parameters) =>
+            {
+                int sum = 0;
+                foreach (var p in parameters)
+                {
+                    if (p is int pi)
+                        sum += pi;
+                    else if (p is string ps)
+                        sum += int.Parse(ps, NumberStyles.Integer, CultureInfo.InvariantCulture);
+                    else
+                        writer.WriteSafeString("!!! add with invalid integer !!!");
+                }
+
+                writer.WriteSafeString(sum);
+            });
         }
 
         /// <summary>

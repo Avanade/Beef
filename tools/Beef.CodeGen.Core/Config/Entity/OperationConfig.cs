@@ -416,12 +416,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for validation.
         /// </summary>
-        public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) ||  x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
+        public List<ParameterConfig> ValidateParameters => Parameters!.Where(x => CompareValue(x.IsMandatory, true) || x.Validator != null || x.ValidatorCode != null).OrderBy(x => x.IsValueArg).ToList();
 
         /// <summary>
         /// Indicates whether there is only a single parameter to be validated.
         /// </summary>
-        public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count == 1; 
+        public bool SingleValidateParameters => CompareNullOrValue(Parent!.ManagerExtensions, false) && ValidateParameters.Count <= 1; 
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection without the value parameter.
@@ -462,6 +462,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/>.
         /// </summary>
         public string OperationTaskReturnType => HasReturnValue ? $"Task<{OperationReturnType}>" : "Task";
+
+        /// <summary>
+        /// Gets the gRPC return type.
+        /// </summary>
+        public string GrpcReturnType => PropertyConfig.InferGrpcType(BaseReturnType!) + (Type == "GetColl" ? "CollectionResult" : "");
 
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
@@ -509,6 +514,11 @@ namespace Beef.CodeGen.Config.Entity
         public string CosmosPartitionKeyCode => CosmosPartitionKey!.StartsWith("PartitionKey.", StringComparison.InvariantCulture) ? CosmosPartitionKey : $"new PartitionKey({CosmosPartitionKey})";
 
         /// <summary>
+        /// Indicates whether the operation is a 'Patch'.
+        /// </summary>
+        public bool IsPatch => Type == "Patch";
+
+        /// <summary>
         /// Gets or sets the PATCH Get variable.
         /// </summary>
         public string? PatchGetVariable { get; set; }
@@ -523,7 +533,17 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            BaseReturnType = DefaultWhereNull(ReturnType, () => Parent!.EntityName);
+            BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
+            {
+                "Get" => Parent!.EntityName,
+                "GetColl" => Parent!.EntityName,
+                "Create" => Parent!.EntityName,
+                "Update" => Parent!.EntityName,
+                "Patch" => Parent!.EntityName,
+                "Delete" => "void",
+                _ => "void"
+            });
+
             if (BaseReturnType!.EndsWith("?", StringComparison.InvariantCulture))
                 BaseReturnType = BaseReturnType[0..^1];
 

@@ -21,8 +21,8 @@
   <Generate GenType="Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator" Template="EntityWebApiController_cs.hbs" FileName="{{Name}}Controller.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}/Controllers" EntityScope="Common" HelpText="EntityWebApiControllerCodeGenerator: Api|Controllers" />
   <Generate GenType="Beef.CodeGen.Generators.EntityWebApiAgentCodeGenerator" Template="EntityWebApiAgent_cs.hbs" FileName="{{Name}}Agent.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Agents" EntityScope="Common" HelpText="EntityWebApiAgentCodeGenerator: Common|Agents" />
 
-  <Generate Template="Grpc_proto.xml" OutDir="{{Company}}.{{AppName}}.Common/Grpc" EntityScope="Common" HelpText="Common/Grpc" />
-  <Generate Template="GrpcTransformers_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Grpc" EntityScope="Common" HelpText="Common/Grpc" />
-  <Generate Template="EntityGrpcService_cs.xml" OutDir="{{Company}}.{{AppName}}.{{ApiName}}/Grpc" EntityScope="Common" HelpText="Api/Grpc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityGrpcProtoCodeGenerator" Template="Grpc_proto.hb" FileName="{{camel Root.Company}}.{{camel Root.AppName}}.proto" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Grpc" EntityScope="Common" HelpText="EntityGrpcProtoCodeGenerator: Common|Grpc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityGrpcProtoCodeGenerator" Template="GrpcTransformers_cs.hb" FileName="Transformers.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Common/Grpc" EntityScope="Common" HelpText="EntityGrpcProtoCodeGenerator: Common|Grpc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityGrpcServiceCodeGenerator" Template="EntityGrpcService_cs.hb" FileName="{{Name}}Service.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}/Grpc" EntityScope="Common" HelpText="EntityGrpcServiceCodeGenerator: Api|Grpc" />
   <Generate Template="EntityGrpcAgent_cs.xml" OutDir="{{Company}}.{{AppName}}.Common/Grpc" EntityScope="Common" HelpText="Common/Grpc" />
 </Script>

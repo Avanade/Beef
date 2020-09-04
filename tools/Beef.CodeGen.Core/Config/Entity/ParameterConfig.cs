@@ -17,6 +17,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Manager", Title = "Provides the generic **Manager-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
+    [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, OperationConfig>
     {
         #region Key
@@ -176,6 +177,17 @@ namespace Beef.CodeGen.Config.Entity
 
         #endregion
 
+        #region Grpc
+
+        /// <summary>
+        /// Gets or sets the underlying gRPC data type.
+        /// </summary>
+        [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Grpc", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        public string? GrpcType { get; set; }
+
+        #endregion
+
         /// <summary>
         /// Indicates whether the parameter is the auto-added value.
         /// </summary>
@@ -223,6 +235,16 @@ namespace Beef.CodeGen.Config.Entity
         public EntityConfig? RelatedEntity { get; set; }
 
         /// <summary>
+        /// Gets or sets the gRPC converter.
+        /// </summary>
+        public string? GrpcConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC mapper.
+        /// </summary>
+        public string? GrpcMapper { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -259,6 +281,16 @@ namespace Beef.CodeGen.Config.Entity
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
+
+            GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
+            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcConverter = Type switch
+            {
+                "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DateTimeToTimestamp",
+                "Guid" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}GuidToStringConverter",
+                "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
+                _ => null
+            };
         }
     }
 }

@@ -753,6 +753,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
 
         /// <summary>
+        /// Gets the list of properties that are to be used for gRPC.
+        /// </summary>
+        public List<PropertyConfig>? GrpcProperties => Properties!.Where(x => x.GrpcFieldNo.HasValue && x.GrpcFieldNo.Value > 0).ToList();
+
+        /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
         [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -803,6 +808,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
         /// </summary>
         public List<OperationConfig>? DataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeData, false)).ToList();
+
+        /// <summary>
+        /// Gets the Grpc <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? GrpcOperations => Operations!.Where(x => CompareValue(x.Grpc, true) && !x.IsPatch).ToList();
 
         /// <summary>
         /// Gets the Data constructor parameters.

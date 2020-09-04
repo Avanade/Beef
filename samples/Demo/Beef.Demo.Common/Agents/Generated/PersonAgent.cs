@@ -427,7 +427,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Person>("api/v1/persons/null", requestOptions: requestOptions,
+            GetAsync<Person?>("api/v1/persons/null", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("name", name) });
 
         /// <summary>

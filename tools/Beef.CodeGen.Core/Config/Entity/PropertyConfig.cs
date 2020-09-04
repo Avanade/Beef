@@ -421,6 +421,13 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("Grpc", Title = "The unique (immutable) field number required to enable gRPC support.", IsImportant = true)]
         public int? GrpcFieldNo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the underlying gRPC data type.
+        /// </summary>
+        [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Grpc", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        public string? GrpcType { get; set; }
+
         #endregion
 
         /// <summary>
@@ -513,6 +520,16 @@ namespace Beef.CodeGen.Config.Entity
         public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? (string.IsNullOrEmpty(WebApiQueryStringConverter) ? Type! : "string") : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
 
         /// <summary>
+        /// Gets or sets the gRPC converter.
+        /// </summary>
+        public string? GrpcConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC mapper.
+        /// </summary>
+        public string? GrpcMapper { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -571,6 +588,16 @@ namespace Beef.CodeGen.Config.Entity
 
             if (CompareValue(RefDataType, "string") && CompareValue(DataConverter, "ReferenceDataCodeConverter"))
                 DataConverter = null;
+
+            GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
+            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcConverter = Type switch
+            {
+                "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}{(DateTimeTransform == "DateOnly" ? "DateTimeToDateOnly" : "DateTimeToTimestamp")}",
+                "Guid" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}GuidToStringConverter",
+                "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
+                _ => null
+            };
         }
 
         /// <summary>
@@ -589,6 +616,35 @@ namespace Beef.CodeGen.Config.Entity
             var parts2 = new string[parts.Length - 1];
             Array.Copy(parts, parts2, parts.Length - 1);
             return string.Join(" ", parts2);
+        }
+
+        /// <summary>
+        /// Infers the gRPC data type.
+        /// </summary>
+        internal static string InferGrpcType(string type, string? refDataType = null, bool? refDataList = null, string? dateTimeTransform = null)
+        {
+            var gt = type switch
+            {
+                "string" => "google.protobuf.StringValue",
+                "bool" => "google.protobuf.BoolValue",
+                "double" => "google.protobuf.DoubleValue",
+                "float" => "google.protobuf.FloatValue",
+                "int" => "google.protobuf.Int32Value",
+                "long" => "google.protobuf.Int64Value",
+                "unit" => "google.protobuf.UInt32Value",
+                "ulong" => "google.protobuf.UInt64Value",
+                "short" => "google.protobuf.Int32Value",  // Not natively supported
+                "ushort" => "google.protobuf.UInt32Value", // Not natively supported
+                "Guid" => "google.protobuf.StringValue", // Not natively supported
+                "byte[]" => "bytes", // Not natively supported
+                "Decimal" => "Decimal", // Not natively supported
+                "DateTime" => string.Compare(dateTimeTransform, "DateOnly", StringComparison.InvariantCulture) == 0 ? "DateOnly" : "google.protobuf.Timestamp", // DateOnly not natively supported
+                "TimeSpan" => "google.protobuf.Duration",
+                "void" => "google.protobuf.Empty",
+                _ => type
+            };
+
+            return !string.IsNullOrEmpty(refDataType) && CompareValue(refDataList, true) ? "repeated " + gt : gt;
         }
     }
 }

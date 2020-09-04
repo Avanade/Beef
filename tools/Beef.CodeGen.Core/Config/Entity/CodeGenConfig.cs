@@ -348,6 +348,11 @@ namespace Beef.CodeGen.Config.Entity
         public List<EntityConfig>? RefDataEntities => Entities.Where(x => !string.IsNullOrEmpty(x.RefDataType) && CompareNullOrValue(x.Abstract, false)).ToList();
 
         /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for Grpc.  
+        /// </summary>
+        public List<EntityConfig>? GrpcEntities => Entities.Where(x => CompareValue(x.Grpc, true) && CompareNullOrValue(x.Abstract, false)).ToList();
+
+        /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.
         /// </summary>
         public string Company => GetRuntimeParameter("Company", true)!;

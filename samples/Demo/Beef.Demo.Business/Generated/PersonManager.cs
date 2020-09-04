@@ -50,9 +50,13 @@ namespace Beef.Demo.Business
         private Func<Person, Guid, Task>? _updateOnBeforeAsync;
         private Func<Person, Guid, Task>? _updateOnAfterAsync;
 
+        private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
+        private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
         private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
         private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
 
+        private Func<Task>? _getAll2OnPreValidateAsync;
+        private Action<MultiValidator>? _getAll2OnValidate;
         private Func<Task>? _getAll2OnBeforeAsync;
         private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
 
@@ -71,6 +75,8 @@ namespace Beef.Demo.Business
         private Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
         private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
 
+        private Func<Task>? _markOnPreValidateAsync;
+        private Action<MultiValidator>? _markOnValidate;
         private Func<Task>? _markOnBeforeAsync;
         private Func<Task>? _markOnAfterAsync;
 
@@ -79,6 +85,8 @@ namespace Beef.Demo.Business
         private Func<MapArgs?, Task>? _mapOnBeforeAsync;
         private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
 
+        private Func<Task>? _getNoArgsOnPreValidateAsync;
+        private Action<MultiValidator>? _getNoArgsOnValidate;
         private Func<Task>? _getNoArgsOnBeforeAsync;
         private Func<Person?, Task>? _getNoArgsOnAfterAsync;
 
@@ -92,6 +100,8 @@ namespace Beef.Demo.Business
         private Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
         private Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
 
+        private Func<Task>? _dataSvcCustomOnPreValidateAsync;
+        private Action<MultiValidator>? _dataSvcCustomOnValidate;
         private Func<Task>? _dataSvcCustomOnBeforeAsync;
         private Func<int, Task>? _dataSvcCustomOnAfterAsync;
 
@@ -105,6 +115,8 @@ namespace Beef.Demo.Business
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
 
+        private Func<Task>? _throwErrorOnPreValidateAsync;
+        private Action<MultiValidator>? _throwErrorOnValidate;
         private Func<Task>? _throwErrorOnBeforeAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
 
@@ -254,6 +266,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getAllOnPreValidateAsync != null) await _getAllOnPreValidateAsync(paging).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getAllOnValidate?.Invoke(__mv, paging))
+                    .Run().ThrowOnError();
+
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
                 var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
@@ -270,6 +288,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getAll2OnPreValidateAsync != null) await _getAll2OnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getAll2OnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
@@ -364,6 +388,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
+                if (_markOnPreValidateAsync != null) await _markOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _markOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
@@ -383,6 +413,10 @@ namespace Beef.Demo.Business
                 Cleaner.CleanUp(args);
                 if (_mapOnPreValidateAsync != null) await _mapOnPreValidateAsync(args).ConfigureAwait(false);
 
+                MultiValidator.Create()
+                    .Additional((__mv) => _mapOnValidate?.Invoke(__mv, args))
+                    .Run().ThrowOnError();
+
                 if (_mapOnBeforeAsync != null) await _mapOnBeforeAsync(args).ConfigureAwait(false);
                 var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
@@ -399,6 +433,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getNoArgsOnPreValidateAsync != null) await _getNoArgsOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getNoArgsOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_getNoArgsOnBeforeAsync != null) await _getNoArgsOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
@@ -482,6 +522,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_dataSvcCustomOnPreValidateAsync != null) await _dataSvcCustomOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _dataSvcCustomOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
@@ -514,6 +560,10 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(name);
                 if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name))
+                    .Run().ThrowOnError();
 
                 if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
                 var __result = await _dataService.GetNullAsync(name).ConfigureAwait(false);
@@ -556,6 +606,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_throwErrorOnPreValidateAsync != null) await _throwErrorOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _throwErrorOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);

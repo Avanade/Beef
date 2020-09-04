@@ -47,10 +47,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
         #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
   {{#each ManagerAutoOperations}}
-    {{#ifne PagingLessParameters.Count 0}}
+    {{#unless SingleValidateParameters}}
         private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnPreValidateAsync;
         private Action<MultiValidator{{#each Parameters}}, {{{ParameterType}}}{{/each}}>? {{PrivateName}}OnValidate;
-    {{/ifne}}
+    {{/unless}}
         private Func<{{#each Parameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnBeforeAsync;
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
 
@@ -115,30 +115,28 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
                 Cleaner.CleanUp({{#each CleanerParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}});
     {{/ifne}}
     {{#if Parent.ManagerExtensions}}
-      {{#ifne PagingLessParameters.Count 0}}
+      {{#unless SingleValdiateParameters}}
                 if ({{PrivateName}}OnPreValidateAsync != null) await {{PrivateName}}OnPreValidateAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
 
-      {{/ifne}}
+      {{/unless}}
     {{/if}}
-    {{#ifne ValidateParameters.Count 0}}
-      {{#if SingleValidateParameters}}
-        {{#each ValidateParameters}}
+    {{#if SingleValidateParameters}}
+      {{#each ValidateParameters}}
                 {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.Run().ThrowOnError();
-        {{/each}}
-      {{else}}
+      {{/each}}
+    {{else}}
                 MultiValidator.Create()
-        {{#each ValidateParameters}}
+      {{#each ValidateParameters}}
                     .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
-        {{/each}}
-        {{#if Parent.ManagerExtensions}}
-          {{#ifne Parameters.Count 0}}
-                    .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv, {{#each Parameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}))
-          {{/ifne}}
-        {{/if}}
+      {{/each}}
+      {{#if Parent.ManagerExtensions}}
+        {{#unless SingleValidateParameters}}
+                    .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
+        {{/unless}}
+      {{/if}}
                     .Run().ThrowOnError();
 
-      {{/if}}
-    {{/ifne}}
+    {{/if}}
     {{#if Parent.ManagerExtensions}}
                 if ({{PrivateName}}OnBeforeAsync != null) await {{PrivateName}}OnBeforeAsync({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
                 {{#if HasReturnValue}}var __result = {{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);

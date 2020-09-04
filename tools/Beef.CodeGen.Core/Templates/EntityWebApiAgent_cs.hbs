@@ -73,20 +73,20 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
     {{#ifeq Type 'GetColl'}}
             GetCollectionResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection, {{BaseReturnType}}>("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
     {{else}}
-            GetAsync{{#if HasReturnValue}}<{{BaseReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
+            GetAsync{{#if HasReturnValue}}<{{ReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
     {{/ifeq}}
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPost'}}
-            PostAsync{{#if HasReturnValue}}<{{BaseReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PostAsync{{#if HasReturnValue}}<{{ReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPut'}}
-            PutAsync{{#if HasReturnValue}}<{{BaseReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PutAsync{{#if HasReturnValue}}<{{ReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPatch'}}
-            PatchAsync{{#if HasReturnValue}}<{{BaseReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PatchAsync{{#if HasReturnValue}}<{{ReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
-            DeleteAsync{{#if HasReturnValue}}<{{BaseReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{/if}}requestOptions: requestOptions,
+            DeleteAsync{{#if HasReturnValue}}<{{ReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq ValueLessParameters.Count 0}}
                 args: Array.Empty<WebApiArg>());

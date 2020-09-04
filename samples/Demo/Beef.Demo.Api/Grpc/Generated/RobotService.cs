@@ -5,36 +5,44 @@
 #nullable enable
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 
-using Beef.Demo.Business;
-using Beef.Grpc;
-using Grpc.Core;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Beef;
+using Beef.Grpc;
+using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
+using Beef.Demo.Business;
 using Beef.Demo.Common.Grpc;
 using Beef.Demo.Common.Grpc.Proto;
+using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Api.Grpc
 {
     /// <summary>
-    /// Provides the <b>Robot</b> gRPC Server functionality.
+    /// Provides the <see cref="Robot"/> gRPC Server functionality.
     /// </summary>
+    [AllowAnonymous]
     public partial class RobotService : RobotGrpcService.RobotGrpcServiceBase
     {
         private readonly IRobotManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotService"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IRobotManager"/>.</param>
-        public RobotService(IRobotManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public RobotService(IRobotManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); ServiceCtor(); }
+
+        partial void ServiceCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="request">The <see cref="RobotGetRequest"/>.</param>
-        /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
-        /// <returns>A <see cref="Robot"/>.</returns>
+        /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+        /// <returns>The <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
         public override Task<Robot> Get(RobotGetRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -46,11 +54,12 @@ namespace Beef.Demo.Api.Grpc
         }
 
         /// <summary>
-        /// Creates the <see cref="Robot"/> entity.
+        /// Creates a new <see cref="Robot"/>.
         /// </summary>
         /// <param name="request">The <see cref="RobotCreateRequest"/>.</param>
-        /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
-        /// <returns>A <see cref="Robot"/>.</returns>
+        /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+        /// <returns>The <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
         public override Task<Robot> Create(RobotCreateRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -62,11 +71,12 @@ namespace Beef.Demo.Api.Grpc
         }
 
         /// <summary>
-        /// Updates the <see cref="Robot"/> entity.
+        /// Updates an existing <see cref="Robot"/>.
         /// </summary>
         /// <param name="request">The <see cref="RobotUpdateRequest"/>.</param>
-        /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
-        /// <returns>A <see cref="Robot"/>.</returns>
+        /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+        /// <returns>The <see cref="Robot"/>.</returns>
+        [AllowAnonymous]
         public override Task<Robot> Update(RobotUpdateRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -78,11 +88,12 @@ namespace Beef.Demo.Api.Grpc
         }
 
         /// <summary>
-        /// Deletes the <see cref="Robot"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="request">The <see cref="RobotDeleteRequest"/>.</param>
-        /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
-        /// <returns>A <see cref="Google.Protobuf.WellKnownTypes.Empty"/>.</returns>
+        /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+        /// <returns>The <see cref="Google.Protobuf.WellKnownTypes.Empty"/>.</returns>
+        [AllowAnonymous]
         public override Task<Google.Protobuf.WellKnownTypes.Empty> Delete(RobotDeleteRequest request, ServerCallContext context)
         {
             return new GrpcService<Google.Protobuf.WellKnownTypes.Empty>(context, async () =>
@@ -90,15 +101,16 @@ namespace Beef.Demo.Api.Grpc
                 var __req = request ?? new RobotDeleteRequest();
                 await _manager.DeleteAsync(Transformers.GuidToStringConverter.ConvertToSrce(__req.Id));
                 return new Google.Protobuf.WellKnownTypes.Empty();
-            }, operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent, alternateStatusCode: null).ExecuteAsync();
+            }, operationType: OperationType.Delete, statusCode: HttpStatusCode.NoContent).ExecuteAsync();
         }
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="request">The <see cref="RobotGetByArgsRequest"/>.</param>
-        /// <param name="context">The <see cref="ServerCallContext context"/>.</param>
-        /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
+        /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+        /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
+        [AllowAnonymous]
         public override Task<RobotCollectionResult> GetByArgs(RobotGetByArgsRequest request, ServerCallContext context)
         {
             return new GrpcService<RobotCollectionResult>(context, async () =>
