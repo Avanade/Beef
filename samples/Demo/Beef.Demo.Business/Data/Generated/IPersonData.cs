@@ -121,7 +121,7 @@ namespace Beef.Demo.Business.Data
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         Task<Person?> GetNullAsync(string? name);
 
         /// <summary>

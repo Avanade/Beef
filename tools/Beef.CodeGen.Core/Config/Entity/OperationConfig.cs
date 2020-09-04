@@ -94,7 +94,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("returnTypeNullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "Indicates whether the `ReturnType` is nullable for the operation.",
-            Description = "This is only applicable for an `Operation.Type` of `Custom`.")]
+            Description = "This is only applicable for an `Operation.Type` of `Custom`. Will be inferred where the `ReturnType` is denoted as nullable; i.e. suffixed by a `?`.")]
         public bool? ReturnTypeNullable { get; set; }
 
         /// <summary>
@@ -471,7 +471,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for an agent.
         /// </summary>
-        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<WebApiAgentResult<{ReturnType}>>" : "Task<WebApiAgentResult>";
+        public string AgentOperationTaskReturnType => HasReturnValue ? $"Task<WebApiAgentResult<{OperationReturnType}>>" : "Task<WebApiAgentResult>";
+
+        /// <summary>
+        /// Gets the <see cref="Task"/> <see cref="ReturnType"/> for a gRPC agent.
+        /// </summary>
+        public string GrpcAgentOperationTaskReturnType => HasReturnValue ? $"Task<GrpcAgentResult<{GrpcReturnType}>>" : "Task<GrpcAgentResult>";
 
         /// <summary>
         /// Gets or sets the base return type.
@@ -529,6 +534,16 @@ namespace Beef.CodeGen.Config.Entity
         public string? PatchUpdateVariable { get; set; }
 
         /// <summary>
+        /// Gets or sets the gRPC converter for the return value.
+        /// </summary>
+        public string? GrpcReturnConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC mapper for the return value.
+        /// </summary>
+        public string? GrpcReturnMapper { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -545,7 +560,18 @@ namespace Beef.CodeGen.Config.Entity
             });
 
             if (BaseReturnType!.EndsWith("?", StringComparison.InvariantCulture))
-                BaseReturnType = BaseReturnType[0..^1];
+            {
+                ReturnType = BaseReturnType = BaseReturnType[0..^1];
+                ReturnTypeNullable = true;
+            }
+
+            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => false);
+            if (ReturnType == "void")
+                ReturnTypeNullable = false;
+            else if (Type == "Get")
+                ReturnTypeNullable = true;
+            else if (Type != "Custom")
+                ReturnTypeNullable = false;
 
             if (ReturnType != null && Type == "GetColl")
                 ReturnType += "CollectionResult";
@@ -560,14 +586,6 @@ namespace Beef.CodeGen.Config.Entity
                 "Delete" => "void",
                 _ => "void"
             });
-
-            ReturnTypeNullable = DefaultWhereNull(ReturnTypeNullable, () => false);
-            if (ReturnType == "void")
-                ReturnTypeNullable = false;
-            else if (Type == "Get")
-                ReturnTypeNullable = true;
-            else if (Type != "Custom")
-                ReturnTypeNullable = false;
 
             ValueType = DefaultWhereNull(ReturnType, () => Type switch
             {
@@ -596,7 +614,7 @@ namespace Beef.CodeGen.Config.Entity
                 "Update" => $"The updated {{{{{ReturnType}}}}}",
                 "Patch" => $"The patched {{{{{ReturnType}}}}}",
                 "Delete" => null,
-                _ => $"A resultant {{{{{ReturnType}}}}}"
+                _ => HasReturnValue ? $"A resultant {{{{{ReturnType}}}}}" : null
             })) + ".";
 
             WebApiReturnText = Type == "GetColl" ? CodeGenerator.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
@@ -711,6 +729,15 @@ namespace Beef.CodeGen.Config.Entity
             }
 
             PrepareData();
+
+            GrpcReturnMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
+            GrpcReturnConverter = BaseReturnType switch
+            {
+                "DateTime" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}DateTimeToTimestamp",
+                "Guid" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}GuidToStringConverter",
+                "decimal" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
+                _ => null
+            };
         }
 
         /// <summary>

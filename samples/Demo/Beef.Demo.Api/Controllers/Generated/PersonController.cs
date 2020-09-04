@@ -295,7 +295,7 @@ namespace Beef.Demo.Api.Controllers
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         [AllowAnonymous]
         [HttpGet("null")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]

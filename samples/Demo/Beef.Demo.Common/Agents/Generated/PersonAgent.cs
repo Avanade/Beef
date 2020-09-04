@@ -45,7 +45,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Person>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Person?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Updates an existing <see cref="Person"/>.
@@ -128,7 +128,7 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Person>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Person?>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Gets the specified <see cref="PersonDetail"/>.
@@ -136,7 +136,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<PersonDetail>> GetDetailAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<PersonDetail?>> GetDetailAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Updates an existing <see cref="PersonDetail"/>.
@@ -195,7 +195,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Person>> GetWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Person?>> GetWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
@@ -239,7 +239,7 @@ namespace Beef.Demo.Common.Agents
     public partial class PersonAgent : WebApiAgentBase, IPersonAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IPersonAgent"/> class.
+        /// Initializes a new instance of the <see cref="PersonAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public PersonAgent(IWebApiAgentArgs args) : base(args) { }
@@ -270,8 +270,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Person>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Person>("api/v1/persons/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Person?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Person?>("api/v1/persons/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -373,8 +373,8 @@ namespace Beef.Demo.Common.Agents
         /// </summary>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Person>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Person>("api/v1/persons/noargsforme", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Person?>> GetNoArgsAsync(WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Person?>("api/v1/persons/noargsforme", requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -383,8 +383,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<PersonDetail>> GetDetailAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<PersonDetail>("api/v1/persons/{id}/detail", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<PersonDetail?>> GetDetailAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<PersonDetail?>("api/v1/persons/{id}/detail", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -456,8 +456,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Person>> GetWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Person>("api/v1/persons/ef/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Person?>> GetWithEfAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Person?>("api/v1/persons/ef/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

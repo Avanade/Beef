@@ -29,7 +29,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Gender?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Creates a new <see cref="Gender"/>.
@@ -55,7 +55,7 @@ namespace Beef.Demo.Common.Agents
     public partial class GenderAgent : WebApiAgentBase, IGenderAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IGenderAgent"/> class.
+        /// Initializes a new instance of the <see cref="GenderAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public GenderAgent(IWebApiAgentArgs args) : base(args) { }
@@ -66,8 +66,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Gender>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Gender>("api/v1/demo/ref/genders/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Gender?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Gender?>("api/v1/demo/ref/genders/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

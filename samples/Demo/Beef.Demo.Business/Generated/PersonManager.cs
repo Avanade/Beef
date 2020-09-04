@@ -552,7 +552,7 @@ namespace Beef.Demo.Business
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>

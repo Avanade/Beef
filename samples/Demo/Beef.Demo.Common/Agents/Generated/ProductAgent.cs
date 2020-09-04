@@ -29,7 +29,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Product>> GetAsync(int id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Product?>> GetAsync(int id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Gets the <see cref="ProductCollectionResult"/> that contains the items that match the selection criteria.
@@ -47,7 +47,7 @@ namespace Beef.Demo.Common.Agents
     public partial class ProductAgent : WebApiAgentBase, IProductAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IProductAgent"/> class.
+        /// Initializes a new instance of the <see cref="ProductAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public ProductAgent(IWebApiAgentArgs args) : base(args) { }
@@ -58,8 +58,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Product>> GetAsync(int id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Product>("api/v1/products/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Product?>> GetAsync(int id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Product?>("api/v1/products/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<int>("id", id) });
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<TripPerson>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<TripPerson?>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Creates a new <see cref="TripPerson"/>.
@@ -63,7 +63,7 @@ namespace Beef.Demo.Common.Agents
     public partial class TripPersonAgent : WebApiAgentBase, ITripPersonAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ITripPersonAgent"/> class.
+        /// Initializes a new instance of the <see cref="TripPersonAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public TripPersonAgent(IWebApiAgentArgs args) : base(args) { }
@@ -74,8 +74,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<TripPerson>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<TripPerson>("api/v1/tripPeople/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<TripPerson?>> GetAsync(string? id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<TripPerson?>("api/v1/tripPeople/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("id", id) });
 
         /// <summary>

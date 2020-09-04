@@ -77,7 +77,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`.", IsImportant = true)]
+        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
@@ -252,6 +252,12 @@ namespace Beef.CodeGen.Config.Entity
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
+            if (Type!.EndsWith("?", StringComparison.InvariantCulture))
+            {
+                Type = Type[0..^1];
+                Nullable = true;
+            }
+
             RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
             Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
             {

@@ -36,7 +36,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Contact>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Contact?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Creates a new <see cref="Contact"/>.
@@ -70,7 +70,7 @@ namespace Beef.Demo.Common.Agents
     public partial class ContactAgent : WebApiAgentBase, IContactAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IContactAgent"/> class.
+        /// Initializes a new instance of the <see cref="ContactAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public ContactAgent(IWebApiAgentArgs args) : base(args) { }
@@ -90,8 +90,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Contact>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Contact>("api/v1/contacts/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Contact?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Contact?>("api/v1/contacts/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Robot>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Robot?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Creates a new <see cref="Robot"/>.
@@ -91,7 +91,7 @@ namespace Beef.Demo.Common.Agents
     public partial class RobotAgent : WebApiAgentBase, IRobotAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IRobotAgent"/> class.
+        /// Initializes a new instance of the <see cref="RobotAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public RobotAgent(IWebApiAgentArgs args) : base(args) { }
@@ -102,8 +102,8 @@ namespace Beef.Demo.Common.Agents
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Robot>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
-            GetAsync<Robot>("api/v1/robots/{id}", requestOptions: requestOptions,
+        public Task<WebApiAgentResult<Robot?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<Robot?>("api/v1/robots/{id}", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

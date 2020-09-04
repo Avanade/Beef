@@ -37,7 +37,7 @@ namespace Beef.Demo.Common.Agents
     public partial class ConfigAgent : WebApiAgentBase, IConfigAgent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IConfigAgent"/> class.
+        /// Initializes a new instance of the <see cref="ConfigAgent"/> class.
         /// </summary>
         /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
         public ConfigAgent(IWebApiAgentArgs args) : base(args) { }

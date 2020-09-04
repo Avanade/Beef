@@ -312,7 +312,7 @@ namespace Beef.Demo.Business.DataSvc
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
