@@ -33,10 +33,7 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="TransactionType"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator TransactionType(Guid id)
-        {
-            return ConvertFromId<TransactionType>(id);
-        }
+        public static implicit operator TransactionType(Guid id) => ConvertFromId<TransactionType>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="TransactionType"/>.
@@ -44,13 +41,10 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="TransactionType"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator TransactionType(string? code)
-        {
-            return ConvertFromCode<TransactionType>(code);
-        }
+        public static implicit operator TransactionType(string? code) => ConvertFromCode<TransactionType>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -69,16 +63,16 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="TransactionType"/> to copy from.</param>
         public void CopyFrom(TransactionType from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -105,7 +99,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -130,29 +124,29 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(TransactionType from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="TransactionType"/> collection.
+    /// Represents the <see cref="TransactionType"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class TransactionTypeCollection : ReferenceDataCollectionBase<TransactionType>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionTypeCollection"/> class.
         /// </summary>
-        public TransactionTypeCollection(){ }
+        public TransactionTypeCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionTypeCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="TransactionTypeCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="TransactionType"/> entities.</param>
         public TransactionTypeCollection(IEnumerable<TransactionType> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

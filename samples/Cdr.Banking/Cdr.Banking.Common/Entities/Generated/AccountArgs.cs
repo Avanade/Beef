@@ -79,14 +79,14 @@ namespace Cdr.Banking.Common.Entities
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether Is Owned.
+        /// Indicates whether Is Owned.
         /// </summary>
         [JsonProperty("is-owned", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Is Owned")]
         public bool? IsOwned
         {
             get => _isOwned;
-            set => SetValue(ref _isOwned, value, false, false, nameof(IsOwned)); 
+            set => SetValue(ref _isOwned, value, false, false, nameof(IsOwned));
         }
 
         #endregion
@@ -98,30 +98,24 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is AccountArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is AccountArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="AccountArgs"/> is equal to the current <see cref="AccountArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(AccountArgs? obj)
+        /// <param name="value">The <see cref="AccountArgs"/> to compare with the current <see cref="AccountArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="AccountArgs"/> is equal to the current <see cref="AccountArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(AccountArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(ProductCategorySid, obj.ProductCategorySid)
-                && Equals(OpenStatusSid, obj.OpenStatusSid)
-                && Equals(IsOwned, obj.IsOwned);
+            return base.Equals((object)value)
+                && Equals(ProductCategorySid, value.ProductCategorySid)
+                && Equals(OpenStatusSid, value.OpenStatusSid)
+                && Equals(IsOwned, value.IsOwned);
         }
 
         /// <summary>
@@ -141,9 +135,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (AccountArgs? a, AccountArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="AccountArgs"/>.
+        /// Returns the hash code for the <see cref="AccountArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="AccountArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="AccountArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -154,7 +148,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -173,8 +167,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="AccountArgs"/> to copy from.</param>
         public void CopyFrom(AccountArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             ProductCategorySid = from.ProductCategorySid;
@@ -183,9 +177,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -215,7 +209,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -239,7 +233,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(AccountArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

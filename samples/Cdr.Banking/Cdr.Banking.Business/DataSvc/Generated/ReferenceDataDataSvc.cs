@@ -23,7 +23,7 @@ namespace Cdr.Banking.Business.DataSvc
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.
     /// </summary>
-    public class ReferenceDataDataSvc : IReferenceDataDataSvc
+    public partial class ReferenceDataDataSvc : IReferenceDataDataSvc
     {
         private readonly IServiceProvider _provider;
         private readonly Dictionary<Type, IReferenceDataCache> _cacheDict = new Dictionary<Type, IReferenceDataCache>();
@@ -41,7 +41,10 @@ namespace Cdr.Banking.Business.DataSvc
             _cacheDict.Add(typeof(RefDataNamespace.MaturityInstructions), new ReferenceDataCache<RefDataNamespace.MaturityInstructionsCollection, RefDataNamespace.MaturityInstructions>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.MaturityInstructionsGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.TransactionType), new ReferenceDataCache<RefDataNamespace.TransactionTypeCollection, RefDataNamespace.TransactionType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TransactionTypeGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TransactionStatusGetAllAsync()))));
+            ReferenceDataDataSvcCtor();
         }
+
+        partial void ReferenceDataDataSvcCtor(); // Enables the ReferenceDataDataSvc constructor to be extended.
 
         /// <summary>
         /// Gets the data within a new scope; each reference data request needs to occur separately and independently.
@@ -57,13 +60,9 @@ namespace Cdr.Banking.Business.DataSvc
         /// </summary>
         /// <param name="type">The <see cref="ReferenceDataBase"/> type associated </param>
         /// <returns>A <see cref="IReferenceDataCollection"/>.</returns>
-        public IReferenceDataCollection GetCollection(Type type)
-        {
-            if (_cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc))
-                return rdc.GetCollection();
-            else
+        public IReferenceDataCollection GetCollection(Type type) =>
+            _cacheDict.TryGetValue(type ?? throw new ArgumentNullException(nameof(type)), out var rdc) ? rdc.GetCollection() :
                 throw new ArgumentException($"Type {type.Name} does not exist within the ReferenceDataDataSvc cache.", nameof(type));
-        }
     }
 }
 

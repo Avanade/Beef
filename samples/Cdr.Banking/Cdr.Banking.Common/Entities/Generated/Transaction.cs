@@ -50,12 +50,12 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="Account"/> identifier.
         /// </summary>
-        [JsonProperty("transactionId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("transactionId", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Identifier")]
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id));
         }
 
         /// <summary>
@@ -66,18 +66,18 @@ namespace Cdr.Banking.Common.Entities
         public string? AccountId
         {
             get => _accountId;
-            set => SetValue(ref _accountId, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountId)); 
+            set => SetValue(ref _accountId, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountId));
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether Is Detail Available.
+        /// Indicates whether Is Detail Available.
         /// </summary>
         [JsonProperty("isDetailAvailable", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Is Detail Available")]
         public bool IsDetailAvailable
         {
             get => _isDetailAvailable;
-            set => SetValue(ref _isDetailAvailable, value, false, false, nameof(IsDetailAvailable)); 
+            set => SetValue(ref _isDetailAvailable, value, false, false, nameof(IsDetailAvailable));
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description)); 
+            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description));
         }
 
         /// <summary>
@@ -140,11 +140,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("postingDateTime", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Posting Date Time")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
         public DateTime PostingDateTime
         {
             get => _postingDateTime;
-            set => SetValue(ref _postingDateTime, value, false, DateTimeTransform.UseDefault, nameof(PostingDateTime)); 
+            set => SetValue(ref _postingDateTime, value, false, DateTimeTransform.UseDefault, nameof(PostingDateTime));
         }
 
         /// <summary>
@@ -152,11 +151,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("executionDateTime", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Execution Date Time")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
         public DateTime ExecutionDateTime
         {
             get => _executionDateTime;
-            set => SetValue(ref _executionDateTime, value, false, DateTimeTransform.UseDefault, nameof(ExecutionDateTime)); 
+            set => SetValue(ref _executionDateTime, value, false, DateTimeTransform.UseDefault, nameof(ExecutionDateTime));
         }
 
         /// <summary>
@@ -167,7 +165,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal Amount
         {
             get => _amount;
-            set => SetValue(ref _amount, value, false, false, nameof(Amount)); 
+            set => SetValue(ref _amount, value, false, false, nameof(Amount));
         }
 
         /// <summary>
@@ -178,7 +176,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency));
         }
 
         /// <summary>
@@ -189,7 +187,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Reference
         {
             get => _reference;
-            set => SetValue(ref _reference, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Reference)); 
+            set => SetValue(ref _reference, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Reference));
         }
 
         /// <summary>
@@ -200,7 +198,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MerchantName
         {
             get => _merchantName;
-            set => SetValue(ref _merchantName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantName)); 
+            set => SetValue(ref _merchantName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantName));
         }
 
         /// <summary>
@@ -211,7 +209,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MerchantCategoryCode
         {
             get => _merchantCategoryCode;
-            set => SetValue(ref _merchantCategoryCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantCategoryCode)); 
+            set => SetValue(ref _merchantCategoryCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MerchantCategoryCode));
         }
 
         /// <summary>
@@ -222,7 +220,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BillerCode
         {
             get => _billerCode;
-            set => SetValue(ref _billerCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerCode)); 
+            set => SetValue(ref _billerCode, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerCode));
         }
 
         /// <summary>
@@ -233,7 +231,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BillerName
         {
             get => _billerName;
-            set => SetValue(ref _billerName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerName)); 
+            set => SetValue(ref _billerName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BillerName));
         }
 
         /// <summary>
@@ -244,13 +242,13 @@ namespace Cdr.Banking.Common.Entities
         public string? ApcaNumber
         {
             get => _apcaNumber;
-            set => SetValue(ref _apcaNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ApcaNumber)); 
+            set => SetValue(ref _apcaNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ApcaNumber));
         }
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="Transaction"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -260,20 +258,17 @@ namespace Cdr.Banking.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(string id) => new UniqueKey(id);
-          
+        public static UniqueKey CreateUniqueKey(string? id) => new UniqueKey(id);
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Id"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Id);
 
         #endregion
@@ -285,43 +280,37 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Transaction val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Transaction val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Transaction"/> is equal to the current <see cref="Transaction"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Transaction? obj)
+        /// <param name="value">The <see cref="Transaction"/> to compare with the current <see cref="Transaction"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Transaction"/> is equal to the current <see cref="Transaction"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Transaction? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(AccountId, obj.AccountId)
-                && Equals(IsDetailAvailable, obj.IsDetailAvailable)
-                && Equals(TypeSid, obj.TypeSid)
-                && Equals(StatusSid, obj.StatusSid)
-                && Equals(Description, obj.Description)
-                && Equals(PostingDateTime, obj.PostingDateTime)
-                && Equals(ExecutionDateTime, obj.ExecutionDateTime)
-                && Equals(Amount, obj.Amount)
-                && Equals(Currency, obj.Currency)
-                && Equals(Reference, obj.Reference)
-                && Equals(MerchantName, obj.MerchantName)
-                && Equals(MerchantCategoryCode, obj.MerchantCategoryCode)
-                && Equals(BillerCode, obj.BillerCode)
-                && Equals(BillerName, obj.BillerName)
-                && Equals(ApcaNumber, obj.ApcaNumber);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(AccountId, value.AccountId)
+                && Equals(IsDetailAvailable, value.IsDetailAvailable)
+                && Equals(TypeSid, value.TypeSid)
+                && Equals(StatusSid, value.StatusSid)
+                && Equals(Description, value.Description)
+                && Equals(PostingDateTime, value.PostingDateTime)
+                && Equals(ExecutionDateTime, value.ExecutionDateTime)
+                && Equals(Amount, value.Amount)
+                && Equals(Currency, value.Currency)
+                && Equals(Reference, value.Reference)
+                && Equals(MerchantName, value.MerchantName)
+                && Equals(MerchantCategoryCode, value.MerchantCategoryCode)
+                && Equals(BillerCode, value.BillerCode)
+                && Equals(BillerName, value.BillerName)
+                && Equals(ApcaNumber, value.ApcaNumber);
         }
 
         /// <summary>
@@ -341,9 +330,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (Transaction? a, Transaction? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Transaction"/>.
+        /// Returns the hash code for the <see cref="Transaction"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Transaction"/>.</returns>
+        /// <returns>The hash code for the <see cref="Transaction"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -367,7 +356,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -386,8 +375,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Transaction"/> to copy from.</param>
         public void CopyFrom(Transaction from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -409,9 +398,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -454,7 +443,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -491,31 +480,27 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(Transaction from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Transaction"/> collection.
+    /// Represents the <see cref="Transaction"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class TransactionCollection : EntityBaseCollection<Transaction>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionCollection"/> class.
         /// </summary>
-        public TransactionCollection(){ }
+        public TransactionCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="TransactionCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Transaction"/> entities.</param>
         public TransactionCollection(IEnumerable<Transaction> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="TransactionCollection"/>.
         /// </summary>
@@ -523,31 +508,29 @@ namespace Cdr.Banking.Common.Entities
         public override object Clone()
         {
             var clone = new TransactionCollection();
-            foreach (Transaction item in this)
+            foreach (var item in this)
             {
                 clone.Add((Transaction)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="TransactionCollectionResult"/> to a <see cref="TransactionCollection"/>.
+        /// An implicit cast from the <see cref="TransactionCollectionResult"/> to a corresponding <see cref="TransactionCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="TransactionCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="TransactionCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator TransactionCollection(TransactionCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="Transaction"/> collection result.
+    /// Represents the <see cref="Transaction"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class TransactionCollectionResult : EntityCollectionResult<TransactionCollection, Transaction>
@@ -558,7 +541,7 @@ namespace Cdr.Banking.Common.Entities
         public TransactionCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="TransactionCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public TransactionCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -581,6 +564,8 @@ namespace Cdr.Banking.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

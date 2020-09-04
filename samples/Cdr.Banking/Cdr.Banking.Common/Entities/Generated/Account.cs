@@ -43,12 +43,12 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="Account"/> identifier.
         /// </summary>
-        [JsonProperty("accountId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("accountId", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Identifier")]
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id));
         }
 
         /// <summary>
@@ -56,11 +56,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("creationDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Creation Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime CreationDate
         {
             get => _creationDate;
-            set => SetValue(ref _creationDate, value, false, DateTimeTransform.DateOnly, nameof(CreationDate)); 
+            set => SetValue(ref _creationDate, value, false, DateTimeTransform.DateOnly, nameof(CreationDate));
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace Cdr.Banking.Common.Entities
         public string? DisplayName
         {
             get => _displayName;
-            set => SetValue(ref _displayName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(DisplayName)); 
+            set => SetValue(ref _displayName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(DisplayName));
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Nickname
         {
             get => _nickname;
-            set => SetValue(ref _nickname, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Nickname)); 
+            set => SetValue(ref _nickname, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Nickname));
         }
 
         /// <summary>
@@ -108,14 +107,14 @@ namespace Cdr.Banking.Common.Entities
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether Is Owned.
+        /// Indicates whether Is Owned.
         /// </summary>
         [JsonProperty("isOwned", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Is Owned")]
         public bool IsOwned
         {
             get => _isOwned;
-            set => SetValue(ref _isOwned, value, false, false, nameof(IsOwned)); 
+            set => SetValue(ref _isOwned, value, false, false, nameof(IsOwned));
         }
 
         /// <summary>
@@ -126,7 +125,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaskedNumber
         {
             get => _maskedNumber;
-            set => SetValue(ref _maskedNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaskedNumber)); 
+            set => SetValue(ref _maskedNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaskedNumber));
         }
 
         /// <summary>
@@ -159,13 +158,13 @@ namespace Cdr.Banking.Common.Entities
         public string? ProductName
         {
             get => _productName;
-            set => SetValue(ref _productName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductName)); 
+            set => SetValue(ref _productName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ProductName));
         }
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="Account"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -175,20 +174,17 @@ namespace Cdr.Banking.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="accountId">The <see cref="Id"/>.</param>
-        public static UniqueKey CreateUniqueKey(string accountId) => new UniqueKey(accountId);
-          
+        public static UniqueKey CreateUniqueKey(string? accountId) => new UniqueKey(accountId);
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Id"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Id);
 
         #endregion
@@ -200,36 +196,30 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Account val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Account val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Account"/> is equal to the current <see cref="Account"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Account? obj)
+        /// <param name="value">The <see cref="Account"/> to compare with the current <see cref="Account"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Account"/> is equal to the current <see cref="Account"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Account? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(CreationDate, obj.CreationDate)
-                && Equals(DisplayName, obj.DisplayName)
-                && Equals(Nickname, obj.Nickname)
-                && Equals(OpenStatusSid, obj.OpenStatusSid)
-                && Equals(IsOwned, obj.IsOwned)
-                && Equals(MaskedNumber, obj.MaskedNumber)
-                && Equals(ProductCategorySid, obj.ProductCategorySid)
-                && Equals(ProductName, obj.ProductName);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(CreationDate, value.CreationDate)
+                && Equals(DisplayName, value.DisplayName)
+                && Equals(Nickname, value.Nickname)
+                && Equals(OpenStatusSid, value.OpenStatusSid)
+                && Equals(IsOwned, value.IsOwned)
+                && Equals(MaskedNumber, value.MaskedNumber)
+                && Equals(ProductCategorySid, value.ProductCategorySid)
+                && Equals(ProductName, value.ProductName);
         }
 
         /// <summary>
@@ -249,9 +239,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (Account? a, Account? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Account"/>.
+        /// Returns the hash code for the <see cref="Account"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Account"/>.</returns>
+        /// <returns>The hash code for the <see cref="Account"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -268,7 +258,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -287,8 +277,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Account"/> to copy from.</param>
         public void CopyFrom(Account from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -303,9 +293,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -341,7 +331,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -371,31 +361,27 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(Account from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Account"/> collection.
+    /// Represents the <see cref="Account"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class AccountCollection : EntityBaseCollection<Account>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountCollection"/> class.
         /// </summary>
-        public AccountCollection(){ }
+        public AccountCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="AccountCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Account"/> entities.</param>
         public AccountCollection(IEnumerable<Account> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="AccountCollection"/>.
         /// </summary>
@@ -403,31 +389,29 @@ namespace Cdr.Banking.Common.Entities
         public override object Clone()
         {
             var clone = new AccountCollection();
-            foreach (Account item in this)
+            foreach (var item in this)
             {
                 clone.Add((Account)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="AccountCollectionResult"/> to a <see cref="AccountCollection"/>.
+        /// An implicit cast from the <see cref="AccountCollectionResult"/> to a corresponding <see cref="AccountCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="AccountCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="AccountCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator AccountCollection(AccountCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="Account"/> collection result.
+    /// Represents the <see cref="Account"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class AccountCollectionResult : EntityCollectionResult<AccountCollection, Account>
@@ -438,7 +422,7 @@ namespace Cdr.Banking.Common.Entities
         public AccountCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="AccountCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public AccountCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -461,6 +445,8 @@ namespace Cdr.Banking.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

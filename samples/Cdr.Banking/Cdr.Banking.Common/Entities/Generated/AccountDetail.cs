@@ -22,7 +22,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the <see cref="Account"/> Detail entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class AccountDetail : Account
+    public partial class AccountDetail : Account, IEquatable<AccountDetail>
     {
         #region Privates
 
@@ -45,7 +45,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Bsb
         {
             get => _bsb;
-            set => SetValue(ref _bsb, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Bsb)); 
+            set => SetValue(ref _bsb, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Bsb));
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Cdr.Banking.Common.Entities
         public string? AccountNumber
         {
             get => _accountNumber;
-            set => SetValue(ref _accountNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountNumber)); 
+            set => SetValue(ref _accountNumber, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AccountNumber));
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Cdr.Banking.Common.Entities
         public string? BundleName
         {
             get => _bundleName;
-            set => SetValue(ref _bundleName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BundleName)); 
+            set => SetValue(ref _bundleName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(BundleName));
         }
 
         /// <summary>
@@ -93,31 +93,31 @@ namespace Cdr.Banking.Common.Entities
         }
 
         /// <summary>
-        /// Gets or sets the Term Deposit (see <see cref="TermDepositAccount"/>).
+        /// Gets or sets the Term Deposit (see <see cref="Common.Entities.TermDepositAccount"/>).
         /// </summary>
         [JsonProperty("termDeposit", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Term Deposit")]
         public TermDepositAccount? TermDeposit
         {
             get => _termDeposit;
-            set => SetValue(ref _termDeposit, value, false, true, nameof(TermDeposit)); 
+            set => SetValue(ref _termDeposit, value, false, true, nameof(TermDeposit));
         }
 
         /// <summary>
-        /// Gets or sets the Credit Card (see <see cref="CreditCardAccount"/>).
+        /// Gets or sets the Credit Card (see <see cref="Common.Entities.CreditCardAccount"/>).
         /// </summary>
         [JsonProperty("creditCard", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Credit Card")]
         public CreditCardAccount? CreditCard
         {
             get => _creditCard;
-            set => SetValue(ref _creditCard, value, false, true, nameof(CreditCard)); 
+            set => SetValue(ref _creditCard, value, false, true, nameof(CreditCard));
         }
 
         #endregion
 
         #region IChangeTracking
-          
+
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
         /// </summary>
@@ -148,33 +148,27 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is AccountDetail val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is AccountDetail val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(AccountDetail? obj)
+        /// <param name="value">The <see cref="AccountDetail"/> to compare with the current <see cref="AccountDetail"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="AccountDetail"/> is equal to the current <see cref="AccountDetail"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(AccountDetail? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Bsb, obj.Bsb)
-                && Equals(AccountNumber, obj.AccountNumber)
-                && Equals(BundleName, obj.BundleName)
-                && Equals(SpecificAccountUTypeSid, obj.SpecificAccountUTypeSid)
-                && Equals(TermDeposit, obj.TermDeposit)
-                && Equals(CreditCard, obj.CreditCard);
+            return base.Equals((object)value)
+                && Equals(Bsb, value.Bsb)
+                && Equals(AccountNumber, value.AccountNumber)
+                && Equals(BundleName, value.BundleName)
+                && Equals(SpecificAccountUTypeSid, value.SpecificAccountUTypeSid)
+                && Equals(TermDeposit, value.TermDeposit)
+                && Equals(CreditCard, value.CreditCard);
         }
 
         /// <summary>
@@ -194,9 +188,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (AccountDetail? a, AccountDetail? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="AccountDetail"/>.
+        /// Returns the hash code for the <see cref="AccountDetail"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="AccountDetail"/>.</returns>
+        /// <returns>The hash code for the <see cref="AccountDetail"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -210,7 +204,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -229,8 +223,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="AccountDetail"/> to copy from.</param>
         public void CopyFrom(AccountDetail from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((Account)from);
             Bsb = from.Bsb;
@@ -242,9 +236,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -277,7 +271,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -307,7 +301,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(AccountDetail from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

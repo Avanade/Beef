@@ -10,34 +10,24 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
+using Beef.RefData.Model;
 using Newtonsoft.Json;
 
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Balance Purse model.
+    /// Represents the Maturity Instructions model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class BalancePurse
+    public partial class MaturityInstructions : ReferenceDataBaseGuid
     {
-        /// <summary>
-        /// Gets or sets the Amount.
-        /// </summary>
-        [JsonProperty("amount", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public decimal Amount { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Currency.
-        /// </summary>
-        [JsonProperty("currency", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string? Currency { get; set; }
     }
 
     /// <summary>
-    /// Represents the <see cref="BalancePurse"/> collection.
+    /// Represents the <see cref="MaturityInstructions"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
-    public partial class BalancePurseCollection : List<BalancePurse> { }
+    public partial class MaturityInstructionsCollection : List<MaturityInstructions> { }
 }
 
 #pragma warning restore CA2227, CA1819

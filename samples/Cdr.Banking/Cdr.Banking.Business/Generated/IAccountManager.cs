@@ -17,30 +17,30 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business
 {
     /// <summary>
-    /// Defines the Account business functionality.
+    /// Defines the <see cref="Account"/> business functionality.
     /// </summary>
     public partial interface IAccountManager
     {
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
+        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging);
 
         /// <summary>
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         Task<AccountDetail?> GetDetailAsync(string? accountId);
 
         /// <summary>
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Balance"/> where found.</returns>
         Task<Balance?> GetBalanceAsync(string? accountId);
     }
 }

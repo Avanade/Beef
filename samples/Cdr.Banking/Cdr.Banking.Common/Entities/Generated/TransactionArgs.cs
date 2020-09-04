@@ -41,11 +41,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("oldest-time", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Oldest time")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
         public DateTime? FromDate
         {
             get => _fromDate;
-            set => SetValue(ref _fromDate, value, false, DateTimeTransform.UseDefault, nameof(FromDate)); 
+            set => SetValue(ref _fromDate, value, false, DateTimeTransform.UseDefault, nameof(FromDate));
         }
 
         /// <summary>
@@ -53,11 +52,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("newest-time", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Newest time")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateTimeFormat)]
         public DateTime? ToDate
         {
             get => _toDate;
-            set => SetValue(ref _toDate, value, false, DateTimeTransform.UseDefault, nameof(ToDate)); 
+            set => SetValue(ref _toDate, value, false, DateTimeTransform.UseDefault, nameof(ToDate));
         }
 
         /// <summary>
@@ -68,7 +66,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal? MinAmount
         {
             get => _minAmount;
-            set => SetValue(ref _minAmount, value, false, false, nameof(MinAmount)); 
+            set => SetValue(ref _minAmount, value, false, false, nameof(MinAmount));
         }
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal? MaxAmount
         {
             get => _maxAmount;
-            set => SetValue(ref _maxAmount, value, false, false, nameof(MaxAmount)); 
+            set => SetValue(ref _maxAmount, value, false, false, nameof(MaxAmount));
         }
 
         /// <summary>
@@ -90,7 +88,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Text
         {
             get => _text;
-            set => SetValue(ref _text, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Text)); 
+            set => SetValue(ref _text, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Text));
         }
 
         #endregion
@@ -102,32 +100,26 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is TransactionArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is TransactionArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="TransactionArgs"/> is equal to the current <see cref="TransactionArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(TransactionArgs? obj)
+        /// <param name="value">The <see cref="TransactionArgs"/> to compare with the current <see cref="TransactionArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="TransactionArgs"/> is equal to the current <see cref="TransactionArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(TransactionArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(FromDate, obj.FromDate)
-                && Equals(ToDate, obj.ToDate)
-                && Equals(MinAmount, obj.MinAmount)
-                && Equals(MaxAmount, obj.MaxAmount)
-                && Equals(Text, obj.Text);
+            return base.Equals((object)value)
+                && Equals(FromDate, value.FromDate)
+                && Equals(ToDate, value.ToDate)
+                && Equals(MinAmount, value.MinAmount)
+                && Equals(MaxAmount, value.MaxAmount)
+                && Equals(Text, value.Text);
         }
 
         /// <summary>
@@ -147,9 +139,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (TransactionArgs? a, TransactionArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="TransactionArgs"/>.
+        /// Returns the hash code for the <see cref="TransactionArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="TransactionArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="TransactionArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -162,7 +154,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -181,8 +173,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="TransactionArgs"/> to copy from.</param>
         public void CopyFrom(TransactionArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             FromDate = from.FromDate;
@@ -193,9 +185,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -227,7 +219,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -253,7 +245,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(TransactionArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

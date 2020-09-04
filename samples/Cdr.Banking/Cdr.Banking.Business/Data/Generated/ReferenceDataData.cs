@@ -9,42 +9,36 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
+using Beef.Data.Cosmos;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-using Beef.Data.Cosmos;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>
-    /// Provides the <b>ReferenceData</b> database access.
+    /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
         private readonly ICosmosDb _cosmos;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ReferenceDataData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public ReferenceDataData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); ReferenceDataDataCtor(); }
+        public ReferenceDataData(ICosmosDb cosmos)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); DataCtor(); }
+
+        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
+        /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> items.
         /// </summary>
-        partial void ReferenceDataDataCtor();
-
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> objects.
-        /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
         public async Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.OpenStatusCollection();
@@ -53,9 +47,9 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
         public async Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync()
         {
             var __coll = new RefDataNamespace.ProductCategoryCollection();
@@ -64,9 +58,9 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.AccountUType"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.AccountUType"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
         public async Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.AccountUTypeCollection();
@@ -75,9 +69,9 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
         public async Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync()
         {
             var __coll = new RefDataNamespace.MaturityInstructionsCollection();
@@ -86,9 +80,9 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionType"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.TransactionType"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
         public async Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionTypeCollection();
@@ -97,9 +91,9 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
         public async Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync()
         {
             var __coll = new RefDataNamespace.TransactionStatusCollection();
@@ -108,39 +102,39 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> entity and Cosmos <see cref="RefDataNamespace.OpenStatus"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.OpenStatus"/> and Cosmos <see cref="Model.OpenStatus"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus> OpenStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.OpenStatus, RefDataNamespace.OpenStatus>()
+        public static CosmosDbMapper<RefDataNamespace.OpenStatus, Model.OpenStatus> OpenStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.OpenStatus, Model.OpenStatus>()
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> entity and Cosmos <see cref="RefDataNamespace.ProductCategory"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.ProductCategory"/> and Cosmos <see cref="Model.ProductCategory"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory> ProductCategoryMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.ProductCategory, RefDataNamespace.ProductCategory>()
+        public static CosmosDbMapper<RefDataNamespace.ProductCategory, Model.ProductCategory> ProductCategoryMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.ProductCategory, Model.ProductCategory>()
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.AccountUType"/> entity and Cosmos <see cref="RefDataNamespace.AccountUType"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.AccountUType"/> and Cosmos <see cref="Model.AccountUType"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType> AccountUTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.AccountUType, RefDataNamespace.AccountUType>()
+        public static CosmosDbMapper<RefDataNamespace.AccountUType, Model.AccountUType> AccountUTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.AccountUType, Model.AccountUType>()
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> entity and Cosmos <see cref="RefDataNamespace.MaturityInstructions"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.MaturityInstructions"/> and Cosmos <see cref="Model.MaturityInstructions"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions> MaturityInstructionsMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.MaturityInstructions, RefDataNamespace.MaturityInstructions>()
+        public static CosmosDbMapper<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions> MaturityInstructionsMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.MaturityInstructions, Model.MaturityInstructions>()
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionType"/> entity and Cosmos <see cref="RefDataNamespace.TransactionType"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.TransactionType"/> and Cosmos <see cref="Model.TransactionType"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType> TransactionTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionType, RefDataNamespace.TransactionType>()
+        public static CosmosDbMapper<RefDataNamespace.TransactionType, Model.TransactionType> TransactionTypeMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionType, Model.TransactionType>()
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> entity and Cosmos <see cref="RefDataNamespace.TransactionStatus"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.TransactionStatus"/> and Cosmos <see cref="Model.TransactionStatus"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus> TransactionStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionStatus, RefDataNamespace.TransactionStatus>()
+        public static CosmosDbMapper<RefDataNamespace.TransactionStatus, Model.TransactionStatus> TransactionStatusMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.TransactionStatus, Model.TransactionStatus>()
             .AddStandardProperties();
     }
 }

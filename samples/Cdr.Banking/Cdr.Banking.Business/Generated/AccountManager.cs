@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Cdr.Banking.Common.Entities;
-using Cdr.Banking.Business.Validation;
 using Cdr.Banking.Business.DataSvc;
+using Cdr.Banking.Business.Validation;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business
 {
     /// <summary>
-    /// Provides the Account business functionality.
+    /// Provides the <see cref="Account"/> business functionality.
     /// </summary>
     public partial class AccountManager : IAccountManager
     {
@@ -31,29 +31,24 @@ namespace Cdr.Banking.Business
         /// Initializes a new instance of the <see cref="AccountManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IAccountDataSvc"/>.</param>
-        public AccountManager(IAccountDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); AccountManagerCtor(); }
+        public AccountManager(IAccountDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); AccountManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void AccountManagerCtor();
+        partial void AccountManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
+        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(AccountArgsValidator.Default))
-                    .Run().ThrowOnError();
-
+                args.Validate(nameof(args)).Entity(AccountArgsValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
             });
         }
@@ -62,17 +57,14 @@ namespace Cdr.Banking.Business
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
-                MultiValidator.Create()
-                    .Add(accountId.Validate(nameof(accountId)).Mandatory())
-                    .Run().ThrowOnError();
-
+                accountId.Validate(nameof(accountId)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
             });
         }
@@ -81,17 +73,14 @@ namespace Cdr.Banking.Business
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Balance"/> where found.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
-                MultiValidator.Create()
-                    .Add(accountId.Validate(nameof(accountId)).Mandatory())
-                    .Run().ThrowOnError();
-
+                accountId.Validate(nameof(accountId)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
             });
         }

@@ -43,7 +43,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal MinPaymentAmount
         {
             get => _minPaymentAmount;
-            set => SetValue(ref _minPaymentAmount, value, false, false, nameof(MinPaymentAmount)); 
+            set => SetValue(ref _minPaymentAmount, value, false, false, nameof(MinPaymentAmount));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal PaymentDueAmount
         {
             get => _paymentDueAmount;
-            set => SetValue(ref _paymentDueAmount, value, false, false, nameof(PaymentDueAmount)); 
+            set => SetValue(ref _paymentDueAmount, value, false, false, nameof(PaymentDueAmount));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Cdr.Banking.Common.Entities
         public string? PaymentCurrency
         {
             get => _paymentCurrency;
-            set => SetValue(ref _paymentCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PaymentCurrency)); 
+            set => SetValue(ref _paymentCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(PaymentCurrency));
         }
 
         /// <summary>
@@ -73,11 +73,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("paymentDueDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Payment Due Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime PaymentDueDate
         {
             get => _paymentDueDate;
-            set => SetValue(ref _paymentDueDate, value, false, DateTimeTransform.DateOnly, nameof(PaymentDueDate)); 
+            set => SetValue(ref _paymentDueDate, value, false, DateTimeTransform.DateOnly, nameof(PaymentDueDate));
         }
 
         #endregion
@@ -89,31 +88,25 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is CreditCardAccount val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is CreditCardAccount val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="CreditCardAccount"/> is equal to the current <see cref="CreditCardAccount"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(CreditCardAccount? obj)
+        /// <param name="value">The <see cref="CreditCardAccount"/> to compare with the current <see cref="CreditCardAccount"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="CreditCardAccount"/> is equal to the current <see cref="CreditCardAccount"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(CreditCardAccount? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(MinPaymentAmount, obj.MinPaymentAmount)
-                && Equals(PaymentDueAmount, obj.PaymentDueAmount)
-                && Equals(PaymentCurrency, obj.PaymentCurrency)
-                && Equals(PaymentDueDate, obj.PaymentDueDate);
+            return base.Equals((object)value)
+                && Equals(MinPaymentAmount, value.MinPaymentAmount)
+                && Equals(PaymentDueAmount, value.PaymentDueAmount)
+                && Equals(PaymentCurrency, value.PaymentCurrency)
+                && Equals(PaymentDueDate, value.PaymentDueDate);
         }
 
         /// <summary>
@@ -133,9 +126,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (CreditCardAccount? a, CreditCardAccount? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="CreditCardAccount"/>.
+        /// Returns the hash code for the <see cref="CreditCardAccount"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="CreditCardAccount"/>.</returns>
+        /// <returns>The hash code for the <see cref="CreditCardAccount"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -147,7 +140,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -166,8 +159,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="CreditCardAccount"/> to copy from.</param>
         public void CopyFrom(CreditCardAccount from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             MinPaymentAmount = from.MinPaymentAmount;
@@ -177,9 +170,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -210,7 +203,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -235,7 +228,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(CreditCardAccount from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

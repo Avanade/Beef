@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Cdr.Banking.Common.Entities;
-using Cdr.Banking.Business.Validation;
 using Cdr.Banking.Business.DataSvc;
+using Cdr.Banking.Business.Validation;
 using RefDataNamespace = Cdr.Banking.Common.Entities;
 
 namespace Cdr.Banking.Business
 {
     /// <summary>
-    /// Provides the Transaction business functionality.
+    /// Provides the <see cref="Transaction"/> business functionality.
     /// </summary>
     public partial class TransactionManager : ITransactionManager
     {
@@ -31,20 +31,18 @@ namespace Cdr.Banking.Business
         /// Initializes a new instance of the <see cref="TransactionManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="ITransactionDataSvc"/>.</param>
-        public TransactionManager(ITransactionDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); TransactionManagerCtor(); }
+        public TransactionManager(ITransactionDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); TransactionManagerCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TransactionManagerCtor();
+        partial void TransactionManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
+        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>

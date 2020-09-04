@@ -35,7 +35,7 @@ namespace Cdr.Banking.Common.Entities
                 typeof(TransactionType),
                 typeof(TransactionStatus)
             };
-        
+
         /// <summary>
         /// Gets the provider interface cref="Type"/> used for <see cref="ReferenceDataManager.GetProvider(Type)"/>. The value is <see cref="IReferenceData"/>.
         /// </summary>

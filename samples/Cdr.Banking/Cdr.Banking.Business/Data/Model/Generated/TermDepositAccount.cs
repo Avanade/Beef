@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Term Deposit Account entity.
+    /// Represents the Term Deposit Account model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class TermDepositAccount
@@ -51,7 +49,7 @@ namespace Cdr.Banking.Business.Data.Model
         /// </summary>
         [JsonProperty("maturityInstructions", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? MaturityInstructions { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

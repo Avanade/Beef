@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
-using Microsoft.Azure.Cosmos;
 using Beef.Data.Cosmos;
 using Beef.Entities;
 using Beef.Mapper;
@@ -23,13 +23,14 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>
-    /// Provides the <see cref="Account"/> Detail data access.
+    /// Provides the <see cref="AccountDetail"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountDetailData
     {
+
         /// <summary>
-        /// Provides the <see cref="AccountDetail"/> entity and Cosmos <see cref="Model.Account"/> property mapping.
+        /// Provides the <see cref="AccountDetail"/> and Cosmos <see cref="Model.AccountDetail"/> property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<AccountDetail, Model.Account, CosmosMapper>
@@ -50,10 +51,7 @@ namespace Cdr.Banking.Business.Data
                 CosmosMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="CosmosMapper"/> constructor to be extended.
-            /// </summary>
-            partial void CosmosMapperCtor();
+            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
         }
     }
 }

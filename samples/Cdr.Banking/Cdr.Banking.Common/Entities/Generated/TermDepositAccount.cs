@@ -41,11 +41,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("lodgementDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Lodgement Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime LodgementDate
         {
             get => _lodgementDate;
-            set => SetValue(ref _lodgementDate, value, false, DateTimeTransform.DateOnly, nameof(LodgementDate)); 
+            set => SetValue(ref _lodgementDate, value, false, DateTimeTransform.DateOnly, nameof(LodgementDate));
         }
 
         /// <summary>
@@ -53,11 +52,10 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         [JsonProperty("maturityDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Maturity Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime MaturityDate
         {
             get => _maturityDate;
-            set => SetValue(ref _maturityDate, value, false, DateTimeTransform.DateOnly, nameof(MaturityDate)); 
+            set => SetValue(ref _maturityDate, value, false, DateTimeTransform.DateOnly, nameof(MaturityDate));
         }
 
         /// <summary>
@@ -68,7 +66,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal MaturityAmount
         {
             get => _maturityAmount;
-            set => SetValue(ref _maturityAmount, value, false, false, nameof(MaturityAmount)); 
+            set => SetValue(ref _maturityAmount, value, false, false, nameof(MaturityAmount));
         }
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace Cdr.Banking.Common.Entities
         public string? MaturityCurrency
         {
             get => _maturityCurrency;
-            set => SetValue(ref _maturityCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaturityCurrency)); 
+            set => SetValue(ref _maturityCurrency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(MaturityCurrency));
         }
 
         /// <summary>
@@ -113,32 +111,26 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is TermDepositAccount val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is TermDepositAccount val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="TermDepositAccount"/> is equal to the current <see cref="TermDepositAccount"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(TermDepositAccount? obj)
+        /// <param name="value">The <see cref="TermDepositAccount"/> to compare with the current <see cref="TermDepositAccount"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="TermDepositAccount"/> is equal to the current <see cref="TermDepositAccount"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(TermDepositAccount? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(LodgementDate, obj.LodgementDate)
-                && Equals(MaturityDate, obj.MaturityDate)
-                && Equals(MaturityAmount, obj.MaturityAmount)
-                && Equals(MaturityCurrency, obj.MaturityCurrency)
-                && Equals(MaturityInstructionsSid, obj.MaturityInstructionsSid);
+            return base.Equals((object)value)
+                && Equals(LodgementDate, value.LodgementDate)
+                && Equals(MaturityDate, value.MaturityDate)
+                && Equals(MaturityAmount, value.MaturityAmount)
+                && Equals(MaturityCurrency, value.MaturityCurrency)
+                && Equals(MaturityInstructionsSid, value.MaturityInstructionsSid);
         }
 
         /// <summary>
@@ -158,9 +150,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (TermDepositAccount? a, TermDepositAccount? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="TermDepositAccount"/>.
+        /// Returns the hash code for the <see cref="TermDepositAccount"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="TermDepositAccount"/>.</returns>
+        /// <returns>The hash code for the <see cref="TermDepositAccount"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -173,7 +165,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -192,8 +184,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="TermDepositAccount"/> to copy from.</param>
         public void CopyFrom(TermDepositAccount from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             LodgementDate = from.LodgementDate;
@@ -204,9 +196,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -238,7 +230,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -264,7 +256,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(TermDepositAccount from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

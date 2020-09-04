@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Transaction model for data persistence entity.
+    /// Represents the Transaction model for data persistence model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Transaction : IStringIdentifier
@@ -35,7 +33,7 @@ namespace Cdr.Banking.Business.Data.Model
         public string? AccountId { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether Is Detail Available.
+        /// Indicates whether Is Detail Available.
         /// </summary>
         [JsonProperty("isDetailAvailable", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsDetailAvailable { get; set; }
@@ -123,7 +121,7 @@ namespace Cdr.Banking.Business.Data.Model
         /// </summary>
         [JsonProperty("transactionDateTime", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime TransactionDateTime { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819
