@@ -10,7 +10,7 @@
           </xs:annotation>
           <xs:complexType>
             <xs:sequence minOccurs="0">
-              <xs:element name="StoredProcedure" maxOccurs="unbounded" >
+               <xs:element name="StoredProcedure" maxOccurs="unbounded" >
                 <xs:annotation>
                   <xs:documentation>The query stored procedure configuration.</xs:documentation>
                 </xs:annotation>
