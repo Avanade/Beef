@@ -113,7 +113,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> CreateAsync(Robot value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Robot>("api/v1/robots", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Robot>("api/v1/robots", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> UpdateAsync(Robot value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Robot>("api/v1/robots/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Robot>("api/v1/robots/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Robot>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<Robot>("api/v1/robots/{id}", patchOption, Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<Robot>("api/v1/robots/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

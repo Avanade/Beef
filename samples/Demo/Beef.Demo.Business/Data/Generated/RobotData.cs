@@ -121,7 +121,7 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Robot"/> and Cosmos <see cref="Model.Robot"/> property mapping.
+        /// Provides the <see cref="Robot"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Robot, Model.Robot, CosmosMapper>

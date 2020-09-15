@@ -30,7 +30,7 @@ namespace Cdr.Banking.Business.Data
     {
 
         /// <summary>
-        /// Provides the <see cref="AccountDetail"/> and Cosmos <see cref="Model.AccountDetail"/> property mapping.
+        /// Provides the <see cref="AccountDetail"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<AccountDetail, Model.Account, CosmosMapper>

@@ -251,7 +251,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> CreateAsync(Person value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Person>("api/v1/persons", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Person>("api/v1/persons", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Person>("api/v1/persons/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Person>("api/v1/persons/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -294,7 +294,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<Person>("api/v1/persons/{id}", patchOption, Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<Person>("api/v1/persons/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -395,7 +395,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetail>> UpdateDetailAsync(PersonDetail value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<PersonDetail>("api/v1/persons/{id}/detail", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<PersonDetail>("api/v1/persons/{id}/detail", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -407,7 +407,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<PersonDetail>> PatchDetailAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<PersonDetail>("api/v1/persons/{id}/detail", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -467,7 +467,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> CreateWithEfAsync(Person value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Person>("api/v1/persons/ef", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Person>("api/v1/persons/ef", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -478,7 +478,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateWithEfAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Person>("api/v1/persons/ef/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Person>("api/v1/persons/ef/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> PatchWithEfAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PatchAsync<Person>("api/v1/persons/ef/{id}", patchOption, Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
     }
 }

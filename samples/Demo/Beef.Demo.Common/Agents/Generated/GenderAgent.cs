@@ -77,7 +77,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> CreateAsync(Gender value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Gender>("api/v1/demo/ref/genders", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Gender>("api/v1/demo/ref/genders", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Gender>> UpdateAsync(Gender value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Gender>("api/v1/demo/ref/genders/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Gender>("api/v1/demo/ref/genders/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
     }
 }

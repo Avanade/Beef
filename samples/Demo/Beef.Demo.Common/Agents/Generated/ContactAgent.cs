@@ -101,7 +101,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Contact>> CreateAsync(Contact value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<Contact>("api/v1/contacts", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<Contact>("api/v1/contacts", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Contact>> UpdateAsync(Contact value, Guid id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<Contact>("api/v1/contacts/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<Contact>("api/v1/contacts/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

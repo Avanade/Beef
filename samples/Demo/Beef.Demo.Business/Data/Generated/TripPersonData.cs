@@ -95,7 +95,7 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="TripPerson"/> and OData <see cref="Model.TripPerson"/> property mapping.
+        /// Provides the <see cref="TripPerson"/> and OData  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class ODataMapper : ODataMapper<TripPerson, Model.Person, ODataMapper>

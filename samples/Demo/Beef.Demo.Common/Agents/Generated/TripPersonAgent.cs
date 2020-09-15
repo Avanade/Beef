@@ -85,7 +85,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TripPerson>> CreateAsync(TripPerson value, WebApiRequestOptions? requestOptions = null) =>
-            PostAsync<TripPerson>("api/v1/tripPeople", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PostAsync<TripPerson>("api/v1/tripPeople", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Beef.Demo.Common.Agents
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<TripPerson>> UpdateAsync(TripPerson value, string? id, WebApiRequestOptions? requestOptions = null) =>
-            PutAsync<TripPerson>("api/v1/tripPeople/{id}", Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+            PutAsync<TripPerson>("api/v1/tripPeople/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("id", id) });
 
         /// <summary>

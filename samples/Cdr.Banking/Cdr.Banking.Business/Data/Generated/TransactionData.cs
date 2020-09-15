@@ -67,7 +67,7 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Transaction"/> and Cosmos <see cref="Model.Transaction"/> property mapping.
+        /// Provides the <see cref="Transaction"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Transaction, Model.Transaction, CosmosMapper>

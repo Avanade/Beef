@@ -39,7 +39,7 @@
 
     <Operation Name="GetDetail" OperationType="Get" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
     <Operation Name="UpdateDetail" OperationType="Update" ValueType="PersonDetail" ReturnType="PersonDetail" Validator="PersonDetailValidator" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
-    <Operation Name="PatchDetail" OperationType="Patch" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" PatchGetOperation="GetDetail" PatchUpdateOperation="IPersonManager.UpdateDetail" />
+    <Operation Name="PatchDetail" OperationType="Patch" ValueType="PersonDetail" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" PatchGetOperation="GetDetail" PatchUpdateOperation="IPersonManager.UpdateDetail" />
 
     <Operation Name="Add" Text="Actually validating the FromBody parameter generation" OperationType="Custom" WebApiRoute="fromBody" WebApiStatus="Created" ManagerCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeDataSvc="true" ExcludeIDataSvc="true">
       <Parameter Name="Person" Type="Person" Nullable="false" WebApiFrom="FromBody"/>

@@ -88,7 +88,7 @@ namespace Cdr.Banking.Business.Data
             => DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
 
         /// <summary>
-        /// Provides the <see cref="Account"/> and Cosmos <see cref="Model.Account"/> property mapping.
+        /// Provides the <see cref="Account"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Account, Model.Account, CosmosMapper>
