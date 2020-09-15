@@ -77,13 +77,13 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
     {{/ifeq}}
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPost'}}
-            PostAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PostAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Beef.Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPut'}}
-            PutAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PutAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{#if HasValue}}Beef.Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpPatch'}}
-            PatchAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
+            PatchAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Beef.Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
             DeleteAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{/if}}requestOptions: requestOptions,

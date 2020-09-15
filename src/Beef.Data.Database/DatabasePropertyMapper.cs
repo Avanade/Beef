@@ -171,7 +171,7 @@ namespace Beef.Data.Database
         /// <returns><c>true</c> indicates that the mapping should occur; otherwise, <c>false</c>.</returns>
         public bool MapDestToSrceWhen(DatabaseRecord dr)
         {
-            return (_mapDestToSrceWhen == null) ? true : _mapDestToSrceWhen.Invoke(dr);
+            return (_mapDestToSrceWhen == null) || _mapDestToSrceWhen.Invoke(dr);
         }
 
         /// <summary>
@@ -288,8 +288,11 @@ namespace Beef.Data.Database
             var val = GetSrceValue(value, operationType)!;
             if (Mapper != null)
             {
-                var em = (IDatabaseMapper)Mapper;
-                em.MapToDb(val, parameters, operationType, this);
+                if (val != null)
+                {
+                    var em = (IDatabaseMapper)Mapper;
+                    em.MapToDb(val, parameters, operationType, this);
+                }
             }
             else
             {

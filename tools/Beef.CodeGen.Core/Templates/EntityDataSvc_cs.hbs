@@ -96,7 +96,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
 
       {{/ifeq}}
     {{/if}}         
-                {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#ifeq Type 'Create' 'Update'}}Check.NotNull(value, nameof(value)){{/ifeq}}{{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+                {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
     {{#ifeq Events.Count 1}}
       {{#each Events}}
                 await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}Async({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).ConfigureAwait(false);

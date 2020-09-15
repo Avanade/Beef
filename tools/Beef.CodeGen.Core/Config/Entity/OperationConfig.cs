@@ -587,7 +587,7 @@ namespace Beef.CodeGen.Config.Entity
                 _ => "void"
             });
 
-            ValueType = DefaultWhereNull(ReturnType, () => Type switch
+            ValueType = DefaultWhereNull(ValueType, () => Type switch
             {
                 "Create" => Parent!.EntityName,
                 "Update" => Parent!.EntityName,
@@ -798,6 +798,9 @@ namespace Beef.CodeGen.Config.Entity
 
                 if (parts.Length > 1)
                     ed.Action = parts[1];
+
+                if (Root!.EventSubjectRoot != null)
+                    ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
 
                 Events.Add(ed);
             }

@@ -85,6 +85,33 @@ namespace Beef.CodeGen.Generators
                 context.Template(writer, parameters);
             });
 
+            // Will check that all of the arguments have a <c>true</c> value where bool; otherwise, non-null.
+            Handlebars.RegisterHelper("ifor", (writer, context, parameters, args) =>
+            {
+                if (!CheckArgs("ifor", writer, args))
+                    return;
+
+                foreach (var arg in args)
+                {
+                    if (arg is bool opt)
+                    {
+                        if (opt)
+                        {
+                            context.Template(writer, parameters);
+                            return;
+                        }
+                    }
+                    else if (arg != null)
+                    {
+                        context.Template(writer, parameters);
+                        return;
+                    }
+                }
+
+                context.Inverse(writer, parameters);
+            });
+
+
             // Converts a value to lowercase.
 #pragma warning disable CA1308 // Normalize strings to uppercase; this is an explicit and required call to lowercase.
             Handlebars.RegisterHelper("lower", (writer, context, parameters) => writer.WriteSafeString(parameters.FirstOrDefault()?.ToString()?.ToLowerInvariant() ?? ""));

@@ -725,7 +725,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the list of properties that form the unique key.
         /// </summary>
-        public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => x.UniqueKey.HasValue && x.UniqueKey.Value).ToList();
+        public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
 
         /// <summary>
         /// Gets the list of properties that are sub-entities.
@@ -924,7 +924,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether auto-implementing 'EntityFramework'.
         /// </summary>
-        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || Operations.Any(x => x.AutoImplement == "EntityFramework");
+        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkEntity != null || Operations.Any(x => x.AutoImplement == "EntityFramework");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Cosmos'.
@@ -972,12 +972,9 @@ namespace Beef.CodeGen.Config.Entity
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
-            EntityFrameworkEntity = DefaultWhereNull(EntityFrameworkEntity, () => $"Model.{Name}");
             CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
-            CosmosEntity = DefaultWhereNull(CosmosEntity, () => $"Model.{Name}");
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
-            ODataEntity = DefaultWhereNull(ODataEntity, () => $"Model.{Name}");
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcConstructor = DefaultWhereNull(DataSvcConstructor, () => "Public");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
