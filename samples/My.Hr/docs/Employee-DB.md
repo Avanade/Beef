@@ -1,6 +1,6 @@
 ﻿# Step 1 - Employee DB
 
-This will walk through the process of creating the required tables, and stored procedures, etc. needed for the `Employee` within the database. All of this work will occur within the context of the `My.Hr.Database` project.
+This will walk through the process of creating the required tables, and stored procedures, etc. needed for the `Employee` within a Microsoft SQL Server database. All of this work will occur within the context of the `My.Hr.Database` project.
 
 The [`Beef.Database.Core`](../../../tools/Beef.Database.Core/README.md) provides the capabilities that will be leveraged. The underlying documentation describes these capabuilities and the database approach in greater detail.
 
@@ -10,7 +10,7 @@ _Note:_ Any time that command line execution is requested, this should be perfor
 
 ## Clean up existing migrations
 
-Within the `Migrations` folder there will four entries that were created during the initial solution skeleton creation. The last two of these should be removed:
+Within the `Migrations` folder there will four entries that were created during the initial solution skeleton creation. The last two of these should be removed. The first two create the `Ref` and `Hr` database schemas. The `Ref` is for the reference data, and `Hr` is for the master data; in some scenarios it may make sense to use only the `Hr` schema which will house both types of data. For this sample two schemas will be used.
 
 ```
 └── Migrations
@@ -24,13 +24,13 @@ Within the `Migrations` folder there will four entries that were created during 
 
 ## Create Employee table
 
-First step is to be the migration script itself, following a similar naming convention to ensure it is executed (applied) in the correct order. This will create the migration script using a pre-defined template to aid development.
+First step is to create the `Employee` table migration script itself, following a similar naming convention to ensure it is executed (applied) in the correct order. This will create the migration script using a pre-defined nameing convention and templated T-SQL to aid development.
 
 ```
 dotnet run scriptnew -create Hr.Employee
 ```
 
-For the purposes of this step, open the newly created migration script and replace its contents with. Notes have been added to give context/purpose where applicable:
+For the purposes of this step, open the newly created migration script and replace its contents with the following. Additional notes have been added to give context/purpose where applicable.
 
 ``` SQL
 -- Migration Script
@@ -63,13 +63,13 @@ COMMIT TRANSACTION
 
 ## Create Emergency Contacts table
 
-Use the following command line to create the migration script.
+Use the following command line to create the `EmergencyContact` table migration script.
 
 ```
 dotnet run scriptnew -create Hr.EmergencyContact
 ```
 
-Replace the contents with the following. _Note_: that we removed the row version and auditing tables as these are not required as this table is tightly-coupled to the `Employee` and can only (and should only) be updated in that context (i.e. is a sub-table).
+Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
 
 ``` SQL
 -- Migration Script
@@ -92,7 +92,7 @@ COMMIT TRANSACTION
 
 ## Create Reference Data tables
 
-To support the capabilities of the tables above the following Reference Data tables are also required:
+To support the capabilities of the tables above the following Reference Data tables are also required.
 - `Ref.Gender`
 - `Ref.TerminationReason`
 - `Ref.RelationshipType`
@@ -111,17 +111,17 @@ dotnet run scriptnew -create Ref.USState
 
 ## Reference Data data
 
-Now that the Reference Data tables exist they will need to be populated. It is recommended that where possible that the Production environment values are specified (as these will be deployed to all environments).
+Now that the Reference Data tables exist they will need to be populated. It is recommended that where possible that the Production environment values are specified (as these are intended to be deployed to all environments).
 
-These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `Data` folder.
+These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.
 
 <br/>
 
 ## Reference Data query
 
-To support the requirement to query the Reference Data values from the database we will use Entity Framework to simplify. The Reference Data table configuration will be drive the EntityFramework .NET (C#) model code-generation via the `EfModel="true"` option. 
+To support the requirement to query the Reference Data values from the database we will use Entity Framework (EF) to simplify. The Reference Data table configuration will drive the EF .NET (C#) model code-generation via the `EfModel="true"` option. 
 
-Remove all existing configuration from `My.Hr.Database.xml` and replace.
+Remove all existing configuration from `My.Hr.Database.xml` and replace. Each table configuration is referencing the underlying table and schema, then requesting an EF model is created for all related columns found within the database. _Beef_ will query the database to infer the columns during code-generation to ensure it "understands" the latest configuration.
 
 ``` XML
 <?xml version="1.0" encoding="utf-8" ?>
@@ -142,7 +142,7 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace.
 
 Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, such as `EmergencyContact`.
 
-Copy the following configuration and append to the `My.Hr.Database.xml`; see comments within for the details.
+Copy the following configuration and append to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
 
 ``` XML
   <!-- References the Employee table to infer the underlying schema, then creates stored procedures as configured:
@@ -194,14 +194,28 @@ To support a flexible query approach for the `Employee` Entity Franework will be
 
 ## Database management
 
-Once the configuration has been completed then the database can be created/updated, the code-generation performed and the Reference Data loaded into the corresponding tables.
+Once the configuration has been completed then the database can be created/updated, the code-generation performed, and the corresponding reference data loaded into the corresponding tables.
 
-At the command line execute the following command to perform.
+At the command line execute the following command to perform. The log output will decribe all actions that were performed.
 
 ```
 dotnet run all
 ```
 
+If at any stage the database becomes corrupted or you need to rebuild, execute the following to drop and start again.
+
+```
+dotnet run drop
+```
+
+<br/>
+
+## Indexes, etc.
+
+Where tables need indexes and other constraints added these would be created using additional migration scripts. None have been included in the sample for brevity.
+
+<br/>
+
 ## Conclusion
 
-At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter. 
+At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter (TVP). 

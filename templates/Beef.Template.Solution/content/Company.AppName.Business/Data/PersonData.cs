@@ -46,11 +46,11 @@ namespace Company.AppName.Business.Data
         }
 #endif
 #if (implement_cosmos)
-        private IQueryable<Person> GetByArgsOnQuery(IQueryable<Person> q, PersonArgs? args, ICosmosDbArgs dbArgs)
+        private IQueryable<Model.Person> GetByArgsOnQuery(IQueryable<Model.Person> q, PersonArgs? args, ICosmosDbArgs dbArgs)
         {
             q = q.WhereWildcard(x => x.FirstName, args?.FirstName);
             q = q.WhereWildcard(x => x.LastName, args?.LastName);
-            q = q.WhereWith(args?.Genders, x => args!.Genders!.ToCodeList().Contains(x.GenderSid));
+            q = q.WhereWith(args?.Genders, x => args!.Genders!.ToCodeList().Contains(x.Gender));
             return q.OrderBy(x => x.LastName);
         }
 #endif

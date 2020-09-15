@@ -280,6 +280,26 @@ namespace My.Hr.Test
                 .Run(a => a.GetAsync(v.Id));
         }
 
+        [Test, TestSetUp]
+        public void C120_Create_Duplicate()
+        {
+            var v = new Employee
+            {
+                Email = "w.jones@org.com",
+                FirstName = "Wendy",
+                LastName = "Jones",
+                GenderSid = "F",
+                Birthday = new DateTime(1985, 03, 18),
+                StartDate = new DateTime(2000, 12, 11),
+                PhoneNo = "(425) 612 8113"
+            };
+
+            // Create value.
+            AgentTester.Test<EmployeeAgent, Employee>()
+                .ExpectStatusCode(HttpStatusCode.Conflict)
+                .Run(a => a.CreateAsync(v));
+        }
+
         #endregion
 
         #region Update

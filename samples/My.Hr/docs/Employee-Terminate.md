@@ -1,12 +1,12 @@
 ﻿# Step 5 - Employee Terminate
 
-This will walk through the process of creating and testing the employee terminate capability.
+This will walk through the process of creating and testing the employee termination capability.
 
 <br/>
 
 ## Functional requirement
 
-The employee terminate will only terminate an existing employee:
+The employee termination will only terminate an existing employee under certain conditions.
 - An employee can not be terminated more than once.
 - An employee can not be termintaed on a date prior to their start date.
 
@@ -24,8 +24,8 @@ The `Termination` operation needs to be added to the `Employee` entity configura
 
 ``` xml
     <!-- Terminate operation
-         - Text is specified to override the default for an Update.
          - OperationType is Update as it follows a similar pattern. 
+         - Text is specified to override the default for an Update.
          - ValueType is overridden with the TerminationDetail to use this instead of the default Employee. 
          - Validator is overridden to use the TerminationDetailValidator. 
          - WebApiMethod is overriden to use HttpPost (an Update otherwise defaults to an HttpPut).
@@ -37,16 +37,21 @@ The `Termination` operation needs to be added to the `Employee` entity configura
     </Operation>
 ```
 
-Execute the code-generation using the command line `dotnet run entity`.
+Execute the code-generation using the command line.
+
+```
+dotnet run entity
+```
+
 </br>
 
 ## Data access logic
 
 The existing `EmployeeData.cs` logic will need to be extended to support the new `Terminate`. 
 
-This is an instance where there is some validation logic that has been added to this data component versus in the related validator. The primary reason for this is efficiency, as we need to do a Get to then Update, so to minimize chattiness and keep this logic together it is all implemented here.
+This is an instance where there is some validation logic that has been added to this data component versus in the related validator. The primary reason for this is efficiency, as we need to do a `Get` to then `Update`, so to minimize chattiness and keep this logic together it is all implemented here.
 
-Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. Note that we are reusing the Get and the Update we implemented previously.
+Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. _Note_ that we are reusing the `Get` and the `Update` we implemented previously.
 
 ``` csharp
         /// <summary>
@@ -74,7 +79,7 @@ Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/D
 
 ## Validation
 
-Although, some of the validate was added into the data access logic, the property-level validation should still occur as usual. Best to ensure the integrity of the data prior to making more expensive data access calls.
+Although, some of the validation was added into the data access logic, the property-level validation should still occur as usual within a validator. It is considered best practice to ensure the integrity of the data prior to making more expensive data access calls where possible; i.e. fail-fast.
 
 Within the `My.Hr.Business/Validation` folder create `TerminationDetailValidator.cs` and implement as follows.
 
@@ -111,4 +116,4 @@ For the purposes of this sample un-comment the region `Terminate`. Execute the t
 
 ## Conclusion
 
-At this stage we now have added and tested the Employee Termination and Search, in addition to the Employee CRUD APIs. Next we will implement the Employee review endpoints.
+At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. Next we will implement the employee review endpoints.

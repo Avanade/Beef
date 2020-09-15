@@ -7,31 +7,34 @@ This will walk through the process of creating and testing the employee search c
 ## Functional requirement
 
 The employee search will allow the following criteria to be searched:
-- First and last name using wildcard; e.g. Smi*
-- Gender selection; one or more
-- Start date range
-- Option to include terminated employees (default is to exclude)
+- First and last name using wildcard; e.g. `Smi*`.
+- Gender selection; one or more.
+- Start date range (from/to).
+- Option to include terminated employees (default is to exclude).
 
 The search should also support paging. The results should be returned in last name, first name and start date order.
 
-Examples of the endpoint are as follows (or any combination thereof):
-- `GET /employees?lastName=smi*` - all employees whos last name starts with `smi`.
-- `GET /employees?gender=f` - all female employees.
-- `GET /employees?startFrom=2000-01-01&startTo=2002-12-31` - all employess who started between 01-Jan-2000 and 31-Dec-2002 (inclusive).
-- `GET /employess?lastName=smi*&includeTerminated=true` - all employees whos last name starts with `smi`, both current and terminated.
-- `GET /employees?gender=f&$skip=10&$take25` - all female employees with paging (skipping the first 10 employees and getting the next 25 in sequence).
+Examples of the endpoint are as follows (or any combination thereof).
+
+Endpoint | Description
+- | -
+`GET /employees?lastName=smi*` | all employees whose last name starts with `smi`.
+`GET /employees?gender=f` | all female employees.
+`GET /employees?startFrom=2000-01-01&startTo=2002-12-31` | all employess who started between 01-Jan-2000 and 31-Dec-2002 (inclusive).
+`GET /employess?lastName=smi*&includeTerminated=true` | all employees whose last name starts with `smi`, both current and terminated.
+`GET /employees?gender=f&$skip=10&$take25` | all female employees with paging (skipping the first 10 employees and getting the next 25 in sequence).
 
 <br/>
 
 ## Data repository
 
-During the initial database set up process the Employee table (with a subset of columns) was enabled via code-generation leveraging an Entity Framework model class. This will be used to perform the query operations so that we can leverage LINQ-style query filtering and sorting.
+During the initial database set up process the `Employee` table (with a subset of columns) was enabled via code-generation leveraging an Entity Framework model class. This will be used to perform the query operations so that we can leverage .NET's LINQ-style query filtering and sorting.
 
 <br/>
 
 ## Selection criteria
 
-The selection criteria will be enabled by defining a class with all of the requisite properties. _Beef_ will then expose each of the properties individually within the API Controller to enable their usage. _Beef_ can automatically enable paging support when selected to do so; therefore, this does not need to be enabled via the selection criteria directly.
+The API selection criteria will be enabled by defining a class with all of the requisite properties. _Beef_ will then expose each of the properties individually within the API Controller to enable their usage. _Beef_ can automatically enable paging support when selected to do so; therefore, this does not need to be enabled via the selection criteria directly.
 
 Add the following entity code-gen configuration after all the other existing entities within `My.Hr.xml` (`My.Hr.CodeGen` project).
 
@@ -65,7 +68,7 @@ The `GetByArgs` operation needs to be added to the `Employee` entity configurati
     </Operation>
 ```
 
-So that the code-gen know what Entity Framework model is to be used this needs to be appended to the existing `Employee` element configuration. Replace the previous XML with the following.
+So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` element configuration. Replace the previous XML with the following.
 
 ``` xml
        - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
@@ -73,7 +76,11 @@ So that the code-gen know what Entity Framework model is to be used this needs t
 
 ```
 
-Execute the code-generation using the command line `dotnet run entity`.
+Execute the code-generation using the command line.
+
+```
+dotnet run entity
+```
 
 </br>
 
@@ -81,11 +88,11 @@ Execute the code-generation using the command line `dotnet run entity`.
 
 The existing `EmployeeData.cs` logic will need to be extended to support the new `GetByArgs`. 
 
-For query operations generally we do not implement using the custom `OnImplementation` approach, as the primary code apart from the application of the search criteria can be generated. As such, in this case _Beef_ will have generated an extension named `_getByArgsOnQuery` to enable. This extension will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
+For query operations generally we do not implement using the custom `OnImplementation` approach, as the primary code apart from the application of the search criteria can be generated. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
 
-Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension method(s) (`_getByArgsOnQuery`).
+Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
 
-Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. The `_ef.With` methods are enabled by _Beef_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards.
+Add the following code to the non-generated `EmployeeData.cs` (`My.Hr.Business/Data`) that was created earlier. The `With` methods are enabled by _Beef_ to simplify the code logic to apply the filter only where the value is not `null`, plus specifically handle the likes of wildcards.
 
 ``` csharp
         partial void EmployeeDataCtor()
@@ -142,10 +149,10 @@ namespace My.Hr.Business.Validation
 
 ## End-to-End testing
 
-For the purposes of this sample un-comment the region `Terminate`. Execute the tests and ensure they all pass as expected.
+For the purposes of this sample un-comment the region `GetByArgs`. Execute the tests and ensure they all pass as expected.
 
 <br/>
 
 ## Conclusion
 
-At this stage we now have added and tested the Employee Search, in addition to the Employee CRUD APIs. Next we will implement the Employee termination endpoint.
+At this stage we now have added and tested the employee search, in addition to the employee CRUD APIs. Next we will implement the employee termination endpoint.

@@ -382,11 +382,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? EntityFrameworkName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding Entity Framework entity model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
+        /// Gets or sets the corresponding Entity Framework model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
         /// </summary>
-        [JsonProperty("entityFrameworkEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The corresponding Entity Framework entity model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
-        public string? EntityFrameworkEntity { get; set; }
+        [JsonProperty("entityFrameworkModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("EntityFramework", Title = "The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
+        public string? EntityFrameworkModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Entity Framework <c>Mapper</c> inherits from.
@@ -417,11 +417,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? CosmosName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding Cosmos entity model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
+        /// Gets or sets the corresponding Cosmos model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
         /// </summary>
-        [JsonProperty("cosmosEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "The corresponding Cosmos entity model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true)]
-        public string? CosmosEntity { get; set; }
+        [JsonProperty("cosmosModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Cosmos", Title = "The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true)]
+        public string? CosmosModel { get; set; }
 
         /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
@@ -473,11 +473,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? ODataName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding OData entity model name required where <see cref="AutoImplement"/> is <c>OData</c>.
+        /// Gets or sets the corresponding OData model name required where <see cref="AutoImplement"/> is <c>OData</c>.
         /// </summary>
-        [JsonProperty("odataEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The corresponding OData entity model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
-        public string? ODataEntity { get; set; }
+        [JsonProperty("odataModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("OData", Title = "The corresponding OData model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
+        public string? ODataModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the underlying OData collection name where <see cref="AutoImplement"/> is <c>OData</c>.
@@ -924,17 +924,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether auto-implementing 'EntityFramework'.
         /// </summary>
-        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkEntity != null || Operations.Any(x => x.AutoImplement == "EntityFramework");
+        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkModel != null || Operations.Any(x => x.AutoImplement == "EntityFramework");
 
         /// <summary>
         /// Indicates whether auto-implementing 'Cosmos'.
         /// </summary>
-        public bool UsesCosmos => AutoImplement == "Cosmos" || Operations.Any(x => x.AutoImplement == "Cosmos");
+        public bool UsesCosmos => AutoImplement == "Cosmos" || CosmosModel != null || Operations.Any(x => x.AutoImplement == "Cosmos");
 
         /// <summary>
         /// Indicates whether auto-implementing 'OData'.
         /// </summary>
-        public bool UsesOData => AutoImplement == "OData" || Operations.Any(x => x.AutoImplement == "OData");
+        public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
 
         /// <summary>
         /// Indicates whether the data extensions section is required.

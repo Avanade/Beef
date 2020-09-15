@@ -18,6 +18,9 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter"),
 
             (ConfigurationEntity.Entity, "AutoInferImplements", "implementsAutoInfer"),
+            (ConfigurationEntity.Entity, "EntityFrameworkEntity", "entityFrameworkModel"),
+            (ConfigurationEntity.Entity, "CosmosEntity", "cosmosModel"),
+            (ConfigurationEntity.Entity, "ODataEntity", "odataModel"),
             (ConfigurationEntity.Entity, "DataDatabaseMapperInheritsFrom", "databaseMapperInheritsFrom"),
             (ConfigurationEntity.Entity, "DataDatabaseCustomMapper", "databaseCustomMapper"),
             (ConfigurationEntity.Entity, "DataEntityFrameworkMapperInheritsFrom", "entityFrameworkMapperInheritsFrom"),

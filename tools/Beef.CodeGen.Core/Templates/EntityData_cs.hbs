@@ -87,17 +87,17 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
         private Action<DatabaseParameters, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}>? {{PrivateName}}OnQuery;
         {{/ifeq}}
         {{#ifeq AutoImplement 'EntityFramework'}}
-        private Func<IQueryable<{{Parent.EntityFrameworkEntity}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.EntityFrameworkEntity}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{Parent.EntityFrameworkModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.EntityFrameworkModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}}   
         {{#ifeq AutoImplement 'Cosmos'}}
           {{#ifval Parent.CosmosValueContainer}}
-        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosEntity}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<CosmosDbValue{{Parent.CosmosEntity}}>>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<CosmosDbValue<{{Parent.CosmosModel}}>>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<CosmosDbValue{{Parent.CosmosModel}}>>>? {{PrivateName}}OnQuery;
           {{else}}
-        private Func<IQueryable<{{Parent.CosmosEntity}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.CosmosEntity}}>>? {{PrivateName}}OnQuery;
+        private Func<IQueryable<{{Parent.CosmosModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, IQueryable<{{Parent.CosmosModel}}>>? {{PrivateName}}OnQuery;
           {{/ifval}}
         {{/ifeq}}  
         {{#ifeq AutoImplement 'OData'}}
-        private Func<Soc.IBoundClient<{{Parent.ODataEntity}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, Soc.IBoundClient<{{Parent.ODataEntity}}>>? {{PrivateName}}OnQuery;
+        private Func<Soc.IBoundClient<{{Parent.ODataModel}}>, {{#each CoreDataParameters}}{{{ParameterType}}}, {{/each}}{{DataArgs.Type}}, Soc.IBoundClient<{{Parent.ODataModel}}>>? {{PrivateName}}OnQuery;
         {{/ifeq}} 
       {{/ifeq}}
       {{#if Parent.DataExtensions}}
@@ -249,10 +249,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
   {{#unless EntityFrameworkCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments EntityFrameworkEntity}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Entity Framework {{{seecomments EntityFrameworkModel}}} property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
-        public partial class EfMapper : EfDbMapper<{{EntityName}}, {{EntityFrameworkEntity}}, EfMapper>
+        public partial class EfMapper : EfDbMapper<{{EntityName}}, {{EntityFrameworkModel}}, EfMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="EfMapper"/> class.
@@ -279,10 +279,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
   {{#unless CosmosCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and Cosmos {{{seecomments EntityFrameworkEntity}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and Cosmos {{{seecomments EntityFrameworkModel}}} property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
-        public partial class CosmosMapper : CosmosDbMapper<{{EntityName}}, {{CosmosEntity}}, CosmosMapper>
+        public partial class CosmosMapper : CosmosDbMapper<{{EntityName}}, {{CosmosModel}}, CosmosMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="CosmosMapper"/> class.
@@ -309,10 +309,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
   {{#unless ODataCustomMapper}}
 
         /// <summary>
-        /// Provides the {{{EntityNameSeeComments}}} and OData {{{seecomments EntityFrameworkEntity}}} property mapping.
+        /// Provides the {{{EntityNameSeeComments}}} and OData {{{seecomments EntityFrameworkModel}}} property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
-        public partial class ODataMapper : ODataMapper<{{EntityName}}, {{ODataEntity}}, ODataMapper>
+        public partial class ODataMapper : ODataMapper<{{EntityName}}, {{ODataModel}}, ODataMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ODataMapper"/> class.

@@ -1,6 +1,6 @@
 ﻿# Step 3 - Employee Test
 
-This will walk through the process of creating the required end-to-end intra-domain integration tests to validate the `Employee` CRUD APIs.
+This will walk through the process of creating the required end-to-end intra-domain integration tests to validate the employee CRUD APIs.
 
 The [`Beef.Test.NUnit`](../../../tools/Beef.Test.NUnit/README.md) provides the integration testing capabilities that will be leveraged. The underlying documentation describes these capabilities and the approach in greater detail.
 
@@ -8,7 +8,7 @@ The [`Beef.Test.NUnit`](../../../tools/Beef.Test.NUnit/README.md) provides the i
 
 ## Project structure
 
-The overall `My.Hr.Test` solution was created with the following; the `PersonText.cs` should be removed.
+The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs` should be removed (deleted).
 
 ```
 └── Data
@@ -21,9 +21,9 @@ The overall `My.Hr.Test` solution was created with the following; the `PersonTex
 
 ## Data population
 
-For the end-to-end testing to function data must first be populated into the database; noting that the Reference Data we created earlier will be included automatically. Foundationally, the `My.Hr.Database` is leveraged to create and set up the database, as well as populate it with data.
+For the end-to-end testing to function data must first be populated into the database; noting that the Reference Data configured and created earlier will be included automatically. Foundationally, the `My.Hr.Database` is leveraged to create and set up the database, as well as populate it with data.
 
-For the purposes of testing the APIs implemented so far a set of Employees and related data is required. The YAML defines the schema, table(s) and colums(s) with the required data values. Copy the following into the `Data.yaml`.
+For the purposes of testing the APIs implemented so far, a set of employees and related data is required. The YAML defines the schema, table(s) and colums(s) with the required column data values. Replace the existing `Data.yaml` with the following.
 
 ``` yaml
 Hr:
@@ -42,7 +42,7 @@ Hr:
 
 ## Employee test
 
-For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs). Comment out the region `GetByArgs` and `Termination` as the capabilities has not been implemented yet.
+For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs). Comment out the region `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
 
 Execute the tests and ensure they all pass as expected.
 

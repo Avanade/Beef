@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.2
+- *Enhancement:* Latest `Beef.Core` and `Beef.CodeGen.Core` references needed.
+
 ## v4.1.1
 - *Enhancement:* Introduction of Dependency Injection support.
 

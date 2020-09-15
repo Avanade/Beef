@@ -10,7 +10,7 @@ _Note:_ Any time that command line execution is requested, this should be perfor
 
 ## Clean up existing
 
-The following files created when the solution was created should be removed:
+The following files were created when the solution was provisioned, these should be removed (deleted):
 - `My.Hr.Business/Data/Person.cs`
 - `My.Hr.Business/Validation/PersonArgsValidator.cs`
 - `My.Hr.Business/Validation/PersonValidator.cs`
@@ -21,9 +21,9 @@ The following files created when the solution was created should be removed:
 
 The `My.RefData.xml` within `My.Hr.CodeGen` provides the code-gen configuration for the [Reference Data](../../../docs/Reference-Data.md). For the purposes of this sample, this configuration is relatively straighforward.
 
-Each Reference Data entity is defined, by specifying the name, the Web API route prefix (i.e. its endpoint), that it is to be automatically implemented using Entity Framework, and the name of the corresponding Entity Framework model (which was preivousl generated from the database).
+Each reference data entity is defined, by specifying the name, the Web API route prefix (i.e. its endpoint), that it is to be automatically implemented using Entity Framework, and the name of the corresponding Entity Framework model (which was previously generated from the database; see `My.Hr.Business/Data/EfModel/Generated` folder).
 
-Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the following.
+Replace the existing `Entity` XML (keeping the `CodeGeneration` element) with the following.
 
 ```
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Gender" />
@@ -36,7 +36,7 @@ Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the follow
 
 ## Reference Data code-gen
 
-Once the Reference Data has been configured the code-generation can be performed. Use the following command line to generate. This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the Reference Data. 
+Once the reference data has been configured the code-generation can be performed. Use the following command line to generate. This will generate all of the required layers, from the API controller, through to the database access using Entity Framework. This is all that is required to operationalize the reference data. 
 
 ```
 dotnet run refdata
@@ -58,8 +58,8 @@ To implement the core `Employee` CRUD operations, the following will need to be 
 
 First up, the entities need to be defined (configured) within the `My.Hr.xml` (`My.Hr.CodeGen` project). The entities that will be created are as follows. Note that we will add some shape (e.g. address) to the data so it is easier (and more logical) to consume and understand, versus mapping directly to the database structure. 
 
-- `EmployeeBase` - this represents the base Employee in that it contains the key properties and will be used as the base for searching as a means to minimise the properties that are available outside of the basic CRUD.
-- `Employee` - this represents the complete detailed Employee, which inherits from the `EmployeeBase`. All of the key operations for the Employee including the search will all be configured/grouped as a logical set here.
+- `EmployeeBase` - this represents the base Employee in that it contains the key properties and will be used as the base for searching as a means to minimise the properties that are available outside of the `Employee` CRUD itself.
+- `Employee` - this represents the complete detailed Employee, which inherits from the `EmployeeBase`. All of the key operations for the Employee including the search will be configured/grouped as a logical set here.
 - `TerminationDetail` - this represents an employee's termination (being date and reason). By having as a sub-type this enable additional related data to be more easily added under the single `Employee.Termination` property.
 - `Address` - this represents the employees' address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
 - `EmergencyContact` - this represents the collection of emergency contacts for an employee. 
@@ -148,7 +148,7 @@ Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the follow
 
 ### Code-gen execution
 
-Once the entities has been configured the code-generation can be performed. Use the following command line to generate. This will generate all of the required layers, from the API controller, through to the database access using Stored Procedure where applicable. This is all that is required to operationalize the Reference Data. 
+Once the entities has been configured the code-generation can be performed. Use the following command line to generate. This will generate all of the required layers, from the API controller, through to the database access using Stored Procedures where configured. 
 
 ```
 dotnet run entity
@@ -158,17 +158,20 @@ dotnet run entity
 
 ### Data access logic
 
-Within the entity code-gen configuration where auto-implmentation is not possible then the data access logic must be specified explicitly. _Beef_ will still generate the boilerplate/skeleton wrapping logic for the data access to ensure consistency, and will invoke an `OnImplementation` method to perform.
+Within the entity code-gen configuration where auto-implmentation is not possible then the data access logic must be specified explicitly. _Beef_ will still generate the boilerplate/skeleton wrapping logic for the data access to ensure consistency, and will invoke a corresponding `OnImplementation` method to perform (which the developer is required to implement).
 
 This logic must be implemented by the developer in a non-generated `partial` class. A new `EmployeeData.cs` must be created within `My.Hr.Business/Data`; do **not** change any files under the `Generated` folder as these will be overridden during the next code-gen execution.
 
 The following represents the initial implementation. 
 
 ``` csharp
+using Beef;
+using Beef.Data.Database;
+using Microsoft.EntityFrameworkCore;
 using My.Hr.Common.Entities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Beef.Data.Database;
 
 namespace My.Hr.Business.Data
 {
@@ -231,7 +234,7 @@ namespace My.Hr.Business.Data
 
 ### Validation
 
-The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](../../../docs/Beef-Validation.md) to simpplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is the custodian of the data integrity.
+The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](../../../docs/Beef-Validation.md) to simpplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity.
 
 To encourage reuse, _Beef_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `My.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
@@ -271,7 +274,7 @@ namespace My.Hr.Business.Validation
 }
 ```
 
-The entity code-gen configuration referenced a `EmployeeValidator` that needs to be implemented. Within the `My.Hr.Business/Validation` folder create `EmployeeValidator.cs` and implement as follows.
+The entity code-gen configuration references a `EmployeeValidator` that needs to be implemented. Within the `My.Hr.Business/Validation` folder create `EmployeeValidator.cs` and implement as follows.
 
 ``` chsarp
 using Beef;
@@ -355,4 +358,4 @@ namespace My.Hr.Business.Validation
 
 ## Conclusion
 
-At this stage we now have a compiling and working API including database access logic for the Reference Data and key Employee CRUD activities. Next we need to perform end-to-end testing to ensure it is functioning as expected.
+At this stage we now have a compiling and working API including database access logic for the reference data and key employee CRUD activities. Next we need to perform end-to-end testing to ensure it is functioning as expected.
