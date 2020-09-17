@@ -37,11 +37,11 @@ namespace My.Hr.Business.Validation
             Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.Gender).Mandatory().IsValid();
-            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.Now.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
-            Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01), "January 1, 1999");
+            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.UtcNow.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
+            Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
             Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
             Property(x => x.Address).Entity(_addressValidator);
-            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: new CollectionRuleItem<EmergencyContact>(_emergencyContactValidator).UniqueKeyDuplicateCheck());
+            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: new CollectionRuleItem<EmergencyContact>(_emergencyContactValidator));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace My.Hr.Business.Validation
                     break;
 
                 case OperationType.Update:
-                    var dataSvc = (IEmployeeDataSvc)ExecutionContext.Current.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
+                    var dataSvc = (IEmployeeDataSvc)context.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
                     var existing = dataSvc.GetAsync(context.Value.Id).GetAwaiter().GetResult();
                     if (existing == null)
                         throw new NotFoundException();

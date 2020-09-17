@@ -21,7 +21,8 @@ namespace My.Hr.Business
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedManagerServices(this IServiceCollection services)
         {
-            return services.AddScoped<IEmployeeManager, EmployeeManager>();
+            return services.AddScoped<IEmployeeManager, EmployeeManager>()
+                           .AddScoped<IPerformanceReviewManager, PerformanceReviewManager>();
         }
     }
 }

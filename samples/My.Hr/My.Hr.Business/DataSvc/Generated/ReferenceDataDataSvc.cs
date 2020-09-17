@@ -39,6 +39,7 @@ namespace My.Hr.Business.DataSvc
             _cacheDict.Add(typeof(RefDataNamespace.TerminationReason), new ReferenceDataCache<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.TerminationReasonGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.RelationshipType), new ReferenceDataCache<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.RelationshipTypeGetAllAsync()))));
             _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.USStateGetAllAsync()))));
+            _cacheDict.Add(typeof(RefDataNamespace.PerformanceOutcome), new ReferenceDataCache<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(() => DataSvcInvoker.Current.InvokeAsync(typeof(ReferenceDataDataSvc), () => GetDataAsync(data => data.PerformanceOutcomeGetAllAsync()))));
             ReferenceDataDataSvcCtor();
         }
 

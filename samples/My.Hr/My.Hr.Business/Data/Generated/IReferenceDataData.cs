@@ -42,6 +42,12 @@ namespace My.Hr.Business.Data
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
         Task<RefDataNamespace.USStateCollection> USStateGetAllAsync();
+
+        /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.PerformanceOutcome"/> items.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
+        Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync();
     }
 }
 

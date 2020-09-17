@@ -16,6 +16,7 @@ BEGIN
 
     -- Execute additional statements.
     DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId
+    DELETE FROM [Hr].[PerformanceReview] WHERE [EmployeeId] = @EmployeeId
 
     -- Commit the transaction.
     COMMIT TRANSACTION

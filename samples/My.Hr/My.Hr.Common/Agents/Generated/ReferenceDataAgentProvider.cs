@@ -56,6 +56,10 @@ namespace My.Hr.Common.Agents
             _typeDict.Add(typeof(RefDataNamespace.USState), nameof(USState));
             _cacheDict.Add(typeof(RefDataNamespace.USState), new ReferenceDataCache<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(() => _agent.USStateGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
+            _nameDict.Add(nameof(PerformanceOutcome), typeof(RefDataNamespace.PerformanceOutcome));
+            _typeDict.Add(typeof(RefDataNamespace.PerformanceOutcome), nameof(PerformanceOutcome));
+            _cacheDict.Add(typeof(RefDataNamespace.PerformanceOutcome), new ReferenceDataCache<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(() => _agent.PerformanceOutcomeGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
+
             ReferenceDataAgentProviderCtor();
         }
 
@@ -88,6 +92,12 @@ namespace My.Hr.Common.Agents
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
         public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
+
+        /// <summary>
+        /// Gets the <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
+        public override RefDataNamespace.PerformanceOutcomeCollection PerformanceOutcome => (RefDataNamespace.PerformanceOutcomeCollection)this[typeof(RefDataNamespace.PerformanceOutcome)];
 
         #endregion
 
@@ -148,6 +158,7 @@ namespace My.Hr.Common.Agents
                         case nameof(TerminationReason): GetCache(_nameDict[nameof(TerminationReason)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.TerminationReason[]>(items!)); break;
                         case nameof(RelationshipType): GetCache(_nameDict[nameof(RelationshipType)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.RelationshipType[]>(items!)); break;
                         case nameof(USState): GetCache(_nameDict[nameof(USState)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.USState[]>(items!)); break;
+                        case nameof(PerformanceOutcome): GetCache(_nameDict[nameof(PerformanceOutcome)]).SetCollection(JsonConvert.DeserializeObject<RefDataNamespace.PerformanceOutcome[]>(items!)); break;
                     }
                  }
             }

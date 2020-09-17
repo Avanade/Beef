@@ -143,6 +143,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2429F084-A
 		samples\My.Hr\docs\Employee-Search.md = samples\My.Hr\docs\Employee-Search.md
 		samples\My.Hr\docs\Employee-Terminate.md = samples\My.Hr\docs\Employee-Terminate.md
 		samples\My.Hr\docs\Employee-Test.md = samples\My.Hr\docs\Employee-Test.md
+		samples\My.Hr\docs\Performance-Review.md = samples\My.Hr\docs\Performance-Review.md
 	EndProjectSection
 EndProject
 Global

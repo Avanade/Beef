@@ -79,6 +79,17 @@ namespace My.Hr.Business.Data
         }
 
         /// <summary>
+        /// Gets all the <see cref="RefDataNamespace.PerformanceOutcome"/> items.
+        /// </summary>
+        /// <returns>The <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.</returns>
+        public async Task<RefDataNamespace.PerformanceOutcomeCollection> PerformanceOutcomeGetAllAsync()
+        {
+            var __coll = new RefDataNamespace.PerformanceOutcomeCollection();
+            await DataInvoker.Current.InvokeAsync(this, async () => { _ef.Query(PerformanceOutcomeMapper.CreateArgs()).SelectQuery(__coll); await Task.CompletedTask.ConfigureAwait(false); }, BusinessInvokerArgs.TransactionSuppress).ConfigureAwait(false);
+            return __coll;
+        }
+
+        /// <summary>
         /// Provides the <see cref="RefDataNamespace.Gender"/> and Entity Framework <see cref="EfModel.Gender"/> property mapping.
         /// </summary>
         public static EfDbMapper<RefDataNamespace.Gender, EfModel.Gender> GenderMapper => EfDbMapper.CreateAuto<RefDataNamespace.Gender, EfModel.Gender>()
@@ -104,6 +115,13 @@ namespace My.Hr.Business.Data
         /// </summary>
         public static EfDbMapper<RefDataNamespace.USState, EfModel.USState> USStateMapper => EfDbMapper.CreateAuto<RefDataNamespace.USState, EfModel.USState>()
             .HasProperty(s => s.Id, d => d.USStateId)
+            .AddStandardProperties();
+
+        /// <summary>
+        /// Provides the <see cref="RefDataNamespace.PerformanceOutcome"/> and Entity Framework <see cref="EfModel.PerformanceOutcome"/> property mapping.
+        /// </summary>
+        public static EfDbMapper<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome> PerformanceOutcomeMapper => EfDbMapper.CreateAuto<RefDataNamespace.PerformanceOutcome, EfModel.PerformanceOutcome>()
+            .HasProperty(s => s.Id, d => d.PerformanceOutcomeId)
             .AddStandardProperties();
     }
 }

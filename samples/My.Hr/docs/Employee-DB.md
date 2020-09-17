@@ -24,7 +24,7 @@ Within the `Migrations` folder there will four entries that were created during 
 
 ## Create Employee table
 
-First step is to create the `Employee` table migration script itself, following a similar naming convention to ensure it is executed (applied) in the correct order. This will create the migration script using a pre-defined nameing convention and templated T-SQL to aid development.
+First step is to create the `Employee` table migration script itself, following a similar naming convention to ensure it is executed (applied) in the correct order. This will create the migration script using a pre-defined naming convention and templated T-SQL to aid development.
 
 ```
 dotnet run scriptnew -create Hr.Employee
@@ -183,9 +183,9 @@ Copy the following configuration and append to the `My.Hr.Database.xml`; see com
 
 ## Entity Framework query
 
-To support a flexible query approach for the `Employee` Entity Franework will be used. To further optimize only the key data will be surfaced via the generated .NET (C#) data model.
+To support a flexible query approach for the `Employee` Entity Framework (EF) will be used. To further optimize only the key data will be surfaced via the generated .NET (C#) data model. Append the following to the end of `My.Hr.Database.xml`.
 
-``` XML
+``` xml
   <!-- References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only. -->
   <Table Name="Employee" Schema="Hr" EfModel="true" IncludeColumns="EmployeeId, Email, FirstName, LastName, GenderCode, Birthday, StartDate, TerminationDate, TerminationReasonCode, PhoneNo" />
 ```
@@ -196,7 +196,7 @@ To support a flexible query approach for the `Employee` Entity Franework will be
 
 Once the configuration has been completed then the database can be created/updated, the code-generation performed, and the corresponding reference data loaded into the corresponding tables.
 
-At the command line execute the following command to perform. The log output will decribe all actions that were performed.
+At the command line execute the following command to perform. The log output will describe all actions that were performed.
 
 ```
 dotnet run all

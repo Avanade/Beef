@@ -66,3 +66,7 @@
     - WV: West Virginia
     - WI: Wisconsin
     - WY: Wyoming
+  - $PerformanceOutcome:
+    - DN: Does not meet expectations
+    - ME: Meets expectations
+    - EE: Exceeds expectations

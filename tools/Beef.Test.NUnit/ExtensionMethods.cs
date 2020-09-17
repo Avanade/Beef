@@ -24,10 +24,7 @@ namespace Beef.Test.NUnit
         /// <param name="value">The <see cref="int"/> value.</param>
         /// <returns>The corresponding <see cref="Guid"/>.</returns>
         /// <remarks>Sets the first argument with the <paramref name="value"/> and the remainder with zeroes using <see cref="Guid(int, short, short, byte[])"/>.</remarks>
-        public static Guid ToGuid(this int value)
-        {
-            return new Guid(value, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        }
+        public static Guid ToGuid(this int value) => new Guid(value, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         /// <summary>
         /// Creates a long string by repeating the character for the specified count (defaults to 250).
@@ -35,10 +32,7 @@ namespace Beef.Test.NUnit
         /// <param name="value">The character value.</param>
         /// <param name="count">The repeating count.</param>
         /// <returns>The resulting string.</returns>
-        public static string ToLongString(this char value, int count = 250)
-        {
-            return new string(value, count);
-        }
+        public static string ToLongString(this char value, int count = 250) => new string(value, count);
 
         /// <summary>
         /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="WebApiAgentResult{TEntity}"/> with no result.
@@ -48,10 +42,8 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock object.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <returns>The <see cref="WebApiAgentResult{TEntity}"/> with no result.</returns>
-        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, HttpStatusCode statusCode = HttpStatusCode.NoContent) where TMock : class
-        {
-            return mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage() { StatusCode = statusCode }));
-        }
+        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, HttpStatusCode statusCode = HttpStatusCode.NoContent) where TMock : class =>
+            mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage() { StatusCode = statusCode }));
 
         /// <summary>
         /// Extends <paramref name="mock"/> to simplify the return of a mocked <see cref="WebApiAgentResult{TEntity}"/> with an entity result.
@@ -62,10 +54,8 @@ namespace Beef.Test.NUnit
         /// <param name="entity">The entity value.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
         /// <returns>The <see cref="WebApiAgentResult{TEntity}"/> with an entity result.</returns>
-        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, TEntity entity, HttpStatusCode statusCode = HttpStatusCode.OK) where TMock : class
-        {
-            return mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage(statusCode), entity));
-        }
+        public static IReturnsResult<TMock> ReturnsWebApiAgentResultAsync<TMock, TEntity>(this IReturns<TMock, Task<WebApiAgentResult<TEntity>>> mock, TEntity entity, HttpStatusCode statusCode = HttpStatusCode.OK) where TMock : class =>
+            mock.ReturnsAsync(() => new WebApiAgentResult<TEntity>(new HttpResponseMessage(statusCode), entity));
 
         /// <summary>
         /// Removes all items from the <see cref="IServiceCollection"/> for the specified <typeparamref name="TService"/>.
@@ -80,6 +70,51 @@ namespace Beef.Test.NUnit
 
             var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(TService));
             return descriptor != null && services.Remove(descriptor);
+        }
+
+        /// <summary>
+        /// Replaces (where existing), or adds, a singleton service <paramref name="instance"/>. 
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="instance">The instance value.</param>
+        public static void ReplaceSingleton<TService>(this IServiceCollection services, TService instance) where TService : class
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.Remove<TService>();
+            services.AddSingleton<TService>(instance);
+        }
+
+        /// <summary>
+        /// Replaces (where existing), or adds, a scoped service <paramref name="instance"/>. 
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="instance">The instance value.</param>
+        public static void ReplaceScoped<TService>(this IServiceCollection services, TService instance) where TService : class
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.Remove<TService>();
+            services.AddScoped<TService>(_ => instance);
+        }
+
+        /// <summary>
+        /// Replaces (where existing), or adds, a transient service <paramref name="instance"/>. 
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <param name="instance">The instance value.</param>
+        public static void ReplaceTransient<TService>(this IServiceCollection services, TService instance) where TService : class
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.Remove<TService>();
+            services.AddTransient<TService>(_ => instance);
         }
     }
 }

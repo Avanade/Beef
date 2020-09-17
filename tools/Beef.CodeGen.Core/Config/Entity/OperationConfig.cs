@@ -69,9 +69,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether a PagingArgs argument is to be added to the operation to enable paging related logic.
         /// </summary>
-        [JsonProperty("pagingArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("paging", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "Indicates whether a `PagingArgs` argument is to be added to the operation to enable (standardized) paging related logic.", IsImportant = true)]
-        public bool? PagingArgs { get; set; }
+        public bool? Paging { get; set; }
 
         /// <summary>
         /// Gets or sets the .NET value parameter <see cref="System.Type"/> for the operation.
@@ -772,7 +772,7 @@ namespace Beef.CodeGen.Config.Entity
                 }
             }
 
-            if (Type == "GetColl" && CompareValue(PagingArgs, true))
+            if (Type == "GetColl" && CompareValue(Paging, true))
                 Parameters.Add(new ParameterConfig { Name = "Paging", Type = "PagingArgs", Text = "{{PagingArgs}}", IsPagingArgs = true });
 
             foreach (var parameter in Parameters)

@@ -8,13 +8,15 @@ The [`Beef.Test.NUnit`](../../../tools/Beef.Test.NUnit/README.md) provides the i
 
 ## Project structure
 
-The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs` should be removed (deleted).
+The overall `My.Hr.Test` solution was created with the following; the existing `PersonTest.cs` and `PersonValidatorTest.cs` should be removed (deleted).
 
 ```
 └── Data
-  └── Data.yaml        <- leave; will replace contents
-└── PersonTest.cs      <- remove
-└── FixtureSetup.cs    <- leave; contains key logic to set up database
+  └── Data.yaml                 <- leave; will replace contents
+└── FixtureSetup.cs             <- leave; contains key logic to set up database
+└── PersonTest.cs               <- remove
+└── Validators
+  └── PersonValidatorTest.cs    <- remove
 ```
 
 <br/>
@@ -44,11 +46,21 @@ Hr:
 
 For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs). Comment out the region `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
 
-Execute the tests and ensure they all pass as expected.
+Review and execute the tests and ensure they all pass as expected.
+
+</br>
+
+## Employee Validator test
+
+This is more of a pure unit test; in that all data repository access is mocked out. This allows these to execute faster without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
+
+For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../My.Hr.Test/Validators/EmployeeValidatorTest.cs)
+
+Review and execute the tests and ensure they all pass as expected.
 
 </br>
 
 ## Conclusion
 
-At this stage we now have a set of functioning and tested Employee CRUD APIs. Next we will implement the Employee search endpoint.
+At this stage we now have a set of functioning and tested performance review APIs. All the desired functionality is now complete. These are now essentially ready for deployment; obviously, before doing so security would be integrated into the solution.
 

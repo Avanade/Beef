@@ -23,7 +23,7 @@ This will represent an employee witin the organization, and house key data such 
 From an endpoint perspective it will support the following.
 
 Endpoint | Description
-- | -
+-|-
 `GET /employees/id` | Get employee by primary identifier.
 `POST /employees` | Create a new employee.
 `PUT /employees/id` | Update (replace) the existing employee (only where not terminated).
@@ -41,7 +41,7 @@ This will respresent a performance review (multiple over time), and house key da
 From an endpoint perspective it will support the following.
 
 Endpoint | Description
-- | -
+-|-
 `GET /reviews/id` | Get review by primary identifier.
 `POST /employees/id/reviews` | Create a review for a specified employee.
 `PUT /reviews/id` | Update (replace) the review.

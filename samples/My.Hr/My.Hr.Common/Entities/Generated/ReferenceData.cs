@@ -31,7 +31,8 @@ namespace My.Hr.Common.Entities
                 typeof(Gender),
                 typeof(TerminationReason),
                 typeof(RelationshipType),
-                typeof(USState)
+                typeof(USState),
+                typeof(PerformanceOutcome)
             };
 
         /// <summary>
@@ -76,6 +77,11 @@ namespace My.Hr.Common.Entities
         /// Gets the <see cref="RefDataNamespace.USStateCollection"/>.
         /// </summary>
         public abstract RefDataNamespace.USStateCollection USState { get; }
+
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.
+        /// </summary>
+        public abstract RefDataNamespace.PerformanceOutcomeCollection PerformanceOutcome { get; }
 
         #endregion
     }

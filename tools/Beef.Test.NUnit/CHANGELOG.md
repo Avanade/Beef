@@ -3,6 +3,8 @@
 Represents the **NuGet** versions.
 
 ## v4.1.2
+- *Enhancement:* Added `ValidationTester` to enable simpler unit-tests (with services mocking) of validators external to the API. Provides a simpler and more test run-time performant means to validate versus having to create all the required test data within the underlying data source. 
+- *Enhancement* Added `ReplaceSingleton`, `ReplaceScoped` and `ReplaceTransient` extension methods to `IServiceCollection` which will replace if existing; otherwise, add.
 - *Enhancement:* Moved all subscriber host arguments to `EventSubscriberHostArgs` to centralize and enable simple configuration via DI.
 
 ## v4.1.1

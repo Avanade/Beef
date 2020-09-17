@@ -87,7 +87,7 @@ message {{Parent.Name}}{{Name}}Request {
     {{#each PagingLessParameters}}
   {{GrpcType}} {{ArgumentName}} = {{add @index 1}};
     {{/each}}
-    {{#if PagingArgs}}
+    {{#if Paging}}
   PagingArgs Paging = 88;
     {{/if}}
 }

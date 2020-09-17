@@ -54,6 +54,11 @@ namespace My.Hr.Business
         /// </summary>
         public override RefDataNamespace.USStateCollection USState => (RefDataNamespace.USStateCollection)this[typeof(RefDataNamespace.USState)];
 
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.
+        /// </summary>
+        public override RefDataNamespace.PerformanceOutcomeCollection PerformanceOutcome => (RefDataNamespace.PerformanceOutcomeCollection)this[typeof(RefDataNamespace.PerformanceOutcome)];
+
         #endregion
 
         /// <summary>
@@ -84,6 +89,7 @@ namespace My.Hr.Business
                         case var n when string.Compare(n, nameof(RefDataNamespace.TerminationReason), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.TerminationReason)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.RelationshipType), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.RelationshipType)); break;
                         case var n when string.Compare(n, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.USState)); break;
+                        case var n when string.Compare(n, nameof(RefDataNamespace.PerformanceOutcome), StringComparison.InvariantCultureIgnoreCase) == 0: types.Add(typeof(RefDataNamespace.PerformanceOutcome)); break;
                     }
                 }
             }

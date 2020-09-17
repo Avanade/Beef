@@ -16,36 +16,10 @@ namespace Company.AppName.Test
     [TestFixture, NonParallelizable]
     public class PersonTest : UsingAgentTesterServer<Startup>
     {
-        #region Validators
-
-        [Test, TestSetUp]
-        public void A110_Validation_Empty()
-        {
-            ExpectValidationException.Throws(
-                () => PersonValidator.Default.Validate(new Person()).ThrowOnError(),
-                "First Name is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.");
-        }
-
-        [Test, TestSetUp]
-        public void A120_Validation_Invalid()
-        {
-            ExpectValidationException.Throws(
-                () => PersonValidator.Default.Validate(new Person { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), GenderSid = "X", Birthday = DateTime.Now.AddDays(1) }).ThrowOnError(),
-                "First Name must not exceed 100 characters in length.",
-                "Last Name must not exceed 100 characters in length.",
-                "Gender is invalid.",
-                "Birthday must be less than or equal to Today.");
-        }
-
-        #endregion
-
         #region Get
 
         [Test, TestSetUp]
-        public void B110_Get_NotFound()
+        public void A110_Get_NotFound()
         {
             AgentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
@@ -53,7 +27,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B120_Get_Found()
+        public void A120_Get_Found()
         {
             AgentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -71,7 +45,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B120_Get_Modified_NotModified()
+        public void A120_Get_Modified_NotModified()
         {
             var v = AgentTester.Test<PersonAgent, Person?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -89,7 +63,7 @@ namespace Company.AppName.Test
         #region GetByArgs
 
         [Test, TestSetUp]
-        public void B210_GetByArgs_All()
+        public void A210_GetByArgs_All()
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -102,7 +76,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B220_GetByArgs_FirstName()
+        public void A220_GetByArgs_FirstName()
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -115,7 +89,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B230_GetByArgs_LastName()
+        public void A230_GetByArgs_LastName()
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -128,7 +102,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B240_GetByArgs_Gender()
+        public void A240_GetByArgs_Gender()
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -141,7 +115,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B250_GetByArgs_Empty()
+        public void A250_GetByArgs_Empty()
         {
             var v = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -153,7 +127,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B260_GetByArgs_FieldSelection()
+        public void A260_GetByArgs_FieldSelection()
         {
             var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -168,7 +142,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void B270_GetByArgs_RefDataText()
+        public void A270_GetByArgs_RefDataText()
         {
             var r = AgentTester.Test<PersonAgent, PersonCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -187,7 +161,7 @@ namespace Company.AppName.Test
         #region Create
 
         [Test, TestSetUp]
-        public void C110_Create()
+        public void B110_Create()
         {
             var v = new Person
             {
@@ -219,7 +193,7 @@ namespace Company.AppName.Test
         #region Update
 
         [Test, TestSetUp]
-        public void D110_Update_NotFound()
+        public void C110_Update_NotFound()
         {
             // Get an existing value.
             var v = AgentTester.Test<PersonAgent, Person?>()
@@ -233,7 +207,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void D120_Update_Concurrency()
+        public void C120_Update_Concurrency()
         {
             // Get an existing value.
             var id = 2.ToGuid();
@@ -254,7 +228,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void D130_Update()
+        public void C130_Update()
         {
             // Get an existing value.
             var id = 2.ToGuid();
@@ -288,7 +262,7 @@ namespace Company.AppName.Test
         #region Patch
 
         [Test, TestSetUp]
-        public void E110_Patch_NotFound()
+        public void D110_Patch_NotFound()
         {
             // Get an existing value.
             var v = AgentTester.Test<PersonAgent, Person?>()
@@ -302,7 +276,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void E120_Patch_Concurrency()
+        public void D120_Patch_Concurrency()
         {
             // Get an existing value.
             var id = 2.ToGuid();
@@ -323,7 +297,7 @@ namespace Company.AppName.Test
         }
 
         [Test, TestSetUp]
-        public void E130_Patch()
+        public void D130_Patch()
         {
             // Get an existing value.
             var id = 2.ToGuid();
@@ -356,7 +330,7 @@ namespace Company.AppName.Test
         #region Delete
 
         [Test, TestSetUp]
-        public void F110_Delete()
+        public void E110_Delete()
         {
             // Check value exists.
             var id = 4.ToGuid();

@@ -21,7 +21,8 @@ namespace My.Hr.Business.DataSvc
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedDataSvcServices(this IServiceCollection services)
         {
-            return services.AddScoped<IEmployeeDataSvc, EmployeeDataSvc>();
+            return services.AddScoped<IEmployeeDataSvc, EmployeeDataSvc>()
+                           .AddScoped<IPerformanceReviewDataSvc, PerformanceReviewDataSvc>();
         }
     }
 }

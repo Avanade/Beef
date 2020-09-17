@@ -25,7 +25,7 @@ Each reference data entity is defined, by specifying the name, the Web API route
 
 Replace the existing `Entity` XML (keeping the `CodeGeneration` element) with the following.
 
-```
+``` xml
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.Gender" />
   <Entity Name="TerminationReason" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/terminationReasons" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.TerminationReason" />
   <Entity Name="RelationshipType" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/relationshipTypes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.RelationshipType" />
@@ -238,7 +238,7 @@ The final component that must be implemented by the developer is the validation 
 
 To encourage reuse, _Beef_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `My.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
-```
+``` csharp
 using Beef.Validation;
 using System.ComponentModel.DataAnnotations;
 
@@ -288,7 +288,7 @@ using System.Text.RegularExpressions;
 namespace My.Hr.Business.Validation
 {
     /// <summary>
-    /// Represents a <see cref="Person"/> validator.
+    /// Represents a <see cref="Employee"/> validator.
     /// </summary>
     public class EmployeeValidator : Validator<Employee, EmployeeValidator>
     {
@@ -316,11 +316,11 @@ namespace My.Hr.Business.Validation
             Property(x => x.FirstName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.LastName).Mandatory().Common(CommonValidators.PersonName);
             Property(x => x.Gender).Mandatory().IsValid();
-            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.Now.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
-            Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01), "January 1, 1999");
+            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.UtcNow.AddYears(-18), errorText: "Birthday is invalid as the Employee must be at least 18 years of age.");
+            Property(x => x.StartDate).Mandatory().CompareValue(CompareOperator.GreaterThanEqual, new DateTime(1999, 01, 01, 0, 0, 0, DateTimeKind.Utc), "January 1, 1999");
             Property(x => x.PhoneNo).Mandatory().Common(CommonValidators.PhoneNo);
             Property(x => x.Address).Entity(_addressValidator);
-            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: new CollectionRuleItem<EmergencyContact>(_emergencyContactValidator).UniqueKeyDuplicateCheck());
+            Property(x => x.EmergencyContacts).Collection(maxCount: 5, item: new CollectionRuleItem<EmergencyContact>(_emergencyContactValidator));
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace My.Hr.Business.Validation
                     break;
 
                 case OperationType.Update:
-                    var dataSvc = (IEmployeeDataSvc)ExecutionContext.Current.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
+                    var dataSvc = (IEmployeeDataSvc)context.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
                     var existing = dataSvc.GetAsync(context.Value.Id).GetAwaiter().GetResult();
                     if (existing == null)
                         throw new NotFoundException();

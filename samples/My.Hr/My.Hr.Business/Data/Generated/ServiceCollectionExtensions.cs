@@ -21,7 +21,8 @@ namespace My.Hr.Business.Data
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedDataServices(this IServiceCollection services)
         {
-            return services.AddScoped<IEmployeeData, EmployeeData>();
+            return services.AddScoped<IEmployeeData, EmployeeData>()
+                           .AddScoped<IPerformanceReviewData, PerformanceReviewData>();
         }
     }
 }

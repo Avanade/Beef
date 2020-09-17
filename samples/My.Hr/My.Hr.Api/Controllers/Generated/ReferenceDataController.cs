@@ -87,6 +87,21 @@ namespace My.Hr.Api.Controllers
             () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, codes, text, includeInactive: this.IncludeInactive())),
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
+        /// <summary> 
+        /// Gets all of the <see cref="RefDataNamespace.PerformanceOutcome"/> reference data items that match the specified criteria.
+        /// </summary>
+        /// <param name="codes">The reference data code list.</param>
+        /// <param name="text">The reference data text (including wildcards).</param>
+        /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
+        [AllowAnonymous]
+        [HttpGet()]
+        [Route("api/v1/ref/performanceOutcomes")]
+        [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult PerformanceOutcomeGetAll(List<string>? codes = default, string? text = default) => new WebApiGet<ReferenceDataFilterResult<RefDataNamespace.PerformanceOutcome>>(this, 
+            () => Task.FromResult(ReferenceDataFilter.ApplyFilter<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, codes, text, includeInactive: this.IncludeInactive())),
+            operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
@@ -115,6 +130,7 @@ namespace My.Hr.Api.Controllers
                         case var s when string.Compare(s, nameof(RefDataNamespace.TerminationReason), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.TerminationReason), ReferenceDataFilter.ApplyFilter<RefDataNamespace.TerminationReasonCollection, RefDataNamespace.TerminationReason>(RefDataNamespace.ReferenceData.Current.TerminationReason, q.Value, includeInactive: inactive))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.RelationshipType), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.RelationshipType), ReferenceDataFilter.ApplyFilter<RefDataNamespace.RelationshipTypeCollection, RefDataNamespace.RelationshipType>(RefDataNamespace.ReferenceData.Current.RelationshipType, q.Value, includeInactive: inactive))); break;
                         case var s when string.Compare(s, nameof(RefDataNamespace.USState), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.USState), ReferenceDataFilter.ApplyFilter<RefDataNamespace.USStateCollection, RefDataNamespace.USState>(RefDataNamespace.ReferenceData.Current.USState, q.Value, includeInactive: inactive))); break;
+                        case var s when string.Compare(s, nameof(RefDataNamespace.PerformanceOutcome), StringComparison.InvariantCultureIgnoreCase) == 0: coll.Add(new ReferenceDataMultiItem(nameof(RefDataNamespace.PerformanceOutcome), ReferenceDataFilter.ApplyFilter<RefDataNamespace.PerformanceOutcomeCollection, RefDataNamespace.PerformanceOutcome>(RefDataNamespace.ReferenceData.Current.PerformanceOutcome, q.Value, includeInactive: inactive))); break;
                     }
                 }
                 

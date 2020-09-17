@@ -55,6 +55,14 @@ namespace My.Hr.Common.Agents
         Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.PerformanceOutcome"/> items that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <param name="names">The optional list of reference data names.</param>
@@ -110,6 +118,15 @@ namespace My.Hr.Common.Agents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<RefDataNamespace.USStateCollection>> USStateGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
             GetAsync<RefDataNamespace.USStateCollection>("api/v1/ref/usStates", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
+
+        /// <summary>
+        /// Gets all of the <see cref="RefDataNamespace.PerformanceOutcome"/> items that match the filter arguments.
+        /// </summary>
+        /// <param name="args">The optional <see cref="ReferenceDataFilter"/> arguments.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<RefDataNamespace.PerformanceOutcomeCollection>> PerformanceOutcomeGetAllAsync(ReferenceDataFilter? args = null, WebApiRequestOptions? requestOptions = null) =>
+            GetAsync<RefDataNamespace.PerformanceOutcomeCollection>("api/v1/ref/performanceOutcomes", requestOptions: requestOptions, args: new WebApiArg[] { new WebApiArg<ReferenceDataFilter>("args", args!, WebApiArgType.FromUriUseProperties) });      
 
         /// <summary>
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3

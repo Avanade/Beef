@@ -91,7 +91,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
   {{#ifeq ValueLessParameters.Count 0}}
                 args: Array.Empty<WebApiArg>());
   {{else}}
-                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{WebApiAgentParameterType}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if PagingArgs}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
+                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{WebApiAgentParameterType}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
   {{/ifeq}}
 {{/each}}
     }

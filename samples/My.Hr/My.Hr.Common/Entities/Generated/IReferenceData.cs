@@ -38,6 +38,11 @@ namespace My.Hr.Common.Entities
         /// </summary>
         RefDataNamespace.USStateCollection USState { get; }
 
+        /// <summary> 
+        /// Gets the <see cref="RefDataNamespace.PerformanceOutcomeCollection"/>.
+        /// </summary>
+        RefDataNamespace.PerformanceOutcomeCollection PerformanceOutcome { get; }
+
         #endregion
     }
 }

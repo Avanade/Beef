@@ -4,4 +4,5 @@
   <Entity Name="TerminationReason" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/terminationReasons" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.TerminationReason" />
   <Entity Name="RelationshipType" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/relationshipTypes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.RelationshipType" />
   <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/usStates" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.USState" />
+  <Entity Name="PerformanceOutcome" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/performanceOutcomes" AutoImplement="EntityFramework" EntityFrameworkEntity="EfModel.PerformanceOutcome" />
 </CodeGeneration>

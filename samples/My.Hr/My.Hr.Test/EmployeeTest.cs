@@ -3,7 +3,6 @@ using Beef.Entities;
 using Beef.Test.NUnit;
 using Beef.WebApi;
 using My.Hr.Api;
-using My.Hr.Business.Validation;
 using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
 using NUnit.Framework;
@@ -17,52 +16,18 @@ namespace My.Hr.Test
     [TestFixture, NonParallelizable]
     public class EmployeeTest : UsingAgentTesterServer<Startup>
     {
-        #region Validators
-
-        [Test, TestSetUp]
-        public void A110_Validation_Empty()
-        {
-            ExecutionContext.Current.OperationType = OperationType.Create;
-            ExpectValidationException.Throws(
-                () => EmployeeValidator.Default.Validate(new Employee()).ThrowOnError(),
-                "First Name is required.",
-                "Email is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.",
-                "Start Date is required.",
-                "Phone No is required.");
-        }
-
-        [Test, TestSetUp]
-        public void A120_Validation_Invalid()
-        {
-            ExecutionContext.Current.OperationType = OperationType.Create;
-            ExpectValidationException.Throws(
-                () => EmployeeValidator.Default.Validate(new Employee { Email = "xxx", FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), GenderSid = "X", Birthday = DateTime.Now.AddYears(10), StartDate = new DateTime(1996, 12, 31), PhoneNo = "(425) 333 4444" }).ThrowOnError(),
-                "Email is invalid.",
-                "First Name must not exceed 100 characters in length.",
-                "Last Name must not exceed 100 characters in length.",
-                "Gender is invalid.",
-                "Birthday is invalid as the Employee must be at least 18 years of age.",
-                "Start Date must be greater than or equal to January 1, 1999.");
-        }
-
-        #endregion
-
         #region Get
 
         [Test, TestSetUp]
-        public void B110_Get_NotFound()
+        public void A110_Get_NotFound()
         {
             AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetAsync(404.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void B120_Get_Found_NoAddress()
+        public void A120_Get_Found_NoAddress()
         {
             AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -83,7 +48,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B120_Get_Found_WithAddress()
+        public void A120_Get_Found_WithAddress()
         {
             AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -106,7 +71,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B120_Get_Modified_NotModified()
+        public void A120_Get_Modified_NotModified()
         {
             var v = AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -124,7 +89,7 @@ namespace My.Hr.Test
         #region GetByArgs
 
         [Test, TestSetUp]
-        public void B210_GetByArgs_All()
+        public void A210_GetByArgs_All()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -137,7 +102,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B210_GetByArgs_All_Paging()
+        public void A210_GetByArgs_All_Paging()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -150,7 +115,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B220_GetByArgs_FirstName()
+        public void A220_GetByArgs_FirstName()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -163,7 +128,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B230_GetByArgs_LastName()
+        public void A230_GetByArgs_LastName()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -176,7 +141,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B230_GetByArgs_LastName_IncludeTerminated()
+        public void A230_GetByArgs_LastName_IncludeTerminated()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -189,7 +154,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B240_GetByArgs_Gender()
+        public void A240_GetByArgs_Gender()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -202,7 +167,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B250_GetByArgs_Empty()
+        public void A250_GetByArgs_Empty()
         {
             var v = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -214,7 +179,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B260_GetByArgs_FieldSelection()
+        public void A260_GetByArgs_FieldSelection()
         {
             var r = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -229,7 +194,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void B270_GetByArgs_RefDataText()
+        public void A270_GetByArgs_RefDataText()
         {
             var r = AgentTester.Test<EmployeeAgent, EmployeeBaseCollectionResult>()
                 .ExpectStatusCode(HttpStatusCode.OK)
@@ -248,7 +213,7 @@ namespace My.Hr.Test
         #region Create
 
         [Test, TestSetUp]
-        public void C110_Create()
+        public void B110_Create()
         {
             var v = new Employee
             {
@@ -281,7 +246,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void C120_Create_Duplicate()
+        public void B120_Create_Duplicate()
         {
             var v = new Employee
             {
@@ -305,7 +270,7 @@ namespace My.Hr.Test
         #region Update
 
         [Test, TestSetUp]
-        public void D110_Update_NotFound()
+        public void C110_Update_NotFound()
         {
             // Get an existing value.
             var v = AgentTester.Test<EmployeeAgent, Employee?>()
@@ -315,12 +280,11 @@ namespace My.Hr.Test
             // Try updating with an invalid identifier.
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(ErrorType.NotFoundError)
                 .Run(a => a.UpdateAsync(v, 404.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void D120_Update_Concurrency()
+        public void C120_Update_Concurrency()
         {
             // Get an existing value.
             var id = 4.ToGuid();
@@ -331,19 +295,17 @@ namespace My.Hr.Test
             // Try updating the value with an invalid eTag (if-match).
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.UpdateAsync(v, id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the value with an invalid eTag.
             v.ETag = TestSetUp.ConcurrencyErrorETag;
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.UpdateAsync(v, id));
         }
 
         [Test, TestSetUp]
-        public void D130_Update()
+        public void C130_Update()
         {
             // Get an existing value.
             var id = 4.ToGuid();
@@ -376,7 +338,7 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void D140_Update_AlreadyTerminated()
+        public void C140_Update_AlreadyTerminated()
         {
             // Get an existing value.
             var id = 2.ToGuid();
@@ -401,7 +363,7 @@ namespace My.Hr.Test
         #region Patch
 
         [Test, TestSetUp]
-        public void E110_Patch_NotFound()
+        public void D110_Patch_NotFound()
         {
             // Get an existing value.
             var v = AgentTester.Test<EmployeeAgent, Employee?>()
@@ -411,12 +373,11 @@ namespace My.Hr.Test
             // Try patching with an invalid identifier.
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(ErrorType.NotFoundError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", 404.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void E120_Patch_Concurrency()
+        public void D120_Patch_Concurrency()
         {
             // Get an existing value.
             var id = 4.ToGuid();
@@ -427,19 +388,17 @@ namespace My.Hr.Test
             // Try updating the value with an invalid eTag (if-match).
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{ \"lastName\": \"Smithers\" }", id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
 
             // Try updating the value with an eTag header (json payload eTag is ignored).
             v.ETag = TestSetUp.ConcurrencyErrorETag;
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
-                .ExpectErrorType(ErrorType.ConcurrencyError)
                 .Run(a => a.PatchAsync(WebApiPatchOption.MergePatch, "{{ \"lastName\": \"Smithers\", \"etag\": {TestSetUp.ConcurrencyErrorETag} }}", id));
         }
 
         [Test, TestSetUp]
-        public void E130_Patch()
+        public void D130_Patch()
         {
             // Get an existing value.
             var id = 4.ToGuid();
@@ -473,7 +432,7 @@ namespace My.Hr.Test
         #region Delete
 
         [Test, TestSetUp]
-        public void F110_Delete()
+        public void E110_Delete()
         {
             // Check value exists.
             var id = 4.ToGuid();
@@ -490,7 +449,6 @@ namespace My.Hr.Test
             // Check value no longer exists.
             AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .ExpectErrorType(Beef.ErrorType.NotFoundError)
                 .Run(a => a.GetAsync(id));
 
             // Delete again (should still be successful as a Delete is idempotent). 
@@ -505,7 +463,7 @@ namespace My.Hr.Test
         #region Terminate
 
         [Test, TestSetUp]
-        public void G110_Terminate_NotFound()
+        public void F110_Terminate_NotFound()
         {
             AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
@@ -513,27 +471,25 @@ namespace My.Hr.Test
         }
 
         [Test, TestSetUp]
-        public void G120_Terminate_MoreThanOnce()
+        public void F120_Terminate_MoreThanOnce()
         {
             var r = AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated more than once.")
                 .Run(a => a.TerminateAsync(new TerminationDetail { Date = DateTime.Now, ReasonSid = "RD" }, 2.ToGuid()));
-
-            Assert.AreEqual("An Employee can not be terminated more than once.", r.Content);
         }
 
         [Test, TestSetUp]
-        public void G130_Terminate_BeforeStart()
+        public void F130_Terminate_BeforeStart()
         {
             var r = AgentTester.Test<EmployeeAgent, Employee>()
                 .ExpectStatusCode(HttpStatusCode.BadRequest)
+                .ExpectErrorType(ErrorType.ValidationError, "An Employee can not be terminated prior to their start date.")
                 .Run(a => a.TerminateAsync(new TerminationDetail { Date = new DateTime(1999, 12, 31), ReasonSid = "RD" }, 1.ToGuid()));
-
-            Assert.AreEqual("An Employee can not be terminated prior to their start date.", r.Content);
         }
 
         [Test, TestSetUp]
-        public void G140_Terminate()
+        public void F140_Terminate()
         {
             var v = AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.OK)

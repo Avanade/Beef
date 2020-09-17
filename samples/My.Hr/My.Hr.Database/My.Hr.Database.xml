@@ -23,6 +23,7 @@
     </StoredProcedure>
     <StoredProcedure Name="Delete" Type="Delete">
       <Execute Statement="DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId" />
+      <Execute Statement="DELETE FROM [Hr].[PerformanceReview] WHERE [EmployeeId] = @EmployeeId" />
     </StoredProcedure>
   </Table>
 
@@ -41,4 +42,8 @@
 
   <!-- References the Employee table to infer the underlying schema, and creates .NET (C#) model for the selected columns only. -->
   <Table Name="Employee" Schema="Hr" EfModel="true" IncludeColumns="EmployeeId, Email, FirstName, LastName, GenderCode, Birthday, StartDate, TerminationDate, TerminationReasonCode, PhoneNo" />
+  
+  <!-- PerformanceReview table and related referenace data. -->
+  <Table Name="PerformanceReview" Schema="Hr" EfModel="true" />
+  <Table Name="PerformanceOutcome" Schema="Ref" EfModel="true" />
 </CodeGeneration>

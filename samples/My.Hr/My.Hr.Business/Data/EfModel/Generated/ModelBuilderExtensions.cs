@@ -28,6 +28,8 @@ namespace My.Hr.Business.Data.EfModel
             RelationshipType.AddToModel(modelBuilder);
             USState.AddToModel(modelBuilder);
             Employee.AddToModel(modelBuilder);
+            PerformanceReview.AddToModel(modelBuilder);
+            PerformanceOutcome.AddToModel(modelBuilder);
         }
     }
 }

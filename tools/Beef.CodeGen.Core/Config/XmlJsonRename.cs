@@ -44,6 +44,7 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Property, "DataODataIgnore", "odataIgnore"),
 
             (ConfigurationEntity.Operation, "OperationType", "type"),
+            (ConfigurationEntity.Operation, "PagingArgs", "paging"),
             (ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId"),
             (ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
 
