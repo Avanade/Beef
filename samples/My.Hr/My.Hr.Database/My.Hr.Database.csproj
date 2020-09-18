@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Schema\" />
     <Folder Include="Data\" />
+    <Folder Include="Schema\Hr\" />
   </ItemGroup>
 
   <ItemGroup>

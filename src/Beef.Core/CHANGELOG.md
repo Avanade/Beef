@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.1.2
 - *Enhancement:* The `CodeGen` namespace has been moved to `Beef.CodeGen.Core`. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`). The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine.
+- *Enhancement:* The `ColoredConsoleLogger` was update to write using `Console.Error` where the `LogLevel` is either `Error` or `Critical`; otherwise, use `Console.Out`.
 
 ## v4.1.1
 - *Enhancement:* Introduction of Dependency Injection support.

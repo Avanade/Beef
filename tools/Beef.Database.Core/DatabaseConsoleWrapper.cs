@@ -35,10 +35,11 @@ namespace Beef.Database.Core
         /// <param name="appName">The application/domain name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
+        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true)
+        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
         {
-            return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo);
+            return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
         }
 
         /// <summary>
@@ -49,10 +50,11 @@ namespace Beef.Database.Core
         /// <param name="appName">The application/domain name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
+        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true)
+        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
         {
-            return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo);
+            return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
         }
 
         /// <summary>
@@ -64,12 +66,14 @@ namespace Beef.Database.Core
         /// <param name="appName">The application/domain name.</param>
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
-        private DatabaseConsoleWrapper(Assembly[] assemblies, string connectionString, string company, string appName, string outDir, bool useBeefDbo = true)
+        /// <param name="refDataSchemaName">The optional reference data schema name.</param>
+        private DatabaseConsoleWrapper(Assembly[] assemblies, string connectionString, string company, string appName, string outDir, bool useBeefDbo = true, string? refDataSchemaName = null)
         {
             ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
             Company = Check.NotEmpty(company, nameof(company));
             AppName = Check.NotEmpty(appName, nameof(appName));
             OutDir = Check.NotEmpty(outDir, nameof(outDir));
+            RefDataSchemaName = refDataSchemaName;
             if (assemblies == null)
                 assemblies = Array.Empty<Assembly>();
 
@@ -121,6 +125,11 @@ namespace Beef.Database.Core
         public string OutDir { get; private set; }
 
         /// <summary>
+        /// Gets the reference data schema name.
+        /// </summary>
+        public string? RefDataSchemaName { get; private set; }
+
+        /// <summary>
         /// Executes the underlying <see cref="DatabaseConsole"/> using the database tooling arguments.
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
@@ -137,6 +146,7 @@ namespace Beef.Database.Core
             var cs = app.Option("-cs|--connectionstring", "Override the database connection string.", CommandOptionType.SingleValue);
             var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
             var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
+            var cr = app.Option("-createref|--scriptnew-create-ref-table", "ScriptNew: use create reference data '[schema.]table' template.", CommandOptionType.SingleValue);
             var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
 
             app.OnExecuteAsync(async (_) =>
@@ -150,10 +160,15 @@ namespace Beef.Database.Core
                 var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value!, cs.Value() ?? ConnectionString, sb.ToString());
                 if (ct.HasValue())
                     rargs += GetTableSchemaParams("Create", ct.Value()!);
+                else if (cr.HasValue())
+                    rargs += GetTableSchemaParams("CreateRef", cr.Value()!);
                 else if (at.HasValue())
                     rargs += GetTableSchemaParams("Alter", at.Value()!);
 
-                await DatabaseConsole.Create().RunAsync(rargs).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(RefDataSchemaName))
+                    rargs += $" -rs {RefDataSchemaName}";
+
+                return await DatabaseConsole.Create().RunAsync(rargs).ConfigureAwait(false);
             });
 
             try
@@ -162,7 +177,7 @@ namespace Beef.Database.Core
             }
             catch (CommandParsingException cpex)
             {
-                Console.WriteLine(cpex.Message);
+                Console.Error.WriteLine(cpex.Message);
                 return -1;
             }
         }
@@ -173,7 +188,7 @@ namespace Beef.Database.Core
         private string GetTableSchemaParams(string action, string arg)
         {
             if (string.IsNullOrEmpty(arg))
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxxxx";
+                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
 
             var parts = arg.Split('.', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
@@ -181,7 +196,7 @@ namespace Beef.Database.Core
             else if (parts.Length == 2)
                 return $" -p ScriptNew={action} -p Schema={parts[0]} -p Table={parts[1]}";
             else
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxxxx";
+                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
         }
 
         /// <summary>

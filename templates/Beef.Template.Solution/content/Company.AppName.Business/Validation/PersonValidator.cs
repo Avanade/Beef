@@ -17,7 +17,7 @@ namespace Company.AppName.Business.Validation
             Property(x => x.FirstName).Mandatory().String(100);
             Property(x => x.LastName).Mandatory().String(100);
             Property(x => x.Gender).Mandatory().IsValid();
-            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, DateTime.Now, "Today");
+            Property(x => x.Birthday).Mandatory().CompareValue(CompareOperator.LessThanEqual, _ => DateTime.UtcNow, _ => "Today");
         }
     }
 }

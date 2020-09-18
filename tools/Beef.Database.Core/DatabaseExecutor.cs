@@ -21,6 +21,55 @@ using System.Threading.Tasks;
 namespace Beef.Database.Core
 {
     /// <summary>
+    /// The <see cref="CodeGenExecutor"/> arguments.
+    /// </summary>
+    public class DatabaseExecutorArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseExecutorArgs"/> class.
+        /// </summary>
+        /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
+        public DatabaseExecutorArgs(DatabaseExecutorCommand command, string connectionString, params Assembly[] assemblies)
+        {
+            Command = command;
+            ConnectionString = Check.NotNull(connectionString, nameof(connectionString));
+            Assemblies = new List<Assembly>(assemblies);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DatabaseExecutorCommand"/>.
+        /// </summary>
+        public DatabaseExecutorCommand Command { get; private set; }
+
+        /// <summary>
+        /// Gets the connection string.
+        /// </summary>
+        public string ConnectionString { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="Assembly"/> list whose embedded resources will be probed.
+        /// </summary>
+        public List<Assembly> Assemblies { get; private set; }
+
+        /// <summary>
+        /// Indicates whether ot use the standard <i>Beef</i> <b>dbo</b> schema objects.
+        /// </summary>
+        public bool UseBeefDbo { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the optional reference data schema name (typically specified where different to the primary schema).
+        /// </summary>
+        public string? RefDataSchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.
+        /// </summary>
+        public CodeGenExecutorArgs? CodeGenArgs { get; set; }
+    }
+
+    /// <summary>
     /// Represents the database executor.
     /// </summary>
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
@@ -42,15 +91,12 @@ namespace Beef.Database.Core
         /// </summary>
         public static string DataNamespace { get; set; } = "Data";
 
-        private readonly DatabaseExecutorCommand _command;
-        private readonly string _connectionString;
-        private readonly Assembly[] _assemblies;
+        private readonly DatabaseExecutorArgs _args;
         private readonly List<string> _namespaces = new List<string>();
-        private readonly CodeGenExecutorArgs _codeGenArgs;
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Represents a DbUp to Beef Logger sink.
+        /// Represents a DbUp to ILogger sink.
         /// </summary>
         private class LoggerSink : IUpgradeLog
         {
@@ -89,56 +135,30 @@ namespace Beef.Database.Core
         /// <summary>
         /// Runs the <see cref="DatabaseExecutor"/> directly.
         /// </summary>
-        /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
-        /// <param name="connectionString">The database connection string.</param>
-        /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects.</param>
-        /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
-        /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
+        /// <param name="args">The <see cref="DatabaseExecutorArgs"/>.</param>
         /// <returns>The return code; zero equals success.</returns>
-        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
+        public static async Task<int> RunAsync(DatabaseExecutorArgs args)
         {
-            var de = new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, codeGenArgs);
-            return await de.RunAsync().ConfigureAwait(false) ? 0 : -1;
-        }
-
-        /// <summary>
-        /// Runs the <see cref="DatabaseExecutor"/> directly.
-        /// </summary>
-        /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
-        /// <param name="connectionString">The database connection string.</param>
-        /// <param name="useBeefDbo">Indicates whether to use the standard <i>Beef</i> <b>dbo</b> schema objects.</param>
-        /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
-        /// <returns>The return code; zero equals success.</returns>
-        public static async Task<int> RunAsync(DatabaseExecutorCommand command, string connectionString, bool useBeefDbo, params Assembly[] assemblies)
-        {
-            var de = new DatabaseExecutor(command, connectionString, useBeefDbo ? assemblies.Prepend(typeof(DatabaseExecutor).Assembly).ToArray() : assemblies, null!);
+            var de = new DatabaseExecutor(args);
             return await de.RunAsync().ConfigureAwait(false) ? 0 : -1;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseExecutor"/> class.
         /// </summary>
-        /// <param name="command">The <see cref="DatabaseExecutorCommand"/>.</param>
-        /// <param name="connectionString">The database connection string.</param>
-        /// <param name="assemblies">The <see cref="Assembly"/> array whose embedded resources will be probed.</param>
-        /// <param name="codeGenArgs">The <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.</param>
-        public DatabaseExecutor(DatabaseExecutorCommand command, string connectionString, Assembly[] assemblies, CodeGenExecutorArgs? codeGenArgs = null)
+        /// <param name="args">The <see cref="DatabaseExecutorArgs"/>.</param>
+        public DatabaseExecutor(DatabaseExecutorArgs args)
         {
-            Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
+            _args = Check.NotNull(args, nameof(args));
+            Logger.Default = _logger = new ColoredConsoleLogger(nameof(DatabaseConsole));
 
-            _command = command;
-            _connectionString = Check.NotEmpty(connectionString, nameof(connectionString));
-            _assemblies = assemblies;
-            _logger = new ColoredConsoleLogger(nameof(DatabaseExecutor));
+            Check.IsFalse(_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.CodeGenArgs == null, nameof(args), "The code generation arguments must be provided when the 'command' includes 'CodeGen'.");
+            if (_args.CodeGenArgs != null && !_args.CodeGenArgs.Parameters.ContainsKey("ConnectionString"))
+                _args.CodeGenArgs.Parameters.Add("ConnectionString", _args.ConnectionString);
 
-            Check.IsFalse(_command.HasFlag(DatabaseExecutorCommand.CodeGen) && codeGenArgs == null, nameof(codeGenArgs), "The code generation arguments must be provided when the 'command' includes 'CodeGen'.");
-            _codeGenArgs = codeGenArgs ?? new CodeGenExecutorArgs(_logger);
-            if (_codeGenArgs != null && !_codeGenArgs.Parameters.ContainsKey("ConnectionString"))
-                _codeGenArgs.Parameters.Add("ConnectionString", _connectionString);
+            _db = new Db(_args.ConnectionString);
 
-            _db = new Db(_connectionString);
-
-            _assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
+            _args.Assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
         }
 
         /// <summary>
@@ -148,25 +168,25 @@ namespace Beef.Database.Core
         {
             var ls = new LoggerSink(_logger);
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Drop))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Drop))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
                 _logger.LogInformation("DB DROP: Checking database existence and dropping where found...");
-                if (!await TimeExecutionAsync(() => { DropDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
+                if (!await TimeExecutionAsync(() => { DropDatabase.For.SqlDatabase(_args.ConnectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
                     return false;
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Create))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Create))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
                 _logger.LogInformation("DB CREATE: Checking database existence and creating where not found...");
-                if (!await TimeExecutionAsync(() => { EnsureDatabase.For.SqlDatabase(_connectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
+                if (!await TimeExecutionAsync(() => { EnsureDatabase.For.SqlDatabase(_args.ConnectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
                     return false;
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Migrate))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Migrate))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
@@ -177,8 +197,8 @@ namespace Beef.Database.Core
                 if (!await TimeExecutionAsync(() =>
                 {
                     result = DeployChanges.To
-                        .SqlDatabase(_connectionString)
-                        .WithScripts(GetMigrationScripts(_assemblies))
+                        .SqlDatabase(_args.ConnectionString)
+                        .WithScripts(GetMigrationScripts(_args.Assemblies))
                         .WithoutTransaction()
                         .LogTo(ls)
                         .Build()
@@ -195,25 +215,24 @@ namespace Beef.Database.Core
                 }
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.CodeGen))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
                 _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
-                CodeGenConsole.LogCodeGenExecutionArgs(_codeGenArgs);
+                CodeGenConsole.LogCodeGenExecutionArgs(_args.CodeGenArgs!);
 
                 if (!await TimeExecutionAsync(async () =>
                 {
-                    var cge = new CodeGenExecutor(_codeGenArgs);
-                    await cge.RunAsync().ConfigureAwait(false);
-                    return true;
+                    var cge = new CodeGenExecutor(_args.CodeGenArgs!);
+                    return await cge.RunAsync().ConfigureAwait(false);
                 }).ConfigureAwait(false))
                 {
                     return false;
                 }
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Schema))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Schema))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
@@ -223,7 +242,7 @@ namespace Beef.Database.Core
                     return false;
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Reset))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Reset))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
@@ -233,7 +252,7 @@ namespace Beef.Database.Core
                     return false;
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.Data))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.Data))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
@@ -243,7 +262,7 @@ namespace Beef.Database.Core
                     return false;
             }
 
-            if (_command.HasFlag(DatabaseExecutorCommand.ScriptNew))
+            if (_args.Command.HasFlag(DatabaseExecutorCommand.ScriptNew))
             {
                 _logger.LogInformation(string.Empty);
                 _logger.LogInformation(new string('-', 80));
@@ -281,7 +300,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Gets all the migration scripts from the assemblies and ensures order.
         /// </summary>
-        private List<SqlScript> GetMigrationScripts(Assembly[] assemblies)
+        private List<SqlScript> GetMigrationScripts(IEnumerable<Assembly> assemblies)
         {
             var scripts = new List<SqlScript>();
             var count = 0;
@@ -325,12 +344,12 @@ namespace Beef.Database.Core
             var list = new List<SqlSchemaScript>();
 
             // See if there are any files out there (recently generated).
-            if (_codeGenArgs?.OutputPath != null)
+            if (_args.CodeGenArgs?.OutputPath != null)
             {
-                _logger.LogInformation($"Probing for files: '{_codeGenArgs.OutputPath.FullName}*.sql'");
+                _logger.LogInformation($"Probing for files: '{_args.CodeGenArgs.OutputPath.FullName}*.sql'");
                 foreach (var ns in _namespaces)
                 {
-                    var di = new DirectoryInfo(Path.Combine(_codeGenArgs.OutputPath.FullName, ns, SchemaNamespace));
+                    var di = new DirectoryInfo(Path.Combine(_args.CodeGenArgs.OutputPath.FullName, ns, SchemaNamespace));
                     if (di.Exists)
                     {
                         foreach (var fi in di.GetFiles("*.sql", SearchOption.AllDirectories))
@@ -343,7 +362,7 @@ namespace Beef.Database.Core
                                 return false;
                             }
 
-                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName.Substring(_codeGenArgs.OutputPath.FullName.Length + 1) };
+                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName.Substring(_args.CodeGenArgs.OutputPath.FullName.Length + 1) };
                             sr.Order = Array.IndexOf(schemaOrder, sr.Reader.Schema);
                             if (sr.Order < 0)
                                 sr.Order = schemaOrder.Length;
@@ -356,7 +375,7 @@ namespace Beef.Database.Core
 
             // Parse all resources and get ready for the SQL code gen.
             _logger.LogInformation($"Probing for embedded resources: {string.Join(", ", GetNamespacesWithSuffix($"{SchemaNamespace}.*.sql"))}");
-            foreach (var ass in _assemblies)
+            foreach (var ass in _args.Assemblies)
             {
                 foreach (var name in ass.GetManifestResourceNames())
                 {
@@ -416,7 +435,7 @@ namespace Beef.Database.Core
         /// </summary>
         private string RenameFileToResourceName(FileInfo fi)
         {
-            var dir = RenameFileToResourceNameReplace(fi.DirectoryName.Substring(_codeGenArgs.OutputPath!.FullName.Length + 1));
+            var dir = RenameFileToResourceNameReplace(fi.DirectoryName.Substring(_args.CodeGenArgs!.OutputPath!.FullName.Length + 1));
             var file = RenameFileToResourceNameReplace(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
             return dir + "." + file + RenameFileToResourceNameReplace(fi.Extension);
         }
@@ -464,11 +483,11 @@ namespace Beef.Database.Core
         {
             // Get all the database table schema information.
             _logger.LogInformation($"Querying database for all existing table and column configurations...");
-            await SqlDataUpdater.RegisterDatabaseAsync(_db, "Ref").ConfigureAwait(false);
+            await SqlDataUpdater.RegisterDatabaseAsync(_db, _args.RefDataSchemaName).ConfigureAwait(false);
 
             // Parse all resources and get ready for the SQL code gen.
             _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{DataNamespace}.*.yaml")))}");
-            foreach (var ass in _assemblies)
+            foreach (var ass in _args.Assemblies)
             {
                 foreach (var name in ass.GetManifestResourceNames())
                 {
@@ -499,13 +518,13 @@ namespace Beef.Database.Core
         /// </summary>
         private async Task<bool> CreateScriptNewAsync()
         {
-            _codeGenArgs.Parameters.TryGetValue("ScriptNew", out var action);
+            _args.CodeGenArgs!.Parameters.TryGetValue("ScriptNew", out var action);
             var di = new DirectoryInfo(Environment.CurrentDirectory);
             var fi = string.IsNullOrEmpty(action)
                 ? new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-comment-text.sql"))
                 : new FileInfo(Path.Combine(di.FullName, MigrationsNamespace,
 #pragma warning disable CA1308 // Normalize strings to uppercase; by-design as lowercase is desired.
-                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-{action.ToLowerInvariant()}-{(_codeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema : "schema")}-{(_codeGenArgs.Parameters.TryGetValue("Table", out var table) ? table : "table")}.sql"));
+                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-{action.ToLowerInvariant()}-{(_args.CodeGenArgs.Parameters.TryGetValue("Schema", out var schema) ? schema : "schema")}-{(_args.CodeGenArgs.Parameters.TryGetValue("Table", out var table) ? table : "table")}.sql"));
 #pragma warning restore CA1308 
 
             if (!fi.Directory.Exists)
@@ -513,7 +532,7 @@ namespace Beef.Database.Core
 
             using var sr = new StringReader("<CodeGeneration />");
             var cg = CodeGenerator.Create(System.Xml.Linq.XElement.Load(sr));
-            cg.CopyParameters(_codeGenArgs.Parameters);
+            cg.CopyParameters(_args.CodeGenArgs.Parameters);
             cg.CodeGenerated += (s, e) =>
             {
                 File.WriteAllText(fi.FullName, e.Content);
@@ -524,7 +543,7 @@ namespace Beef.Database.Core
                 await cg.GenerateAsync(System.Xml.Linq.XElement.Load(st)).ConfigureAwait(false);
             }
 
-            _logger.LogInformation($"Script file created: {fi.FullName}");
+            _logger.LogWarning($"Script file created: {fi.FullName}");
             return true;
         }
     }

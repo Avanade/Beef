@@ -6,17 +6,9 @@
 BEGIN TRANSACTION
 
 ]]>
-  <If Condition="Config.ScriptNew == null">
-    <Then>
-      <![CDATA[-- SQL STATEMENT(s)
-]]>
-    </Then>
-    <Else>
-      <If Condition="Config.ScriptNew == 'Create'">
-        <Then>
-          <If Condition="Config.Schema == 'Ref'">
-            <Then>
-              <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
+  <Switch Value="Config.ScriptNew">
+    <Case Value="'CreateRef'">
+      <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
   [{{Config.Table}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
   [Code] NVARCHAR(50) NOT NULL UNIQUE,
   [Text] NVARCHAR(250) NULL,
@@ -29,9 +21,9 @@ BEGIN TRANSACTION
   [UpdatedDate] DATETIME2 NULL
 );
 ]]>
-            </Then>
-            <Else>
-              <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
+    </Case>
+    <Case Value="'Create'">
+      <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
   [{{Config.Table}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
   -- [Code] NVARCHAR(50) NULL UNIQUE,
   -- [Text] NVARCHAR(250) NULL,
@@ -44,17 +36,17 @@ BEGIN TRANSACTION
   [UpdatedDate] DATETIME2 NULL
 );
 ]]>
-            </Else>
-          </If>
-        </Then>
-        <Else>
-          <![CDATA[ALTER TABLE [{{Config.Schema}}].[{{Config.Table}}]
+    </Case>
+    <Case Value="'Alter'">
+      <![CDATA[ALTER TABLE [{{Config.Schema}}].[{{Config.Table}}]
   -- ADD [Column] NVARCHAR(50) NULL
 ]]>
-        </Else>
-      </If>
-    </Else>
-  </If>
+    </Case>
+    <Default>
+      <![CDATA[-- SQL STATEMENT(s)
+]]>
+    </Default>
+  </Switch>
   <![CDATA[	
 COMMIT TRANSACTION]]>
 </Template>

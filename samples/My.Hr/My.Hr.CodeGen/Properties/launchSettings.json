@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "My.Hr.CodeGen": {
+      "commandName": "Project",
+      "commandLineArgs": "entity"
+    }
+  }
+}

@@ -22,10 +22,9 @@ namespace My.Hr.Test
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
-                return await DatabaseExecutor.RunAsync(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
-                    config["ConnectionStrings:Database"], useBeefDbo: true,
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()).ConfigureAwait(false) == 0;
+                return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:Database"],
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true } ).ConfigureAwait(false) == 0;
             });
         }
     }

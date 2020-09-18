@@ -149,11 +149,11 @@ namespace Beef.CodeGen
             var cge = new CodeGenExecutor(args);
             var sw = Stopwatch.StartNew();
 
-            await cge.RunAsync().ConfigureAwait(false);
+            var result = await cge.RunAsync().ConfigureAwait(false);
 
             sw.Stop();
             WriteFooter(sw);
-            return 0;
+            return result ? 0 : -1;
         }
 
         /// <summary>

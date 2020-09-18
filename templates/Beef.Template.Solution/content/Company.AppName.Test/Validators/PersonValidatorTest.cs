@@ -39,7 +39,7 @@ namespace Company.AppName.Test.Validators
                 FirstName = 'x'.ToLongString(),
                 LastName = 'x'.ToLongString(),
                 GenderSid = "X",
-                Birthday = DateTime.Now.AddDays(1)
+                Birthday = DateTime.UtcNow.AddDays(1)
             };
 
             ValidationTester.Test()
@@ -60,7 +60,7 @@ namespace Company.AppName.Test.Validators
                 FirstName = "Sam",
                 LastName = "Reilly",
                 GenderSid = "F",
-                Birthday = DateTime.Now.AddYears(-18)
+                Birthday = DateTime.UtcNow.AddYears(-18)
             };
 
             ValidationTester.Test()

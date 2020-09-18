@@ -51,12 +51,10 @@ COMMIT TRANSACTION
 
 ### Create Reference Data table
 
-To support the above a `Ref.PerformanceOutcome` tabke is also required.
-
-Execute the following to create the migration script. No further changes will be needed.
+To support the above a `Ref.PerformanceOutcome` table is also required. Execute the following to create the migration script. No further changes will be needed.
 
 ```
-dotnet run scriptnew -create Ref.PerformanceOutcome
+dotnet run scriptnew -createref Ref.PerformanceOutcome
 ```
 
 <br/>

@@ -154,7 +154,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Executes the selected code generation.
         /// </summary>
-        public async Task RunAsync()
+        public async Task<bool> RunAsync()
         {
             var overallCreatedCount = 0;
             var overallUpdatedCount = 0;
@@ -232,13 +232,16 @@ namespace Beef.CodeGen
             {
                 _args.Logger.LogError(gcex.Message);
                 _args.Logger.LogInformation(string.Empty);
+                return false;
             }
 
             if (_args.ExpectNoChange && (overallCreatedCount != 0 || overallUpdatedCount != 0))
             {
                 _args.Logger.LogError("Unexpected changes detected; one or more files were created and/or updated.");
-                throw new CodeGenException("Unexpected changes detected; one or more files were created and/or updated.");
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>

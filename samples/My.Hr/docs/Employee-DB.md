@@ -98,13 +98,13 @@ To support the capabilities of the tables above the following Reference Data tab
 - `Ref.RelationshipType`
 - `Ref.USState`
 
-At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `Ref` schema specified. No further changes will be needed for these tables.
+At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `-creatref` option specified. No further changes will be needed for these tables.
 
 ```
-dotnet run scriptnew -create Ref.Gender
-dotnet run scriptnew -create Ref.TerminationReason
-dotnet run scriptnew -create Ref.RelationshipType
-dotnet run scriptnew -create Ref.USState
+dotnet run scriptnew -createref Ref.Gender
+dotnet run scriptnew -createref Ref.TerminationReason
+dotnet run scriptnew -createref Ref.RelationshipType
+dotnet run scriptnew -createref Ref.USState
 ```
 
 <br/>
@@ -114,6 +114,16 @@ dotnet run scriptnew -create Ref.USState
 Now that the Reference Data tables exist they will need to be populated. It is recommended that where possible that the Production environment values are specified (as these are intended to be deployed to all environments).
 
 These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.
+
+_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly.
+
+``` yaml
+Ref:
+  - $Gender:
+    - M: Male
+    - F: Female
+    - N: Not specified
+```
 
 <br/>
 
