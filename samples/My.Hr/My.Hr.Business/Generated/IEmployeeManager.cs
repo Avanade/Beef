@@ -24,7 +24,7 @@ namespace My.Hr.Business
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         Task<Employee?> GetAsync(Guid id);
 
@@ -39,7 +39,7 @@ namespace My.Hr.Business
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         Task<Employee> UpdateAsync(Employee value, Guid id);
 

@@ -11,6 +11,6 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="EfDb"/> class.
         /// </summary>
         /// <param name="dbContext">The entity framework database context.</param>
-        public EfDb(EfDbContext dbContext) : base(dbContext) => OnUpdatePreReadForNotFound = true;
+        public EfDb(EfDbContext dbContext) : base(dbContext) { }
     }
 }

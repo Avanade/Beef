@@ -72,14 +72,14 @@ namespace Beef.Data.OData
             {
                 var coll = q.Skip(0).Top(2).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.Single();
-            }));
+            }))!;
         }
 
         /// <summary>
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectSingleOrDefault()
+        public T? SelectSingleOrDefault()
         {
             return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
@@ -98,14 +98,14 @@ namespace Beef.Data.OData
             {
                 var coll = q.Skip(0).Top(1).FindEntriesAsync().GetAwaiter().GetResult();
                 return coll.First();
-            }));
+            }))!;
         }
 
         /// <summary>
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectFirstOrDefault()
+        public T? SelectFirstOrDefault()
         {
             return ODataBase.GetValue(QueryArgs, ExecuteQuery(q =>
             {
@@ -152,7 +152,7 @@ namespace Beef.Data.OData
 
                 foreach (var item in q.FindEntriesAsync(ann).GetAwaiter().GetResult())
                 {
-                    coll.Add(ODataBase.GetValue(QueryArgs, item));
+                    coll.Add(ODataBase.GetValue(QueryArgs, item)!);
                 }
 
                 if (ann != null)

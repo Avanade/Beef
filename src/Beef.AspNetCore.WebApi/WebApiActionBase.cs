@@ -305,11 +305,12 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="func">The The function to invoke.</param>
+        /// <param name="convertNotfoundToNoContent">Indicates whether a <see cref="NotFoundObjectResult"/> should be converted to an <see cref="HttpStatusCode.NoContent"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func)
+        protected virtual Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
         {
-            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func),
+            return WebApiControllerInvoker.Current.InvokeAsync(Controller, () => ExecuteResultAsyncInternal(context, func, convertNotfoundToNoContent),
                 memberName: CallerMemberName, filePath: CallerFilePath, lineNumber: CallerLineNumber);
         }
 
@@ -317,7 +318,7 @@ namespace Beef.AspNetCore.WebApi
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is no result.
         /// </summary>
         [DebuggerStepThrough()]
-        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<Task> func)
+        private async Task ExecuteResultAsyncInternal(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
         {
             try
             {
@@ -329,6 +330,12 @@ namespace Beef.AspNetCore.WebApi
             }
             catch (Exception ex)
             {
+                if (convertNotfoundToNoContent && ex is NotFoundException)
+                {
+                    await CreateResult(context, HttpStatusCode.NoContent).ExecuteResultAsync(context).ConfigureAwait(false);
+                    return;
+                }
+
                 var ai = ExecuteExceptionHandler == null ? null : ExecuteExceptionHandler(context, ex);
                 if (ai == null)
                     throw;
@@ -635,7 +642,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         public override Task ExecuteResultAsync(ActionContext context)
         {
-            return ExecuteResultAsync(context, _func);
+            return ExecuteResultAsync(context, _func, false);
         }
     }
 
@@ -715,7 +722,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         public override Task ExecuteResultAsync(ActionContext context)
         {
-            return ExecuteResultAsync(context, _func);
+            return ExecuteResultAsync(context, _func, false);
         }
     }
 
@@ -795,7 +802,7 @@ namespace Beef.AspNetCore.WebApi
         [DebuggerStepThrough()]
         public override Task ExecuteResultAsync(ActionContext context)
         {
-            return ExecuteResultAsync(context, _func);
+            return ExecuteResultAsync(context, _func, true);
         }
     }
 
@@ -865,9 +872,10 @@ namespace Beef.AspNetCore.WebApi
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="func">The The function to invoke.</param>
+        /// <param name="convertNotfoundToNoContent">Indicates whether a <see cref="NotFoundObjectResult"/> should be converted to an <see cref="HttpStatusCode.NoContent"/>.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous execute operation.</returns>
         [DebuggerStepThrough()]
-        protected override Task ExecuteResultAsync(ActionContext context, Func<Task> func)
+        protected override Task ExecuteResultAsync(ActionContext context, Func<Task> func, bool convertNotfoundToNoContent)
         {
             throw new NotSupportedException();
         }

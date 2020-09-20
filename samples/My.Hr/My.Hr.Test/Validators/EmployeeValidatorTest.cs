@@ -203,5 +203,29 @@ namespace My.Hr.Test.Validators
                 .ExpectErrorType(Beef.ErrorType.ValidationError, "Once an Employee has been Terminated the data can no longer be updated.")
                 .Run(() => EmployeeValidator.Default.Validate(e));
         }
+
+        [Test]
+        public void B110_CanDelete_NotFound()
+        {
+            var eds = new Mock<IEmployeeDataSvc>();
+            eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
+
+            ValidationTester.Test()
+                .AddScopedService(eds)
+                .ExpectErrorType(Beef.ErrorType.NotFoundError)
+                .Run(() => EmployeeValidator.CanDelete.Validate(1.ToGuid()));
+        }
+
+        [Test]
+        public void B110_CanDelete_Invalid()
+        {
+            var eds = new Mock<IEmployeeDataSvc>();
+            eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { StartDate = DateTime.UtcNow.AddDays(-1) });
+
+            ValidationTester.Test()
+                .AddScopedService(eds)
+                .ExpectErrorType(Beef.ErrorType.ValidationError, "An employee cannot be deleted after they have started their employment.")
+                .Run(() => EmployeeValidator.CanDelete.Validate(1.ToGuid()));
+        }
     }
 }

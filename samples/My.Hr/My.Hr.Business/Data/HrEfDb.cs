@@ -11,6 +11,6 @@ namespace My.Hr.Business.Data
         /// Initializes a new instance of the <see cref="HrEfDb"/> class.
         /// </summary>
         /// <param name="dbContext">The entity framework database context.</param>
-        public HrEfDb(HrEfDbContext dbContext) : base(dbContext) => OnUpdatePreReadForNotFound = true;
+        public HrEfDb(HrEfDbContext dbContext) : base(dbContext) { }
     }
 }

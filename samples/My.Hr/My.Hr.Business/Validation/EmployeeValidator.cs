@@ -59,8 +59,7 @@ namespace My.Hr.Business.Validation
                     break;
 
                 case OperationType.Update:
-                    var dataSvc = (IEmployeeDataSvc)context.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
-                    var existing = dataSvc.GetAsync(context.Value.Id).GetAwaiter().GetResult();
+                    var existing = context.GetService<IEmployeeDataSvc>().GetAsync(context.Value.Id).GetAwaiter().GetResult();
                     if (existing == null)
                         throw new NotFoundException();
 
@@ -71,5 +70,18 @@ namespace My.Hr.Business.Validation
                     break;
             }
         }
+
+        /// <summary>
+        /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
+        /// </summary>
+        public static CommonValidator<Guid> CanDelete = CommonValidator.Create<Guid>(cv => cv.Custom(context => 
+        {
+            var existing = context.GetService<IEmployeeDataSvc>().GetAsync(context.Value).GetAwaiter().GetResult();
+            if (existing == null)
+                throw new NotFoundException();
+
+            if (existing.StartDate <= DateTime.Now)
+                throw new ValidationException("An employee cannot be deleted after they have started their employment.");
+        }));
     }
 }

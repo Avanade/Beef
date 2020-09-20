@@ -168,6 +168,34 @@ namespace Beef.Core.UnitTest.Mapper
         }
 
         [Test]
+        public void MapToDest_EntityValue_PropMapper2()
+        {
+            var r = new PersonB { AddressX = new AddressX { City = "123", Street = "456" } };
+
+            EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper.Create<Address, AddressX>().HasProperty(sa => sa.Street, da => da.City)))
+                .MapToDest(new PersonA { Address = new Address { Street = "AAA", City = "BBB" } }, r);
+
+            Assert.IsNotNull(r);
+            Assert.IsNotNull(r.AddressX);
+            Assert.AreEqual("456", r.AddressX.Street);
+            Assert.AreEqual("AAA", r.AddressX.City);
+        }
+
+        [Test]
+        public void MapToDest_EntityValue_PropMapper3()
+        {
+            var r = new PersonB { AddressX = new AddressX { City = "123", Street = "456" } };
+
+            EntityMapper.Create<PersonA, PersonB>()
+                .HasProperty(s => s.Address, d => d.AddressX, p => p.SetMapper(EntityMapper.Create<Address, AddressX>().HasProperty(sa => sa.Street, da => da.City)))
+                .MapToDest(new PersonA(), r);
+
+            Assert.IsNotNull(r);
+            Assert.IsNull(r.AddressX);
+        }
+
+        [Test]
         public void MapToDest_CollNull()
         {
             var r = EntityMapper.Create<PersonA, PersonB>()

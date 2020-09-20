@@ -25,7 +25,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        T SelectSingleOrDefault();
+        T? SelectSingleOrDefault();
 
         /// <summary>
         /// Selects first item.
@@ -37,7 +37,7 @@ namespace Beef.Data.EntityFrameworkCore
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        T SelectFirstOrDefault();
+        T? SelectFirstOrDefault();
 
         /// <summary>
         /// Executes the query command creating a resultant collection.
@@ -137,9 +137,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectSingleOrDefault()
+        public T? SelectSingleOrDefault()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.SingleOrDefault()), Mapper.OperationTypes.Get)!;
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.SingleOrDefault()), Mapper.OperationTypes.Get);
         }
 
         /// <summary>
@@ -155,9 +155,9 @@ namespace Beef.Data.EntityFrameworkCore
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectFirstOrDefault()
+        public T? SelectFirstOrDefault()
         {
-            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.FirstOrDefault()), Mapper.OperationTypes.Get)!;
+            return QueryArgs.Mapper.MapToSrce(ExecuteQuery(q => q.FirstOrDefault()), Mapper.OperationTypes.Get);
         }
 
         #endregion

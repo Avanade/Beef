@@ -26,7 +26,7 @@ namespace My.Hr.Common.Agents
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<Employee?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null);
@@ -43,7 +43,7 @@ namespace My.Hr.Common.Agents
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<Employee>> UpdateAsync(Employee value, Guid id, WebApiRequestOptions? requestOptions = null);
@@ -53,7 +53,7 @@ namespace My.Hr.Common.Agents
         /// </summary>
         /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         Task<WebApiAgentResult<Employee>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null);
@@ -99,7 +99,7 @@ namespace My.Hr.Common.Agents
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee?>> GetAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
@@ -120,7 +120,7 @@ namespace My.Hr.Common.Agents
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> UpdateAsync(Employee value, Guid id, WebApiRequestOptions? requestOptions = null) =>
@@ -132,7 +132,7 @@ namespace My.Hr.Common.Agents
         /// </summary>
         /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Employee>> PatchAsync(WebApiPatchOption patchOption, JToken value, Guid id, WebApiRequestOptions? requestOptions = null) =>

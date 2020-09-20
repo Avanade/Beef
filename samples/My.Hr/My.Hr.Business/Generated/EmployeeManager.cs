@@ -39,7 +39,7 @@ namespace My.Hr.Business
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         public Task<Employee?> GetAsync(Guid id)
         {
@@ -74,7 +74,7 @@ namespace My.Hr.Business
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         public Task<Employee> UpdateAsync(Employee value, Guid id)
         {
@@ -100,7 +100,7 @@ namespace My.Hr.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
-                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
+                id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).Run().ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }

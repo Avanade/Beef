@@ -24,7 +24,7 @@ namespace My.Hr.Business.Data
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         Task<Employee?> GetAsync(Guid id);
 

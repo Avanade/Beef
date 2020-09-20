@@ -12,13 +12,13 @@ This sample will walkthrough an approach of adding the capabilities in a series 
 
 Within the sample there will two primary entities exposed:
 - **Employee** - being an employee that either is, or was, employed by the ficticous organization.
-- **Performance Review** - being a recording of a number of performance reviews over time.
+- **Performance Review** - being a recording of a number of performance reviews for an employee over time.
 
 </br>
 
 ### Employee
 
-This will represent an employee witin the organization, and house key data such as their name, address, phone number, gender, date of birth, start and termination dates, and a list of up to five emergency contacts.
+This will represent an employee within the organization, and house key data such as their name, address, phone number, gender, date of birth, start and termination dates, and a list of up to five emergency contacts.
 
 From an endpoint perspective it will support the following.
 
@@ -28,8 +28,8 @@ Endpoint | Description
 `POST /employees` | Create a new employee.
 `PUT /employees/id` | Update (replace) the existing employee (only where not terminated).
 `PATCH /employees/id` | Patch the existing employee (only where not terminated).
-`DELETE /employees/id` | Delete an existing employee (only where they have not starter started).
-`GET /employees` | Gets employee(s) that match the selection criteria (subset of fields returned).
+`DELETE /employees/id` | Delete an existing employee (only where not started).
+`GET /employees` | Gets employee(s) that match the selection criteria (a subset of the fields to be returned, plus support for paging).
 `POST /employees/id/terminate` | Updates the employee as terminated (other endpoints do not allow termination).
 
 </br>
@@ -47,7 +47,7 @@ Endpoint | Description
 `PUT /reviews/id` | Update (replace) the review.
 `PATCH /reviews/id` | Patch the existing review.
 `DELETE /reviews/id` | Delete an existing employee (only where not started).
-`GET /employee/id/reviews` | Gets review(s) for the employee that match the selection criteria.
+`GET /employee/id/reviews` | Gets all review(s) for the employee (with paging support).
 
 </br>
 
@@ -55,7 +55,7 @@ Endpoint | Description
 
 This solution should be created using the solution [template](../../templates/Beef.Template.Solution/README.md) capability, following the getting started [guide](../../docs/Sample-EntityFramework-GettingStarted.md).
 
-The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the copy & paste activities that will be required it is recommended that the `My.Hr` naming below is used.
+The following four commands should be invoked to create the solution structure. Start in a folder where the solution should reside. To simplify the ongoing copy and paste activities within this sample it is highly recommended that the `My.Hr` naming convention below is used.
 
 ```
 dotnet new -i beef.template.solution --nuget-source https://api.nuget.org/v3/index.json
@@ -78,7 +78,7 @@ The following solution structure will have been generated. Open `My.Hr.sln` in V
 
 _Note:_ Code generation should **not** be performed before updating the corresponding XML files as described in the next sections. Otherwise, extraneous files will be generated that will then need to be manually removed.
 
-Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects. This then represents the base-line to build up the solution from.
+Also, any files that start with `Person` (being the demonstration entity) should be removed (deleted) from their respective projects as they are encountered. This then represents the base-line to build up the solution from.
 
 </br>
 

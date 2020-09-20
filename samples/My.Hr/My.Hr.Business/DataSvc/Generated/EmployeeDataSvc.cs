@@ -43,7 +43,7 @@ namespace My.Hr.Business.DataSvc
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         public Task<Employee?> GetAsync(Guid id)
         {

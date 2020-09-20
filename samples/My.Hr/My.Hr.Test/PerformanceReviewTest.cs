@@ -123,5 +123,104 @@ namespace My.Hr.Test
         }
 
         #endregion
+
+        #region Update
+
+        [Test, TestSetUp]
+        public void C110_Update_NotFound()
+        {
+            // Get an existing value.
+            var v = AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(3.ToGuid())).Value!;
+
+            // Try updating with an invalid identifier.
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.UpdateAsync(v, 404.ToGuid()));
+        }
+
+        [Test, TestSetUp]
+        public void C120_Update_Concurrency()
+        {
+            // Get an existing value.
+            var id = 3.ToGuid();
+            var v = AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(id)).Value!;
+
+            // Try updating the value with an invalid eTag (if-match).
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.UpdateAsync(v, id, new WebApiRequestOptions { ETag = TestSetUp.ConcurrencyErrorETag }));
+
+            // Try updating the value with an invalid eTag.
+            v.ETag = TestSetUp.ConcurrencyErrorETag;
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview>()
+                .ExpectStatusCode(HttpStatusCode.PreconditionFailed)
+                .Run(a => a.UpdateAsync(v, id));
+        }
+
+        [Test, TestSetUp]
+        public void C130_Update()
+        {
+            // Get an existing value.
+            var id = 3.ToGuid();
+            var v = AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(id)).Value!;
+
+            // Make some changes to the data.
+            v.Notes += "X";
+
+            // Update the value.
+            v = AgentTester.Test<PerformanceReviewAgent, PerformanceReview>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectChangeLogUpdated()
+                .ExpectETag(v.ETag)
+                .ExpectUniqueKey()
+                .ExpectValue(_ => v)
+                .ExpectEvent($"My.Hr.PerformanceReview.{id}", "Updated")
+                .Run(a => a.UpdateAsync(v, id)).Value!;
+
+            // Check the value was updated properly.
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => v)
+                .Run(a => a.GetAsync(id));
+        }
+
+        #endregion
+
+        #region Delete
+
+        [Test, TestSetUp]
+        public void E110_Delete()
+        {
+            var id = 3.ToGuid();
+
+            // Get an existing value.
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(id));
+
+            // Delete value.
+            AgentTester.Test<PerformanceReviewAgent>()
+                .ExpectStatusCode(HttpStatusCode.NoContent)
+                .ExpectEvent($"My.Hr.PerformanceReview.{id}", "Deleted")
+                .Run(a => a.DeleteAsync(id));
+
+            // Check value no longer exists.
+            AgentTester.Test<PerformanceReviewAgent, PerformanceReview?>()
+                .ExpectStatusCode(HttpStatusCode.NotFound)
+                .Run(a => a.GetAsync(id));
+
+            // Delete again (should still be successful as a Delete is idempotent); note there should be no corresponding event as nothing actually happened.
+            AgentTester.Test<PerformanceReviewAgent>()
+                .ExpectStatusCode(HttpStatusCode.NoContent)
+                .Run(a => a.DeleteAsync(id));
+        }
+
+        #endregion
     }
 }

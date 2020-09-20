@@ -41,7 +41,7 @@ namespace My.Hr.Api.Controllers
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.
         /// </summary>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
@@ -71,7 +71,7 @@ namespace My.Hr.Api.Controllers
         /// Updates an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
         [AllowAnonymous]
         [HttpPut("{id}")]
@@ -86,7 +86,7 @@ namespace My.Hr.Api.Controllers
         /// Patches an existing <see cref="Employee"/>.
         /// </summary>
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Employee"/>.</param>
-        /// <param name="id">The Id.</param>
+        /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="Employee"/>.</returns>
         [AllowAnonymous]
         [HttpPatch("{id}")]

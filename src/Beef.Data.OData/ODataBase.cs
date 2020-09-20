@@ -106,8 +106,8 @@ namespace Beef.Data.OData
             {
                 try
                 {
-                    var val = await Client.For<TModel>(getArgs.CollectionName).Key(okeys).FindEntryAsync().ConfigureAwait(false);
-                    return GetValue(getArgs, val);
+                    var model = await GetModelAsync(getArgs, okeys).ConfigureAwait(false);
+                    return GetValue(getArgs, model);
                 }
                 catch (WebRequestException odex)
                 {
@@ -117,6 +117,24 @@ namespace Beef.Data.OData
                     throw;
                 }
             }, this).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets the model.
+        /// </summary>
+        private async Task<TModel?> GetModelAsync<T, TModel>(ODataArgs<T, TModel> getArgs, object[]? keys) where T : class, new() where TModel : class, new()
+        {
+            try
+            {
+                return await Client.For<TModel>(getArgs.CollectionName).Key(keys).FindEntryAsync().ConfigureAwait(false);
+            }
+            catch (WebRequestException odex)
+            {
+                if (odex.Code == System.Net.HttpStatusCode.NotFound && getArgs.NullOnNotFoundResponse)
+                    return null;
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -141,7 +159,7 @@ namespace Beef.Data.OData
             {
                 var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
                 var created = await Client.For<TModel>(saveArgs.CollectionName).Set(model).InsertEntryAsync(true).ConfigureAwait(false);
-                return GetValue(saveArgs, created);
+                return GetValue(saveArgs, created)!;
             }, this).ConfigureAwait(false);
         }
 
@@ -166,12 +184,16 @@ namespace Beef.Data.OData
             return await Invoker.InvokeAsync(this, async () =>
             {
                 var okeys = saveArgs.GetODataKeys(value);
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create) ?? throw new InvalidOperationException("Mapping to the OData model must not result in a null value.");
+                var model = await GetModelAsync(saveArgs, okeys).ConfigureAwait(false);
+                if (model == null)
+                    throw new NotFoundException();
+
+                saveArgs.Mapper.MapToDest(value, model, Mapper.OperationTypes.Update);
                 var updated = await Client.For<TModel>(saveArgs.CollectionName).Key(okeys).Set(model).UpdateEntryAsync(true).ConfigureAwait(false);
                 if (updated == null)
                     throw new NotFoundException();
 
-                return GetValue(saveArgs, updated);
+                return GetValue(saveArgs, updated)!;
             }, this).ConfigureAwait(false);
         }
 
@@ -198,7 +220,7 @@ namespace Beef.Data.OData
                 catch (WebRequestException odex)
                 {
                     if (odex.Code == System.Net.HttpStatusCode.NotFound)
-                        return;
+                        throw new NotFoundException();
 
                     throw;
                 }
@@ -208,10 +230,10 @@ namespace Beef.Data.OData
         /// <summary>
         /// Gets the corresponding entity value from the model value.
         /// </summary>
-        internal static T GetValue<T, TModel>(ODataArgs<T, TModel> args, TModel model) where T : class, new() where TModel : class, new()
+        internal static T? GetValue<T, TModel>(ODataArgs<T, TModel> args, TModel? model) where T : class, new() where TModel : class, new()
         {
-            if (model == default)
-                return default!;
+            if (model == null)
+                return null;
             else
                 return args.Mapper.MapToSrce(model, Mapper.OperationTypes.Get) ?? throw new InvalidOperationException("Mapping from the OData model must not result in a null value.");
         }

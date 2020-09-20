@@ -11,6 +11,6 @@ namespace Company.AppName.Business.Data
         /// Initializes a new instance of the <see cref="AppNameEfDb"/> class.
         /// </summary>
         /// <param name="dbContext">The entity framework database context.</param>
-        public AppNameEfDb(AppNameEfDbContext dbContext) : base(dbContext) => OnUpdatePreReadForNotFound = true;
+        public AppNameEfDb(AppNameEfDbContext dbContext) : base(dbContext) { }
     }
 }

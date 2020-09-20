@@ -180,8 +180,8 @@ namespace Beef.Test.NUnit
         /// Runs the <paramref name="func"/> checking against the expected outcomes.
         /// </summary>
         /// <param name="func">The function to execute.</param>
-        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
-        public IValidationContext? Run(Func<IValidationContext> func)
+        /// <returns>The resulting <see cref="IValidationContextBase"/> where applicable; otherwise, <c>null</c>.</returns>
+        public IValidationContextBase? Run(Func<IValidationContextBase> func)
         {
             PrepareExecutionContext(_username, _args);
             ExecutionContext.Current.OperationType = _operationType;

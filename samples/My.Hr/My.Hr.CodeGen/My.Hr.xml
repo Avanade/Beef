@@ -33,19 +33,23 @@
        - The WebApiRoutePrefix is defined, which is in turn extended by each operation. 
        - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
   <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DatabaseSchema="Hr" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
-    <Property Name="Id" Type="Guid" UniqueKey="true" Inherited="true" DataDatabaseIgnore="true" />
+    <Property Name="Id" Text="{{Employee}} identifier" Type="Guid" UniqueKey="true" Inherited="true" DataDatabaseIgnore="true" />
     <Property Name="Address" Type="Address" DataConverter="ObjectToJsonConverter{T}" DataName="AddressJson"/>
     <Property Name="EmergencyContacts" Type="EmergencyContactCollection" DataDatabaseIgnore="true" />
 
     <!-- CRUD operations:
          - Get - Get by unique identifier which it infers from the properties marked as UniqueKey; data access cannot be automatically implemented given complexity.
          - Create/Update/Patch - infers UniqueKey where appropriate; data access cannot be automatically implemented given complexity (Patch is Controller-only, reuses Get and Update to perform). 
-         - Delete - infers UniqueKey; can be automatically implemented as it will invoke stored procedure with key and expects no result. -->
+         - Delete - explictly defining so that we can tie further validation to the identifier check. 
+                  - Using the Property attribute to copy configuration from the Entity itself.
+                  - Providing further validation by using the Common extension method to invoke the EmployeeValidator.CanDelete. -->
     <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
     <Operation Name="Create" OperationType="Create" WebApiRoute="" AutoImplement="None" />
     <Operation Name="Update" OperationType="Update" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
     <Operation Name="Patch" OperationType="Patch" UniqueKey="true" WebApiRoute="{id}" />
-    <Operation Name="Delete" OperationType="Delete" UniqueKey="true" WebApiRoute="{id}" />
+    <Operation Name="Delete" OperationType="Delete" WebApiRoute="{id}">
+      <Parameter Name="Id" Property="Id" IsMandatory="true" ValidatorFluent="Common(EmployeeValidator.CanDelete)"/>
+    </Operation>
   
     <!-- Search operation 
          - OperationType is GetColl which indicates that a collection is the expected result. 

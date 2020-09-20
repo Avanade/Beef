@@ -434,28 +434,40 @@ namespace My.Hr.Test
         [Test, TestSetUp]
         public void E110_Delete()
         {
-            // Check value exists.
-            var id = 4.ToGuid();
-            AgentTester.Test<EmployeeAgent, Employee?>()
-                .ExpectStatusCode(HttpStatusCode.OK)
-                .Run(a => a.GetAsync(id));
+            var v = new Employee
+            {
+                Email = "j.jones@org.com",
+                FirstName = "Jarrod",
+                LastName = "Jones",
+                GenderSid = "M",
+                Birthday = new DateTime(1928, 10, 28),
+                StartDate = DateTime.UtcNow.AddDays(1),
+                PhoneNo = "(456) 789 0123",
+                Address = new Address { Street1 = "2732 85 PL NE", City = "Bellevue", StateSid = "WA", PostCode = "98101" },
+                EmergencyContacts = new EmergencyContactCollection { new EmergencyContact { FirstName = "Danny", LastName = "Keen", PhoneNo = "(234) 297 9834", RelationshipSid = "FRD" } }
+            };
+
+            // Create an employee in the future.
+            v = AgentTester.Test<EmployeeAgent, Employee>()
+                .ExpectStatusCode(HttpStatusCode.Created)
+                .ExpectEvent("My.Hr.Employee.*", "Created")
+                .Run(a => a.CreateAsync(v)).Value;
 
             // Delete value.
             AgentTester.Test<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"My.Hr.Employee.{id}", "Deleted")
-                .Run(a => a.DeleteAsync(id));
+                .ExpectEvent($"My.Hr.Employee.{v.Id}", "Deleted")
+                .Run(a => a.DeleteAsync(v.Id));
 
             // Check value no longer exists.
             AgentTester.Test<EmployeeAgent, Employee?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .Run(a => a.GetAsync(id));
+                .Run(a => a.GetAsync(v.Id));
 
-            // Delete again (should still be successful as a Delete is idempotent). 
+            // Delete again (should still be successful as a Delete is idempotent); note there should be no corresponding event as nothing actually happened.
             AgentTester.Test<EmployeeAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"My.Hr.Employee.{id}", "Deleted")
-                .Run(a => a.DeleteAsync(id));
+                .Run(a => a.DeleteAsync(v.Id));
         }
 
         #endregion

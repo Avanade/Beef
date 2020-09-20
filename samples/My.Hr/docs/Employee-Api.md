@@ -107,12 +107,16 @@ Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the follow
     <!-- CRUD operations:
          - Get - Get by unique identifier which it infers from the properties marked as UniqueKey; data access cannot be automatically implemented given complexity.
          - Create/Update/Patch - infers UniqueKey where appropriate; data access cannot be automatically implemented given complexity (Patch is Controller-only, reuses Get and Update to perform). 
-         - Delete - infers UniqueKey; can be automatically implemented as it will invoke stored procedure with key and expects no result. -->
+         - Delete - explictly defining so that we can tie further validation to the identifier check. 
+                  - Using the Property attribute to copy configuration from the Entity itself.
+                  - Providing further validation by using the Common extension method to invoke the EmployeeValidator.CanDelete. -->
     <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
     <Operation Name="Create" OperationType="Create" WebApiRoute="" AutoImplement="None" />
     <Operation Name="Update" OperationType="Update" UniqueKey="true" WebApiRoute="{id}" AutoImplement="None" />
     <Operation Name="Patch" OperationType="Patch" UniqueKey="true" WebApiRoute="{id}" />
-    <Operation Name="Delete" OperationType="Delete" UniqueKey="true" WebApiRoute="{id}" />
+    <Operation Name="Delete" OperationType="Delete" WebApiRoute="{id}">
+      <Parameter Name="Id" Property="Id" IsMandatory="true" ValidatorFluent="Common(EmployeeValidator.CanDelete)"/>
+    </Operation>
   </Entity>
 
   <!-- Creating a TerminationDetail with Date and Reason.
@@ -338,8 +342,7 @@ namespace My.Hr.Business.Validation
                     break;
 
                 case OperationType.Update:
-                    var dataSvc = (IEmployeeDataSvc)context.ServiceProvider!.GetService(typeof(IEmployeeDataSvc));
-                    var existing = dataSvc.GetAsync(context.Value.Id).GetAwaiter().GetResult();
+                    var existing = context.GetService<IEmployeeDataSvc>().GetAsync(context.Value.Id).GetAwaiter().GetResult();
                     if (existing == null)
                         throw new NotFoundException();
 
@@ -350,6 +353,16 @@ namespace My.Hr.Business.Validation
                     break;
             }
         }
+
+        /// <summary>
+        /// Common validator that will be referenced by the Delete operation to ensure that the employee can indeed be deleted.
+        /// </summary>
+        public static CommonValidator<Guid> CanDelete = CommonValidator.Create<Guid>(cv => cv.Custom(context => 
+        {
+            var existing = context.GetService<IEmployeeDataSvc>().GetAsync(context.Value).GetAwaiter().GetResult();
+            if (existing != null && existing.StartDate >= DateTime.Now)
+                throw new ValidationException("An employee cannot be deleted after they have started.");
+        }));
     }
 }
 ```

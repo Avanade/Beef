@@ -239,7 +239,7 @@ namespace Beef.Data.Cosmos
                     var ro = CosmosDb.GetItemRequestOptions(DbArgs);
                     var resp = await Container.ReadItemAsync<CosmosDbValue<TModel>>(key, DbArgs.PartitionKey ?? PartitionKey.None, ro).ConfigureAwait(false);
                     if (resp?.Resource == null || resp.Resource.Type != _typeName)
-                        return;
+                        throw new NotFoundException();
 
                     CheckAuthorized(resp.Resource);
                     ro.SessionToken = resp.Headers?.Session;
