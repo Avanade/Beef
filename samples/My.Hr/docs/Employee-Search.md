@@ -17,7 +17,7 @@ The search should also support paging. The results should be returned in last na
 Examples of the endpoint are as follows (or any combination thereof).
 
 Endpoint | Description
-- | -
+-|-
 `GET /employees?lastName=smi*` | all employees whose last name starts with `smi`.
 `GET /employees?gender=f` | all female employees.
 `GET /employees?startFrom=2000-01-01&startTo=2002-12-31` | all employess who started between 01-Jan-2000 and 31-Dec-2002 (inclusive).
@@ -68,7 +68,7 @@ The `GetByArgs` operation needs to be added to the `Employee` entity configurati
     </Operation>
 ```
 
-So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` element configuration. Replace the previous XML with the following.
+So that the code-gen knows what Entity Framework model is to be used this needs to be appended to the existing `Employee` element configuration. Replace the previous XML with the following (note that the xml comment termination will need to be fixed if copied).
 
 ``` xml
        - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
@@ -88,7 +88,7 @@ dotnet run entity
 
 The existing `EmployeeData.cs` logic will need to be extended to support the new `GetByArgs`. 
 
-For query operations generally we do not implement using the custom `OnImplementation` approach, as the primary code apart from the application of the search criteria can be generated. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
+For query operations generally we do not implement using the custom `OnImplementation` approach, as the primary code with the exception of the actual search criteria can be generated. As such, in this case _Beef_ will have generated an extension delegate named `_getByArgsOnQuery` to enable. This extension delegate will be passed in the `IQueryable<EfModel.Employee>` so that filtering and sorting, etc. can be applied, as well as the search arguments (`EmployeeArgs`). _Note:_ no paging is applied as _Beef_ will apply this automatically.
 
 Extensions within _Beef_ are leveraged by implementing the partial constructor method (`EmployeeDataCtor`) and providing an implementation for the requisite extension delegate (`_getByArgsOnQuery`).
 
@@ -149,10 +149,14 @@ namespace My.Hr.Business.Validation
 
 ## End-to-End testing
 
-For the purposes of this sample un-comment the region `GetByArgs`. Execute the tests and ensure they all pass as expected.
+For the purposes of this sample un-comment the region `GetByArgs` within `EmployeeTest.cs`. Execute the tests and ensure they all pass as expected.
+
+As extra homework, you should also consider implementing unit testing for the validator.
 
 <br/>
 
 ## Conclusion
 
-At this stage we now have added and tested the employee search, in addition to the employee CRUD APIs. Next we will implement the employee termination endpoint.
+At this stage we now have added and tested the employee search, in addition to the employee CRUD APIs. 
+
+Next we will implement the [employee termination](./Employee-Terminate.md) endpoint.

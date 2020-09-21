@@ -31,7 +31,7 @@ For the purposes of testing the APIs implemented so far, a set of employees and 
 Hr:
   - Employee:
     - { EmployeeId: 1, Email: w.jones@org.com, FirstName: Wendy, LastName: Jones, GenderCode: F, Birthday: 1985-03-18, StartDate: 2000-12-11, PhoneNo: (425) 612 8113 }
-    - { EmployeeId: 2, Email: b.smith@org.com,  FirstName: Brian, LastName: Smith, GenderCode: M, Birthday: 1994-11-07, StartDate: 2013-08-06, TerminationDate: 2011-04-08, TerminationReasonCode: RE, PhoneNo: (429) 120 0098 }
+    - { EmployeeId: 2, Email: b.smith@org.com,  FirstName: Brian, LastName: Smith, GenderCode: M, Birthday: 1994-11-07, StartDate: 2013-08-06, TerminationDate: 2015-04-08, TerminationReasonCode: RE, PhoneNo: (429) 120 0098 }
     - { EmployeeId: 3, Email: r.Browne@org.com,  FirstName: Rachael, LastName: Browne, GenderCode: F, Birthday: 1972-06-28, StartDate: 2019-11-06, PhoneNo: (421) 783 2343 }
     - { EmployeeId: 4, Email: w.smither@org.com,  FirstName: Waylon, LastName: Smithers, GenderCode: M, Birthday: 1952-02-21, StartDate: 2001-01-22, PhoneNo: (428) 893 2793, AddressJson: '{ "street1": "8365 851 PL NE", "city": "Redmond", "state": "WA", "postCode": "98052" }' }
   - EmergencyContact:
@@ -44,7 +44,7 @@ Hr:
 
 ## Employee test
 
-For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs). Comment out the region `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
+For the purposes of this sample, copy the contents of [`EmployeeTest.cs`](../My.Hr.Test/EmployeeTest.cs) and paste into an equivalent (new) `EmployeeTest.cs`. Comment out the region `GetByArgs` and `Termination` as these capabilities have not been implemented yet.
 
 Review and execute the tests and ensure they all pass as expected.
 
@@ -54,7 +54,7 @@ Review and execute the tests and ensure they all pass as expected.
 
 This is more of a pure unit test; in that all data repository access is mocked out. This allows these to execute faster without database set up requirements, but will need the likes of reference data, and other, mocked as required. The sample demonstrates how these validators can be easily and thoroughly tested.
 
-For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../My.Hr.Test/Validators/EmployeeValidatorTest.cs)
+For the purposes of this sample, copy the contents of [`EmployeeValidatorTest.cs`](../My.Hr.Test/Validators/EmployeeValidatorTest.cs) and paste into an equiavlent (new) `Validators/EmployeeValidatorTest.cs`.
 
 Review and execute the tests and ensure they all pass as expected.
 
@@ -62,5 +62,7 @@ Review and execute the tests and ensure they all pass as expected.
 
 ## Conclusion
 
-At this stage we now have a set of functioning and tested performance review APIs. All the desired functionality is now complete. These are now essentially ready for deployment; obviously, before doing so security would be integrated into the solution.
+At this stage we now have a set of functioning and tested performance review APIs. All the desired functionality is now complete. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
+
+Next we will implement the [employee termination](./Employee-Search.md) endpoint.
 

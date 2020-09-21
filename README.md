@@ -156,6 +156,7 @@ The following samples are provided to guide usage:
 
 Sample | Description
 -|-
+[`My.Hr`](./samples/My.Hr) | A sample as an end-to-end solution walkthrough to demonstrate the usage of _Beef_ within the context of a fictitious Human Resources solution. The main intent is to show how _Beef_ can be used against a relational database (SQL Server) leveraging both direct ADO.NET (with stored procedures) and Entity Framework (EF) where applicable.
 [`Cdr.Banking`](./samples/Cdr.Banking) | A sample as an end-to-end solution to demonstrate _Beef_ being used to solve a real-world scenario. This demonstrates an implementation of the [CDR](https://consumerdatastandards.org.au/) [Banking](https://consumerdatastandardsaustralia.github.io/standards/#consumer-data-standards-banking-apis) APIs leveraging a Cosmos DB data source.
 [`Demo`](./samples/Demo) | A sample as an end-to-end solution to demonstrate the tiering & layering, code-generation, database management and automated intra-domain integration testing. This is primarily used to further test the key end-to-end capabilities enabled by _Beef_.
 
@@ -219,10 +220,15 @@ _Beef_ is open source under the [MIT license](./LICENSE) and is free for commerc
 
 To start using _Beef_ you do not need to clone or fork the repo; you just need to create a solution with the underlying projects using the prescribed [solution structure](./docs/Solution-Structure.md), including referencing the appropriate [NuGet packages](#Framework). To accelerate this a .NET Core [template capability](./templates/Beef.Template.Solution/README.md) is provided to enable you to get up and running in minutes.
 
-See the following for example end-to-end usage; each demonstrating the same API functionality leveraging different data sources to accomplish:
+See the following for example end-to-end solution/project creation; each demonstrating the same API functionality leveraging different data sources to accomplish:
 - [Cosmos sample](./docs/Sample-Cosmos-GettingStarted.md)
 - [Database Stored Procedures sample](./docs/Sample-StoredProcs-GettingStarted.md)
 - [Database Entity Framework sample](./docs/Sample-EntityFramework-GettingStarted.md)
+
+Otherwise, follow along with the following sample tutorials that will provide a more in-depth walkthrough solving a defined functional problem:
+
+- [`My.Hr`](./samples/My.Hr)
+- [`Cdr.Banking`](./samples/Cdr.Banking)
 
 <br/>
 

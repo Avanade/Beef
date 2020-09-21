@@ -349,10 +349,9 @@ namespace Company.AppName.Test
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetAsync(id));
 
-            // Delete again (should still be successful as a Delete is idempotent). 
+            // Delete again (should still be successful as a Delete is idempotent); but no event should be raised. 
             AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
-                .ExpectEvent($"Company.AppName.Person.{id}", "Deleted")
                 .Run(a => a.DeleteAsync(id));
         }
 

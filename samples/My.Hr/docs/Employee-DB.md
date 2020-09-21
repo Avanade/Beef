@@ -115,7 +115,7 @@ Now that the Reference Data tables exist they will need to be populated. It is r
 
 These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.
 
-_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly.
+_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically).
 
 ``` yaml
 Ref:
@@ -135,14 +135,12 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 ``` XML
 <?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration RefDatabaseSchema="Ref" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
-
+<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- Reference data tables/models. -->
   <Table Name="Gender" Schema="Ref" EfModel="true" />
   <Table Name="TerminationReason" Schema="Ref" EfModel="true" />
   <Table Name="RelationshipType" Schema="Ref" EfModel="true" />
   <Table Name="USState" Schema="Ref" EfModel="true" />
-
 </CodeGeneration>
 ```
 
@@ -152,7 +150,7 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, such as `EmergencyContact`.
 
-Copy the following configuration and append to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
+Copy the following configuration and append (after reference data) to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
 
 ``` XML
   <!-- References the Employee table to infer the underlying schema, then creates stored procedures as configured:
@@ -160,7 +158,7 @@ Copy the following configuration and append to the `My.Hr.Database.xml`; see com
        - The Create and Update also specify the required SQL User-Defined Type (UDT) for the data to be passed into the stored procedure. -->
   <Table Name="Employee" Schema="Hr">
     <StoredProcedure Name="Get" Type="Get">
-      <Execute Statement="EXEC [Hr].[spEmergencyContactGetByEmployeeId]" @EmployeeId />
+      <Execute Statement="EXEC [Hr].[spEmergencyContactGetByEmployeeId] @EmployeeId" />
     </StoredProcedure>
     <StoredProcedure Name="Create" Type="Create">
       <Parameter Name="EmergencyContactList" SqlType="[Hr].[udtEmergencyContactList] READONLY" />
@@ -168,7 +166,7 @@ Copy the following configuration and append to the `My.Hr.Database.xml`; see com
     </StoredProcedure>
     <StoredProcedure Name="Update" Type="Update">
       <Parameter Name="EmergencyContactList" SqlType="[Hr].[udtEmergencyContactList] READONLY" />
-      <Execute Statement="EXEC [Hr].sp[EmergencyContactMerge] @EmployeeId, @EmergencyContactList" />
+      <Execute Statement="EXEC [Hr].[spEmergencyContactMerge] @EmployeeId, @EmergencyContactList" />
     </StoredProcedure>
     <StoredProcedure Name="Delete" Type="Delete">
       <Execute Statement="DELETE FROM [Hr].[EmergencyContact] WHERE [EmployeeId] = @EmployeeId" />
@@ -229,3 +227,5 @@ Where tables need indexes and other constraints added these would be created usi
 ## Conclusion
 
 At this stage we now have a working database ready for the consuming API logic to be added. The required database tables exist, the Reference Data data has been loaded, the required stored procedures and user-defined type (UDT) have been generated and added to the database. The .NET (C#) Entity Framework models have been generated and added to the `My.Hr.Business` project, including the requisite table-valued parameter (TVP). 
+
+Next we need to create the [employee API](./Employee-Api.md) endpoint to perform the desired CRUD operations.

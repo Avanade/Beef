@@ -32,8 +32,7 @@ namespace My.Hr.Business.Data
         /// Executes the 'Get' stored procedure passing the identifier and returns the result.
         /// </summary>
         private Task<Employee?> GetOnImplementationAsync(Guid id) =>
-            ExecuteStatement(_db.StoredProcedure("[Hr].[spEmployeeGet]")
-                                .Param(DbMapper.Default.GetParamName(nameof(Employee.Id)), id));
+            ExecuteStatement(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default.GetParamName(nameof(Employee.Id)), id));
 
         /// <summary>
         /// Executes the 'Create' stored procedure and returns the result.

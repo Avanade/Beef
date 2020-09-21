@@ -110,10 +110,14 @@ namespace My.Hr.Business.Validation
 
 ## End-to-End testing
 
-For the purposes of this sample un-comment the region `Terminate`. Execute the tests and ensure they all pass as expected.
+For the purposes of this sample un-comment the region `Terminate` within `EmployeeTest.cs`. Execute the tests and ensure they all pass as expected.
+
+As extra homework, you should also consider implementing unit testing for the validator.
 
 <br/>
 
 ## Conclusion
 
-At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. Next we will implement the employee review endpoints.
+At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. 
+
+Next we will implement the [employee review](./Performance-Review.md) endpoints.

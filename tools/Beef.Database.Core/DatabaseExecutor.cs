@@ -158,6 +158,9 @@ namespace Beef.Database.Core
 
             _db = new Db(_args.ConnectionString);
 
+            if (_args.UseBeefDbo)
+                _args.Assemblies.Insert(0, typeof(DatabaseConsoleWrapper).Assembly);
+
             _args.Assemblies.ForEach(ass => _namespaces.Add(ass.GetName().Name!));
         }
 
@@ -238,7 +241,8 @@ namespace Beef.Database.Core
                 _logger.LogInformation(new string('-', 80));
                 _logger.LogInformation("DB SCHEMA: Drops and creates the database objects...");
 
-                if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync(new string[] { "dbo", "Ref" })).ConfigureAwait(false))
+                if (!await TimeExecutionAsync(() => 
+                    DropAndCreateAllObjectsAsync(string.IsNullOrEmpty(_args.RefDataSchemaName) ? new string[] { "dbo" } : new string[] { "dbo", _args.RefDataSchemaName })).ConfigureAwait(false))
                     return false;
             }
 

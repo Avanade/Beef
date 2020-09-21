@@ -249,7 +249,7 @@ namespace Beef.Data.Cosmos
                 catch (CosmosException cex)
                 {
                     if (cex.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return;
+                        throw new NotFoundException();
 
                     throw;
                 }

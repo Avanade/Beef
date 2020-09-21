@@ -1,4 +1,4 @@
-﻿# Step 6 - Performance Review
+﻿# Step 6 - Employee Performance Review
 
 This will walk through the process of creating and testing the employee performance review capability.
 
@@ -6,7 +6,7 @@ This will walk through the process of creating and testing the employee performa
 
 ## Functional requirement
 
-The employee performance review can occur at any time during an employee's employment. 
+In simple terms an employee performance review can occur at any time during an employee's employment. It captures the basic information, when, the reviewer, the outcome and related notes.
 
 <br/>
 
@@ -33,6 +33,7 @@ BEGIN TRANSACTION
 
 CREATE TABLE [Hr].[PerformanceReview] (
   [PerformanceReviewId] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
+  [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
   [Date] DATETIME2 NULL,
   [PerformanceOutcomeCode] NVARCHAR(50) NULL,
   [Reviewer] NVARCHAR(100) NULL,
@@ -284,7 +285,16 @@ namespace My.Hr.Business.Validation
 
 ## End-to-End testing
 
-For the purposes of this sample, copy the contents of [`PerformanceReviewTest.cs`](../My.Hr.Test/PerformanceReviewTest.cs) (`My.Hr.Test` root folder) and [`PerformanceReviewValidatorTest.cs`](../My.Hr.Test/Validators)PerformanceReviewValidatorTest.cs) (`My.Hr.Test/Validators` folder).
+For the purposes of this sample, copy the contents of [`PerformanceReviewTest.cs`](../My.Hr.Test/PerformanceReviewTest.cs) (`My.Hr.Test` root folder) and [`PerformanceReviewValidatorTest.cs`](../My.Hr.Test/Validators/PerformanceReviewValidatorTest.cs) (`My.Hr.Test/Validators` folder).
+
+For the end-to-end testing to function performance review related data must first be populated into the database; append the following into the existing `Data.yaml` (`My.Hr.Test/Data`).
+
+``` yaml
+  - PerformanceReview:
+    - { PerformanceReviewId: 1, EmployeeId: 2, Date: 2014-03-15, PerformanceOutcomeCode: DN, Reviewer: r.Browne@org.com, Notes: Work quality low. }
+    - { PerformanceReviewId: 2, EmployeeId: 1, Date: 2016-11-12, PerformanceOutcomeCode: EE, Reviewer: r.Browne@org.com, Notes: They are awesome! }
+    - { PerformanceReviewId: 3, EmployeeId: 2, Date: 2014-01-15, PerformanceOutcomeCode: DN, Reviewer: r.Browne@org.com, Notes: Work quality below standard. }
+```
 
 Review and execute the tests and ensure they all pass as expected.
 

@@ -60,7 +60,7 @@ First up, the entities need to be defined (configured) within the `My.Hr.xml` (`
 
 - `EmployeeBase` - this represents the base Employee in that it contains the key properties and will be used as the base for searching as a means to minimise the properties that are available outside of the `Employee` CRUD itself.
 - `Employee` - this represents the complete detailed Employee, which inherits from the `EmployeeBase`. All of the key operations for the Employee including the search will be configured/grouped as a logical set here.
-- `TerminationDetail` - this represents an employee's termination (being date and reason). By having as a sub-type this enable additional related data to be more easily added under the single `Employee.Termination` property.
+- `TerminationDetail` - this represents an employee's termination (being date and reason). By having as a sub-type this enables additional related data to be more easily added under the single `Employee.Termination` property.
 - `Address` - this represents the employees' address. By having as a sub-type it makes it easier and more explicit that there is a valid address via the `Employee.Address` property; in that we can validate the full address on the existence of the property itself (i.e. not `null`).
 - `EmergencyContact` - this represents the collection of emergency contacts for an employee. 
 
@@ -97,8 +97,7 @@ Replace the existing `Entity` XML (keeping the `CodeGeneration`) with the follow
        - The Id is re-specified, but marked as inherited, as is needed to assist with the operations that reference the UniqueKey.
        - The Validator is specified, which is then used by both the Create and Update operations.
        - The AutoImplement specifies that operations should be auto-implemented using Database (ADO.NET) unless explicitly overridden.
-       - The WebApiRoutePrefix is defined, which is in turn extended by each operation. 
-       - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
+       - The WebApiRoutePrefix is defined, which is in turn extended by each operation. -->
   <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DatabaseSchema="Hr" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper">
     <Property Name="Id" Type="Guid" UniqueKey="true" Inherited="true" DataDatabaseIgnore="true" />
     <Property Name="Address" Type="Address" DataConverter="ObjectToJsonConverter{T}" DataName="AddressJson"/>
@@ -185,8 +184,7 @@ namespace My.Hr.Business.Data
         /// Executes the 'Get' stored procedure passing the identifier and returns the result.
         /// </summary>
         private Task<Employee?> GetOnImplementationAsync(Guid id) =>
-            ExecuteStatement(_db.StoredProcedure("[Hr].[spEmployeeGet]")
-                                .Param(DbMapper.Default.GetParamName(nameof(Employee.Id)), id));
+            ExecuteStatement(_db.StoredProcedure("[Hr].[spEmployeeGet]").Param(DbMapper.Default.GetParamName(nameof(Employee.Id)), id));
 
         /// <summary>
         /// Executes the 'Create' stored procedure and returns the result.
@@ -238,7 +236,7 @@ namespace My.Hr.Business.Data
 
 ### Validation
 
-The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](../../../docs/Beef-Validation.md) to simpplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity.
+The final component that must be implemented by the developer is the validation logic. _Beef_ provides a rich, integrated, [validation framework](../../../docs/Beef-Validation.md) to simplify and standardize the validation as much as possible. This is also intended to encourage a more thorough approach to validation as the API is considered the primary custodian of the underlying data integrity - as Deep Throat said to Mulder in the [X-Files](https://en.wikipedia.org/wiki/The_X-Files), "trust no one"!
 
 To encourage reuse, _Beef_ has the concept of common validators which allow for standardised validations to be created that are then reusable. Within the `My.Hr.Business/Validation` folder create `CommonValidators.cs` and implement as follows.
 
@@ -360,8 +358,11 @@ namespace My.Hr.Business.Validation
         public static CommonValidator<Guid> CanDelete = CommonValidator.Create<Guid>(cv => cv.Custom(context => 
         {
             var existing = context.GetService<IEmployeeDataSvc>().GetAsync(context.Value).GetAwaiter().GetResult();
-            if (existing != null && existing.StartDate >= DateTime.Now)
-                throw new ValidationException("An employee cannot be deleted after they have started.");
+            if (existing == null)
+                throw new NotFoundException();
+
+            if (existing.StartDate <= DateTime.Now)
+                throw new ValidationException("An employee cannot be deleted after they have started their employment.");
         }));
     }
 }
@@ -371,4 +372,6 @@ namespace My.Hr.Business.Validation
 
 ## Conclusion
 
-At this stage we now have a compiling and working API including database access logic for the reference data and key employee CRUD activities. Next we need to perform end-to-end testing to ensure it is functioning as expected.
+At this stage we now have a compiling and working API including database access logic for the reference data and key employee CRUD activities. 
+
+Next we need to perform end-to-end [intra-integration testing](./Employee-Test.md) to ensure it is functioning as expected.
