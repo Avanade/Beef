@@ -64,5 +64,5 @@ Review and execute the tests and ensure they all pass as expected.
 
 At this stage we now have a set of functioning and tested performance review APIs. All the desired functionality is now complete. These are now essentially ready for deployment; obviously, before doing so security would need to be integrated into the solution.
 
-Next we will implement the [employee termination](./Employee-Search.md) endpoint.
+Next we will implement the [employee search](./Employee-Search.md) endpoint.
 

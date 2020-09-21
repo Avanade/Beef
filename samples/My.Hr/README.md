@@ -90,7 +90,7 @@ As described earlier, this sample will walk through the implementation in a numb
 3. [Employee Test](./docs/Employee-Test.md) - creates the `Employee` end-to-end integration tests to validate the API and database functionality.
 4. [Employee Search](./docs/Employee-Search.md) - adds the `Employee` search capability and tests.
 5. [Employee Terminate](./docs/Employee-Terminate.md) - adds the `Employee` termination capability and tests.
-6. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee performance review capability end-to-end, from the the database, through the APIs and corresponding testing.
+6. [Employee Performance Review](./docs/Performance-Review.md) - adds the employee `PerformanceReview` capability end-to-end, from the the database, through the APIs and corresponding testing.
 
 <br/>
 
@@ -100,4 +100,4 @@ The basis of the functional capabilities have been created for our fictitious so
 
 The developer should have witnessed that reasonably complicated logic can be built using this _config_ to _code-gen_ to _custom_ approach. Where the _custom_ effort is for the most part focused on the key business value delivery; not the related boilerplate. Plus, with the testing framework, how complex end-to-end intra-domain integration tests can be created to appropriately validate the underlying logic - which can easily be integrated into the developer build-test-release lifecycle.
 
-There is absoltely a learning curve required for using _Beef_; and in time greater acceleration comes with on-going experience. Please review the extended documentation and provide feedback, questions, defects, etc. via a [issue](https://github.com/Avanade/Beef/issues). Thanks :-)
+It is acknowledged that there is a learning curve required for using _Beef_; and in time greater acceleration will be achieved as experience is gained. Please review the extended documentation and provide feedback, questions, defects, etc. via a [issue](https://github.com/Avanade/Beef/issues). Thanks and enjoy :-)

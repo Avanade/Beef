@@ -302,4 +302,6 @@ Review and execute the tests and ensure they all pass as expected.
 
 ## Conclusion
 
-At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. Next we will implement the employee review endpoints.
+At this stage we now have added and tested the performance review capabilities. All the desired functional requirements have now been implemented.
+
+Next we will [wrap up](./../README.md#conclusion) the sample.

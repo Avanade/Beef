@@ -222,6 +222,9 @@ namespace Beef.Grpc
             catch (grpc.RpcException) { throw; }
             catch (Exception ex)
             {
+                if (ex is NotFoundException && OperationType == OperationType.Delete)
+                    HandleResponseStatus(HttpStatusCode.NoContent);
+
                 ExceptionHandler(this, ex);
                 throw;
             }
@@ -230,7 +233,7 @@ namespace Beef.Grpc
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
-        [DebuggerStepThrough()]
+        //[DebuggerStepThrough()]
         private async Task<TResult> ExecuteResultAsyncInternal<TResult>(Func<Task<TResult>> func)
         {
             try
@@ -253,6 +256,12 @@ namespace Beef.Grpc
             catch (grpc.RpcException) { throw; }
             catch (Exception ex)
             {
+                if (ex is NotFoundException && OperationType == OperationType.Delete)
+                {
+                    HandleResponseStatus(HttpStatusCode.NoContent);
+                    return typeof(TResult) == typeof(Google.Protobuf.WellKnownTypes.Empty) ? (TResult)(object)new Google.Protobuf.WellKnownTypes.Empty() : default!;
+                }
+
                 ExceptionHandler(this, ex);
                 throw;
             }

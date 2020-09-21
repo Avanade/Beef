@@ -120,4 +120,4 @@ As extra homework, you should also consider implementing unit testing for the va
 
 At this stage we now have added and tested the employee termination and search, in addition to the employee CRUD APIs. 
 
-Next we will implement the [employee review](./Performance-Review.md) endpoints.
+Next we will implement the employee [performance review](./Performance-Review.md) endpoints.
