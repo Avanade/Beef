@@ -41,7 +41,7 @@ namespace Beef.Demo.Common.Entities
         public string? Street
         {
             get => _street;
-            set => SetValue(ref _street, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Street)); 
+            set => SetValue(ref _street, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Street));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Beef.Demo.Common.Entities
         public string? City
         {
             get => _city;
-            set => SetValue(ref _city, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(City)); 
+            set => SetValue(ref _city, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(City));
         }
 
         #endregion
@@ -64,29 +64,23 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Address val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Address val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Address"/> is equal to the current <see cref="Address"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Address? obj)
+        /// <param name="value">The <see cref="Address"/> to compare with the current <see cref="Address"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Address"/> is equal to the current <see cref="Address"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Address? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Street, obj.Street)
-                && Equals(City, obj.City);
+            return base.Equals((object)value)
+                && Equals(Street, value.Street)
+                && Equals(City, value.City);
         }
 
         /// <summary>
@@ -106,9 +100,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (Address? a, Address? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Address"/>.
+        /// Returns the hash code for the <see cref="Address"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Address"/>.</returns>
+        /// <returns>The hash code for the <see cref="Address"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -118,7 +112,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -137,8 +131,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Address"/> to copy from.</param>
         public void CopyFrom(Address from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Street = from.Street;
@@ -146,9 +140,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -177,7 +171,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -200,7 +194,7 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Address from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

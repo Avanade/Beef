@@ -33,6 +33,7 @@
     <None Remove="content\Company.AppName.Business\Validation\PersonArgsValidator.cs" />
     <None Remove="content\Company.AppName.Test\Cosmos\Person.yaml" />
     <None Remove="content\Company.AppName.Test\Cosmos\RefData.yaml" />
+    <None Remove="content\Company.AppName.Test\Validators\PersonValidatorTest.cs" />
   </ItemGroup>
   
   <ItemGroup>

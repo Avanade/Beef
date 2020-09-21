@@ -133,7 +133,7 @@ namespace Beef.Data.Cosmos
         /// Selects a single item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectSingleOrDefault()
+        public T? SelectSingleOrDefault()
         {
             return _container.GetValue(ExecuteQuery(q =>
             {
@@ -159,7 +159,7 @@ namespace Beef.Data.Cosmos
         /// Selects first item or default.
         /// </summary>
         /// <returns>The single item or default.</returns>
-        public T SelectFirstOrDefault()
+        public T? SelectFirstOrDefault()
         {
             return _container.GetValue(ExecuteQuery(q =>
             {

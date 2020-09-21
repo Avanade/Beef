@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Beef.CodeGen</RootNamespace>
-    <Version>4.1.1</Version>
+    <Version>4.1.2</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ApplicationIcon />
     <StartupObject />
@@ -36,13 +36,33 @@
 
   <ItemGroup>
     <None Remove="Templates\DbEfModelBuilderExtensions_cs.xml" />
-    <None Remove="Templates\EntityGrpcAgent_cs.xml" />
-    <None Remove="Templates\IEntityDataSvc_cs.xml" />
-    <None Remove="Templates\IReferenceDataDataSvc_cs.xml" />
-    <None Remove="Templates\IReferenceData_cs.xml" />
-    <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
-    <None Remove="Templates\ServiceCollectionExtensionsData_cs.xml" />
-    <None Remove="Templates\ServiceCollectionExtensionsManager_cs.xml" />
+    <None Remove="Templates\EntityDataSvc_cs.hbs" />
+    <None Remove="Templates\EntityData_cs.hbs" />
+    <None Remove="Templates\EntityGrpcAgent_cs.hbs" />
+    <None Remove="Templates\EntityGrpcService_cs.hbs" />
+    <None Remove="Templates\EntityManager_cs.hbs" />
+    <None Remove="Templates\EntityWebApiAgent_cs.hbs" />
+    <None Remove="Templates\EntityWebApiController_cs.hbs" />
+    <None Remove="Templates\Entity_cs.hbs" />
+    <None Remove="Templates\GrpcTransformers_cs.hbs" />
+    <None Remove="Templates\Grpc_proto.hbs" />
+    <None Remove="Templates\IEntityDataSvc_cs.hbs" />
+    <None Remove="Templates\IEntityData_cs.hbs" />
+    <None Remove="Templates\IEntityManager_cs.hbs" />
+    <None Remove="Templates\IReferenceDataDataSvc_cs.hbs" />
+    <None Remove="Templates\IReferenceDataData_cs.hbs" />
+    <None Remove="Templates\IReferenceData_cs.hbs" />
+    <None Remove="Templates\Model_cs.hbs" />
+    <None Remove="Templates\ReferenceDataDataSvc_cs.hbs" />
+    <None Remove="Templates\ReferenceDataData_cs.hbs" />
+    <None Remove="Templates\ReferenceDataProvider_cs.hbs" />
+    <None Remove="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
+    <None Remove="Templates\ReferenceDataWebApiAgent_cs.hbs" />
+    <None Remove="Templates\ReferenceDataWebApiController_cs.hbs" />
+    <None Remove="Templates\ReferenceData_cs.hbs" />
+    <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
+    <None Remove="Templates\ServiceCollectionExtensionsData_cs.hbs" />
+    <None Remove="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,35 +91,37 @@
     <EmbeddedResource Include="Templates\DbSpTableUpsert_sql.xml" />
     <EmbeddedResource Include="Templates\DbUdtTableList_sql.xml" />
     <EmbeddedResource Include="Templates\DbVwTable_sql.xml" />
-    <EmbeddedResource Include="Templates\EntityDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityData_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityManager_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\Entity_cs.xml" />
-    <EmbeddedResource Include="Templates\GrpcTransformers_cs.xml" />
-    <EmbeddedResource Include="Templates\EntityGrpcService_cs.xml" />
-    <EmbeddedResource Include="Templates\Grpc_proto.xml" />
-    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\IEntityData_cs.xml" />
-    <EmbeddedResource Include="Templates\IEntityManager_cs.xml" />
-    <EmbeddedResource Include="Templates\IReferenceDataData_cs.xml" />
-    <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataData_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiCoreController_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.xml" />
-    <EmbeddedResource Include="Templates\IReferenceData_cs.xml" />
-    <EmbeddedResource Include="Templates\ReferenceData_cs.xml" />
-    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.xml" />
-    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.xml" />
-    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.xml" />
+    <EmbeddedResource Include="Templates\EntityData_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityGrpcService_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityGrpcAgent_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityWebApiAgent_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityWebApiController_cs.hbs" />
+    <EmbeddedResource Include="Templates\Entity_cs.hbs" />
+    <EmbeddedResource Include="Templates\GrpcTransformers_cs.hbs" />
+    <EmbeddedResource Include="Templates\Grpc_proto.hbs" />
+    <EmbeddedResource Include="Templates\IEntityData_cs.hbs" />
+    <EmbeddedResource Include="Templates\IEntityDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityManager_cs.hbs" />
+    <EmbeddedResource Include="Templates\IEntityManager_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataData_cs.hbs" />
+    <EmbeddedResource Include="Templates\IReferenceDataData_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\IReferenceDataDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\Model_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgentProvider_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataWebApiAgent_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataWebApiController_cs.hbs" />
+    <EmbeddedResource Include="Templates\IReferenceData_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />
+    <EmbeddedResource Include="Templates\ReferenceData_cs.hbs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Handlebars.Net" Version="1.10.1" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>

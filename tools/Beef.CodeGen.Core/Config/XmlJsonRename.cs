@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Beef.CodeGen.Config
 {
@@ -10,13 +12,15 @@ namespace Beef.CodeGen.Config
     /// </summary>
     public static class XmlJsonRename
     {
-        private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
+        private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> _config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
         {
-            (ConfigurationEntity.CodeGen, "WebApiRoutePrefix", "refDataWebApiRoutePrefix"),
             (ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
             (ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter"),
 
             (ConfigurationEntity.Entity, "AutoInferImplements", "implementsAutoInfer"),
+            (ConfigurationEntity.Entity, "EntityFrameworkEntity", "entityFrameworkModel"),
+            (ConfigurationEntity.Entity, "CosmosEntity", "cosmosModel"),
+            (ConfigurationEntity.Entity, "ODataEntity", "odataModel"),
             (ConfigurationEntity.Entity, "DataDatabaseMapperInheritsFrom", "databaseMapperInheritsFrom"),
             (ConfigurationEntity.Entity, "DataDatabaseCustomMapper", "databaseCustomMapper"),
             (ConfigurationEntity.Entity, "DataEntityFrameworkMapperInheritsFrom", "entityFrameworkMapperInheritsFrom"),
@@ -26,7 +30,7 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper"),
             (ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom"),
             (ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper"),
-
+ 
             (ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
             (ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
             (ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),
@@ -40,11 +44,17 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Property, "DataODataIgnore", "odataIgnore"),
 
             (ConfigurationEntity.Operation, "OperationType", "type"),
+            (ConfigurationEntity.Operation, "PagingArgs", "paging"),
             (ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId"),
             (ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
 
-            (ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric")
+            (ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric"),
+            (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode")
+        });
 
+        private static readonly List<(ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToJsonConvert = new List<(ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigurationEntity, string, Func<string?, string?>)[]
+        {
+            (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Yes" : "Mapper"))
         });
 
         /// <summary>
@@ -52,8 +62,8 @@ namespace Beef.CodeGen.Config
         /// </summary>
         public static string GetJsonName(ConfigurationEntity entity, string xmlName)
         {
-            var item = config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
-            return item.JsonName ?? (Beef.CodeGen.CodeGenerator.ToCamelCase(xmlName)!);
+            var item = _config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
+            return item.JsonName ?? (StringConversion.ToCamelCase(xmlName)!);
         }
 
         /// <summary>
@@ -61,8 +71,17 @@ namespace Beef.CodeGen.Config
         /// </summary>
         public static string GetXmlName(ConfigurationEntity entity, string jsonName)
         {
-            var item = config.FirstOrDefault(x => x.Entity == entity && x.JsonName == jsonName);
-            return item.XmlName ?? (Beef.CodeGen.CodeGenerator.ToPascalCase(jsonName)!);
+            var item = _config.FirstOrDefault(x => x.Entity == entity && x.JsonName == jsonName);
+            return item.XmlName ?? (StringConversion.ToPascalCase(jsonName)!);
+        }
+
+        /// <summary>
+        /// Gets the JSON value from the XML value.
+        /// </summary>
+        public static string? GetJsonValue(ConfigurationEntity entity, string xmlName, string? xmlValue)
+        {
+            var item = _xmlToJsonConvert.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
+            return item.Converter == null ? xmlValue : item.Converter(xmlValue);
         }
     }
 

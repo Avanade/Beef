@@ -29,7 +29,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="db">The <see cref="DatabaseBase"/>.</param>
         /// <param name="refDataSchema">The reference data schema.</param>
-        public static async Task RegisterDatabaseAsync(DatabaseBase db, string refDataSchema)
+        public static async Task RegisterDatabaseAsync(DatabaseBase db, string? refDataSchema = null)
         {
             if (DbTables == null)
                 DbTables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="tables">The tables.</param>
         /// <param name="refDataSchema">The reference data schema.</param>
-        public static void RegisterDatabase(List<Table> tables, string refDataSchema)
+        public static void RegisterDatabase(List<Table> tables, string? refDataSchema = null)
         {
             if (DbTables == null)
                 DbTables = tables;

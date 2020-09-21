@@ -163,7 +163,9 @@ namespace Beef.CodeGen.Loaders
                 sp.AttributeAdd("Name", "GetAll");
                 sp.AttributeAdd("Type", "GetAll");
 
-                if (config.Root.Attributes.ContainsKey("RefDatabaseSchema") && table.Schema == config.Root.GetAttributeValue<string>("RefDatabaseSchema"))
+                var isRefData = config.GetAttributeValue<bool?>("RefData");
+                if ((isRefData.HasValue && isRefData.Value) 
+                    || (!isRefData.HasValue && config.Root.Attributes.ContainsKey("RefDatabaseSchema") && table.Schema == config.Root.GetAttributeValue<string>("RefDatabaseSchema")))
                 {
                     var obList = new List<CodeGenConfig>();
                     CodeGenConfig ob = new CodeGenConfig("OrderBy", config);

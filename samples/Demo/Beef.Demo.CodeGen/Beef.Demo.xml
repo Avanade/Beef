@@ -26,7 +26,7 @@
       <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />
     </Operation>
 
-    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" WebApiOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:Merge" >
+    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" WebApiOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:MergeFrom;Demo.Person.{toId}:MergeTo" >
       <Parameter Name="FromId" Text="from {{Person}} identifier" Type="Guid" IsMandatory="true"  />
       <Parameter Name="ToId" Text="to {{Person}} identifier" Type="Guid" IsMandatory="true" ValidatorFluent="CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!)" />
     </Operation>
@@ -39,10 +39,10 @@
 
     <Operation Name="GetDetail" OperationType="Get" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
     <Operation Name="UpdateDetail" OperationType="Update" ValueType="PersonDetail" ReturnType="PersonDetail" Validator="PersonDetailValidator" UniqueKey="true" WebApiRoute="{id}/detail" AutoImplement="None" />
-    <Operation Name="PatchDetail" OperationType="Patch" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" PatchGetOperation="GetDetail" PatchUpdateOperation="PersonManager.UpdateDetail" />
+    <Operation Name="PatchDetail" OperationType="Patch" ValueType="PersonDetail" ReturnType="PersonDetail" UniqueKey="true" WebApiRoute="{id}/detail" PatchGetOperation="GetDetail" PatchUpdateOperation="IPersonManager.UpdateDetail" />
 
     <Operation Name="Add" Text="Actually validating the FromBody parameter generation" OperationType="Custom" WebApiRoute="fromBody" WebApiStatus="Created" ManagerCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeDataSvc="true" ExcludeIDataSvc="true">
-      <Parameter Name="Person" Type="Person" WebApiFrom="FromBody"/>
+      <Parameter Name="Person" Type="Person" Nullable="false" WebApiFrom="FromBody"/>
     </Operation>
 
     <Operation Name="DataSvcCustom" OperationType="Custom" Text="Validate a DataSvc Custom generation" ReturnType="int" DataSvcCustom="true" ExcludeData="true" ExcludeIData="true" ExcludeWebApi="true" ExcludeWebApiAgent="true" />
@@ -145,7 +145,7 @@
   </Entity>
   
   <!-- ODATA CRUD -->
-  <Entity Name="TripPerson" Implements="IStringIdentifier" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/tripPeople" Get="true" Create="true" Update="true" Delete="true" AutoImplement="OData" ODataName="TripOData" ODataEntity="Model.Person" ODataCollectionName="Persons">
+  <Entity Name="TripPerson" Implements="IStringIdentifier" Collection="true" CollectionResult="true" WebApiRoutePrefix="api/v1/tripPeople" Get="true" Create="true" Update="true" Delete="true" AutoImplement="OData" ODataName="TripOData" ODataEntity="Model.Person">
     <Property Name="Id" Text="{{TripPerson}} identifier (username)" Type="string" UniqueKey="true" DataName="UserName" />
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />

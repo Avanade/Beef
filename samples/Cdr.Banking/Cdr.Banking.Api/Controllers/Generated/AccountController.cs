@@ -21,28 +21,32 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Account</b> Web API functionality.
+    /// Provides the <see cref="Account"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/banking/accounts")]
     public partial class AccountController : ControllerBase
     {
         private readonly IAccountManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IAccountManager"/>.</param>
-        public AccountController(IAccountManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public AccountController(IAccountManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); AccountControllerCtor(); }
+
+        partial void AccountControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get all accounts.
         /// </summary>
         /// <param name="productCategory">The Product Category (see <see cref="RefDataNamespace.ProductCategory"/>).</param>
         /// <param name="openStatus">The Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).</param>
-        /// <param name="isOwned">The Is Owned.</param>
-        /// <returns>A <see cref="AccountCollection"/>.</returns>
-        [HttpGet()]
-        [Route("")]
+        /// <param name="isOwned">Indicates whether Is Owned.</param>
+        /// <returns>The <see cref="AccountCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("")]
         [ProducesResponseType(typeof(AccountCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAccounts([FromQuery(Name = "product-category")] string? productCategory = default, [FromQuery(Name = "open-status")] string? openStatus = default, [FromQuery(Name = "is-owned")] bool? isOwned = default)
@@ -56,9 +60,9 @@ namespace Cdr.Banking.Api.Controllers
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{accountId}")]
+        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{accountId}")]
         [ProducesResponseType(typeof(AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetDetail(string? accountId)
@@ -71,9 +75,9 @@ namespace Cdr.Banking.Api.Controllers
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{accountId}/balance")]
+        /// <returns>The selected <see cref="Balance"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{accountId}/balance")]
         [ProducesResponseType(typeof(Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetBalance(string? accountId)

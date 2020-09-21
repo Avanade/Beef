@@ -41,7 +41,7 @@ namespace Beef.Demo.Common.Entities
         public string? AdditionalInfo
         {
             get => _additionalInfo;
-            set => SetValue(ref _additionalInfo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AdditionalInfo)); 
+            set => SetValue(ref _additionalInfo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AdditionalInfo));
         }
 
         #endregion
@@ -54,10 +54,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="PowerSource"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator PowerSource(Guid id)
-        {
-            return ConvertFromId<PowerSource>(id);
-        }
+        public static implicit operator PowerSource(Guid id) => ConvertFromId<PowerSource>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="PowerSource"/>.
@@ -65,13 +62,10 @@ namespace Beef.Demo.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="PowerSource"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator PowerSource(string? code)
-        {
-            return ConvertFromCode<PowerSource>(code);
-        }
+        public static implicit operator PowerSource(string? code) => ConvertFromCode<PowerSource>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -90,17 +84,17 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="PowerSource"/> to copy from.</param>
         public void CopyFrom(PowerSource from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
             AdditionalInfo = from.AdditionalInfo;
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -128,7 +122,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -153,29 +147,29 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(PowerSource from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="PowerSource"/> collection.
+    /// Represents the <see cref="PowerSource"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PowerSourceCollection : ReferenceDataCollectionBase<PowerSource>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="PowerSourceCollection"/> class.
         /// </summary>
-        public PowerSourceCollection(){ }
+        public PowerSourceCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PowerSourceCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="PowerSourceCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="PowerSource"/> entities.</param>
         public PowerSourceCollection(IEnumerable<PowerSource> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

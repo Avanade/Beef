@@ -9,19 +9,20 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
-using Beef.Mapper;
-using Beef.Mapper.Converters;
+using Beef.Data.Cosmos;
 using Beef.Data.Database;
 using Beef.Data.EntityFrameworkCore;
-using Beef.Data.Cosmos;
+using Beef.Mapper;
+using Beef.Mapper.Converters;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Provides the <b>ReferenceData</b> database access.
+    /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
@@ -30,27 +31,20 @@ namespace Beef.Demo.Business.Data
         private readonly ICosmosDb _cosmos;
 
         /// <summary>
-        /// Parameterless constructor is explictly not supported.
-        /// </summary>
-        private ReferenceDataData() => throw new NotSupportedException();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos) { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); ReferenceDataDataCtor(); }
+        public ReferenceDataData(IDatabase db, IEfDb ef, ICosmosDb cosmos)
+            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); _cosmos = Check.NotNull(cosmos, nameof(cosmos)); DataCtor(); }
+
+        partial void DataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
+        /// Gets all the <see cref="RefDataNamespace.Country"/> items.
         /// </summary>
-        partial void ReferenceDataDataCtor();
-
-        /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.Country"/> objects.
-        /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.CountryCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.CountryCollection"/>.</returns>
         public async Task<RefDataNamespace.CountryCollection> CountryGetAllAsync()
         {
             var __coll = new RefDataNamespace.CountryCollection();
@@ -63,9 +57,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.USState"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.USState"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.USStateCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.USStateCollection"/>.</returns>
         public async Task<RefDataNamespace.USStateCollection> USStateGetAllAsync()
         {
             var __coll = new RefDataNamespace.USStateCollection();
@@ -78,9 +72,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.Gender"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.Gender"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.GenderCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.GenderCollection"/>.</returns>
         public async Task<RefDataNamespace.GenderCollection> GenderGetAllAsync()
         {
             var __coll = new RefDataNamespace.GenderCollection();
@@ -97,9 +91,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.EyeColor"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.EyeColor"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.EyeColorCollection"/>.</returns>
         public async Task<RefDataNamespace.EyeColorCollection> EyeColorGetAllAsync()
         {
             var __coll = new RefDataNamespace.EyeColorCollection();
@@ -108,9 +102,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.PowerSource"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.PowerSource"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.PowerSourceCollection"/>.</returns>
         public async Task<RefDataNamespace.PowerSourceCollection> PowerSourceGetAllAsync()
         {
             var __coll = new RefDataNamespace.PowerSourceCollection();
@@ -119,9 +113,9 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.Company"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.Company"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.CompanyCollection"/>.</returns>
         public async Task<RefDataNamespace.CompanyCollection> CompanyGetAllAsync()
         {
             var __coll = new RefDataNamespace.CompanyCollection();
@@ -130,18 +124,18 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.EyeColor"/> entity and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.EyeColor"/> and Entity Framework <see cref="EfModel.EyeColor"/> property mapping.
         /// </summary>
         public static EfDbMapper<RefDataNamespace.EyeColor, EfModel.EyeColor> EyeColorMapper => EfDbMapper.CreateAuto<RefDataNamespace.EyeColor, EfModel.EyeColor>()
             .HasProperty(s => s.Id, d => d.EyeColorId)
             .AddStandardProperties();
 
         /// <summary>
-        /// Provides the <see cref="RefDataNamespace.PowerSource"/> entity and Cosmos <see cref="RefDataNamespace.PowerSource"/> property mapping.
+        /// Provides the <see cref="RefDataNamespace.PowerSource"/> and Cosmos <see cref="Model.PowerSource"/> property mapping.
         /// </summary>
-        public static CosmosDbMapper<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource> PowerSourceMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, RefDataNamespace.PowerSource>()
-            .AddStandardProperties()
-            .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any));
+        public static CosmosDbMapper<RefDataNamespace.PowerSource, Model.PowerSource> PowerSourceMapper => CosmosDbMapper.CreateAuto<RefDataNamespace.PowerSource, Model.PowerSource>()
+            .HasProperty(s => s.AdditionalInfo, d => d.AdditionalInfo, p => p.SetOperationTypes(OperationTypes.Any))
+            .AddStandardProperties();
     }
 }
 

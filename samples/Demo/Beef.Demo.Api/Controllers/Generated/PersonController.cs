@@ -21,26 +21,32 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Person</b> Web API functionality.
+    /// Provides the <see cref="Person"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/persons")]
     public partial class PersonController : ControllerBase
     {
         private readonly IPersonManager _manager;
-        
+        private readonly IPersonManager _personManager;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IPersonManager"/>.</param>
-        public PersonController(IPersonManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        /// <param name="personManager">The <see cref="IPersonManager"/>.</param>
+        public PersonController(IPersonManager manager, IPersonManager personManager)
+            { _manager = Check.NotNull(manager, nameof(manager)); _personManager = Check.NotNull(personManager, nameof(personManager)); PersonControllerCtor(); }
+
+        partial void PersonControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Creates the <see cref="Person"/> entity.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> entity.</param>
-        /// <returns>The created <see cref="Person"/> entity.</returns>
-        [HttpPost()]
-        [Route("")]
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Person value)
         {
@@ -49,11 +55,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        [HttpDelete()]
-        [Route("{id}")]
+        [AllowAnonymous]
+        [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {
@@ -62,12 +68,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
@@ -77,13 +83,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> entity.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> entity.</param>
+        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="Person"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}")]
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Person value, Guid id)
         {
@@ -92,13 +98,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Patches the <see cref="Person"/> entity.
+        /// Patches an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> value that contains the patch content for the entity.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The patched <see cref="Person"/> entity.</returns>
-        [HttpPatch()]
-        [Route("{id}")]
+        /// <returns>The patched <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
         {
@@ -107,11 +113,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="PersonCollection"/>.</returns>
-        [HttpGet()]
-        [Route("all")]
+        /// <returns>The <see cref="PersonCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("all")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll()
@@ -121,11 +127,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="PersonCollection"/>.</returns>
-        [HttpGet()]
-        [Route("allnopaging")]
+        /// <returns>The <see cref="PersonCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("allnopaging")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll2()
@@ -135,14 +141,14 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
-        /// <param name="genders">The Genders (see <see cref="Gender"/>).</param>
-        /// <returns>A <see cref="PersonCollection"/>.</returns>
-        [HttpGet()]
-        [Route("")]
+        /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <returns>The <see cref="PersonCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
@@ -153,14 +159,14 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
-        /// <param name="genders">The Genders (see <see cref="Gender"/>).</param>
-        /// <returns>A <see cref="PersonDetailCollection"/>.</returns>
-        [HttpGet()]
-        [Route("argsdetail")]
+        /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <returns>The <see cref="PersonDetailCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("argsdetail")]
         [ProducesResponseType(typeof(PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetDetailByArgs(string? firstName = default, string? lastName = default, List<string>? genders = default)
@@ -176,8 +182,8 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        [HttpPost]
-        [Route("merge")]
+        [AllowAnonymous]
+        [HttpPost("merge")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Merge(Guid fromId, Guid toId)
         {
@@ -188,8 +194,8 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        [HttpPost]
-        [Route("mark")]
+        [AllowAnonymous]
+        [HttpPost("mark")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult Mark()
         {
@@ -200,10 +206,10 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="coordinates">The Coordinates (see <see cref="MapCoordinates"/>).</param>
+        /// <param name="coordinates">The Coordinates (see <see cref="Common.Entities.MapCoordinates"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        [HttpPost]
-        [Route("map")]
+        [AllowAnonymous]
+        [HttpPost("map")]
         [ProducesResponseType(typeof(MapCoordinates), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Map(string? coordinates = default)
@@ -216,9 +222,9 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Get no arguments.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("noargsforme")]
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("noargsforme")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetNoArgs()
@@ -228,12 +234,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}/detail")]
+        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetDetail(Guid id)
@@ -243,13 +249,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="PersonDetail"/> entity.
+        /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/> entity.</param>
+        /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="PersonDetail"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}/detail")]
+        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult UpdateDetail([FromBody] PersonDetail value, Guid id)
         {
@@ -258,28 +264,28 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Patches the <see cref="Person"/> entity.
+        /// Patches an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> value that contains the patch content for the entity.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The patched <see cref="PersonDetail"/> entity.</returns>
-        [HttpPatch()]
-        [Route("{id}/detail")]
+        /// <returns>The patched <see cref="PersonDetail"/>.</returns>
+        [AllowAnonymous]
+        [HttpPatch("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult PatchDetail([FromBody] JToken value, Guid id)
         {
-            return new WebApiPatch<PersonDetail>(this, value, () => _manager.GetDetailAsync(id), (__value) => _manager.UpdateDetailAsync(__value, id),
+            return new WebApiPatch<PersonDetail>(this, value, () => _manager.GetDetailAsync(id), (__value) => _personManager.UpdateDetailAsync(__value, id),
                 operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
         }
 
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Person"/>).</param>
-        [HttpPost]
-        [Route("fromBody")]
+        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        [AllowAnonymous]
+        [HttpPost("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public IActionResult Add([FromBody] Person? person)
+        public IActionResult Add([FromBody] Person person)
         {
             return new WebApiPost(this, () => _manager.AddAsync(person),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.Created);
@@ -289,9 +295,9 @@ namespace Beef.Demo.Api.Controllers
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
-        [HttpGet]
-        [Route("null")]
+        /// <returns>A resultant <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpGet("null")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetNull(string? name)
@@ -301,14 +307,14 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>
         /// <param name="lastName">The Last Name.</param>
-        /// <param name="genders">The Genders (see <see cref="Gender"/>).</param>
-        /// <returns>A <see cref="PersonCollection"/>.</returns>
-        [HttpGet()]
-        [Route("args")]
+        /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
+        /// <returns>The <see cref="PersonCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("args")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetByArgsWithEf(string? firstName = default, string? lastName = default, List<string>? genders = default)
@@ -321,8 +327,8 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Throw Error.
         /// </summary>
-        [HttpPost]
-        [Route("error")]
+        [AllowAnonymous]
+        [HttpPost("error")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult ThrowError()
         {
@@ -331,12 +337,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("ef/{id}")]
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetWithEf(Guid id)
@@ -346,12 +352,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Creates the <see cref="Person"/> entity.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> entity.</param>
-        /// <returns>The created <see cref="Person"/> entity.</returns>
-        [HttpPost()]
-        [Route("ef")]
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("ef")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult CreateWithEf([FromBody] Person value)
         {
@@ -360,13 +366,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> entity.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> entity.</param>
+        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The updated <see cref="Person"/> entity.</returns>
-        [HttpPut()]
-        [Route("ef/{id}")]
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult UpdateWithEf([FromBody] Person value, Guid id)
         {
@@ -375,11 +381,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        [HttpDelete()]
-        [Route("ef/{id}")]
+        [AllowAnonymous]
+        [HttpDelete("ef/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult DeleteWithEf(Guid id)
         {
@@ -388,13 +394,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Patches the <see cref="Person"/> entity.
+        /// Patches an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="JToken"/> value that contains the patch content for the entity.</param>
+        /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The patched <see cref="Person"/> entity.</returns>
-        [HttpPatch()]
-        [Route("ef/{id}")]
+        /// <returns>The patched <see cref="Person"/>.</returns>
+        [AllowAnonymous]
+        [HttpPatch("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult PatchWithEf([FromBody] JToken value, Guid id)
         {

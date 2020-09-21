@@ -17,7 +17,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Defines the Config business functionality.
+    /// Defines the <b>Config</b> business functionality.
     /// </summary>
     public partial interface IConfigManager
     {

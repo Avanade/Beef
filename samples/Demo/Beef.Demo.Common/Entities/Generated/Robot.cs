@@ -43,12 +43,12 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets or sets the <see cref="Robot"/> identifier.
         /// </summary>
-        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("id", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Identifier")]
         public Guid Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, false, nameof(Id)); 
+            set => SetValue(ref _id, value, false, false, nameof(Id));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Beef.Demo.Common.Entities
         public string? ModelNo
         {
             get => _modelNo;
-            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo)); 
+            set => SetValue(ref _modelNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ModelNo));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Beef.Demo.Common.Entities
         public string? SerialNo
         {
             get => _serialNo;
-            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo)); 
+            set => SetValue(ref _serialNo, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(SerialNo));
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding <see cref="EyeColor"/> text (read-only where selected).
+        /// Gets the corresponding {{EyeColor}} text (read-only where selected).
         /// </summary>
         [JsonProperty("eyeColorText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? EyeColorText { get => _eyeColorText ?? GetRefDataText(() => EyeColor); set => _eyeColorText = value; }
@@ -113,7 +113,7 @@ namespace Beef.Demo.Common.Entities
         }
 
         /// <summary>
-        /// Gets the corresponding <see cref="PowerSource"/> text (read-only where selected).
+        /// Gets the corresponding {{PowerSource}} text (read-only where selected).
         /// </summary>
         [JsonProperty("powerSourceText", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? PowerSourceText { get => _powerSourceText ?? GetRefDataText(() => PowerSource); set => _powerSourceText = value; }
@@ -137,24 +137,24 @@ namespace Beef.Demo.Common.Entities
         public string? ETag
         {
             get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag)); 
+            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
         }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Change Log")]
         public ChangeLog? ChangeLog
         {
             get => _changeLog;
-            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog)); 
+            set => SetValue(ref _changeLog, value, false, true, nameof(ChangeLog));
         }
 
         #endregion
 
         #region IChangeTracking
-          
+
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
         /// </summary>
@@ -176,8 +176,8 @@ namespace Beef.Demo.Common.Entities
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="Robot"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -187,20 +187,17 @@ namespace Beef.Demo.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="id">The <see cref="Id"/>.</param>
         public static UniqueKey CreateUniqueKey(Guid id) => new UniqueKey(id);
-          
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Id"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Id);
 
         #endregion
@@ -212,34 +209,28 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Robot val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Robot val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Robot"/> is equal to the current <see cref="Robot"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Robot? obj)
+        /// <param name="value">The <see cref="Robot"/> to compare with the current <see cref="Robot"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Robot"/> is equal to the current <see cref="Robot"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Robot? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(ModelNo, obj.ModelNo)
-                && Equals(SerialNo, obj.SerialNo)
-                && Equals(EyeColorSid, obj.EyeColorSid)
-                && Equals(PowerSourceSid, obj.PowerSourceSid)
-                && Equals(ETag, obj.ETag)
-                && Equals(ChangeLog, obj.ChangeLog);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(ModelNo, value.ModelNo)
+                && Equals(SerialNo, value.SerialNo)
+                && Equals(EyeColorSid, value.EyeColorSid)
+                && Equals(PowerSourceSid, value.PowerSourceSid)
+                && Equals(ETag, value.ETag)
+                && Equals(ChangeLog, value.ChangeLog);
         }
 
         /// <summary>
@@ -259,9 +250,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (Robot? a, Robot? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Robot"/>.
+        /// Returns the hash code for the <see cref="Robot"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Robot"/>.</returns>
+        /// <returns>The hash code for the <see cref="Robot"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -276,7 +267,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -295,8 +286,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Robot"/> to copy from.</param>
         public void CopyFrom(Robot from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -309,9 +300,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -345,7 +336,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -373,31 +364,27 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Robot from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Robot"/> collection.
+    /// Represents the <see cref="Robot"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class RobotCollection : EntityBaseCollection<Robot>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotCollection"/> class.
         /// </summary>
-        public RobotCollection(){ }
+        public RobotCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="RobotCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Robot"/> entities.</param>
         public RobotCollection(IEnumerable<Robot> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="RobotCollection"/>.
         /// </summary>
@@ -405,31 +392,29 @@ namespace Beef.Demo.Common.Entities
         public override object Clone()
         {
             var clone = new RobotCollection();
-            foreach (Robot item in this)
+            foreach (var item in this)
             {
                 clone.Add((Robot)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="RobotCollectionResult"/> to a <see cref="RobotCollection"/>.
+        /// An implicit cast from the <see cref="RobotCollectionResult"/> to a corresponding <see cref="RobotCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="RobotCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="RobotCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator RobotCollection(RobotCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="Robot"/> collection result.
+    /// Represents the <see cref="Robot"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class RobotCollectionResult : EntityCollectionResult<RobotCollection, Robot>
@@ -440,7 +425,7 @@ namespace Beef.Demo.Common.Entities
         public RobotCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="RobotCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public RobotCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -463,6 +448,8 @@ namespace Beef.Demo.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

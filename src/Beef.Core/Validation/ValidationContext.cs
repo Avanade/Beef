@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Beef.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,9 @@ using System.Linq.Expressions;
 namespace Beef.Validation
 {
     /// <summary>
-    /// Provides the base validation context properties for an entity.
+    /// Provides the base validation context properties.
     /// </summary>
-    public interface IValidationContext
+    public interface IValidationContextBase
     {
         /// <summary>
         /// Gets the entity value.
@@ -28,7 +29,13 @@ namespace Beef.Validation
         /// Indicates whether there has been a validation error.
         /// </summary>
         bool HasErrors { get; }
+    }
 
+    /// <summary>
+    /// Provides the validation context properties for an entity.
+    /// </summary>
+    public interface IValidationContext : IValidationContextBase
+    {
         /// <summary>
         /// Gets the entity prefix used for fully qualified <i>entity.property</i> naming (<c>null</c> represents the root).
         /// </summary>
@@ -111,7 +118,7 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the entity value.
         /// </summary>
-        object? IValidationContext.Value => Value;
+        object? IValidationContextBase.Value => Value;
 
         /// <summary>
         /// Gets the entity value.
@@ -157,6 +164,14 @@ namespace Beef.Validation
         /// Gets the <see cref="IServiceProvider"/> from the <see cref="ExecutionContext.ServiceProvider"/>.
         /// </summary>
         public IServiceProvider ServiceProvider => (ExecutionContext.HasCurrent ? ExecutionContext.Current.ServiceProvider : null) ?? throw new InvalidOperationException("There is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+
+        /// <summary>
+        /// Gets service of type <typeparamref name="TService"/> from the <see cref="ServiceProvider"/>.
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
+        /// <returns>The specified service where found; </returns>
+        public TService GetService<TService>(bool throwExceptionOnNull = true) where TService : class => ExecutionContext.GetService<TService>(throwExceptionOnNull);
 
         /// <summary>
         /// Throws a <see cref="ValidationException"/> where an error was found (and optionally if warnings).

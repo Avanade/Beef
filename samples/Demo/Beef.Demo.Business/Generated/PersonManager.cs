@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.Validation;
 using Beef.Demo.Business.DataSvc;
+using Beef.Demo.Business.Validation;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Person business functionality.
+    /// Provides the <see cref="Person"/> business functionality.
     /// </summary>
     public partial class PersonManager : IPersonManager
     {
@@ -50,9 +50,13 @@ namespace Beef.Demo.Business
         private Func<Person, Guid, Task>? _updateOnBeforeAsync;
         private Func<Person, Guid, Task>? _updateOnAfterAsync;
 
+        private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
+        private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
         private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
         private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
 
+        private Func<Task>? _getAll2OnPreValidateAsync;
+        private Action<MultiValidator>? _getAll2OnValidate;
         private Func<Task>? _getAll2OnBeforeAsync;
         private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
 
@@ -71,6 +75,8 @@ namespace Beef.Demo.Business
         private Func<Guid, Guid, Task>? _mergeOnBeforeAsync;
         private Func<Person, Guid, Guid, Task>? _mergeOnAfterAsync;
 
+        private Func<Task>? _markOnPreValidateAsync;
+        private Action<MultiValidator>? _markOnValidate;
         private Func<Task>? _markOnBeforeAsync;
         private Func<Task>? _markOnAfterAsync;
 
@@ -79,6 +85,8 @@ namespace Beef.Demo.Business
         private Func<MapArgs?, Task>? _mapOnBeforeAsync;
         private Func<MapCoordinates, MapArgs?, Task>? _mapOnAfterAsync;
 
+        private Func<Task>? _getNoArgsOnPreValidateAsync;
+        private Action<MultiValidator>? _getNoArgsOnValidate;
         private Func<Task>? _getNoArgsOnBeforeAsync;
         private Func<Person?, Task>? _getNoArgsOnAfterAsync;
 
@@ -92,6 +100,8 @@ namespace Beef.Demo.Business
         private Func<PersonDetail, Guid, Task>? _updateDetailOnBeforeAsync;
         private Func<PersonDetail, Guid, Task>? _updateDetailOnAfterAsync;
 
+        private Func<Task>? _dataSvcCustomOnPreValidateAsync;
+        private Action<MultiValidator>? _dataSvcCustomOnValidate;
         private Func<Task>? _dataSvcCustomOnBeforeAsync;
         private Func<int, Task>? _dataSvcCustomOnAfterAsync;
 
@@ -105,6 +115,8 @@ namespace Beef.Demo.Business
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
 
+        private Func<Task>? _throwErrorOnPreValidateAsync;
+        private Action<MultiValidator>? _throwErrorOnValidate;
         private Func<Task>? _throwErrorOnBeforeAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
 
@@ -135,18 +147,16 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        public PersonManager(IPersonDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
+        public PersonManager(IPersonDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
+
+        partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        partial void PersonManagerCtor();
-
-        /// <summary>
-        /// Creates the <see cref="Person"/> object.
-        /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -170,7 +180,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteAsync(Guid id)
@@ -193,10 +203,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -218,11 +228,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
+        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -247,15 +257,21 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getAllOnPreValidateAsync != null) await _getAllOnPreValidateAsync(paging).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getAllOnValidate?.Invoke(__mv, paging))
+                    .Run().ThrowOnError();
+
                 if (_getAllOnBeforeAsync != null) await _getAllOnBeforeAsync(paging).ConfigureAwait(false);
                 var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
@@ -264,14 +280,20 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getAll2OnPreValidateAsync != null) await _getAll2OnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getAll2OnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_getAll2OnBeforeAsync != null) await _getAll2OnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
@@ -280,11 +302,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -306,11 +328,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -366,6 +388,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
+                if (_markOnPreValidateAsync != null) await _markOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _markOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
@@ -375,7 +403,7 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
@@ -399,12 +427,18 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Get no arguments.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetNoArgsAsync()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
+                if (_getNoArgsOnPreValidateAsync != null) await _getNoArgsOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _getNoArgsOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_getNoArgsOnBeforeAsync != null) await _getNoArgsOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
@@ -413,10 +447,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -438,11 +472,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="PersonDetail"/> object.
+        /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/> object.</param>
+        /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
+        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -469,8 +503,8 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Actually validating the FromBody parameter generation.
         /// </summary>
-        /// <param name="person">The Person (see <see cref="Person"/>).</param>
-        public Task AddAsync(Person? person)
+        /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
+        public Task AddAsync(Person person)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
@@ -488,6 +522,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_dataSvcCustomOnPreValidateAsync != null) await _dataSvcCustomOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _dataSvcCustomOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_dataSvcCustomOnBeforeAsync != null) await _dataSvcCustomOnBeforeAsync().ConfigureAwait(false);
                 var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
@@ -498,14 +538,13 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Validate a Manager Custom generation.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> ManagerCustomAsync()
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
-                var __result = await ManagerCustomOnImplementationAsync().ConfigureAwait(false);
-                return Cleaner.Clean(__result);
+                return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
             });
         }
 
@@ -513,7 +552,7 @@ namespace Beef.Demo.Business
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -534,11 +573,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -567,6 +606,12 @@ namespace Beef.Demo.Business
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                if (_throwErrorOnPreValidateAsync != null) await _throwErrorOnPreValidateAsync().ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _throwErrorOnValidate?.Invoke(__mv))
+                    .Run().ThrowOnError();
+
                 if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
@@ -574,10 +619,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetWithEfAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
@@ -599,10 +644,10 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Creates the <see cref="Person"/> object.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateWithEfAsync(Person value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -626,11 +671,11 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
+        /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -655,7 +700,7 @@ namespace Beef.Demo.Business
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteWithEfAsync(Guid id)

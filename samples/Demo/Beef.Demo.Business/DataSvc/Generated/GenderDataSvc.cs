@@ -21,7 +21,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Gender data repository services.
+    /// Provides the <see cref="Gender"/> data repository services.
     /// </summary>
     public partial class GenderDataSvc : IGenderDataSvc
     {
@@ -38,38 +38,35 @@ namespace Beef.Demo.Business.DataSvc
         public GenderDataSvc(IGenderData data, IEventPublisher evtPub, IRequestCache cache)
             { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); GenderDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void GenderDataSvcCtor();
+        partial void GenderDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Gender"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Gender"/> where found.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Gender __val))
+                if (_cache.TryGetValue(__key, out Gender? __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Creates the <see cref="Gender"/> object.
+        /// Creates a new <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Gender> CreateAsync(Gender value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Create").ConfigureAwait(false);
@@ -79,13 +76,13 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Updates the <see cref="Gender"/> object.
+        /// Updates an existing <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Gender> UpdateAsync(Gender value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(GenderDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Gender.{__result.Id}", "Update").ConfigureAwait(false);

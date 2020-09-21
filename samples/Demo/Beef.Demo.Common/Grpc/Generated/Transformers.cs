@@ -95,7 +95,7 @@ namespace Beef.Demo.Common.Grpc
         #region Mappers
 
         /// <summary>
-        /// Gets the <see cref="Beef.Entities.ChangeLog"/> gRpc mapper.
+        /// Gets the <see cref="Beef.Entities.ChangeLog"/> gRPC mapper.
         /// </summary>
         public static EntityMapper<Beef.Entities.ChangeLog, proto.ChangeLog> ChangeLog => EntityMapper.Create<Beef.Entities.ChangeLog, proto.ChangeLog>()
             .HasProperty(e => e.CreatedBy, g => g.CreatedBy)
@@ -104,7 +104,7 @@ namespace Beef.Demo.Common.Grpc
             .HasProperty(e => e.UpdatedDate, g => g.UpdatedDate, p => p.SetConverter(NullableDateTimeToTimestamp));
 
         /// <summary>
-        /// Gets the <see cref="entities.Person"/> gRpc mapper.
+        /// Gets the <b>Person</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.Person, proto.Person> Person => EntityMapper.Create<entities.Person, proto.Person>()
             .HasProperty(e => e.Id, g => g.Id, p => p.SetConverter(GuidToStringConverter))
@@ -119,21 +119,21 @@ namespace Beef.Demo.Common.Grpc
             .HasProperty(e => e.ChangeLog, g => g.ChangeLog, p => p.SetMapper(ChangeLog));
 
         /// <summary>
-        /// Gets the <see cref="entities.PersonCollectionResult"/> gRpc mapper.
+        /// Gets the <b>PersonCollectionResult</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.PersonCollectionResult, proto.PersonCollectionResult> PersonCollectionResult => EntityMapper.Create<entities.PersonCollectionResult, proto.PersonCollectionResult>()
             .HasProperty(e => e.Result, g => g.Result, p => p.SetMapper(Person))
             .HasProperty(e => e.Paging, g => g.Paging, p => p.SetConverter(PagingResultToPagingResultConverter));
 
         /// <summary>
-        /// Gets the <see cref="entities.Address"/> gRpc mapper.
+        /// Gets the <b>Address</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.Address, proto.Address> Address => EntityMapper.Create<entities.Address, proto.Address>()
             .HasProperty(e => e.Street, g => g.Street)
             .HasProperty(e => e.City, g => g.City);
 
         /// <summary>
-        /// Gets the <see cref="entities.Robot"/> gRpc mapper.
+        /// Gets the <b>Robot</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.Robot, proto.Robot> Robot => EntityMapper.Create<entities.Robot, proto.Robot>()
             .HasProperty(e => e.Id, g => g.Id, p => p.SetConverter(GuidToStringConverter))
@@ -145,22 +145,22 @@ namespace Beef.Demo.Common.Grpc
             .HasProperty(e => e.ChangeLog, g => g.ChangeLog, p => p.SetMapper(ChangeLog));
 
         /// <summary>
-        /// Gets the <see cref="entities.RobotCollectionResult"/> gRpc mapper.
+        /// Gets the <b>RobotCollectionResult</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.RobotCollectionResult, proto.RobotCollectionResult> RobotCollectionResult => EntityMapper.Create<entities.RobotCollectionResult, proto.RobotCollectionResult>()
             .HasProperty(e => e.Result, g => g.Result, p => p.SetMapper(Robot))
             .HasProperty(e => e.Paging, g => g.Paging, p => p.SetConverter(PagingResultToPagingResultConverter));
 
         /// <summary>
-        /// Gets the <see cref="entities.RobotArgs"/> gRpc mapper.
+        /// Gets the <b>RobotArgs</b> gRPC mapper.
         /// </summary>
         public static EntityMapper<entities.RobotArgs, proto.RobotArgs> RobotArgs => EntityMapper.Create<entities.RobotArgs, proto.RobotArgs>()
             .HasProperty(e => e.ModelNo, g => g.ModelNo)
             .HasProperty(e => e.SerialNo, g => g.SerialNo)
             .HasProperty(e => e.PowerSourcesSids, g => g.PowerSources);
+
+        #endregion
     }
-    
-    #endregion
 }
 
 #pragma warning restore IDE0005

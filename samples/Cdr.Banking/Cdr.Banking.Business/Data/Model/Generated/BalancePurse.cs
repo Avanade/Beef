@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Balance Purse entity.
+    /// Represents the Balance Purse model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class BalancePurse
@@ -33,10 +31,10 @@ namespace Cdr.Banking.Business.Data.Model
         /// </summary>
         [JsonProperty("currency", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string? Currency { get; set; }
-    } 
+    }
 
     /// <summary>
-    /// Represents a <see cref="BalancePurse"/> collection.
+    /// Represents the <see cref="BalancePurse"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class BalancePurseCollection : List<BalancePurse> { }

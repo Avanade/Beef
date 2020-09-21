@@ -2,6 +2,7 @@
 
 using Beef.Caching;
 using Beef.Entities;
+using HandlebarsDotNet;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,8 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Model", Title = "Provides the data **Model** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
     [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
-    public class EntityConfig : ConfigBase<CodeGenConfig>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+    public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
         #region Key
 
@@ -125,6 +127,14 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("RefData", Title = "The Reference Data sort order option.", Options = new string[] { "SortOrder", "Id", "Code", "Text" },
             Description = "Specifies the default sort order for the underlying Reference Data collection. Defaults to `SortOrder`.")]
         public string? RefDataSortOrder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Reference Data <c>ToString</c> composite <see cref="Beef.RefData.ReferenceDataBase.StringFormat"/>.
+        /// </summary>
+        [JsonProperty("refDataStringFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("RefData", Title = "The Reference Data `ToString` composite format.",
+            Description = "The string format supports the standard composite formatting; where the following indexes are used: `{0}` for `Id`, `{1}` for `Code` and `{2}` for `Text`. Defaults to `{2}`.")]
+        public string? RefDataStringFormat { get; set; }
 
         #endregion
 
@@ -372,27 +382,27 @@ namespace Beef.CodeGen.Config.Entity
         public string? EntityFrameworkName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding Entity Framework entity model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
+        /// Gets or sets the corresponding Entity Framework model name required where <see cref="AutoImplement"/> is <c>EntityFramework</c>.
         /// </summary>
-        [JsonProperty("entityFrameworkEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("EntityFramework", Title = "The corresponding Entity Framework entity model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
-        public string? EntityFrameworkEntity { get; set; }
+        [JsonProperty("entityFrameworkModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("EntityFramework", Title = "The corresponding Entity Framework model name (required where `AutoImplement` is `EntityFramework`).", IsImportant = true)]
+        public string? EntityFrameworkModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the <c>Mapper</c> that the generated Entity Framework <c>Mapper</c> inherits from.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkMapperInheritsFrom", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "The name of the `Mapper  that the generated Entity Framework `Mapper` inherits from.",
             Description = "Defaults to `Model.{Name}`; i.e. an entity with the same name in the `Model` namespace.")]
-        public string? DataEntityFrameworkMapperInheritsFrom { get; set; }
+        public string? EntityFrameworkMapperInheritsFrom { get; set; }
 
         /// <summary>
         /// Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkCustomMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "Indicates that a custom Entity Framework `Mapper` will be used; i.e. not generated.",
             Description = "Otherwise, by default, a `Mapper` will be generated.")]
-        public bool? DataEntityFrameworkCustomMapper { get; set; }
+        public bool? EntityFrameworkCustomMapper { get; set; }
 
         #endregion
 
@@ -407,11 +417,11 @@ namespace Beef.CodeGen.Config.Entity
         public string? CosmosName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding Cosmos entity model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
+        /// Gets or sets the corresponding Cosmos model name required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
         /// </summary>
-        [JsonProperty("cosmosEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Cosmos", Title = "The corresponding Cosmos entity model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true)]
-        public string? CosmosEntity { get; set; }
+        [JsonProperty("cosmosModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Cosmos", Title = "The corresponding Cosmos model name (required where `AutoImplement` is `Cosmos`).", IsImportant = true)]
+        public string? CosmosModel { get; set; }
 
         /// <summary>
         /// Gets or sets the Cosmos <c>ContainerId</c> required where <see cref="AutoImplement"/> is <c>Cosmos</c>.
@@ -458,16 +468,16 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the .NET OData interface name used where `AutoImplement` is `OData`.
         /// </summary>
         [JsonProperty("odataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.", 
+        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.",
             Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).")]
         public string? ODataName { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding OData entity model name required where <see cref="AutoImplement"/> is <c>OData</c>.
+        /// Gets or sets the corresponding OData model name required where <see cref="AutoImplement"/> is <c>OData</c>.
         /// </summary>
-        [JsonProperty("odataEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The corresponding OData entity model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
-        public string? ODataEntity { get; set; }
+        [JsonProperty("odataModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("OData", Title = "The corresponding OData model name (required where `AutoImplement` is `OData`).", IsImportant = true)]
+        public string? ODataModel { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the underlying OData collection name where <see cref="AutoImplement"/> is <c>OData</c>.
@@ -613,11 +623,12 @@ namespace Beef.CodeGen.Config.Entity
         public bool? ExcludeIData { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Data</c> class (<c>XxxData.cs</c>).
+        /// Gets or sets the option to exclude the creation of the <c>Data</c> class (<c>XxxData.cs</c>).
         /// </summary>
         [JsonProperty("excludeData", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Data` class (`XxxData.cs`).")]
-        public bool? ExcludeData { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the creation of the `Data` class (`XxxData.cs`).", Options = new string[] { "No", "Yes", "Mapper" },
+            Description = "Defaults to `No` indicating _not_ to exlude. A value of `Yes` indicates to exclude all output; alternatively, `Mapper` indicates to at least output the corresponding `Mapper` class.")]
+        public string? ExcludeData { get; set; }
 
         /// <summary>
         /// Indicates whether to exclude the creation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
@@ -699,72 +710,257 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Property` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<PropertyConfig>? Properties { get; set; }
 
+        /// <summary>
+        /// Gets the list of private properties to be implemented (that are not inherited).
+        /// </summary>
+        public List<PropertyConfig>? PrivateProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToList();
 
         /// <summary>
-        /// Gets the list of properties that are not inherited.
+        /// Gets the list of core properties to be implemented (that are not inherited).
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "This is appropriate for what is obstensibly a DTO.")]
-        public PropertyConfig[] PropertiesNotInherited => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && (x.RefDataMapping == null || !x.RefDataMapping.Value)).ToArray();
+        public List<PropertyConfig>? CoreProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that form the unique key.
+        /// </summary>
+        public List<PropertyConfig>? UniqueKeyProperties => Properties!.Where(x => (x.UniqueKey.HasValue && x.UniqueKey.Value) && (x.Inherited == null || !x.Inherited.Value)).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are sub-entities.
+        /// </summary>
+        public List<PropertyConfig>? EntityProperties => Properties!.Where(x => (x.Inherited == null || !x.Inherited.Value) && x.IsEntity.HasValue && x.IsEntity.Value).ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for database mapping.
+        /// </summary>
+        public List<PropertyConfig>? DatabaseMapperProperties => Properties!.Where(x => CompareNullOrValue(x.DatabaseIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? EntityFrameworkMapperProperties => Properties!.Where(x => CompareNullOrValue(x.EntityFrameworkIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? CosmosMapperProperties => Properties!.Where(x => CompareNullOrValue(x.CosmosIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for entity framework mapping.
+        /// </summary>
+        public List<PropertyConfig>? ODataMapperProperties => Properties!.Where(x => CompareNullOrValue(x.ODataIgnore, false) && x.Name != "ETag" && x.Name != "ChangeLog").ToList();
+
+        /// <summary>
+        /// Gets the list of properties that are to be used for gRPC.
+        /// </summary>
+        public List<PropertyConfig>? GrpcProperties => Properties!.Where(x => x.GrpcFieldNo.HasValue && x.GrpcFieldNo.Value > 0).ToList();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
         [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Operation` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<OperationConfig>? Operations { get; set; }
+
+        /// <summary>
+        /// Gets the IEntityManager <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIManager, false)).ToList();
+
+        /// <summary>
+        /// Gets the EntityManager <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? ManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false)).ToList();
+
+        /// <summary>
+        /// Gets the EntityManager <see cref="OperationConfig"/> collection where the Manager is not custom.
+        /// </summary>
+        public List<OperationConfig>? ManagerAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false) && CompareNullOrValue(x.ManagerCustom, false)).ToList();
+
+        /// <summary>
+        /// Gets the IEntityDataSvc <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IDataSvcOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false)).ToList();
+
+        /// <summary>
+        /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? DataSvcOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false)).ToList();
+
+        /// <summary>
+        /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection where the DataSvc is not custom.
+        /// </summary>
+        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
+
+        /// <summary>
+        /// Gets the DataSvc constructor parameters.
+        /// </summary>
+        public List<ParameterConfig> DataSvcConstructorParameters { get; } = new List<ParameterConfig>();
+
+        /// <summary>
+        /// Gets the IEntityData <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? IDataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIData, false)).ToList();
+
+        /// <summary>
+        /// Gets the IEntityData <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? DataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeData, false)).ToList();
+
+        /// <summary>
+        /// Gets the Grpc <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? GrpcOperations => Operations!.Where(x => CompareValue(x.Grpc, true) && !x.IsPatch).ToList();
+
+        /// <summary>
+        /// Gets the Data constructor parameters.
+        /// </summary>
+        public List<ParameterConfig> DataConstructorParameters { get; } = new List<ParameterConfig>();
+
+        /// <summary>
+        /// Gets the EntityController <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? WebApiOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApi, false)).ToList();
+
+        /// <summary>
+        /// Gets the EntityAgent <see cref="OperationConfig"/> collection.
+        /// </summary>
+        public List<OperationConfig>? WebApiAgentOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApiAgent, false)).ToList();
+
+        /// <summary>
+        /// Gets the WebApi Contructor parameters.
+        /// </summary>
+        public List<ParameterConfig> WebApiConstructorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
         /// </summary>
         [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema(Title = "The corresponding `Consts` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ConstConfig>? Consts { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => CodeGenerator.ToComments($"Represents the {Text} entity.");
 
         /// <summary>
-        /// Gets or sets the entity name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityName { get; set; }
+        public string? EntityName => !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}<T>";
 
         /// <summary>
-        /// Gets or sets the entity collection name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity collection name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityCollectionName { get; set; }
+        public string? EntityCollectionName => !GenericWithT.HasValue || !GenericWithT.Value ? $"{Name}Collection" : $"{Name}Collection<T>";
 
         /// <summary>
-        /// Gets or sets the entity collection result name (accounts for <see cref="GenericWithT"/>).
+        /// Gets the entity collection result name (accounts for <see cref="GenericWithT"/>).
         /// </summary>
-        public string? EntityCollectionResultName { get; set; }
+        public string? EntityCollectionResultName => !GenericWithT.HasValue || !GenericWithT.Value ? $"{Name}CollectionResult" : $"{Name}CollectionResult<T>";
 
         /// <summary>
-        /// Indicates whether the entity (based on all configurations) should implement the <see cref="EntityBase"/> capabilties.
+        /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public bool HasEntityBase => !(CompareValue(OmitEntityBase, true) || Parent!.IsDataModel);
+        public string? EntityNameSeeComments => CompareValue(ExcludeEntity, true) ? $"<b>{Name}</b>" : CodeGenerator.ToSeeComments(Name);
+
+        /// <summary>
+        /// Gets or sets the computed entity inherits.
+        /// </summary>
+        public string? EntityInherits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed model inherits.
+        /// </summary>
+        public string? ModelInherits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed entity collection inherits.
+        /// </summary>
+        public string? EntityCollectionInherits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed entity inherits.
+        /// </summary>
+        public string? EntityImplements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the computed model inherits.
+        /// </summary>
+        public string? ModelImplements { get; set; }
+
+        /// <summary>
+        /// Inidicates whether any of the operations use validators.
+        /// </summary>
+        public bool UsesValidators => Validator != null || Operations.Any(x => x.Validator != null || x.Parameters.Any(y => y.Validator != null));
+
+        /// <summary>
+        /// Indicates whether at least one operation needs a Manager.
+        /// </summary>
+        public bool RequiresManager => !(CompareValue(ExcludeManager, true) && CompareValue(ExcludeIManager, true));
+
+        /// <summary>
+        /// Indicates whether at least one operation needs a DataSvc.
+        /// </summary>
+        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations.Any(x => CompareNullOrValue(x.ManagerCustom, false));
+
+        /// <summary>
+        /// Indicates whether at least one operation needs a Data.
+        /// </summary>
+        public bool RequiresData => (CompareValue(ExcludeData, "None") && CompareValue(ExcludeIData, true)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+
+        /// <summary>
+        /// Indicates whether any of the operations will raise an event. 
+        /// </summary>
+        public bool SupportsEvents => Operations.Any(x => x.Events.Count > 0);
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'Database'.
+        /// </summary>
+        public bool UsesDatabase => AutoImplement == "Database" || Operations.Any(x => x.AutoImplement == "Database");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'EntityFramework'.
+        /// </summary>
+        public bool UsesEntityFramework => AutoImplement == "EntityFramework" || EntityFrameworkModel != null || Operations.Any(x => x.AutoImplement == "EntityFramework");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'Cosmos'.
+        /// </summary>
+        public bool UsesCosmos => AutoImplement == "Cosmos" || CosmosModel != null || Operations.Any(x => x.AutoImplement == "Cosmos");
+
+        /// <summary>
+        /// Indicates whether auto-implementing 'OData'.
+        /// </summary>
+        public bool UsesOData => AutoImplement == "OData" || ODataModel != null || Operations.Any(x => x.AutoImplement == "OData");
+
+        /// <summary>
+        /// Indicates whether the data extensions section is required.
+        /// </summary>
+        public bool DataExtensionsRequired => CompareValue(DataExtensions, true) || UsesCosmos || DataOperations.Any(x => x.Type == "GetColl");
+
+        /// <summary>
+        /// Gets the reference data qualified Entity name.
+        /// </summary>
+        public string RefDataQualifiedEntityCollectionName => RefDataQualifiedEntityName + "Collection";
+
+        /// <summary>
+        /// Gets the reference data qualified Entity name.
+        /// </summary>
+        public string RefDataQualifiedEntityName => string.IsNullOrEmpty(RefDataType) ? Name! : $"{(string.IsNullOrEmpty(Root?.RefDataNamespace) ? "RefDataBusNamesapce" : "RefDataNamespace")}.{Name}";
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
-            EntityName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}<T>";
-            EntityCollectionName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}Collection<T>";
-            EntityCollectionResultName = !GenericWithT.HasValue || !GenericWithT.Value ? Name : $"{Name}CollectionResult<T>";
-
-            Text = DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
-            SummaryText = CodeGenerator.ToComments($"Represents the {Text} entity.");
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
-            PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => CodeGenerator.ToCamelCase(Name));
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             ConstType = DefaultWhereNull(ConstType, () => "string");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             RefDataSortOrder = DefaultWhereNull(RefDataSortOrder, () => "SortOrder");
@@ -773,15 +969,12 @@ namespace Beef.CodeGen.Config.Entity
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
-            DatabaseName = DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName);
+            DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
-            EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName);
-            EntityFrameworkEntity = DefaultWhereNull(EntityFrameworkEntity, () => $"Model.{Name}");
-            CosmosName = DefaultWhereNull(CosmosName, () => Parent!.CosmosName);
-            CosmosEntity = DefaultWhereNull(CosmosEntity, () => $"Model.{Name}");
-            CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "ParitionKey.None");
-            ODataName = DefaultWhereNull(ODataName, () => Parent!.ODataName);
-            ODataEntity = DefaultWhereNull(ODataEntity, () => $"Model.{Name}");
+            EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
+            CosmosName = InterfaceiseName(DefaultWhereNull(CosmosName, () => Parent!.CosmosName));
+            CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
+            ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcConstructor = DefaultWhereNull(DataSvcConstructor, () => "Public");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
@@ -790,7 +983,7 @@ namespace Beef.CodeGen.Config.Entity
             WebApiConstructor = DefaultWhereNull(WebApiConstructor, () => "Public");
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
-            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true));
+            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? "Yes" : "No");
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => CompareValue(ExcludeAll, true));
             ExcludeIManager = DefaultWhereNull(ExcludeIManager, () => CompareValue(ExcludeAll, true));
@@ -804,37 +997,44 @@ namespace Beef.CodeGen.Config.Entity
             PrepareProperties();
             PrepareOperations();
             InferImplements();
+            PrepareConstructors();
         }
+
+        /// <summary>
+        /// Interface-ise the name; i.e. prefix with an 'I'.
+        /// </summary>
+        private static string? InterfaceiseName(string? name) => string.IsNullOrEmpty(name) || (name.StartsWith("I", StringComparison.Ordinal) && name.Length >= 2 && char.IsUpper(name[1])) ? name : "I" + name;
 
         /// <summary>
         /// Infers the <see cref="Inherits"/>, <see cref="CollectionInherits"/> and <see cref="CollectionResultInherits"/> values.
         /// </summary>
         private void InferInherits()
         {
-            Inherits = DefaultWhereNull(Inherits, () =>
+            EntityInherits = Inherits;
+            EntityInherits = DefaultWhereNull(EntityInherits, () => RefDataType switch
             {
-                if (!CompareNullOrValue(OmitEntityBase, false))
-                    return null;
-
-                return RefDataType switch
-                {
-                    "int" => "ReferenceDataBaseInt",
-                    "Guid" => "ReferenceDataBaseGuid",
-                    _ => "EntityBase"
-                };
+                "int" => "ReferenceDataBaseInt",
+                "Guid" => "ReferenceDataBaseGuid",
+                _ => CompareNullOrValue(OmitEntityBase, false) ? "EntityBase" : null
             });
 
-            CollectionInherits = DefaultWhereNull(CollectionInherits, () =>
+            ModelInherits = RefDataType switch
             {
-                if (!CompareNullOrValue(OmitEntityBase, false))
-                    return $"List<{EntityName}>";
+                "int" => "ReferenceDataBaseInt",
+                "Guid" => "ReferenceDataBaseGuid",
+                _ => null
+            };
 
+            EntityCollectionInherits = CollectionInherits;
+            EntityCollectionInherits = DefaultWhereNull(EntityCollectionInherits, () =>
+            {
                 if (RefDataType == null)
                     return CompareValue(CollectionKeyed, true) ? $"EntityBaseKeyedCollection<UniqueKey, {EntityName}>" : $"EntityBaseCollection<{EntityName}>";
                 else
                     return $"ReferenceDataCollectionBase<{EntityName}>";
             });
 
+            CollectionInherits = DefaultWhereNull(CollectionInherits, () => $"List<{EntityName}>");
             CollectionResultInherits = DefaultWhereNull(CollectionResultInherits, () => $"EntityCollectionResult<{EntityCollectionName}, {EntityName}>");
         }
 
@@ -848,7 +1048,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var constant in Consts)
             {
-                constant.Prepare(this);
+                constant.Prepare(Root!, this);
             }
         }
 
@@ -863,7 +1063,7 @@ namespace Beef.CodeGen.Config.Entity
             if (RefDataType != null)
             {
                 var i = 0;
-                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = "{{" + Name + "}} identifier", Type = RefDataType, UniqueKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
+                AddInheritedProperty("Id", ref i, () => new PropertyConfig { Text = $"{{{{{Name}}}}} identifier", Type = RefDataType, UniqueKey = true, DataAutoGenerated = true, DataName = $"{Name}Id" });
                 AddInheritedProperty("Code", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("Text", ref i, () => new PropertyConfig { Type = "string" });
                 AddInheritedProperty("IsActive", ref i, () => new PropertyConfig { Type = "bool" });
@@ -874,7 +1074,7 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var property in Properties)
             {
-                property.Prepare(this);
+                property.Prepare(Root!, this);
             }
         }
 
@@ -922,7 +1122,7 @@ namespace Beef.CodeGen.Config.Entity
             // Prepare each operations.
             foreach (var operation in Operations)
             {
-                operation.Prepare(this);
+                operation.Prepare(Root!, this);
             }
         }
 
@@ -931,22 +1131,24 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private void InferImplements()
         {
-            if (!ImplementsAutoInfer.HasValue || !ImplementsAutoInfer.Value)
+            if (ImplementsAutoInfer.HasValue && !ImplementsAutoInfer.Value)
                 return;
 
             var implements = new List<string>();
+            var modelImplements = new List<string>();
+
             if (Implements != null)
             {
                 foreach (var str in Implements!.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
                     var txt = str?.Trim();
-                    if (string.IsNullOrEmpty(txt))
+                    if (!string.IsNullOrEmpty(txt))
                         implements.Add(txt!);
                 }
             }
 
             var i = 0;
-            var id = Properties.FirstOrDefault(x => x.Name == "Id" && (!x.Inherited.HasValue || !x.Inherited.Value) && x.UniqueKey.HasValue && x.UniqueKey.Value);
+            var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
             if (id != null)
             {
                 var iid = id.Type switch
@@ -957,17 +1159,82 @@ namespace Beef.CodeGen.Config.Entity
                     _ => "IIdentifier",
                 };
 
-                if (!implements.Contains(iid))
-                    implements.Insert(i++, iid);
+                implements.Insert(i, iid);
+                modelImplements.Insert(i++, iid);
             }
 
-            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string") && !implements.Contains("IETag"))
-                implements.Insert(i++, "IETag");
+            if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i, "IETag");
+                modelImplements.Insert(i++, "IETag");
+            }
 
-            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog") && !implements.Contains("IChangeLog"))
-                implements.Insert(i++, "IChangeLog");
+            if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
+            {
+                implements.Insert(i, "IChangeLog");
+                modelImplements.Insert(i++, "IChangeLog");
+            }
 
-            Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
+            //Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
+
+            if (RefDataType == null)
+                implements.Add($"IEquatable<{EntityName}>");
+
+            EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());
+            ModelImplements = modelImplements.Count == 0 ? null : string.Join(", ", modelImplements.GroupBy(x => x).Select(y => y.First()).ToArray());
+        }
+
+        /// <summary>
+        /// Prepare the constructors.
+        /// </summary>
+        private void PrepareConstructors()
+        {
+            // DataSvc constructors.
+            var oc = new OperationConfig();
+            oc.Prepare(Root!, this);
+
+            if (RequiresData)
+                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
+
+            if (SupportsEvents)
+                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
+
+            if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
+                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
+            else 
+                DataSvcCaching = false;
+
+            foreach (var ctor in DataSvcConstructorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
+
+            // Data constructors.
+            if (UsesDatabase)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
+
+            if (UsesEntityFramework)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
+
+            if (UsesCosmos)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
+
+            if (UsesOData)
+                DataConstructorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+
+            foreach (var ctor in DataConstructorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
+
+            // WebAPI contstructors.
+            if (RequiresManager)
+                WebApiConstructorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
+
+            foreach (var ctor in WebApiConstructorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
         }
     }
 }

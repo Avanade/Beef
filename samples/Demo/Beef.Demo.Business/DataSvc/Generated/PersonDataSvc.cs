@@ -21,7 +21,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Person data repository services.
+    /// Provides the <see cref="Person"/> data repository services.
     /// </summary>
     public partial class PersonDataSvc : IPersonDataSvc
     {
@@ -66,19 +66,16 @@ namespace Beef.Demo.Business.DataSvc
         public PersonDataSvc(IPersonData data, IEventPublisher evtPub, IRequestCache cache)
             { _data = Check.NotNull(data, nameof(data)); _evtPub = Check.NotNull(evtPub, nameof(evtPub)); _cache = Check.NotNull(cache, nameof(cache)); PersonDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void PersonDataSvcCtor();
+        partial void PersonDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Creates the <see cref="Person"/> object.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateAsync(Person value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
@@ -89,12 +86,12 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
@@ -104,33 +101,33 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Person __val))
+                if (_cache.TryGetValue(__key, out Person? __val))
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateAsync(Person value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -141,13 +138,13 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
@@ -156,12 +153,12 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetAll2Async()
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
@@ -170,14 +167,14 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -186,14 +183,14 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         public Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -209,12 +206,13 @@ namespace Beef.Demo.Business.DataSvc
         /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person> MergeAsync(Guid fromId, Guid toId)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
                 await _evtPub.PublishAsync(
-                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "Merge", fromId, toId)).ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
+                    _evtPub.CreateValueEvent(__result, $"Demo.Person.{toId}", "MergeTo", fromId, toId)).ConfigureAwait(false);
+
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
             });
@@ -225,7 +223,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         public Task MarkAsync()
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
@@ -235,11 +233,11 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         public Task<MapCoordinates> MapAsync(MapArgs? args)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
@@ -250,50 +248,50 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Get no arguments.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetNoArgsAsync()
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey();
-                if (_cache.TryGetValue(__key, out Person __val))
+                if (_cache.TryGetValue(__key, out Person? __val))
                     return __val;
 
                 var __result = await _data.GetNoArgsAsync().ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
         public Task<PersonDetail?> GetDetailAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out PersonDetail __val))
+                if (_cache.TryGetValue(__key, out PersonDetail? __val))
                     return __val;
 
                 var __result = await _data.GetDetailAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="PersonDetail"/> object.
+        /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/> object.</param>
-        /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
+        /// <param name="value">The <see cref="PersonDetail"/>.</param>
+        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         public Task<PersonDetail> UpdateDetailAsync(PersonDetail value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -308,39 +306,32 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <returns>A resultant <see cref="int"/>.</returns>
         public Task<int> DataSvcCustomAsync()
-        {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
-            {
-                var __result = await DataSvcCustomOnImplementationAsync().ConfigureAwait(false);
-                return __result;
-            });
-        }
+            => DataSvcInvoker.Current.InvokeAsync(this, () => DataSvcCustomOnImplementationAsync());
 
         /// <summary>
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         public Task<Person?> GetNullAsync(string? name)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetNullAsync(name).ConfigureAwait(false);
-                _cache.SetValue(__result?.UniqueKey ?? UniqueKey.Empty, __result);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         public Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
@@ -353,7 +344,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         public Task ThrowErrorAsync()
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
@@ -361,33 +352,33 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         public Task<Person?> GetWithEfAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(id);
-                if (_cache.TryGetValue(__key, out Person __val))
+                if (_cache.TryGetValue(__key, out Person? __val))
                     return __val;
 
                 var __result = await _data.GetWithEfAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 return __result;
             });
         }
 
         /// <summary>
-        /// Creates the <see cref="Person"/> object.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         public Task<Person> CreateWithEfAsync(Person value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
@@ -398,13 +389,13 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         public Task<Person> UpdateWithEfAsync(Person value)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
@@ -415,16 +406,15 @@ namespace Beef.Demo.Business.DataSvc
         }
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         public Task DeleteWithEfAsync(Guid id)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(PersonDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync(
-                    _evtPub.CreateEvent($"Demo.Person.{id}", "Delete", id)).ConfigureAwait(false);
+                await _evtPub.PublishAsync($"Demo.Person.{id}", "", id).ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });

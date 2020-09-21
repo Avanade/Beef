@@ -10,7 +10,7 @@ namespace Beef.Validation
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-    public class ValueValidatorResult<TEntity, TProperty> where TEntity : class
+    public sealed class ValueValidatorResult<TEntity, TProperty> : IValidationContextBase where TEntity : class
     {
         private readonly PropertyContext<TEntity, TProperty> _context;
 
@@ -26,10 +26,20 @@ namespace Beef.Validation
         /// <summary>
         /// Gets the value.
         /// </summary>
+        object? IValidationContextBase.Value => Value;
+
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
         public TProperty Value
         {
             get { return _context.Value; }
         }
+
+        /// <summary>
+        /// Indicates whether there has been a validation error.
+        /// </summary>
+        bool IValidationContextBase.HasErrors => HasError;
 
         /// <summary>
         /// Indicates whether there has been a validation error.

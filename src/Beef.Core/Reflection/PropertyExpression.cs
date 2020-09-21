@@ -145,7 +145,7 @@ namespace Beef.Reflection
             }
 
             // Create expression (with compilation also).
-            var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca == null ? Beef.CodeGen.CodeGenerator.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
+            var pe = new PropertyExpression<TEntity, TProperty>(name, jpa == null ? name : jpa.PropertyName!, ca == null ? StringConversion.ToSentenceCase(me.Member.Name)! : ca.Name, propertyExpression.Compile())
             {
                 JsonPropertyAttribute = jpa
             };

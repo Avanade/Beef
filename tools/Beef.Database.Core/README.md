@@ -56,7 +56,7 @@ The data specified follows a basic indenting/levelling rule to enable:
 
 ### Reference data
 
-[*Reference Data*](../../docs/Reference-Data.md) is treated as a special case; generally identified by being in the `Ref` schema. The first column name and value pair are treated as the `Code` and `Text` columns. Also the `IsActive` column will automatically be set to `true`, and the `SortOrder` column to the index (1-based) in which it is specified. 
+[*Reference Data*](../../docs/Reference-Data.md) is treated as a special case. The first column name and value pair are treated as the `Code` and `Text` columns. Also the `IsActive` column will automatically be set to `true`, and the `SortOrder` column to the index (1-based) in which it is specified. 
 
 Where a column is a *Reference Data* reference the reference data code can be specified, with the identifier being determined at runtime (using a sub-query) as it is unlikely to be known at configuration time. The tooling determines this by the column name being suffixed by `Id` and a corresponding table name in the `Ref` schema; example `GenderId` column and corresponding table `Ref.Gender`.
 
@@ -95,7 +95,7 @@ To simplify the database management here are some further considerations that ma
 
 - **Nullable everything** - all columns (except) the primary key should be defined as nullable. The business logic should validate the request to ensure data is provided where mandatory. Makes changes to the database schema easier over time without this constraint.
 - **Minimise constraints** - do not use database constraints unless absolutely necessary; only leverage where the database is the best and/or most efficient means to perform; i.e. uniqueness. The business logic should validate the request to ensure that any related data is provided, is valid and consistent. 
-- **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except `dbo` or `sec` (security where used).
+- **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except special cases, such as `dbo` or `sec` (security where used) for example.
 - **Standardise column lengths** - use a standard set of column lengths within the database and have the business logic manage the length constraint. As such the column length must be the same or greater that what is required.
 - **JSON for schema-less** - where there is data that needs to be persisted, but rarely searched on, a schema-less approach should be considered such that a JSON object is persisted versus having to define columns. This can further simplify the database requirements where the data is hierarchical in nature. To enable the [`ObjectToJsonConverter`](../../src/Beef.Core/Mapper/Converters/ObjectToJsonConverter.cs) should be used within the corresponding mapper (e.g. [`DatabasePropertyMapper`](../../src/Beef.Data.Database/DatabasePropertyMapper.cs)).
 
@@ -140,7 +140,8 @@ Command | Description
 -|-
 `ScriptNew` | Creates a new (skeleton) script file using the defined naming convention.
 `ScriptNew -create Schema.Table` | Creates a new table create script file for the named schema and table.
-`ScriptNew -alter Schema.Table` | Creates a new table create script file for the named schema and table.
+`ScriptNew -createref Schema.Table` | Creates a new reference data table create script file for the named schema and table.
+`ScriptNew -alter Schema.Table` | Creates a new table alter script file for the named schema and table.
 
 <br/>
 
@@ -158,8 +159,6 @@ public class Program
 }
 ```
 
-<br/>
-
 To automatically added artefacts as embedded resources make the following change to your `.csproj` file:
 
 ``` xml
@@ -170,12 +169,11 @@ To automatically added artefacts as embedded resources make the following change
   </ItemGroup>
 ```
 
-<br/>
-
 To run the console application, simply specify the required command; e.g:
+
 ```
 dotnet run dropandall
 dotnet run all
 dotnet run database -cs "Data Source=.;Initial atalog=Beef.Test;Integrated Security=True"
-dotnet run scriptnew -create Ref.Eyecolor
+dotnet run scriptnew -createref Ref.Eyecolor
 ```

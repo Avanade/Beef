@@ -15,44 +15,44 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>
-    /// Provides the <see cref="T:ReferenceData"/> database access.
+    /// Provides the <b>ReferenceData</b> data access.
     /// </summary>
     public partial interface IReferenceDataData
     {
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.OpenStatus"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
         Task<RefDataNamespace.OpenStatusCollection> OpenStatusGetAllAsync();
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.ProductCategory"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
         Task<RefDataNamespace.ProductCategoryCollection> ProductCategoryGetAllAsync();
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.AccountUType"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.AccountUType"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
         Task<RefDataNamespace.AccountUTypeCollection> AccountUTypeGetAllAsync();
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.MaturityInstructions"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
         Task<RefDataNamespace.MaturityInstructionsCollection> MaturityInstructionsGetAllAsync();
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionType"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.TransactionType"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
         Task<RefDataNamespace.TransactionTypeCollection> TransactionTypeGetAllAsync();
 
         /// <summary>
-        /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> objects.
+        /// Gets all the <see cref="RefDataNamespace.TransactionStatus"/> items.
         /// </summary>
-        /// <returns>A <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
+        /// <returns>The <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
         Task<RefDataNamespace.TransactionStatusCollection> TransactionStatusGetAllAsync();
     }
 }

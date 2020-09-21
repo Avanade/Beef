@@ -13,17 +13,17 @@ using System.Threading.Tasks;
 using Beef;
 using Beef.Business;
 using Beef.Data.OData;
-using Soc = Simple.OData.Client;
 using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 using Beef.Demo.Common.Entities;
 using RefDataNamespace = Beef.Demo.Common.Entities;
+using Soc = Simple.OData.Client;
 
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Provides the Trip Person data access.
+    /// Provides the <see cref="TripPerson"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TripPersonData : ITripPersonData
@@ -34,18 +34,16 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="TripPersonData"/> class.
         /// </summary>
         /// <param name="odata">The <see cref="ITripOData"/>.</param>
-        public TripPersonData(ITripOData odata) { _odata = Check.NotNull(odata, nameof(odata)); TripPersonDataCtor(); }
+        public TripPersonData(ITripOData odata)
+            { _odata = Check.NotNull(odata, nameof(odata)); TripPersonDataCtor(); }
+
+        partial void TripPersonDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TripPersonDataCtor();
-
-        /// <summary>
-        /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
         public Task<TripPerson?> GetAsync(string? id)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -56,41 +54,35 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Creates the <see cref="TripPerson"/> object.
+        /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>The created <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> CreateAsync(TripPerson value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await _odata.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _odata.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="TripPerson"/> object.
+        /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>The updated <see cref="TripPerson"/>.</returns>
         public Task<TripPerson> UpdateAsync(TripPerson value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = ODataMapper.Default.CreateArgs();
-                return await _odata.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _odata.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Deletes the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         public Task DeleteAsync(string? id)
@@ -103,7 +95,7 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="TripPerson"/> entity and OData property mapping.
+        /// Provides the <see cref="TripPerson"/> and OData  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class ODataMapper : ODataMapper<TripPerson, Model.Person, ODataMapper>
@@ -116,13 +108,11 @@ namespace Beef.Demo.Business.Data
                 Property(s => s.Id, d => d.UserName).SetUniqueKey(false);
                 Property(s => s.FirstName, d => d.FirstName);
                 Property(s => s.LastName, d => d.LastName);
+                AddStandardProperties();
                 ODataMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="ODataMapper"/> constructor to be extended.
-            /// </summary>
-            partial void ODataMapperCtor();
+            partial void ODataMapperCtor(); // Enables the ODataMapper constructor to be extended.
         }
     }
 }

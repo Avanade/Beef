@@ -39,41 +39,6 @@ namespace Beef.Events.Subscribe
         public EventSubscriberHostArgs Args { get; private set; }
 
         /// <summary>
-        /// Indicates whether multiple messages (<see cref="EventData"/>) can be processed; default is <c>false</c>.
-        /// </summary>
-        public bool AreMultipleMessagesSupported { get; set; }
-
-        /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.ContinueSilent"/>.
-        /// </summary>
-        public ResultHandling NotSubscribedHandling { get; set; } = ResultHandling.ContinueSilent;
-
-        /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.DataNotFound"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
-        /// </summary>
-        public ResultHandling DataNotFoundHandling { get; set; } = ResultHandling.Stop;
-
-        /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidEventData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
-        /// </summary>
-        public ResultHandling InvalidEventDataHandling { get; set; } = ResultHandling.Stop;
-
-        /// <summary>
-        /// Gets the <see cref="ResultHandling"/> for a <see cref="Result"/> with a <see cref="SubscriberStatus.InvalidData"/> status (can be overriden by an <see cref="IEventSubscriber"/>). Defaults to <see cref="ResultHandling.Stop"/>.
-        /// </summary>
-        public ResultHandling InvalidDataHandling { get; set; } = ResultHandling.Stop;
-
-        /// <summary>
-        /// Gets or sets the subject path seperator <see cref="string"/> (see <see cref="IEventPublisher.PathSeparator"/>).
-        /// </summary>
-        public string SubjectPathSeparator { get; set; } = ".";
-
-        /// <summary>
-        /// Gets or sets the subject template wildcard <see cref="string"/> (see <see cref="IEventPublisher.TemplateWildcard"/>).
-        /// </summary>
-        public string SubjectTemplateWildcard { get; set; } = "*";
-
-        /// <summary>
         /// Receives the message and processes when the <paramref name="subject"/> and <paramref name="action"/> has been subscribed.
         /// </summary>
         /// <param name="subject">The event subject.</param>
@@ -92,7 +57,7 @@ namespace Beef.Events.Subscribe
                 return CheckResult(Result.InvalidEventData(null, "EventData is invalid; Subject is required."), null, null, null);
 
             // Match a subscriber to the subject + template supplied.
-            var subscriber = Args.CreateEventSubscriber(SubjectTemplateWildcard, SubjectPathSeparator, subject, action);
+            var subscriber = Args.CreateEventSubscriber(Args.SubjectTemplateWildcard, Args.SubjectPathSeparator, subject, action);
             if (subscriber == null)
                 return CheckResult(Result.NotSubscribed(), subject, action, null);
 
@@ -120,7 +85,11 @@ namespace Beef.Events.Subscribe
                 // Create and set the execution context for the event.
                 ExecutionContext.Reset();
                 var ec = Args.ServiceProvider.GetService<ExecutionContext>();
-                UpdateExecutionContext(ec, subscriber, @event);
+                if (Args.UpdateExecutionContext == null)
+                    UpdateExecutionContext(ec, subscriber, @event);
+                else
+                    Args.UpdateExecutionContext(ec, subscriber, @event);
+
                 ec.ServiceProvider = Args.ServiceProvider;
                 ec.CorrelationId = @event.CorrelationId;
                 ExecutionContext.SetCurrent(ec);
@@ -161,19 +130,19 @@ namespace Beef.Events.Subscribe
                     break;
 
                 case SubscriberStatus.InvalidEventData:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? InvalidEventDataHandling);
+                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidEventDataHandling ?? Args.InvalidEventDataHandling);
                     break;
 
                 case SubscriberStatus.NotSubscribed:
-                    HandleTheHandling(result, result.ResultHandling ?? NotSubscribedHandling);
+                    HandleTheHandling(result, result.ResultHandling ?? Args.NotSubscribedHandling);
                     break;
 
                 case SubscriberStatus.DataNotFound:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? DataNotFoundHandling);
+                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.DataNotFoundHandling ?? Args.DataNotFoundHandling);
                     break;
 
                 case SubscriberStatus.InvalidData:
-                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? InvalidDataHandling);
+                    HandleTheHandling(result, result.ResultHandling ?? subscriber?.InvalidDataHandling ?? Args.InvalidDataHandling);
                     break;
 
                 case SubscriberStatus.ExceptionContinue:
@@ -214,10 +183,8 @@ namespace Beef.Events.Subscribe
         /// <param name="executionContext">The <see cref="ExecutionContext"/> to update.</param>
         /// <param name="subscriber">The <see cref="IEventSubscriber"/> that will process the message.</param>
         /// <param name="event">The <see cref="EventData"/>.</param>
-        /// <remarks>When overridding it is the responsibility of the overridder to honour the <see cref="IEventSubscriber.RunAsUser"/> selection.</remarks>
-#pragma warning disable CA1716 // Identifiers should not match keywords; by-design, is the best name.
-        protected virtual void UpdateExecutionContext(ExecutionContext executionContext, IEventSubscriber subscriber, EventData @event)
-#pragma warning restore CA1716 
+        /// <remarks></remarks>
+        private static void UpdateExecutionContext(ExecutionContext executionContext, IEventSubscriber subscriber, EventData @event)
         {
             if (executionContext == null)
                 throw new ArgumentNullException(nameof(executionContext));

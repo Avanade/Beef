@@ -42,18 +42,18 @@ namespace Beef.Demo.Common.Entities
         public Guid PersonId
         {
             get => _personId;
-            set => SetValue(ref _personId, value, true, false, nameof(PersonId)); 
+            set => SetValue(ref _personId, value, true, false, nameof(PersonId));
         }
 
         /// <summary>
         /// Gets or sets the Name.
         /// </summary>
-        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Include)]
         [Display(Name="Name")]
         public string? Name
         {
             get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name)); 
+            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name));
         }
 
         /// <summary>
@@ -61,11 +61,10 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         [JsonProperty("startDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Start Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime StartDate
         {
             get => _startDate;
-            set => SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, nameof(StartDate)); 
+            set => SetValue(ref _startDate, value, false, DateTimeTransform.DateOnly, nameof(StartDate));
         }
 
         /// <summary>
@@ -73,17 +72,16 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         [JsonProperty("endDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="End Date")]
-        [DisplayFormat(DataFormatString = Beef.Entities.StringFormat.DateOnlyFormat)]
         public DateTime? EndDate
         {
             get => _endDate;
-            set => SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, nameof(EndDate)); 
+            set => SetValue(ref _endDate, value, false, DateTimeTransform.DateOnly, nameof(EndDate));
         }
 
         #endregion
 
-        #region UniqueKey
-      
+        #region IUniqueKey
+
         /// <summary>
         /// Indicates whether the <see cref="WorkHistory"/> has a <see cref="UniqueKey"/> value.
         /// </summary>
@@ -93,20 +91,17 @@ namespace Beef.Demo.Common.Entities
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         public override string[] UniqueKeyProperties => new string[] { nameof(Name) };
-        
+
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
         /// </summary>
         /// <returns>The <see cref="Beef.Entities.UniqueKey"/>.</returns>
         /// <param name="name">The <see cref="Name"/>.</param>
-        public static UniqueKey CreateUniqueKey(string name) => new UniqueKey(name);
-          
+        public static UniqueKey CreateUniqueKey(string? name) => new UniqueKey(name);
+
         /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
+        /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Name"/>).
         /// </summary>
-        /// <remarks>
-        /// The <b>UniqueKey</b> key consists of the following property(s): <see cref="Name"/>.
-        /// </remarks>
         public override UniqueKey UniqueKey => new UniqueKey(Name);
 
         #endregion
@@ -118,31 +113,25 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is WorkHistory val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is WorkHistory val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(WorkHistory? obj)
+        /// <param name="value">The <see cref="WorkHistory"/> to compare with the current <see cref="WorkHistory"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="WorkHistory"/> is equal to the current <see cref="WorkHistory"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(WorkHistory? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(PersonId, obj.PersonId)
-                && Equals(Name, obj.Name)
-                && Equals(StartDate, obj.StartDate)
-                && Equals(EndDate, obj.EndDate);
+            return base.Equals((object)value)
+                && Equals(PersonId, value.PersonId)
+                && Equals(Name, value.Name)
+                && Equals(StartDate, value.StartDate)
+                && Equals(EndDate, value.EndDate);
         }
 
         /// <summary>
@@ -162,9 +151,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (WorkHistory? a, WorkHistory? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="WorkHistory"/>.
+        /// Returns the hash code for the <see cref="WorkHistory"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="WorkHistory"/>.</returns>
+        /// <returns>The hash code for the <see cref="WorkHistory"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -176,7 +165,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -195,8 +184,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="WorkHistory"/> to copy from.</param>
         public void CopyFrom(WorkHistory from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             PersonId = from.PersonId;
@@ -206,9 +195,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -238,7 +227,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -247,7 +236,8 @@ namespace Beef.Demo.Common.Entities
         {
             get
             {
-                return Cleaner.IsInitial(Name)
+                return Cleaner.IsInitial(PersonId)
+                    && Cleaner.IsInitial(Name)
                     && Cleaner.IsInitial(StartDate)
                     && Cleaner.IsInitial(EndDate);
             }
@@ -262,31 +252,27 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(WorkHistory from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="WorkHistory"/> collection.
+    /// Represents the <see cref="WorkHistory"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class WorkHistoryCollection : EntityBaseCollection<WorkHistory>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class.
         /// </summary>
-        public WorkHistoryCollection(){ }
+        public WorkHistoryCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="WorkHistoryCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="WorkHistory"/> entities.</param>
         public WorkHistoryCollection(IEnumerable<WorkHistory> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="WorkHistoryCollection"/>.
         /// </summary>
@@ -294,16 +280,16 @@ namespace Beef.Demo.Common.Entities
         public override object Clone()
         {
             var clone = new WorkHistoryCollection();
-            foreach (WorkHistory item in this)
+            foreach (var item in this)
             {
                 clone.Add((WorkHistory)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

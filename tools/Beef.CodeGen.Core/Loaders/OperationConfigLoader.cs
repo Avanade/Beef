@@ -66,13 +66,13 @@ namespace Beef.CodeGen.Loaders
             config.AttributeUpdate("ReturnText", config.Attributes["ReturnText"]);
 
             if (config.Attributes.ContainsKey("OperationType") && config.Attributes["OperationType"] == "Custom")
-                config.AttributeAdd("Text", CodeGenerator.ToSentenceCase(config.Attributes["Name"]));
+                config.AttributeAdd("Text", StringConversion.ToSentenceCase(config.Attributes["Name"]));
 
             if (config.Attributes.ContainsKey("Text"))
                 config.AttributeUpdate("Text", config.Attributes["Text"]);
 
-            config.AttributeAdd("PrivateName", CodeGenerator.ToPrivateCase(config.Attributes["Name"]));
-            config.AttributeAdd("ArgumentName", CodeGenerator.ToCamelCase(config.Attributes["Name"]));
+            config.AttributeAdd("PrivateName", StringConversion.ToPrivateCase(config.Attributes["Name"]));
+            config.AttributeAdd("ArgumentName", StringConversion.ToCamelCase(config.Attributes["Name"]));
             config.AttributeAdd("QualifiedName", entity.Attributes["Name"] + config.Attributes["Name"]);
 
             return Task.CompletedTask;

@@ -68,6 +68,14 @@
     "implement_none": {
       "type": "computed",
       "value": "(datasource == \"None\")"
+    },
+    "created_date": {
+      "type": "generated",
+      "generator": "now",
+      "parameters": {
+        "format": "yyyyMMdd"
+      },
+      "replaces": "20190101"
     }
   },
   "sources": [

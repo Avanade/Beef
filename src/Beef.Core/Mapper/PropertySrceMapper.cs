@@ -390,13 +390,10 @@ namespace Beef.Mapper
                 return;
 
             TSrceProperty val = GetSrceValue(sourceEntity, operationType)!;
-            if (val != null)
+            foreach (var pm in Mapper.Mappings)
             {
-                foreach (var pm in Mapper.Mappings)
-                {
-                    if (pm.OperationTypes.HasFlag(operationType) && ((IPropertySrceMapper<TSrceProperty>)pm).MapSrceToDestWhen(val))
-                        ((IPropertySrceMapper<TSrceProperty>)pm).MapToDest(val, destinationEntity, operationType);
-                }
+                if (pm.OperationTypes.HasFlag(operationType) && ((IPropertySrceMapper<TSrceProperty>)pm).MapSrceToDestWhen(val))
+                    ((IPropertySrceMapper<TSrceProperty>)pm).MapToDest(val, destinationEntity, operationType);
             }
         }
 

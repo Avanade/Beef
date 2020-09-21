@@ -2,8 +2,8 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Beef.CodeGen.Config.Entity
 {
@@ -18,7 +18,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("DataSvc", Title = "Provides the **Data Services-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    public class CodeGenConfig : ConfigBase<object>
+    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig
     {
         #region RefData
 
@@ -26,22 +26,22 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Common`.
         /// </summary>
         [JsonProperty("refDataNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.", IsImportant = true)]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Common`.", IsImportant = true)]
         public string? RefDataNamespace { get; set; }
 
         /// <summary>
         /// Gets or sets the namespace for the Reference Data entities (adds as a c# <c>using</c> statement) where the <see cref="EntityConfig.EntityScope"/> is `Business`.
         /// </summary>
         [JsonProperty("refDataBusNamespace", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Business`.")]
+        [PropertySchema("RefData", Title = "The namespace for the Reference Data entities (adds as a c# `using` statement) where the `Entity.EntityScope` property configuration is `Business`.")]
         public string? RefDataBusNamespace { get; set; }
 
         /// <summary>
         /// Gets or sets the <c>RouteAtttribute</c> for the Reference Data Web API controller required for named pre-fetching.
         /// </summary>
-        [JsonProperty("refDataWebApiRoutePrefix", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("refDataWebApiRoute", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("RefData", Title = "The `RouteAtttribute` for the Reference Data Web API controller required for named pre-fetching.", IsImportant = true)]
-        public string? RefDataWebApiRoutePrefix { get; set; }
+        public string? RefDataWebApiRoute { get; set; }
 
         /// <summary>
         /// Gets or sets the cache used for the ReferenceData providers.
@@ -120,7 +120,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "Indicates whether the Web API controller should use `Authorize` (`true`); otherwise, `AllowAnonynous` (`false`).",
-            Description = "Defaults to the `AllowAnonynous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+            Description = "Defaults to the `AllowAnonynous` (`false`). This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public bool? WebApiAuthorize { get; set; }
 
         #endregion
@@ -176,7 +176,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("refDataDefaultMapperConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "The default Reference Data property `Converter` used by the generated `Mapper`(s) where not specifically defined.", Options = new string[] { "ReferenceDataCodeConverter", "ReferenceDataInt32IdConverter", "ReferenceDataNullableInt32IdConverter", "ReferenceDataGuidIdConverter", "ReferenceDataNullableGuidIdConverter" },
-            Description = "Defaults to `Business`. A value of `Business` indicates that the Validators will be defined within the `Business` namespace/assembly; otherwise, defined within the `Common` namespace/assembly.")]
+            Description = "Defaults to `ReferenceDataCodeConverter`.")]
         public string? RefDataDefaultMapperConverter { get; set; }
 
         /// <summary>
@@ -274,9 +274,17 @@ namespace Beef.CodeGen.Config.Entity
 
             foreach (var p in parameters)
             {
-                RuntimeParameters.Add(p.Key, p.Value);
+                if (RuntimeParameters.ContainsKey(p.Key))
+                    RuntimeParameters[p.Key] = p.Value;
+                else
+                    RuntimeParameters.Add(p.Key, p.Value);
             }
         }
+
+        /// <summary>
+        /// Resets the runtime parameters.
+        /// </summary>
+        public void ResetRuntimeParameters() => RuntimeParameters.Clear();
 
         /// <summary>
         /// Gets the specified runtime parameter value.
@@ -320,6 +328,31 @@ namespace Beef.CodeGen.Config.Entity
         public List<EntityConfig>? Entities { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
+        /// </summary>
+        public List<EntityConfig>? IManagerEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
+        /// </summary>
+        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
+ 
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
+        /// </summary>
+        public List<EntityConfig>? IDataEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for Reference Data.  
+        /// </summary>
+        public List<EntityConfig>? RefDataEntities => Entities.Where(x => !string.IsNullOrEmpty(x.RefDataType) && CompareNullOrValue(x.Abstract, false)).ToList();
+
+        /// <summary>
+        /// Gets the <see cref="Entities"/> that are selected for Grpc.  
+        /// </summary>
+        public List<EntityConfig>? GrpcEntities => Entities.Where(x => CompareValue(x.Grpc, true) && CompareNullOrValue(x.Abstract, false)).ToList();
+
+        /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.
         /// </summary>
         public string Company => GetRuntimeParameter("Company", true)!;
@@ -328,6 +361,11 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets the application name from the <see cref="RuntimeParameters"/>.
         /// </summary>
         public string AppName => GetRuntimeParameter("AppName", true)!;
+
+        /// <summary>
+        /// Gets the API name from the <see cref="RuntimeParameters"/>.
+        /// </summary>
+        public string ApiName => DefaultWhereNull(GetRuntimeParameter("ApiName"), () => "Api")!;
 
         /// <summary>
         /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
@@ -345,6 +383,16 @@ namespace Beef.CodeGen.Config.Entity
         public bool IsDataModel => GetRuntimeBoolParameter("IsDataModel");
 
         /// <summary>
+        /// Indicates whether the intended code generation is explicitly for Reference Data.
+        /// </summary>
+        public bool IsRefData => GetRuntimeBoolParameter("IsRefData");
+
+        /// <summary>
+        /// Gets the reference data specific properties.
+        /// </summary>
+        public RefDataConfig? RefData { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -359,14 +407,19 @@ namespace Beef.CodeGen.Config.Entity
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
+            RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
+            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => false);
 
             if (Entities != null && Entities.Count > 0)
             {
                 foreach (var entity in Entities)
                 {
-                    entity.Prepare(this);
+                    entity.Prepare(Root!, this);
                 }
             }
+
+            RefData = new RefDataConfig();
+            RefData.Prepare(Root!, this);
         }
     }
 }

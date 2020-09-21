@@ -19,7 +19,7 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Transaction data repository services.
+    /// Provides the <see cref="Transaction"/> data repository services.
     /// </summary>
     public partial class TransactionDataSvc : ITransactionDataSvc
     {
@@ -32,21 +32,18 @@ namespace Cdr.Banking.Business.DataSvc
         public TransactionDataSvc(ITransactionData data)
             { _data = Check.NotNull(data, nameof(data)); TransactionDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TransactionDataSvcCtor();
+        partial void TransactionDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
+        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(TransactionDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false);
                 return __result;

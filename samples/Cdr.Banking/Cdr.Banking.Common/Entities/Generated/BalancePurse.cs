@@ -41,7 +41,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal Amount
         {
             get => _amount;
-            set => SetValue(ref _amount, value, false, false, nameof(Amount)); 
+            set => SetValue(ref _amount, value, false, false, nameof(Amount));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency));
         }
 
         #endregion
@@ -64,29 +64,23 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is BalancePurse val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is BalancePurse val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="BalancePurse"/> is equal to the current <see cref="BalancePurse"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(BalancePurse? obj)
+        /// <param name="value">The <see cref="BalancePurse"/> to compare with the current <see cref="BalancePurse"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="BalancePurse"/> is equal to the current <see cref="BalancePurse"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(BalancePurse? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Amount, obj.Amount)
-                && Equals(Currency, obj.Currency);
+            return base.Equals((object)value)
+                && Equals(Amount, value.Amount)
+                && Equals(Currency, value.Currency);
         }
 
         /// <summary>
@@ -106,9 +100,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (BalancePurse? a, BalancePurse? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="BalancePurse"/>.
+        /// Returns the hash code for the <see cref="BalancePurse"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="BalancePurse"/>.</returns>
+        /// <returns>The hash code for the <see cref="BalancePurse"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -118,7 +112,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -137,8 +131,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="BalancePurse"/> to copy from.</param>
         public void CopyFrom(BalancePurse from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Amount = from.Amount;
@@ -146,9 +140,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -177,7 +171,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -200,31 +194,27 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(BalancePurse from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="BalancePurse"/> collection.
+    /// Represents the <see cref="BalancePurse"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class BalancePurseCollection : EntityBaseCollection<BalancePurse>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="BalancePurseCollection"/> class.
         /// </summary>
-        public BalancePurseCollection(){ }
+        public BalancePurseCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BalancePurseCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="BalancePurseCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="BalancePurse"/> entities.</param>
         public BalancePurseCollection(IEnumerable<BalancePurse> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="BalancePurseCollection"/>.
         /// </summary>
@@ -232,16 +222,16 @@ namespace Cdr.Banking.Common.Entities
         public override object Clone()
         {
             var clone = new BalancePurseCollection();
-            foreach (BalancePurse item in this)
+            foreach (var item in this)
             {
                 clone.Add((BalancePurse)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

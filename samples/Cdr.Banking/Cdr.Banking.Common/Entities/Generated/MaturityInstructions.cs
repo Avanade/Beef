@@ -33,10 +33,7 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator MaturityInstructions(Guid id)
-        {
-            return ConvertFromId<MaturityInstructions>(id);
-        }
+        public static implicit operator MaturityInstructions(Guid id) => ConvertFromId<MaturityInstructions>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="MaturityInstructions"/>.
@@ -44,13 +41,10 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="MaturityInstructions"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator MaturityInstructions(string? code)
-        {
-            return ConvertFromCode<MaturityInstructions>(code);
-        }
+        public static implicit operator MaturityInstructions(string? code) => ConvertFromCode<MaturityInstructions>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -69,16 +63,16 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="MaturityInstructions"/> to copy from.</param>
         public void CopyFrom(MaturityInstructions from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -105,7 +99,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -130,29 +124,29 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(MaturityInstructions from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="MaturityInstructions"/> collection.
+    /// Represents the <see cref="MaturityInstructions"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class MaturityInstructionsCollection : ReferenceDataCollectionBase<MaturityInstructions>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="MaturityInstructionsCollection"/> class.
         /// </summary>
-        public MaturityInstructionsCollection(){ }
+        public MaturityInstructionsCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MaturityInstructionsCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="MaturityInstructionsCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="MaturityInstructions"/> entities.</param>
         public MaturityInstructionsCollection(IEnumerable<MaturityInstructions> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

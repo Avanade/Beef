@@ -242,7 +242,7 @@ namespace Beef.Data.Cosmos
                     var ro = CosmosDb.GetItemRequestOptions(DbArgs);
                     var resp = await Container.ReadItemAsync<TModel>(key, DbArgs.PartitionKey ?? PartitionKey.None, ro).ConfigureAwait(false);
                     if (resp?.Resource == null)
-                        return;
+                        throw new NotFoundException();
 
                     CheckAuthorized(resp.Resource);
                     await Container.DeleteItemAsync<T>(key, DbArgs.PartitionKey ?? PartitionKey.None, CosmosDb.GetItemRequestOptions(DbArgs)).ConfigureAwait(false);
@@ -250,7 +250,7 @@ namespace Beef.Data.Cosmos
                 catch (CosmosException cex)
                 {
                     if (cex.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return;
+                        throw new NotFoundException();
 
                     throw;
                 }

@@ -46,7 +46,7 @@ namespace Cdr.Banking.Common.Entities
         public string? Id
         {
             get => _id;
-            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id)); 
+            set => SetValue(ref _id, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Id));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal CurrentBalance
         {
             get => _currentBalance;
-            set => SetValue(ref _currentBalance, value, false, false, nameof(CurrentBalance)); 
+            set => SetValue(ref _currentBalance, value, false, false, nameof(CurrentBalance));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal AvailableBalance
         {
             get => _availableBalance;
-            set => SetValue(ref _availableBalance, value, false, false, nameof(AvailableBalance)); 
+            set => SetValue(ref _availableBalance, value, false, false, nameof(AvailableBalance));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal CreditLimit
         {
             get => _creditLimit;
-            set => SetValue(ref _creditLimit, value, false, false, nameof(CreditLimit)); 
+            set => SetValue(ref _creditLimit, value, false, false, nameof(CreditLimit));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Cdr.Banking.Common.Entities
         public decimal AmortisedLimit
         {
             get => _amortisedLimit;
-            set => SetValue(ref _amortisedLimit, value, false, false, nameof(AmortisedLimit)); 
+            set => SetValue(ref _amortisedLimit, value, false, false, nameof(AmortisedLimit));
         }
 
         /// <summary>
@@ -101,24 +101,24 @@ namespace Cdr.Banking.Common.Entities
         public string? Currency
         {
             get => _currency;
-            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency)); 
+            set => SetValue(ref _currency, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Currency));
         }
 
         /// <summary>
-        /// Gets or sets the Purses (see <see cref="BalancePurseCollection"/>).
+        /// Gets or sets the Purses.
         /// </summary>
         [JsonProperty("purses", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="Purses")]
         public BalancePurseCollection? Purses
         {
             get => _purses;
-            set => SetValue(ref _purses, value, false, true, nameof(Purses)); 
+            set => SetValue(ref _purses, value, false, true, nameof(Purses));
         }
 
         #endregion
 
         #region IChangeTracking
-          
+
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
         /// </summary>
@@ -147,34 +147,28 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is Balance val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is Balance val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="Balance"/> is equal to the current <see cref="Balance"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Balance? obj)
+        /// <param name="value">The <see cref="Balance"/> to compare with the current <see cref="Balance"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="Balance"/> is equal to the current <see cref="Balance"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(Balance? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Id, obj.Id)
-                && Equals(CurrentBalance, obj.CurrentBalance)
-                && Equals(AvailableBalance, obj.AvailableBalance)
-                && Equals(CreditLimit, obj.CreditLimit)
-                && Equals(AmortisedLimit, obj.AmortisedLimit)
-                && Equals(Currency, obj.Currency)
-                && Equals(Purses, obj.Purses);
+            return base.Equals((object)value)
+                && Equals(Id, value.Id)
+                && Equals(CurrentBalance, value.CurrentBalance)
+                && Equals(AvailableBalance, value.AvailableBalance)
+                && Equals(CreditLimit, value.CreditLimit)
+                && Equals(AmortisedLimit, value.AmortisedLimit)
+                && Equals(Currency, value.Currency)
+                && Equals(Purses, value.Purses);
         }
 
         /// <summary>
@@ -194,9 +188,9 @@ namespace Cdr.Banking.Common.Entities
         public static bool operator != (Balance? a, Balance? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="Balance"/>.
+        /// Returns the hash code for the <see cref="Balance"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="Balance"/>.</returns>
+        /// <returns>The hash code for the <see cref="Balance"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -211,7 +205,7 @@ namespace Cdr.Banking.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -230,8 +224,8 @@ namespace Cdr.Banking.Common.Entities
         /// <param name="from">The <see cref="Balance"/> to copy from.</param>
         public void CopyFrom(Balance from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Id = from.Id;
@@ -244,9 +238,9 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -280,7 +274,7 @@ namespace Cdr.Banking.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -308,7 +302,7 @@ namespace Cdr.Banking.Common.Entities
         partial void OnAfterCopyFrom(Balance from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

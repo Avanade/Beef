@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="webapisettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="webapisettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.AspNetCore.WebApi\Beef.AspNetCore.WebApi.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Events\Beef.Events.csproj" />
+    <ProjectReference Include="..\My.Hr.Business\My.Hr.Business.csproj" />
+    <ProjectReference Include="..\My.Hr.Common\My.Hr.Common.csproj" />
+  </ItemGroup>
+</Project>

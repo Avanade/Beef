@@ -41,7 +41,7 @@ namespace Beef.Demo.Common.Entities
         public string? Name
         {
             get => _name;
-            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name)); 
+            set => SetValue(ref _name, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Name));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Beef.Demo.Common.Entities
         public string? Description
         {
             get => _description;
-            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description)); 
+            set => SetValue(ref _description, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(Description));
         }
 
         #endregion
@@ -64,29 +64,23 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is ProductArgs val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is ProductArgs val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="ProductArgs"/> is equal to the current <see cref="ProductArgs"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(ProductArgs? obj)
+        /// <param name="value">The <see cref="ProductArgs"/> to compare with the current <see cref="ProductArgs"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="ProductArgs"/> is equal to the current <see cref="ProductArgs"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(ProductArgs? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(Name, obj.Name)
-                && Equals(Description, obj.Description);
+            return base.Equals((object)value)
+                && Equals(Name, value.Name)
+                && Equals(Description, value.Description);
         }
 
         /// <summary>
@@ -106,9 +100,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (ProductArgs? a, ProductArgs? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="ProductArgs"/>.
+        /// Returns the hash code for the <see cref="ProductArgs"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="ProductArgs"/>.</returns>
+        /// <returns>The hash code for the <see cref="ProductArgs"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -118,7 +112,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -137,8 +131,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="ProductArgs"/> to copy from.</param>
         public void CopyFrom(ProductArgs from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((EntityBase)from);
             Name = from.Name;
@@ -146,9 +140,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -177,7 +171,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -200,7 +194,7 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(ProductArgs from);
 
         #endregion
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

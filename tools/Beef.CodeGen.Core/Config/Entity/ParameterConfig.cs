@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.Entities;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -16,7 +17,8 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Manager", Title = "Provides the generic **Manager-layer** configuration.")]
     [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
-    public class ParameterConfig : ConfigBase<OperationConfig>
+    [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
+    public class ParameterConfig : ConfigBase<CodeGenConfig, OperationConfig>
     {
         #region Key
 
@@ -75,7 +77,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`.", IsImportant = true)]
+        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
@@ -120,9 +122,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
         /// </summary>
-        [JsonProperty("validatorFluent", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("validatorCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).")]
-        public string? ValidatorFluent { get; set; }
+        public string? ValidatorCode { get; set; }
 
         /// <summary>
         /// Indicates whether a <see cref="ValidationException"/> should be thrown when the parameter value has its default value (null, zero, etc).
@@ -175,10 +177,72 @@ namespace Beef.CodeGen.Config.Entity
 
         #endregion
 
+        #region Grpc
+
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets or sets the underlying gRPC data type.
         /// </summary>
-        public string? SummaryText { get; set; }
+        [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Grpc", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        public string? GrpcType { get; set; }
+
+        #endregion
+
+        /// <summary>
+        /// Indicates whether the parameter is the auto-added value.
+        /// </summary>
+        public bool IsValueArg { get; set; }
+
+        /// <summary>
+        /// Indicates whether the parameter is the auto-enabled <see cref="PagingArgs"/>.
+        /// </summary>
+        public bool IsPagingArgs { get; set; } 
+
+        /// <summary>
+        /// Gets the formatted summary text.
+        /// </summary>
+        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" ? CodeGenerator.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            : CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+
+        /// <summary>
+        /// Gets the computed declared parameter type.
+        /// </summary>
+        public string? ParameterType => CompareValue(Nullable, true) ? $"{Type}?" : Type;
+
+        /// <summary>
+        /// Gets the WebApi parameter type.
+        /// </summary>
+        public string WebApiParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : string.IsNullOrEmpty(RefDataType) ? ParameterType! : (CompareValue(Nullable, true) ? $"{RefDataType}?" : RefDataType!);
+
+        /// <summary>
+        /// Gets the WebApi Agent parameter type.
+        /// </summary>
+        public string WebApiAgentParameterType => IsValueArg && Parent!.Type == "Patch" ? "JToken" : ParameterType!;
+
+        /// <summary>
+        /// Gets the <see cref="WebApiFrom"/> for use in an Agent.
+        /// </summary>
+        public string? WebApiAgentFrom => WebApiFrom switch { "FromBody" => "FromBody", "FromEntityProperties" => "FromUriUseProperties", _ => null };
+
+        /// <summary>
+        /// Gets the parameter argument using the specified converter.
+        /// </summary>
+        public string ParameterConverted => string.IsNullOrEmpty(DataConverter) ? ArgumentName! : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{ParameterType}>" : "")}.Default.ConvertToDest({ArgumentName})";
+
+        /// <summary>
+        /// Gets or sets the related entity.
+        /// </summary>
+        public EntityConfig? RelatedEntity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC converter.
+        /// </summary>
+        public string? GrpcConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC mapper.
+        /// </summary>
+        public string? GrpcMapper { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -188,19 +252,51 @@ namespace Beef.CodeGen.Config.Entity
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
-            Text = DefaultWhereNull(Text, () => pc == null ? CodeGenerator.ToSentenceCase(Name) : pc.Text);
-            SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
-            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? CodeGenerator.ToPrivateCase(Name) : pc.Name);
-            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? CodeGenerator.ToCamelCase(Name) : pc.ArgumentName);
+            if (Type!.EndsWith("?", StringComparison.InvariantCulture))
+            {
+                Type = Type[0..^1];
+                Nullable = true;
+            }
+
+            RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            {
+                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+
+                if (RelatedEntity != null)
+                {
+                    if (RelatedEntity.EntityScope == null || RelatedEntity.EntityScope == "Common")
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                    else
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                }
+
+                return StringConversion.ToSentenceCase(Name);
+            }));
+
+            PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
+            ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
+            WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");
 
             RefDataType = DefaultWhereNull(RefDataType, () => pc?.RefDataType);
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
+
+            GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
+            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcConverter = Type switch
+            {
+                "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DateTimeToTimestamp",
+                "Guid" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}GuidToStringConverter",
+                "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
+                _ => null
+            };
         }
     }
 }

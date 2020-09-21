@@ -31,6 +31,7 @@ namespace Beef.Database.Core
         private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
+        private readonly CommandOption _refSchema;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -74,6 +75,8 @@ namespace Beef.Database.Core
 
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
+
+            _refSchema = App.Option("-rs|--refschema", "Reference data schema name.", CommandOptionType.SingleValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -154,7 +157,7 @@ namespace Beef.Database.Core
 
             WriteHeader(args);
 
-            var de = new DatabaseExecutor(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray(), args);
+            var de = new DatabaseExecutor(new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args });
             var sw = Stopwatch.StartNew();
 
             var result = await de.RunAsync().ConfigureAwait(false);

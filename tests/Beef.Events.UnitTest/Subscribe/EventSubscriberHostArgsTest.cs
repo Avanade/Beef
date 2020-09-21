@@ -12,23 +12,22 @@ namespace Beef.Events.UnitTest.Subscribe
         [Test]
         public void Ctor_NoIEventSubscriber()
         {
-            var sp = TestSetUp.CreateServiceProvider();
-            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(sp));
-            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(sp, (Type[])null));
-            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(sp, new Type[] { }));
+            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create());
+            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create((Type[])null));
+            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(new Type[] { }));
         }
 
         [Test]
         public void Ctor_NoSubscribersInAssembly()
         {
-            var sp = TestSetUp.CreateServiceProvider();
-            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(sp, typeof(TestAttribute).Assembly));
+            ExpectException.Throws<ArgumentException>("*", () => EventSubscriberHostArgs.Create(typeof(TestAttribute).Assembly));
         }
 
         [Test]
         public void Ctor_SubscribersInAssembly()
         {
-            var ts = EventSubscriberHostArgs.GetSubscriberTypes(this.GetType().Assembly);
+            var args = EventSubscriberHostArgs.Create(GetType().Assembly);
+            var ts = args.GetSubscriberTypes();
             Assert.AreEqual(2, ts.Length);
         }
     }

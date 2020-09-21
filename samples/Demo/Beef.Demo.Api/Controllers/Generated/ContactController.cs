@@ -21,25 +21,29 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Contact</b> Web API functionality.
+    /// Provides the <see cref="Contact"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/contacts")]
     public partial class ContactController : ControllerBase
     {
         private readonly IContactManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ContactController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="IContactManager"/>.</param>
-        public ContactController(IContactManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public ContactController(IContactManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); ContactControllerCtor(); }
+
+        partial void ContactControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> collection entity that matches the selection criteria.
+        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="ContactCollection"/>.</returns>
-        [HttpGet()]
-        [Route("")]
+        /// <returns>The <see cref="ContactCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("")]
         [ProducesResponseType(typeof(ContactCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetAll()
@@ -49,12 +53,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> entity that matches the selection criteria.
+        /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> entity where found.</returns>
-        [HttpGet()]
-        [Route("{id}")]
+        /// <returns>The selected <see cref="Contact"/> where found.</returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult Get(Guid id)
@@ -64,12 +68,12 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Creates the <see cref="Contact"/> entity.
+        /// Creates a new <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> entity.</param>
-        /// <returns>The created <see cref="Contact"/> entity.</returns>
-        [HttpPost()]
-        [Route("")]
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>The created <see cref="Contact"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Contact value)
         {
@@ -78,13 +82,13 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the <see cref="Contact"/> entity.
+        /// Updates an existing <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> entity.</param>
+        /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The updated <see cref="Contact"/> entity.</returns>
-        [HttpPut()]
-        [Route("{id}")]
+        /// <returns>The updated <see cref="Contact"/>.</returns>
+        [AllowAnonymous]
+        [HttpPut("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Contact value, Guid id)
         {
@@ -93,11 +97,11 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes the <see cref="Contact"/> entity that matches the selection criteria.
+        /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        [HttpDelete()]
-        [Route("{id}")]
+        [AllowAnonymous]
+        [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
         {

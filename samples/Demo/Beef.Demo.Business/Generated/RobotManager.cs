@@ -14,14 +14,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 using Beef.Demo.Common.Entities;
-using Beef.Demo.Business.Validation;
 using Beef.Demo.Business.DataSvc;
+using Beef.Demo.Business.Validation;
 using RefDataNamespace = Beef.Demo.Common.Entities;
 
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Provides the Robot business functionality.
+    /// Provides the <see cref="Robot"/> business functionality.
     /// </summary>
     public partial class RobotManager : IRobotManager
     {
@@ -31,37 +31,32 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
-        private RobotManager(IRobotDataSvc dataService) { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
+        private RobotManager(IRobotDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); RobotManagerCtor(); }
+
+        partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void RobotManagerCtor();
-
-        /// <summary>
-        /// Gets the <see cref="Robot"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Robot"/> where found.</returns>
         public Task<Robot?> GetAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
             });
         }
 
         /// <summary>
-        /// Creates the <see cref="Robot"/> object.
+        /// Creates a new <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <param name="value">The <see cref="Robot"/>.</param>
+        /// <returns>The created <see cref="Robot"/>.</returns>
         public Task<Robot> CreateAsync(Robot value)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -70,20 +65,17 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Run().ThrowOnError();
-
+                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="Robot"/> object.
+        /// Updates an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
+        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <returns>The updated <see cref="Robot"/>.</returns>
         public Task<Robot> UpdateAsync(Robot value, Guid id)
         {
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
@@ -93,16 +85,13 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(RobotValidator.Default))
-                    .Run().ThrowOnError();
-
+                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             });
         }
 
         /// <summary>
-        /// Deletes the <see cref="Robot"/> object.
+        /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         public Task DeleteAsync(Guid id)
@@ -111,30 +100,24 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
-                MultiValidator.Create()
-                    .Add(id.Validate(nameof(id)).Mandatory())
-                    .Run().ThrowOnError();
-
+                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
+        /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
         public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(RobotArgsValidator.Default))
-                    .Run().ThrowOnError();
-
+                args.Validate(nameof(args)).Entity(RobotArgsValidator.Default).Run().ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             });
         }

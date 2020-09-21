@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -20,7 +18,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the other <see cref="Person"/> without <see cref="EntityBase"/> capabilities entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PersonOther : IGuidIdentifier, IChangeLog, IETag
+    public partial class PersonOther : IGuidIdentifier, IETag, IChangeLog
     {
         /// <summary>
         /// Gets or sets the <see cref="Person"/> identifier.
@@ -47,14 +45,14 @@ namespace Beef.Demo.Common.Entities
         public string? ETag { get; set; }
 
         /// <summary>
-        /// Gets or sets the Change Log (see <see cref="ChangeLog"/>).
+        /// Gets or sets the Change Log (see <see cref="Beef.Entities.ChangeLog"/>).
         /// </summary>
         [JsonProperty("changeLog", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ChangeLog? ChangeLog { get; set; }
-    } 
+    }
 
     /// <summary>
-    /// Represents a <see cref="PersonOther"/> collection.
+    /// Represents the <see cref="PersonOther"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PersonOtherCollection : List<PersonOther> { }

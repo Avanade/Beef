@@ -24,14 +24,16 @@ namespace Cdr.Banking.Api.Controllers
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     public partial class ReferenceDataController : ControllerBase
     {
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.OpenStatus"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.OpenStatus"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.OpenStatus"/> collection.</returns>
+        /// <returns>A RefDataNamespace.OpenStatus collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/openStatuses")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.OpenStatus>), (int)HttpStatusCode.OK)]
@@ -41,11 +43,12 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.ProductCategory"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.ProductCategory"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.ProductCategory"/> collection.</returns>
+        /// <returns>A RefDataNamespace.ProductCategory collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/productCategories")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.ProductCategory>), (int)HttpStatusCode.OK)]
@@ -55,11 +58,12 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.AccountUType"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.AccountUType"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.AccountUType"/> collection.</returns>
+        /// <returns>A RefDataNamespace.AccountUType collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/accountUTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.AccountUType>), (int)HttpStatusCode.OK)]
@@ -69,11 +73,12 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.MaturityInstructions"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.MaturityInstructions"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.MaturityInstructions"/> collection.</returns>
+        /// <returns>A RefDataNamespace.MaturityInstructions collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/maturityInstructions")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.MaturityInstructions>), (int)HttpStatusCode.OK)]
@@ -83,11 +88,12 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.TransactionType"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.TransactionType"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.TransactionType"/> collection.</returns>
+        /// <returns>A RefDataNamespace.TransactionType collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/transactionTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionType>), (int)HttpStatusCode.OK)]
@@ -97,11 +103,12 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary> 
-        /// Gets all of the <see cref="RefDataNamespace.TransactionStatus"/> reference data entities that match the specified criteria.
+        /// Gets all of the <see cref="RefDataNamespace.TransactionStatus"/> reference data items that match the specified criteria.
         /// </summary>
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
-        /// <returns>A <see cref="RefDataNamespace.TransactionStatus"/> collection.</returns>
+        /// <returns>A RefDataNamespace.TransactionStatus collection.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/transactionStatuses")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TransactionStatus>), (int)HttpStatusCode.OK)]
@@ -111,9 +118,10 @@ namespace Cdr.Banking.Api.Controllers
             operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
 
         /// <summary>
-        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: api/v1/ref?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
+        /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
+        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]

@@ -568,9 +568,6 @@ namespace Beef.Mapper
         /// <param name="operationType">The single <see cref="Mapper.OperationTypes"/> being performed to enable selection.</param>
         public virtual void MapToDest(TSrce sourceEntity, TDest destinationEntity, OperationTypes operationType)
         {
-            if (sourceEntity == null || destinationEntity == null)
-                return;
-
             if (!OperationTypes.HasFlag(operationType))
                 return;
 
@@ -581,7 +578,7 @@ namespace Beef.Mapper
 
             CreateAutoMapperIfRequired();
 
-            if (Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection))
+            if (val != null && Converter == null && Mapper != null && (IsSrceComplexType && !SrceComplexTypeReflector!.IsCollection) && (IsDestComplexType && !DestComplexTypeReflector!.IsCollection))
             {
                 TDestProperty dval = GetDestValue(destinationEntity, operationType);
                 if (dval != null)

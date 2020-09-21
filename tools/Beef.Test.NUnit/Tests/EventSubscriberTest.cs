@@ -128,7 +128,8 @@ namespace Beef.Test.NUnit.Tests
                     try
                     {
                         ExecutionContext.Reset();
-                        tesh = new EventSubscriberTestHost(EventSubscriberHostArgs.Create(scope.ServiceProvider, typeof(TSubscriber)).UseLoggerForAuditing());
+                        var args = EventSubscriberHostArgs.Create(typeof(TSubscriber)).UseServiceProvider(scope.ServiceProvider).UseLoggerForAuditing();
+                        tesh = new EventSubscriberTestHost(args);
                         sw = Stopwatch.StartNew();
                         await tesh.ReceiveAsync(@event).ConfigureAwait(false);
                         sw.Stop();

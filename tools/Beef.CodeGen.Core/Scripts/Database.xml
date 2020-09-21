@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<Script LoaderType="Beef.CodeGen.Loaders.TableConfigLoader, Beef.CodeGen.Core">
+<Script ConfigType="Database" LoaderType="Beef.CodeGen.Loaders.TableConfigLoader, Beef.CodeGen.Core">
   <Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />

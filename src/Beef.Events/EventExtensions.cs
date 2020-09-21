@@ -39,33 +39,26 @@ namespace Beef.Events
         }
 
         /// <summary>
-        /// Adds a scoped service to instantiate a new <see cref="EventHubSubscriberHost"/> instance with subscriber auto-discovery.
-        /// </summary>
-        /// <typeparam name="TStartup">The startup class whereby all the subscribers reside.</typeparam>
-        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="addSubscriberTypeServices">Indicates whether to add all the subscriber types (auto-discovered within <typeparamref name="TStartup"/>) as transient services.</param>
-        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventHubSubscriberHost<TStartup>(this IServiceCollection services, bool addSubscriberTypeServices = true) where TStartup : class
-            => AddBeefEventHubSubscriberHost(services, addSubscriberTypeServices, EventSubscriberHostArgs.GetSubscriberTypes(typeof(TStartup).Assembly));
-
-        /// <summary>
-        /// Adds a scoped service to instantiate a new <see cref="EventHubSubscriberHost"/> instance using the specified subscriber types.
+        /// Adds a scoped service to instantiate a new <see cref="EventHubSubscriberHost"/> instance using the specified <paramref name="args"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
-        /// <param name="addSubscriberTypeServices">Indicates whether to add all the <paramref name="eventSubscriberTypes"/> as transient services.</param>
-        /// <param name="eventSubscriberTypes">One or more <see cref="IEventSubscriber"/> types.</param>
+        /// <param name="args">The <see cref="EventSubscriberHostArgs"/>.</param>
+        /// <param name="addSubscriberTypeServices">Indicates whether to add all the <see cref="EventSubscriberHostArgs.GetSubscriberTypes"/> as transient services (defaults to <c>true</c>).</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
-        public static IServiceCollection AddBeefEventHubSubscriberHost(this IServiceCollection services, bool addSubscriberTypeServices = true, params Type[] eventSubscriberTypes)
+        public static IServiceCollection AddBeefEventHubSubscriberHost(this IServiceCollection services, EventSubscriberHostArgs args, bool addSubscriberTypeServices = true)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            services.AddScoped(sp => EventSubscriberHostArgs.Create(sp, eventSubscriberTypes))
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            services.AddScoped(sp => args.UseServiceProvider(sp))
                     .AddScoped<EventHubSubscriberHost>();
 
             if (addSubscriberTypeServices)
             {
-                foreach (var type in eventSubscriberTypes)
+                foreach (var type in args.GetSubscriberTypes())
                 {
                     services.AddTransient(type);
                 }

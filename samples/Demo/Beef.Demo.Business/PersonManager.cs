@@ -1,6 +1,8 @@
 ﻿using Beef.Demo.Common.Entities;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace Beef.Demo.Business
 {
     public partial class PersonManager
@@ -11,9 +13,11 @@ namespace Beef.Demo.Business
             return Task.CompletedTask;
         }
 
-        private Task<Person> ManagerCustomOnImplementationAsync()
+        private Task<Person?> ManagerCustomOnImplementationAsync()
         {
-            return Task.FromResult<Person>(null);
+            return Task.FromResult<Person?>(null);
         }
     }
 }
+
+#nullable restore

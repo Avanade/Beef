@@ -22,7 +22,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the <see cref="Person"/> detail entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PersonDetail : Person
+    public partial class PersonDetail : Person, IEquatable<PersonDetail>
     {
         #region Privates
 
@@ -33,20 +33,20 @@ namespace Beef.Demo.Common.Entities
         #region Properties
 
         /// <summary>
-        /// Gets or sets the History (see <see cref="WorkHistoryCollection"/>).
+        /// Gets or sets the History.
         /// </summary>
         [JsonProperty("history", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [Display(Name="History")]
         public WorkHistoryCollection? History
         {
             get => _history;
-            set => SetValue(ref _history, value, false, true, nameof(History)); 
+            set => SetValue(ref _history, value, false, true, nameof(History));
         }
 
         #endregion
 
         #region IChangeTracking
-          
+
         /// <summary>
         /// Resets the entity state to unchanged by accepting the changes (resets <see cref="EntityBase.ChangeTracking"/>).
         /// </summary>
@@ -75,28 +75,22 @@ namespace Beef.Demo.Common.Entities
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is PersonDetail val))
-                return false;
-
-            return Equals(val);
-        }
+        public override bool Equals(object? obj) => obj is PersonDetail val && Equals(val);
 
         /// <summary>
         /// Determines whether the specified <see cref="PersonDetail"/> is equal to the current <see cref="PersonDetail"/> by comparing the values of all the properties.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(PersonDetail? obj)
+        /// <param name="value">The <see cref="PersonDetail"/> to compare with the current <see cref="PersonDetail"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="PersonDetail"/> is equal to the current <see cref="PersonDetail"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(PersonDetail? value)
         {
-            if (obj == null)
+            if (value == null)
                 return false;
-            else if (ReferenceEquals(obj, this))
+            else if (ReferenceEquals(value, this))
                 return true;
 
-            return base.Equals((object)obj)
-                && Equals(History, obj.History);
+            return base.Equals((object)value)
+                && Equals(History, value.History);
         }
 
         /// <summary>
@@ -116,9 +110,9 @@ namespace Beef.Demo.Common.Entities
         public static bool operator != (PersonDetail? a, PersonDetail? b) => !Equals(a, b);
 
         /// <summary>
-        /// Returns a hash code for the <see cref="PersonDetail"/>.
+        /// Returns the hash code for the <see cref="PersonDetail"/>.
         /// </summary>
-        /// <returns>A hash code for the <see cref="PersonDetail"/>.</returns>
+        /// <returns>The hash code for the <see cref="PersonDetail"/>.</returns>
         public override int GetHashCode()
         {
             var hash = new HashCode();
@@ -127,7 +121,7 @@ namespace Beef.Demo.Common.Entities
         }
     
         #endregion
-        
+
         #region ICopyFrom
     
         /// <summary>
@@ -146,17 +140,17 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="PersonDetail"/> to copy from.</param>
         public void CopyFrom(PersonDetail from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((Person)from);
             History = CopyOrClone(from.History, History);
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -184,7 +178,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -209,31 +203,27 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(PersonDetail from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="PersonDetail"/> collection.
+    /// Represents the <see cref="PersonDetail"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class PersonDetailCollection : EntityBaseCollection<PersonDetail>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class.
         /// </summary>
-        public PersonDetailCollection(){ }
+        public PersonDetailCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="PersonDetailCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="PersonDetail"/> entities.</param>
         public PersonDetailCollection(IEnumerable<PersonDetail> entities) => AddRange(entities);
 
-        #endregion
-
-        #region ICloneable
-        
         /// <summary>
         /// Creates a deep copy of the <see cref="PersonDetailCollection"/>.
         /// </summary>
@@ -241,31 +231,29 @@ namespace Beef.Demo.Common.Entities
         public override object Clone()
         {
             var clone = new PersonDetailCollection();
-            foreach (PersonDetail item in this)
+            foreach (var item in this)
             {
                 clone.Add((PersonDetail)item.Clone());
             }
                 
             return clone;
         }
-        
-        #endregion
-
-        #region Operator
 
         /// <summary>
-        /// An implicit cast from a <see cref="PersonDetailCollectionResult"/> to a <see cref="PersonDetailCollection"/>.
+        /// An implicit cast from the <see cref="PersonDetailCollectionResult"/> to a corresponding <see cref="PersonDetailCollection"/>.
         /// </summary>
         /// <param name="result">The <see cref="PersonDetailCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="PersonDetailCollection"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator PersonDetailCollection(PersonDetailCollectionResult result) => result?.Result!;
-
-        #endregion
     }
 
+    #endregion  
+
+    #region CollectionResult
+
     /// <summary>
-    /// Represents a <see cref="PersonDetail"/> collection result.
+    /// Represents the <see cref="PersonDetail"/> collection result.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class PersonDetailCollectionResult : EntityCollectionResult<PersonDetailCollection, PersonDetail>
@@ -276,7 +264,7 @@ namespace Beef.Demo.Common.Entities
         public PersonDetailCollectionResult() { }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with default <see cref="PagingArgs"/>.
+        /// Initializes a new instance of the <see cref="PersonDetailCollectionResult"/> class with <paramref name="paging"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         public PersonDetailCollectionResult(PagingArgs? paging) : base(paging) { }
@@ -299,6 +287,8 @@ namespace Beef.Demo.Common.Entities
             return clone;
         }
     }
+
+    #endregion
 }
 
 #pragma warning restore CA2227, CA1819

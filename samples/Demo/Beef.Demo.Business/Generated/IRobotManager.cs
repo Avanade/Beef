@@ -17,44 +17,44 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business
 {
     /// <summary>
-    /// Defines the Robot business functionality.
+    /// Defines the <see cref="Robot"/> business functionality.
     /// </summary>
     public partial interface IRobotManager
     {
         /// <summary>
-        /// Gets the <see cref="Robot"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>The selected <see cref="Robot"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Robot"/> where found.</returns>
         Task<Robot?> GetAsync(Guid id);
 
         /// <summary>
-        /// Creates the <see cref="Robot"/> object.
+        /// Creates a new <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <param name="value">The <see cref="Robot"/>.</param>
+        /// <returns>The created <see cref="Robot"/>.</returns>
         Task<Robot> CreateAsync(Robot value);
 
         /// <summary>
-        /// Updates the <see cref="Robot"/> object.
+        /// Updates an existing <see cref="Robot"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Robot"/> object.</param>
+        /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        /// <returns>A refreshed <see cref="Robot"/> object.</returns>
+        /// <returns>The updated <see cref="Robot"/>.</returns>
         Task<Robot> UpdateAsync(Robot value, Guid id);
 
         /// <summary>
-        /// Deletes the <see cref="Robot"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         Task DeleteAsync(Guid id);
 
         /// <summary>
-        /// Gets the <see cref="Robot"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="RobotCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="RobotArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="RobotCollectionResult"/>.</returns>
+        /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
         Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging);
 
         /// <summary>

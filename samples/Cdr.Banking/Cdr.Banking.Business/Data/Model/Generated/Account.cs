@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Account model for data persistence entity.
+    /// Represents the Account model for data persistence model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class Account : IStringIdentifier
@@ -53,7 +51,7 @@ namespace Cdr.Banking.Business.Data.Model
         public string? OpenStatus { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether Is Owned.
+        /// Indicates whether Is Owned.
         /// </summary>
         [JsonProperty("isOwned", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsOwned { get; set; }
@@ -101,23 +99,23 @@ namespace Cdr.Banking.Business.Data.Model
         public string? SpecificAccountUType { get; set; }
 
         /// <summary>
-        /// Gets or sets the Term Deposit (see <see cref="TermDepositAccount"/>).
+        /// Gets or sets the Term Deposit (see <see cref="Common.Entities.TermDepositAccount"/>).
         /// </summary>
         [JsonProperty("termDeposit", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public TermDepositAccount? TermDeposit { get; set; }
 
         /// <summary>
-        /// Gets or sets the Credit Card (see <see cref="CreditCardAccount"/>).
+        /// Gets or sets the Credit Card (see <see cref="Common.Entities.CreditCardAccount"/>).
         /// </summary>
         [JsonProperty("creditCard", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public CreditCardAccount? CreditCard { get; set; }
 
         /// <summary>
-        /// Gets or sets the Balance (see <see cref="Balance"/>).
+        /// Gets or sets the Balance (see <see cref="Common.Entities.Balance"/>).
         /// </summary>
         [JsonProperty("balance", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Balance? Balance { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

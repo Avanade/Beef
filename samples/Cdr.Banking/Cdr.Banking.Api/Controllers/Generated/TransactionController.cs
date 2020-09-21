@@ -21,18 +21,22 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Api.Controllers
 {
     /// <summary>
-    /// Provides the <b>Transaction</b> Web API functionality.
+    /// Provides the <see cref="Transaction"/> Web API functionality.
     /// </summary>
+    [AllowAnonymous]
     [Route("api/v1/banking/accounts")]
     public partial class TransactionController : ControllerBase
     {
         private readonly ITransactionManager _manager;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionController"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="ITransactionManager"/>.</param>
-        public TransactionController(ITransactionManager manager) => _manager = Check.NotNull(manager, nameof(manager));
+        public TransactionController(ITransactionManager manager)
+            { _manager = Check.NotNull(manager, nameof(manager)); TransactionControllerCtor(); }
+
+        partial void TransactionControllerCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get transaction for account.
@@ -43,9 +47,9 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="minAmount">The Min Amount.</param>
         /// <param name="maxAmount">The Max Amount.</param>
         /// <param name="text">The Text.</param>
-        /// <returns>A <see cref="TransactionCollection"/>.</returns>
-        [HttpGet()]
-        [Route("{accountId}/transactions")]
+        /// <returns>The <see cref="TransactionCollection"/></returns>
+        [AllowAnonymous]
+        [HttpGet("{accountId}/transactions")]
         [ProducesResponseType(typeof(TransactionCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult GetTransactions([FromRoute] string? accountId, [FromQuery(Name = "oldest-time")] DateTime? fromDate = default, [FromQuery(Name = "newest-time")] DateTime? toDate = default, [FromQuery(Name = "min-amount")] decimal? minAmount = default, [FromQuery(Name = "max-amount")] decimal? maxAmount = default, string? text = default)

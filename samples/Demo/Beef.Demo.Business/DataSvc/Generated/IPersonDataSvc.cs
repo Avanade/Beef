@@ -17,64 +17,64 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.DataSvc
 {
     /// <summary>
-    /// Defines the Person data repository services.
+    /// Defines the <see cref="Person"/> data repository services.
     /// </summary>
     public partial interface IPersonDataSvc
     {
         /// <summary>
-        /// Creates the <see cref="Person"/> object.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         Task<Person> CreateAsync(Person value);
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         Task DeleteAsync(Guid id);
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         Task<Person?> GetAsync(Guid id);
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         Task<Person> UpdateAsync(Person value);
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         Task<PersonCollectionResult> GetAllAsync(PagingArgs? paging);
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         Task<PersonCollectionResult> GetAll2Async();
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         Task<PersonCollectionResult> GetByArgsAsync(PersonArgs? args, PagingArgs? paging);
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonDetailCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonDetailCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonDetailCollectionResult"/>.</returns>
         Task<PersonDetailCollectionResult> GetDetailByArgsAsync(PersonArgs? args, PagingArgs? paging);
 
         /// <summary>
@@ -93,28 +93,28 @@ namespace Beef.Demo.Business.DataSvc
         /// <summary>
         /// Get <see cref="Person"/> at specified <see cref="MapCoordinates"/>.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="MapArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.MapArgs"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
         Task<MapCoordinates> MapAsync(MapArgs? args);
 
         /// <summary>
         /// Get no arguments.
         /// </summary>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         Task<Person?> GetNoArgsAsync();
 
         /// <summary>
-        /// Gets the <see cref="PersonDetail"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="PersonDetail"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="PersonDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
         Task<PersonDetail?> GetDetailAsync(Guid id);
 
         /// <summary>
-        /// Updates the <see cref="PersonDetail"/> object.
+        /// Updates an existing <see cref="PersonDetail"/>.
         /// </summary>
-        /// <param name="value">The <see cref="PersonDetail"/> object.</param>
-        /// <returns>A refreshed <see cref="PersonDetail"/> object.</returns>
+        /// <param name="value">The <see cref="PersonDetail"/>.</param>
+        /// <returns>The updated <see cref="PersonDetail"/>.</returns>
         Task<PersonDetail> UpdateDetailAsync(PersonDetail value);
 
         /// <summary>
@@ -127,15 +127,15 @@ namespace Beef.Demo.Business.DataSvc
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
-        /// <returns>A resultant <see cref="Person?"/>.</returns>
+        /// <returns>A resultant <see cref="Person"/>.</returns>
         Task<Person?> GetNullAsync(string? name);
 
         /// <summary>
-        /// Gets the <see cref="Person"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="PersonArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="PersonCollectionResult"/>.</returns>
+        /// <returns>The <see cref="PersonCollectionResult"/>.</returns>
         Task<PersonCollectionResult> GetByArgsWithEfAsync(PersonArgs? args, PagingArgs? paging);
 
         /// <summary>
@@ -144,28 +144,28 @@ namespace Beef.Demo.Business.DataSvc
         Task ThrowErrorAsync();
 
         /// <summary>
-        /// Gets the <see cref="Person"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        /// <returns>The selected <see cref="Person"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Person"/> where found.</returns>
         Task<Person?> GetWithEfAsync(Guid id);
 
         /// <summary>
-        /// Creates the <see cref="Person"/> object.
+        /// Creates a new <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The created <see cref="Person"/>.</returns>
         Task<Person> CreateWithEfAsync(Person value);
 
         /// <summary>
-        /// Updates the <see cref="Person"/> object.
+        /// Updates an existing <see cref="Person"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Person"/> object.</param>
-        /// <returns>A refreshed <see cref="Person"/> object.</returns>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
         Task<Person> UpdateWithEfAsync(Person value);
 
         /// <summary>
-        /// Deletes the <see cref="Person"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         Task DeleteWithEfAsync(Guid id);

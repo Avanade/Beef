@@ -80,13 +80,6 @@ namespace Beef.Data.EntityFrameworkCore
         public EfDbInvoker<TDbContext> Invoker { get; private set; }
 
         /// <summary>
-        /// Indicates whether a pre-read is performed on an <see cref="UpdateAsync{T, TModel}(EfDbArgs{T, TModel}, T)"/> to confirm existence and throw a corresponding
-        /// <see cref="NotFoundException"/> where not found. Otherwise, where not found a <see cref="ConcurrencyException"/> will be thrown. The pre-read requires an additional
-        /// database keyed-read and therefore has a minor performance impact as a result.
-        /// </summary>
-        public bool OnUpdatePreReadForNotFound { get; set; } = false;
-
-        /// <summary>
         /// Gets or sets the <see cref="DatabaseWildcard"/> to enable wildcard replacement.
         /// </summary>
         public DatabaseWildcard Wildcard { get; set; } = new DatabaseWildcard();
@@ -229,26 +222,23 @@ namespace Beef.Data.EntityFrameworkCore
 
             return await Invoker.InvokeAsync(this, async () =>
             {
-                if (OnUpdatePreReadForNotFound)
+                // Check (find) if the entity exists.
+                var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
+                for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
                 {
-                    // Check (find) if the entity exists.
-                    var efKeys = new object[saveArgs.Mapper.UniqueKey.Count];
-                    for (int i = 0; i < saveArgs.Mapper.UniqueKey.Count; i++)
-                    {
-                        var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
-                        efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
-                    }
-
-                    var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
-                    if (em == null)
-                        throw new NotFoundException();
-
-                    // Remove the entity from the tracker before we attempt to update; otherwise, will use existing rowversion and concurrency will not work as expected.
-                    DbContext.Remove(em);
-                    DbContext.ChangeTracker.AcceptAllChanges();
+                    var v = saveArgs.Mapper.UniqueKey[i].GetSrceValue(value, Mapper.OperationTypes.Unspecified);
+                    efKeys[i] = saveArgs.Mapper.UniqueKey[i].ConvertToDestValue(v, Mapper.OperationTypes.Unspecified)!;
                 }
 
-                var model = saveArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Update) ?? throw new InvalidOperationException("Mapping to the EF entity must not result in a null value.");
+                var model = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
+                if (model == null)
+                    throw new NotFoundException();
+
+                // Remove the entity from the tracker before we attempt to update; otherwise, will use existing rowversion and concurrency will not work as expected.
+                DbContext.Remove(model);
+                DbContext.ChangeTracker.AcceptAllChanges();
+
+                saveArgs.Mapper.MapToDest(value, model, Mapper.OperationTypes.Update);
                 DbContext.Update(model);
 
                 if (saveArgs.SaveChanges)
@@ -280,7 +270,7 @@ namespace Beef.Data.EntityFrameworkCore
                 // A pre-read is required to get the row version for concurrency.
                 var em = (TModel)await DbContext.FindAsync(typeof(TModel), efKeys).ConfigureAwait(false);
                 if (em == null)
-                    return;
+                    throw new NotFoundException();
 
                 DbContext.Remove(em);
 

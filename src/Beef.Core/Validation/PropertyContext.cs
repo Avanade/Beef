@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Entities;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -161,6 +162,19 @@ namespace Beef.Validation
         /// Indicates whether there has been a validation error.
         /// </summary>
         public bool HasError { get; internal set; }
+
+        /// <summary>
+        /// Gets the <see cref="IServiceProvider"/> from the <see cref="ExecutionContext.ServiceProvider"/>.
+        /// </summary>
+        public IServiceProvider ServiceProvider => (ExecutionContext.HasCurrent ? ExecutionContext.Current.ServiceProvider : null) ?? throw new InvalidOperationException("There is either no ExecutionContext.Current or the ExecutionContext.ServiceProvider has not been configured.");
+
+        /// <summary>
+        /// Gets service of type <typeparamref name="TService"/> from the <see cref="ServiceProvider"/>.
+        /// </summary>
+        /// <typeparam name="TService">The service <see cref="Type"/>.</typeparam>
+        /// <param name="throwExceptionOnNull">Indicates whether to throw an <see cref="InvalidOperationException"/> where the underlying <see cref="IServiceProvider.GetService(Type)"/> returns <c>null</c>.</param>
+        /// <returns>The specified service where found; </returns>
+        public TService GetService<TService>(bool throwExceptionOnNull = true) where TService : class => ExecutionContext.GetService<TService>(throwExceptionOnNull);
 
         /// <summary>
         /// Enables the underlying value to be overridden (updated).

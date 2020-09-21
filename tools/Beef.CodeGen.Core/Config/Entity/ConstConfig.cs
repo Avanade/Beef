@@ -10,7 +10,7 @@ namespace Beef.CodeGen.Config.Entity
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Const", Title = "The **Const** is used to define an constant value for an `Entity`.", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    public class ConstConfig : ConfigBase<EntityConfig>
+    public class ConstConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// Gets or sets the unique constant name.
@@ -24,7 +24,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The C# code for the constant value.", IsMandatory = true, IsImportant = true,
-            Description = "Where the `Type` is `string` then the specified default value will need to be delimited. Any valid value assignment C# code can be used.")]
+            Description = "The code generation will ensure it is delimited correctly to output correctly formed C# code.")]
         public string? Value { get; set; }
 
         /// <summary>
@@ -36,17 +36,21 @@ namespace Beef.CodeGen.Config.Entity
         public string? Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => $"Represents a {Text} constant value.";
+
+        /// <summary>
+        /// Gets the value formatted for code output.
+        /// </summary>
+        public string? FormattedValue => CompareValue(Value, "int") ? Value : (CompareValue(Value, "Guid") ? $"new Guid(\"{Value}\")" : $"\"{Value}\"");
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
-            DefaultWhereNull(Text, () => CodeGenerator.ToSentenceCase(Name));
-            SummaryText = $"Represents a {Text} constant value.";
+            DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
         }
     }
 }

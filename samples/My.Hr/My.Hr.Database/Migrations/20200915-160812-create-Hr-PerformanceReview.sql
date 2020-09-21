@@ -1,0 +1,19 @@
+-- Migration Script
+
+BEGIN TRANSACTION
+
+CREATE TABLE [Hr].[PerformanceReview] (
+  [PerformanceReviewId] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
+  [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
+  [Date] DATETIME2 NULL,
+  [PerformanceOutcomeCode] NVARCHAR(50) NULL,
+  [Reviewer] NVARCHAR(100) NULL,
+  [Notes] NVARCHAR(4000) NULL,
+  [RowVersion] TIMESTAMP NOT NULL,
+  [CreatedBy] NVARCHAR(250) NULL,
+  [CreatedDate] DATETIME2 NULL,
+  [UpdatedBy] NVARCHAR(250) NULL,
+  [UpdatedDate] DATETIME2 NULL
+);
+	
+COMMIT TRANSACTION

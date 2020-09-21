@@ -71,23 +71,23 @@ namespace Beef.Diagnostics
                 _ => ConsoleColor.Cyan
             };
 
-            ConsoleWriteLine(text, color);
+            ConsoleWriteLine(text, color, logLevel);
         }
 
         /// <summary>
         /// Writes the specified text to the console.
         /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="foregroundColor">The foreground <see cref="ConsoleColor"/>.</param>
-        private static void ConsoleWriteLine(string? text = null, ConsoleColor? foregroundColor = null)
+        private static void ConsoleWriteLine(string? text, ConsoleColor? foregroundColor, LogLevel logLevel)
         {
+            var c = logLevel == LogLevel.Error || logLevel == LogLevel.Critical ? Console.Error : Console.Out;
+
             if (string.IsNullOrEmpty(text))
-                Console.WriteLine();
+                c.WriteLine();
             else
             {
                 var currColor = Console.ForegroundColor;
                 Console.ForegroundColor = foregroundColor ?? currColor;
-                Console.WriteLine(text);
+                c.WriteLine(text);
                 Console.ForegroundColor = currColor;
             }
         }

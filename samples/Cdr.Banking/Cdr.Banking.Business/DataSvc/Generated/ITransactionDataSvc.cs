@@ -17,7 +17,7 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>
-    /// Defines the Transaction data repository services.
+    /// Defines the <see cref="Transaction"/> data repository services.
     /// </summary>
     public partial interface ITransactionDataSvc
     {
@@ -25,9 +25,9 @@ namespace Cdr.Banking.Business.DataSvc
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
+        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging);
     }
 }

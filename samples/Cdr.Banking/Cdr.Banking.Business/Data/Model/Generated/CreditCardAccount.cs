@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Beef.Entities;
 using Newtonsoft.Json;
@@ -17,7 +15,7 @@ using Newtonsoft.Json;
 namespace Cdr.Banking.Business.Data.Model
 {
     /// <summary>
-    /// Represents the Credit Card Account entity.
+    /// Represents the Credit Card Account model.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class CreditCardAccount
@@ -45,7 +43,7 @@ namespace Cdr.Banking.Business.Data.Model
         /// </summary>
         [JsonProperty("paymentDueDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime PaymentDueDate { get; set; }
-    } 
+    }
 }
 
 #pragma warning restore CA2227, CA1819

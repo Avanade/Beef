@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
-using Microsoft.Azure.Cosmos;
 using Beef.Data.Cosmos;
 using Beef.Entities;
 using Beef.Mapper;
@@ -23,7 +23,7 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>
-    /// Provides the Account data access.
+    /// Provides the <see cref="Account"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class AccountData : IAccountData
@@ -43,19 +43,17 @@ namespace Cdr.Banking.Business.Data
         /// Initializes a new instance of the <see cref="AccountData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public AccountData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); AccountDataCtor(); }
+        public AccountData(ICosmosDb cosmos)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); AccountDataCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void AccountDataCtor();
+        partial void AccountDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
+        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -71,7 +69,7 @@ namespace Cdr.Banking.Business.Data
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -85,14 +83,12 @@ namespace Cdr.Banking.Business.Data
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Balance"/> where found.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
-        {
-            return DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
-        }
+            => DataInvoker.Current.InvokeAsync(this, () => GetBalanceOnImplementationAsync(accountId));
 
         /// <summary>
-        /// Provides the <see cref="Account"/> entity and Cosmos <see cref="Model.Account"/> property mapping.
+        /// Provides the <see cref="Account"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Account, Model.Account, CosmosMapper>
@@ -102,7 +98,7 @@ namespace Cdr.Banking.Business.Data
             /// </summary>
             public CosmosMapper()
             {
-                Property(s => s.Id, d => d.Id).SetUniqueKey(true);
+                Property(s => s.Id, d => d.Id).SetUniqueKey(false);
                 Property(s => s.CreationDate, d => d.CreationDate);
                 Property(s => s.DisplayName, d => d.DisplayName);
                 Property(s => s.Nickname, d => d.Nickname);
@@ -115,10 +111,7 @@ namespace Cdr.Banking.Business.Data
                 CosmosMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="CosmosMapper"/> constructor to be extended.
-            /// </summary>
-            partial void CosmosMapperCtor();
+            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
         }
     }
 }

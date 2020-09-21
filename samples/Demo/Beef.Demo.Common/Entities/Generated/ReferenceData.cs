@@ -35,7 +35,7 @@ namespace Beef.Demo.Common.Entities
                 typeof(PowerSource),
                 typeof(Company)
             };
-        
+
         /// <summary>
         /// Gets the provider interface cref="Type"/> used for <see cref="ReferenceDataManager.GetProvider(Type)"/>. The value is <see cref="IReferenceData"/>.
         /// </summary>

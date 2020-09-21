@@ -22,7 +22,7 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Provides the Gender data access.
+    /// Provides the <see cref="Gender"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class GenderData : IGenderData
@@ -33,18 +33,16 @@ namespace Beef.Demo.Business.Data
         /// Initializes a new instance of the <see cref="GenderData"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
-        public GenderData(IDatabase db) { _db = Check.NotNull(db, nameof(db)); GenderDataCtor(); }
+        public GenderData(IDatabase db)
+            { _db = Check.NotNull(db, nameof(db)); GenderDataCtor(); }
+
+        partial void GenderDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void GenderDataCtor();
-
-        /// <summary>
-        /// Gets the <see cref="Gender"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Gender"/>.
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
-        /// <returns>The selected <see cref="Gender"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Gender"/> where found.</returns>
         public Task<Gender?> GetAsync(Guid id)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -55,41 +53,35 @@ namespace Beef.Demo.Business.Data
         }
 
         /// <summary>
-        /// Creates the <see cref="Gender"/> object.
+        /// Creates a new <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>The created <see cref="Gender"/>.</returns>
         public Task<Gender> CreateAsync(Gender value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderCreate]");
-                return await _db.CreateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _db.CreateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Updates the <see cref="Gender"/> object.
+        /// Updates an existing <see cref="Gender"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Gender"/> object.</param>
-        /// <returns>A refreshed <see cref="Gender"/> object.</returns>
+        /// <param name="value">The <see cref="Gender"/>.</param>
+        /// <returns>The updated <see cref="Gender"/>.</returns>
         public Task<Gender> UpdateAsync(Gender value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             return DataInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __dataArgs = DbMapper.Default.CreateArgs("[Ref].[spGenderUpdate]");
-                return await _db.UpdateAsync(__dataArgs, value).ConfigureAwait(false);
+                return await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
             });
         }
 
         /// <summary>
-        /// Provides the <see cref="Gender"/> entity and database property mapping.
+        /// Provides the <see cref="Gender"/> property and database column mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<Gender, DbMapper>
@@ -110,10 +102,7 @@ namespace Beef.Demo.Business.Data
                 DbMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="DbMapper"/> constructor to be extended.
-            /// </summary>
-            partial void DbMapperCtor();
+            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
         }
     }
 }

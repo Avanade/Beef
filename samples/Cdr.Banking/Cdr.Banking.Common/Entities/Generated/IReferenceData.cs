@@ -14,7 +14,7 @@ namespace Cdr.Banking.Common.Entities
     /// <summary>
     /// Provides for the required <b>ReferenceData</b> capabilities. 
     /// </summary>
-    public interface IReferenceData : IReferenceDataProvider
+    public partial interface IReferenceData : IReferenceDataProvider
     {
         #region Collections
 

@@ -22,7 +22,7 @@ namespace Beef.CodeGen.Config.Entity
     [CategorySchema("Annotation", Title = "Provides additional property **Annotation** configuration.")]
     [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
     [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    public class PropertyConfig : ConfigBase<EntityConfig>
+    public class PropertyConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         #region Key
 
@@ -82,7 +82,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether the .NET <see cref="Type"/> should be declared as nullable.
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`.", IsImportant = true)]
+        [PropertySchema("Property", Title = "Indicates whether the .NET `Type should be declared as nullable; e.g. `string?`. Will be inferred where the `Type` is denoted as nullable; i.e. suffixed by a `?`.", IsImportant = true)]
         public bool? Nullable { get; set; }
 
         /// <summary>
@@ -316,17 +316,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets or sets the Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkMapper", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "The Entity Framework property `Mapper` class name where `Entity.AutoImplement` is selected.",
             Description = "A `Mapper` is used to map a data source value to/from a .NET complex `Type` (i.e. class with one or more properties).")]
-        public string? DataEntityFrameworkMapper { get; set; }
+        public string? EntityFrameworkMapper { get; set; }
 
         /// <summary>
         /// Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.
         /// </summary>
-        [JsonProperty("dataEntityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("entityFrameworkIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("EntityFramework", Title = "Indicates whether the property should be ignored (excluded) from the Entity Framework `Mapper` generated output.")]
-        public bool? DataEntityFrameworkIgnore { get; set; }
+        public bool? EntityFrameworkIgnore { get; set; }
 
         #endregion
 
@@ -407,7 +407,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.
         /// </summary>
         [JsonProperty("webApiQueryStringConverter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "the `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
+        [PropertySchema("WebApi", Title = "The `IPropertyMapperConverter` to perform `Type` to `string` conversion for writing to and parsing from the query string.")]
         public string? WebApiQueryStringConverter { get; set; }
 
         #endregion
@@ -421,27 +421,53 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("Grpc", Title = "The unique (immutable) field number required to enable gRPC support.", IsImportant = true)]
         public int? GrpcFieldNo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the underlying gRPC data type.
+        /// </summary>
+        [JsonProperty("grpcType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Grpc", Title = "The underlying gRPC data type; will be inferred where not specified.")]
+        public string? GrpcType { get; set; }
+
         #endregion
 
         /// <summary>
-        /// Gets or sets the formatted summary text.
+        /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText { get; set; }
+        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
 
         /// <summary>
-        /// Gets or sets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
+        /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
-        public string? SummaryRefDataSid { get; set; }
+        public string? SummaryRefDataSid => CompareValue(RefDataList, true)
+            ? CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
+            : CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
 
         /// <summary>
-        /// Gets or sets the formatted summary text for the Reference Data Text property.
+        /// Gets the formatted summary text for the Reference Data Text property.
         /// </summary>
-        public string? SummaryRefDataText { get; set; }
+        public string? SummaryRefDataText => $"Gets the corresponding {{{{{Name}}}}} text (read-only where selected).";
 
         /// <summary>
-        /// Gets the computed declared type.
+        /// Gets the formatted summary text when used in a parameter context.
         /// </summary>
-        public string ComputedType
+        public string? ParameterSummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+
+        /// <summary>
+        /// Gets the <see cref="Name"/> formatted as see comments.
+        /// </summary>
+        public string? PropertyNameSeeComments => CodeGenerator.ToSeeComments(Name);
+
+        /// <summary>
+        /// Gets the computed declared property type.
+        /// </summary>
+        public string PropertyType => string.IsNullOrEmpty(RefDataType) 
+            ? PrivateType 
+            : (CompareValue(RefDataList, true) ? $"ReferenceDataSidList<{Type}, {RefDataType}>?" : CompareValue(Nullable, true) ? Type + "?" : Type!);
+
+        /// <summary>
+        /// Gets the computed declared private type.
+        /// </summary>
+        public string PrivateType
         {
             get
             {
@@ -454,9 +480,54 @@ namespace Beef.CodeGen.Config.Entity
         }
 
         /// <summary>
+        /// Gets or sets the declared type including nullability.
+        /// </summary>
+        public string? DeclaredType { get; set; } 
+
+        /// <summary>
+        /// Gets the computed property name.
+        /// </summary>
+        public string PropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : Name! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
+        /// Gets the computed argument name.
+        /// </summary>
+        public string PropertyArgumentName => string.IsNullOrEmpty(RefDataType) ? ArgumentName! : ArgumentName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
         /// Gets the computed private name.
         /// </summary>
-        public string ComputedPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+        public string PropertyPrivateName => string.IsNullOrEmpty(RefDataType) ? PrivateName! : PrivateName! + (CompareValue(RefDataList, true) ? "Sids" : "Sid");
+
+        /// <summary>
+        /// Gets the computed data mapper property name.
+        /// </summary>
+        public string DataMapperPropertyName => string.IsNullOrEmpty(RefDataType) ? Name! : CompareNullOrValue(DataConverter, "ReferenceDataCodeConverter") ? PropertyName : Name!;
+
+        /// <summary>
+        /// Gets the data converter C# code.
+        /// </summary>
+        public string? DataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $".SetConverter({DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default!)";
+
+        /// <summary>
+        /// Gets the data converter C# code for reference data data access.
+        /// </summary>
+        public string? RefDataConverterCode => string.IsNullOrEmpty(DataConverter) ? null : $"{DataConverter}{(CompareValue(DataConverterIsGeneric, true) ? $"<{Type}>" : "")}.Default.ConvertToSrce(";
+
+        /// <summary>
+        /// Gets the WebAPI parameter type.
+        /// </summary>
+        public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? (string.IsNullOrEmpty(WebApiQueryStringConverter) ? Type! : "string") : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
+
+        /// <summary>
+        /// Gets or sets the gRPC converter.
+        /// </summary>
+        public string? GrpcConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gRPC mapper.
+        /// </summary>
+        public string? GrpcMapper { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -464,12 +535,42 @@ namespace Beef.CodeGen.Config.Entity
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "string");
-            Text = DefaultWhereNull(Text, () => Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture) || Parent!.Parent!.Entities.Any(x => x.Name == Type) ? CodeGenerator.ToSeeComments(Name) : CodeGenerator.ToSentenceCase(Name));
-            SummaryText = CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Get or sets the")} {Text}.");
-            SummaryRefDataSid = CodeGenerator.ToComments($"Gets or sets the {Text} using the underlying Serialization Identifier (SID).");
-            SummaryRefDataText = CodeGenerator.ToComments($"Gets the corresponding {Text} text (read-only where selected).");
-            PrivateName = DefaultWhereNull(PrivateName, () => CodeGenerator.ToPrivateCase(Name));
-            ArgumentName = DefaultWhereNull(ArgumentName, () => CodeGenerator.ToCamelCase(Name));
+            if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                RefDataType = DefaultWhereNull(RefDataType, () => "string");
+
+            if (RefDataType != null && !Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                Type = $"RefDataNamespace.{Type}";
+
+            if (Type!.EndsWith("?", StringComparison.InvariantCulture))
+            {
+                Type = Type[0..^1];
+                Nullable = true;
+            }
+
+            DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
+
+            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            {
+                if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+
+                if (Type == "ChangeLog")
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Beef.Entities." + Type)})";
+
+                var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
+                if (ent != null)
+                {
+                    if (ent.EntityScope == null || ent.EntityScope == "Common")
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                    else
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                }
+
+                return StringConversion.ToSentenceCase(Name);
+            }));
+
+            PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
+            ArgumentName = DefaultWhereNull(ArgumentName, () => StringConversion.ToCamelCase(Name));
             DateTimeTransform = DefaultWhereNull(DateTimeTransform, () => "UseDefault");
             StringTrim = DefaultWhereNull(StringTrim, () => "UseDefault");
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
@@ -477,14 +578,32 @@ namespace Beef.CodeGen.Config.Entity
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
-            DataName = DefaultWhereNull(DataName, () => Name);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
-            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type));
+            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => false);
+            BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
 
-            if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                RefDataType = DefaultWhereNull(RefDataType, () => "string");
+            DataConverter = DefaultWhereNull(DataConverter, () => string.IsNullOrEmpty(RefDataType) ? null : Root!.RefDataDefaultMapperConverter);
+            if (!string.IsNullOrEmpty(DataConverter) && (DataConverter.EndsWith("{T}", StringComparison.InvariantCulture) || DataConverter.EndsWith("<T>", StringComparison.InvariantCulture)))
+            {
+                DataConverterIsGeneric = true;
+                DataConverter = DataConverter![0..^3];
+            }
+
+            if (CompareValue(RefDataType, "string") && CompareValue(DataConverter, "ReferenceDataCodeConverter"))
+                DataConverter = null;
+
+            GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
+            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcConverter = Type switch
+            {
+                "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}{(DateTimeTransform == "DateOnly" ? "DateTimeToDateOnly" : "DateTimeToTimestamp")}",
+                "Guid" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}GuidToStringConverter",
+                "decimal" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DecimalToDecimalConverter",
+                _ => null
+            };
         }
 
         /// <summary>
@@ -492,7 +611,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private string GenerateDisplayName()
         {
-            var dn = CodeGenerator.ToSentenceCase(Name)!;
+            var dn = StringConversion.ToSentenceCase(Name)!;
             var parts = dn.Split(' ');
             if (parts.Length == 1)
                 return (parts[0] == "Id") ? "Identifier" : dn;
@@ -503,6 +622,35 @@ namespace Beef.CodeGen.Config.Entity
             var parts2 = new string[parts.Length - 1];
             Array.Copy(parts, parts2, parts.Length - 1);
             return string.Join(" ", parts2);
+        }
+
+        /// <summary>
+        /// Infers the gRPC data type.
+        /// </summary>
+        internal static string InferGrpcType(string type, string? refDataType = null, bool? refDataList = null, string? dateTimeTransform = null)
+        {
+            var gt = type switch
+            {
+                "string" => "google.protobuf.StringValue",
+                "bool" => "google.protobuf.BoolValue",
+                "double" => "google.protobuf.DoubleValue",
+                "float" => "google.protobuf.FloatValue",
+                "int" => "google.protobuf.Int32Value",
+                "long" => "google.protobuf.Int64Value",
+                "unit" => "google.protobuf.UInt32Value",
+                "ulong" => "google.protobuf.UInt64Value",
+                "short" => "google.protobuf.Int32Value",  // Not natively supported
+                "ushort" => "google.protobuf.UInt32Value", // Not natively supported
+                "Guid" => "google.protobuf.StringValue", // Not natively supported
+                "byte[]" => "bytes", // Not natively supported
+                "Decimal" => "Decimal", // Not natively supported
+                "DateTime" => string.Compare(dateTimeTransform, "DateOnly", StringComparison.InvariantCulture) == 0 ? "DateOnly" : "google.protobuf.Timestamp", // DateOnly not natively supported
+                "TimeSpan" => "google.protobuf.Duration",
+                "void" => "google.protobuf.Empty",
+                _ => type
+            };
+
+            return !string.IsNullOrEmpty(refDataType) && CompareValue(refDataList, true) ? "repeated " + gt : gt;
         }
     }
 }

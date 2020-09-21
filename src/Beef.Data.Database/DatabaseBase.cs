@@ -337,12 +337,14 @@ namespace Beef.Data.Database
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="saveArgs">The <see cref="DatabaseArgs{T}"/>.</param>
         /// <param name="keys">The key values.</param>
-        public Task DeleteAsync<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new()
+        public async Task DeleteAsync<T>(DatabaseArgs<T> saveArgs, params IComparable[] keys) where T : class, new()
         {
             if (saveArgs == null)
                 throw new ArgumentNullException(nameof(saveArgs));
 
-            return StoredProcedure(saveArgs.StoredProcedure).Params((p) => saveArgs.Mapper.GetKeyParams(p, OperationTypes.Delete, keys)).NonQueryAsync();
+            var rowsAffected = await StoredProcedure(saveArgs.StoredProcedure).Params((p) => saveArgs.Mapper.GetKeyParams(p, OperationTypes.Delete, keys)).NonQueryAsync().ConfigureAwait(false);
+            if (rowsAffected == 0)
+                throw new NotFoundException();
         }
 
         /// <summary>

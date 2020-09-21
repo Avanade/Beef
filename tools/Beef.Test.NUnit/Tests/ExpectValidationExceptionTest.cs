@@ -189,11 +189,11 @@ namespace Beef.Test.NUnit.Tests
         public void CompareExpectedVsActual(MessageItemCollection? expectedMessages, MessageItemCollection? actualMessages)
         {
             var exp = (from e in expectedMessages ?? new MessageItemCollection()
-                       where !actualMessages.Any(a => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
+                       where !(actualMessages ?? new MessageItemCollection()).Any(a => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
                        select e).ToList();
 
             var act = (from a in actualMessages ?? new MessageItemCollection()
-                       where !expectedMessages.Any(e => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
+                       where !(expectedMessages ?? new MessageItemCollection()).Any(e => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
                        select a).ToList();
 
             var sb = new StringBuilder();

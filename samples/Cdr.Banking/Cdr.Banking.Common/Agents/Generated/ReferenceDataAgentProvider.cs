@@ -23,7 +23,7 @@ namespace Cdr.Banking.Common.Agents
     /// <summary>
     /// Provides the <see cref="ReferenceData"/> implementation using the corresponding Web API agent.
     /// </summary>
-    public class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
+    public partial class ReferenceDataAgentProvider : RefDataNamespace.ReferenceData
     {
         private readonly Dictionary<string, Type> _nameDict = new Dictionary<string, Type>();
         private readonly Dictionary<Type, string> _typeDict = new Dictionary<Type, string>();
@@ -64,50 +64,53 @@ namespace Cdr.Banking.Common.Agents
             _typeDict.Add(typeof(RefDataNamespace.TransactionStatus), nameof(TransactionStatus));
             _cacheDict.Add(typeof(RefDataNamespace.TransactionStatus), new ReferenceDataCache<RefDataNamespace.TransactionStatusCollection, RefDataNamespace.TransactionStatus>(() => _agent.TransactionStatusGetAllAsync().ContinueWith((t) => t.Result.Value, TaskScheduler.Current)));
 
+            ReferenceDataAgentProviderCtor();
         }
+
+        partial void ReferenceDataAgentProviderCtor(); // Enables the ReferenceDataAgentProvider constructor to be extended.
 
         #endregion
 
         #region Collections
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.OpenStatusCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.OpenStatusCollection"/>.</returns>
         public override RefDataNamespace.OpenStatusCollection OpenStatus => (RefDataNamespace.OpenStatusCollection)this[typeof(RefDataNamespace.OpenStatus)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.ProductCategoryCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.ProductCategoryCollection"/>.</returns>
         public override RefDataNamespace.ProductCategoryCollection ProductCategory => (RefDataNamespace.ProductCategoryCollection)this[typeof(RefDataNamespace.ProductCategory)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.AccountUTypeCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.AccountUTypeCollection"/>.</returns>
         public override RefDataNamespace.AccountUTypeCollection AccountUType => (RefDataNamespace.AccountUTypeCollection)this[typeof(RefDataNamespace.AccountUType)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.MaturityInstructionsCollection"/>.</returns>
         public override RefDataNamespace.MaturityInstructionsCollection MaturityInstructions => (RefDataNamespace.MaturityInstructionsCollection)this[typeof(RefDataNamespace.MaturityInstructions)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.TransactionTypeCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.TransactionTypeCollection"/>.</returns>
         public override RefDataNamespace.TransactionTypeCollection TransactionType => (RefDataNamespace.TransactionTypeCollection)this[typeof(RefDataNamespace.TransactionType)];
 
-        /// <summary> 
+        /// <summary>
         /// Gets the <see cref="RefDataNamespace.TransactionStatusCollection"/>.
         /// </summary>
         /// <returns>The <see cref="RefDataNamespace.TransactionStatusCollection"/>.</returns>
         public override RefDataNamespace.TransactionStatusCollection TransactionStatus => (RefDataNamespace.TransactionStatusCollection)this[typeof(RefDataNamespace.TransactionStatus)];
 
         #endregion
-  
+
         #region This/GetCache/PrefetchAsync
     
         /// <summary>

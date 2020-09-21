@@ -25,6 +25,19 @@ namespace Beef.Demo.Common.Entities
     [ReferenceDataInterface(typeof(IReferenceData))]
     public partial class Gender : ReferenceDataBaseGuid
     {
+        #region Constants
+
+        /// <summary>
+        /// Represents a  constant value.
+        /// </summary>
+        public const string Female = "F";
+        /// <summary>
+        /// Represents a  constant value.
+        /// </summary>
+        public const string Male = "M";
+
+        #endregion
+
         #region Privates
 
         private string? _alternateName;
@@ -41,7 +54,7 @@ namespace Beef.Demo.Common.Entities
         public string? AlternateName
         {
             get => _alternateName;
-            set => SetValue(ref _alternateName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AlternateName)); 
+            set => SetValue(ref _alternateName, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(AlternateName));
         }
 
         /// <summary>
@@ -51,7 +64,7 @@ namespace Beef.Demo.Common.Entities
         public string? TripCode
         {
             get => GetMapping<string>(nameof(TripCode));
-            set { var __tripCode = GetMapping<string>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
+            set { var __tripCode = GetMapping<string?>(nameof(TripCode)) ?? default; SetValue(ref __tripCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(TripCode)); SetMapping(nameof(TripCode), __tripCode!); }
         }
 
         #endregion
@@ -64,10 +77,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="Gender"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Gender(Guid id)
-        {
-            return ConvertFromId<Gender>(id);
-        }
+        public static implicit operator Gender(Guid id) => ConvertFromId<Gender>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="Gender"/>.
@@ -75,13 +85,10 @@ namespace Beef.Demo.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="Gender"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Gender(string? code)
-        {
-            return ConvertFromCode<Gender>(code);
-        }
+        public static implicit operator Gender(string? code) => ConvertFromCode<Gender>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -100,8 +107,8 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Gender"/> to copy from.</param>
         public void CopyFrom(Gender from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
             AlternateName = from.AlternateName;
@@ -109,9 +116,9 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -139,7 +146,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -151,7 +158,8 @@ namespace Beef.Demo.Common.Entities
                 if (!base.IsInitial)
                     return false;
 
-                return Cleaner.IsInitial(AlternateName);
+                return Cleaner.IsInitial(AlternateName)
+                    && Cleaner.IsInitial(TripCode);
             }
         }
 
@@ -164,29 +172,29 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Gender from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Gender"/> collection.
+    /// Represents the <see cref="Gender"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class GenderCollection : ReferenceDataCollectionBase<Gender>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="GenderCollection"/> class.
         /// </summary>
-        public GenderCollection(){ }
+        public GenderCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GenderCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="GenderCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Gender"/> entities.</param>
         public GenderCollection(IEnumerable<Gender> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

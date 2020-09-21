@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 using Beef;
 using Beef.Business;
-using Microsoft.Azure.Cosmos;
 using Beef.Data.Cosmos;
 using Beef.Entities;
 using Beef.Mapper;
@@ -23,7 +23,7 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.Data
 {
     /// <summary>
-    /// Provides the Transaction data access.
+    /// Provides the <see cref="Transaction"/> data access.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TransactionData : ITransactionData
@@ -43,20 +43,18 @@ namespace Cdr.Banking.Business.Data
         /// Initializes a new instance of the <see cref="TransactionData"/> class.
         /// </summary>
         /// <param name="cosmos">The <see cref="ICosmosDb"/>.</param>
-        public TransactionData(ICosmosDb cosmos) { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); TransactionDataCtor(); }
+        public TransactionData(ICosmosDb cosmos)
+            { _cosmos = Check.NotNull(cosmos, nameof(cosmos)); TransactionDataCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void TransactionDataCtor();
+        partial void TransactionDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get transaction for account.
         /// </summary>
         /// <param name="accountId">The Account Id.</param>
-        /// <param name="args">The Args (see <see cref="TransactionArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.TransactionArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="TransactionCollectionResult"/>.</returns>
+        /// <returns>The <see cref="TransactionCollectionResult"/>.</returns>
         public Task<TransactionCollectionResult> GetTransactionsAsync(string? accountId, TransactionArgs? args, PagingArgs? paging)
         {
             return DataInvoker.Current.InvokeAsync(this, async () =>
@@ -69,7 +67,7 @@ namespace Cdr.Banking.Business.Data
         }
 
         /// <summary>
-        /// Provides the <see cref="Transaction"/> entity and Cosmos <see cref="Model.Transaction"/> property mapping.
+        /// Provides the <see cref="Transaction"/> and Cosmos  property mapping.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Transaction, Model.Transaction, CosmosMapper>
@@ -99,10 +97,7 @@ namespace Cdr.Banking.Business.Data
                 CosmosMapperCtor();
             }
             
-            /// <summary>
-            /// Enables the <see cref="CosmosMapper"/> constructor to be extended.
-            /// </summary>
-            partial void CosmosMapperCtor();
+            partial void CosmosMapperCtor(); // Enables the CosmosMapper constructor to be extended.
         }
     }
 }

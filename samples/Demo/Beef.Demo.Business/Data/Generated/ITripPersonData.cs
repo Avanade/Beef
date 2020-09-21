@@ -17,33 +17,33 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Defines the Trip Person data access.
+    /// Defines the <see cref="TripPerson"/> data access.
     /// </summary>
     public partial interface ITripPersonData
     {
         /// <summary>
-        /// Gets the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        /// <returns>The selected <see cref="TripPerson"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
         Task<TripPerson?> GetAsync(string? id);
 
         /// <summary>
-        /// Creates the <see cref="TripPerson"/> object.
+        /// Creates a new <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>The created <see cref="TripPerson"/>.</returns>
         Task<TripPerson> CreateAsync(TripPerson value);
 
         /// <summary>
-        /// Updates the <see cref="TripPerson"/> object.
+        /// Updates an existing <see cref="TripPerson"/>.
         /// </summary>
-        /// <param name="value">The <see cref="TripPerson"/> object.</param>
-        /// <returns>A refreshed <see cref="TripPerson"/> object.</returns>
+        /// <param name="value">The <see cref="TripPerson"/>.</param>
+        /// <returns>The updated <see cref="TripPerson"/>.</returns>
         Task<TripPerson> UpdateAsync(TripPerson value);
 
         /// <summary>
-        /// Deletes the <see cref="TripPerson"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         Task DeleteAsync(string? id);

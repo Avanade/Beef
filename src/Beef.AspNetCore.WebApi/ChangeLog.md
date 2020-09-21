@@ -2,11 +2,13 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.2
+- *Fixed:* An HTTP Delete will now catch a `NotFoundException` and return an HTTP Status Code 204 (no content) as a delete is considered idempotent.
+
 ## v4.1.1
 - *Enhancement:* Introduction of Dependency Injection support.
 
 ## v3.1.7
-
 - *Fixed:* Issue [60](https://github.com/Avanade/Beef/issues/60) fixed; ETag will be generated and returned correctly where underlying `Type` does not implement `IETag`.
 
 ## v3.1.6

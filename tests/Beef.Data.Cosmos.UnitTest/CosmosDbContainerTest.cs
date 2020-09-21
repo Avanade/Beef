@@ -204,8 +204,8 @@ namespace Beef.Data.Cosmos.UnitTest
             ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons1.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons1.DeleteAsync(1, 2));
 
-            await _db.Persons1.DeleteAsync(404.ToGuid());
-            await _db.Persons1.DeleteAsync(100.ToGuid());
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons1.DeleteAsync(404.ToGuid()));
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons1.DeleteAsync(100.ToGuid()));
             await _db.Persons1.DeleteAsync(4.ToGuid());
 
             using (var r = await _db.Persons1.Container.ReadItemStreamAsync(4.ToGuid().ToString(), Microsoft.Azure.Cosmos.PartitionKey.None))
@@ -221,8 +221,8 @@ namespace Beef.Data.Cosmos.UnitTest
             ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons2.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons2.DeleteAsync(1, 2));
 
-            await _db.Persons2.DeleteAsync(404.ToGuid());
-            await _db.Persons2.DeleteAsync(100.ToGuid());
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons2.DeleteAsync(404.ToGuid()));
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons2.DeleteAsync(100.ToGuid()));
             await _db.Persons2.DeleteAsync(4.ToGuid());
 
             using (var r = await _db.Persons2.Container.ReadItemStreamAsync(4.ToGuid().ToString(), Microsoft.Azure.Cosmos.PartitionKey.None))
@@ -238,8 +238,8 @@ namespace Beef.Data.Cosmos.UnitTest
             ExpectException.Throws<ArgumentNullException>("*", () => _db.Persons3.DeleteAsync());
             ExpectException.Throws<NotSupportedException>("Only a single key value is currently supported.", () => _db.Persons3.DeleteAsync(1, 2));
 
-            await _db.Persons3.DeleteAsync(404.ToGuid());
-            await _db.Persons3.DeleteAsync(100.ToGuid());
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons3.DeleteAsync(404.ToGuid()));
+            ExpectException.Throws<NotFoundException>("*", () => _db.Persons3.DeleteAsync(100.ToGuid()));
             await _db.Persons3.DeleteAsync(4.ToGuid());
 
             using (var r = await _db.Persons3.Container.ReadItemStreamAsync(4.ToGuid().ToString(), Microsoft.Azure.Cosmos.PartitionKey.None))

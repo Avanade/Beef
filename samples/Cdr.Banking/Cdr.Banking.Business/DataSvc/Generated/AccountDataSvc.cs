@@ -20,7 +20,7 @@ using RefDataNamespace = Cdr.Banking.Common.Entities;
 namespace Cdr.Banking.Business.DataSvc
 {
     /// <summary>
-    /// Provides the Account data repository services.
+    /// Provides the <see cref="Account"/> data repository services.
     /// </summary>
     public partial class AccountDataSvc : IAccountDataSvc
     {
@@ -35,20 +35,17 @@ namespace Cdr.Banking.Business.DataSvc
         public AccountDataSvc(IAccountData data, IRequestCache cache)
             { _data = Check.NotNull(data, nameof(data)); _cache = Check.NotNull(cache, nameof(cache)); AccountDataSvcCtor(); }
 
-        /// <summary>
-        /// Enables additional functionality to be added to the constructor.
-        /// </summary>
-        partial void AccountDataSvcCtor();
+        partial void AccountDataSvcCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Get all accounts.
         /// </summary>
-        /// <param name="args">The Args (see <see cref="AccountArgs"/>).</param>
+        /// <param name="args">The Args (see <see cref="Common.Entities.AccountArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <returns>A <see cref="AccountCollectionResult"/>.</returns>
+        /// <returns>The <see cref="AccountCollectionResult"/>.</returns>
         public Task<AccountCollectionResult> GetAccountsAsync(AccountArgs? args, PagingArgs? paging)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.GetAccountsAsync(args, paging).ConfigureAwait(false);
                 return __result;
@@ -59,17 +56,17 @@ namespace Cdr.Banking.Business.DataSvc
         /// Get <see cref="AccountDetail"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="AccountDetail"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
         public Task<AccountDetail?> GetDetailAsync(string? accountId)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(accountId);
-                if (_cache.TryGetValue(__key, out AccountDetail __val))
+                if (_cache.TryGetValue(__key, out AccountDetail? __val))
                     return __val;
 
                 var __result = await _data.GetDetailAsync(accountId).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -78,17 +75,17 @@ namespace Cdr.Banking.Business.DataSvc
         /// Get <see cref="Account"/> <see cref="Balance"/>.
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
-        /// <returns>The selected <see cref="Balance"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Balance"/> where found.</returns>
         public Task<Balance?> GetBalanceAsync(string? accountId)
         {
-            return DataSvcInvoker.Current.InvokeAsync(typeof(AccountDataSvc), async () => 
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __key = new UniqueKey(accountId);
-                if (_cache.TryGetValue(__key, out Balance __val))
+                if (_cache.TryGetValue(__key, out Balance? __val))
                     return __val;
 
                 var __result = await _data.GetBalanceAsync(accountId).ConfigureAwait(false);
-                _cache.SetValue(__key, __result!);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }

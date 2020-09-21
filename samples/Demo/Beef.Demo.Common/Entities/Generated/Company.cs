@@ -35,7 +35,7 @@ namespace Beef.Demo.Common.Entities
         public string? ExternalCode
         {
             get => GetMapping<string>(nameof(ExternalCode));
-            set { var __externalCode = GetMapping<string>(nameof(ExternalCode)) ?? default; SetValue(ref __externalCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ExternalCode)); SetMapping(nameof(ExternalCode), __externalCode!); }
+            set { var __externalCode = GetMapping<string?>(nameof(ExternalCode)) ?? default; SetValue(ref __externalCode, value, true, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ExternalCode)); SetMapping(nameof(ExternalCode), __externalCode!); }
         }
 
         #endregion
@@ -48,10 +48,7 @@ namespace Beef.Demo.Common.Entities
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding <see cref="Company"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Company(Guid id)
-        {
-            return ConvertFromId<Company>(id);
-        }
+        public static implicit operator Company(Guid id) => ConvertFromId<Company>(id);
 
         /// <summary>
         /// An implicit cast from a <b>Code</b> to a <see cref="Company"/>.
@@ -59,13 +56,10 @@ namespace Beef.Demo.Common.Entities
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding <see cref="Company"/>.</returns>
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
-        public static implicit operator Company(string? code)
-        {
-            return ConvertFromCode<Company>(code);
-        }
+        public static implicit operator Company(string? code) => ConvertFromCode<Company>(code);
 
         #endregion
-
+    
         #region ICopyFrom
     
         /// <summary>
@@ -84,17 +78,17 @@ namespace Beef.Demo.Common.Entities
         /// <param name="from">The <see cref="Company"/> to copy from.</param>
         public void CopyFrom(Company from)
         {
-             if (from == null)
-                 throw new ArgumentNullException(nameof(from));
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
 
             CopyFrom((ReferenceDataBaseGuid)from);
             ExternalCode = from.ExternalCode;
 
             OnAfterCopyFrom(from);
         }
-    
+
         #endregion
-        
+
         #region ICloneable
         
         /// <summary>
@@ -121,7 +115,7 @@ namespace Beef.Demo.Common.Entities
 
             OnAfterCleanUp();
         }
-    
+
         /// <summary>
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
@@ -133,7 +127,7 @@ namespace Beef.Demo.Common.Entities
                 if (!base.IsInitial)
                     return false;
 
-                return true;
+                return Cleaner.IsInitial(ExternalCode);
             }
         }
 
@@ -146,29 +140,29 @@ namespace Beef.Demo.Common.Entities
         partial void OnAfterCopyFrom(Company from);
 
         #endregion
-    } 
+    }
+
+    #region Collection
 
     /// <summary>
-    /// Represents a <see cref="Company"/> collection.
+    /// Represents the <see cref="Company"/> collection.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class CompanyCollection : ReferenceDataCollectionBase<Company>
     {
-        #region Constructors
-    
         /// <summary>
         /// Initializes a new instance of the <see cref="CompanyCollection"/> class.
         /// </summary>
-        public CompanyCollection(){ }
+        public CompanyCollection() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CompanyCollection"/> class with an entity range.
+        /// Initializes a new instance of the <see cref="CompanyCollection"/> class with an entities range.
         /// </summary>
         /// <param name="entities">The <see cref="Company"/> entities.</param>
         public CompanyCollection(IEnumerable<Company> entities) => AddRange(entities);
-
-        #endregion
     }
+
+    #endregion  
 }
 
 #pragma warning restore CA2227, CA1819

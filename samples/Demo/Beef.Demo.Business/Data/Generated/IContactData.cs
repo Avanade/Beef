@@ -17,39 +17,39 @@ using RefDataNamespace = Beef.Demo.Common.Entities;
 namespace Beef.Demo.Business.Data
 {
     /// <summary>
-    /// Defines the Contact data access.
+    /// Defines the <see cref="Contact"/> data access.
     /// </summary>
     public partial interface IContactData
     {
         /// <summary>
-        /// Gets the <see cref="Contact"/> collection object that matches the selection criteria.
+        /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
-        /// <returns>A <see cref="ContactCollectionResult"/>.</returns>
+        /// <returns>The <see cref="ContactCollectionResult"/>.</returns>
         Task<ContactCollectionResult> GetAllAsync();
 
         /// <summary>
-        /// Gets the <see cref="Contact"/> object that matches the selection criteria.
+        /// Gets the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        /// <returns>The selected <see cref="Contact"/> object where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The selected <see cref="Contact"/> where found.</returns>
         Task<Contact?> GetAsync(Guid id);
 
         /// <summary>
-        /// Creates the <see cref="Contact"/> object.
+        /// Creates a new <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>The created <see cref="Contact"/>.</returns>
         Task<Contact> CreateAsync(Contact value);
 
         /// <summary>
-        /// Updates the <see cref="Contact"/> object.
+        /// Updates an existing <see cref="Contact"/>.
         /// </summary>
-        /// <param name="value">The <see cref="Contact"/> object.</param>
-        /// <returns>A refreshed <see cref="Contact"/> object.</returns>
+        /// <param name="value">The <see cref="Contact"/>.</param>
+        /// <returns>The updated <see cref="Contact"/>.</returns>
         Task<Contact> UpdateAsync(Contact value);
 
         /// <summary>
-        /// Deletes the <see cref="Contact"/> object that matches the selection criteria.
+        /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         Task DeleteAsync(Guid id);

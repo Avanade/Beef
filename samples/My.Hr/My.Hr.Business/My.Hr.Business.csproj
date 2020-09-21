@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\..\..\src\Beef.Data.EntityFrameworkCore\Beef.Data.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\My.Hr.Common\My.Hr.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataSvc\" />
+  </ItemGroup>
+</Project>
