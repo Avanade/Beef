@@ -63,8 +63,8 @@ namespace {{Config.Company}}.{{Config.AppName}}.Business
         </Else>
       </If>
       <![CDATA[.AddScoped<I{{Entity.EntityName}}Manager, {{Entity.EntityName}}Manager>()]]>
+      <Set Name="System.Close" Value="true" />
     </If>
-    <Set Name="System.Close" Value="true" />
   </Entity>
   <If Condition="System.Close">
     <![CDATA[;]]>
