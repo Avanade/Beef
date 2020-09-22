@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Entities;
+using Beef.Data.Database;
+using Beef.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -159,10 +163,12 @@ namespace Beef.CodeGen.Config.Database
         #endregion
 
         /// <summary>
-        /// Sets the list of tables within the parent database.
+        /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
-        /// <param name="dbTables">The list of tables.</param>
-        public void SetDbTable(List<Table> dbTables) => DbTables = dbTables;
+        [JsonProperty("tables", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema(Title = "The corresponding `Table` collection.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<TableConfig>? Tables { get; set; }
 
         /// <summary>
         /// Gets or sets the list of tables that exist within the database.
@@ -174,6 +180,8 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            LoadDbTablesConfig();
+
             RefDatabaseSchema = DefaultWhereNull(RefDatabaseSchema, () => "Ref");
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
@@ -183,6 +191,41 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
+
+            if (Tables != null && Tables.Count > 0)
+            {
+                foreach (var table in Tables)
+                {
+                    table.Prepare(Root!, this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Load the database table and columns configuration.
+        /// </summary>
+        private void LoadDbTablesConfig()
+        {
+            Logger.Default.Log(LogLevel.Information, string.Empty);
+            Logger.Default.Log(LogLevel.Information, $"  Querying database to infer table(s)/column(s) configuration...");
+
+            if (!RuntimeParameters.TryGetValue("ConnectionString", out var cs))
+                throw new CodeGenException("ConnectionString must be specified as a RuntimeParameter.");
+
+            var sw = Stopwatch.StartNew();
+            using var db = new SqlServerDb(cs);
+            DbTables = Table.LoadTablesAndColumnsAsync(db, RefDatabaseSchema, false, false).GetAwaiter().GetResult();
+
+            sw.Stop();
+            Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
+        }
+
+        /// <summary>
+        /// SQL Server DB.
+        /// </summary>
+        private class SqlServerDb : DatabaseBase
+        {
+            public SqlServerDb(string connectionString) : base(connectionString, Microsoft.Data.SqlClient.SqlClientFactory.Instance) { }
         }
     }
 }

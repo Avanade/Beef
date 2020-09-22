@@ -14,6 +14,7 @@ namespace Beef.CodeGen.Config
     {
         private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> _config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
         {
+            // Entity oriented configuration.
             (ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
             (ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter"),
 
@@ -49,12 +50,28 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
 
             (ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric"),
-            (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode")
+            (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode"),
+
+            // Database oriented configuration.
+            (ConfigurationEntity.Table, "GetAll", "getColl"),
+            (ConfigurationEntity.Table, "GetAllOrderBy", "getCollOrderBy"),
+
+            (ConfigurationEntity.Parameter, "IsNullable", "nullable"),
+            (ConfigurationEntity.Parameter, "IsCollection", "collection")
         });
 
         private static readonly List<(ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToJsonConvert = new List<(ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigurationEntity, string, Func<string?, string?>)[]
         {
-            (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Yes" : "Mapper"))
+            (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Yes" : "Mapper")),
+
+            (ConfigurationEntity.Table, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigurationEntity.Table, "GetCollOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+
+            (ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
+
+            (ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "Asc" ? "Ascending" : "Descending"))
         });
 
         /// <summary>
@@ -102,7 +119,17 @@ namespace Beef.CodeGen.Config
         Property,
         /// <summary>Operation configuration.</summary>
         Operation,
+        /// <summary>Table configuration.</summary>
+        Table,
+        /// <summary>Stored procedure configuration.</summary>
+        StoredProcedure,
         /// <summary>Parameter configuration.</summary>
-        Parameter
+        Parameter,
+        /// <summary>OrderBy configuration.</summary>
+        OrderBy,
+        /// <summary>Where configuration.</summary>
+        Where,
+        /// <summary>Execute configuration.</summary>
+        Execute
     }
 }

@@ -166,7 +166,6 @@ namespace Beef.CodeGen.Config.Entity
 
         #region WebApi
 
-
         /// <summary>
         /// Gets or sets the option for how the parameter will be delcared within the Web API Controller.
         /// </summary>

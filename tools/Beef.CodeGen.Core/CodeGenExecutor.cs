@@ -164,15 +164,10 @@ namespace Beef.CodeGen
                 // Load the script configuration.
                 var (scripts, loaders, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
 
-                ConfigBase? cfg = null;
-                IRootConfig? rcfg = null;
-                if (configType == ConfigType.Entity)
-                {
-                    cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
-                    rcfg = (IRootConfig)cfg;
-                    rcfg.ReplaceRuntimeParameters(_args.Parameters);
-                    cfg.Prepare(cfg, cfg);
-                }
+                var cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
+                var rcfg = (IRootConfig)cfg;
+                rcfg.ReplaceRuntimeParameters(_args.Parameters);
+                cfg.Prepare(cfg, cfg);
 
                 // Create the "legacy" code generator instance.
                 string? outputDir = null;
@@ -231,6 +226,9 @@ namespace Beef.CodeGen
             catch (CodeGenException gcex)
             {
                 _args.Logger.LogError(gcex.Message);
+                if (gcex.InnerException != null)
+                    _args.Logger.LogError(gcex.InnerException.Message);
+
                 _args.Logger.LogInformation(string.Empty);
                 return false;
             }
@@ -336,7 +334,7 @@ namespace Beef.CodeGen
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            var yaml = configType == ConfigType.Entity ? XmlToYamlConverter.ConvertEntityXmlToYaml(xml) : throw new NotImplementedException();
+                            var yaml = configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertEntityXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertEntityXmlToYaml(xml);
 
                             using var sr = new StringReader(yaml);
                             var yml = new DeserializerBuilder().Build().Deserialize(sr);
@@ -345,7 +343,7 @@ namespace Beef.CodeGen
                             using var jsr = new StringReader(json);
                             using var jr = new JsonTextReader(jsr);
                             var js = JsonSerializer.Create();
-                            return CheckNotNull(js.Deserialize(jr, configType == ConfigType.Entity ? typeof(Config.Entity.CodeGenConfig) : throw new NotImplementedException()));
+                            return CheckNotNull(js.Deserialize(jr, configType == ConfigType.Entity ? typeof(Config.Entity.CodeGenConfig) : typeof(Config.Database.CodeGenConfig)));
                         }
 
                     case ".YAML": throw new NotImplementedException();

@@ -2,7 +2,6 @@
 
 using Beef.CodeGen.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,8 +52,8 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Is a DTO; therefore, OK.")]
-        public string[]? IncludeColumns { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? IncludeColumns { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
@@ -62,8 +61,8 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Is a DTO; therefore, OK.")]
-        public string[]? ExcludeColumns { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? ExcludeColumns { get; set; }
 
         #endregion
 
@@ -77,19 +76,19 @@ namespace Beef.CodeGen.Config.Database
         public bool? Get { get; set; }
 
         /// <summary>
-        /// Indicates that a `GetAll` stored procedure will be automatically generated where not otherwise explicitly specified.
+        /// Indicates that a `GetColl` stored procedure will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("getAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("getColl", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CodeGen", Title = "Indicates that a `GetAll` stored procedure will be automatically generated where not otherwise explicitly specified.")]
-        public bool? GetAll { get; set; }
+        public bool? GetColl { get; set; }
 
         /// <summary>
         /// Gets or sets the list of columns names (including sort order ASC/DESC) to be used as the GetAll query sort order (will automatically add `alias` where not specified for column).
         /// </summary>
         [JsonProperty("getAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CodeGen", Title = "The list of columns names (including sort order ASC/DESC) to be used as the GetAll query sort order (will automatically add `alias` where not specified for column).")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Is a DTO; therefore, OK.")]
-        public string[]? GetAllOrderBy { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? GetCollOrderBy { get; set; }
 
         /// <summary>
         /// Indicates that a `Create` stored procedure will be automatically generated where not otherwise explicitly specified.
@@ -133,30 +132,30 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Indicates that a `User Defined Table (UDT)` type should be created.
         /// </summary>
-        [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("udt", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Udt", Title = "Indicates that a `User Defined Table (UDT)` type should be created.", IsImportant = true)]
         public bool? Udt { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names to be excluded from the `User Defined Table (UDT)`.
         /// </summary>
-        [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("udtExcludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Udt", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
             Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Is a DTO; therefore, OK.")]
-        public string[]? UdtExcludeColumns { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? UdtExcludeColumns { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
         /// </summary>
-        [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("tvp", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Udt", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
         public string? Tvp { get; set; }
 
         /// <summary>
         /// Indicates that a `Merge` (upsert of `Udt` list) stored procedure will be automatically generated where not otherwise explicitly specified.
         /// </summary>
-        [JsonProperty("delete", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("merge", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Udt", Title = "Indicates that a `Merge` (upsert of `Udt` list) stored procedure will be automatically generated where not otherwise explicitly specified.")]
         public bool? Merge { get; set; }
 
@@ -167,11 +166,19 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).
         /// </summary>
-        [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("permission", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Auth", Title = "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).", IsImportant = true)]
         public string? Permission { get; set; }
 
         #endregion
+
+        /// <summary>
+        /// Gets or sets the corresponding <see cref="StoredProcedureConfig"/> collection.
+        /// </summary>
+        [JsonProperty("storedProcedures", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema(Title = "The corresponding `StoredProcedure` collection.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<StoredProcedureConfig>? StoredProcedures { get; set; }
 
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
@@ -198,8 +205,16 @@ namespace Beef.CodeGen.Config.Database
 
             foreach (var c in DbTable.Columns)
             {
-                if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name)))
+                if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                     DbColumns.Add(c);
+            }
+
+            if (StoredProcedures != null && StoredProcedures.Count > 0)
+            {
+                foreach (var storedProcedure in StoredProcedures)
+                {
+                    storedProcedure.Prepare(Root!, this);
+                }
             }
         }
     }

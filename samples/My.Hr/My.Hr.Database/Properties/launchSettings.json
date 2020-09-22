@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "My.Hr.Database": {
+      "commandName": "Project",
+      "commandLineArgs": "codegen",
+      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\My.Hr\\My.Hr.Database"
+    }
+  }
+}
