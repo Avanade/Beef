@@ -26,7 +26,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("refDatabaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("RefData", Title = "The schema name to identify the Reference Data related tables.", IsImportant = true,
-            Description = "Defaults to `Ref`.")]
+            Description = "Where not specified an attempt will be made to infer.")]
         public string? RefDatabaseSchema { get; set; }
 
         #endregion
@@ -96,6 +96,14 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
             Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
         public string? ColumnNameUpdatedDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table or function that is to be used to join against for security-based `OrgUnitId` verification.
+        /// </summary>
+        [JsonProperty("orgUnitJoinObject", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The table or function (object) that is to be used to join against for security-based `OrgUnitId` verification.",
+            Description = "Defaults to `[Sec].[fnGetUserOrgUnits]`. To remove capability set `OrgUnitId` to `None`.")]
+        public string? OrgUnitJoinObject { get; set; }
 
         #endregion
 
@@ -182,7 +190,6 @@ namespace Beef.CodeGen.Config.Database
         {
             LoadDbTablesConfig();
 
-            RefDatabaseSchema = DefaultWhereNull(RefDatabaseSchema, () => "Ref");
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
             ColumnNameOrgUnitId = DefaultWhereNull(ColumnNameOrgUnitId, () => "OrgUnitId");
@@ -191,6 +198,7 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
+            OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]");
 
             if (Tables != null && Tables.Count > 0)
             {

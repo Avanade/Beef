@@ -87,7 +87,7 @@ namespace Beef.CodeGen.Generators
 
                 var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
                 var xp = new XElement(ns + "attribute",
-                    new XAttribute("name", XmlJsonRename.GetXmlName(ce, name)),
+                    new XAttribute("name", XmlYamlTranslate.GetXmlName(ce, name)),
                     new XAttribute("use", psa.IsMandatory ? "required" : "optional"));
 
                 xp.Add(new XElement(ns + "annotation", new XElement(ns + "documentation", GetDocumentation(name, psa))));

@@ -1,18 +1,19 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Config.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
+using System.Text;
 
 namespace Beef.CodeGen.Config
 {
     /// <summary>
-    /// Represents a temporary capability to rename XML attribute names with a new JSON property name. For the most part the names will not change other than PascalCase versus camelCase.
+    /// Represents a temporary capability to translate XML and YAML property names and values. For the most part the names will not change other than PascalCase versus camelCase.
     /// </summary>
-    public static class XmlJsonRename
+    public static class XmlYamlTranslate
     {
-        private static readonly List<(ConfigurationEntity Entity, string XmlName, string JsonName)> _config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
+        private static readonly List<(ConfigurationEntity Entity, string XmlName, string YamlName)> _config = new List<(ConfigurationEntity, string, string)>(new (ConfigurationEntity, string, string)[] 
         {
             // Entity oriented configuration.
             (ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
@@ -53,14 +54,11 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode"),
 
             // Database oriented configuration.
-            (ConfigurationEntity.Table, "GetAll", "getColl"),
-            (ConfigurationEntity.Table, "GetAllOrderBy", "getCollOrderBy"),
-
             (ConfigurationEntity.Parameter, "IsNullable", "nullable"),
             (ConfigurationEntity.Parameter, "IsCollection", "collection")
         });
 
-        private static readonly List<(ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToJsonConvert = new List<(ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigurationEntity, string, Func<string?, string?>)[]
+        private static readonly List<(ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToYamlConvert = new List<(ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigurationEntity, string, Func<string?, string?>)[]
         {
             (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Yes" : "Mapper")),
 
@@ -68,36 +66,64 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigurationEntity.Table, "GetCollOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : XmlToGetAllOrderBy(xml)),
 
             (ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
+            (ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
-            (ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "Asc" ? "Ascending" : "Descending"))
+            (ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending"))
         });
 
         /// <summary>
-        /// Gets the JSON name from the XML name.
+        /// Converts the GetAllOrderBy XML to YAML.
         /// </summary>
-        public static string GetJsonName(ConfigurationEntity entity, string xmlName)
+        private static string XmlToGetAllOrderBy(string xml)
         {
-            var item = _config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
-            return item.JsonName ?? (StringConversion.ToCamelCase(xmlName)!);
+            var sb = new StringBuilder();
+
+            foreach (var ob in xml.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (sb.Length == 0)
+                    sb.Append("[");
+                else
+                    sb.Append(",");
+
+                var parts = ob.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                sb.Append($" {{ name: {parts[0]}");
+                if (parts.Length > 1)
+                    sb.Append($", order: {(parts[1].StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending")}");
+
+                sb.Append(" }");
+            }
+
+            sb.Append(" ]");
+            return sb.ToString();
         }
 
         /// <summary>
-        /// Gets the XML name from the JSON name.
+        /// Gets the YAML name from the XML name.
+        /// </summary>
+        public static string GetYamlName(ConfigurationEntity entity, string xmlName)
+        {
+            var item = _config.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
+            return item.YamlName ?? (StringConversion.ToCamelCase(xmlName)!);
+        }
+
+        /// <summary>
+        /// Gets the XML name from the YAML name.
         /// </summary>
         public static string GetXmlName(ConfigurationEntity entity, string jsonName)
         {
-            var item = _config.FirstOrDefault(x => x.Entity == entity && x.JsonName == jsonName);
+            var item = _config.FirstOrDefault(x => x.Entity == entity && x.YamlName == jsonName);
             return item.XmlName ?? (StringConversion.ToPascalCase(jsonName)!);
         }
 
         /// <summary>
-        /// Gets the JSON value from the XML value.
+        /// Gets the YAML value from the XML value.
         /// </summary>
-        public static string? GetJsonValue(ConfigurationEntity entity, string xmlName, string? xmlValue)
+        public static string? GetYamlValue(ConfigurationEntity entity, string xmlName, string? xmlValue)
         {
-            var item = _xmlToJsonConvert.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
+            var item = _xmlToYamlConvert.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
             return item.Converter == null ? xmlValue : item.Converter(xmlValue);
         }
     }

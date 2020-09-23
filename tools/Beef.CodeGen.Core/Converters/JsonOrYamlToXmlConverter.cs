@@ -113,7 +113,7 @@ namespace Beef.CodeGen.Converters
                     }
                 }
                 else
-                    xml.Add(new XAttribute(XmlJsonRename.GetXmlName(entity, jp.Name), jp.Value));
+                    xml.Add(new XAttribute(XmlYamlTranslate.GetXmlName(entity, jp.Name), jp.Value));
             }
         }
 

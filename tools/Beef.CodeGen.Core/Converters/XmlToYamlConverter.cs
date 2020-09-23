@@ -167,7 +167,7 @@ namespace Beef.CodeGen.Converters
 
             foreach (var att in xml.Attributes())
             {
-                var jname = XmlJsonRename.GetJsonName(ce, att.Name.LocalName);
+                var jname = XmlYamlTranslate.GetYamlName(ce, att.Name.LocalName);
                 var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
                 if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
                     continue;
@@ -175,7 +175,7 @@ namespace Beef.CodeGen.Converters
                 if (needsComma)
                     args.Writer.Write(", ");
 
-                var val = XmlJsonRename.GetJsonValue(ce, att.Name.LocalName, att.Value);
+                var val = XmlYamlTranslate.GetYamlValue(ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;
 

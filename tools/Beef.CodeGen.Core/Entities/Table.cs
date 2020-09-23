@@ -32,6 +32,7 @@ namespace Beef.CodeGen.Entities
             var tables = new List<Table>();
             Table? table = null;
 
+            // Get all the tables and their columns.
             await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableAndColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
             {
                 var ct = TableMapper.Default.MapFromDb(dr, Mapper.OperationTypes.Get)!;
@@ -42,6 +43,12 @@ namespace Beef.CodeGen.Entities
                 if (autoSecurity && table.Schema != refDataSchema)
                     table.UserRole = $"{table.Schema}.{table.Name}";
             }).ConfigureAwait(false);
+
+            // Determine whether a table is considered reference data; has columns: Code, Text and SortOrder
+            foreach (var t in tables.Where(x => x.Columns.Any(c => c.Name == "Code") && x.Columns.Any(c => c.Name == "Text") && x.Columns.Any(c => c.Name == "SortOrder")))
+            {
+                t.IsRefData = true;
+            }
 
             // Configure all the single column primary and unique constraints.
             foreach (var pks in db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTablePrimaryKey.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
@@ -143,8 +150,13 @@ namespace Beef.CodeGen.Entities
                         col.ForeignTable = rt.Name;
                         col.ForeignColumn = rt.Columns.Where(x => x.IsPrimaryKey).First().Name;
                         col.IsForeignRefData = col.ForeignSchema == refDataSchema;
+                        continue;
                     }
                 }
+                //foreach (var c in t.Columns)
+                //{
+
+                //}
             }
 
             return tables;
@@ -189,6 +201,11 @@ namespace Beef.CodeGen.Entities
         /// Indicates whether the Table is actually a View.
         /// </summary>
         public bool IsAView { get; set; }
+
+        /// <summary>
+        /// Indicates whether the Table is considered reference data.
+        /// </summary>
+        public bool IsRefData { get; set; }
 
         /// <summary>
         /// Gets or sets the alias (automatically updated when the <see cref="Name"/> is set and the current alias value is <c>null</c>).
