@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Database" LoaderType="Beef.CodeGen.Loaders.TableConfigLoader, Beef.CodeGen.Core">
-  <Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseGetCodeGenerator" Template="DbSpTableGet_sql.hb" FileName="sp{{Parent.Name}}{{Name}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{Parent.Schema}}/Stored Procedures" />
+  <!--<Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableUpsert_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
@@ -12,5 +13,5 @@
   <Generate Template="DbUdtTableList_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbTvpTable_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/" />
   <Generate Template="DbEfTableModel_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
-  <Generate Template="DbEfModelBuilderExtensions_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />
+  <Generate Template="DbEfModelBuilderExtensions_cs.xml" OutDir="{{Company}}.{{AppName}}.Business/Data" />-->
 </Script>

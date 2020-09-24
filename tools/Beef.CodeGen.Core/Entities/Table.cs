@@ -103,15 +103,15 @@ namespace Beef.CodeGen.Entities
                 }).ConfigureAwait(false).GetAwaiter().GetResult().GroupBy(x => x.ConstraintName).Where(x => x.Count() == 1))
                 {
                     var fk = fks.Single();
-                    var col = (from t in tables
-                                from c in t.Columns
-                                where t.Schema == fk.TableSchema && t.Name == fk.TableName && c.Name == fk.TableColumnName
-                                select c).Single();
+                    var r = (from t in tables
+                               from c in t.Columns
+                               where t.Schema == fk.TableSchema && t.Name == fk.TableName && c.Name == fk.TableColumnName
+                               select (t, c)).Single();
 
-                    col.ForeignSchema = fk.ForeignSchema;
-                    col.ForeignTable = fk.ForeignTable;
-                    col.ForeignColumn = fk.ForiegnColumn;
-                    col.IsForeignRefData = col.ForeignSchema == refDataSchema;
+                    r.c.ForeignSchema = fk.ForeignSchema;
+                    r.c.ForeignTable = fk.ForeignTable;
+                    r.c.ForeignColumn = fk.ForiegnColumn;
+                    r.c.IsForeignRefData = r.t.IsRefData;
                 }
 
                 await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableIdentityColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
@@ -138,25 +138,37 @@ namespace Beef.CodeGen.Entities
                 }).ConfigureAwait(false);
             }
 
-            // Auto-determine reference data relationships even where no foreign key defined.
+            // Perform final preparation and auto-determine reference data relationships even where no foreign key defined.
             foreach (var t in tables)
             {
-                foreach (var col in t.Columns.Where(x => !x.IsForeignRefData && x.Name!.Length > 2 && x.Name.EndsWith("Id", StringComparison.InvariantCulture)))
+                foreach (var c in t.Columns)
                 {
-                    var rt = tables.Where(x => x.Name != t.Name && x.Name == col.Name![0..^2] && x.Schema == refDataSchema).SingleOrDefault();
-                    if (rt != null)
+                    if (c.ForeignTable == null)
                     {
-                        col.ForeignSchema = rt.Schema;
-                        col.ForeignTable = rt.Name;
-                        col.ForeignColumn = rt.Columns.Where(x => x.IsPrimaryKey).First().Name;
-                        col.IsForeignRefData = col.ForeignSchema == refDataSchema;
-                        continue;
+                        if (c.Name!.Length > 2 && c.Name!.EndsWith("Id", StringComparison.InvariantCulture))
+                        {
+                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && t.Name == c.Name![0..^2]).ToList();
+                            if (rt.Count == 1)
+                            {
+                                c.ForeignSchema = rt[0].Schema;
+                                c.ForeignTable = rt[0].Name;
+                                c.ForeignColumn = rt[0].Columns.Where(x => x.IsPrimaryKey).First().Name;
+                                c.IsForeignRefData = rt[0].IsRefData;
+                            }
+                        }
+                        else if (c.Name!.Length > 4 && c.Name!.EndsWith("Code", StringComparison.InvariantCulture))
+                        {
+                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && t.Name == c.Name![0..^4]).ToList();
+                            if (rt.Count == 1)
+                            {
+                                c.ForeignSchema = rt[0].Schema;
+                                c.ForeignTable = rt[0].Name;
+                                c.ForeignColumn = rt[0].Columns.Where(x => x.IsPrimaryKey).First().Name;
+                                c.IsForeignRefData = rt[0].IsRefData;
+                            }
+                        }
                     }
                 }
-                //foreach (var c in t.Columns)
-                //{
-
-                //}
             }
 
             return tables;
@@ -196,6 +208,11 @@ namespace Beef.CodeGen.Entities
         /// Gets or sets the schema.
         /// </summary>
         public string? Schema { get; set; }
+
+        /// <summary>
+        /// Gets the fully qualified name schema.table name.
+        /// </summary>
+        public string? QualifiedName => $"[{Schema}].[{Name}]";
 
         /// <summary>
         /// Indicates whether the Table is actually a View.

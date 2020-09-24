@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -114,6 +115,16 @@ namespace Beef.CodeGen.Config.Database
         public List<ExecuteConfig>? Execute { get; set; }
 
         /// <summary>
+        /// Gets the "Before" <see cref="ExecuteConfig"/> collection.
+        /// </summary>
+        public List<ExecuteConfig>? ExecuteBefore => Execute!.Where(x => x.Location == "Before").ToList();
+
+        /// <summary>
+        /// Gets the "After" <see cref="ExecuteConfig"/> collection.
+        /// </summary>
+        public List<ExecuteConfig>? ExecuteAfter => Execute!.Where(x => x.Location == "After").ToList();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -121,37 +132,44 @@ namespace Beef.CodeGen.Config.Database
         {
             Type = DefaultWhereNull(Type, () => "GetColl");
             ReselectStatement = DefaultWhereNull(ReselectStatement, () => $"[{Parent!.Schema}].[sp{Parent.Name}Get]");
-
-            if (Parameters != null && Parameters.Count > 0)
+            Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch
             {
-                foreach (var storedProcedure in Parameters)
-                {
-                    storedProcedure.Prepare(Root!, this);
-                }
+                "Delete" => "DELETE",
+                "Get" => "READ",
+                "GetColl" => "READ",
+                _ => "WRITE"
+            });
+
+            if (Parameters == null)
+                Parameters = new List<ParameterConfig>();
+
+            foreach (var parameter in Parameters)
+            {
+                parameter.Prepare(Root!, this);
             }
 
-            if (Where != null && Where.Count > 0)
+            if (Where == null)
+                Where = new List<WhereConfig>();
+
+            foreach (var where in Where)
             {
-                foreach (var where in Where)
-                {
-                    where.Prepare(Root!, this);
-                }
+                where.Prepare(Root!, this);
             }
 
-            if (OrderBy != null && OrderBy.Count > 0)
+            if (OrderBy == null)
+                OrderBy = new List<OrderByConfig>();
+
+            foreach (var orderby in OrderBy)
             {
-                foreach (var orderby in OrderBy)
-                {
-                    orderby.Prepare(Root!, this);
-                }
+                orderby.Prepare(Root!, this);
             }
 
-            if (Execute != null && Execute.Count > 0)
+            if (Execute == null)
+                Execute = new List<ExecuteConfig>();
+
+            foreach (var execute in Execute)
             {
-                foreach (var execute in Execute)
-                {
-                    execute.Prepare(Root!, this);
-                }
+                execute.Prepare(Root!, this);
             }
         }
     }

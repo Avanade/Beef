@@ -256,14 +256,69 @@ namespace Beef.CodeGen.Config.Database
         public List<GetAllOrderByConfig>? GetAllOrderBy { get; set; }
 
         /// <summary>
+        /// Gets the selected column configurations.
+        /// </summary>
+        public List<ColumnConfig> Columns { get; } = new List<ColumnConfig>();
+
+        /// <summary>
+        /// Gets the related IsDeleted column.
+        /// </summary>
+        public ColumnConfig ColumnIsDeleted => Columns.Where(x => x.Name == ColumnNameIsDeleted && ColumnNameIsDeleted != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related TenantId column.
+        /// </summary>
+        public ColumnConfig ColumnTenantId => Columns.Where(x => x.Name == ColumnNameTenantId && ColumnNameTenantId != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related OrgUnitId column.
+        /// </summary>
+        public ColumnConfig ColumnOrgUnitId => Columns.Where(x => x.Name == ColumnNameOrgUnitId && ColumnNameOrgUnitId != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related RowVersion column.
+        /// </summary>
+        public ColumnConfig ColumnRowVersion => Columns.Where(x => x.Name == ColumnNameRowVersion && ColumnNameRowVersion != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related CreatedBy column.
+        /// </summary>
+        public ColumnConfig ColumnCreatedBy => Columns.Where(x => x.Name == ColumnNameCreatedBy && ColumnNameCreatedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related CreatedDate column.
+        /// </summary>
+        public ColumnConfig ColumnCreatedDate => Columns.Where(x => x.Name == ColumnNameCreatedDate && ColumnNameCreatedDate != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related UpdatedBy column.
+        /// </summary>
+        public ColumnConfig ColumnUpdatedBy => Columns.Where(x => x.Name == ColumnNameUpdatedBy && ColumnNameUpdatedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related UpdatedDate column.
+        /// </summary>
+        public ColumnConfig ColumnUpdatedDate => Columns.Where(x => x.Name == ColumnNameUpdatedDate && ColumnNameUpdatedDate != "None").SingleOrDefault();
+
+        /// <summary>
+        /// Gets the columns considered unique key.
+        /// </summary>
+        public List<ColumnConfig> UniqueKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).ToList();
+
+        /// <summary>
+        /// Gets the core columns (excluding special internal)
+        /// </summary>
+        public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnNameIsDeleted || x.Name == ColumnNameTenantId)).ToList();
+
+        /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
         public Table? DbTable { get; private set; }
 
         /// <summary>
-        /// Gets the selected (actual) database column configurations.
+        /// Gets the fully qualified name schema.table name.
         /// </summary>
-        public List<Column> DbColumns { get; } = new List<Column>();
+        public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
         /// <inheritdoc/>
@@ -290,17 +345,18 @@ namespace Beef.CodeGen.Config.Database
             foreach (var c in DbTable.Columns)
             {
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
-                    DbColumns.Add(c);
+                {
+                    var cc = new ColumnConfig { Name = c.Name, DbColumn = c };
+                    cc.Prepare(Root!, this);
+                    Columns.Add(cc);
+                }
             }
 
             PrepareStoredProcedures();
 
-            if (StoredProcedures != null && StoredProcedures.Count > 0)
+            foreach (var storedProcedure in StoredProcedures!)
             {
-                foreach (var storedProcedure in StoredProcedures)
-                {
-                    storedProcedure.Prepare(Root!, this);
-                }
+                storedProcedure.Prepare(Root!, this);
             }
         }
 
@@ -314,19 +370,19 @@ namespace Beef.CodeGen.Config.Database
 
             // Add in selected operations where applicable (in reverse order in which output).
             if (CompareValue(Delete, true) && !StoredProcedures.Any(x => x.Name == "Delete"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Delete", Type = "Delete" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Delete", Type = "Delete" });
 
             if (CompareValue(Merge, true) && !StoredProcedures.Any(x => x.Name == "Merge"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Merge", Type = "Merge" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Merge", Type = "Merge" });
 
             if (CompareValue(Update, true) && !StoredProcedures.Any(x => x.Name == "Upsert"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Upsert", Type = "Upsert" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Upsert", Type = "Upsert" });
 
             if (CompareValue(Update, true) && !StoredProcedures.Any(x => x.Name == "Update"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Update", Type = "Update" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Update", Type = "Update" });
 
             if (CompareValue(Create, true) && !StoredProcedures.Any(x => x.Name == "Create"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Create", Type = "Create" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Create", Type = "Create" });
 
             if (CompareValue(GetAll, true) && !StoredProcedures.Any(x => x.Name == "GetAll"))
             {
@@ -339,13 +395,16 @@ namespace Beef.CodeGen.Config.Database
                         spc.OrderBy.Add(new OrderByConfig { Name = gaob.Name, Order = gaob.Order });
                     }
                 }
-                //else if (DbTable.Is)
+                else if (DbTable!.IsRefData)
+                {
+                    spc.OrderBy = new List<OrderByConfig>(new OrderByConfig[] { new OrderByConfig { Name = "SortOrder" }, new OrderByConfig { Name = "Code" } });
+                }
 
-                StoredProcedures.Insert(0, spc);
+                StoredProcedures.Add(spc);
             }
 
             if (CompareValue(Get, true) && !StoredProcedures.Any(x => x.Name == "Get"))
-                StoredProcedures.Insert(0, new StoredProcedureConfig { Name = "Get", Type = "Get" });
+                StoredProcedures.Add(new StoredProcedureConfig { Name = "Get", Type = "Get" });
         }
     }
 }

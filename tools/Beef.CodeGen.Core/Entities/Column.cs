@@ -2,6 +2,7 @@
 
 using Beef.Data.Database;
 using System;
+using System.Text;
 using System.Xml.Linq;
 
 namespace Beef.CodeGen.Entities
@@ -253,10 +254,7 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
-        public string DotNetType
-        {
-            get => string.IsNullOrEmpty(Type) ? "string" : GetDotNetTypeName(Type);
-        }
+        public string DotNetType => string.IsNullOrEmpty(Type) ? "string" : GetDotNetTypeName(Type);
 
         /// <summary>
         /// Creates (and adds) the <see cref="Table"/> element for code generation.

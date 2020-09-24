@@ -105,6 +105,14 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `[Sec].[fnGetUserOrgUnits]`. To remove capability set `OrgUnitId` to `None`.")]
         public string? OrgUnitJoinObject { get; set; }
 
+        /// <summary>
+        /// Gets or sets the stored procedure or function that is to be used for `Permission` verification.
+        /// </summary>
+        [JsonProperty("userPermissionObject", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The stored procedure or function (object) that is to be used for `Permission` verification.",
+            Description = "Defaults to `[Sec].[spCheckUserHasPermission]`.")]
+        public string? UserPermissionObject { get; set; }
+
         #endregion
 
         #region RuntimeParameters
@@ -184,6 +192,16 @@ namespace Beef.CodeGen.Config.Database
         public List<Table>? DbTables { get; private set; }
 
         /// <summary>
+        /// Gets the company name from the <see cref="RuntimeParameters"/>.
+        /// </summary>
+        public string Company => GetRuntimeParameter("Company", true)!;
+
+        /// <summary>
+        /// Gets the application name from the <see cref="RuntimeParameters"/>.
+        /// </summary>
+        public string AppName => GetRuntimeParameter("AppName", true)!;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -199,6 +217,7 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
             OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]");
+            UserPermissionObject = DefaultWhereNull(UserPermissionObject, () => "[Sec].[spCheckUserHasPermission]");
 
             if (Tables != null && Tables.Count > 0)
             {
