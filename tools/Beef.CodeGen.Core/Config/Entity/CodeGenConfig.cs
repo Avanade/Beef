@@ -116,12 +116,12 @@ namespace Beef.CodeGen.Config.Entity
         #region WebApi
 
         /// <summary>
-        /// Indicates whether the Web API controller should use <c>Authorize</c> (<c>true</c>); otherwise, <c>AllowAnonynous</c> (<c>false</c>).
+        /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "Indicates whether the Web API controller should use `Authorize` (`true`); otherwise, `AllowAnonynous` (`false`).",
-            Description = "Defaults to the `AllowAnonynous` (`false`). This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
-        public bool? WebApiAuthorize { get; set; }
+        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
+            Description = "Defaults to the `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+        public string? WebApiAuthorize { get; set; }
 
         #endregion
 
@@ -408,7 +408,7 @@ namespace Beef.CodeGen.Config.Entity
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
-            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => false);
+            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => "AllowAnonymous");
 
             if (Entities != null && Entities.Count > 0)
             {

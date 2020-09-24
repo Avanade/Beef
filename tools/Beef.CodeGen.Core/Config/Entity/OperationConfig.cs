@@ -231,6 +231,14 @@ namespace Beef.CodeGen.Config.Entity
         public string? WebApiRoute { get; set; }
 
         /// <summary>
+        /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
+        /// </summary>
+        [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
+            Description = "Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified.")]
+        public string? WebApiAuthorize { get; set; }
+
+        /// <summary>
         /// Gets or sets the HTTP Method for the operation.
         /// </summary>
         [JsonProperty("webApiMethod", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -698,6 +706,7 @@ namespace Beef.CodeGen.Config.Entity
 
             PrepareParameters();
 
+            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
             {
                 "GetColl" => "",
