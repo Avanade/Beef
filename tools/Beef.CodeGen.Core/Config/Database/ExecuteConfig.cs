@@ -25,7 +25,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the location of the statement in relation to the primary statement.
         /// </summary>
-        [JsonProperty("orderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("location", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The location of the statement in relation to the primary statement.", IsImportant = true, Options = new string[] { "Before", "After" },
             Description = "Defaults to `After`.")]
         public string? Location { get; set; }
@@ -36,6 +36,7 @@ namespace Beef.CodeGen.Config.Database
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
+            Location = DefaultWhereNull(Location, () => "After");
         }
     }
 }

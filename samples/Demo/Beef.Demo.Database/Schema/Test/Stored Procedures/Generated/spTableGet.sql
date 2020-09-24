@@ -25,6 +25,9 @@ BEGIN
     EXEC [dbo].[spThrowAuthorizationException]
   END
 
+  -- Execute additional (pre) statements.
+  EXEC Demo.Before
+
   SELECT
     [t].[TableId],
     [t].[Name],
@@ -37,4 +40,11 @@ BEGIN
     [t].[CreatedDate],
     [t].[UpdatedBy],
     [t].[UpdatedDate]
-    FROM [Test].[Table] as t
+    FROM [Test].[Table] AS [t] WITH (NOLOCK)
+      WHERE [t].[TableId] = @TableId
+        AND [t].[TenantId] = @TenantId
+        AND ISNULL([t].[IsDeleted], 0) = 0
+
+  -- Execute additional statements.
+  EXEC Demo.After
+END

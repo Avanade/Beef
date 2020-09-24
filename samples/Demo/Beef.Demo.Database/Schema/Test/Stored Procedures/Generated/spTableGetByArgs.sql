@@ -1,5 +1,7 @@
 CREATE PROCEDURE [Test].[spTableGetByArgs]
    @Name AS NVARCHAR(50) NULL = NULL
+  ,@MinCount AS INT
+  ,@MaxCount AS INT NULL = NULL
 AS
 BEGIN
   /*
@@ -33,4 +35,6 @@ BEGIN
     WHERE ([t].[TenantId] = @TenantId)
       AND ISNULL([t].[IsDeleted], 0) = 0
       AND (@Name IS NULL OR [t].[Name] LIKE @Name)
+      AND ([t].[Count] >= @MinCount)
+      AND (@MaxCount IS NULL OR [t].[Count] <= @MaxCount)
 END

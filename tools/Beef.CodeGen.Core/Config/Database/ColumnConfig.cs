@@ -42,6 +42,11 @@ namespace Beef.CodeGen.Config.Database
         public string? ParameterSql { get; private set; }
 
         /// <summary>
+        /// Gets the where equality clause.
+        /// </summary>
+        public string WhereEquals => Name == Parent?.ColumnIsDeleted?.Name ? $"ISNULL({QualifiedName}, 0) = 0" : $"{QualifiedName} = {ParameterName}";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]

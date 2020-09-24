@@ -23,4 +23,9 @@ BEGIN
     [p].[UpdatedDate],
     [p].[UniqueCode],
     [p].[EyeColorCode]
-    FROM [Demo].[Person] as p
+    FROM [Demo].[Person] AS [p]
+      WHERE [p].[PersonId] = @PersonId
+
+  -- Execute additional statements.
+  EXEC [Demo].[spWorkHistoryGetByPersonId] @PersonId
+END
