@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. `WebApiAuthorize` attribute was honouring previous override sideeffect. Changed attribute configuration from a `bool` to a `string`. Code-gen will output the supplied value as-is. XML boolean values are automatically converted. _Note:_ the XML Schema and corresponding documentation have not been updated; this will occur during a future release.
+
 ## v4.1.2
 - *Enhancement:* The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. All the _entity_ and _reference date_ related code-generation templates (and related) have been ported. The _database_ related code-generation is still using the legacy custom.
 - *Enhancement:* The `CodeGen` namespace from `Beef.Core` has been moved relocated. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`).
@@ -11,7 +14,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Introduction of Dependency Injection support.
 
 ## v3.1.20
-- *Fixed*: Issue [66](https://github.com/Avanade/Beef/issues/63) fixed. Changed the path separator to be `/` so that is compatible on Windows and Linux. By using `/` this matches the `Path.AltDirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.altdirectoryseparatorchar) for Windows and `Path.DirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.directoryseparatorchar) for Linux, making it universally compatible.
+- *Fixed*: Issue [66](https://github.com/Avanade/Beef/issues/66) fixed. Changed the path separator to be `/` so that is compatible on Windows and Linux. By using `/` this matches the `Path.AltDirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.altdirectoryseparatorchar) for Windows and `Path.DirectorySeparatorChar`(https://docs.microsoft.com/en-us/dotnet/api/system.io.path.directoryseparatorchar) for Linux, making it universally compatible.
 
 ## v3.1.19
 - *Enhancment:* Request [62](https://github.com/Avanade/Beef/issues/62) applied. Generate a non-zero exit code when detecting updated files if none are expected. E.g. if executing the code generation as part of build pipeline.

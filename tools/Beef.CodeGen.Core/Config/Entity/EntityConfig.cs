@@ -569,12 +569,12 @@ namespace Beef.CodeGen.Config.Entity
         public string? WebApiRoutePrefix { get; set; }
 
         /// <summary>
-        /// Indicates whether the Web API controller should use <c>Authorize</c> (<c>true</c>); otherwise, <c>AllowAnonynous</c> (<c>false</c>).
+        /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "Indicates whether the Web API controller should use `Authorize` (`true`); otherwise, `AllowAnonynous` (`false`).",
+        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
             Description = "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.")]
-        public bool? WebApiAuthorize { get; set; }
+        public string? WebApiAuthorize { get; set; }
 
         /// <summary>
         /// Gets or sets the access modifier for the generated Web API `Controller` constructor.

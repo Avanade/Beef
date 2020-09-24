@@ -34,7 +34,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} Web API functionality.
     /// </summary>
-    [{{#if WebApiAuthorize}}Authorize{{else}}AllowAnonymous{{/if}}]
+    [{{{WebApiAuthorize}}}]
 {{#ifval WebApiRoutePrefix}}
     [Route("{{WebApiRoutePrefix}}")]
 {{/ifval}}
@@ -76,7 +76,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
   {{#if HasReturnValue}}
         /// <returns>{{{WebApiReturnText}}}</returns>
   {{/if}}
-        [{{#if WebApiAuthorize}}Authorize{{else}}AllowAnonymous{{/if}}]
+        [{{{WebApiAuthorize}}}]
         [{{WebApiMethod}}("{{WebApiRoute}}")]
         [ProducesResponseType({{#if HasReturnValue}}typeof({{#ifeq Type 'GetColl'}}{{BaseReturnType}}Collection{{else}}{{BaseReturnType}}{{/ifeq}}), {{/if}}(int)HttpStatusCode.{{WebApiStatus}})]
   {{#if HasReturnValue}}
