@@ -74,7 +74,7 @@ namespace Beef.CodeGen
 
             _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
 
-            _logger = Logger.Default ?? new ColoredConsoleLogger(nameof(CodeGenConsole));
+            _logger = Logger.Default == null ? Logger.Default = new ColoredConsoleLogger(nameof(CodeGenConsole)) : Logger.Default;
 
             App.OnExecuteAsync(async (_) =>
             {
@@ -126,6 +126,9 @@ namespace Beef.CodeGen
             catch (CommandParsingException cpex)
             {
                 _logger.LogError(cpex.Message);
+                if (cpex.InnerException != null)
+                    _logger.LogError(cpex.InnerException.Message);
+
                 return -1;
             }
         }
