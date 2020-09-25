@@ -216,7 +216,7 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
-            OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]");
+            OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]()");
             UserPermissionObject = DefaultWhereNull(UserPermissionObject, () => "[Sec].[spCheckUserHasPermission]");
 
             if (Tables != null && Tables.Count > 0)

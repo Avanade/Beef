@@ -418,10 +418,10 @@ namespace Beef.Database.Core
             var sb = new StringBuilder();
             foreach (var sr in list.OrderByDescending(x => x.Order).ThenByDescending(x => x.Reader!.Order).ThenByDescending(x => x.Name))
             {
-                sb.AppendLine($"DROP {sr.Reader!.Type} IF EXISTS [{sr.Reader.Schema}].[{sr.Reader.Name}]");
+                sb.AppendLine($"  DROP {sr.Reader!.Type} IF EXISTS [{sr.Reader.Schema}].[{sr.Reader.Name}]");
             }
 
-            if (!await ExecuteSqlStatementAsync(() => _db.SqlStatement(sb.ToString()).NonQueryAsync(), "the drop of all existing (known) database objects.").ConfigureAwait(false))
+            if (!await ExecuteSqlStatementAsync(() => _db.SqlStatement(sb.ToString()).NonQueryAsync(), "the drop of all existing (known) database objects.", sb.ToString()).ConfigureAwait(false))
                 return false;
 
             // Execute each script one-by-one.
@@ -455,11 +455,14 @@ namespace Beef.Database.Core
         /// <summary>
         /// Wraps the SQL statement(s) and reports success or failure.
         /// </summary>
-        private async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text)
+        private async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text, string? additionalInfo = null)
         {
             try
             {
                 _logger.LogInformation($"Executing {text}");
+                if (additionalInfo != null)
+                    _logger.LogInformation(additionalInfo);
+
                 await func().ConfigureAwait(false);
                 return true;
             }

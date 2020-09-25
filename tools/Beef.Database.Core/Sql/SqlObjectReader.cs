@@ -133,6 +133,11 @@ namespace Beef.Database.Core.Sql
                 if (ci >= 0)
                     txt = txt.Substring(0, ci - 1).TrimEnd();
 
+                // Remove function component.
+                ci = txt.IndexOf("(", StringComparison.InvariantCulture);
+                if (ci >= 0)
+                    txt = txt.Substring(0, ci - 1).TrimEnd();
+
                 // Parse out the token(s).
                 var col = 0;
                 for (; col < txt.Length; col++)
