@@ -109,26 +109,50 @@ namespace Beef.CodeGen.Config.Database
 
             Column = DefaultWhereNull(Column, () => Name);
             Operator = DefaultWhereNull(Operator, () => "EQ");
+            if (CompareValue(Collection, true))
+                Nullable = false;
+
             SqlType = DefaultWhereNull(SqlType, () =>
             {
                 var c = Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn;
                 if (c == null)
                     throw new CodeGenException($"Parameter '{Name}' specified Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
 
-                var sb = new StringBuilder($"{c.Type!.ToUpperInvariant()}");
-                if (Entities.Column.TypeIsString(c.Type))
-                    sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
-
-                sb.Append(c.Type.ToUpperInvariant() switch
+                var sb = new StringBuilder();
+                if (CompareValue(Collection, true))
                 {
-                    "DECIMAL" => $"({c.Precision}, {c.Scale})",
-                    "NUMERIC" => $"({c.Precision}, {c.Scale})",
-                    "TIME" => c.Scale.HasValue && c.Scale.Value > 0 ? $"({c.Scale})" : string.Empty,
-                    _ => string.Empty
-                });
+                    var udt = c.Type!.ToUpperInvariant() switch
+                    {
+                        "UNIQUEIDENTIFIER" => "UniqueIdentifier",
+                        "NVARCHAR" => "NVarChar",
+                        "INT" => "Int",
+                        "BIGINT" => "BigInt",
+                        "DATETIME2" => "DateTime2",
+                        _ => c.Type
+                    };
+
+                    sb.Append($"[dbo].[udt{udt}List] READONLY");
+                }
+                else
+                {
+                    sb.Append($"{c.Type!.ToUpperInvariant()}");
+                    if (Entities.Column.TypeIsString(c.Type))
+                        sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
+
+                    sb.Append(c.Type.ToUpperInvariant() switch
+                    {
+                        "DECIMAL" => $"({c.Precision}, {c.Scale})",
+                        "NUMERIC" => $"({c.Precision}, {c.Scale})",
+                        "TIME" => c.Scale.HasValue && c.Scale.Value > 0 ? $"({c.Scale})" : string.Empty,
+                        _ => string.Empty
+                    });
+                }
 
                 return sb.ToString();
             });
+
+            if (CompareValue(Collection, true))
+                Name += "s";
 
             SqlOperator = Operator!.ToUpperInvariant() switch
             {
@@ -142,8 +166,20 @@ namespace Beef.CodeGen.Config.Database
                 _ => Operator
             };
 
-            ParameterSql = $"{ParameterName} AS {SqlType}{(Nullable.HasValue && Nullable.Value ? " NULL" : "")}";
-            WhereSql = DefaultWhereNull(WhereSql, () => $"[{Parent!.Parent!.Alias}].[{Column}] {SqlOperator} @{Column}");
+            ParameterSql = $"{ParameterName} AS {SqlType}{(CompareValue(Nullable, true) ? " NULL = NULL" : "")}";
+            WhereSql = DefaultWhereNull(WhereSql, () =>
+            {
+                if (CompareValue(Collection, true))
+                {
+                    //(@GenderIdsCount = 0 OR[p].[GenderId] IN(SELECT[Value] FROM @GenderIds))
+                    return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT [Value] FROM {ParameterName}))";
+                }
+                else
+                {
+                    var sql = $"[{Parent!.Parent!.Alias}].[{Column}] {SqlOperator} @{Name}";
+                    return CompareValue(Nullable, true) ? $"(@{Name} IS NULL OR {sql})" : sql;
+                }
+            });
         }
     }
 }

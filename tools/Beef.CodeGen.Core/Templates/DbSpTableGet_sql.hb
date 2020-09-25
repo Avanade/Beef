@@ -49,8 +49,8 @@ BEGIN
     {{QualifiedName}}{{#unless @last}},{{/unless}}
 {{/each}}
     FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]{{#ifval WithHints}} WITH ({{WithHints}}){{/ifval}}
-{{#each Parameters}}
-      {{#if @first}}WHERE{{else}}  AND{{/if}} {{WhereSql}}
+{{#each Where}}
+      {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
 {{/each}}
 {{#each ExecuteAfter}}
   {{#if @first}}

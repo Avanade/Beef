@@ -11,10 +11,12 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "The **OrderBy** is used to define the query order", Description = "", Markdown = "")]
+    [ClassSchema("OrderBy", Title = "The **OrderBy** is used to define the query order", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class OrderByConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
+        #region Key
+
         /// <summary>
         /// Gets or sets the name of the column to order by.
         /// </summary>
@@ -29,6 +31,13 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("Key", Title = "The corresponding column name; used to infer characteristics.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
             Description = "Defaults to `Ascending`.")]
         public string? Order { get; set; }
+
+        #endregion
+
+        /// <summary>
+        /// Gets the order by SQL.
+        /// </summary>
+        public string OrderBySql => $"[{Parent!.Parent!.Alias}].[{Name}] {(Order!.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "DESC" : "ASC")}";
 
         /// <summary>
         /// <inheritdoc/>

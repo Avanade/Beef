@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -11,7 +8,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure where statement configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "The **Where** statement is used to define additional filtering.", Description = "", Markdown = "")]
+    [ClassSchema("Where", Title = "The **Where** statement is used to define additional filtering.", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class WhereConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {

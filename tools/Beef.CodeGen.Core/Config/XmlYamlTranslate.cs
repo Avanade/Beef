@@ -54,6 +54,8 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode"),
 
             // Database oriented configuration.
+            (ConfigurationEntity.StoredProcedure, "OrderBy", "orderby"),
+
             (ConfigurationEntity.Parameter, "IsNullable", "nullable"),
             (ConfigurationEntity.Parameter, "IsCollection", "collection")
         });

@@ -120,6 +120,11 @@ namespace Beef.CodeGen.Config.Database
         public List<ParameterConfig> ArgumentParameters => Parameters!.Where(x => !x.WhereOnly).ToList();
 
         /// <summary>
+        /// Gets the parameters defined as a collection.
+        /// </summary>
+        public List<ParameterConfig> CollectionParameters => Parameters!.Where(x => CompareValue(x.Collection, true)).ToList();
+
+        /// <summary>
         /// Gets the "Before" <see cref="ExecuteConfig"/> collection.
         /// </summary>
         public List<ExecuteConfig>? ExecuteBefore => Execute!.Where(x => x.Location == "Before").ToList();
@@ -148,42 +153,32 @@ namespace Beef.CodeGen.Config.Database
             if (Parameters == null)
                 Parameters = new List<ParameterConfig>();
 
-            switch (Type)
-            {
-                case "Get":
-                    foreach (var c in Parent!.Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).Reverse())
-                    {
-                        Parameters.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable });
-                    }
-
-                    AddWhereOnlyParameters(true);
-
-                    break;
-            }
-
-            foreach (var parameter in Parameters)
-            {
-                parameter.Prepare(Root!, this);
-            }
-
             if (Where == null)
                 Where = new List<WhereConfig>();
+
+            if (OrderBy == null)
+                OrderBy = new List<OrderByConfig>();
+
+            if (Execute == null)
+                Execute = new List<ExecuteConfig>();
+
+            AddColumnsAsParameters();
+
+            foreach (var parameter in Parameters.AsQueryable().Reverse())
+            {
+                parameter.Prepare(Root!, this);
+                Where.Insert(0, new WhereConfig { Statement = parameter.WhereSql });
+            }
 
             foreach (var where in Where)
             {
                 where.Prepare(Root!, this);
             }
 
-            if (OrderBy == null)
-                OrderBy = new List<OrderByConfig>();
-
             foreach (var orderby in OrderBy)
             {
                 orderby.Prepare(Root!, this);
             }
-
-            if (Execute == null)
-                Execute = new List<ExecuteConfig>();
 
             foreach (var execute in Execute)
             {
@@ -194,7 +189,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Insert the special TenantId and IsDeleted where only parameters (i.e. not used as arguments).
         /// </summary>
-        private void AddWhereOnlyParameters(bool appendToEnd)
+        private void AddWhereOnlyParameters(bool bookEnd)
         {
             if (Parent!.DbTable!.IsAView)
                 return;
@@ -202,7 +197,15 @@ namespace Beef.CodeGen.Config.Database
             var tenantId = Parent.ColumnTenantId == null ? null : new ParameterConfig { Name = Parent.ColumnTenantId.Name, WhereOnly = true };
             var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, WhereOnly = true, WhereSql = $"ISNULL({Parent.ColumnIsDeleted.QualifiedName}, 0) = 0" };
 
-            if (appendToEnd)
+            if (bookEnd)
+            {
+                if (tenantId != null)
+                    Parameters!.Insert(0, tenantId);
+
+                if (isDeleted != null)
+                    Parameters!.Add(isDeleted);
+            }
+            else
             {
                 if (tenantId != null)
                     Parameters!.Add(tenantId);
@@ -210,13 +213,28 @@ namespace Beef.CodeGen.Config.Database
                 if (isDeleted != null)
                     Parameters!.Add(isDeleted);
             }
-            else
+        }
+
+
+        /// <summary>
+        /// Add columns as parameters depending on type.
+        /// </summary>
+        private void AddColumnsAsParameters()
+        {
+            switch (Type)
             {
-                if (isDeleted != null)
-                    Parameters!.Insert(0, isDeleted);
-                
-                if (tenantId != null)
-                    Parameters!.Insert(0, tenantId);
+                case "Get":
+                    foreach (var c in Parent!.Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).Reverse())
+                    {
+                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable });
+                    }
+
+                    AddWhereOnlyParameters(bookEnd: false);
+                    break;
+
+                case "GetColl":
+                    AddWhereOnlyParameters(bookEnd: true);
+                    break;
             }
         }
     }
