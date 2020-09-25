@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Entities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,13 +136,17 @@ namespace Beef.CodeGen.Config.Database
         public List<ExecuteConfig>? ExecuteAfter => Execute!.Where(x => x.Location == "After").ToList();
 
         /// <summary>
+        /// Gets the settable columns.
+        /// </summary>
+        public List<Column> SettableColumns { get; } = new List<Column>();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "GetColl");
-            ReselectStatement = DefaultWhereNull(ReselectStatement, () => $"[{Parent!.Schema}].[sp{Parent.Name}Get]");
             Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch
             {
                 "Delete" => "DELETE",
@@ -215,7 +220,6 @@ namespace Beef.CodeGen.Config.Database
             }
         }
 
-
         /// <summary>
         /// Add columns as parameters depending on type.
         /// </summary>
@@ -224,7 +228,7 @@ namespace Beef.CodeGen.Config.Database
             switch (Type)
             {
                 case "Get":
-                    foreach (var c in Parent!.Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).Reverse())
+                    foreach (var c in Parent!.PrimaryKeyColumns.AsEnumerable().Reverse())
                     {
                         Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable });
                     }
@@ -234,6 +238,25 @@ namespace Beef.CodeGen.Config.Database
 
                 case "GetColl":
                     AddWhereOnlyParameters(bookEnd: true);
+                    break;
+
+                case "Create":
+                    // Ignore no-go columns (not a parameter or settable column).
+                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x == Parent.ColumnRowVersion || x == Parent.ColumnUpdatedBy || x == Parent.ColumnUpdatedDate || x.DbColumn!.IsComputed)).Reverse())
+                    {
+                        if (c != Parent.ColumnTenantId)
+                        {
+                            var audit = c == Parent.ColumnCreatedBy || c == Parent.ColumnCreatedDate;
+                            if (c.DbColumn!.IsPrimaryKey)
+                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsIdentity ? false : c.DbColumn.IsNullable, Output = c.DbColumn.IsIdentity });
+                            else
+                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn.IsNullable });
+                        }
+
+                        if (!c.DbColumn!.IsPrimaryKey && !c.DbColumn.IsIdentity)
+                            SettableColumns.Insert(0, c.DbColumn);
+                    }
+
                     break;
             }
         }

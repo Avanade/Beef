@@ -127,9 +127,9 @@ BEGIN
 ]]>
       <If Condition="System.MultiTenancy == true">
         <![CDATA[
-    -- Set the tenant identifier.
-    DECLARE @TenantId UNIQUEIDENTIFIER
-    SET @TenantId = dbo.fnGetTenantId(NULL)
+      -- Set the tenant identifier.
+      DECLARE @TenantId UNIQUEIDENTIFIER
+      SET @TenantId = dbo.fnGetTenantId(NULL)
 ]]>
       </If>
       <If Condition="Table.Permission != null or StoredProcedure.Permission != null">

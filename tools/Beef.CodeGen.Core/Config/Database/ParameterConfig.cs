@@ -99,6 +99,11 @@ namespace Beef.CodeGen.Config.Database
         public string? ParameterSql { get; private set; }
 
         /// <summary>
+        /// Inidicates whether the parameter is OUTPUT versus input.
+        /// </summary>
+        public bool Output { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -166,14 +171,11 @@ namespace Beef.CodeGen.Config.Database
                 _ => Operator
             };
 
-            ParameterSql = $"{ParameterName} AS {SqlType}{(CompareValue(Nullable, true) ? " NULL = NULL" : "")}";
+            ParameterSql = $"{ParameterName} AS {SqlType}{(CompareValue(Nullable, true) ? " NULL = NULL" : "")}{(Output ? " = NULL OUTPUT" : "")}";
             WhereSql = DefaultWhereNull(WhereSql, () =>
             {
                 if (CompareValue(Collection, true))
-                {
-                    //(@GenderIdsCount = 0 OR[p].[GenderId] IN(SELECT[Value] FROM @GenderIds))
                     return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT [Value] FROM {ParameterName}))";
-                }
                 else
                 {
                     var sql = $"[{Parent!.Parent!.Alias}].[{Column}] {SqlOperator} @{Name}";

@@ -301,12 +301,17 @@ namespace Beef.CodeGen.Config.Database
         public ColumnConfig ColumnUpdatedDate => Columns.Where(x => x.Name == ColumnNameUpdatedDate && ColumnNameUpdatedDate != "None").SingleOrDefault();
 
         /// <summary>
-        /// Gets the columns considered unique key.
+        /// Gets the columns considered part of the primary key.
         /// </summary>
-        public List<ColumnConfig> UniqueKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).ToList();
+        public List<ColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();
 
         /// <summary>
-        /// Gets the core columns (excluding special internal)
+        /// Gets the columns considered part of the primary key.
+        /// </summary>
+        public List<ColumnConfig> PrimaryKeyIdentityColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey && x.DbColumn!.IsIdentity).ToList();
+
+        /// <summary>
+        /// Gets the core columns (excludes special internal IsDeleted and TenantId columns).
         /// </summary>
         public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnNameIsDeleted || x.Name == ColumnNameTenantId)).ToList();
 

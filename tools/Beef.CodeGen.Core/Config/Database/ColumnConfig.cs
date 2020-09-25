@@ -37,6 +37,11 @@ namespace Beef.CodeGen.Config.Database
         public string ParameterName => "@" + Name;
 
         /// <summary>
+        /// Gets the SQL type.
+        /// </summary>
+        public string? SqlType { get; private set; }
+
+        /// <summary>
         /// Gets the parameter SQL definition.
         /// </summary>
         public string? ParameterSql { get; private set; }
@@ -52,12 +57,15 @@ namespace Beef.CodeGen.Config.Database
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
-            ParameterSql = CreateParameterSql();
+            UpdateSqlProperties();
         }
 
-        private string CreateParameterSql()
+        /// <summary>
+        /// Update the required SQL properties.
+        /// </summary>
+        private void UpdateSqlProperties()
         {
-            var sb = new StringBuilder($"{ParameterName} AS {DbColumn!.Type!.ToUpperInvariant()}");
+            var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
             if (Column.TypeIsString(DbColumn!.Type))
                 sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
 
@@ -72,7 +80,8 @@ namespace Beef.CodeGen.Config.Database
             if (DbColumn!.IsNullable)
                 sb.Append(" NULL");
 
-            return sb.ToString();
+            SqlType = sb.ToString();
+            ParameterSql = $"{ParameterName} AS {SqlType}";
         }
     }
 }
