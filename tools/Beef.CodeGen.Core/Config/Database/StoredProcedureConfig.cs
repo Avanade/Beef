@@ -115,6 +115,11 @@ namespace Beef.CodeGen.Config.Database
         public List<ExecuteConfig>? Execute { get; set; }
 
         /// <summary>
+        /// Gets the parameters to be used as the arguments parameters.
+        /// </summary>
+        public List<ParameterConfig> ArgumentParameters => Parameters!.Where(x => !x.WhereOnly).ToList();
+
+        /// <summary>
         /// Gets the "Before" <see cref="ExecuteConfig"/> collection.
         /// </summary>
         public List<ExecuteConfig>? ExecuteBefore => Execute!.Where(x => x.Location == "Before").ToList();
@@ -143,6 +148,19 @@ namespace Beef.CodeGen.Config.Database
             if (Parameters == null)
                 Parameters = new List<ParameterConfig>();
 
+            switch (Type)
+            {
+                case "Get":
+                    foreach (var c in Parent!.Columns.Where(x => x.DbColumn!.IsPrimaryKey || x.DbColumn!.IsIdentity).Reverse())
+                    {
+                        Parameters.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable });
+                    }
+
+                    AddWhereOnlyParameters(true);
+
+                    break;
+            }
+
             foreach (var parameter in Parameters)
             {
                 parameter.Prepare(Root!, this);
@@ -170,6 +188,35 @@ namespace Beef.CodeGen.Config.Database
             foreach (var execute in Execute)
             {
                 execute.Prepare(Root!, this);
+            }
+        }
+
+        /// <summary>
+        /// Insert the special TenantId and IsDeleted where only parameters (i.e. not used as arguments).
+        /// </summary>
+        private void AddWhereOnlyParameters(bool appendToEnd)
+        {
+            if (Parent!.DbTable!.IsAView)
+                return;
+
+            var tenantId = Parent.ColumnTenantId == null ? null : new ParameterConfig { Name = Parent.ColumnTenantId.Name, WhereOnly = true };
+            var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, WhereOnly = true, WhereSql = $"ISNULL({Parent.ColumnIsDeleted.QualifiedName}, 0) = 0" };
+
+            if (appendToEnd)
+            {
+                if (tenantId != null)
+                    Parameters!.Add(tenantId);
+
+                if (isDeleted != null)
+                    Parameters!.Add(isDeleted);
+            }
+            else
+            {
+                if (isDeleted != null)
+                    Parameters!.Insert(0, isDeleted);
+                
+                if (tenantId != null)
+                    Parameters!.Insert(0, tenantId);
             }
         }
     }

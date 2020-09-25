@@ -1,6 +1,6 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{Parent.Schema}}].[sp{{Parent.Name}}{{Name}}]
-{{#each Parent.UniqueKeyColumns}}
+{{#each ArgumentParameters}}
   {{ParameterSql}}{{#unless @last}},{{/unless}}
 {{/each}}
 AS
@@ -43,21 +43,14 @@ BEGIN
 
   {{/if}}
 {{/each}}
+  -- Execute the primary select query.
   SELECT
 {{#each Parent.CoreColumns}}
     {{QualifiedName}}{{#unless @last}},{{/unless}}
 {{/each}}
     FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]{{#ifval WithHints}} WITH ({{WithHints}}){{/ifval}}
-{{#each Parent.UniqueKeyColumns}}
-      {{#if @first}}WHERE{{else}}  AND{{/if}} {{WhereEquals}}
-  {{#unless Parent.IsAView}}
-    {{#ifval Parent.ColumnTenantId}}
-        AND {{Parent.ColumnTenantId.WhereEquals}}
-    {{/ifval}}
-    {{#ifval Parent.ColumnIsDeleted}}
-        AND {{Parent.ColumnIsDeleted.WhereEquals}}
-    {{/ifval}}
-  {{/unless}}
+{{#each Parameters}}
+      {{#if @first}}WHERE{{else}}  AND{{/if}} {{WhereSql}}
 {{/each}}
 {{#each ExecuteAfter}}
   {{#if @first}}

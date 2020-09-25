@@ -8,6 +8,7 @@ BEGIN
 
   SET NOCOUNT ON;
 
+  -- Execute the primary select query.
   SELECT
     [p].[PersonId],
     [p].[FirstName],

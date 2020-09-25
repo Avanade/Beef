@@ -28,6 +28,7 @@ BEGIN
   -- Execute additional (pre) statements.
   EXEC Demo.Before
 
+  -- Execute the primary select query.
   SELECT
     [t].[TableId],
     [t].[Name],
