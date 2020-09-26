@@ -74,7 +74,7 @@ BEGIN
 
     -- Update the record.
     UPDATE [{{Parent.Alias}}] SET
-{{#each SettableColumns}}
+{{#each SettableColumnsUpdate}}
       {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
 {{/each}}
       FROM {{Parent.QualifiedName}} [{{Parent.Alias}}]

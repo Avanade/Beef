@@ -50,13 +50,13 @@ BEGIN
     DECLARE @InsertedIdentity TABLE({{#each Parent.PrimaryKeyIdentityColumns}}[{{Name}}] {{SqlType}}{{#unless @last}}, {{/unless}}{{/each}})
 
     INSERT INTO {{Parent.QualifiedName}} (
-{{#each SettableColumns}}
+{{#each SettableColumnsInsert}}
       [{{Name}}]{{#unless @last}},{{/unless}}
 {{/each}}
     )
     OUTPUT {{#each Parent.PrimaryKeyIdentityColumns}}inserted.{{Name}}{{#unless @last}}, {{/unless}}{{/each}} INTO @InsertedIdentity
     VALUES (
-{{#each SettableColumns}}
+{{#each SettableColumnsInsert}}
       {{ParameterName}}{{#unless @last}},{{/unless}}
 {{/each}}    )
 
