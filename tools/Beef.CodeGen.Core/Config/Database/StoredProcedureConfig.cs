@@ -140,6 +140,26 @@ namespace Beef.CodeGen.Config.Database
         public List<SettableColumnConfig> SettableColumns { get; } = new List<SettableColumnConfig>();
 
         /// <summary>
+        /// Gets the settable columns for an insert.
+        /// </summary>
+        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => x.Name != Parent!.ColumnNameUpdatedBy && x.Name != Parent.ColumnNameUpdatedDate).ToList();
+
+        /// <summary>
+        /// Gets the settable columns for an update.
+        /// </summary>
+        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => x.Name != Parent!.ColumnNameTenantId && x.Name != Parent!.ColumnNameCreatedBy && x.Name != Parent.ColumnNameCreatedDate).ToList();
+
+        /// <summary>
+        /// Gets the settable columns for an upsert-insert.
+        /// </summary>
+        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => x.Name != Parent!.ColumnNameUpdatedBy && x.Name != Parent.ColumnNameUpdatedDate).ToList();
+
+        /// <summary>
+        /// Gets the settable columns for an upsert-update.
+        /// </summary>
+        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnNameTenantId && x.Name != Parent!.ColumnNameCreatedBy && x.Name != Parent.ColumnNameCreatedDate).ToList();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -263,7 +283,7 @@ namespace Beef.CodeGen.Config.Database
                         }
 
                         if (!c.DbColumn!.IsPrimaryKey && !c.DbColumn.IsIdentity)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name });
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 
                     break;
@@ -279,7 +299,28 @@ namespace Beef.CodeGen.Config.Database
                         }
 
                         if (!c.DbColumn!.IsPrimaryKey && !c.DbColumn.IsIdentity && c != Parent.ColumnRowVersion)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name });
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                    }
+
+                    AddWhereOnlyParameters(bookEnd: false);
+                    break;
+
+                case "Upsert":
+                    // Ignore no-go columns (not a parameter or settable column).
+                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x.DbColumn!.IsComputed)).Reverse())
+                    {
+                        if (c == Parent.ColumnRowVersion)
+                        {
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = true, IsWhere = false });
+                        }
+                        else if (c != Parent.ColumnTenantId)
+                        {
+                            var audit = c == Parent.ColumnCreatedBy || c == Parent.ColumnCreatedDate || c == Parent.ColumnUpdatedBy || c == Parent.ColumnUpdatedDate;
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
+                        }
+
+                        if (c != Parent.ColumnRowVersion)
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);

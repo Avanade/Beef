@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Entities;
+
 namespace Beef.CodeGen.Config.Database
 {
     /// <summary>
@@ -21,6 +23,11 @@ namespace Beef.CodeGen.Config.Database
         /// Gets the parameter name.
         /// </summary>
         public string ParameterName => $"@{Name}";
+
+        /// <summary>
+        /// Gets or sets the database column configuration.
+        /// </summary>
+        public Column? DbColumn { get; set; }
 
         /// <summary>
         /// <inheritdoc/>

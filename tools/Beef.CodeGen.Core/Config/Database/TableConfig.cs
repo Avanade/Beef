@@ -380,7 +380,7 @@ namespace Beef.CodeGen.Config.Database
             if (CompareValue(Merge, true) && !StoredProcedures.Any(x => x.Name == "Merge"))
                 StoredProcedures.Add(new StoredProcedureConfig { Name = "Merge", Type = "Merge" });
 
-            if (CompareValue(Update, true) && !StoredProcedures.Any(x => x.Name == "Upsert"))
+            if (CompareValue(Upsert, true) && !StoredProcedures.Any(x => x.Name == "Upsert"))
                 StoredProcedures.Add(new StoredProcedureConfig { Name = "Upsert", Type = "Upsert" });
 
             if (CompareValue(Update, true) && !StoredProcedures.Any(x => x.Name == "Update"))
