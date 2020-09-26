@@ -8,7 +8,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "The **OrderBy** is used to define the `GetAll` query order", Description = "", Markdown = "")]
+    [ClassSchema("GetAllOrderBy", Title = "The **OrderBy** is used to define the `GetAll` query order", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class GetAllOrderByConfig : ConfigBase<CodeGenConfig, TableConfig>
     {
@@ -30,7 +30,6 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             Order = DefaultWhereNull(Order, () => "Ascending");

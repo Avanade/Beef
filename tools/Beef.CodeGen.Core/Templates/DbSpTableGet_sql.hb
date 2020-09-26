@@ -25,8 +25,8 @@ BEGIN
 {{#ifval Parent.ColumnOrgUnitId}}
   -- Check user has permission to org unit.
   DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
-  SET @CurrOrgUnitId = (SELECT TOP 1 [x].[{{Parent.ColumnOrgUnitId.Name}}] FROM {{Parent.QualifiedName}} AS x 
-    WHERE {{#each Parent.PrimaryKeyColumns}}x.[{{Name}}] = @{{Name}}{{/each}}{{#ifval Parent.ColumnIsDeleted}} AND ISNULL(x.[{{Parent.ColumnIsDeleted.Name}}], 0) = 0{{/ifval}}{{#ifval Parent.ColumnTenantId}} AND x.[{{Parent.ColumnTenantId.Name}}] = @{{Parent.ColumnTenantId.Name}}{{/ifval}})
+  SET @CurrOrgUnitId = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnOrgUnitId.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
+    {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
 
   IF (@CurrOrgUnitId IS NOT NULL AND (SELECT COUNT(*) FROM {{Root.OrgUnitJoinObject}} AS orgunits WHERE orgunits.{{Parent.ColumnOrgUnitId.Name}} = @CurrOrgUnitId) = 0)
   BEGIN

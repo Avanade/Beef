@@ -45,7 +45,7 @@
     <StoredProcedure Name="GetDetail" Type="Get">
       <Execute Statement="EXEC [Demo].[spWorkHistoryGetByPersonId] @PersonId" />
     </StoredProcedure>
-    <StoredProcedure Name="UpdateDetail" Type="Update" ReselectStatement="[Demo].[spPersonGetDetail] @PersonId">
+    <StoredProcedure Name="UpdateDetail" Type="Update" ReselectStatement="EXEC [Demo].[spPersonGetDetail] @PersonId">
       <Parameter Name="WorkHistoryList" SqlType="[Demo].[udtWorkHistoryList] READONLY" />
       <Execute Statement="EXEC [Demo].[spWorkHistoryMerge] @PersonId, @WorkHistoryList" Location="After" />
     </StoredProcedure>

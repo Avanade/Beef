@@ -2,8 +2,6 @@
 
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -42,7 +40,6 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))

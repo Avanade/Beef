@@ -33,7 +33,6 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             Location = DefaultWhereNull(Location, () => "After");

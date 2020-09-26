@@ -27,16 +27,41 @@ BEGIN
     EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
 
 {{/ifval}}
-{{#ifval Parent.ColumnCreatedDate Parent.ColumnCreatedBy}}
+{{#ifval Parent.ColumnUpdatedDate Parent.ColumnUpdatedBy}}
     -- Set audit details.
-  {{#ifval Parent.ColumnCreatedDate}}
-    EXEC @{{Parent.ColumnCreatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnCreatedDate.Name}}
+  {{#ifval Parent.ColumnUpdatedDate}}
+    EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
   {{/ifval}}
-  {{#ifval Parent.ColumnCreatedBy}}
-    EXEC @{{Parent.ColumnCreatedBy.Name}} = fnGetUsername @{{Parent.ColumnCreatedBy.Name}}
+  {{#ifval Parent.ColumnUpdatedBy}}
+    EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
   {{/ifval}}
 {{/ifval}}
 
+    -- Check exists.
+    DECLARE @PrevRowVersion BINARY(8)
+    SET @PrevRowVersion = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnRowVersion.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
+    IF @PrevRowVersion IS NULL
+    BEGIN
+      EXEC spThrowNotFoundException
+    END
+
+{{#ifval Parent.ColumnOrgUnitId}}
+    -- Check user has permission to org unit.
+    DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
+    SET @CurrOrgUnitId = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnOrgUnitId.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
+      {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
+
+    IF (@CurrOrgUnitId IS NOT NULL AND (SELECT COUNT(*) FROM {{Root.OrgUnitJoinObject}} AS orgunits WHERE orgunits.{{Parent.ColumnOrgUnitId.Name}} = @CurrOrgUnitId) = 0)
+    BEGIN
+      EXEC [dbo].[spThrowAuthorizationException]
+    END
+
+{{/ifval}}
+    -- Check concurrency (where provided).
+    IF @RowVersion IS NULL OR @PrevRowVersion <> @RowVersion
+    BEGIN
+      EXEC spThrowConcurrencyException
+    END
 {{#each ExecuteBefore}}
   {{#if @first}}
     -- Execute additional (pre) statements.
@@ -46,26 +71,16 @@ BEGIN
 
   {{/if}}
 {{/each}}
-    -- Create the record.
-    DECLARE @InsertedIdentity TABLE({{#each Parent.PrimaryKeyIdentityColumns}}[{{Name}}] {{SqlType}}{{#unless @last}}, {{/unless}}{{/each}})
 
-    INSERT INTO {{Parent.QualifiedName}} (
+    -- Update the record.
+    UPDATE [{{Parent.Alias}}] SET
 {{#each SettableColumns}}
-      [{{Name}}]{{#unless @last}},{{/unless}}
+      {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
 {{/each}}
-    )
-    OUTPUT {{#each Parent.PrimaryKeyIdentityColumns}}inserted.{{Name}}{{#unless @last}}, {{/unless}}{{/each}} INTO @InsertedIdentity
-    VALUES (
-{{#each SettableColumns}}
-      {{ParameterName}}{{#unless @last}},{{/unless}}
-{{/each}}    )
-
-{{#ifne Parent.PrimaryKeyIdentityColumns.Count 0}}
-    -- Get the inserted identity.
-  {{#each Parent.PrimaryKeyIdentityColumns}}
-    SELECT @{{Name}} = [{{Name}}] FROM @InsertedIdentity
-  {{/each}}
-{{/ifne}}
+      FROM {{Parent.QualifiedName}} [{{Parent.Alias}}]
+{{#each Where}}
+      {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
+{{/each}}
 {{#each ExecuteAfter}}
   {{#if @first}}
 

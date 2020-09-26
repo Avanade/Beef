@@ -17,8 +17,8 @@ BEGIN
 
   -- Check user has permission to org unit.
   DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
-  SET @CurrOrgUnitId = (SELECT TOP 1 [x].[OrgUnitId] FROM [Test].[Table] AS x 
-    WHERE x.[TableId] = @TableId AND ISNULL(x.[IsDeleted], 0) = 0 AND x.[TenantId] = @TenantId)
+  SET @CurrOrgUnitId = (SELECT TOP 1 [t].[OrgUnitId] FROM [Test].[Table] AS [t]
+    WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ISNULL([t].[IsDeleted], 0) = 0)
 
   IF (@CurrOrgUnitId IS NOT NULL AND (SELECT COUNT(*) FROM [Sec].[fnGetUserOrgUnits]() AS orgunits WHERE orgunits.OrgUnitId = @CurrOrgUnitId) = 0)
   BEGIN

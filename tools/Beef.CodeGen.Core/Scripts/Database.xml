@@ -4,9 +4,10 @@
   <Generate GenType="Beef.CodeGen.Generators.DatabaseGetCodeGenerator" Template="DbSpTableGet_sql.hb" FileName="sp{{Parent.Name}}{{Name}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{Parent.Schema}}/Stored Procedures" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseGetCollCodeGenerator" Template="DbSpTableGetColl_sql.hb" FileName="sp{{Parent.Name}}{{Name}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{Parent.Schema}}/Stored Procedures" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCreateCodeGenerator" Template="DbSpTableCreate_sql.hb" FileName="sp{{Parent.Name}}{{Name}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{Parent.Schema}}/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseUpdateCodeGenerator" Template="DbSpTableUpdate_sql.hb" FileName="sp{{Parent.Name}}{{Name}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{Parent.Schema}}/Stored Procedures" />
   <!--<Generate Template="DbSpTableGet_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" /> -->
   <!--<Generate Template="DbSpTableCreate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />-->
-  <Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
+  <!--<Generate Template="DbSpTableUpdate_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />-->
   <Generate Template="DbSpTableUpsert_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableDelete_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />
   <Generate Template="DbSpTableMerge_sql.xml" OutDir="{{Company}}.{{AppDir}}.Database/Schema" />

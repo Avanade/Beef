@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -138,12 +137,11 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the settable columns.
         /// </summary>
-        public List<Column> SettableColumns { get; } = new List<Column>();
+        public List<SettableColumnConfig> SettableColumns { get; } = new List<SettableColumnConfig>();
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             Type = DefaultWhereNull(Type, () => "GetColl");
@@ -167,12 +165,18 @@ namespace Beef.CodeGen.Config.Database
             if (Execute == null)
                 Execute = new List<ExecuteConfig>();
 
+            foreach (var parameter in Parameters)
+            {
+                parameter.IsWhere = Parent!.Columns.Any(x => x.Name == (parameter.Column ?? parameter.Name));
+            }
+
             AddColumnsAsParameters();
 
             foreach (var parameter in Parameters.AsQueryable().Reverse())
             {
                 parameter.Prepare(Root!, this);
-                Where.Insert(0, new WhereConfig { Statement = parameter.WhereSql });
+                if (parameter.IsWhere)
+                    Where.Insert(0, new WhereConfig { Statement = parameter.WhereSql });
             }
 
             foreach (var where in Where)
@@ -189,6 +193,11 @@ namespace Beef.CodeGen.Config.Database
             {
                 execute.Prepare(Root!, this);
             }
+
+            foreach (var settable in SettableColumns)
+            {
+                settable.Prepare(Root!, this);
+            }
         }
 
         /// <summary>
@@ -199,8 +208,8 @@ namespace Beef.CodeGen.Config.Database
             if (Parent!.DbTable!.IsAView)
                 return;
 
-            var tenantId = Parent.ColumnTenantId == null ? null : new ParameterConfig { Name = Parent.ColumnTenantId.Name, WhereOnly = true };
-            var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, WhereOnly = true, WhereSql = $"ISNULL({Parent.ColumnIsDeleted.QualifiedName}, 0) = 0" };
+            var tenantId = Parent.ColumnTenantId == null ? null : new ParameterConfig { Name = Parent.ColumnTenantId.Name, IsWhere = true, WhereOnly = true };
+            var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, IsWhere = true, WhereOnly = true, WhereSql = $"ISNULL({Parent.ColumnIsDeleted.QualifiedName}, 0) = 0" };
 
             if (bookEnd)
             {
@@ -230,7 +239,7 @@ namespace Beef.CodeGen.Config.Database
                 case "Get":
                     foreach (var c in Parent!.PrimaryKeyColumns.AsEnumerable().Reverse())
                     {
-                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable });
+                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable, IsWhere = true });
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
@@ -254,9 +263,26 @@ namespace Beef.CodeGen.Config.Database
                         }
 
                         if (!c.DbColumn!.IsPrimaryKey && !c.DbColumn.IsIdentity)
-                            SettableColumns.Insert(0, c.DbColumn);
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name });
                     }
 
+                    break;
+
+                case "Update":
+                    // Ignore no-go columns (not a parameter or settable column).
+                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x == Parent.ColumnTenantId || x == Parent.ColumnCreatedBy || x == Parent.ColumnCreatedDate || x.DbColumn!.IsComputed)).Reverse())
+                    {
+                        if (c != Parent.ColumnTenantId)
+                        {
+                            var audit = c == Parent.ColumnUpdatedBy || c == Parent.ColumnUpdatedDate;
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
+                        }
+
+                        if (!c.DbColumn!.IsPrimaryKey && !c.DbColumn.IsIdentity && c != Parent.ColumnRowVersion)
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name });
+                    }
+
+                    AddWhereOnlyParameters(bookEnd: false);
                     break;
             }
         }

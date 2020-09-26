@@ -39,6 +39,7 @@
     <None Remove="Templates\DbSpTableCreate_sql.hb" />
     <None Remove="Templates\DbSpTableGetColl_sql.hb" />
     <None Remove="Templates\DbSpTableGet_sql.hb" />
+    <None Remove="Templates\DbSpTableUpdate_sql.hb" />
     <None Remove="Templates\EntityDataSvc_cs.hbs" />
     <None Remove="Templates\EntityData_cs.hbs" />
     <None Remove="Templates\EntityGrpcAgent_cs.hbs" />
@@ -83,6 +84,7 @@
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
     <EmbeddedResource Include="Templates\DbEfModelBuilderExtensions_cs.xml" />
+    <EmbeddedResource Include="Templates\DbSpTableUpdate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableGetColl_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableGet_sql.hb" />

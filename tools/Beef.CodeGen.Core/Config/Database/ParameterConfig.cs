@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -74,6 +72,11 @@ namespace Beef.CodeGen.Config.Database
         #endregion
 
         /// <summary>
+        /// Indicates whether the parameter is to be used for the where.
+        /// </summary>
+        public bool IsWhere { get; set; }
+
+        /// <summary>
         /// Indicates whether the parameter is to be used for the where clause only.
         /// </summary>
         public bool WhereOnly { get; set; }
@@ -106,7 +109,6 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
