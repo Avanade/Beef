@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeGeneration RefDatabaseSchema="Ref" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- Special test to generate all variations. -->
-  <Table Name="Table" Schema="Test" Create="true" Update="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
+  <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
     <StoredProcedure Name="GetByArgs" Type="GetAll">
       <Parameter Name="Name" IsNullable="true" Operator="LIKE" />
       <Parameter Name="MinCount" Operator="GE" Column="Count" />
