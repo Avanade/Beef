@@ -142,22 +142,22 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the settable columns for an insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnNameRowVersion && x.Name != Parent.ColumnNameUpdatedBy && x.Name != Parent.ColumnNameUpdatedDate).ToList();
+        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnRowVersion?.Name && x.Name != Parent.ColumnUpdatedBy?.Name && x.Name != Parent.ColumnUpdatedDate?.Name).ToList();
 
         /// <summary>
         /// Gets the settable columns for an update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnNameTenantId && x.Name != Parent!.ColumnNameCreatedBy && x.Name != Parent.ColumnNameCreatedDate).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnTenantId?.Name && x.Name != Parent!.ColumnCreatedBy?.Name && x.Name != Parent.ColumnCreatedDate?.Name).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => x.Name != Parent!.ColumnNameUpdatedBy && x.Name != Parent.ColumnNameUpdatedDate).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => x.Name != Parent!.ColumnUpdatedBy?.Name && x.Name != Parent.ColumnUpdatedDate?.Name).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnNameTenantId && x.Name != Parent!.ColumnNameCreatedBy && x.Name != Parent.ColumnNameCreatedDate).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnTenantId?.Name && x.Name != Parent!.ColumnCreatedBy?.Name && x.Name != Parent.ColumnCreatedDate?.Name).ToList();
 
         /// <summary>
         /// <inheritdoc/>
@@ -320,6 +320,22 @@ namespace Beef.CodeGen.Config.Database
                         }
 
                         if (c != Parent.ColumnRowVersion)
+                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                    }
+
+                    AddWhereOnlyParameters(bookEnd: false);
+                    break;
+
+                case "Delete":
+                    foreach (var c in Parent!.Columns.Where(x => x.DbColumn!.IsPrimaryKey || x == Parent.ColumnDeletedBy || x == Parent.ColumnDeletedDate).Reverse())
+                    {
+                        var audit = c == Parent.ColumnDeletedBy || c == Parent.ColumnDeletedDate;
+                        if (audit && Parent!.ColumnIsDeleted == null)
+                            continue;
+
+                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
+
+                        if (audit)
                             SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 

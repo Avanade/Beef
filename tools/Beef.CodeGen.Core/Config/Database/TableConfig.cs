@@ -237,6 +237,22 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
+        /// <summary>
+        /// Gets or sets the column name for the `DeletedBy` capability.
+        /// </summary>
+        [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
+            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+        public string? ColumnNameDeletedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column name for the `DeletedDate` capability.
+        /// </summary>
+        [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
+            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+        public string? ColumnNameDeletedDate { get; set; }
+
         #endregion
 
         /// <summary>
@@ -301,6 +317,16 @@ namespace Beef.CodeGen.Config.Database
         public ColumnConfig ColumnUpdatedDate => Columns.Where(x => x.Name == ColumnNameUpdatedDate && ColumnNameUpdatedDate != "None").SingleOrDefault();
 
         /// <summary>
+        /// Gets the related DeletedBy column.
+        /// </summary>
+        public ColumnConfig ColumnDeletedBy => Columns.Where(x => x.Name == ColumnNameDeletedBy && ColumnNameDeletedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+
+        /// <summary>
+        /// Gets the related DeletedDate column.
+        /// </summary>
+        public ColumnConfig ColumnDeletedDate => Columns.Where(x => x.Name == ColumnNameDeletedDate && ColumnNameDeletedDate != "None").SingleOrDefault();
+
+        /// <summary>
         /// Gets the columns considered part of the primary key.
         /// </summary>
         public List<ColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();
@@ -313,7 +339,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the core columns (excludes special internal IsDeleted and TenantId columns).
         /// </summary>
-        public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnNameIsDeleted || x.Name == ColumnNameTenantId)).ToList();
+        public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnIsDeleted?.Name || x.Name == ColumnTenantId?.Name)).ToList();
 
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
@@ -346,10 +372,12 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => Root!.ColumnNameCreatedDate);
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => Root!.ColumnNameUpdatedBy);
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => Root!.ColumnNameUpdatedDate);
+            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Root!.ColumnNameDeletedBy);
+            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Root!.ColumnNameDeletedDate);
 
             foreach (var c in DbTable.Columns)
             {
-                if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
+                if ((c.Name == ColumnTenantId?.Name || c.Name == ColumnOrgUnitId?.Name || c.Name == ColumnIsDeleted?.Name) || ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!))))
                 {
                     var cc = new ColumnConfig { Name = c.Name, DbColumn = c };
                     cc.Prepare(Root!, this);

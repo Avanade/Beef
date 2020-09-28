@@ -98,6 +98,22 @@ namespace Beef.CodeGen.Config.Database
         public string? ColumnNameUpdatedDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the column name for the `DeletedBy` capability.
+        /// </summary>
+        [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
+            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+        public string? ColumnNameDeletedBy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column name for the `DeletedDate` capability.
+        /// </summary>
+        [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
+            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+        public string? ColumnNameDeletedDate { get; set; }
+
+        /// <summary>
         /// Gets or sets the table or function that is to be used to join against for security-based `OrgUnitId` verification.
         /// </summary>
         [JsonProperty("orgUnitJoinObject", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -216,6 +232,8 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameCreatedDate = DefaultWhereNull(ColumnNameCreatedDate, () => "CreatedDate");
             ColumnNameUpdatedBy = DefaultWhereNull(ColumnNameUpdatedBy, () => "UpdatedBy");
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
+            ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => "UpdatedBy");
+            ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => "UpdatedDate");
             OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]()");
             UserPermissionObject = DefaultWhereNull(UserPermissionObject, () => "[Sec].[spCheckUserHasPermission]");
 

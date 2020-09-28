@@ -1,9 +1,8 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{Parent.Schema}}].[sp{{Parent.Name}}{{Name}}]
 {{#each ArgumentParameters}}
-  {{ParameterSql}},
+  {{ParameterSql}}{{#unless @last}},{{/unless}}
 {{/each}}
-  @ReselectRecord AS BIT = 0
 AS
 BEGIN
   /*
@@ -24,27 +23,9 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
     -- Check user has permission.
-    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
+    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'
 
 {{/ifval}}
-{{#ifval Parent.ColumnUpdatedDate Parent.ColumnUpdatedBy}}
-    -- Set audit details.
-  {{#ifval Parent.ColumnUpdatedDate}}
-    EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
-  {{/ifval}}
-  {{#ifval Parent.ColumnUpdatedBy}}
-    EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
-  {{/ifval}}
-{{/ifval}}
-
-    -- Check exists.
-    DECLARE @PrevRowVersion BINARY(8)
-    SET @PrevRowVersion = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnRowVersion.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
-    IF @PrevRowVersion IS NULL
-    BEGIN
-      EXEC spThrowNotFoundException
-    END
-
 {{#ifval Parent.ColumnOrgUnitId}}
     -- Check user has permission to org unit.
     DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
@@ -57,30 +38,41 @@ BEGIN
     END
 
 {{/ifval}}
-    -- Check concurrency (where provided).
-    IF @RowVersion IS NULL OR @PrevRowVersion <> @RowVersion
-    BEGIN
-      EXEC spThrowConcurrencyException
-    END
 {{#each ExecuteBefore}}
   {{#if @first}}
     -- Execute additional (pre) statements.
   {{/if}}
     {{{Statement}}}
-  {{#if @last}}
 
-  {{/if}}
 {{/each}}
+{{#ifval Parent.ColumnIsDeleted}}
+  {{#ifval Parent.ColumnDeletedDate Parent.ColumnDeletedBy}}
+    -- Set audit details.
+    {{#ifval Parent.ColumnDeletedDate}}
+    EXEC @{{Parent.ColumnDeletedDate.Name}} = fnGetTimestamp @{{Parent.ColumnDeletedDate.Name}}
+    {{/ifval}}
+    {{#ifval Parent.ColumnDeletedBy}}
+    EXEC @{{Parent.ColumnDeletedBy.Name}} = fnGetUsername @{{Parent.ColumnDeletedBy.Name}}
+    {{/ifval}}
 
-    -- Update the record.
+  {{/ifval}}
+    -- Update the IsDeleted bit (logically delete).
     UPDATE [{{Parent.Alias}}] SET
-{{#each SettableColumnsUpdate}}
+      {{Parent.ColumnIsDeleted.QualifiedName}} = 1{{#ifne SettableColumnsUpdate.Count 0}},{{/ifne}}
+  {{#each SettableColumnsUpdate}}
       {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
-{{/each}}
+  {{/each}}
       FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
-{{#each Where}}
+  {{#each Where}}
       {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
-{{/each}}
+  {{/each}}
+{{else}}
+    -- Delete the record.
+    DELETE [{{Parent.Alias}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
+  {{#each Where}}
+      {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
+  {{/each}}
+{{/ifval}}
 {{#each ExecuteAfter}}
   {{#if @first}}
 
@@ -99,14 +91,4 @@ BEGIN
 
     THROW;
   END CATCH
-  
-  -- Reselect record.
-  IF @ReselectRecord = 1
-  BEGIN
-  {{#ifval ReselectStatement}}
-    {{{ReselectStatement}}}
-  {{else}}
-    EXEC [{{Parent.Schema}}].[sp{{Parent.Name}}Get] {{#each Parent.PrimaryKeyColumns}}@{{Name}}{{#unless @last}}, {{/unless}}{{/each}}
-  {{/ifval}}
-  END
 END

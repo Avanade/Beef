@@ -54,7 +54,7 @@ BEGIN
       [p].[UpdatedDate] = @UpdatedDate,
       [p].[UniqueCode] = @UniqueCode,
       [p].[EyeColorCode] = @EyeColorCode
-      FROM [Demo].[Person] [p]
+      FROM [Demo].[Person] AS [p]
       WHERE [p].[PersonId] = @PersonId
 
     -- Commit the transaction.

@@ -1,18 +1,20 @@
 CREATE PROCEDURE [Demo].[spPersonDelete]
-   @PersonId AS UNIQUEIDENTIFIER
+  @PersonId AS UNIQUEIDENTIFIER
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost. 
    */
- 
+
+  SET NOCOUNT ON;
+
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
     -- Delete the record.
-    DELETE FROM [Demo].[Person]
-      WHERE [PersonId] = @PersonId
+    DELETE [p] FROM [Demo].[Person] AS [p]
+      WHERE [p].[PersonId] = @PersonId
 
     -- Commit the transaction.
     COMMIT TRANSACTION

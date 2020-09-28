@@ -65,7 +65,7 @@ BEGIN
       [t].[OrgUnitId] = @OrgUnitId,
       [t].[UpdatedBy] = @UpdatedBy,
       [t].[UpdatedDate] = @UpdatedDate
-      FROM [Test].[Table] [t]
+      FROM [Test].[Table] AS [t]
       WHERE [t].[TableId] = @TableId
         AND [t].[TenantId] = @TenantId
         AND ISNULL([t].[IsDeleted], 0) = 0

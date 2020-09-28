@@ -56,7 +56,6 @@ BEGIN
         [{{Name}}]{{#unless @last}},{{/unless}}
 {{/each}}
       )
-      OUTPUT {{#each Parent.PrimaryKeyIdentityColumns}}inserted.{{Name}}{{#unless @last}}, {{/unless}}{{/each}} INTO @InsertedIdentity
       VALUES (
 {{#each SettableColumnsUpsertInsert}}
         {{ParameterName}}{{#unless @last}},{{/unless}}
@@ -114,7 +113,7 @@ BEGIN
 {{#each SettableColumnsUpsertUpdate}}
         {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
 {{/each}}
-        FROM {{Parent.QualifiedName}} [{{Parent.Alias}}]
+        FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
 {{#each Where}}
         {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
 {{/each}}

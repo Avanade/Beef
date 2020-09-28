@@ -50,7 +50,7 @@ BEGIN
       [p].[City] = @City,
       [p].[UpdatedBy] = @UpdatedBy,
       [p].[UpdatedDate] = @UpdatedDate
-      FROM [Demo].[Person2] [p]
+      FROM [Demo].[Person2] AS [p]
       WHERE [p].[PersonId] = @PersonId
         AND ISNULL([p].[IsDeleted], 0) = 0
 

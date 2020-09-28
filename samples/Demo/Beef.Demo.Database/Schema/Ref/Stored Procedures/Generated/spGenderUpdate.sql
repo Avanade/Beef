@@ -50,7 +50,7 @@ BEGIN
       [g].[UpdatedDate] = @UpdatedDate,
       [g].[AlternateName] = @AlternateName,
       [g].[TripCode] = @TripCode
-      FROM [Ref].[Gender] [g]
+      FROM [Ref].[Gender] AS [g]
       WHERE [g].[GenderId] = @GenderId
 
     -- Commit the transaction.

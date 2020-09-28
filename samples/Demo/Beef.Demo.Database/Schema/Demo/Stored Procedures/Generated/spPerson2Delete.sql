@@ -1,13 +1,15 @@
 CREATE PROCEDURE [Demo].[spPerson2Delete]
-   @PersonId AS UNIQUEIDENTIFIER
-  ,@UpdatedBy AS NVARCHAR(250) NULL
-  ,@UpdatedDate AS DATETIME2 NULL
+  @PersonId AS UNIQUEIDENTIFIER,
+  @UpdatedBy AS NVARCHAR(250) NULL = NULL,
+  @UpdatedDate AS DATETIME2 NULL = NULL
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost. 
    */
- 
+
+  SET NOCOUNT ON;
+
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
@@ -15,14 +17,15 @@ BEGIN
     -- Set audit details.
     EXEC @UpdatedDate = fnGetTimestamp @UpdatedDate
     EXEC @UpdatedBy = fnGetUsername @UpdatedBy
-  
+
     -- Update the IsDeleted bit (logically delete).
-    UPDATE [Demo].[Person2] SET
-        [IsDeleted] = 1
-       ,[UpdatedDate] = @UpdatedDate
-       ,[UpdatedBy] = @UpdatedBy
-      WHERE ISNULL([IsDeleted], 0) = 0
-        AND [PersonId] = @PersonId
+    UPDATE [p] SET
+      [p].[IsDeleted] = 1,
+      [p].[UpdatedBy] = @UpdatedBy,
+      [p].[UpdatedDate] = @UpdatedDate
+      FROM [Demo].[Person2] AS [p]
+      WHERE [p].[PersonId] = @PersonId
+        AND ISNULL([p].[IsDeleted], 0) = 0
 
     -- Commit the transaction.
     COMMIT TRANSACTION
