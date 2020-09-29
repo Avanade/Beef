@@ -372,6 +372,11 @@ namespace Beef.CodeGen.Config.Database
         public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnIsDeleted?.Name || x.Name == ColumnTenantId?.Name)).ToList();
 
         /// <summary>
+        /// Gets the UDT columns (excludes special columns).
+        /// </summary>
+        public List<ColumnConfig> UdtColumns => Columns.Where(x => !x.IsAudit && !x.IsIsDeletedColumn && !x.IsTenantIdColumn && (UdtExcludeColumns == null || !UdtExcludeColumns.Contains(x.Name!))).ToList();
+
+        /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
         public Table? DbTable { get; private set; }

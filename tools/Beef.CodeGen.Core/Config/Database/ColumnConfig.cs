@@ -45,6 +45,11 @@ namespace Beef.CodeGen.Config.Database
         public string? ParameterSql { get; private set; }
 
         /// <summary>
+        /// Gets the UDT SQL definition.
+        /// </summary>
+        public string? UdtSql { get; private set; }
+
+        /// <summary>
         /// Gets the where equality clause.
         /// </summary>
         public string WhereEquals => Name == Parent?.ColumnIsDeleted?.Name ? $"ISNULL({QualifiedName}, 0) = 0" : $"{QualifiedName} = {ParameterName}";
@@ -117,7 +122,7 @@ namespace Beef.CodeGen.Config.Database
         public bool IsUpdateColumn => (!DbColumn!.IsComputed && !IsAudit) || IsUpdated;
 
         /// <summary>
-        /// Indicates where the column should be considered for a 'Update' operation.
+        /// Indicates where the column should be considered for a 'Delete' operation.
         /// </summary>
         public bool IsDeleteColumn => (!DbColumn!.IsComputed && !IsAudit) || IsDeleted;
 
@@ -171,6 +176,7 @@ namespace Beef.CodeGen.Config.Database
 
             SqlType = sb.ToString();
             ParameterSql = $"{ParameterName} AS {SqlType}";
+            UdtSql = $"[{Name}] {SqlType}";
         }
     }
 }
