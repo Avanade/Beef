@@ -50,6 +50,98 @@ namespace Beef.CodeGen.Config.Database
         public string WhereEquals => Name == Parent?.ColumnIsDeleted?.Name ? $"ISNULL({QualifiedName}, 0) = 0" : $"{QualifiedName} = {ParameterName}";
 
         /// <summary>
+        /// Gets the SQL for defining initial value for comparisons.
+        /// </summary>
+        public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
+            ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
+            : (Column.TypeIsInteger(DbColumn!.Type) || Column.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+
+        /// <summary>
+        /// Indicates whether the column is considered an audit column.
+        /// </summary>
+        public bool IsAudit => IsCreated || IsUpdated || IsDeleted;
+
+        /// <summary>
+        /// Indicates whether the column is "CreatedBy" or "CreatedDate".
+        /// </summary>
+        public bool IsCreated => IsCreatedBy || IsCreatedDate;
+
+        /// <summary>
+        /// Indicates whether the column is "CreatedBy".
+        /// </summary>
+        public bool IsCreatedBy => Name == Parent!.ColumnCreatedBy?.Name;
+
+        /// <summary>
+        /// Indicates whether the column is "CreatedDate".
+        /// </summary>
+        public bool IsCreatedDate => Name == Parent!.ColumnCreatedDate?.Name;
+
+        /// <summary>
+        /// Indicates whether the column is "UpdatedBy" or "UpdatedDate".
+        /// </summary>
+        public bool IsUpdated => IsUpdatedBy || IsUpdatedDate;
+
+        /// <summary>
+        /// Indicates whether the column is "UpdatedBy".
+        /// </summary>
+        public bool IsUpdatedBy => Name == Parent!.ColumnUpdatedBy?.Name;
+
+        /// <summary>
+        /// Indicates whether the column is "UpdatedDate".
+        /// </summary>
+        public bool IsUpdatedDate => Name == Parent!.ColumnUpdatedDate?.Name;
+
+        /// <summary>
+        /// Indicates whether the column is "DeletedBy" or "DeletedDate".
+        /// </summary>
+        public bool IsDeleted => IsDeletedBy || IsDeletedDate;
+
+        /// <summary>
+        /// Indicates whether the column is "DeletedBy".
+        /// </summary>
+        public bool IsDeletedBy => Name == Parent!.ColumnDeletedBy?.Name;
+
+        /// <summary>
+        /// Indicates whether the column is "DeletedDate".
+        /// </summary>
+        public bool IsDeletedDate => Name == Parent!.ColumnDeletedDate?.Name;
+
+        /// <summary>
+        /// Indicates where the column should be considered for a 'Create' operation.
+        /// </summary>
+        public bool IsCreateColumn => (!DbColumn!.IsComputed && !IsAudit) || IsCreated;
+
+        /// <summary>
+        /// Indicates where the column should be considered for a 'Update' operation.
+        /// </summary>
+        public bool IsUpdateColumn => (!DbColumn!.IsComputed && !IsAudit) || IsUpdated;
+
+        /// <summary>
+        /// Indicates where the column should be considered for a 'Update' operation.
+        /// </summary>
+        public bool IsDeleteColumn => (!DbColumn!.IsComputed && !IsAudit) || IsDeleted;
+
+        /// <summary>
+        /// Indicates where the column is the "TenantId" column.
+        /// </summary>
+        public bool IsTenantIdColumn => Name == Parent!.ColumnTenantId?.Name;
+
+        /// <summary>
+        /// Indicates where the column is the "OrgUnitId" column.
+        /// </summary>
+        public bool IsOrgUnitIdColumn => Name == Parent!.ColumnOrgUnitId?.Name;
+
+        /// <summary>
+        /// Indicates where the column is the "RowVersion" column.
+        /// </summary>
+        public bool IsRowVersionColumn => Name == Parent!.ColumnRowVersion?.Name;
+
+        /// <summary>
+        /// Indicates where the column is the "IsDeleted" column.
+        /// </summary>
+        public bool IsIsDeletedColumn => Name == Parent!.ColumnIsDeleted?.Name;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()

@@ -327,6 +327,36 @@ namespace Beef.CodeGen.Config.Database
         public ColumnConfig ColumnDeletedDate => Columns.Where(x => x.Name == ColumnNameDeletedDate && ColumnNameDeletedDate != "None").SingleOrDefault();
 
         /// <summary>
+        /// Indicates whether there any audit columns.
+        /// </summary>
+        public bool HasAuditColumns => ColumnCreatedBy != null || ColumnCreatedDate != null || ColumnUpdatedBy != null || ColumnUpdatedDate != null || ColumnDeletedBy != null || ColumnDeletedDate != null;
+
+        /// <summary>
+        /// Indicates whether there are any audit "By" columns.
+        /// </summary>
+        public bool HasAuditByColumns => ColumnCreatedBy != null || ColumnUpdatedBy != null || ColumnDeletedBy != null;
+
+        /// <summary>
+        /// Indicates whether there are any audit "Date" columns.
+        /// </summary>
+        public bool HasAuditDateColumns => ColumnCreatedDate != null || ColumnUpdatedDate != null || ColumnDeletedDate != null;
+
+        /// <summary>
+        /// Indicates whether there are any audit "Created" columns
+        /// </summary>
+        public bool HasAuditCreated => ColumnCreatedBy != null || ColumnCreatedDate != null;
+
+        /// <summary>
+        /// Indicates whether there are any audit "Updated" columns
+        /// </summary>
+        public bool HasAuditUpdated => ColumnUpdatedBy != null || ColumnUpdatedDate != null;
+
+        /// <summary>
+        /// Indicates whether there are any audit "Deleted" columns
+        /// </summary>
+        public bool HasAuditDeleted => ColumnDeletedBy != null || ColumnDeletedDate != null;
+
+        /// <summary>
         /// Gets the columns considered part of the primary key.
         /// </summary>
         public List<ColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();

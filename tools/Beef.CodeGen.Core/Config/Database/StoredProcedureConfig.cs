@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,22 +143,47 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the settable columns for an insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnRowVersion?.Name && x.Name != Parent.ColumnUpdatedBy?.Name && x.Name != Parent.ColumnUpdatedDate?.Name).ToList();
+        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsRowVersionColumn && !x.IsAudit) || (x.IsAudit && x.IsCreated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for an update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnTenantId?.Name && x.Name != Parent!.ColumnCreatedBy?.Name && x.Name != Parent.ColumnCreatedDate?.Name).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+
+        /// <summary>
+        /// Gets the settable columns for a delete.
+        /// </summary>
+        public List<SettableColumnConfig> SettableColumnsDelete => SettableColumns.Where(x => x.IsAudit && x.IsDeleted).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => x.Name != Parent!.ColumnUpdatedBy?.Name && x.Name != Parent.ColumnUpdatedDate?.Name).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => !x.IsAudit || (x.IsAudit && x.IsCreated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => !(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && x.Name != Parent!.ColumnTenantId?.Name && x.Name != Parent!.ColumnCreatedBy?.Name && x.Name != Parent.ColumnCreatedDate?.Name).ToList();
+        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+
+        /// <summary>
+        /// Gets the primary merge on statements.
+        /// </summary>
+        public List<string>? MergeOn { get; private set; }
+
+        /// <summary>
+        /// Gets the merge matching source columns
+        /// </summary>
+        public List<string>? MergeMatchSourceColumns { get; private set; }
+
+        /// <summary>
+        /// Gets the merge matching target columns
+        /// </summary>
+        public List<string>? MergeMatchTargetColumns { get; private set; }
+
+        /// <summary>
+        /// Gets the merge list jon on statements.
+        /// </summary>
+        public List<string>? MergeListJoinOn { get; private set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -270,35 +296,29 @@ namespace Beef.CodeGen.Config.Database
                     break;
 
                 case "Create":
-                    // Ignore no-go columns (not a parameter or settable column).
-                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x == Parent.ColumnRowVersion || x == Parent.ColumnUpdatedBy || x == Parent.ColumnUpdatedDate || x.DbColumn!.IsComputed)).Reverse())
+                    foreach (var c in Parent!.Columns.Where(x => x.IsCreateColumn && !x.IsIsDeletedColumn && !x.IsRowVersionColumn).Reverse())
                     {
-                        if (c != Parent.ColumnTenantId)
+                        if (!c.IsTenantIdColumn)
                         {
-                            var audit = c == Parent.ColumnCreatedBy || c == Parent.ColumnCreatedDate;
                             if (c.DbColumn!.IsPrimaryKey)
-                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsIdentity ? false : c.DbColumn.IsNullable, Output = c.DbColumn.IsIdentity });
+                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = !c.DbColumn!.IsIdentity && c.DbColumn.IsNullable, Output = c.DbColumn.IsIdentity });
                             else
-                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn.IsNullable });
+                                Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn.IsNullable });
                         }
 
-                        if (c != Parent.ColumnRowVersion)
+                        if (!c.IsRowVersionColumn)
                             SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 
                     break;
 
                 case "Update":
-                    // Ignore no-go columns (not a parameter or settable column).
-                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x == Parent.ColumnTenantId || x == Parent.ColumnCreatedBy || x == Parent.ColumnCreatedDate || x.DbColumn!.IsComputed)).Reverse())
+                    foreach (var c in Parent!.Columns.Where(x => x.IsUpdateColumn && !x.IsIsDeletedColumn && !x.IsTenantIdColumn).Reverse())
                     {
-                        if (c != Parent.ColumnTenantId)
-                        {
-                            var audit = c == Parent.ColumnUpdatedBy || c == Parent.ColumnUpdatedDate;
-                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
-                        }
+                        if (!c.IsTenantIdColumn)
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
 
-                        if (c != Parent.ColumnRowVersion)
+                        if (!c.IsRowVersionColumn)
                             SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 
@@ -306,20 +326,14 @@ namespace Beef.CodeGen.Config.Database
                     break;
 
                 case "Upsert":
-                    // Ignore no-go columns (not a parameter or settable column).
-                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnIsDeleted || x.DbColumn!.IsComputed)).Reverse())
+                    foreach (var c in Parent!.Columns.Where(x => (x.IsCreateColumn || x.IsUpdateColumn) && !x.IsIsDeletedColumn).Reverse())
                     {
-                        if (c == Parent.ColumnRowVersion)
-                        {
+                        if (c.IsRowVersionColumn)
                             Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = true, IsWhere = false });
-                        }
-                        else if (c != Parent.ColumnTenantId)
-                        {
-                            var audit = c == Parent.ColumnCreatedBy || c == Parent.ColumnCreatedDate || c == Parent.ColumnUpdatedBy || c == Parent.ColumnUpdatedDate;
-                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey, Output = Type == "Create" && c.DbColumn.IsIdentity });
-                        }
+                        else if (!c.IsTenantIdColumn)
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey, Output = Type == "Create" && c.DbColumn.IsIdentity });
 
-                        if (c != Parent.ColumnRowVersion)
+                        if (!c.IsRowVersionColumn)
                             SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
                     }
 
@@ -333,10 +347,67 @@ namespace Beef.CodeGen.Config.Database
                         if (audit && Parent!.ColumnIsDeleted == null)
                             continue;
 
-                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit ? true : c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
+                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
 
                         if (audit)
                             SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                    }
+
+                    AddWhereOnlyParameters(bookEnd: false);
+                    break;
+
+                case "Merge":
+                    foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnRowVersion || x == Parent.ColumnIsDeleted || x.DbColumn!.IsComputed)).Reverse())
+                    {
+                        var p = Parameters?.Where(x => (x.Column != null && c.Name == x.Column) || (x.Column == null && c.Name == x.Name)).SingleOrDefault();
+                        SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn, MergeValueSql = p?.ParameterName });
+                    }
+
+                    if (MergeOverrideIdentityColumns == null)
+                        MergeOverrideIdentityColumns = new List<string>();
+
+                    MergeOn = new List<string>();
+                    MergeMatchSourceColumns = new List<string>();
+                    MergeMatchTargetColumns = new List<string>();
+                    MergeListJoinOn = new List<string>();
+                    foreach (var c in Parent!.Columns.Where(x => !x.DbColumn!.IsComputed))
+                    {
+                        if (c.DbColumn!.IsPrimaryKey)
+                        {
+                            if (MergeOverrideIdentityColumns.Count == 0)
+                                MergeOn.Add($"[{Parent.Alias}].[{c.Name}] = [List].[{c.Name}]");
+
+                            MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = [List].[{c.Name}]");
+                        }
+                        else if (c.IsRowVersionColumn)
+                            MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = [List].[{c.Name}]");
+                        else if (c.IsTenantIdColumn)
+                        {
+                            MergeOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId.Name}");
+                            MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId.Name}");
+                        }
+                        else if (c.IsIsDeletedColumn)
+                            MergeListJoinOn.Add($"ISNULL([{Parent.Alias}].[{c.Name}], 0) = 0");
+                        else if (!c.IsAudit && (Parent.UdtExcludeColumns == null || !Parent.UdtExcludeColumns!.Contains(c.Name!)))
+                        {
+                            MergeMatchSourceColumns.Add($"[list].[{c.Name}]");
+                            MergeMatchTargetColumns.Add($"[{Parent!.Alias}].[{c.Name}]");
+                        }
+                    }
+
+                    if (MergeOverrideIdentityColumns != null && MergeOverrideIdentityColumns.Count > 0)
+                    {
+                        foreach (var name in MergeOverrideIdentityColumns)
+                        {
+                            if (!MergeOn.Contains(name))
+                                MergeOn.Add($"[{Parent.Alias}].[{name}] = [List].[{name}]");
+                        }
+
+                        foreach (var parameter in Parameters!)
+                        {
+                            var name = parameter.Column ?? parameter.Name;
+                            MergeOn.Add($"[{Parent.Alias}].[{name}] = {parameter.ParameterName}");
+                        }
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
