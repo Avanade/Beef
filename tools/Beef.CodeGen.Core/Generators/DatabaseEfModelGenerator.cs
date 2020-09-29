@@ -2,7 +2,6 @@
 
 using Beef.CodeGen.Config.Database;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Beef.CodeGen.Generators
 {
@@ -17,6 +16,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<TableConfig> SelectGenConfig(Config.Database.CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Tables!.Where(x => x.EfModel.HasValue && x.EfModel.Value);
+            => Check.NotNull(config, nameof(config)).EFModels;
     }
 }

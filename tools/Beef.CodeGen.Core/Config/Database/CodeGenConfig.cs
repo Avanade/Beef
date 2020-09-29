@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -201,6 +202,11 @@ namespace Beef.CodeGen.Config.Database
         [PropertyCollectionSchema(Title = "The corresponding `Table` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<TableConfig>? Tables { get; set; }
+
+        /// <summary>
+        /// Gets all the tables that require an EfModel to be generated.
+        /// </summary>
+        public List<TableConfig> EFModels => Tables!.Where(x => CompareValue(x.EfModel, true)).ToList();
 
         /// <summary>
         /// Gets or sets the list of tables that exist within the database.
