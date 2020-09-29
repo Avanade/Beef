@@ -19,7 +19,7 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
   -- Check user has permission.
-  EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'
+  EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'
 
 {{/ifval}}
 {{#ifval Parent.ColumnOrgUnitId}}

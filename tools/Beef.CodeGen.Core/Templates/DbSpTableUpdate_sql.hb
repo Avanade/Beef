@@ -24,10 +24,10 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
     -- Check user has permission.
-    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
+    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
 
 {{/ifval}}
-{{#ifval Parent.ColumnUpdatedDate Parent.ColumnUpdatedBy}}
+{{#if Parent.HasAuditUpdated}}
     -- Set audit details.
   {{#ifval Parent.ColumnUpdatedDate}}
     EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
@@ -35,7 +35,7 @@ BEGIN
   {{#ifval Parent.ColumnUpdatedBy}}
     EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
   {{/ifval}}
-{{/ifval}}
+{{/if}}
 
     -- Check exists.
     DECLARE @PrevRowVersion BINARY(8)

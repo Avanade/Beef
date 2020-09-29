@@ -405,17 +405,21 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => Root!.ColumnNameDeletedBy);
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => Root!.ColumnNameDeletedDate);
 
+            PrepareStoredProcedures();
+
             foreach (var c in DbTable.Columns)
             {
-                if ((c.Name == ColumnTenantId?.Name || c.Name == ColumnOrgUnitId?.Name || c.Name == ColumnIsDeleted?.Name) || ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!))))
-                {
-                    var cc = new ColumnConfig { Name = c.Name, DbColumn = c };
-                    cc.Prepare(Root!, this);
-                    Columns.Add(cc);
-                }
-            }
+                var cc = new ColumnConfig { Name = c.Name, DbColumn = c };
+                cc.Prepare(Root!, this);
 
-            PrepareStoredProcedures();
+                // Certain special columns have to always be included.
+                if (cc.IsTenantIdColumn || cc.IsOrgUnitIdColumn || cc.IsIsDeletedColumn)
+                    Columns.Add(cc);
+                else if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
+                    Columns.Add(cc);
+                else if (cc.IsAudit && StoredProcedures!.Any(x => x.Type == "Create" || x.Type == "Update" || x.Type == "Upsert" || x.Type == "Delete" || x.Type == "Merge"))
+                    Columns.Add(cc);
+            }
 
             foreach (var storedProcedure in StoredProcedures!)
             {
@@ -424,7 +428,7 @@ namespace Beef.CodeGen.Config.Database
         }
 
         /// <summary>
-        /// Prepares the Operations.
+        /// Prepares the stored procedures.
         /// </summary>
         private void PrepareStoredProcedures()
         {

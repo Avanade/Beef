@@ -23,7 +23,7 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
     -- Check user has permission.
-    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'
+    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'
 
 {{/ifval}}
 {{#ifval Parent.ColumnOrgUnitId}}
@@ -46,7 +46,7 @@ BEGIN
 
 {{/each}}
 {{#ifval Parent.ColumnIsDeleted}}
-  {{#ifval Parent.ColumnDeletedDate Parent.ColumnDeletedBy}}
+  {{#if Parent.HasAuditDeleted}}
     -- Set audit details.
     {{#ifval Parent.ColumnDeletedDate}}
     EXEC @{{Parent.ColumnDeletedDate.Name}} = fnGetTimestamp @{{Parent.ColumnDeletedDate.Name}}
@@ -55,7 +55,7 @@ BEGIN
     EXEC @{{Parent.ColumnDeletedBy.Name}} = fnGetUsername @{{Parent.ColumnDeletedBy.Name}}
     {{/ifval}}
 
-  {{/ifval}}
+  {{/if}}
     -- Update the IsDeleted bit (logically delete).
     UPDATE [{{Parent.Alias}}] SET
       {{Parent.ColumnIsDeleted.QualifiedName}} = 1{{#ifne SettableColumnsUpdate.Count 0}},{{/ifne}}

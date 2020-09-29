@@ -24,7 +24,7 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
     -- Check user has permission.
-    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
+    EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
 
 {{/ifval}}
     -- Check exists.
@@ -32,7 +32,7 @@ BEGIN
     SET @PrevRowVersion = (SELECT TOP 1 [{{Parent.Alias}}].[{{Parent.ColumnRowVersion.Name}}] FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}] {{#each Where}}{{#if @first}}WHERE {{else}} AND {{/if}}{{{Statement}}}{{/each}})
     IF @PrevRowVersion IS NULL
     BEGIN
-  {{#ifval Parent.ColumnCreatedDate Parent.ColumnCreatedBy}}
+{{#if Parent.HasAuditCreated}}
       -- Set audit details.
   {{#ifval Parent.ColumnCreatedDate}}
       EXEC @{{Parent.ColumnCreatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnCreatedDate.Name}}
@@ -40,7 +40,7 @@ BEGIN
   {{#ifval Parent.ColumnCreatedBy}}
       EXEC @{{Parent.ColumnCreatedBy.Name}} = fnGetUsername @{{Parent.ColumnCreatedBy.Name}}
   {{/ifval}}
-{{/ifval}}
+{{/if}}
 
 {{#each ExecuteBefore}}
   {{#if @first}}
@@ -89,7 +89,7 @@ BEGIN
         EXEC spThrowConcurrencyException
       END
 
-{{#ifval Parent.ColumnUpdatedDate Parent.ColumnUpdatedBy}}
+{{#if Parent.HasAuditUpdated}}
       -- Set audit details.
   {{#ifval Parent.ColumnUpdatedDate}}
       EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
@@ -98,7 +98,7 @@ BEGIN
       EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
   {{/ifval}}
 
-{{/ifval}}
+{{/if}}
 {{#each ExecuteBefore}}
   {{#if @first}}
       -- Execute additional (pre) statements.
