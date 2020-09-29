@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.Entities;
 using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace Beef.CodeGen.Config.Database
@@ -59,7 +60,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
             ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
-            : (Column.TypeIsInteger(DbColumn!.Type) || Column.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+            : (Column.TypeIsInteger(DbColumn!.Type) || TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
 
         /// <summary>
         /// Indicates whether the column is considered an audit column.
@@ -147,6 +148,26 @@ namespace Beef.CodeGen.Config.Database
         public bool IsIsDeletedColumn => Name == Parent!.ColumnIsDeleted?.Name;
 
         /// <summary>
+        /// Indicates that the name ends with URL.
+        /// </summary>
+        public bool IsNameEndsWithUrl => Name!.EndsWith("Url", System.StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Gets or sets the EF SQL Type.
+        /// </summary>
+        public string? EfSqlType { get; set; }
+
+        /// <summary>
+        /// Gets the corresponding .NET <see cref="System.Type"/> name.
+        /// </summary>
+        public string DotNetType => GetDotNetTypeName(DbColumn!.Type);
+
+        /// <summary>
+        /// Indicates whether the .NET property is nullable.
+        /// </summary>
+        public bool IsDotNetNullable => DbColumn!.IsNullable || DotNetType == "string" || DotNetType == "byte[]";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -160,7 +181,7 @@ namespace Beef.CodeGen.Config.Database
         private void UpdateSqlProperties()
         {
             var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
-            if (Column.TypeIsString(DbColumn!.Type))
+            if (TypeIsString(DbColumn!.Type))
                 sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
 
             sb.Append(DbColumn!.Type.ToUpperInvariant() switch
@@ -171,6 +192,8 @@ namespace Beef.CodeGen.Config.Database
                 _ => string.Empty
             });
 
+            EfSqlType = sb.ToString();
+
             if (DbColumn!.IsNullable)
                 sb.Append(" NULL");
 
@@ -178,5 +201,136 @@ namespace Beef.CodeGen.Config.Database
             ParameterSql = $"{ParameterName} AS {SqlType}";
             UdtSql = $"[{Name}] {SqlType}";
         }
+
+        #region Static
+
+        /// <summary>
+        /// Indicates whether the database type maps to a <see cref="string"/>.
+        /// </summary>
+        /// <param name="dbType">The database type.</param>
+        public static bool TypeIsString(string dbType)
+        {
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
+            {
+                case "NCHAR":
+                case "CHAR":
+                case "NVARCHAR":
+                case "VARCHAR":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the database type maps to a <see cref="decimal"/>.
+        /// </summary>
+        /// <param name="dbType">The database type.</param>
+        public static bool TypeIsDecimal(string dbType)
+        {
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
+            {
+                case "DECIMAL":
+                case "MONEY":
+                case "NUMERIC":
+                case "SMALLMONEY":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the database type maps to a <see cref="DateTime"/>.
+        /// </summary>
+        /// <param name="dbType">The database type.</param>
+        public static bool TypeIsDateTime(string dbType)
+        {
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
+            {
+                case "DATE":
+                case "DATETIME":
+                case "DATETIME2":
+                case "DATETIMEOFFSET":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the database type maps to an integer.
+        /// </summary>
+        /// <param name="dbType">The database type.</param>
+        public static bool TypeIsInteger(string dbType)
+        {
+            if (dbType == null)
+                return false;
+
+            switch (dbType.ToUpperInvariant())
+            {
+                case "INT":
+                case "BIGINT":
+                case "SMALLINT":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the corresponding .NET <see cref="System.Type"/> name for the database type.
+        /// </summary>
+        /// <param name="dbType">The database type.</param>
+        /// <returns>The .NET <see cref="System.Type"/> name.</returns>
+        public static string GetDotNetTypeName(string? dbType = "NVARCHAR")
+        {
+            // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-data-type-mappings
+
+            if (string.IsNullOrEmpty(dbType))
+                throw new ArgumentNullException(nameof(dbType));
+
+            if (TypeIsString(dbType))
+                return "string";
+            else if (TypeIsDecimal(dbType))
+                return "decimal";
+            else if (TypeIsDateTime(dbType))
+                return "DateTime";
+
+            switch (dbType.ToUpperInvariant())
+            {
+                case "ROWVERSION":
+                case "TIMESTAMP":
+                case "VARBINARY": return "byte[]";
+                case "BIT": return "bool";
+                case "DATETIMEOFFSET": return "DateTimeOffset";
+                case "FLOAT": return "double";
+                case "INT": return "int";
+                case "BIGINT": return "long";
+                case "SMALLINT": return "short";
+                case "TINYINT": return "byte";
+                case "REAL": return "float";
+                case "TIME": return "TimeSpan";
+                case "UNIQUEIDENTIFIER": return "Guid";
+
+                default:
+                    throw new InvalidOperationException($"Database data type '{dbType}' does not have corresponding .NET type mapping defined.");
+            }
+        }
+
+        #endregion
     }
 }

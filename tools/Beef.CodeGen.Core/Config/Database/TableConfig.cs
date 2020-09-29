@@ -124,6 +124,14 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("CodeGen", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.")]
         public bool? EfModel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the .NET (C#) EntityFramework (EF) model name.
+        /// </summary>
+        [JsonProperty("efModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CodeGen", Title = "The .NET (C#) EntityFramework (EF) model name.",
+            Description = "Defaults to `Name`.")]
+        public string? EfModelName { get; set; }
+
         #endregion
 
         #region Udt
@@ -387,6 +395,16 @@ namespace Beef.CodeGen.Config.Database
         public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
+        /// Inidicates whether the source of the EfModel is a database View.
+        /// </summary>
+        public bool EfIsAView => CompareValue(View, true) || DbTable!.IsAView;
+
+        /// <summary>
+        /// Gets the Ef database object name.
+        /// </summary>
+        public string EfDbName => CompareValue(View, true) ? "vw" + Name! : Name!;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -398,6 +416,7 @@ namespace Beef.CodeGen.Config.Database
                 throw new CodeGenException($"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+            EfModelName = DefaultWhereNull(EfModelName, () => Name);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);
