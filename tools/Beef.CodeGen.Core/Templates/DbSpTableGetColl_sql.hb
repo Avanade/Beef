@@ -24,7 +24,7 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
   -- Check user has permission.
-  EXEC {{Root.UserPermissionObject}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'
+  EXEC {{Root.CheckUserPermissionSql}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'
 
 {{/ifval}}
 {{#each CollectionParameters}}
@@ -54,7 +54,7 @@ BEGIN
 {{/if}}
     FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]{{#ifval WithHints}} WITH ({{WithHints}}){{/ifval}}
 {{#ifval Parent.ColumnOrgUnitId}}
-    INNER JOIN {{Root.OrgUnitJoinObject}} AS orgunits ON [t].[{{Parent.ColumnOrgUnitId.Name}}] = [orgunits].[{{Parent.ColumnOrgUnitId.Name}}]
+    INNER JOIN {{Root.OrgUnitJoinSql}} AS orgunits ON [{{Parent.Alias}}].[{{Parent.ColumnOrgUnitId.Name}}] = [orgunits].[{{Parent.ColumnOrgUnitId.Name}}]
 {{/ifval}}
 {{#each Where}}
     {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}

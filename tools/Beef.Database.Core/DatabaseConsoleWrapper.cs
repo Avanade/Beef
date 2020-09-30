@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Config.Database;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -36,10 +37,11 @@ namespace Beef.Database.Core
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <param name="refDataSchemaName">The optional reference data schema name.</param>
+        /// <param name="schemaOrder">The list of schemas in priority order (used to sequence the drop (reverse order) and create (specified order) of the database objects).</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
+        public static DatabaseConsoleWrapper Create(Assembly[] assemblies, string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null, string[]? schemaOrder = null)
         {
-            return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
+            return new DatabaseConsoleWrapper(assemblies, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName, schemaOrder);
         }
 
         /// <summary>
@@ -51,10 +53,11 @@ namespace Beef.Database.Core
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <param name="refDataSchemaName">The optional reference data schema name.</param>
+        /// <param name="schemaOrder">The list of schemas in priority order (used to sequence the drop (reverse order) and create (specified order) of the database objects).</param>
         /// <returns>The <see cref="DatabaseConsoleWrapper"/> instance.</returns>
-        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null)
+        public static DatabaseConsoleWrapper Create(string connectionString, string company, string appName, string outDir = "./..", bool useBeefDbo = true, string? refDataSchemaName = null, string[]? schemaOrder = null)
         {
-            return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName);
+            return new DatabaseConsoleWrapper(new Assembly[] { Assembly.GetEntryAssembly()! }, connectionString, company, appName, outDir, useBeefDbo, refDataSchemaName, schemaOrder);
         }
 
         /// <summary>
@@ -67,7 +70,8 @@ namespace Beef.Database.Core
         /// <param name="outDir">The output path/directory.</param>
         /// <param name="useBeefDbo">Indicates whether to use the standard BEEF <b>dbo</b> schema objects (defaults to <c>true</c>).</param>
         /// <param name="refDataSchemaName">The optional reference data schema name.</param>
-        private DatabaseConsoleWrapper(Assembly[] assemblies, string connectionString, string company, string appName, string outDir, bool useBeefDbo = true, string? refDataSchemaName = null)
+        /// <param name="schemaOrder">The list of schemas in priority order (used to sequence the drop (reverse order) and create (specified order) of the database objects).</param>
+        private DatabaseConsoleWrapper(Assembly[] assemblies, string connectionString, string company, string appName, string outDir, bool useBeefDbo = true, string? refDataSchemaName = null, string[]? schemaOrder = null)
         {
             ConnectionString = Check.NotEmpty(connectionString, nameof(connectionString));
             Company = Check.NotEmpty(company, nameof(company));
@@ -76,6 +80,9 @@ namespace Beef.Database.Core
             RefDataSchemaName = refDataSchemaName;
             if (assemblies == null)
                 assemblies = Array.Empty<Assembly>();
+
+            if (schemaOrder != null)
+                SchemaOrder.AddRange(schemaOrder);
 
             if (useBeefDbo)
             {
@@ -130,6 +137,11 @@ namespace Beef.Database.Core
         public string? RefDataSchemaName { get; private set; }
 
         /// <summary>
+        /// Gets or sets the schema order.
+        /// </summary>
+        public List<string> SchemaOrder { get; private set; } = new List<string>();
+
+        /// <summary>
         /// Executes the underlying <see cref="DatabaseConsole"/> using the database tooling arguments.
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
@@ -167,6 +179,8 @@ namespace Beef.Database.Core
 
                 if (!string.IsNullOrEmpty(RefDataSchemaName))
                     rargs += $" -rs {RefDataSchemaName}";
+
+                SchemaOrder.ForEach(so => rargs += $" -so {so}");
 
                 return await DatabaseConsole.Create().RunAsync(rargs).ConfigureAwait(false);
             });

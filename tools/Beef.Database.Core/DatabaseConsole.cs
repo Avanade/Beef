@@ -32,6 +32,7 @@ namespace Beef.Database.Core
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
         private readonly CommandOption _refSchema;
+        private readonly CommandOption _schemaOrder;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -77,6 +78,8 @@ namespace Beef.Database.Core
                 .Accepts(v => v.Use(new ParamsValidator()));
 
             _refSchema = App.Option("-rs|--refschema", "Reference data schema name.", CommandOptionType.SingleValue);
+
+            _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -157,7 +160,14 @@ namespace Beef.Database.Core
 
             WriteHeader(args);
 
-            var de = new DatabaseExecutor(new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args });
+            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args };
+            if (_refSchema.HasValue())
+                dea.RefDataSchemaName = _refSchema.Value();
+
+            if (_schemaOrder.HasValue())
+                dea.SchemaOrder.AddRange(_schemaOrder.Values);
+
+            var de = new DatabaseExecutor(dea);
             var sw = Stopwatch.StartNew();
 
             var result = await de.RunAsync().ConfigureAwait(false);

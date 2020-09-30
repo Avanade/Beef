@@ -21,6 +21,7 @@
     <None Remove="Migrations\20200820-142642-create-Test-Schema.sql" />
     <None Remove="Migrations\20200820-142907-create-Test-Table.sql" />
     <None Remove="Migrations\20200820-150153-create-Sec-Schema.sql" />
+    <None Remove="Schema\Sec\Functions\fnGetUserHasPermission.sql" />
     <None Remove="Schema\Sec\Functions\fnGetUserOrgUnits.sql" />
     <None Remove="Schema\Sec\Stored Procedures\spCheckUserHasPermission.sql" />
   </ItemGroup>

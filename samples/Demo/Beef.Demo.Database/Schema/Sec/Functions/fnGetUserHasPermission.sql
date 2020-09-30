@@ -1,12 +1,11 @@
-﻿CREATE PROCEDURE [Sec].[spCheckUserHasPermission]
+﻿CREATE FUNCTION [Sec].[fnGetUserHasPermission](
   @TenantId UNIQUEIDENTIFIER,
   @UserId UNIQUEIDENTIFIER,
   @Permission NVARCHAR(50),
-  @OrgUnitId UNIQUEIDENTIFIER NULL
+  @OrgUnitId UNIQUEIDENTIFIER NULL)
+RETURNS BIT
 AS
 BEGIN
-  SET NOCOUNT ON
-
   IF @TenantId IS NULL
   BEGIN
 	SET @TenantId = [dbo].[fnGetTenantId](@TenantId)
@@ -21,9 +20,9 @@ BEGIN
   BEGIN
 	IF (SELECT COUNT(*) FROM [Sec].[fnGetUserOrgUnits]() WHERE [OrgUnitId] = @OrgUnitId) = 0
 	BEGIN
-	  EXEC [dbo].[spThrowAuthorizationException]
+	  RETURN 0
 	END
   END
 
-  -- Should be logic here to do an actual permissions check; if not authorized then [dbo].[spThrowAuthorizationException]; otherwise, return.
+  RETURN 1 -- 1 if allowed; zero if not allowed.
 END

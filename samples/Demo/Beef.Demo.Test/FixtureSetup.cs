@@ -18,9 +18,12 @@ namespace Beef.Demo.Test
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
             TestSetUp.RegisterSetUp(async (count, data) =>
             {
-                return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"], 
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly) { UseBeefDbo = true, RefDataSchemaName = "Ref" }).ConfigureAwait(false) == 0;
+                var args = new DatabaseExecutorArgs(
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"],
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly)
+                { UseBeefDbo = true, RefDataSchemaName = "Ref" }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
+
+                return await DatabaseExecutor.RunAsync(args).ConfigureAwait(false) == 0;
             });
         }
     }

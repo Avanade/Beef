@@ -59,7 +59,7 @@ namespace Beef.Database.Core.Sql
                 // Check and see if it is a reference data id.
                 col = Table.DbTable.Columns.Where(c => c.Name == column.Name + "Id").SingleOrDefault();
                 if (col == null || !col.IsForeignRefData)
-                    throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' does not have a column named '{column.Name}'.");
+                    throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' does not have a column named '{column.Name}' or '{column.Name}Id'; or was not identified as a foreign key to Reference Data.");
 
                 column.Name += "Id";
             }
@@ -73,7 +73,7 @@ namespace Beef.Database.Core.Sql
             string? str = null;
             try
             {
-                str = column.Value is DateTime ? ((DateTime)column.Value).ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
+                str = column.Value is DateTime time ? time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
                 switch (ColumnConfig.GetDotNetTypeName(col.Type))
                 {
                     case "string": column.Value = str; break;
@@ -117,7 +117,7 @@ namespace Beef.Database.Core.Sql
                     column.UseForeignKeyQueryForId = true;
                 }
                 else
-                    throw new SqlDataUpdaterException($"'{Table.Schema}.{Table.Name}' column '{column.Name}' type '{col.Type}' cannot parse value '{column.Value.ToString()}': {fex.Message}");
+                    throw new SqlDataUpdaterException($"'{Table.Schema}.{Table.Name}' column '{column.Name}' type '{col.Type}' cannot parse value '{column.Value}': {fex.Message}");
             }
         }
     }

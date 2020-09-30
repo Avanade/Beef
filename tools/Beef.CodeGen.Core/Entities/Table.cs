@@ -147,24 +147,24 @@ namespace Beef.CodeGen.Entities
                     {
                         if (c.Name!.Length > 2 && c.Name!.EndsWith("Id", StringComparison.InvariantCulture))
                         {
-                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && t.Name == c.Name![0..^2]).ToList();
-                            if (rt.Count == 1)
+                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && x.Name == c.Name![0..^2]).FirstOrDefault();
+                            if (rt != null)
                             {
-                                c.ForeignSchema = rt[0].Schema;
-                                c.ForeignTable = rt[0].Name;
-                                c.ForeignColumn = rt[0].Columns.Where(x => x.IsPrimaryKey).First().Name;
-                                c.IsForeignRefData = rt[0].IsRefData;
+                                c.ForeignSchema = rt.Schema;
+                                c.ForeignTable = rt.Name;
+                                c.ForeignColumn = rt.Columns.Where(x => x.IsPrimaryKey).First().Name;
+                                c.IsForeignRefData = rt.IsRefData;
                             }
                         }
                         else if (c.Name!.Length > 4 && c.Name!.EndsWith("Code", StringComparison.InvariantCulture))
                         {
-                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && t.Name == c.Name![0..^4]).ToList();
-                            if (rt.Count == 1)
+                            var rt = tables.Where(x => x.QualifiedName != t.QualifiedName && x.Name == c.Name![0..^4]).FirstOrDefault();
+                            if (rt != null && rt.IsRefData)
                             {
-                                c.ForeignSchema = rt[0].Schema;
-                                c.ForeignTable = rt[0].Name;
-                                c.ForeignColumn = rt[0].Columns.Where(x => x.IsPrimaryKey).First().Name;
-                                c.IsForeignRefData = rt[0].IsRefData;
+                                c.ForeignSchema = rt.Schema;
+                                c.ForeignTable = rt.Name;
+                                c.ForeignColumn = rt.Columns.Where(x => x.Name == "Code").First().Name;
+                                c.IsForeignRefData = rt.IsRefData;
                             }
                         }
                     }

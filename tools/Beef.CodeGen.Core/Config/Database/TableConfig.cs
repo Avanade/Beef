@@ -405,6 +405,11 @@ namespace Beef.CodeGen.Config.Database
         public string EfDbName => CompareValue(View, true) ? "vw" + Name! : Name!;
 
         /// <summary>
+        /// Gets or sets the view where statements.
+        /// </summary>
+        public List<string>? ViewWhere { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -449,6 +454,9 @@ namespace Beef.CodeGen.Config.Database
             {
                 storedProcedure.Prepare(Root!, this);
             }
+
+            if (CompareValue(View, true))
+                PrepareView();
         }
 
         /// <summary>
@@ -496,6 +504,19 @@ namespace Beef.CodeGen.Config.Database
 
             if (CompareValue(Get, true) && !StoredProcedures.Any(x => x.Name == "Get"))
                 StoredProcedures.Add(new StoredProcedureConfig { Name = "Get", Type = "Get" });
+        }
+
+        /// <summary>
+        /// Prepares the view.
+        /// </summary>
+        private void PrepareView()
+        {
+            ViewWhere = new List<string>();
+            if (ColumnTenantId != null)
+                ViewWhere.Add($"[{Alias}].[{ColumnTenantId.Name}] = dbo.fnGetTenantId(NULL)");
+
+            if (!string.IsNullOrEmpty(Permission))
+                ViewWhere.Add($"{Root!.GetUserPermissionSql}(NULL, NULL, '{Permission.ToUpperInvariant()}.READ', NULL) = 1");
         }
     }
 }

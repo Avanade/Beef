@@ -47,6 +47,7 @@
     <None Remove="Templates\DbSpTableUpsert_sql.hb" />
     <None Remove="Templates\DbTvpTable_cs.hb" />
     <None Remove="Templates\DbUdtTableList_sql.hb" />
+    <None Remove="Templates\DbVwTable_sql.hb" />
     <None Remove="Templates\EntityDataSvc_cs.hbs" />
     <None Remove="Templates\EntityData_cs.hbs" />
     <None Remove="Templates\EntityGrpcAgent_cs.hbs" />
@@ -94,6 +95,7 @@
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hb" />
+    <EmbeddedResource Include="Templates\DbVwTable_sql.hb" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.hb" />
     <EmbeddedResource Include="Templates\DbUdtTableList_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableMerge_sql.hb" />

@@ -115,20 +115,28 @@ namespace Beef.CodeGen.Config.Database
         public string? ColumnNameDeletedDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the table or function that is to be used to join against for security-based `OrgUnitId` verification.
+        /// Gets or sets the SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.
         /// </summary>
-        [JsonProperty("orgUnitJoinObject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The table or function (object) that is to be used to join against for security-based `OrgUnitId` verification.",
-            Description = "Defaults to `[Sec].[fnGetUserOrgUnits]`. To remove capability set `OrgUnitId` to `None`.")]
-        public string? OrgUnitJoinObject { get; set; }
+        [JsonProperty("orgUnitJoinSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
+            Description = "Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`.")]
+        public string? OrgUnitJoinSql { get; set; }
 
         /// <summary>
-        /// Gets or sets the stored procedure or function that is to be used for `Permission` verification.
+        /// Gets or sets the SQL stored procedure that is to be used for `Permission` verification.
         /// </summary>
-        [JsonProperty("userPermissionObject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Infer", Title = "The stored procedure or function (object) that is to be used for `Permission` verification.",
+        [JsonProperty("checkUserPermissionSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The SQL stored procedure that is to be used for `Permission` verification.",
             Description = "Defaults to `[Sec].[spCheckUserHasPermission]`.")]
-        public string? UserPermissionObject { get; set; }
+        public string? CheckUserPermissionSql { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SQL function that is to be used for `Permission` verification.
+        /// </summary>
+        [JsonProperty("getUserPermissionSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The SQL function that is to be used for `Permission` verification.",
+            Description = "Defaults to `[Sec].[fnGetUserHasPermission]`.")]
+        public string? GetUserPermissionSql { get; set; }
 
         #endregion
 
@@ -240,8 +248,9 @@ namespace Beef.CodeGen.Config.Database
             ColumnNameUpdatedDate = DefaultWhereNull(ColumnNameUpdatedDate, () => "UpdatedDate");
             ColumnNameDeletedBy = DefaultWhereNull(ColumnNameDeletedBy, () => "UpdatedBy");
             ColumnNameDeletedDate = DefaultWhereNull(ColumnNameDeletedDate, () => "UpdatedDate");
-            OrgUnitJoinObject = DefaultWhereNull(OrgUnitJoinObject, () => "[Sec].[fnGetUserOrgUnits]()");
-            UserPermissionObject = DefaultWhereNull(UserPermissionObject, () => "[Sec].[spCheckUserHasPermission]");
+            OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
+            CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
+            GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
 
             if (Tables != null && Tables.Count > 0)
             {

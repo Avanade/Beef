@@ -67,6 +67,23 @@ namespace Beef.Database.Core
         /// Gets or sets the <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.
         /// </summary>
         public CodeGenExecutorArgs? CodeGenArgs { get; set; }
+
+        /// <summary>
+        /// Gets the list of schemas in priority order (used to sequence the drop (reverse order) and create (specified order) of the database objects). Where <see cref="UseBeefDbo"/>
+        /// is specified then <c>dbo</c> will automatically be inserted into first position (index zero) if not otherwise specified.
+        /// </summary>
+        public List<string?> SchemaOrder { get; private set; } = new List<string?>();
+
+        /// <summary>
+        /// Adds the <paramref name="schemas"/> to the <see cref="SchemaOrder"/>.
+        /// </summary>
+        /// <param name="schemas">The schemas.</param>
+        /// <returns>The <see cref="DatabaseExecutorArgs"/> instance to support fluent-style method-chaining.</returns>
+        public DatabaseExecutorArgs AddSchemaOrder(params string[] schemas)
+        {
+            SchemaOrder.AddRange(schemas);
+            return this;
+        }
     }
 
     /// <summary>
@@ -241,8 +258,13 @@ namespace Beef.Database.Core
                 _logger.LogInformation(new string('-', 80));
                 _logger.LogInformation("DB SCHEMA: Drops and creates the database objects...");
 
-                if (!await TimeExecutionAsync(() => 
-                    DropAndCreateAllObjectsAsync(string.IsNullOrEmpty(_args.RefDataSchemaName) ? new string[] { "dbo" } : new string[] { "dbo", _args.RefDataSchemaName })).ConfigureAwait(false))
+                if (!string.IsNullOrEmpty(_args.RefDataSchemaName))
+                    _args.SchemaOrder.Insert(0, _args.RefDataSchemaName);
+
+                if (_args.UseBeefDbo && !_args.SchemaOrder.Contains("dbo"))
+                    _args.SchemaOrder.Insert(0, "dbo");
+
+                if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync()).ConfigureAwait(false))
                     return false;
             }
 
@@ -343,7 +365,7 @@ namespace Beef.Database.Core
         /// <summary>
         /// Drops and/or Alter and/or Create Objects.
         /// </summary>
-        private async Task<bool> DropAndCreateAllObjectsAsync(string[] schemaOrder)
+        private async Task<bool> DropAndCreateAllObjectsAsync()
         {
             var list = new List<SqlSchemaScript>();
 
@@ -367,9 +389,9 @@ namespace Beef.Database.Core
                             }
 
                             var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName.Substring(_args.CodeGenArgs.OutputPath.FullName.Length + 1) };
-                            sr.Order = Array.IndexOf(schemaOrder, sr.Reader.Schema);
+                            sr.Order = _args.SchemaOrder.IndexOf(sr.Reader.Schema!);
                             if (sr.Order < 0)
-                                sr.Order = schemaOrder.Length;
+                                sr.Order = _args.SchemaOrder.Count;
 
                             list.Add(sr);
                         }
@@ -400,9 +422,9 @@ namespace Beef.Database.Core
                     }
 
                     var sr = new SqlSchemaScript { Name = name, Reader = sor };
-                    sr.Order = Array.IndexOf(schemaOrder, sr.Reader.Schema);
+                    sr.Order = _args.SchemaOrder.IndexOf(sr.Reader.Schema!);
                     if (sr.Order < 0)
-                        sr.Order = schemaOrder.Length;
+                        sr.Order = _args.SchemaOrder.Count;
 
                     list.Add(sr);
                 }
