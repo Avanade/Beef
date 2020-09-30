@@ -104,14 +104,13 @@ namespace Beef.CodeGen.Entities
         /// </summary>
         /// <param name="dbType">The database type.</param>
         /// <returns>The .NET <see cref="System.Type"/> name.</returns>
-        public static string GetDotNetTypeName(string dbType)
+        public static string GetDotNetTypeName(string? dbType)
         {
             // https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-data-type-mappings
 
             if (string.IsNullOrEmpty(dbType))
-                throw new ArgumentNullException(nameof(dbType));
-
-            if (TypeIsString(dbType))
+                return "string";
+            else if (TypeIsString(dbType))
                 return "string";
             else if (TypeIsDecimal(dbType))
                 return "decimal";
@@ -255,6 +254,37 @@ namespace Beef.CodeGen.Entities
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
         public string DotNetType => string.IsNullOrEmpty(Type) ? "string" : GetDotNetTypeName(Type);
+
+        /// <summary>
+        /// Gets the fully defined SQL type.
+        /// </summary>
+        public string SqlType
+        {
+            get
+            {
+                var sb = new StringBuilder(Type!.ToUpperInvariant());
+                if (Column.TypeIsString(Type))
+                    sb.Append(Length.HasValue && Length.Value > 0 ? $"({Length.Value})" : "(MAX)");
+
+                sb.Append(Type.ToUpperInvariant() switch
+                {
+                    "DECIMAL" => $"({Precision}, {Scale})",
+                    "NUMERIC" => $"({Precision}, {Scale})",
+                    "TIME" => Scale.HasValue && Scale.Value > 0 ? $"({Scale})" : string.Empty,
+                    _ => string.Empty
+                });
+
+                if (IsNullable)
+                    sb.Append(" NULL");
+
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the column is considered an audit column.
+        /// </summary>
+        public bool IsAudit => Name == DatabaseColumns.CreatedByName || Name == DatabaseColumns.CreatedDateName || Name == DatabaseColumns.UpdatedByName || Name == DatabaseColumns.UpdatedDateName || Name == DatabaseColumns.DeletedByName || Name == DatabaseColumns.DeletedDateName;
 
         /// <summary>
         /// Creates (and adds) the <see cref="Table"/> element for code generation.

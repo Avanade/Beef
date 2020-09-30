@@ -143,7 +143,7 @@ namespace Beef.CodeGen.Config.Database
                 else
                 {
                     sb.Append($"{c.Type!.ToUpperInvariant()}");
-                    if (ColumnConfig.TypeIsString(c.Type))
+                    if (Beef.CodeGen.Entities.Column.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 
                     sb.Append(c.Type.ToUpperInvariant() switch

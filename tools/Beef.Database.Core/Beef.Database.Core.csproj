@@ -35,7 +35,8 @@
 
   <ItemGroup>
     <None Remove="Resources\DeleteAllAndReset.sql" />
-    <None Remove="Resources\ScriptNew_sql.xml" />
+    <None Remove="Resources\ScriptNew_sql.hb" />
+    <None Remove="Resources\TableInsertOrMerge_sql.hb" />
     <None Remove="Resources\TableInsertOrMerge_sql.xml" />
     <None Remove="Schema\dbo\Functions\fnGetTenantId.sql" />
     <None Remove="Schema\dbo\Functions\fnGetTimestamp.sql" />
@@ -58,7 +59,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\DeleteAllAndReset.sql" />
-    <EmbeddedResource Include="Resources\ScriptNew_sql.xml" />
+    <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.hb" />
+    <EmbeddedResource Include="Resources\ScriptNew_sql.hb" />
     <EmbeddedResource Include="Resources\TableInsertOrMerge_sql.xml" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetTenantId.sql" />
     <EmbeddedResource Include="Schema\dbo\Functions\fnGetTimestamp.sql" />

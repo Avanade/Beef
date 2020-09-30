@@ -71,7 +71,17 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public Dictionary<string, Column> Columns { get; } = new Dictionary<string, Column>();
+        public List<Column> Columns { get; } = new List<Column>();
+
+        /// <summary>
+        /// Gets the merge match columns.
+        /// </summary>
+        public List<Column> MergeMatchColumns => Columns.Where(x => !x.IsAudit).ToList();
+
+        /// <summary>
+        /// Gets the primary key columns.
+        /// </summary>
+        public List<Column> PrimaryKeyColumns => Columns.Where(x => x.IsPrimaryKey).ToList();
 
         /// <summary>
         /// Gets the rows.
@@ -87,9 +97,9 @@ namespace Beef.Database.Core.Sql
             if (row == null)
                 throw new ArgumentNullException(nameof(row));
 
-            foreach (var c in row.Columns.Where(x => x.Value != null && !string.IsNullOrEmpty(x.Value.Name)))
+            foreach (var c in row.Columns)
             {
-                AddColumn(c.Value.Name!);
+                AddColumn(c.Name!);
             }
 
             Rows.Add(row);
@@ -100,8 +110,12 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         private void AddColumn(string name)
         {
-            if (!Columns.ContainsKey(name))
-                Columns.Add(name, DbTable.Columns.Where(x => x.Name == name).SingleOrDefault());
+            var column = DbTable.Columns.Where(x => x.Name == name).SingleOrDefault();
+            if (column == null)
+                return;
+
+            if (!Columns.Any(x => x.Name == name))
+                Columns.Add(column);
         }
 
         /// <summary>
@@ -133,7 +147,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         private void AddColumnWhereNotSpecified(SqlDataRow row, bool when, string name, object value)
         {
-            if (when && !row.Columns.ContainsKey(name))
+            if (when && !row.Columns.Any(x => x.Name == name))
             {
                 AddColumn(name);
                 row.AddColumn(name, value);

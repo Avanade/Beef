@@ -2,7 +2,9 @@
 
 using Beef.CodeGen;
 using Beef.CodeGen.Entities;
+using Beef.CodeGen.Generators;
 using Beef.Data.Database;
+using HandlebarsDotNet;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -238,7 +240,7 @@ namespace Beef.Database.Core.Sql
                 // Add the columns configuration (used/referenced).
                 foreach (var col in t.Columns)
                 {
-                    col.Value.CreateXml(xt);
+                    col.CreateXml(xt);
                 }
 
                 // Add the actual rows and columns.
@@ -249,9 +251,9 @@ namespace Beef.Database.Core.Sql
                     foreach (var c in r.Columns)
                     {
                         var xc = new XElement("Col",
-                            new XAttribute("Name", c.Value.Name),
-                            new XAttribute("Value", c.Value.ToSqlValue()),
-                            new XAttribute("UseForeignKeyQueryForId", c.Value.UseForeignKeyQueryForId));
+                            new XAttribute("Name", c.Name),
+                            new XAttribute("Value", c.ToSqlValue()),
+                            new XAttribute("UseForeignKeyQueryForId", c.UseForeignKeyQueryForId));
 
                         xr.Add(xc);
                     }
@@ -269,14 +271,22 @@ namespace Beef.Database.Core.Sql
         /// Generates the SQL.
         /// </summary>
         /// <param name="codeGen">The code generation action to execute.</param>
-        public async Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
+        public Task GenerateSqlAsync(Action<CodeGeneratorEventArgs> codeGen)
         {
             if (codeGen == null)
                 throw new ArgumentNullException(nameof(codeGen));
 
-            var cg = CodeGenerator.Create(CreateXml());
-            cg.CodeGenerated += (o, e) => codeGen(e);
-            await cg.GenerateAsync(XElement.Load(typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.xml"))).ConfigureAwait(false);
+            using var st = typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.hb");
+            using var tr = new StreamReader(st!);
+            HandlebarsHelpers.RegisterHelpers();
+            var hb = Handlebars.Compile(tr.ReadToEnd());
+
+            foreach (var t in Tables)
+            {
+                codeGen(new CodeGeneratorEventArgs { Content = hb.Invoke(t), OutputFileName = $"{t.Schema}.{t.Name} SQL" });
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

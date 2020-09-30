@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen.Config.Database;
+using Beef.CodeGen.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Beef.Database.Core.Sql
 {
@@ -29,7 +31,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public Dictionary<string, SqlDataColumn> Columns { get; } = new Dictionary<string, SqlDataColumn>();
+        public List<SqlDataColumn> Columns { get; } = new List<SqlDataColumn>();
 
         /// <summary>
         /// Adds a <see cref="SqlDataColumn"/> to the row using the specified name and value.
@@ -64,8 +66,11 @@ namespace Beef.Database.Core.Sql
                 column.Name += "Id";
             }
 
-            if (!Columns.TryAdd(column.Name, column))
+            if (Columns.Any(x => x.Name == column.Name))
                 throw new SqlDataUpdaterException($"Table '{Table.Schema}.{Table.Name}' column '{column.Name}' has been specified more than once.");
+
+            column.DbColumn = col;
+            Columns.Add(column);
 
             if (column.Value == null)
                 return;
@@ -74,7 +79,7 @@ namespace Beef.Database.Core.Sql
             try
             {
                 str = column.Value is DateTime time ? time.ToString(SqlDataUpdater.DateTimeFormat, System.Globalization.CultureInfo.InvariantCulture) : column.Value.ToString()!;
-                switch (ColumnConfig.GetDotNetTypeName(col.Type))
+                switch (Column.GetDotNetTypeName(col.Type))
                 {
                     case "string": column.Value = str; break;
                     case "decimal": column.Value = decimal.Parse(str, System.Globalization.CultureInfo.InvariantCulture); break;

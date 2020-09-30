@@ -85,7 +85,7 @@ namespace Beef.CodeGen.Generators
                 context.Template(writer, parameters);
             });
 
-            // Will check that all of the arguments have a <c>true</c> value where bool; otherwise, non-null.
+            // Will check that any of the arguments have a <c>true</c> value where bool; otherwise, non-null.
             Handlebars.RegisterHelper("ifor", (writer, context, parameters, args) =>
             {
                 if (!CheckArgs("ifor", writer, args))

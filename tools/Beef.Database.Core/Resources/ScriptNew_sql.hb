@@ -1,14 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<Template OutputFileName="XXXX">
-  <![CDATA[-- Migration Script
+﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
+-- Migration Script
 
 BEGIN TRANSACTION
 
-]]>
-  <Switch Value="Config.ScriptNew">
-    <Case Value="'CreateRef'">
-      <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
+{{#ifeq Action 'CreateRef'}}
+CREATE TABLE [{{Schema}}].[{{Table}}] (
   [{{Config.Table}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
   [Code] NVARCHAR(50) NOT NULL UNIQUE,
   [Text] NVARCHAR(250) NULL,
@@ -20,10 +16,9 @@ BEGIN TRANSACTION
   [UpdatedBy] NVARCHAR(250) NULL,
   [UpdatedDate] DATETIME2 NULL
 );
-]]>
-    </Case>
-    <Case Value="'Create'">
-      <![CDATA[CREATE TABLE [{{Config.Schema}}].[{{Config.Table}}] (
+{{else}}
+  {{#ifeq Action 'Create'}}
+CREATE TABLE [{{Schema}}].[{{Table}}] (
   [{{Config.Table}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
   -- [Code] NVARCHAR(50) NULL UNIQUE,
   -- [Text] NVARCHAR(250) NULL,
@@ -35,18 +30,14 @@ BEGIN TRANSACTION
   [UpdatedBy] NVARCHAR(250) NULL,
   [UpdatedDate] DATETIME2 NULL
 );
-]]>
-    </Case>
-    <Case Value="'Alter'">
-      <![CDATA[ALTER TABLE [{{Config.Schema}}].[{{Config.Table}}]
+  {{else}}
+    {{#ifeq Action 'Alter'}}
+ALTER TABLE [{{Schema}}].[{{Table}}]
   -- ADD [Column] NVARCHAR(50) NULL
-]]>
-    </Case>
-    <Default>
-      <![CDATA[-- SQL STATEMENT(s)
-]]>
-    </Default>
-  </Switch>
-  <![CDATA[	
-COMMIT TRANSACTION]]>
-</Template>
+    {{else}}
+-- SQL STATEMENT(s)
+    {{/ifeq}}
+  {{/ifeq}}
+{{/ifeq}}
+
+COMMIT TRANSACTION
