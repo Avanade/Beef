@@ -9,14 +9,14 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the <b>WebAPI EntityController</b> code generator; where not excluded and at least one operation exists.
     /// </summary>
-    public class EntityWebApiControllerCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
+    public class EntityWebApiControllerCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
+        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
             => Check.NotNull(config, nameof(config)).Entities.Where(x => IsFalse(x.ExcludeWebApi) && x.Operations!.Count > 0).AsEnumerable();
     }
 }

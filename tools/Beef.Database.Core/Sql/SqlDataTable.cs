@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Beef.Data.Database;
 using System;
 using System.Collections.Generic;
@@ -54,9 +54,9 @@ namespace Beef.Database.Core.Sql
         public string Name { get; private set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="Table"/>.
+        /// Gets or sets the database <see cref="CodeGen.DbModels.DbTable"/>.
         /// </summary>
-        public Table DbTable { get; private set; }
+        public DbTable DbTable { get; private set; }
 
         /// <summary>
         /// Indicates whether the table is reference data.
@@ -71,17 +71,17 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the columns.
         /// </summary>
-        public List<Column> Columns { get; } = new List<Column>();
+        public List<DbColumn> Columns { get; } = new List<DbColumn>();
 
         /// <summary>
         /// Gets the merge match columns.
         /// </summary>
-        public List<Column> MergeMatchColumns => Columns.Where(x => !x.IsAudit).ToList();
+        public List<DbColumn> MergeMatchColumns => Columns.Where(x => !x.IsAudit).ToList();
 
         /// <summary>
         /// Gets the primary key columns.
         /// </summary>
-        public List<Column> PrimaryKeyColumns => Columns.Where(x => x.IsPrimaryKey).ToList();
+        public List<DbColumn> PrimaryKeyColumns => Columns.Where(x => x.IsPrimaryKey).ToList();
 
         /// <summary>
         /// Gets the rows.

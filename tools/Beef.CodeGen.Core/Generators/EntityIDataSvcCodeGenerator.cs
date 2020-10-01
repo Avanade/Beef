@@ -9,14 +9,14 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the <b>IEntityDataSvc</b> code generator; where not excluded and at least one operation exists.
     /// </summary>
-    public class IEntityDataSvcCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
+    public class EntityIDataSvcCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
+        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
             => Check.NotNull(config, nameof(config)).Entities.Where(x => IsFalse(x.ExcludeIDataSvc) && x.Operations!.Count > 0).AsEnumerable();
     }
 }

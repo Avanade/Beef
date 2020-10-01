@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// <b>CodeGen Console</b> that facilitates the code generation output by handling the standard console arguments invoking the underlying <see cref="CodeGenerator"/>.
+    /// <b>CodeGen Console</b> that facilitates the code generation output by handling the standard console arguments invoking the underlying <see cref="CodeGeneratorEventArgs"/>.
     /// </summary>
     /// <remarks>Command line parsing: https://natemcmaster.github.io/CommandLineUtils/ </remarks>
     public class CodeGenConsole
@@ -74,7 +74,7 @@ namespace Beef.CodeGen
 
             _expectNoChange = App.Option("--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
 
-            _logger = Logger.Default == null ? Logger.Default = new ColoredConsoleLogger(nameof(CodeGenConsole)) : Logger.Default;
+            _logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
 
             App.OnExecuteAsync(async (_) =>
             {

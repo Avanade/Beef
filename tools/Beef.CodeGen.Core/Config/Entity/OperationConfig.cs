@@ -603,7 +603,7 @@ namespace Beef.CodeGen.Config.Entity
                 _ => null
             });
 
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => Type switch
+            Text = ToComments(DefaultWhereNull(Text, () => Type switch
                 {
                     "Get" => $"Gets the specified {{{{{ReturnType}}}}}",
                     "GetColl" => $"Gets the {{{{{ReturnType}}}}} that contains the items that match the selection criteria",
@@ -614,7 +614,7 @@ namespace Beef.CodeGen.Config.Entity
                     _ => StringConversion.ToSentenceCase(Name)
                 }));
 
-            ReturnText = CodeGenerator.ToComments(DefaultWhereNull(ReturnText, () => Type switch
+            ReturnText = ToComments(DefaultWhereNull(ReturnText, () => Type switch
             {
                 "Get" => $"The selected {{{{{ReturnType}}}}} where found",
                 "GetColl" => $"The {{{{{ReturnType}}}}}",
@@ -625,7 +625,7 @@ namespace Beef.CodeGen.Config.Entity
                 _ => HasReturnValue ? $"A resultant {{{{{ReturnType}}}}}" : null
             })) + ".";
 
-            WebApiReturnText = Type == "GetColl" ? CodeGenerator.ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
+            WebApiReturnText = Type == "GetColl" ? ToComments($"The {{{{{BaseReturnType}Collection}}}}") : ReturnText;
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
@@ -739,7 +739,7 @@ namespace Beef.CodeGen.Config.Entity
 
             PrepareData();
 
-            GrpcReturnMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
+            GrpcReturnMapper = SystemTypes.Contains(BaseReturnType) ? null : GrpcReturnType;
             GrpcReturnConverter = BaseReturnType switch
             {
                 "DateTime" => $"{(CompareValue(ReturnTypeNullable, true) ? "Nullable" : "")}DateTimeToTimestamp",

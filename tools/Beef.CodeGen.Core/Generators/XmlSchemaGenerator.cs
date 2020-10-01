@@ -81,13 +81,16 @@ namespace Beef.CodeGen.Generators
                 if (jpa == null)
                     continue;
 
+                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
+                var xmlName = XmlYamlTranslate.GetXmlName(ce, name);
+                //var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ce, xmlName);
+
                 var psa = pi.GetCustomAttribute<PropertySchemaAttribute>();
                 if (psa == null)
                     continue;
 
-                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
                 var xp = new XElement(ns + "attribute",
-                    new XAttribute("name", XmlYamlTranslate.GetXmlName(ce, name)),
+                    new XAttribute("name", xmlName),
                     new XAttribute("use", psa.IsMandatory ? "required" : "optional"));
 
                 xp.Add(new XElement(ns + "annotation", new XElement(ns + "documentation", GetDocumentation(name, psa))));

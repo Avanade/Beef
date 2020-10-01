@@ -8,12 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Beef.CodeGen.Entities
+namespace Beef.CodeGen.DbModels
 {
     /// <summary>
     /// Represents the SQL Server Database <b>Table</b> schema definition.
     /// </summary>
-    public class Table
+    public class DbTable
     {
         private string? _name;
 
@@ -24,13 +24,13 @@ namespace Beef.CodeGen.Entities
         /// <param name="refDataSchema">The reference data schema.</param>
         /// <param name="autoSecurity">Indicates whether the UserRole security should be automatically applied.</param>
         /// <param name="skipSqlSpecific">Indicates whether to skip the Microsoft SQL Server specific metadata queries.</param>
-        public static async Task<List<Table>> LoadTablesAndColumnsAsync(DatabaseBase db, string? refDataSchema = null, bool autoSecurity = false, bool skipSqlSpecific = false)
+        public static async Task<List<DbTable>> LoadTablesAndColumnsAsync(DatabaseBase db, string? refDataSchema = null, bool autoSecurity = false, bool skipSqlSpecific = false)
         {
             if (db == null)
                 throw new ArgumentNullException(nameof(db));
 
-            var tables = new List<Table>();
-            Table? table = null;
+            var tables = new List<DbTable>();
+            DbTable? table = null;
 
             // Get all the tables and their columns.
             await db.SqlStatement((await ResourceManager.GetResourceContentAsync("SelectTableAndColumns.sql").ConfigureAwait(false))!).SelectQueryAsync((dr) =>
@@ -290,12 +290,12 @@ namespace Beef.CodeGen.Entities
         public bool EfModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="Column"/> list.
+        /// Gets or sets the <see cref="DbColumn"/> list.
         /// </summary>
-        public List<Column> Columns { get; private set; } = new List<Column>();
+        public List<DbColumn> Columns { get; private set; } = new List<DbColumn>();
 
         /// <summary>
-        /// Creates (and adds) the <see cref="Table"/> element for code generation.
+        /// Creates (and adds) the <see cref="DbTable"/> element for code generation.
         /// </summary>
         /// <param name="xml">The <see cref="XElement"/> to add to.</param>
         public void CreateXml(XElement xml)
@@ -354,10 +354,10 @@ namespace Beef.CodeGen.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Table"/> database mapper.
+    /// Represents the <see cref="DbTable"/> database mapper.
     /// </summary>
 #pragma warning disable CA1812 // Apparently never instantiated; by-design - it is!
-    internal class TableMapper : DatabaseMapper<Table, TableMapper>
+    internal class TableMapper : DatabaseMapper<DbTable, TableMapper>
 #pragma warning restore CA1812
     {
         /// <summary>
@@ -373,12 +373,12 @@ namespace Beef.CodeGen.Entities
         /// <summary>
         /// Default other properties.
         /// </summary>
-        /// <param name="value">The <see cref="Table"/> value.</param>
+        /// <param name="value">The <see cref="DbTable"/> value.</param>
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
         /// <param name="operationType">The <see cref="OperationTypes"/>.</param>
         /// <param name="data">Optional data.</param>
-        /// <returns>The <see cref="Table"/> value.</returns>
-        protected override Table OnMapFromDb(Table value, DatabaseRecord dr, OperationTypes operationType, object? data)
+        /// <returns>The <see cref="DbTable"/> value.</returns>
+        protected override DbTable OnMapFromDb(DbTable value, DatabaseRecord dr, OperationTypes operationType, object? data)
         {
             value.View = !value.IsAView;
             value.Get = true;

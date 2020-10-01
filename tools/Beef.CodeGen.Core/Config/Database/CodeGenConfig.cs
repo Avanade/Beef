@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Beef.Data.Database;
 using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -219,7 +219,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the list of tables that exist within the database.
         /// </summary>
-        public List<Table>? DbTables { get; private set; }
+        public List<DbTable>? DbTables { get; private set; }
 
         /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.
@@ -274,7 +274,7 @@ namespace Beef.CodeGen.Config.Database
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlServerDb(cs);
-            DbTables = Table.LoadTablesAndColumnsAsync(db, RefDatabaseSchema, false, false).GetAwaiter().GetResult();
+            DbTables = DbTable.LoadTablesAndColumnsAsync(db, RefDatabaseSchema, false, false).GetAwaiter().GetResult();
 
             sw.Stop();
             Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");

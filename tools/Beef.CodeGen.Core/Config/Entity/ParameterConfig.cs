@@ -200,8 +200,9 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" ? CodeGenerator.ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
-            : CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? SummaryText => IsValueArg && Parent!.Type == "Patch" 
+            ? ToComments($"The {{{{JToken}}}} that contains the patch content for the {Text}.")
+            : ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the computed declared parameter type.
@@ -258,17 +259,17 @@ namespace Beef.CodeGen.Config.Entity
             }
 
             RelatedEntity = Root!.Entities.FirstOrDefault(x => x.Name == Type);
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            Text = ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
 
                 if (RelatedEntity != null)
                 {
                     if (RelatedEntity.EntityScope == null || RelatedEntity.EntityScope == "Common")
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Common.Entities." + Type)})";
                     else
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Business.Entities." + Type)})";
                 }
 
                 return StringConversion.ToSentenceCase(Name);
@@ -276,7 +277,7 @@ namespace Beef.CodeGen.Config.Entity
 
             PrivateName = DefaultWhereNull(PrivateName, () => pc == null ? StringConversion.ToPrivateCase(Name) : pc.Name);
             ArgumentName = DefaultWhereNull(ArgumentName, () => pc == null ? StringConversion.ToCamelCase(Name) : pc.ArgumentName);
-            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
+            Nullable = DefaultWhereNull(Nullable, () => pc == null ? !IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
@@ -288,7 +289,7 @@ namespace Beef.CodeGen.Config.Entity
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
 
             GrpcType = DefaultWhereNull(GrpcType, () => PropertyConfig.InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList));
-            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
             GrpcConverter = Type switch
             {
                 "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}DateTimeToTimestamp",

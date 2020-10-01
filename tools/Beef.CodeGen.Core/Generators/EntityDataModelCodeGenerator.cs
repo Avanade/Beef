@@ -7,9 +7,9 @@ using System.Linq;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the <b>Grpc EntityAgent</b> code generator; where not excluded and at least one operation exists.
+    /// Represents the <b>entity model</b> code generator; where the <see cref="EntityConfig.DataModel"/> is <c>true</c>.
     /// </summary>
-    public class EntityGrpcAgentCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
+    public class EntityDataModelCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
@@ -17,6 +17,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.Grpc) && x.GrpcOperations!.Count > 0).AsEnumerable();
+            => Check.NotNull(config, nameof(config)).Entities.Where(x => IsTrue(x.DataModel)).AsEnumerable();
     }
 }

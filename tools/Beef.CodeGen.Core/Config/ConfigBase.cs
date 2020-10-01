@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Beef.CodeGen.Config
 {
@@ -32,6 +33,26 @@ namespace Beef.CodeGen.Config
     /// </summary>
     public abstract class ConfigBase
     {
+        #region static
+
+        /// <summary>
+        /// The list of standard system <see cref="Type"/> names.
+        /// </summary>
+        public static List<string> SystemTypes => new List<string>
+        {
+            "void", "bool", "byte", "char", "decimal", "double", "float", "int", "long",
+            "sbyte", "short", "unit", "ulong", "ushort", "string", "DateTime", "TimeSpan", "Guid"
+        };
+
+        /// <summary>
+        /// The list of system <see cref="Type"/> names that should not be nullable by default.
+        /// </summary>
+        public static List<string> IgnoreNullableTypes => new List<string>
+        {
+            "bool", "byte", "char", "decimal", "double", "float", "int", "long",
+            "sbyte", "short", "unit", "ulong", "ushort", "DateTime", "TimeSpan", "Guid"
+        };
+
         /// <summary>
         /// Defaults the <see cref="string"/> <paramref name="value"/> where <c>null</c> using the <paramref name="defaultValue"/> function.
         /// </summary>
@@ -77,6 +98,67 @@ namespace Beef.CodeGen.Config
         /// <param name="compareTo">The value to compare to.</param>
         /// <returns><c>true</c> where equal; otherwise, <c>false</c>.</returns>
         public static bool CompareValue(bool? propertyValue, bool compareTo) => propertyValue != null && propertyValue == compareTo;
+
+        /// <summary>
+        /// Converts <paramref name="text"/> to c# 'see cref=' Comments ('List&lt;int&gt;' would become 'List{int}' respectively). 
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        private static string? ReplaceGenericsBracketWithCommentsBracket(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = text.Replace("<", "{", StringComparison.InvariantCulture);
+            s = s.Replace(">", "}", StringComparison.InvariantCulture);
+            return s;
+        }
+
+        /// <summary>
+        /// Converts <paramref name="text"/> to c# Comments ('{{xyx}}' would become 'see cref=' XML, and any &lt;&gt; within the xyz would become {} respectively). 
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        public static string? ToComments(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var s = text;
+            while (true)
+            {
+                var start = s.IndexOf("{{", StringComparison.InvariantCultureIgnoreCase);
+                var end = s.IndexOf("}}", StringComparison.InvariantCultureIgnoreCase);
+
+                if (start < 0 && end < 0)
+                    break;
+
+                if (start < 0 || end < 0 || end < start)
+                    throw new CodeGenException("Start and End {{ }} parameter mismatch.", text);
+
+                string sub = s.Substring(start, end - start + 2);
+                string? mid = ReplaceGenericsBracketWithCommentsBracket(sub[2..^2]);
+
+                s = s.Replace(sub, string.Format(CultureInfo.InvariantCulture, "<see cref=\"{0}\"/>", mid), StringComparison.InvariantCulture);
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Converts <paramref name="text"/> to c# 'see cref=' comments ('List&lt;int&gt;' would become '&lt;see cref="List{int}/&gt;' respectively). 
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The converted text.</returns>
+        public static string? ToSeeComments(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            return $"<see cref=\"{ReplaceGenericsBracketWithCommentsBracket(text)}\"/>";
+        }
+
+        #endregion
 
         /// <summary>
         /// Prepares the configuration properties in advance of the code-generation execution (Internal use!).

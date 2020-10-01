@@ -580,7 +580,7 @@ namespace Beef.Database.Core
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 
-            using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.ScriptNew_sql.hb"))
+            using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.ScriptNew_sql.hbs"))
             {
                 using var tr = new StreamReader(st!);
                 HandlebarsHelpers.RegisterHelpers();

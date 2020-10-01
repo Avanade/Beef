@@ -9,14 +9,14 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the primary <b>entity</b> code generator; where not excluded, within the selected scope, and where not omitting entity base capabilities.
     /// </summary>
-    public class EntityCodeGenerator : CodeGeneratorBase<Config.Entity.CodeGenConfig, EntityConfig>
+    public class EntityCodeGenerator : CodeGeneratorBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<EntityConfig> SelectGenConfig(Config.Entity.CodeGenConfig config)
+        protected override IEnumerable<EntityConfig> SelectGenConfig(CodeGenConfig config)
             => Check.NotNull(config, nameof(config)).Entities.Where(x => IsFalse(x.ExcludeEntity) && x.EntityScope == x.Root!.EntityScope && IsFalse(x.OmitEntityBase)).AsEnumerable();
     }
 }

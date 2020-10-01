@@ -146,10 +146,7 @@ namespace Beef.CodeGen
         /// Initializes a new instance of the <see cref="CodeGenExecutor"/> class.
         /// </summary>
         /// <param name="args">The <see cref="CodeGenExecutorArgs"/>.</param>
-        public CodeGenExecutor(CodeGenExecutorArgs args)
-        {
-            _args = Check.NotNull(args, nameof(args));
-        }
+        public CodeGenExecutor(CodeGenExecutorArgs args) => _args = Check.NotNull(args, nameof(args));
 
         /// <summary>
         /// Executes the selected code generation.
@@ -162,19 +159,12 @@ namespace Beef.CodeGen
             try
             {
                 // Load the script configuration.
-                var (scripts, loaders, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
+                var (scripts, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
 
                 var cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
                 var rcfg = (IRootConfig)cfg;
                 rcfg.ReplaceRuntimeParameters(_args.Parameters);
                 cfg.Prepare(cfg, cfg);
-
-                // Create the "legacy" code generator instance.
-                string? outputDir = null;
-
-                using var cfs = File.OpenText(_args.ConfigFile!.FullName);
-                var gen = CodeGenerator.Create(await XElement.LoadAsync(cfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false), loaders);
-                gen.CodeGenerated += (sender, e) => { CodeGenerated(outputDir!, e); };
 
                 // Execute each of the script instructions.
                 foreach (var script in scripts)
@@ -189,31 +179,16 @@ namespace Beef.CodeGen
                     // Get the template contents.
                     var template = await GetTemplateContentsAsync(script).ConfigureAwait(false);
 
-                    if (script.GenType != null)
-                    {
-                        // Execute the new+improved handlebars-based code-gen.
-                        rcfg!.ResetRuntimeParameters();
-                        rcfg!.ReplaceRuntimeParameters(_args.Parameters);
-                        rcfg!.ReplaceRuntimeParameters(script.OtherParameters);
+                    // Execute the new+improved handlebars-based code-gen.
+                    rcfg!.ResetRuntimeParameters();
+                    rcfg!.ReplaceRuntimeParameters(_args.Parameters);
+                    rcfg!.ReplaceRuntimeParameters(script.OtherParameters);
 
-                        var gt = Type.GetType(script.GenType) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be loaded.");
-                        var cg = (CodeGeneratorBase)(Activator.CreateInstance(gt) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be instantiated."));
-                        cg.OutputFileName = script.FileName;
-                        cg.OutputDirName = script.OutDir;
-                        cg.Generate(template, cfg!, e => CodeGenerated(_args.OutputPath!.FullName, e));
-                    }
-                    else
-                    {
-                        // Execute the legacy custom code-gen (being slowly deprecated).
-                        gen.ClearParameters();
-                        gen.CopyParameters(_args.Parameters);
-                        gen.CopyParameters(script.OtherParameters);
-
-                        outputDir = Path.Combine(_args.OutputPath!.FullName, SubstituteOutputDir(script.OutDir!));
-
-                        using var sr = new StringReader(template);
-                        await gen.GenerateAsync(XElement.Load(sr, LoadOptions.None)).ConfigureAwait(false);
-                    }
+                    var gt = Type.GetType(script.GenType!) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be loaded.");
+                    var cg = (CodeGeneratorBase)(Activator.CreateInstance(gt) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be instantiated."));
+                    cg.OutputFileName = script.FileName;
+                    cg.OutputDirName = script.OutDir;
+                    cg.Generate(template, cfg!, e => CodeGenerated(_args.OutputPath!.FullName, e));
 
                     // Provide statistics.
                     _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
@@ -245,7 +220,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Load the code-gen scripts configuration.
         /// </summary>
-        private async Task<(List<CodeGenScriptArgs>, List<ICodeGenConfigLoader>, ConfigType)> LoadScriptConfigAsync()
+        private async Task<(List<CodeGenScriptArgs>, ConfigType)> LoadScriptConfigAsync()
         {
             var list = new List<CodeGenScriptArgs>();
 
@@ -292,33 +267,9 @@ namespace Beef.CodeGen
 
             var ct = xmlScript.Attribute("ConfigType")?.Value ?? throw new CodeGenException("The Script XML file must have an attribute named 'ConfigType' within the root 'Script' element.");
             if (Enum.TryParse<ConfigType>(ct, true, out var configType))
-                return (list, GetLoaders(xmlScript), configType);
+                return (list, configType);
 
             throw new CodeGenException($"The Script XML file attribute named 'ConfigType' has an invalid value '{ct}'.");
-        }
-
-        /// <summary>
-        /// Gets the configured set of loaders.
-        /// </summary>
-        private static List<ICodeGenConfigLoader> GetLoaders(XElement xmlScript)
-        {
-            var loaders = new List<ICodeGenConfigLoader>();
-
-            var lt = xmlScript.Attribute("LoaderType")?.Value;
-            if (string.IsNullOrEmpty(lt))
-                return loaders;
-
-            var type = Type.GetType(lt, false, true);
-            if (type == null)
-                throw new CodeGenException($"The Script XML 'LoaderType' does not exist: {lt}.");
-
-            if (Activator.CreateInstance(type) is ICodeGenConfigGetLoaders cgl)
-            {
-                loaders.AddRange(cgl.GetLoaders());
-                return loaders;
-            }
-
-            throw new CodeGenException($"The Script XML 'LoaderType' does not implement 'ICodeGenConfigGetLoaders': {lt}.");
         }
 
         /// <summary>
@@ -374,23 +325,6 @@ namespace Beef.CodeGen
                 throw new CodeGenException($"The Template file '{fi.FullName}' does not exist.");
 
             return await File.ReadAllTextAsync(fi.FullName, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Handle the output directory substitution.
-        /// </summary>
-        private string SubstituteOutputDir(string outputDir)
-        {
-            var dir = outputDir;
-            foreach (var p in _args.Parameters)
-            {
-                dir = dir.Replace("{{" + p.Key + "}}", p.Value, StringComparison.InvariantCultureIgnoreCase);
-            }
-
-            if (dir.Contains("{{", StringComparison.InvariantCultureIgnoreCase) || dir.Contains("}}", StringComparison.InvariantCultureIgnoreCase))
-                throw new CodeGenException($"Unhandled substitution characters have been found in the Script OutDir {dir}.");
-
-            return dir;
         }
 
         /// <summary>

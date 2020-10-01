@@ -5,12 +5,12 @@ using System;
 using System.Text;
 using System.Xml.Linq;
 
-namespace Beef.CodeGen.Entities
+namespace Beef.CodeGen.DbModels
 {
     /// <summary>
     /// Represents the SQL Server Database <b>Column</b> schema definition.
     /// </summary>
-    public class Column
+    public class DbColumn
     {
         /// <summary>
         /// Indicates whether the database type maps to a <see cref="string"/>.
@@ -263,7 +263,7 @@ namespace Beef.CodeGen.Entities
             get
             {
                 var sb = new StringBuilder(Type!.ToUpperInvariant());
-                if (Column.TypeIsString(Type))
+                if (DbColumn.TypeIsString(Type))
                     sb.Append(Length.HasValue && Length.Value > 0 ? $"({Length.Value})" : "(MAX)");
 
                 sb.Append(Type.ToUpperInvariant() switch
@@ -287,7 +287,7 @@ namespace Beef.CodeGen.Entities
         public bool IsAudit => Name == DatabaseColumns.CreatedByName || Name == DatabaseColumns.CreatedDateName || Name == DatabaseColumns.UpdatedByName || Name == DatabaseColumns.UpdatedDateName || Name == DatabaseColumns.DeletedByName || Name == DatabaseColumns.DeletedDateName;
 
         /// <summary>
-        /// Creates (and adds) the <see cref="Table"/> element for code generation.
+        /// Creates (and adds) the <see cref="DbTable"/> element for code generation.
         /// </summary>
         /// <param name="xml">The <see cref="XElement"/> to add to.</param>
         public void CreateXml(XElement xml)
@@ -346,10 +346,10 @@ namespace Beef.CodeGen.Entities
     }
 
     /// <summary>
-    /// Represents the <see cref="Column"/> database mapper.
+    /// Represents the <see cref="DbColumn"/> database mapper.
     /// </summary>
 #pragma warning disable CA1812 // Apparently never instantiated; by-design - it is!
-    internal class ColumnMapper : DatabaseMapper<Column, ColumnMapper>
+    internal class ColumnMapper : DatabaseMapper<DbColumn, ColumnMapper>
 #pragma warning restore CA1812
     {
         /// <summary>

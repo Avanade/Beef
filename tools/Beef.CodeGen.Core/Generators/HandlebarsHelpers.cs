@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Config;
 using HandlebarsDotNet;
 using System.Collections;
 using System.Globalization;
@@ -124,7 +125,7 @@ namespace Beef.CodeGen.Generators
             Handlebars.RegisterHelper("pascal", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPascalCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
 
             // Converts a value to the c# '<see cref="value"/>' comments equivalent.
-            Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(Beef.CodeGen.CodeGenerator.ToSeeComments(parameters.FirstOrDefault()?.ToString())));
+            Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(ConfigBase.ToSeeComments(parameters.FirstOrDefault()?.ToString())));
 
             // Adds a value to a value.
             Handlebars.RegisterHelper("add", (writer, context, parameters) =>

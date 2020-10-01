@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Config.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,6 +79,15 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending"))
         });
 
+        private static readonly List<(ConfigurationEntity Entity, string XmlName, Type OverrideType, PropertySchemaAttribute Attribute)> _xmlSpecificPropertySchema = new List<(ConfigurationEntity, string, Type, PropertySchemaAttribute)>(new (ConfigurationEntity, string, Type, PropertySchemaAttribute)[]
+        {
+            (ConfigurationEntity.CodeGen, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi") 
+                { 
+                    Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), or `AllowAnonymous` (or `false`).",
+                    Description = "Defaults to the `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                })
+        });
+
         /// <summary>
         /// Converts the GetAllOrderBy XML to YAML.
         /// </summary>
@@ -131,6 +139,15 @@ namespace Beef.CodeGen.Config
         {
             var item = _xmlToYamlConvert.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
             return item.Converter == null ? xmlValue : item.Converter(xmlValue);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PropertySchemaAttribute"/> for the specified XML name.
+        /// </summary>
+        public static (Type Type, PropertySchemaAttribute Attribute) GetXmlPropertySchemaAttribute(ConfigurationEntity entity, string xmlName)
+        {
+            var item = _xmlSpecificPropertySchema.FirstOrDefault(x => x.Entity == entity && x.XmlName == xmlName);
+            return (item.OverrideType, item.Attribute);
         }
     }
 

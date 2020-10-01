@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using System;
 
 namespace Beef.Database.Core.Sql
@@ -21,9 +21,9 @@ namespace Beef.Database.Core.Sql
         public object? Value { get; set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="Column"/> configuration.
+        /// Gets or sets the database <see cref="CodeGen.DbModels.DbColumn"/> configuration.
         /// </summary>
-        public Column? DbColumn { get; set; }
+        public DbColumn? DbColumn { get; set; }
 
         /// <summary>
         /// Gets the SQL formatted value.

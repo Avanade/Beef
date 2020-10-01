@@ -5,5 +5,5 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the <b>Root</b> code generator for <see cref="Config.Database.CodeGenConfig"/>.
     /// </summary>
-    public class RootDatabaseCodeGenerator : CodeGeneratorBase<Config.Database.CodeGenConfig> { }
+    public class DatabaseRootCodeGenerator : CodeGeneratorBase<Config.Database.CodeGenConfig> { }
 }

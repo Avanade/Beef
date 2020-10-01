@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.CodeGen;
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Beef.CodeGen.Generators;
 using Beef.Data.Database;
 using HandlebarsDotNet;
@@ -34,7 +34,7 @@ namespace Beef.Database.Core.Sql
         public static async Task RegisterDatabaseAsync(DatabaseBase db, string? refDataSchema = null)
         {
             if (DbTables == null)
-                DbTables = await Table.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
+                DbTables = await DbTable.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
 
             RefDataSchema = refDataSchema;
         }
@@ -44,7 +44,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="tables">The tables.</param>
         /// <param name="refDataSchema">The reference data schema.</param>
-        public static void RegisterDatabase(List<Table> tables, string? refDataSchema = null)
+        public static void RegisterDatabase(List<DbTable> tables, string? refDataSchema = null)
         {
             if (DbTables == null)
                 DbTables = tables;
@@ -60,7 +60,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the registered database tables.
         /// </summary>
-        public static List<Table>? DbTables { get; private set; }
+        public static List<DbTable>? DbTables { get; private set; }
 
         /// <summary>
         /// Reads and parses the YAML <see cref="string"/>.
@@ -276,7 +276,7 @@ namespace Beef.Database.Core.Sql
             if (codeGen == null)
                 throw new ArgumentNullException(nameof(codeGen));
 
-            using var st = typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.hb");
+            using var st = typeof(SqlDataUpdater).Assembly.GetManifestResourceStream($"{typeof(DatabaseExecutor).Namespace}.Resources.TableInsertOrMerge_sql.hbs");
             using var tr = new StreamReader(st!);
             HandlebarsHelpers.RegisterHelpers();
             var hb = Handlebars.Compile(tr.ReadToEnd());

@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -387,7 +387,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
         /// </summary>
-        public Table? DbTable { get; private set; }
+        public DbTable? DbTable { get; private set; }
 
         /// <summary>
         /// Gets the fully qualified name schema.table name.

@@ -433,14 +433,14 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
+        public string? SummaryText => ToComments($"{(Type == "bool" ? "Indicates whether" : "Gets or sets the")} {Text}.");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Serialization Identifier (SID) property.
         /// </summary>
         public string? SummaryRefDataSid => CompareValue(RefDataList, true)
-            ? CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
-            : CodeGenerator.ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
+            ? ToComments($"Gets or sets the {{{{{Name}}}}} list using the underlying Serialization Identifier (SID).")
+            : ToComments($"Gets or sets the {{{{{Name}}}}} using the underlying Serialization Identifier (SID).");
 
         /// <summary>
         /// Gets the formatted summary text for the Reference Data Text property.
@@ -450,12 +450,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text when used in a parameter context.
         /// </summary>
-        public string? ParameterSummaryText => CodeGenerator.ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
+        public string? ParameterSummaryText => ToComments($"{(Type == "bool" ? "Indicates whether" : "The")} {Text}.");
 
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? PropertyNameSeeComments => CodeGenerator.ToSeeComments(Name);
+        public string? PropertyNameSeeComments => ToSeeComments(Name);
 
         /// <summary>
         /// Gets the computed declared property type.
@@ -549,21 +549,21 @@ namespace Beef.CodeGen.Config.Entity
 
             DeclaredType = $"{Type}{(CompareValue(Nullable, true) ? "?" : "")}";
 
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () =>
+            Text = ToComments(DefaultWhereNull(Text, () =>
             {
                 if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments(Type)})";
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments(Type)})";
 
                 if (Type == "ChangeLog")
-                    return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Beef.Entities." + Type)})";
+                    return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Beef.Entities." + Type)})";
 
                 var ent = Root!.Entities.FirstOrDefault(x => x.Name == Type);
                 if (ent != null)
                 {
                     if (ent.EntityScope == null || ent.EntityScope == "Common")
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Common.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Common.Entities." + Type)})";
                     else
-                        return $"{StringConversion.ToSentenceCase(Name)} (see {CodeGenerator.ToSeeComments("Business.Entities." + Type)})";
+                        return $"{StringConversion.ToSentenceCase(Name)} (see {ToSeeComments("Business.Entities." + Type)})";
                 }
 
                 return StringConversion.ToSentenceCase(Name);
@@ -576,7 +576,7 @@ namespace Beef.CodeGen.Config.Entity
             StringTransform = DefaultWhereNull(StringTransform, () => "UseDefault");
             RefDataText = DefaultWhereNull(RefDataText, () => Parent!.RefDataText);
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
-            Nullable = DefaultWhereNull(Nullable, () => !Beef.CodeGen.CodeGenConfig.IgnoreNullableTypes.Contains(Type!));
+            Nullable = DefaultWhereNull(Nullable, () => !IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
@@ -596,7 +596,7 @@ namespace Beef.CodeGen.Config.Entity
                 DataConverter = null;
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
-            GrpcMapper = Beef.CodeGen.CodeGenConfig.SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
+            GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;
             GrpcConverter = Type switch
             {
                 "DateTime" => $"{(CompareValue(Nullable, true) ? "Nullable" : "")}{(DateTimeTransform == "DateOnly" ? "DateTimeToDateOnly" : "DateTimeToTimestamp")}",

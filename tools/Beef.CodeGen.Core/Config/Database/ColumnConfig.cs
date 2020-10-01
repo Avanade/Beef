@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Entities;
+using Beef.CodeGen.DbModels;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 
 namespace Beef.CodeGen.Config.Database
@@ -21,9 +20,9 @@ namespace Beef.CodeGen.Config.Database
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the database <see cref="Column"/> configuration.
+        /// Gets or sets the database <see cref="DbModels.DbColumn"/> configuration.
         /// </summary>
-        public Column? DbColumn { get; set; }
+        public DbColumn? DbColumn { get; set; }
 
         /// <summary>
         /// Gets the qualified name (includes the alias).
@@ -60,7 +59,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         public string SqlInitialValue => DbColumn!.Type!.ToUpperInvariant() == "UNIQUEIDENTIFIER"
             ? "CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')"
-            : (Column.TypeIsInteger(DbColumn!.Type) || Column.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
+            : (DbColumn.TypeIsInteger(DbColumn!.Type) || DbColumn.TypeIsDecimal(DbColumn!.Type) ? "0" : "''");
 
         /// <summary>
         /// Indicates whether the column is considered an audit column.
@@ -160,7 +159,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the corresponding .NET <see cref="System.Type"/> name.
         /// </summary>
-        public string DotNetType => Column.GetDotNetTypeName(DbColumn!.Type);
+        public string DotNetType => DbColumn.GetDotNetTypeName(DbColumn!.Type);
 
         /// <summary>
         /// Indicates whether the .NET property is nullable.
@@ -181,7 +180,7 @@ namespace Beef.CodeGen.Config.Database
         private void UpdateSqlProperties()
         {
             var sb = new StringBuilder(DbColumn!.Type!.ToUpperInvariant());
-            if (Column.TypeIsString(DbColumn!.Type))
+            if (DbColumn.TypeIsString(DbColumn!.Type))
                 sb.Append(DbColumn!.Length.HasValue && DbColumn!.Length.Value > 0 ? $"({DbColumn!.Length.Value})" : "(MAX)");
 
             sb.Append(DbColumn!.Type.ToUpperInvariant() switch

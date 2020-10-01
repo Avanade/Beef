@@ -2,7 +2,6 @@
 
 using Beef.Caching;
 using Beef.Entities;
-using HandlebarsDotNet;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -844,7 +843,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the formatted summary text.
         /// </summary>
-        public string? SummaryText => CodeGenerator.ToComments($"Represents the {Text} entity.");
+        public string? SummaryText => ToComments($"Represents the {Text} entity.");
 
         /// <summary>
         /// Gets the entity name (accounts for <see cref="GenericWithT"/>).
@@ -864,7 +863,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? EntityNameSeeComments => CompareValue(ExcludeEntity, true) ? $"<b>{Name}</b>" : CodeGenerator.ToSeeComments(Name);
+        public string? EntityNameSeeComments => CompareValue(ExcludeEntity, true) ? $"<b>{Name}</b>" : ToSeeComments(Name);
 
         /// <summary>
         /// Gets or sets the computed entity inherits.
@@ -956,7 +955,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            Text = CodeGenerator.ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
+            Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));

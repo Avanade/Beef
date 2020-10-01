@@ -9,14 +9,14 @@ namespace Beef.CodeGen.Generators
     /// <summary>
     /// Represents the Database Update stored procedure code generator.
     /// </summary>
-    public class DatabaseUpdateCodeGenerator : CodeGeneratorBase<Config.Database.CodeGenConfig, StoredProcedureConfig>
+    public class DatabaseUpdateCodeGenerator : CodeGeneratorBase<CodeGenConfig, StoredProcedureConfig>
     {
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
-        protected override IEnumerable<StoredProcedureConfig> SelectGenConfig(Config.Database.CodeGenConfig config)
+        protected override IEnumerable<StoredProcedureConfig> SelectGenConfig(CodeGenConfig config)
             => Check.NotNull(config, nameof(config)).Tables.SelectMany(x => x.StoredProcedures).Where(x => x.Type == "Update");
     }
 }
