@@ -1,340 +1,433 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://schemas.beef.com/codegen/2015/01/database" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.beef.com/codegen/2015/01/entity" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:element name="CodeGeneration">
+    <xs:annotation>
+      <xs:documentation>The **CodeGeneration** is used as the global configuration for driving the underlying code-generation.</xs:documentation>
+    </xs:annotation>
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" name="Table">
+        <xs:element name="Table" minOccurs="0" maxOccurs="unbounded">
           <xs:annotation>
-            <xs:documentation>The database table/view configuration.</xs:documentation>
+            <xs:documentation>The **Table** is used to identify a database `Table` and define its code-generation characteristics.</xs:documentation>
           </xs:annotation>
           <xs:complexType>
-            <xs:sequence minOccurs="0">
-               <xs:element name="StoredProcedure" maxOccurs="unbounded" >
+            <xs:sequence>
+              <xs:element name="StoredProcedure" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                  <xs:documentation>The query stored procedure configuration.</xs:documentation>
+                  <xs:documentation>The **StoredProcedure** is used to identify a database `Stored Procedure` and define its code-generation characteristics.</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
-                  <xs:choice maxOccurs="unbounded">
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Column">
+                  <xs:sequence>
+                    <xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The stored procedure column configuration (will automatically default where not specified).</xs:documentation>
+                        <xs:documentation>The **Parameter** is used to define a Stored Procedure's Parameter and its charateristics.</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
-                        <xs:attribute name="Name" type="xs:string" use="required">
+                        <xs:attribute name="Name" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The stored procedure parameter name (without the @).</xs:documentation>
+                            <xs:documentation>The parameter name (without the `@` prefix).</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="Type" type="xs:string" use="optional">
+                        <xs:attribute name="Column" use="optional" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The SQL type.</xs:documentation>
+                            <xs:documentation>The corresponding column name; used to infer characteristics. Defaults to `Name`.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="Length" type="xs:string" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>The SQL type length.</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="Precision" type="xs:string" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>The SQL type precision.</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="Scale" type="xs:string" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>The SQL type scale.</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="IsNullable" type="xs:boolean" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>Indicates whether the parameter is nullable (when the parameter value is NULL it will not be included in the query).</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="IsPrimaryKey" type="xs:boolean" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>Indicates whether the column forms part of the primary key.</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="IsIdentity" type="xs:boolean" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>Indicates whether the column is an identity column (auto-generated).</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Parameter">
-                      <xs:annotation>
-                        <xs:documentation>The stored procedure parameter configuration (will automatically default standard parameters for Get/Create/Update/Upsert/Delete).</xs:documentation>
-                      </xs:annotation>
-                      <xs:complexType>
-                        <xs:attribute name="Name" type="xs:string" use="required">
-                          <xs:annotation>
-                            <xs:documentation>The stored procedure parameter name (without the @).</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="Column" type="xs:string" use="optional">
-                          <xs:annotation>
-                            <xs:documentation>The corresponding column name (defaults to Name where not specified).</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                        <xs:attribute name="SqlType" type="xs:string" use="optional">
+                        <xs:attribute name="SqlType" use="optional" type="xs:string">
                           <xs:annotation>
                             <xs:documentation>The SQL type definition (overrides inerhited Column definition) including length/precision/scale.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="IsNullable" type="xs:boolean" use="optional">
+                        <xs:attribute name="IsNullable" use="optional" type="xs:boolean">
                           <xs:annotation>
-                            <xs:documentation>Indicates whether the parameter is nullable (when the parameter value is NULL it will not be included in the query).</xs:documentation>
+                            <xs:documentation>Indicates whether the parameter is nullable. Note that When the parameter value is `NULL` it will not be included in the query.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="TreatColumnNullAs" type="xs:string" use="optional">
+                        <xs:attribute name="TreatColumnNullAs" use="optional" type="xs:boolean">
                           <xs:annotation>
-                            <xs:documentation>Indicates that the column value where null should be treated as the specified value; results in: ISNULL([x].[col], value)</xs:documentation>
+                            <xs:documentation>Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="IsCollection" type="xs:boolean" use="optional">
+                        <xs:attribute name="IsCollection" use="optional" type="xs:boolean">
                           <xs:annotation>
-                            <xs:documentation>Indicates whether the parameter is a collection (one or more values to be included IN the query).</xs:documentation>
+                            <xs:documentation>Indicates whether the parameter is a collection (one or more values to be included `IN` the query).</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="Operator" use="optional">
                           <xs:annotation>
-                            <xs:documentation>The query operator (defaults to EQ).</xs:documentation>
+                            <xs:documentation>The where clause equality operator Defaults to `EQ`.</xs:documentation>
                           </xs:annotation>
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
-                              <xs:enumeration value="EQ"/>
-                              <xs:enumeration value="NE"/>
-                              <xs:enumeration value="LT"/>
-                              <xs:enumeration value="LE"/>
-                              <xs:enumeration value="GT"/>
-                              <xs:enumeration value="GE"/>
-                              <xs:enumeration value="LIKE"/>
+                              <xs:enumeration value="EQ" />
+                              <xs:enumeration value="NE" />
+                              <xs:enumeration value="LT" />
+                              <xs:enumeration value="LE" />
+                              <xs:enumeration value="GT" />
+                              <xs:enumeration value="GE" />
+                              <xs:enumeration value="LIKE" />
                             </xs:restriction>
                           </xs:simpleType>
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="OrderBy">
+                    <xs:element name="Where" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The query order by configuration.</xs:documentation>
+                        <xs:documentation>The **Where** statement is used to define additional filtering.</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
-                        <xs:attribute name="Name" type="xs:string" use="required">
+                        <xs:attribute name="Statement" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The column name.</xs:documentation>
+                            <xs:documentation>The where statement (TSQL).</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
-                        <xs:attribute name="Order"  use="optional">
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="OrderBy" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>The **OrderBy** is used to define the query order</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:attribute name="Name" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The sort order (defaults to Asc).</xs:documentation>
+                            <xs:documentation>The name of the `Column` to order by; used to infer characteristics.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="Order" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>The corresponding sort order. Defaults to `Asc`.</xs:documentation>
                           </xs:annotation>
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
-                              <xs:enumeration value="Asc"/>
-                              <xs:enumeration value="Desc"/>
+                              <xs:enumeration value="Asc" />
+                              <xs:enumeration value="Desc" />
                             </xs:restriction>
                           </xs:simpleType>
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Where">
+                    <xs:element name="Execute" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The Where SQL configuration.</xs:documentation>
+                        <xs:documentation>The **Execute** statement to enable additional functionality to be added before or after the primary statement.</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
-                        <xs:attribute name="Statement" type="xs:string" use="required">
+                        <xs:attribute name="Statement" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The statement to execute.</xs:documentation>
-                          </xs:annotation>
-                        </xs:attribute>
-                      </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" name="Execute">
-                      <xs:annotation>
-                        <xs:documentation>The execute SQL configuration.</xs:documentation>
-                      </xs:annotation>
-                      <xs:complexType>
-                        <xs:attribute name="Statement" type="xs:string" use="required">
-                          <xs:annotation>
-                            <xs:documentation>The statement to execute.</xs:documentation>
+                            <xs:documentation>The additional statement (TSQL).</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="Location" use="optional">
                           <xs:annotation>
-                            <xs:documentation>Defines the location of the statement within the stored procedure (defaults to After).</xs:documentation>
+                            <xs:documentation>The location of the statement in relation to the primary statement. Defaults to `After`.</xs:documentation>
                           </xs:annotation>
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
-                              <xs:enumeration value="Before"/>
-                              <xs:enumeration value="After"/>
+                              <xs:enumeration value="Before" />
+                              <xs:enumeration value="After" />
                             </xs:restriction>
                           </xs:simpleType>
                         </xs:attribute>
                       </xs:complexType>
                     </xs:element>
-                  </xs:choice>
-                  <xs:attribute name="Name" type="xs:string" use="required">
+                  </xs:sequence>
+                  <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>The stored procedure name.</xs:documentation>
+                      <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="Type" use="optional">
                     <xs:annotation>
-                      <xs:documentation>The stored procedure type (defaults to GetAll).</xs:documentation>
+                      <xs:documentation>The stored procedure operation type. Defaults to `GetAll`.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
-                        <xs:enumeration value="Get"/>
-                        <xs:enumeration value="GetAll"/>
-                        <xs:enumeration value="Create"/>
-                        <xs:enumeration value="Update"/>
-                        <xs:enumeration value="Upsert"/>
-                        <xs:enumeration value="Delete"/>
-                        <xs:enumeration value="Merge"/>
+                        <xs:enumeration value="Get" />
+                        <xs:enumeration value="GetAll" />
+                        <xs:enumeration value="Create" />
+                        <xs:enumeration value="Update" />
+                        <xs:enumeration value="Upsert" />
+                        <xs:enumeration value="Delete" />
+                        <xs:enumeration value="Merge" />
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
-                  <xs:attribute name="Permission" type="xs:string" use="optional">
+                  <xs:attribute name="Paging" use="optional" type="xs:boolean">
                     <xs:annotation>
-                      <xs:documentation>The permission (fullname being name.action) override to be used for security permission checking.</xs:documentation>
+                      <xs:documentation>Indicates whether standardized paging support should be added. This only applies where the stored procedure operation `Type` is `GetColl`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="Paging" type="xs:boolean" use="optional">
+                  <xs:attribute name="ReselectStatement" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether paging support should be added (GetAll only).</xs:documentation>
+                      <xs:documentation>The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`. Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="IntoTempTable" type="xs:boolean" use="optional">
+                  <xs:attribute name="IntoTempTable" use="optional" type="xs:boolean">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether to select into a #TempTable to allow other statements to get access to the selected data; a `Select * from #TempTable` is also performed (GetAll only).</xs:documentation>
+                      <xs:documentation>Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data. A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="ReselectStatement" type="xs:string" use="optional">
+                  <xs:attribute name="MergeOverrideIdentityColumns" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>Overrides the Reselect statement to execute (Create/Update/Upsert only).</xs:documentation>
+                      <xs:documentation>The comma seperated list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_. This is used to override the default behaviour of using the primary key column(s).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="MergeOverrideIdentityColumns" type="xs:string" use="optional">
+                  <xs:attribute name="WithHints" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>Overrides the column names used in the Merge statement with those specified in the comma separated list to determine whether to insert, update or delete. Defaults to the identity column name inferred from the database schema.</xs:documentation>
+                      <xs:documentation>the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
-                  <xs:attribute name="WithHints" type="xs:string" use="optional">
+                  <xs:attribute name="Permission" use="optional" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>Specifies the table hints using the SQL Server 'With ()' statement; the value specified will be used as-is; e.g. 'NOLOCK' will result in 'WITH(NOLOCK)'.</xs:documentation>
+                      <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="GetAllOrderBy" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>The **OrderBy** is used to define the `GetAll` query order</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="Name" use="required" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the column to order by.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Order" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The corresponding column name; used to infer characteristics. Defaults to `Ascending`.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Ascending" />
+                        <xs:enumeration value="Descending" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
-            <xs:attribute name="Name" type="xs:string" use="required">
+            <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The database table/view name used to identify the table/view within the specified schema.</xs:documentation>
+                <xs:documentation>The name of the `Table` in the database.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Schema" type="xs:string" use="optional">
+            <xs:attribute name="Schema" use="required" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The database schema used to identify the table/view.</xs:documentation>
+                <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Alias" type="xs:string" use="optional">
+            <xs:attribute name="Alias" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The alias for the schema/name combination used in the generated output (automatically defaults).</xs:documentation>
+                <xs:documentation>The name of the `Schema` where the `Table` is defined in the database. Will automatically default where not specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="IncludeColumns" type="xs:string" use="optional">
+            <xs:attribute name="IncludeColumns" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>A comma separated list of columns names to be included.</xs:documentation>
+                <xs:documentation>The comma separated list of `Column` names to be included in the underlying generated output. Where not specified this Indicates whether all `Columns` are to be included.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="ExcludeColumns" type="xs:string" use="optional">
+            <xs:attribute name="ExcludeColumns" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>A comma separated list of columns names to be excluded.</xs:documentation>
+                <xs:documentation>The comma seperated list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Get" type="xs:boolean" use="optional">
+            <xs:attribute name="Get" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a Get stored procedure should be created using the defined primary key as parameters.</xs:documentation>
+                <xs:documentation>Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="GetAll" type="xs:boolean" use="optional">
+            <xs:attribute name="GetAll" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a GetAll stored procedure should be created with no parameters.</xs:documentation>
+                <xs:documentation>Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="GetAllOrderBy" type="xs:string" use="optional">
+            <xs:attribute name="Create" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>A comma separated list of columns names (including sort order ASC/DESC) to be used as the GetAll query sort order (will attempt to add alias, etc. where not specified for column).</xs:documentation>
+                <xs:documentation>Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Create" type="xs:boolean" use="optional">
+            <xs:attribute name="Update" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a Create stored procedure should be created.</xs:documentation>
+                <xs:documentation>Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Update" type="xs:boolean" use="optional">
+            <xs:attribute name="Upsert" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether an Update stored procedure should be created.</xs:documentation>
+                <xs:documentation>Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Upsert" type="xs:boolean" use="optional">
+            <xs:attribute name="Delete" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether an Upsert (create or updates) stored procedure should be created.</xs:documentation>
+                <xs:documentation>Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Delete" type="xs:boolean" use="optional">
+            <xs:attribute name="View" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a Delete stored procedure should be created.</xs:documentation>
+                <xs:documentation>Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified (only applies for a `Table`).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Permission" type="xs:string" use="optional">
+            <xs:attribute name="EfModel" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>The permission (prefix) to be used for security permission checking (suffix defaults to Read, Write or Delete) - overide in StoredProcedure as required.</xs:documentation>
+                <xs:documentation>Indicates whether an `Entity Framework` .NET (C#) model is to be generated.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="EfModel" type="xs:boolean" use="optional">
+            <xs:attribute name="EfModelName" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>Indicates whether an entity framework c# model should be created.</xs:documentation>
+                <xs:documentation>The .NET (C#) EntityFramework (EF) model name. Defaults to `Name`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="View" type="xs:boolean" use="optional">
+            <xs:attribute name="Udt" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a database view should be created (only applies for a Table).</xs:documentation>
+                <xs:documentation>Indicates whether a `User Defined Table (UDT)` type should be created.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Udt" type="xs:boolean" use="optional">
+            <xs:attribute name="UdtExcludeColumns" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>Indicates whether a user defined table type should be created.</xs:documentation>
+                <xs:documentation>The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`. Where not specified this indicates that no `Columns` are to be excluded.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="UdtExcludeColumns" type="xs:string" use="optional">
+            <xs:attribute name="Tvp" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>A comma separated list of columns names to be excluded from the Udt.</xs:documentation>
+                <xs:documentation>The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Tvp" type="xs:string" use="optional">
+            <xs:attribute name="Merge" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Specifies the .NET Entity associated with the Udt so that it can ibe expressed (created) as a Table-Valued Parameter for usage within the corresponding DbMapper.</xs:documentation>
+                <xs:documentation>Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Merge" type="xs:boolean" use="optional">
+            <xs:attribute name="Permission" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>Indicates whether a Merge (upsert of Udt list) stored procedure should be created.</xs:documentation>
+                <xs:documentation>The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `TenantId` capability. Defaults to `TenantId`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `OrgUnitId`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `RowVersion`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CreatedBy`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CreatedDate`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="GetAllOrderBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order</xs:documentation>
               </xs:annotation>
             </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="RefDatabaseSchema" type="xs:string" use="optional">
+      <xs:attribute name="RefDatabaseSchema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The schema name to identify the reference data tables.</xs:documentation>
+          <xs:documentation>The schema name to identify the Reference Data related tables. Where not specified an attempt will be made to infer.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="ConnectionString" type="xs:string" use="optional">
+      <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The connection string used to connect to the database to query the underlying table definitions.</xs:documentation>
+          <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `TenantId` capability. Defaults to `TenantId`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `OrgUnitId`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `RowVersion` capability. Defaults to `RowVersion`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CreatedBy`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CreatedDate`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="OrgUnitJoinSql" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification. Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CheckUserPermissionSql" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The SQL stored procedure that is to be used for `Permission` verification. Defaults to `[Sec].[spCheckUserHasPermission]`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="GetUserPermissionSql" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The SQL function that is to be used for `Permission` verification. Defaults to `[Sec].[fnGetUserHasPermission]`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

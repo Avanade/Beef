@@ -285,77 +285,19 @@ namespace Beef.CodeGen.DbModels
         /// Indicates whether the column is considered an audit column.
         /// </summary>
         public bool IsAudit => Name == DatabaseColumns.CreatedByName || Name == DatabaseColumns.CreatedDateName || Name == DatabaseColumns.UpdatedByName || Name == DatabaseColumns.UpdatedDateName || Name == DatabaseColumns.DeletedByName || Name == DatabaseColumns.DeletedDateName;
-
-        /// <summary>
-        /// Creates (and adds) the <see cref="DbTable"/> element for code generation.
-        /// </summary>
-        /// <param name="xml">The <see cref="XElement"/> to add to.</param>
-        public void CreateXml(XElement xml)
-        {
-            if (xml == null)
-                throw new ArgumentNullException(nameof(xml));
-
-            var xc = new XElement("Column",
-                new XAttribute("Name", Name),
-                new XAttribute("Type", Type),
-                new XAttribute("DotNetType", DotNetType),
-                new XAttribute("IsNullable", IsNullable));
-
-            if (Length.HasValue)
-                xc.Add(new XAttribute("Length", Length.Value));
-
-            if (Precision.HasValue)
-                xc.Add(new XAttribute("Precision", Precision.Value));
-
-            if (Scale.HasValue)
-                xc.Add(new XAttribute("Scale", Scale.Value));
-
-            if (IsIdentity)
-            {
-                xc.Add(new XAttribute("IsIdentity", true));
-                if (!IsComputed && DefaultValue == null)
-                {
-                    xc.Add(new XAttribute("IdentitySeed", IdentitySeed ?? 1));
-                    xc.Add(new XAttribute("IdentityIncrement", IdentityIncrement ?? 1));
-                }
-            }
-
-            if (IsComputed)
-                xc.Add(new XAttribute("IsComputed", true));
-
-            if (!string.IsNullOrEmpty(DefaultValue))
-                xc.Add(new XAttribute("DefaultValue", DefaultValue));
-
-            if (IsPrimaryKey)
-                xc.Add(new XAttribute("IsPrimaryKey", true));
-
-            if (IsUnique)
-                xc.Add(new XAttribute("IsUnique", true));
-
-            if (ForeignTable != null)
-            {
-                xc.Add(new XAttribute("ForeignTable", ForeignTable));
-                xc.Add(new XAttribute("ForeignSchema", ForeignSchema));
-                xc.Add(new XAttribute("ForeignColumn", ForeignColumn));
-                if (IsForeignRefData)
-                    xc.Add(new XAttribute("IsForeignRefData", true));
-            }
-
-            xml.Add(xc);
-        }
     }
 
     /// <summary>
     /// Represents the <see cref="DbColumn"/> database mapper.
     /// </summary>
 #pragma warning disable CA1812 // Apparently never instantiated; by-design - it is!
-    internal class ColumnMapper : DatabaseMapper<DbColumn, ColumnMapper>
+    internal class DbColumnMapper : DatabaseMapper<DbColumn, DbColumnMapper>
 #pragma warning restore CA1812
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ColumnMapper"/> class.
+        /// Initializes a new instance of the <see cref="DbColumnMapper"/> class.
         /// </summary>
-        public ColumnMapper()
+        public DbColumnMapper()
         {
             Property(x => x.Name, "COLUMN_NAME");
             Property(x => x.Type, "DATA_TYPE");

@@ -77,10 +77,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="tr">The SQL <see cref="TextReader"/>.</param>
         /// <returns>A <see cref="SqlObjectReader"/>.</returns>
-        public static SqlObjectReader Read(TextReader tr)
-        {
-            return new SqlObjectReader(tr);
-        }
+        public static SqlObjectReader Read(TextReader tr) => new SqlObjectReader(tr);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlObjectReader"/> class.

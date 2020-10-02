@@ -600,83 +600,83 @@ namespace Beef.CodeGen.Config.Entity
         #region Exclude
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Entity</c> class (<c>Xxx.cs</c>).
+        /// The option to exclude the generation of the <c>Entity</c> class (<c>Xxx.cs</c>).
         /// </summary>
         [JsonProperty("excludeEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Entity` class (`Xxx.cs`).", IsImportant = true)]
-        public bool? ExcludeEntity { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Entity` class (`Xxx.cs`).", IsImportant = true, Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeEntity { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the generation of <b>all</b> <c>Operation</c> related artefacts; excluding the <c>Entity</c> class.
+        /// The option to exclude the generation of <b>all</b> <c>Operation</c> related code; excluding the <c>Entity</c> class.
         /// </summary>
         [JsonProperty("excludeAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the generation of all< `Operation` related artefacts; excluding the `Entity` class.", IsImportant = true,
-            Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to `true`.")]
-        public bool? ExcludeAll { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.", IsImportant = true, Options = new string[] { NoOption, YesOption },
+            Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to `Yes`.")]
+        public string? ExcludeAll { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Data</c> interface (<c>IXxxData.cs</c>).
+        /// The option to exclude the generation of the <c>Data</c> interface (<c>IXxxData.cs</c>).
         /// </summary>
         [JsonProperty("excludeIData", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Data` interface (`IXxxData.cs`).")]
-        public bool? ExcludeIData { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Data` interface (`IXxxData.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeIData { get; set; }
 
         /// <summary>
-        /// Gets or sets the option to exclude the creation of the <c>Data</c> class (<c>XxxData.cs</c>).
+        /// Gets or sets the option to exclude the generation of the <c>Data</c> class (<c>XxxData.cs</c>).
         /// </summary>
         [JsonProperty("excludeData", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "The option to exclude the creation of the `Data` class (`XxxData.cs`).", Options = new string[] { "No", "Yes", "Mapper" },
-            Description = "Defaults to `No` indicating _not_ to exlude. A value of `Yes` indicates to exclude all output; alternatively, `Mapper` indicates to at least output the corresponding `Mapper` class.")]
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Data` class (`XxxData.cs`).", Options = new string[] { NoOption, YesOption, "RequiresMapper" },
+            Description = "Defaults to `No` indicating _not_ to exlude. A value of `Yes` indicates to exclude all output; alternatively, `RequiresMapper` indicates to at least output the corresponding `Mapper` class.")]
         public string? ExcludeData { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
+        /// The option to exclude the generation of the <c>DataSvc</c> interface (<c>IXxxDataSvc.cs</c>).
         /// </summary>
         [JsonProperty("excludeIDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `DataSvc` interface (`IXxxDataSvc.cs`).")]
-        public bool? ExcludeIDataSvc { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `DataSvc` interface (`IXxxDataSvc.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeIDataSvc { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>DataSvc</c> class (<c>XxxDataSvc.cs</c>).
+        /// The option to exclude the generation of the <c>DataSvc</c> class (<c>XxxDataSvc.cs</c>).
         /// </summary>
         [JsonProperty("excludeDataSvc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `DataSvc` class (`XxxDataSvc.cs`).")]
-        public bool? ExcludeDataSvc { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `DataSvc` class (`XxxDataSvc.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeDataSvc { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Manager</c> interface (<c>IXxxManager.cs</c>).
+        /// The option to exclude the generation of the <c>Manager</c> interface (<c>IXxxManager.cs</c>).
         /// </summary>
         [JsonProperty("excludeIManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Manager` interface (`IXxxManager.cs`).")]
-        public bool? ExcludeIManager { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Manager` interface (`IXxxManager.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeIManager { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the <c>Manager</c> class (<c>XxxManager.cs</c>).
+        /// The option to exclude the generation of the <c>Manager</c> class (<c>XxxManager.cs</c>).
         /// </summary>
         [JsonProperty("excludeManager", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the `Manager` class (`XxxManager.cs`).")]
-        public bool? ExcludeManager { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the `Manager` class (`XxxManager.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeManager { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the WebAPI <c>Controller</c> class (<c>XxxController.cs</c>).
+        /// The option to exclude the generation of the WebAPI <c>Controller</c> class (<c>XxxController.cs</c>).
         /// </summary>
         [JsonProperty("excludeWebApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the WebAPI `Controller` class (`XxxController.cs`).")]
-        public bool? ExcludeWebApi { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the WebAPI `Controller` class (`XxxController.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeWebApi { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the WebAPI <c>Agent</c> class (<c>XxxAgent.cs</c>).
+        /// The option to exclude the generation of the WebAPI <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
         [JsonProperty("excludeWebApiAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).")]
-        public bool? ExcludeWebApiAgent { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the WebAPI consuming `Agent` class (`XxxAgent.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeWebApiAgent { get; set; }
 
         /// <summary>
-        /// Indicates whether to exclude the creation of the gRPC <c>Agent</c> class (<c>XxxAgent.cs</c>).
+        /// The option to exclude the generation of the gRPC <c>Agent</c> class (<c>XxxAgent.cs</c>).
         /// </summary>
         [JsonProperty("excludeGrpcAgent", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether to exclude the creation of the gRPC consuming `Agent` class (`XxxAgent.cs`).")]
-        public bool? ExcludeGrpcAgent { get; set; }
+        [PropertySchema("Exclude", Title = "The option to exclude the generation of the gRPC consuming `Agent` class (`XxxAgent.cs`).", Options = new string[] { NoOption, YesOption })]
+        public string? ExcludeGrpcAgent { get; set; }
 
         #endregion
 
@@ -708,7 +708,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the corresponding <see cref="PropertyConfig"/> collection.
         /// </summary>
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Property` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Property` collection.")]
         public List<PropertyConfig>? Properties { get; set; }
 
         /// <summary>
@@ -760,38 +760,38 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the corresponding <see cref="OperationConfig"/> collection.
         /// </summary>
         [JsonProperty("operations", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Operation` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Operation` collection.")]
         public List<OperationConfig>? Operations { get; set; }
 
         /// <summary>
         /// Gets the IEntityManager <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? IManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIManager, false)).ToList();
+        public List<OperationConfig>? IManagerOperations => Operations!.Where(x => IsNoOption(x.ExcludeIManager)).ToList();
 
         /// <summary>
         /// Gets the EntityManager <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? ManagerOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false)).ToList();
+        public List<OperationConfig>? ManagerOperations => Operations!.Where(x => IsNoOption(x.ExcludeManager)).ToList();
 
         /// <summary>
         /// Gets the EntityManager <see cref="OperationConfig"/> collection where the Manager is not custom.
         /// </summary>
-        public List<OperationConfig>? ManagerAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeManager, false) && CompareNullOrValue(x.ManagerCustom, false)).ToList();
+        public List<OperationConfig>? ManagerAutoOperations => Operations!.Where(x => IsNoOption(x.ExcludeManager) && CompareNullOrValue(x.ManagerCustom, false)).ToList();
 
         /// <summary>
         /// Gets the IEntityDataSvc <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? IDataSvcOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false)).ToList();
+        public List<OperationConfig>? IDataSvcOperations => Operations!.Where(x => IsNoOption(x.ExcludeIDataSvc)).ToList();
 
         /// <summary>
         /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? DataSvcOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false)).ToList();
+        public List<OperationConfig>? DataSvcOperations => Operations!.Where(x => IsNoOption(x.ExcludeDataSvc)).ToList();
 
         /// <summary>
         /// Gets the EntityDataSvc <see cref="OperationConfig"/> collection where the DataSvc is not custom.
         /// </summary>
-        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
+        public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => IsNoOption(x.ExcludeDataSvc) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
 
         /// <summary>
         /// Gets the DataSvc constructor parameters.
@@ -801,12 +801,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? IDataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeIData, false)).ToList();
+        public List<OperationConfig>? IDataOperations => Operations!.Where(x => IsNoOption(x.ExcludeIData)).ToList();
 
         /// <summary>
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? DataOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeData, false)).ToList();
+        public List<OperationConfig>? DataOperations => Operations!.Where(x => IsNoOption(x.ExcludeData)).ToList();
 
         /// <summary>
         /// Gets the Grpc <see cref="OperationConfig"/> collection.
@@ -821,12 +821,12 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the EntityController <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? WebApiOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApi, false)).ToList();
+        public List<OperationConfig>? WebApiOperations => Operations!.Where(x => IsNoOption(x.ExcludeWebApi)).ToList();
 
         /// <summary>
         /// Gets the EntityAgent <see cref="OperationConfig"/> collection.
         /// </summary>
-        public List<OperationConfig>? WebApiAgentOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeWebApiAgent, false)).ToList();
+        public List<OperationConfig>? WebApiAgentOperations => Operations!.Where(x => IsNoOption(x.ExcludeWebApiAgent)).ToList();
 
         /// <summary>
         /// Gets the WebApi Contructor parameters.
@@ -837,7 +837,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
         /// </summary>
         [JsonProperty("consts", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Consts` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Consts` collection.")]
         public List<ConstConfig>? Consts { get; set; }
 
         /// <summary>
@@ -863,7 +863,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the <see cref="Name"/> formatted as see comments.
         /// </summary>
-        public string? EntityNameSeeComments => CompareValue(ExcludeEntity, true) ? $"<b>{Name}</b>" : ToSeeComments(Name);
+        public string? EntityNameSeeComments => IsYesOption(ExcludeEntity) ? $"<b>{Name}</b>" : ToSeeComments(Name);
 
         /// <summary>
         /// Gets or sets the computed entity inherits.
@@ -898,17 +898,17 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Indicates whether at least one operation needs a Manager.
         /// </summary>
-        public bool RequiresManager => !(CompareValue(ExcludeManager, true) && CompareValue(ExcludeIManager, true));
+        public bool RequiresManager => !(IsYesOption(ExcludeManager) && IsYesOption(ExcludeIManager));
 
         /// <summary>
         /// Indicates whether at least one operation needs a DataSvc.
         /// </summary>
-        public bool RequiresDataSvc => !(CompareValue(ExcludeDataSvc, true) && CompareValue(ExcludeIDataSvc, true)) || Operations.Any(x => CompareNullOrValue(x.ManagerCustom, false));
+        public bool RequiresDataSvc => !(IsYesOption(ExcludeDataSvc) && IsYesOption(ExcludeIDataSvc)) || Operations.Any(x => CompareNullOrValue(x.ManagerCustom, false));
 
         /// <summary>
         /// Indicates whether at least one operation needs a Data.
         /// </summary>
-        public bool RequiresData => (CompareValue(ExcludeData, "None") && CompareValue(ExcludeIData, true)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
+        public bool RequiresData => (CompareValue(ExcludeData, "None") && IsYesOption(ExcludeIData)) || Operations.Any(x => CompareNullOrValue(x.DataSvcCustom, false));
 
         /// <summary>
         /// Indicates whether any of the operations will raise an event. 
@@ -980,16 +980,16 @@ namespace Beef.CodeGen.Config.Entity
             ManagerConstructor = DefaultWhereNull(ManagerConstructor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiConstructor = DefaultWhereNull(WebApiConstructor, () => "Public");
-            ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => false);
-            ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, true));
-            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, true) ? "Yes" : "No");
-            ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, true));
-            ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => CompareValue(ExcludeAll, true));
-            ExcludeIManager = DefaultWhereNull(ExcludeIManager, () => CompareValue(ExcludeAll, true));
-            ExcludeManager = DefaultWhereNull(ExcludeManager, () => CompareValue(ExcludeAll, true));
-            ExcludeWebApi = DefaultWhereNull(ExcludeWebApi, () => CompareValue(ExcludeAll, true));
-            ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, true));
-            ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, true));
+            ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => NoOption);
+            ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeDataSvc = DefaultWhereNull(ExcludeDataSvc, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeIManager = DefaultWhereNull(ExcludeIManager, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeManager = DefaultWhereNull(ExcludeManager, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeWebApi = DefaultWhereNull(ExcludeWebApi, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeWebApiAgent = DefaultWhereNull(ExcludeWebApiAgent, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
+            ExcludeGrpcAgent = DefaultWhereNull(ExcludeGrpcAgent, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
 
             InferInherits();
             PrepareConsts();

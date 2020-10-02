@@ -225,6 +225,16 @@ namespace Beef.CodeGen
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
+            // http://www.patorjk.com/software/taag/#p=display&h=2&f=Big&t=Beef%20CodeGen%0A
+            _logger.LogInformation(@"
+  ____             __    _____          _       _____            
+ |  _ \           / _|  / ____|        | |     / ____|           
+ | |_) | ___  ___| |_  | |     ___   __| | ___| |  __  ___ _ __  
+ |  _ < / _ \/ _ \  _| | |    / _ \ / _` |/ _ \ | |_ |/ _ \ '_ \ 
+ | |_) |  __/  __/ |   | |___| (_) | (_| |  __/ |__| |  __/ | | |
+ |____/ \___|\___|_|    \_____\___/ \__,_|\___|\_____|\___|_| |_|
+                                                                 
+");
             _logger.LogInformation(App.Description);
             _logger.LogInformation(string.Empty);
             LogCodeGenExecutionArgs(args);

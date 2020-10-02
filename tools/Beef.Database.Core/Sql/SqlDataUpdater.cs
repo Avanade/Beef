@@ -30,32 +30,11 @@ namespace Beef.Database.Core.Sql
         /// Register the database.
         /// </summary>
         /// <param name="db">The <see cref="DatabaseBase"/>.</param>
-        /// <param name="refDataSchema">The reference data schema.</param>
-        public static async Task RegisterDatabaseAsync(DatabaseBase db, string? refDataSchema = null)
+        public static async Task RegisterDatabaseAsync(DatabaseBase db)
         {
             if (DbTables == null)
-                DbTables = await DbTable.LoadTablesAndColumnsAsync(db, refDataSchema).ConfigureAwait(false);
-
-            RefDataSchema = refDataSchema;
+                DbTables = await DbTable.LoadTablesAndColumnsAsync(db, false).ConfigureAwait(false);
         }
-
-        /// <summary>
-        /// Registers the database tables.
-        /// </summary>
-        /// <param name="tables">The tables.</param>
-        /// <param name="refDataSchema">The reference data schema.</param>
-        public static void RegisterDatabase(List<DbTable> tables, string? refDataSchema = null)
-        {
-            if (DbTables == null)
-                DbTables = tables;
-
-            RefDataSchema = refDataSchema;
-        }
-
-        /// <summary>
-        /// Gets the reference data schema.
-        /// </summary>
-        public static string? RefDataSchema { get; private set; }
 
         /// <summary>
         /// Gets the registered database tables.
@@ -101,10 +80,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="json">The JSON <see cref="string"/>.</param>
         /// <returns>The <see cref="SqlDataUpdater"/>.</returns>
-        public static SqlDataUpdater ReadJson(string json)
-        {
-            return new SqlDataUpdater(JObject.Parse(json));
-        }
+        public static SqlDataUpdater ReadJson(string json) => new SqlDataUpdater(JObject.Parse(json));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlDataUpdater"/> class.
@@ -218,53 +194,6 @@ namespace Beef.Database.Core.Sql
                 JTokenType.String => j.Value<String>(),
                 _ => null,
             };
-        }
-
-        /// <summary>
-        /// Writes the configuration as XML in preparation for code generation.
-        /// </summary>
-        /// <returns>The <see cref="XElement"/>.</returns>
-        public XElement CreateXml()
-        {
-            var xgc = new XElement("CodeGeneration");
-
-            foreach (var t in Tables)
-            {
-                var xt = new XElement("Table",
-                    new XAttribute("Name", t.Name),
-                    new XAttribute("Schema", t.Schema),
-                    new XAttribute("Alias", t.DbTable.Alias),
-                    new XAttribute("IsMerge", t.IsMerge),
-                    new XAttribute("IsRefData", t.IsRefData));
-
-                // Add the columns configuration (used/referenced).
-                foreach (var col in t.Columns)
-                {
-                    col.CreateXml(xt);
-                }
-
-                // Add the actual rows and columns.
-                foreach (var r in t.Rows)
-                {
-                    var xr = new XElement("Row");
-
-                    foreach (var c in r.Columns)
-                    {
-                        var xc = new XElement("Col",
-                            new XAttribute("Name", c.Name),
-                            new XAttribute("Value", c.ToSqlValue()),
-                            new XAttribute("UseForeignKeyQueryForId", c.UseForeignKeyQueryForId));
-
-                        xr.Add(xc);
-                    }
-
-                    xt.Add(xr);
-                }
-
-                xgc.Add(xt);
-            }
-
-            return xgc;
         }
 
         /// <summary>

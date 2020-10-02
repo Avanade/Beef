@@ -61,11 +61,6 @@ namespace Beef.Database.Core
         public bool UseBeefDbo { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the optional reference data schema name (typically specified where different to the primary schema).
-        /// </summary>
-        public string? RefDataSchemaName { get; set; }
-
-        /// <summary>
         /// Gets or sets the <see cref="DatabaseExecutorCommand.CodeGen"/> arguments.
         /// </summary>
         public CodeGenExecutorArgs? CodeGenArgs { get; set; }
@@ -264,9 +259,6 @@ namespace Beef.Database.Core
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
                     _logger.LogInformation("DB SCHEMA: Drops and creates the database objects...");
-
-                    if (!string.IsNullOrEmpty(_args.RefDataSchemaName))
-                        _args.SchemaOrder.Insert(0, _args.RefDataSchemaName);
 
                     if (_args.UseBeefDbo && !_args.SchemaOrder.Contains("dbo"))
                         _args.SchemaOrder.Insert(0, "dbo");
@@ -525,7 +517,7 @@ namespace Beef.Database.Core
         {
             // Get all the database table schema information.
             _logger.LogInformation($"Querying database for all existing table and column configurations...");
-            await SqlDataUpdater.RegisterDatabaseAsync(_db!, _args.RefDataSchemaName).ConfigureAwait(false);
+            await SqlDataUpdater.RegisterDatabaseAsync(_db!).ConfigureAwait(false);
 
             // Parse all resources and get ready for the SQL code gen.
             _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{DataNamespace}.*.yaml")))}");

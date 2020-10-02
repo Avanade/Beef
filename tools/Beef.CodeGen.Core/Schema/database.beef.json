@@ -1,0 +1,460 @@
+{
+  "title": "JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "type": "object",
+  "properties": {
+    "refDatabaseSchema": {
+      "type": "string",
+      "title": "The schema name to identify the Reference Data related tables.",
+      "description": "Where not specified an attempt will be made to infer."
+    },
+    "columnNameIsDeleted": {
+      "type": "string",
+      "title": "The column name for the `IsDeleted` capability.",
+      "description": "Defaults to `IsDeleted`. To remove capability set to `None`."
+    },
+    "columnNameTenantId": {
+      "type": "string",
+      "title": "The column name for the `TenantId` capability.",
+      "description": "Defaults to `TenantId`. To remove capability set to `None`."
+    },
+    "columnNameOrgUnitId": {
+      "type": "string",
+      "title": "The column name for the `OrgUnitId` capability.",
+      "description": "Defaults to `OrgUnitId`. To remove capability set to `None`."
+    },
+    "columnNameRowVersion": {
+      "type": "string",
+      "title": "The column name for the `RowVersion` capability.",
+      "description": "Defaults to `RowVersion`. To remove capability set to `None`."
+    },
+    "columnNameCreatedBy": {
+      "type": "string",
+      "title": "The column name for the `CreatedBy` capability.",
+      "description": "Defaults to `CreatedBy`. To remove capability set to `None`."
+    },
+    "columnNameCreatedDate": {
+      "type": "string",
+      "title": "The column name for the `CreatedDate` capability.",
+      "description": "Defaults to `CreatedDate`. To remove capability set to `None`."
+    },
+    "columnNameUpdatedBy": {
+      "type": "string",
+      "title": "The column name for the `UpdatedBy` capability.",
+      "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+    },
+    "columnNameUpdatedDate": {
+      "type": "string",
+      "title": "The column name for the `UpdatedDate` capability.",
+      "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+    },
+    "columnNameDeletedBy": {
+      "type": "string",
+      "title": "The column name for the `DeletedBy` capability.",
+      "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+    },
+    "columnNameDeletedDate": {
+      "type": "string",
+      "title": "The column name for the `DeletedDate` capability.",
+      "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+    },
+    "orgUnitJoinSql": {
+      "type": "string",
+      "title": "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
+      "description": "Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`."
+    },
+    "checkUserPermissionSql": {
+      "type": "string",
+      "title": "The SQL stored procedure that is to be used for `Permission` verification.",
+      "description": "Defaults to `[Sec].[spCheckUserHasPermission]`."
+    },
+    "getUserPermissionSql": {
+      "type": "string",
+      "title": "The SQL function that is to be used for `Permission` verification.",
+      "description": "Defaults to `[Sec].[fnGetUserHasPermission]`."
+    },
+    "tables": {
+      "type": "array",
+      "title": "The corresponding `Table` collection.",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "The name of the `Table` in the database."
+            },
+            "schema": {
+              "type": "string",
+              "title": "The name of the `Schema` where the `Table` is defined in the database."
+            },
+            "alias": {
+              "type": "string",
+              "title": "The name of the `Schema` where the `Table` is defined in the database.",
+              "description": "Will automatically default where not specified."
+            },
+            "includeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be included in the underlying generated output.",
+              "description": "Where not specified this Indicates whether all `Columns` are to be included.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the underlying generated output.",
+              "description": "Where not specified this indicates no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "get": {
+              "type": "boolean",
+              "title": "Indicates whether a `Get` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "getAll": {
+              "type": "boolean",
+              "title": "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "create": {
+              "type": "boolean",
+              "title": "Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "update": {
+              "type": "boolean",
+              "title": "Indicates whether a `Update` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "upsert": {
+              "type": "boolean",
+              "title": "Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "delete": {
+              "type": "boolean",
+              "title": "Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "view": {
+              "type": "boolean",
+              "title": "Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified (only applies for a `Table`)."
+            },
+            "efModel": {
+              "type": "boolean",
+              "title": "Indicates whether an `Entity Framework` .NET (C#) model is to be generated."
+            },
+            "efModelName": {
+              "type": "string",
+              "title": "The .NET (C#) EntityFramework (EF) model name.",
+              "description": "Defaults to `Name`."
+            },
+            "udt": {
+              "type": "boolean",
+              "title": "Indicates whether a `User Defined Table (UDT)` type should be created."
+            },
+            "udtExcludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
+              "description": "Where not specified this indicates that no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "tvp": {
+              "type": "string",
+              "title": "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`."
+            },
+            "merge": {
+              "type": "boolean",
+              "title": "Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified."
+            },
+            "permission": {
+              "type": "string",
+              "title": "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure)."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `IsDeleted`. To remove capability set to `None`."
+            },
+            "columnNameTenantId": {
+              "type": "string",
+              "title": "The column name for the `TenantId` capability.",
+              "description": "Defaults to `TenantId`. To remove capability set to `None`."
+            },
+            "columnNameOrgUnitId": {
+              "type": "string",
+              "title": "The column name for the `OrgUnitId` capability.",
+              "description": "Defaults to `OrgUnitId`. To remove capability set to `None`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `RowVersion`. To remove capability set to `None`."
+            },
+            "columnNameCreatedBy": {
+              "type": "string",
+              "title": "The column name for the `CreatedBy` capability.",
+              "description": "Defaults to `CreatedBy`. To remove capability set to `None`."
+            },
+            "columnNameCreatedDate": {
+              "type": "string",
+              "title": "The column name for the `CreatedDate` capability.",
+              "description": "Defaults to `CreatedDate`. To remove capability set to `None`."
+            },
+            "columnNameUpdatedBy": {
+              "type": "string",
+              "title": "The column name for the `UpdatedBy` capability.",
+              "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+            },
+            "columnNameUpdatedDate": {
+              "type": "string",
+              "title": "The column name for the `UpdatedDate` capability.",
+              "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+            },
+            "columnNameDeletedBy": {
+              "type": "string",
+              "title": "The column name for the `DeletedBy` capability.",
+              "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+            },
+            "columnNameDeletedDate": {
+              "type": "string",
+              "title": "The column name for the `DeletedDate` capability.",
+              "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+            },
+            "storedProcedures": {
+              "type": "array",
+              "title": "The corresponding `StoredProcedure` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "type": {
+                      "type": "string",
+                      "title": "The stored procedure operation type.",
+                      "description": "Defaults to `GetColl`.",
+                      "enum": [
+                        "Get",
+                        "GetColl",
+                        "Create",
+                        "Update",
+                        "Upsert",
+                        "Delete",
+                        "Merge"
+                      ]
+                    },
+                    "paging": {
+                      "type": "boolean",
+                      "title": "Indicates whether standardized paging support should be added.",
+                      "description": "This only applies where the stored procedure operation `Type` is `GetColl`."
+                    },
+                    "reselectStatement": {
+                      "type": "string",
+                      "title": "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
+                      "description": "Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s)."
+                    },
+                    "intoTempTable": {
+                      "type": "boolean",
+                      "title": "Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data.",
+                      "description": "A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`."
+                    },
+                    "mergeOverrideIdentityColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+                      "description": "This is used to override the default behaviour of using the primary key column(s).",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "withHints": {
+                      "type": "string",
+                      "title": "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`."
+                    },
+                    "permission": {
+                      "type": "string",
+                      "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "parameters": {
+                      "type": "array",
+                      "title": "The corresponding `Parameter` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The parameter name (without the `@` prefix)."
+                            },
+                            "column": {
+                              "type": "string",
+                              "title": "The corresponding column name; used to infer characteristics.",
+                              "description": "Defaults to `Name`."
+                            },
+                            "sqlType": {
+                              "type": "string",
+                              "title": "The SQL type definition (overrides inerhited Column definition) including length/precision/scale."
+                            },
+                            "nullable": {
+                              "type": "boolean",
+                              "title": "Indicates whether the parameter is nullable.",
+                              "description": "Note that When the parameter value is `NULL` it will not be included in the query."
+                            },
+                            "treatColumnNullAs": {
+                              "type": "boolean",
+                              "title": "Indicates whether the column value where NULL should be treated as the specified value; results in: `ISNULL([x].[col], value)`."
+                            },
+                            "collection": {
+                              "type": "boolean",
+                              "title": "Indicates whether the parameter is a collection (one or more values to be included `IN` the query)."
+                            },
+                            "operator": {
+                              "type": "string",
+                              "title": "The where clause equality operator",
+                              "description": "Defaults to `EQ`.",
+                              "enum": [
+                                "EQ",
+                                "NE",
+                                "LT",
+                                "LE",
+                                "GT",
+                                "GE",
+                                "LIKE"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    "where": {
+                      "type": "array",
+                      "title": "The corresponding `Where` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "statement": {
+                              "type": "string",
+                              "title": "The where statement (TSQL)."
+                            }
+                          },
+                          "required": [
+                            "statement"
+                          ]
+                        }
+                      ]
+                    },
+                    "orderby": {
+                      "type": "array",
+                      "title": "The corresponding `OrderBy` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The name of the `Column` to order by; used to infer characteristics."
+                            },
+                            "order": {
+                              "type": "string",
+                              "title": "The corresponding sort order.",
+                              "description": "Defaults to `Ascending`.",
+                              "enum": [
+                                "Ascending",
+                                "Descending"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    },
+                    "execute": {
+                      "type": "array",
+                      "title": "The corresponding `Execute` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "statement": {
+                              "type": "string",
+                              "title": "The additional statement (TSQL)."
+                            },
+                            "location": {
+                              "type": "string",
+                              "title": "The location of the statement in relation to the primary statement.",
+                              "description": "Defaults to `After`.",
+                              "enum": [
+                                "Before",
+                                "After"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "statement"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "getAllOrderBy": {
+              "type": "array",
+              "title": "The corresponding `GetAll` stored procedure `OrderBy` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the column to order by."
+                    },
+                    "order": {
+                      "type": "string",
+                      "title": "The corresponding column name; used to infer characteristics.",
+                      "description": "Defaults to `Ascending`.",
+                      "enum": [
+                        "Ascending",
+                        "Descending"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "schema"
+          ]
+        }
+      ]
+    }
+  }
+}

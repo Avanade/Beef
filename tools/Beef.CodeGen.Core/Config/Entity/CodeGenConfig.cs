@@ -120,7 +120,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
-            Description = "Defaults to the `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+            Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
 
         #endregion
@@ -323,24 +323,24 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the corresponding <see cref="EntityConfig"/> collection.
         /// </summary>
         [JsonProperty("entities", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Entity` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Entity` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<EntityConfig>? Entities { get; set; }
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxManager.  
         /// </summary>
-        public List<EntityConfig>? IManagerEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIManager, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IManagerEntities => Entities.Where(x => IsNoOption(x.ExcludeIManager) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIDataSvc, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataSvcEntities => Entities.Where(x => IsNoOption(x.ExcludeIDataSvc) && x.Operations!.Count > 0).ToList();
  
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for IXxxData.  
         /// </summary>
-        public List<EntityConfig>? IDataEntities => Entities.Where(x => CompareNullOrValue(x.ExcludeIData, false) && x.Operations!.Count > 0).ToList();
+        public List<EntityConfig>? IDataEntities => Entities.Where(x => IsNoOption(x.ExcludeIData) && x.Operations!.Count > 0).ToList();
 
         /// <summary>
         /// Gets the <see cref="Entities"/> that are selected for Reference Data.  

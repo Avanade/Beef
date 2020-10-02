@@ -36,11 +36,8 @@ namespace Beef.Database.Core.Sql
             Schema = schema;
             Name = name;
 
-            if (SqlDataUpdater.RefDataSchema != null)
-                IsRefData = Schema == SqlDataUpdater.RefDataSchema;
-            else
-                // Will attempt to infer by checking for specified columns.
-                IsRefData = DbTable.Columns.Any(x => x.Name == "Code") && DbTable.Columns.Any(x => x.Name == "Text") && DbTable.Columns.Any(x => x.Name == "IsActive") && DbTable.Columns.Any(x => x.Name == "SortOrder");
+            // Will attempt to infer by checking for specified columns.
+            IsRefData = DbTable.Columns.Any(x => x.Name == "Code") && DbTable.Columns.Any(x => x.Name == "Text") && DbTable.Columns.Any(x => x.Name == "IsActive") && DbTable.Columns.Any(x => x.Name == "SortOrder");
         }
 
         /// <summary>

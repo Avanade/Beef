@@ -19,14 +19,14 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the column to order by.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the column to order by.", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `Column` to order by; used to infer characteristics.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding column name; used to infer characteristics.
+        /// Gets or sets the sort order option.
         /// </summary>
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The corresponding column name; used to infer characteristics.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
+        [PropertySchema("Key", Title = "The corresponding sort order.", IsImportant = true, Options = new string[] { "Ascending", "Descending" },
             Description = "Defaults to `Ascending`.")]
         public string? Order { get; set; }
 

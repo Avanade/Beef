@@ -110,7 +110,17 @@ namespace Beef.CodeGen.Builders
                     jtw.WritePropertyName("items");
                     jtw.WriteStartArray();
 
-                    WriteObject(ComplexTypeReflector.GetItemType(pi.PropertyType), jtw);
+                    if (pi.PropertyType == typeof(List<string>))
+                    {
+                        jtw.WriteStartObject();
+                        jtw.WritePropertyName("type");
+                        jtw.WriteValue("string");
+                        jtw.WritePropertyName("uniqueItems");
+                        jtw.WriteValue(true);
+                        jtw.WriteEndObject();
+                    }
+                    else
+                        WriteObject(ComplexTypeReflector.GetItemType(pi.PropertyType), jtw);
 
                     jtw.WriteEndArray();
                 }

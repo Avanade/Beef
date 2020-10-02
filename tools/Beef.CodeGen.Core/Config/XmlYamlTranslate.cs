@@ -62,16 +62,35 @@ namespace Beef.CodeGen.Config
         private static readonly List<(ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToYamlConvert = new List<(ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigurationEntity, string, Func<string?, string?>)[]
         {
             (ConfigurationEntity.CodeGen, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
-            (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Yes" : "Mapper")),
+
+            (ConfigurationEntity.Entity, "ExcludeEntity", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeAll", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeIData", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeData", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : "RequiresMapper")),
+            (ConfigurationEntity.Entity, "ExcludeIDataSvc", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeDataSvc", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeIManager", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeManager", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeWebApi", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeWebApiAgent", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Entity, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigurationEntity.Entity, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
+            (ConfigurationEntity.Operation, "ExcludeIData", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeData", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeIDataSvc", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeDataSvc", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeIManager", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeManager", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeWebApi", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeWebApiAgent", (xml) => ConvertBoolToYesNo(xml)),
+            (ConfigurationEntity.Operation, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigurationEntity.Operation, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
             (ConfigurationEntity.Table, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigurationEntity.Table, "GetCollOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : XmlToGetAllOrderBy(xml)),
+            (ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
             (ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
             (ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
@@ -79,12 +98,98 @@ namespace Beef.CodeGen.Config
             (ConfigurationEntity.OrderBy, "Order", (xml) => string.IsNullOrEmpty(xml) ? null : (xml.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending"))
         });
 
+        private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);
+
         private static readonly List<(ConfigurationEntity Entity, string XmlName, Type OverrideType, PropertySchemaAttribute Attribute)> _xmlSpecificPropertySchema = new List<(ConfigurationEntity, string, Type, PropertySchemaAttribute)>(new (ConfigurationEntity, string, Type, PropertySchemaAttribute)[]
         {
             (ConfigurationEntity.CodeGen, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi") 
                 { 
-                    Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), or `AllowAnonymous` (or `false`).",
-                    Description = "Defaults to the `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                    Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
+                    Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                }),
+
+            (ConfigurationEntity.Entity, "ExcludeEntity", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeAll", typeof(bool?), new PropertySchemaAttribute("ExcludeAll") 
+            { 
+                Title = "The option to exclude the generation of all `Operation` related artefacts; excluding the `Entity` class.",
+                Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to `true`."
+            }),
+            (ConfigurationEntity.Entity, "ExcludeIData", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IData` interface (`IXxxData.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeData", typeof(bool?), new PropertySchemaAttribute("Exclude")
+                {
+                    Title = "Indicates whether to exclude the generation of the `Data` class (`XxxData.cs`).",
+                    Description = "An unspecified (null) value indicates _not_ to exclude. A value of `true` indicates to exclude all output; alternatively, where `false` is specifically specified it indicates to at least output the corresponding `Mapper` class."
+                }),
+            (ConfigurationEntity.Entity, "ExcludeIDataSvc", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IDataSvc` interface (`IXxxDataSvc.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeDataSvc", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `DataSvc` class (`IXxxDataSvc.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeIManager", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IManager` interface (`IXxxManager.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeManager", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `Manager` class (`XxxManager.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeWebApi", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxController` class (`IXxxController.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeWebApiAgent", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxAgent` class (`XxxAgent.cs`)." }),
+            (ConfigurationEntity.Entity, "ExcludeGrpcAgent", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxAgent` class (`XxxAgent.cs`)." }),
+            (ConfigurationEntity.Entity, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi") 
+                { 
+                    Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
+                    Description = "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also."
+                }),
+
+            (ConfigurationEntity.Operation, "ExcludeAll", typeof(bool?), new PropertySchemaAttribute("ExcludeAll")
+            {
+                Title = "The option to exclude the generation of all `Operation` related output; excluding the `Entity` class.",
+                Description = "Is a shorthand means for setting all of the other `Exclude*` properties (with the exception of `ExcludeEntity`) to `true`."
+            }),
+            (ConfigurationEntity.Operation, "ExcludeIData", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IData` interface (`IXxxData.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeData", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `Data` class (`XxxData.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeIDataSvc", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IDataSvc` interface (`IXxxDataSvc.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeDataSvc", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `DataSvc` class (`IXxxDataSvc.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeIManager", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `IManager` interface (`IXxxManager.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeManager", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `Manager` class (`XxxManager.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeWebApi", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxController` class (`IXxxController.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeWebApiAgent", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxAgent` class (`XxxAgent.cs`) output." }),
+            (ConfigurationEntity.Operation, "ExcludeGrpcAgent", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `XxxAgent` class (`XxxAgent.cs`) output." }),
+            (ConfigurationEntity.Operation, "WebApiAuthorize", typeof(string), new PropertySchemaAttribute("WebApi")
+                {
+                    Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
+                    Description = "Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified."
+                }),
+
+            (ConfigurationEntity.Table, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The comma separated list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this Indicates whether all `Columns` are to be included."
+                }),
+            (ConfigurationEntity.Table, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The comma seperated list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this indicates no `Columns` are to be excluded."
+                }),
+            (ConfigurationEntity.Table, "GetAllOrderBy", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order"
+                }),
+            (ConfigurationEntity.Table, "UdtExcludeColumns", typeof(string), new PropertySchemaAttribute("Udt")
+                {
+                    Title = "The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
+                    Description = "Where not specified this indicates that no `Columns` are to be excluded."
+                }),
+
+            (ConfigurationEntity.StoredProcedure, "Type", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The stored procedure operation type.",
+                    Options = new string[] { "Get", "GetAll", "Create", "Update", "Upsert", "Delete", "Merge" },
+                    Description = "Defaults to `GetAll`."
+                }),
+            (ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The comma seperated list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+                    Description = "This is used to override the default behaviour of using the primary key column(s)."
+                }),
+
+            (ConfigurationEntity.OrderBy, "Order", typeof(string), new PropertySchemaAttribute("Key")
+                {
+                    Title = "The corresponding sort order.",
+                    Options = new string[] { "Asc", "Desc" },
+                    Description = "Defaults to `Asc`."
                 })
         });
 

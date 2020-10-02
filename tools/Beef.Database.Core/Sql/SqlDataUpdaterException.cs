@@ -12,9 +12,7 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlDataUpdaterException"/> class.
         /// </summary>
-        public SqlDataUpdaterException()
-        {
-        }
+        public SqlDataUpdaterException() { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlDataUpdaterException"/> class with a specified <paramref name="message"/>.
@@ -27,8 +25,6 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
-        public SqlDataUpdaterException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+        public SqlDataUpdaterException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

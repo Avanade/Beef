@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,12 +58,12 @@ namespace Beef.CodeGen.Config.Database
         public bool? IntoTempTable { get; set; }
 
         /// <summary>
-        /// Gets or sets the column names (comma separated) to be used in the `Merge` statement to determine whether to insert, update or delete.
+        /// Gets or sets the column names to be used in the `Merge` statement to determine whether to insert, update or delete.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         [JsonProperty("mergeOverrideIdentityColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The column names to be used in the `Merge` statement to determine whether to insert, update or delete.",
-            Description = "This is used to override the default behaviour of using the identity column(s).")]
+        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+            Description = "This is used to override the default behaviour of using the primary key column(s).")]
         public List<string>? MergeOverrideIdentityColumns { get; set; }
 
         /// <summary>
@@ -87,7 +86,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="ParameterConfig"/> collection.
         /// </summary>
         [JsonProperty("parameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Parameter` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Parameter` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ParameterConfig>? Parameters { get; set; }
 
@@ -95,7 +94,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="WhereConfig"/> collection.
         /// </summary>
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Where` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<WhereConfig>? Where { get; set; }
 
@@ -103,7 +102,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="OrderByConfig"/> collection.
         /// </summary>
         [JsonProperty("orderby", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `OrderBy` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `OrderBy` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<OrderByConfig>? OrderBy { get; set; }
 
@@ -111,7 +110,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="ExecuteConfig"/> collection.
         /// </summary>
         [JsonProperty("execute", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Execute` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Execute` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ExecuteConfig>? Execute { get; set; }
 

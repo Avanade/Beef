@@ -11,7 +11,7 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure additional statement configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "The **Execute** statement to enable additional functionality to be added before or after the primary statement.", Description = "", Markdown = "")]
+    [ClassSchema("Execute", Title = "The **Execute** statement to enable additional functionality to be added before or after the primary statement.", Description = "", Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class ExecuteConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {

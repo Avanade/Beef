@@ -24,7 +24,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("value", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The C# code for the constant value.", IsMandatory = true, IsImportant = true,
-            Description = "The code generation will ensure it is delimited correctly to output correctly formed C# code.")]
+            Description = "The code generation will ensure the value is delimited properly to output correctly formed .NET (C#) code.")]
         public string? Value { get; set; }
 
         /// <summary>

@@ -31,7 +31,6 @@ namespace Beef.Database.Core
         private readonly CommandOption _templateOpt;
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
-        private readonly CommandOption _refSchema;
         private readonly CommandOption _schemaOrder;
         private readonly ILogger _logger;
 
@@ -76,8 +75,6 @@ namespace Beef.Database.Core
 
             _paramsOpt = App.Option("-p|--param", "Name=Value pair(s) passed into code generation.", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new ParamsValidator()));
-
-            _refSchema = App.Option("-rs|--refschema", "Reference data schema name.", CommandOptionType.SingleValue);
 
             _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
 
@@ -161,9 +158,6 @@ namespace Beef.Database.Core
             WriteHeader(args);
 
             var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args };
-            if (_refSchema.HasValue())
-                dea.RefDataSchemaName = _refSchema.Value();
-
             if (_schemaOrder.HasValue())
                 dea.SchemaOrder.AddRange(_schemaOrder.Values);
 
@@ -182,6 +176,17 @@ namespace Beef.Database.Core
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
+            // http://www.patorjk.com/software/taag/#p=display&h=2&f=Big&t=Beef%20DB%20tool%0A
+            _logger.LogInformation(@"
+  ____             __   _____  ____    _              _ 
+ |  _ \           / _| |  __ \|  _ \  | |            | |
+ | |_) | ___  ___| |_  | |  | | |_) | | |_ ___   ___ | |
+ |  _ < / _ \/ _ \  _| | |  | |  _ <  | __/ _ \ / _ \| |
+ | |_) |  __/  __/ |   | |__| | |_) | | || (_) | (_) | |
+ |____/ \___|\___|_|   |_____/|____/   \__\___/ \___/|_|
+
+");
+
             _logger.LogInformation(App.Description);
             _logger.LogInformation(string.Empty);
             _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");

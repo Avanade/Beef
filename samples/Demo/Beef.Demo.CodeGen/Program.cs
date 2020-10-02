@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Beef.Demo.CodeGen
 {
-    class Program
+    public class Program
     {
         static Task<int> Main(string[] args)
         {

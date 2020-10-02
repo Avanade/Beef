@@ -18,10 +18,7 @@ namespace Beef.Database.Core.Sql
         /// Initializes a new instance of the <see cref="SqlDataRow"/> class.
         /// </summary>
         /// <param name="table">The parent <see cref="SqlDataTable"/>.</param>
-        public SqlDataRow(SqlDataTable table)
-        {
-            Table = table;
-        }
+        public SqlDataRow(SqlDataTable table) => Table = table;
 
         /// <summary>
         /// Gets the <see cref="SqlDataTable"/>.
@@ -38,10 +35,7 @@ namespace Beef.Database.Core.Sql
         /// </summary>
         /// <param name="name">The column name.</param>
         /// <param name="value">The column value.</param>
-        public void AddColumn(string name, object? value)
-        {
-            AddColumn(new SqlDataColumn { Name = name, Value = value });
-        }
+        public void AddColumn(string name, object? value) => AddColumn(new SqlDataColumn { Name = name, Value = value });
 
         /// <summary>
         /// Adds a <see cref="SqlDataColumn"/> to the row.

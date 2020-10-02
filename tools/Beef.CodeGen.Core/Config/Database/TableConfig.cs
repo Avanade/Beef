@@ -50,7 +50,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this Indicates whether all `Columns` are to be included.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
@@ -59,8 +59,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
-            Description = "Where not specified this Indicates whether no `Columns` are to be excluded.")]
+        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+            Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
 
@@ -147,8 +147,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be excluded from the `User Defined Table (UDT)`.
         /// </summary>
         [JsonProperty("udtExcludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Udt", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
-            Description = "Where not specified this Indicates whether no `Columns` are to be excluded.")]
+        [PropertyCollectionSchema("Udt", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
+            Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? UdtExcludeColumns { get; set; }
 
@@ -267,7 +267,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="StoredProcedureConfig"/> collection.
         /// </summary>
         [JsonProperty("storedProcedures", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `StoredProcedure` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `StoredProcedure` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<StoredProcedureConfig>? StoredProcedures { get; set; }
 
@@ -275,7 +275,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the <see cref="GetAllOrderByConfig"/> collection).
         /// </summary>
         [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `GetAll` stored procedure `OrderBy` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `GetAll` stored procedure `OrderBy` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<GetAllOrderByConfig>? GetAllOrderBy { get; set; }
 

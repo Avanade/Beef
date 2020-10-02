@@ -4,6 +4,7 @@ using Beef.CodeGen.Config;
 using Beef.Reflection;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Xml.Linq;
 
@@ -67,6 +68,10 @@ namespace Beef.CodeGen.Generators
                 if (pcsa == null)
                     continue;
 
+                // Properties with List<string> are not compatible with XML and should be picked up as comma separated strings.
+                if (pi.PropertyType == typeof(List<string>))
+                    continue;
+
                 WriteObject(ComplexTypeReflector.GetItemType(pi.PropertyType), ns, xs, false);
                 hasSeq = true;
             }
@@ -83,9 +88,9 @@ namespace Beef.CodeGen.Generators
 
                 var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
                 var xmlName = XmlYamlTranslate.GetXmlName(ce, name);
-                //var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ce, xmlName);
+                var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ce, xmlName);
 
-                var psa = pi.GetCustomAttribute<PropertySchemaAttribute>();
+                var psa = xmlOverride.Attribute ?? pi.GetCustomAttribute<PropertySchemaAttribute>();
                 if (psa == null)
                     continue;
 
@@ -96,10 +101,10 @@ namespace Beef.CodeGen.Generators
                 xp.Add(new XElement(ns + "annotation", new XElement(ns + "documentation", GetDocumentation(name, psa))));
 
                 if (psa.Options == null)
-                    xp.Add(new XAttribute("type", GetXmlType(pi)));
+                    xp.Add(new XAttribute("type", GetXmlType(pi, xmlOverride.Type)));
                 else
                 {
-                    var xr = new XElement(ns + "restriction", new XAttribute("base", GetXmlType(pi)));
+                    var xr = new XElement(ns + "restriction", new XAttribute("base", GetXmlType(pi, xmlOverride.Type)));
                     foreach (var opt in psa.Options)
                         xr.Add(new XElement(ns + "enumeration", new XAttribute("value", opt)));
 
@@ -117,14 +122,15 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Gets the corresponding XML type for the property.
         /// </summary>
-        private static string GetXmlType(PropertyInfo pi)
+        private static string GetXmlType(PropertyInfo pi, Type? overrideType)
         {
-            return pi.PropertyType switch
+            var type = overrideType ?? pi.PropertyType;
+            return type switch
             {
                 Type t when t == typeof(string) => "xs:string",
                 Type t when t == typeof(bool?) => "xs:boolean",
                 Type t when t == typeof(int?) => "xs:int",
-                _ => throw new InvalidOperationException($"Type '{pi.DeclaringType?.Name}' Property '{pi.Name}' has a Type '{pi.PropertyType.Name}' that is not supported."),
+                _ => throw new InvalidOperationException($"Type '{pi.DeclaringType?.Name}' Property '{pi.Name}' has a Type '{type.Name}' that is not supported."),
             };
         }
 

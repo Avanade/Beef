@@ -2,8 +2,8 @@
   "profiles": {
     "Beef.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "beef.demo.xml -s  EntityWebApiCoreAgent.xml -p Company=Beef -p AppName=Demo -p ApiName=WebApi",
-      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Demo"
+      "commandLineArgs": "--GENERATEDATABASEJSONSCHEMA",
+      "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\tools\\Beef.CodeGen.Core"
     }
   }
 }

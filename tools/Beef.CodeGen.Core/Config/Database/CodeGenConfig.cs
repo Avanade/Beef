@@ -207,7 +207,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
         [JsonProperty("tables", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema(Title = "The corresponding `Table` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Table` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<TableConfig>? Tables { get; set; }
 
@@ -274,7 +274,7 @@ namespace Beef.CodeGen.Config.Database
 
             var sw = Stopwatch.StartNew();
             using var db = new SqlServerDb(cs);
-            DbTables = DbTable.LoadTablesAndColumnsAsync(db, RefDatabaseSchema, false, false).GetAwaiter().GetResult();
+            DbTables = DbTable.LoadTablesAndColumnsAsync(db, false).GetAwaiter().GetResult();
 
             sw.Stop();
             Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
