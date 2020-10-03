@@ -116,7 +116,7 @@ namespace Beef.CodeGen
             {
                 using var xfs = xfi.OpenRead();
                 var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                var yaml = type == CommandType.Database ? new DatabaseXmlToYamlConverter().ConvertEntityXmlToYaml(xml) : new EntityXmlToYamlConverter().ConvertEntityXmlToYaml(xml);
+                var yaml = type == CommandType.Database ? new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml) : new EntityXmlToYamlConverter().ConvertXmlToYaml(xml);
                 using var ysw = yfi.CreateText();
                 await ysw.WriteAsync(yaml).ConfigureAwait(false);
 

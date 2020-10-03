@@ -129,7 +129,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Represents the <b>Database</b> configuration.
         /// </summary>
-        Database,
+        Database
     }
 
     /// <summary>
@@ -285,7 +285,7 @@ namespace Beef.CodeGen
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            return LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertEntityXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertEntityXmlToYaml(xml));
+                            return LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml));
                         }
 
                     case ".YAML":

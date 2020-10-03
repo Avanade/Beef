@@ -20,8 +20,9 @@ namespace Beef.CodeGen.Generators
         /// Creates an <see cref="XDocument"/> as the <c>XmlSchema</c> from the <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The root <see cref="Type"/> to derive the schema from.</typeparam>
+        /// <param name="configType">The <see cref="ConfigType"/>.</param>
         /// <returns>An <see cref="XDocument"/>.</returns>
-        public static XDocument Create<T>()
+        public static XDocument Create<T>(ConfigType configType)
         {
             var ns = XNamespace.Get("http://www.w3.org/2001/XMLSchema");
             var xdoc = new XDocument(new XDeclaration("1.0", "utf-8", null),
@@ -31,7 +32,7 @@ namespace Beef.CodeGen.Generators
                     new XAttribute("attributeFormDefault", "unqualified"),
                     new XAttribute("elementFormDefault", "qualified")));
 
-            WriteObject(typeof(T), ns, xdoc.Root, true);
+            WriteObject(configType, typeof(T), ns, xdoc.Root, true);
 
             return xdoc;
         }
@@ -39,7 +40,7 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Writes the schema for the object.
         /// </summary>
-        private static void WriteObject(Type type, XNamespace ns, XElement xe, bool isRoot)
+        private static void WriteObject(ConfigType ct, Type type, XNamespace ns, XElement xe, bool isRoot)
         {
             var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
             if (csa == null)
@@ -72,7 +73,7 @@ namespace Beef.CodeGen.Generators
                 if (pi.PropertyType == typeof(List<string>))
                     continue;
 
-                WriteObject(ComplexTypeReflector.GetItemType(pi.PropertyType), ns, xs, false);
+                WriteObject(ct, ComplexTypeReflector.GetItemType(pi.PropertyType), ns, xs, false);
                 hasSeq = true;
             }
 
@@ -87,8 +88,8 @@ namespace Beef.CodeGen.Generators
                     continue;
 
                 var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
-                var xmlName = XmlYamlTranslate.GetXmlName(ce, name);
-                var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ce, xmlName);
+                var xmlName = XmlYamlTranslate.GetXmlName(ct, ce, name);
+                var xmlOverride = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, xmlName);
 
                 var psa = xmlOverride.Attribute ?? pi.GetCustomAttribute<PropertySchemaAttribute>();
                 if (psa == null)

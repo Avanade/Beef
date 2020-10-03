@@ -33,9 +33,9 @@ namespace Beef.CodeGen
             {
                 switch (args[0].ToUpperInvariant())
                 {
-                    case "--GENERATEENTITYXMLSCHEMA": return SpecialActivitiesCenter("Generate Entity XML Schema", "./Schema/codegen.entity.xsd", fn => XmlSchemaGenerator.Create<Config.Entity.CodeGenConfig>().Save(fn, System.Xml.Linq.SaveOptions.None));
+                    case "--GENERATEENTITYXMLSCHEMA": return SpecialActivitiesCenter("Generate Entity XML Schema", "./Schema/codegen.entity.xsd", fn => XmlSchemaGenerator.Create<Config.Entity.CodeGenConfig>(ConfigType.Entity).Save(fn, System.Xml.Linq.SaveOptions.None));
                     case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Entity.CodeGenConfig>("JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef).")));
-                    case "--GENERATEDATABASEXMLSCHEMA": return SpecialActivitiesCenter("Generate Database XML Schema", "./Schema/codegen.table.xsd", fn => XmlSchemaGenerator.Create<Config.Database.CodeGenConfig>().Save(fn, System.Xml.Linq.SaveOptions.None));
+                    case "--GENERATEDATABASEXMLSCHEMA": return SpecialActivitiesCenter("Generate Database XML Schema", "./Schema/codegen.table.xsd", fn => XmlSchemaGenerator.Create<Config.Database.CodeGenConfig>(ConfigType.Database).Save(fn, System.Xml.Linq.SaveOptions.None));
                     case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Database.CodeGenConfig>("JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).")));
                 }
             }

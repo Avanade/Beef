@@ -41,14 +41,19 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    public abstract class XmlToYamlConverter
+    internal abstract class XmlToYamlConverter
     {
         /// <summary>
-        /// Converts an existing <b>Entity XML</b> document into the equivlent new YAML format.
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected abstract ConfigType ConfigType { get; }
+
+        /// <summary>
+        /// Converts an existing XML document into the equivlent new YAML format.
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
         /// <returns>The new YAML formatted <see cref="string"/>.</returns>
-        public string ConvertEntityXmlToYaml(XDocument xml)
+        internal string ConvertXmlToYaml(XDocument xml)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -60,7 +65,7 @@ namespace Beef.CodeGen.Converters
             using (var sw = new StringWriter(sb))
             {
                 var (entity, type, _) = GetEntityConfigInfo(xml.Root.Name.LocalName);
-                WriteElement(new YamlFormatArgs(sw), xml.Root, entity, type);
+                WriteElement(new YamlFormatArgs(sw), xml.Root, ConfigType, entity, type);
             }
 
             return sb.ToString();
@@ -74,7 +79,7 @@ namespace Beef.CodeGen.Converters
         /// <summary>
         /// Writes the XML element as YAML.
         /// </summary>
-        private void WriteElement(YamlFormatArgs args, XElement xml, ConfigurationEntity entity, Type type)
+        private void WriteElement(YamlFormatArgs args, XElement xml, ConfigType ct, ConfigurationEntity entity, Type type)
         {
             WriteComments(args, xml);
 
@@ -85,7 +90,7 @@ namespace Beef.CodeGen.Converters
 
             args.Indent += 2;
 
-            WriteAttributes(args, entity, type, xml);
+            WriteAttributes(args, ct, entity, type, xml);
 
             // Group by element name, then process as a collection.
             foreach (var grp in xml.Elements().GroupBy(x => x.Name).Select(g => new { g.Key, Children = xml.Elements(g.Key) }))
@@ -123,7 +128,7 @@ namespace Beef.CodeGen.Converters
                         args.Writer.WriteLine();
 
                     args.Level++;
-                    WriteElement(args, child, info.entity, info.type);
+                    WriteElement(args, child, ct, info.entity, info.type);
                     args.Level--;
                 }
 
@@ -161,13 +166,13 @@ namespace Beef.CodeGen.Converters
         /// <summary>
         /// Writes the XML attribues as YAML.
         /// </summary>
-        private static void WriteAttributes(YamlFormatArgs args, ConfigurationEntity ce, Type type, XElement xml)
+        private static void WriteAttributes(YamlFormatArgs args, ConfigType ct, ConfigurationEntity ce, Type type, XElement xml)
         {
             var needsComma = false;
 
             foreach (var att in xml.Attributes())
             {
-                var jname = XmlYamlTranslate.GetYamlName(ce, att.Name.LocalName);
+                var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
                 var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
                 if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
                     continue;
@@ -175,7 +180,7 @@ namespace Beef.CodeGen.Converters
                 if (needsComma)
                     args.Writer.Write(", ");
 
-                var val = XmlYamlTranslate.GetYamlValue(ce, att.Name.LocalName, att.Value);
+                var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;
 
@@ -201,8 +206,13 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Entity XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    public class EntityXmlToYamlConverter : XmlToYamlConverter
+    internal class EntityXmlToYamlConverter : XmlToYamlConverter
     {
+        /// <summary>
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected override ConfigType ConfigType => ConfigType.Entity;
+
         /// <summary>
         /// Gets the configuration for a given XML element.
         /// </summary>
@@ -221,8 +231,13 @@ namespace Beef.CodeGen.Converters
     /// <summary>
     /// Database XML to YAML converter. Generates an opinionated terse YAML format.
     /// </summary>
-    public class DatabaseXmlToYamlConverter : XmlToYamlConverter
+    internal class DatabaseXmlToYamlConverter : XmlToYamlConverter
     {
+        /// <summary>
+        /// Gets the <see cref="CodeGen.ConfigType"/>.
+        /// </summary>
+        protected override ConfigType ConfigType => ConfigType.Database;
+
         /// <summary>
         /// Gets the configuration for a given XML element.
         /// </summary>
