@@ -1,0 +1,26 @@
+entities:
+  # CosmosDb model
+- { name: Robot, text: Robot, collection: true, omitEntityBase: true, properties: [
+    { name: Id, type: Guid },
+    { name: ModelNo, type: string },
+    { name: SerialNo, type: string },
+    { name: EyeColor, type: string },
+    { name: PowerSource, type: string },
+    { name: ETag, argumentName: etag, jsonName: _etag, type: string },
+    { name: ChangeLog, type: ChangeLog }
+  ] }
+
+  # OData model
+- { name: Product, omitEntityBase: true, properties: [
+    { name: ID, type: int },
+    { name: Name, type: string },
+    { name: Description, type: string }
+  ] }
+
+- { name: Person, jsonSerializer: None, properties: [
+    { name: UserName, type: string },
+    { name: FirstName, type: string },
+    { name: LastName, type: string }
+    # The endpoint always fails when Gender is passed; removed for now.
+    # { name: Gender, type: string }
+  ] }

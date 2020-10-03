@@ -13,15 +13,6 @@ namespace Beef.CodeGen
     /// </summary>
     public class CodeGenConsoleWrapper
     {
-        private enum CommandType
-        {
-            Entity = 1,
-            Database = 2,
-            RefData = 4,
-            DataModel = 8,
-            All = Entity | Database | RefData | DataModel
-        }
-
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
         /// </summary>
@@ -191,39 +182,45 @@ namespace Beef.CodeGen
             };
 
             var cmd = app.Argument<CommandType>("command", "Execution command type: Entity, Database, RefData or All.", false).IsRequired();
-            var cs = app.Option("-c|--connectionString", "Override the connection string for Database.", CommandOptionType.SingleValue);
-            var cx = app.Option("-x|--xml", "Override the filename for the configuration XML.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
+            var cs = app.Option("-cs|--connectionString", "Override the connection string for Database.", CommandOptionType.SingleValue);
+            var cf = app.Option("-cf|--configFile", "Override the filename for the configuration.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
             var enc = app.Option("-enc|--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
-
-            var entityFileName = EntityFileNameTemplate;
-            var databaseFileName = DatabaseFileNameTemplate;
-            var refDataFileName = RefDataFileNameTemplate;
-            var dataModelFileName = DataModelFileNameTemplate;
+            var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
 
             app.OnExecuteAsync(async (_) =>
             {
                 var ct = cmd.Value == null ? CommandType.All : Enum.Parse<CommandType>(cmd.Value, true);
-                if (cx.HasValue())
+                string? cfn = null;
+                if (cf.HasValue())
                 {
                     if (ct == CommandType.All)
-                        throw new CommandParsingException(app, "Command 'All' is not compatible with --xml; the command must be more specific when using a configuration XML file.");
+                        throw new CommandParsingException(app, "Command 'All' is not compatible with --configFile; the command must be more specific when using a specified configuration file.");
 
-                    entityFileName = databaseFileName = refDataFileName = dataModelFileName = cx.Value()!;
+                    cfn = cf.Value()!;
+                }
+
+                if (x2y.HasValue())
+                {
+                    if (ct == CommandType.All)
+                        throw new CommandParsingException(app, "Command 'All' is not compatible with --xmlToYaml; the command must be more specific when converting XML configuration to YAML.");
+
+                    return await CodeGenFileManager.ConvertXmlToYamlAsync(ct, cfn ?? CodeGenFileManager.GetConfigFilename(ct, Company, AppName)).ConfigureAwait(false);
                 }
 
                 var encArg = enc.HasValue() ? " --expectNoChanges" : string.Empty;
+
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(databaseFileName + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName) + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(refDataFileName + " " + RefDataCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.RefData, Company, AppName) + " " + RefDataCommandLineTemplate) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(entityFileName + " " + EntityCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Entity, Company, AppName) + " " + EntityCommandLineTemplate) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(dataModelFileName + " " + DataModelCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.DataModel, Company, AppName) + " " + DataModelCommandLineTemplate) + encArg)).ConfigureAwait(false);
 
                 return rc;
             });
@@ -234,7 +231,7 @@ namespace Beef.CodeGen
             }
             catch (CommandParsingException cpex)
             {
-                Console.WriteLine(cpex.Message);
+                Console.Error.WriteLine(cpex.Message);
                 return -1;
             }
         }

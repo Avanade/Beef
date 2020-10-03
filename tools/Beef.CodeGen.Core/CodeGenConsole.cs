@@ -52,7 +52,7 @@ namespace Beef.CodeGen
 
             App.HelpOption(true);
 
-            _configArg = App.Argument("config", "CodeGeneration configuration XML file.")
+            _configArg = App.Argument("config", "CodeGeneration configuration YAML/JSON/XML file.")
                 .IsRequired()
                 .Accepts(v => v.ExistingFile());
 
@@ -155,7 +155,7 @@ namespace Beef.CodeGen
             var result = await cge.RunAsync().ConfigureAwait(false);
 
             sw.Stop();
-            WriteFooter(sw);
+            WriteFooter(_logger, sw);
             return result ? 0 : -1;
         }
 
@@ -225,8 +225,21 @@ namespace Beef.CodeGen
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
+            WriteMasthead(_logger);
+            _logger.LogInformation(App.Description);
+            _logger.LogInformation(string.Empty);
+            LogCodeGenExecutionArgs(args);
+            _logger.LogInformation(string.Empty);
+        }
+
+        /// <summary>
+        /// Writes the mast head information.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        public static void WriteMasthead(ILogger logger)
+        {
             // http://www.patorjk.com/software/taag/#p=display&h=2&f=Big&t=Beef%20CodeGen%0A
-            _logger.LogInformation(@"
+            logger.LogInformation(@"
   ____             __    _____          _       _____            
  |  _ \           / _|  / ____|        | |     / ____|           
  | |_) | ___  ___| |_  | |     ___   __| | ___| |  __  ___ _ __  
@@ -235,20 +248,16 @@ namespace Beef.CodeGen
  |____/ \___|\___|_|    \_____\___/ \__,_|\___|\_____|\___|_| |_|
                                                                  
 ");
-            _logger.LogInformation(App.Description);
-            _logger.LogInformation(string.Empty);
-            LogCodeGenExecutionArgs(args);
-            _logger.LogInformation(string.Empty);
         }
 
         /// <summary>
         /// Write the footer information.
         /// </summary>
-        private void WriteFooter(Stopwatch sw)
+        public static void WriteFooter(ILogger logger, Stopwatch sw)
         {
-            _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"CodeGen complete [{sw.ElapsedMilliseconds}ms].");
-            _logger.LogInformation(string.Empty);
+            logger.LogInformation(string.Empty);
+            logger.LogInformation($"CodeGen complete [{sw?.ElapsedMilliseconds}ms].");
+            logger.LogInformation(string.Empty);
         }
     }
 }

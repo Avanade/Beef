@@ -285,20 +285,17 @@ namespace Beef.CodeGen
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            var yaml = configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertEntityXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertEntityXmlToYaml(xml);
-
-                            using var sr = new StringReader(yaml);
-                            var yml = new DeserializerBuilder().Build().Deserialize(sr);
-                            var json = new SerializerBuilder().JsonCompatible().Build().Serialize(yml!);
-
-                            using var jsr = new StringReader(json);
-                            using var jr = new JsonTextReader(jsr);
-                            var js = JsonSerializer.Create();
-                            return CheckNotNull(js.Deserialize(jr, configType == ConfigType.Entity ? typeof(Config.Entity.CodeGenConfig) : typeof(Config.Database.CodeGenConfig)));
+                            return LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertEntityXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertEntityXmlToYaml(xml));
                         }
 
-                    case ".YAML": throw new NotImplementedException();
-                    case ".JSON": throw new NotImplementedException();
+                    case ".YAML":
+                    case ".YML":
+                        return LoadConfigFileFromYaml(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+
+                    case ".JSON":
+                    case ".JSN":
+                        return LoadConfigFileFromJson(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+
                     default: throw new CodeGenException($"The Config file '{_args.ConfigFile!.FullName}' is not a supported file type.");
                 }
             }
@@ -307,9 +304,30 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
+        /// Load the YAML configuration.
+        /// </summary>
+        private ConfigBase LoadConfigFileFromYaml(ConfigType configType, string yaml)
+        {
+            using var sr = new StringReader(yaml);
+            var yml = new DeserializerBuilder().Build().Deserialize(sr);
+            return LoadConfigFileFromJson(configType, new SerializerBuilder().JsonCompatible().Build().Serialize(yml!));
+        }
+
+        /// <summary>
+        /// Load the JSON configuration.
+        /// </summary>
+        private ConfigBase LoadConfigFileFromJson(ConfigType configType, string json)
+        {
+            using var jsr = new StringReader(json);
+            using var jr = new JsonTextReader(jsr);
+            var js = JsonSerializer.Create();
+            return CheckNotNull(js.Deserialize(jr, configType == ConfigType.Entity ? typeof(Config.Entity.CodeGenConfig) : typeof(Config.Database.CodeGenConfig)));
+        }
+
+        /// <summary>
         /// Checks not null and converts type.
         /// </summary>
-        private ConfigBase CheckNotNull(object? val) => (ConfigBase)(val ?? throw new CodeGenException($"The contents of the Config File {_args.ConfigFile!.Name} are not valid."));
+        private ConfigBase CheckNotNull(object? val) => (ConfigBase)(val ?? throw new CodeGenException($"The contents of the Config File '{_args.ConfigFile!.Name}' are not valid."));
 
         /// <summary>
         /// Gets the template contents.
