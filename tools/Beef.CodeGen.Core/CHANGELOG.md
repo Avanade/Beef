@@ -2,6 +2,11 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been retired (removed).
+- *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
+- *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
+
 ## v4.1.4
 - *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. There was an additional issue where the value was set to `false` it in turn resulted in `Authorize` versus `AllowAnonymous` which has been corrected.
 
@@ -9,7 +14,7 @@ Represents the **NuGet** versions.
 - *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. `WebApiAuthorize` attribute was honouring previous override sideeffect. Changed attribute configuration from a `bool` to a `string`. Code-gen will output the supplied value as-is. XML boolean values are automatically converted. _Note:_ the XML Schema and corresponding documentation have not been updated; this will occur during a future release.
 
 ## v4.1.2
-- *Enhancement:* The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. All the _entity_ and _reference date_ related code-generation templates (and related) have been ported. The _database_ related code-generation is still using the legacy custom.
+- *Enhancement:* The first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. All the _entity_ and _reference date_ related code-generation templates (and related) have been ported. The _database_ related code-generation is still using the legacy custom.
 - *Enhancement:* The `CodeGen` namespace from `Beef.Core` has been moved relocated. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`).
 - *Fixed:* Issue [71](https://github.com/Avanade/Beef/issues/71) has been resolved. A runtime error will now correctly result in a return code of `-1`.
 

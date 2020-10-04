@@ -7,7 +7,7 @@ CREATE TABLE #temp (
 )
 
   {{#each Rows}}
-INSERT INTO #temp ({{#each Columns}}[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}) VALUES ({{#each Columns}}{{#if UseForeignKeyQueryForId}}(SELECT [{{DbColumn.ForeignColumn}}] FROM [{{DbColumn.ForeignSchema}}].[{{DbColumn.ForeignTable}}] WHERE [Code] = {{SqlValue}}){{else}}{{SqlValue}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}})
+INSERT INTO #temp ({{#each Columns}}[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}) VALUES ({{#each Columns}}{{#if UseForeignKeyQueryForId}}(SELECT [{{DbColumn.ForeignColumn}}] FROM [{{DbColumn.ForeignSchema}}].[{{DbColumn.ForeignTable}}] WHERE [Code] = {{{SqlValue}}}){{else}}{{{SqlValue}}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}})
   {{/each}}
 
 MERGE INTO [{{Schema}}].[{{Name}}] WITH (HOLDLOCK) as [t]
@@ -26,7 +26,7 @@ SELECT @@ROWCOUNT
 DROP TABLE #temp
 {{else}}
   {{#each Rows}}
-INSERT INTO [{{Table.Schema}}].[{{Table.Name}}] ({{#each Columns}}[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}) VALUES ({{#each Columns}}{{#if UseForeignKeyQueryForId}}(SELECT [{{DbColumn.ForeignColumn}}] FROM [{{DbColumn.ForeignSchema}}].[{{DbColumn.ForeignTable}}] WHERE [Code] = {{SqlValue}}){{else}}{{SqlValue}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}})
+INSERT INTO [{{Table.Schema}}].[{{Table.Name}}] ({{#each Columns}}[{{Name}}]{{#unless @last}}, {{/unless}}{{/each}}) VALUES ({{#each Columns}}{{#if UseForeignKeyQueryForId}}(SELECT [{{DbColumn.ForeignColumn}}] FROM [{{DbColumn.ForeignSchema}}].[{{DbColumn.ForeignTable}}] WHERE [Code] = {{{SqlValue}}}){{else}}{{{SqlValue}}}{{/if}}{{#unless @last}}, {{/unless}}{{/each}})
   {{/each}}
 SELECT {{Rows.Count}} -- Total rows inserted
 {{/if}}

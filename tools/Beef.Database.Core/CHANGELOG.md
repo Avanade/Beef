@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* All database code generation now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net).
+- *Enhancement:* Reference data schema specification now removed throughout; will now be inferred from the database itself (columns `Code`, `Text`, `IsActive` and `SortOrder`). This will allow any schema to be used.
+
 ## v4.1.2
 - *Enhancement:* The `ScriptNew` option has been changed to add support for a new `-createref` to create using the reference data schema; instead of the inferring from the schema name (this support has been removed). This way the developer explicitly decides and allows reference data to be used in any schema.
 - *Fixed:* Issue [71](https://github.com/Avanade/Beef/issues/71) has been resolved. A runtime error will now correctly result in a return code of `-1`.

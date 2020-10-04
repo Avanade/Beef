@@ -1,14 +1,14 @@
 CREATE PROCEDURE [Hr].[spEmergencyContactMerge]
-   @EmployeeId AS UNIQUEIDENTIFIER
-  ,@List AS [Hr].[udtEmergencyContactList] READONLY
+  @EmployeeId AS UNIQUEIDENTIFIER,
+  @List AS [Hr].[udtEmergencyContactList] READONLY
 AS
 BEGIN
   /*
    * This is automatically generated; any changes will be lost. 
    */
- 
+
   SET NOCOUNT ON;
-  
+
   BEGIN TRY
     -- Wrap in a transaction.
     BEGIN TRANSACTION
@@ -18,50 +18,48 @@ BEGIN
     SET @ListCount = (SELECT COUNT(*) FROM @List WHERE [EmergencyContactId] IS NOT NULL AND [EmergencyContactId] <> CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000'))
 
     DECLARE @RecordCount INT
-    SET @RecordCount = (SELECT COUNT(*) FROM @List as [list]
-      INNER JOIN [Hr].[EmergencyContact] as [ec]
-        ON [ec].[EmergencyContactId] = [list].[EmergencyContactId]
-        AND [ec].[EmployeeId] = @EmployeeId)
-      
+    SET @RecordCount = (SELECT COUNT(*) FROM @List AS [list]
+      INNER JOIN [Hr].[EmergencyContact] AS [ec]
+        ON [ec].[EmergencyContactId] = [List].[EmergencyContactId])
+
     IF @ListCount <> @RecordCount
     BEGIN
       EXEC spThrowConcurrencyException
     END
 
     -- Merge the records.
-    MERGE INTO [Hr].[EmergencyContact] WITH (HOLDLOCK) AS [t]
-      USING @List as [s]
-        ON ([t].[EmergencyContactId] = [s].[EmergencyContactId]
-        AND [t].[EmployeeId] = @EmployeeId)
+    MERGE INTO [Hr].[EmergencyContact] WITH (HOLDLOCK) AS [ec]
+      USING @List AS [list]
+        ON ([ec].[EmergencyContactId] = [List].[EmergencyContactId])
       WHEN MATCHED AND EXISTS
-          (SELECT [s].[FirstName], [s].[LastName], [s].[PhoneNo], [s].[RelationshipTypeCode]
-           EXCEPT
-           SELECT [t].[FirstName], [t].[LastName], [t].[PhoneNo], [t].[RelationshipTypeCode])
+         (SELECT [list].[FirstName], [list].[LastName], [list].[PhoneNo], [list].[RelationshipTypeCode]
+          EXCEPT
+          SELECT [ec].[FirstName], [ec].[LastName], [ec].[PhoneNo], [ec].[RelationshipTypeCode])
         THEN UPDATE SET
-           [t].[FirstName] = [s].[FirstName]
-          ,[t].[LastName] = [s].[LastName]
-          ,[t].[PhoneNo] = [s].[PhoneNo]
-          ,[t].[RelationshipTypeCode] = [s].[RelationshipTypeCode]
+          [ec].[EmployeeId] = @EmployeeId,
+          [ec].[FirstName] = [list].[FirstName],
+          [ec].[LastName] = [list].[LastName],
+          [ec].[PhoneNo] = [list].[PhoneNo],
+          [ec].[RelationshipTypeCode] = [list].[RelationshipTypeCode]
       WHEN NOT MATCHED BY TARGET
         THEN INSERT (
-           [EmployeeId]
-          ,[FirstName]
-          ,[LastName]
-          ,[PhoneNo]
-          ,[RelationshipTypeCode]
-        )
-        VALUES (
-          @EmployeeId
-         ,[s].[FirstName]
-         ,[s].[LastName]
-         ,[s].[PhoneNo]
-         ,[s].[RelationshipTypeCode]
+          [EmployeeId],
+          [FirstName],
+          [LastName],
+          [PhoneNo],
+          [RelationshipTypeCode]
+        ) VALUES (
+          @EmployeeId,
+          [list].[FirstName],
+          [list].[LastName],
+          [list].[PhoneNo],
+          [list].[RelationshipTypeCode]
         )
       WHEN NOT MATCHED BY SOURCE
-        AND [t].[EmployeeId] = @EmployeeId
+        AND [ec].[EmployeeId] = @EmployeeId
         THEN DELETE;
-
-    -- Commit the transaction.
+  
+  -- Commit the transaction.
     COMMIT TRANSACTION
   END TRY
   BEGIN CATCH

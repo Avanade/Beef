@@ -21,7 +21,7 @@ namespace Beef.Demo.Test
                 var args = new DatabaseExecutorArgs(
                     count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:BeefDemo"],
                     typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly(), typeof(Beef.Demo.Abc.Database.Scripts).Assembly)
-                { UseBeefDbo = true, RefDataSchemaName = "Ref" }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
+                { UseBeefDbo = true }.AddSchemaOrder("Sec", "Ref", "Test", "Demo");
 
                 return await DatabaseExecutor.RunAsync(args).ConfigureAwait(false) == 0;
             });
