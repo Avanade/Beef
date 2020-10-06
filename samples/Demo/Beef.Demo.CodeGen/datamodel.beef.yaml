@@ -1,26 +1,32 @@
 entities:
   # CosmosDb model
-- { name: Robot, text: Robot, collection: true, omitEntityBase: true, properties: [
-    { name: Id, type: Guid },
-    { name: ModelNo },
-    { name: SerialNo },
-    { name: EyeColor },
-    { name: PowerSource },
-    { name: ETag, argumentName: etag, jsonName: _etag },
-    { name: ChangeLog, type: ChangeLog }
-  ] }
+- { name: Robot, text: Robot, collection: true, omitEntityBase: true,
+    properties: [
+      { name: Id, type: Guid },
+      { name: ModelNo },
+      { name: SerialNo },
+      { name: EyeColor },
+      { name: PowerSource },
+      { name: ETag, argumentName: etag, jsonName: _etag },
+      { name: ChangeLog, type: ChangeLog }
+    ]
+  }
 
-  # OData model
-- { name: Product, omitEntityBase: true, properties: [
-    { name: ID, type: int },
-    { name: Name },
-    { name: Description }
-  ] }
+  # OData models
+- { name: Product, omitEntityBase: true,
+    properties: [
+      { name: ID, type: int },
+      { name: Name },
+      { name: Description }
+    ] 
+  }
 
-- { name: Person, jsonSerializer: None, properties: [
-    { name: UserName },
-    { name: FirstName },
-    { name: LastName }
-    # The endpoint always fails when Gender is passed; removed for now.
-    # { name: Gender }
-  ] }
+- { name: Person, jsonSerializer: None,
+    properties: [
+      { name: UserName },
+      { name: FirstName },
+      { name: LastName }
+      # The endpoint always fails when Gender is passed; removed for now.
+      # { name: Gender }
+    ] 
+  }

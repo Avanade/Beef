@@ -36,6 +36,25 @@ namespace Beef.CodeGen.Converters
         /// Gets or sets the number of indent characters.
         /// </summary>
         public int Indent { get; set; } = -2;
+
+        /// <summary>
+        /// Indicates whether there were attributes written on the current line.
+        /// </summary>
+        public bool HasAttributes { get; set; }
+
+        /// <summary>
+        /// Writes the close squiggly bracket accounting for a needed space if an attribute has proceeded it.
+        /// </summary>
+        public void WriteClosingSquigglyBracket()
+        {
+            if (HasAttributes)
+            {
+                HasAttributes = false;
+                Writer.Write(" ");
+            }
+
+            Writer.Write("}");
+        }
     }
 
     /// <summary>
@@ -83,41 +102,43 @@ namespace Beef.CodeGen.Converters
         {
             WriteComments(args, xml);
 
-            if (args.Indent == 0)
+            args.Indent += 2;
+            if (args.Indent == 2)
                 args.Writer.Write("- { ");
             else if (args.Indent > 0)
-                args.Writer.Write($"{new string(' ', args.Indent)}  {{ ");
-
-            args.Indent += 2;
+                args.Writer.Write($"{new string(' ', args.Indent)}{{ ");
 
             WriteAttributes(args, ct, entity, type, xml);
 
             // Group by element name, then process as a collection.
-            foreach (var grp in xml.Elements().GroupBy(x => x.Name).Select(g => new { g.Key, Children = xml.Elements(g.Key) }))
+            int i = 0;
+            var coll = xml.Elements().GroupBy(x => x.Name).Select(g => new { g.Key, Children = xml.Elements(g.Key) });
+            foreach (var grp in coll)
             {
                 var info = GetEntityConfigInfo(grp.Key.LocalName);
                 if (info.entity == ConfigurationEntity.None)
                     return;
 
                 if (args.Indent > 0)
-                    args.Writer.Write(", ");
-
-                args.Writer.Write($"{info.name}:");
-                if (args.Indent > 0)
                 {
-                    args.Writer.Write(" [");
-                    if (args.Level >= 2)
-                        args.Indent += 2;
+                    args.Writer.WriteLine(",");
+                    args.Indent += 2;
+                    args.Writer.Write($"{new string(' ', args.Indent)}{info.name}:");
                 }
+                else
+                    args.Writer.Write($"{info.name}:");
+
+                if (args.Indent > 0)
+                    args.Writer.Write(" [");
 
                 args.Writer.WriteLine();
-                int i = 0;
+                int j = 0;
 
                 foreach (var child in grp.Children)
                 {
-                    if (i++ > 0)
+                    if (j++ > 0)
                     {
-                        args.Writer.Write(" }");
+                        args.WriteClosingSquigglyBracket();
                         if (args.Indent > 0)
                             args.Writer.Write(",");
 
@@ -132,12 +153,21 @@ namespace Beef.CodeGen.Converters
                     args.Level--;
                 }
 
-                args.Writer.WriteLine(" }");
+                args.WriteClosingSquigglyBracket();
+                args.Writer.WriteLine();
+
                 if (args.Indent > 0)
                 {
                     args.Writer.Write($"{new string(' ', args.Indent)}]");
-                    if (args.Level >= 2)
-                        args.Indent -= 2;
+                    args.Indent -= 2;
+                }
+
+                i++;
+                if (i == coll.Count())
+                {
+                    args.Writer.WriteLine();
+                    if (args.Indent > 0)
+                        args.Writer.Write($"{new string(' ', args.Indent)}");
                 }
             }
 
@@ -177,12 +207,12 @@ namespace Beef.CodeGen.Converters
                 if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
                     continue;
 
-                if (needsComma)
-                    args.Writer.Write(", ");
-
                 var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;
+
+                if (needsComma)
+                    args.Writer.Write(", ");
 
                 if (!(val.StartsWith("[", StringComparison.OrdinalIgnoreCase) && val.EndsWith("]", StringComparison.OrdinalIgnoreCase)))
                 {
@@ -193,6 +223,7 @@ namespace Beef.CodeGen.Converters
                         val = $"'{val}'";
                 }
 
+                args.HasAttributes = true;
                 args.Writer.Write($"{jname}: {val}");
 
                 if (args.Indent > 0)

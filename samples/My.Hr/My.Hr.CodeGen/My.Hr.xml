@@ -23,7 +23,7 @@
     <Property Name="Termination" Type="TerminationDetail" DataDatabaseMapper="TerminationDetailData.DbMapper" DataEntityFrameworkIgnore="true" />
     <Property Name="PhoneNo" Type="string" />
     <Property Name="ETag" ArgumentName="etag" Type="string" />
-    <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
+    <Property Name="ChangeLog" Type="ChangeLog" />
   </Entity>
 
   <!-- Creating an Employee inheriting from EmployeeBase (DataMapper will also inherit).

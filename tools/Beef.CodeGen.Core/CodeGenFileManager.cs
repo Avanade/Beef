@@ -26,7 +26,7 @@ namespace Beef.CodeGen
         /// <summary>
         /// Gets the list of supported <see cref="CommandType.RefData"/> filenames (will search in order specified).
         /// </summary>
-        public static List<string> RefDataFilenames { get; } = new List<string>(new string[] { "ref.beef.yaml", "refdata.beef.json", "refdata.beef.xml", "{{Company}}.RefData.xml" });
+        public static List<string> RefDataFilenames { get; } = new List<string>(new string[] { "refdata.beef.yaml", "refdata.beef.json", "refdata.beef.xml", "{{Company}}.RefData.xml" });
 
         /// <summary>
         /// Gets the list of supported <see cref="CommandType.RefData"/> filenames (will search in order specified).

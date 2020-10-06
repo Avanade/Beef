@@ -97,7 +97,8 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates that the property Type is another generated entity / collection and therefore specific capabilities can be assumed (e.g. CopyFrom and Clone).
         /// </summary>
         [JsonProperty("isEntity", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Property", Title = "Indicates that the property `Type` is another generated entity / collection and therefore specific capabilities can be assumed (e.g. `CopyFrom` and `Clone`).", IsImportant = true)]
+        [PropertySchema("Property", Title = "Indicates that the property `Type` is another generated entity / collection and therefore specific capabilities can be assumed (e.g. `CopyFrom` and `Clone`).", IsImportant = true,
+            Description = "Will be inferred (default to `true`) where the `Type` is `ChangeLog` or the `Type` is found as another `Entity` within the code-generation configuration file.")]
         public bool? IsEntity { get; set; }
 
         /// <summary>
@@ -581,7 +582,7 @@ namespace Beef.CodeGen.Config.Entity
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");
-            IsEntity = DefaultWhereNull(IsEntity, () => Parent!.Parent!.Entities!.Any(x => x.Name == Type) && RefDataType == null);
+            IsEntity = DefaultWhereNull(IsEntity, () => (Type == "ChangeLog" || Parent!.Parent!.Entities!.Any(x => x.Name == Type)) && RefDataType == null);
             Immutable = DefaultWhereNull(Immutable, () => false);
             BubblePropertyChanged = DefaultWhereNull(BubblePropertyChanged, () => CompareValue(IsEntity, true));
 
