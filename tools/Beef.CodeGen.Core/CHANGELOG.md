@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.5
+- *Fixed:* Issue 74 also resolved for Reference Data code-generation.
+
 ## v4.1.4
 - *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. There was an additional issue where the value was set to `false` it in turn resulted in `Authorize` versus `AllowAnonymous` which has been corrected.
 
