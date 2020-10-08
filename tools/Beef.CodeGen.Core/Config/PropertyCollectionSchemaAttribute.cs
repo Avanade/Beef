@@ -32,6 +32,11 @@ namespace Beef.CodeGen.Config
         public string? Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the markdown.
+        /// </summary>
+        public string? Markdown { get; set; }
+
+        /// <summary>
         /// Indicates whether the property is mandatory.
         /// </summary>
         public bool IsMandatory { get; set; }

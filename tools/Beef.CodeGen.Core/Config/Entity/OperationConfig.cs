@@ -13,15 +13,42 @@ namespace Beef.CodeGen.Config.Entity
     /// Represents the <b>Operation</b> code-generation configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Operation", Title = "The **Operation** is used to define an operation and its charateristics.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    [CategorySchema("Auth", Title = "Provides the **Authorization** configuration.")]
-    [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
-    [CategorySchema("Manager", Title = "Provides the **Manager-layer** configuration.")]
-    [CategorySchema("DataSvc", Title = "Provides the **Data Services-layer** configuration.")]
-    [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
-    [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
+    [ClassSchema("Operation", Title = "'CodeGeneration' object (entity-driven)",
+        Description = "The code generation for an `Operation` is primarily driven by the `OperationType` attribute. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.", 
+        Markdown = @"
+The valid `OperationType` values are as follows:
+
+- **`Get`** - indicates a get (read) returning a single entity value.
+- **`GetColl`** - indicates a get (read) returning an entity collection.
+- **`Create`** - indicates the creation of an entity.
+- **`Update`** - indicates the updating of an entity.
+- **[`Patch`](./Http-Patch.md)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
+- **`Delete`** - indicates the deleting of an entity.
+- **`Custom`** - indicates a customised operation where arguments and return value will be explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer.
+
+A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
+``` yaml
+operations: [
+  { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Create, type: Create, webApiRoute: , autoImplement: None },
+  { name: Update, type: Update, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
+  { name: Patch, type: Patch, uniqueKey: true, webApiRoute: '{id}' },
+  { name: Delete, type: Delete, webApiRoute: '{id}',
+    parameters: [
+      { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }
+    ]
+  }
+]
+```")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
+    [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
+    [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
+    [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
+    [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
+    [CategorySchema("Exclude", Title = "Provides the _Exclude_ configuration.")]
+    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class OperationConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
@@ -388,7 +415,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether gRPC support (more specifically service-side) is required for the Operation.
         /// </summary>
         [JsonProperty("grpc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Exclude", Title = "Indicates whether gRPC support (more specifically service-side) is required for the Operation.", IsImportant = true,
+        [PropertySchema("gRPC", Title = "Indicates whether gRPC support (more specifically service-side) is required for the Operation.", IsImportant = true,
             Description = "gRPC support is an explicit opt-in model (see `CodeGeneration.Grpc` configuration); therefore, each corresponding `Entity`, `Property` and `Operation` will also need to be opted-in specifically.")]
         public bool? Grpc { get; set; }
 

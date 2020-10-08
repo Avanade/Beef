@@ -186,15 +186,14 @@ The following are references to additional documentation (these are all accessib
 ### Code-generation
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
-- [Template structure](./docs/Template-structure.md)
-- Entity-driven:
-  - [CodeGeneration element](./docs/Entity-CodeGeneration-element.md)
-  - [Entity element](./docs/Entity-Entity-element.md)
-  - [Property element](./docs/Entity-Property-element.md)
-  - [Operation element](./docs/Entity-Operation-element.md)
-  - [Parameter element](./docs/Entity-Parameter-element.md)
-  - [Const element](./docs/Entity-Const-element.md)
-- Table-driven ([database](./tools/Beef.Database.Core/README.md)):
+- **Entity-driven** (.NET C#):
+  - [CodeGeneration](./docs/Entity-CodeGeneration-YAML.md)
+  - [Entity](./docs/Entity-Entity-YAML.md)
+  - [Property](./docs/Entity-Property-YAML.md)
+  - [Operation](./docs/Entity-Operation-YAML.md)
+  - [Parameter](./docs/Entity-Parameter-YAML.md)
+  - [Const](./docs/Entity-Const-YAML.md)
+- **Table-driven** ([database](./tools/Beef.Database.Core/README.md)):
   - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
   - [Table element](./docs/Table-Table-element.md)
   - [Stored procedure element](./docs/Table-StoredProcedure-element.md)

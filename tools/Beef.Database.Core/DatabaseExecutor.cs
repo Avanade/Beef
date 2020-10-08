@@ -548,7 +548,7 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Creates the new script from the template.
+        /// Creates the new script from the template.dotnet run 
         /// </summary>
         private async Task<bool> CreateScriptNewAsync()
         {

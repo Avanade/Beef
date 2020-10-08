@@ -22,7 +22,7 @@ _Beef_ primarily leverages **Gen-many** as this offers the greatest long-term be
 
 ## Code-gen data source
 
-The code-gen is driven by a data source, in this case XML. This acts as a type of DSL ([Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language)) to define the key characteristics / attributes that will be used to generate the required artefacts.
+The code-gen is driven by a data source, in this case YAML, JSON or XML. This acts as a type of DSL ([Domain Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language)) to define the key characteristics / attributes that will be used to generate the required artefacts.
 
 <br/>
 
@@ -34,11 +34,9 @@ The _Beef_ standard templates can be found [here](./Templates).
 
 <br/>
 
-## Scripts and loaders
+## Scripts (code-gen orchestration)
 
 To orchestrate the code generation, in terms of the templates to be used, an XML-based script file is used. The _Beef_ standard scripts can be found [here](./Scripts).
-
-Additionally, the script can define the _loader_ `Type` which is a class that implements [`ICodeGenConfigLoader`](../../src/Beef.Core/CodeGen/ICodeGenConfigLoader.cs). The purpose of a loader is to manipulate (update) the configuration XML before processing via the templates. The _Beef_ standard loaders can be found [here](./Loaders).
 
 <br/>
 
@@ -71,7 +69,7 @@ The **Entity.xml** is defined by a schema [codegen.entity.xsd](../../tools/Beef.
 
 ### Database table-driven code-gen
 
-The database table-driven code generation is enabled by a **Table.xml** file that is responsible for defining the characteristics for the generation of stored procedures. A [Table](../../docs/Table-Table-element.md) has [StoredProcedures](../../docs/Table-StoredProcedure-element.md) (and underlying [Parameters](../../docs/Table-Parameter-element.md), [Where](../../docs/Table-Where-element.md) and [OrderBy](../../docs/Table-OrderBy-element.md) clauses, and [Execute](../../docs/Table-Execute-element.md) statements). The tablle definitions are wrapped by a root [CodeGeneration](../../docs/Table-CodeGeneration-element.md) element.
+The database table-driven code generation is enabled by a **Table.xml** file that is responsible for defining the characteristics for the generation of stored procedures. A [Table](../../docs/Table-Table-element.md) has [StoredProcedures](../../docs/Table-StoredProcedure-element.md) (and underlying [Parameters](../../docs/Table-Parameter-element.md), [Where](../../docs/Table-Where-element.md) and [OrderBy](../../docs/Table-OrderBy-element.md) clauses, and [Execute](../../docs/Table-Execute-element.md) statements). The table definitions are wrapped by a root [CodeGeneration](../../docs/Table-CodeGeneration-element.md) element.
 
  Standard stored procedures can be generated from a **Table** schema, as well as the definition of a custom defined **Stored Procedure**.
 

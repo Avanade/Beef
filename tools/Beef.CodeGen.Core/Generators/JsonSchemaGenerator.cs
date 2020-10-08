@@ -60,7 +60,7 @@ namespace Beef.CodeGen.Builders
                 if (jpa == null)
                     continue;
 
-                var name = jpa.PropertyName ??StringConversion.ToCamelCase(pi.Name)!;
+                var name = jpa.PropertyName ?? StringConversion.ToCamelCase(pi.Name)!;
                 jtw.WritePropertyName(name);
                 jtw.WriteStartObject();
 

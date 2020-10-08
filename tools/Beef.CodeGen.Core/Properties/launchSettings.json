@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.CodeGen": {
       "commandName": "Project",
-      "commandLineArgs": "--GENERATEDATABASEJSONSCHEMA",
+      "commandLineArgs": "--GENERATEENTITYMARKDOWN",
       "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\tools\\Beef.CodeGen.Core"
     }
   }

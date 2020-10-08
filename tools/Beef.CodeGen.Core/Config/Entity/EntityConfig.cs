@@ -13,24 +13,39 @@ namespace Beef.CodeGen.Config.Entity
     /// Represents the <b>Entity</b> code-generation configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Entity", Title = "The **Entity** is used as the primary configuration for driving the entity-driven code generation.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
-    [CategorySchema("Entity", Title = "Provides the **Entity class** configuration.")]
-    [CategorySchema("Collection", Title = "Provides the **Entity collection class** configuration.")]
-    [CategorySchema("Operation", Title = "Provides the **Operation** configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `Create`, `Update` and `Delete` operations (versus having to specify directly).")]
-    [CategorySchema("Auth", Title = "Provides the **Authorization** configuration.")]
-    [CategorySchema("WebApi", Title = "Provides the data **Web API** configuration.")]
-    [CategorySchema("Manager", Title = "Provides the **Manager-layer** configuration.")]
-    [CategorySchema("DataSvc", Title = "Provides the **Data Services-layer** configuration.")]
-    [CategorySchema("Data", Title = "Provides the generic **Data-layer** configuration.")]
-    [CategorySchema("Database", Title = "Provides the specific **Database (ADO.NET)** configuration where `AutoImplement` is `Database`.")]
-    [CategorySchema("EntityFramework", Title = "Provides the specific **Entity Framework** configuration where `AutoImplement` is `EntityFramework`.")]
-    [CategorySchema("Cosmos", Title = "Provides the specific **Cosmos** configuration where `AutoImplement` is `Cosmos`.")]
-    [CategorySchema("OData", Title = "Provides the specific **OData** configuration where `AutoImplement` is `OData`.")]
-    [CategorySchema("Model", Title = "Provides the data **Model** configuration.")]
-    [CategorySchema("Grpc", Title = "Provides the **gRPC** configuration.")]
-    [CategorySchema("Exclude", Title = "Provides the **Exclude** configuration.")]
+    [ClassSchema("Entity", Title = "'Entity' object (entity-driven)",
+        Description = "The **Entity** is used as the primary configuration for driving the entity-driven code generation.",
+        Markdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
+``` yaml
+entities:
+- { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseSchema: Hr, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,
+```
+
+<br/>
+
+A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/refdata.beef.yaml) for a _reference data_ entity is as follows:
+``` yaml
+entities:
+- { name: Gender, refDataType: Guid, collection: true, webApiRoutePrefix: api/v1/demo/ref/genders, autoImplement: Database, databaseSchema: Ref }
+```")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
+    [CategorySchema("Entity", Title = "Provides the _Entity class_ configuration.")]
+    [CategorySchema("Collection", Title = "Provides the _Entity collection class_ configuration.")]
+    [CategorySchema("Operation", Title = "Provides the _Operation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `Create`, `Update` and `Delete` operations (versus having to specify directly).")]
+    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("WebApi", Title = "Provides the data _Web API_ configuration.")]
+    [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
+    [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
+    [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
+    [CategorySchema("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.")]
+    [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework_ configuration where `AutoImplement` is `EntityFramework`.")]
+    [CategorySchema("Cosmos", Title = "Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.")]
+    [CategorySchema("OData", Title = "Provides the specific _OData_ configuration where `AutoImplement` is `OData`.")]
+    [CategorySchema("Model", Title = "Provides the data _Model_ configuration.")]
+    [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
+    [CategorySchema("Exclude", Title = "Provides the _Exclude_ configuration.")]
+    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
@@ -115,8 +130,8 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overridding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates whether a corresponding `text` property is added when generating a Reference Data property overridding the `CodeGeneration.RefDataText` selection.",
-            Description = "This is used where serializing within the `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to true (automatically performed where url contains `$text=true`).")]
+        [PropertySchema("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overridding the `CodeGeneration.RefDataText` selection.",
+            Description = "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
         public bool? RefDataText { get; set; }
 
         /// <summary>
@@ -467,7 +482,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the .NET OData interface name used where `AutoImplement` is `OData`.
         /// </summary>
         [JsonProperty("odataName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.",
+        [PropertySchema("OData", Title = "The .NET OData interface name used where `AutoImplement` is `OData`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.ODataName` configuration property (its default value is `IOData`).")]
         public string? ODataName { get; set; }
 
@@ -571,7 +586,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
+        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.", IsImportant = true,
             Description = "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.")]
         public string? WebApiAuthorize { get; set; }
 
@@ -698,7 +713,7 @@ namespace Beef.CodeGen.Config.Entity
         /// Indicates whether gRPC support (more specifically service-side) is required for the Entity.
         /// </summary>
         [JsonProperty("grpc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Grpc", Title = "Indicates whether gRPC support (more specifically service-side) is required for the Entity.", IsImportant = true,
+        [PropertySchema("gRPC", Title = "Indicates whether gRPC support (more specifically service-side) is required for the Entity.", IsImportant = true,
             Description = "gRPC support is an explicit opt-in model (see `CodeGeneration.Grpc` configuration); therefore, each corresponding `Property` and `Operation` will also need to be opted-in specifically.")]
         public bool? Grpc { get; set; }
 

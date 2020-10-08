@@ -37,6 +37,7 @@ namespace Beef.CodeGen
                     case "--GENERATEENTITYJSONSCHEMA": return SpecialActivitiesCenter("Generate Entity JSON Schema", "./Schema/entity.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Entity.CodeGenConfig>("JSON Schema for Beef Entity code-generation (https://github.com/Avanade/Beef).")));
                     case "--GENERATEDATABASEXMLSCHEMA": return SpecialActivitiesCenter("Generate Database XML Schema", "./Schema/codegen.table.xsd", fn => XmlSchemaGenerator.Create<Config.Database.CodeGenConfig>(ConfigType.Database).Save(fn, System.Xml.Linq.SaveOptions.None));
                     case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Database.CodeGenConfig>("JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).")));
+                    case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Entity.CodeGenConfig>(fn, ConfigType.Entity, true));
                 }
             }
 
@@ -52,6 +53,7 @@ namespace Beef.CodeGen
             Logger.Default.LogInformation("Business Entity Execution Framework (Beef) Code Generator - ** Special Activities Center **");
             Logger.Default.LogInformation($" Action: {title}");
             Logger.Default.LogInformation($" Filename: {filename}");
+
             var sw = Stopwatch.StartNew();
             action(filename);
             sw.Stop();
