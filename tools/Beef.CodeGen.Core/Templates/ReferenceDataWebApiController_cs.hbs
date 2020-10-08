@@ -29,7 +29,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API functionality.
     /// </summary>
-    [{{#if WebApiAuthorize}}Authorize{{else}}AllowAnonymous{{/if}}]
+    [{{{WebApiAuthorize}}}]
     public partial class ReferenceDataController : ControllerBase
     {
 {{#each RefDataEntities}}
@@ -39,7 +39,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A {{RefDataQualifiedEntityName}} collection.</returns>
-        [{{#if WebApiAuthorize}}Authorize{{else}}AllowAnonymous{{/if}}]
+        [{{{WebApiAuthorize}}}]
         [HttpGet()]
   {{#ifval WebApiRoutePrefix}}
         [Route("{{WebApiRoutePrefix}}")]
@@ -55,7 +55,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: {{Config.RefDataWebApiRoute}}?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
-        [{{#if WebApiAuthorize}}Authorize{{else}}AllowAnonymous{{/if}}]
+        [{{{WebApiAuthorize}}}]
         [HttpGet()]
         [Route("{{RefDataWebApiRoute}}")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]
