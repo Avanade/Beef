@@ -7,6 +7,9 @@ Represents the **NuGet** versions.
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
 - *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
 
+## v4.1.5
+- *Fixed:* Issue 74 also resolved for Reference Data code-generation.
+
 ## v4.1.4
 - *Fixed*: Issue [74](https://github.com/Avanade/Beef/issues/74) fixed. There was an additional issue where the value was set to `false` it in turn resulted in `Authorize` versus `AllowAnonymous` which has been corrected.
 
