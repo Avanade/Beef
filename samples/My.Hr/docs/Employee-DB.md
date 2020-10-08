@@ -8,6 +8,20 @@ _Note:_ Any time that command line execution is requested, this should be perfor
 
 <br/>
 
+## Entity relationship diagram
+
+The following provides a visual (ERD) for the database tables that will be created. A relationship label of _refers_ indicates a reference data relationship. The _(via JSON)_ implies that the relating table references invisibly to the database via a JSON data column. 
+
+``` mermaid
+erDiagram
+    Employee ||--o{ EmergencyContact : has
+    Employee }|..|{ Gender : refers
+    Employee }|..|{ TerminationReason : refers
+    Employee }|..|{ USState : "refers (via JSON)" 
+    EmergencyContact }|..|{ RelationshipType : refers
+```
+<br/>
+
 ## Clean up existing migrations
 
 Within the `Migrations` folder there will four entries that were created during the initial solution skeleton creation. The last two of these should be removed. The first two create the `Ref` and `Hr` database schemas. The `Ref` is for the reference data, and `Hr` is for the master data; in some scenarios it may make sense to use only the `Hr` schema which will house both types of data. For this sample two schemas will be used.
@@ -115,7 +129,7 @@ Now that the Reference Data tables exist they will need to be populated. It is r
 
 These values (database rows) are specified using YAML. For brevity in this document, copy the data for the above tables **only** (for now) from [`RefData.yaml`](../My.Hr.Database/Data/RefData.yaml) replacing the contents of the prefilled `RefData.yaml` within the `My.Hr.Database/Data` folder.
 
-_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically).
+_Note:_ The format and hierarchy for the YAML, is: Schema, Table, Row. For reference data tables where only `Code: Text` is provided, this is treated as a special case shorthand to update those two columns accordingly (the other columns will be updated automatically). The `$` prefix for a table indicates a `merge` versus an `insert` (default).
 
 ``` yaml
 Ref:
@@ -148,7 +162,9 @@ Remove all existing configuration from `My.Hr.Database.xml` and replace. Each ta
 
 ## Stored Procedure CRUD
 
-Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, such as `EmergencyContact`.
+Stored procedures will be used for the primary `Employee` CRUD as this also allows a simplified (and performant) means to select and update related tables as required, in this case `EmergencyContact`.
+
+Where these related tables contain a related collection (i.e. zero or more rows), then a SQL [Merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql?view=sql-server-ver15) is used as it will `insert`, `update` or `delete` each row accordingly. To generate this the _Beef code-gen_ enables a `Type` of `Merge`. Additionally, a SQL [User-Defined Type (UDT)](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql?view=sql-server-ver15) and corresponding .NET (C#) [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) will also need to be generated to support the passing of the data (multiple rows) between .NET and SQL Server.
 
 Copy the following configuration and append (after reference data) to the `My.Hr.Database.xml`; see comments within for the details. Again, _Beef_ will query the database to infer the columns during code-generation.
 

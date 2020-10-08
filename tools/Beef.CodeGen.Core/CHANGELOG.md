@@ -2,7 +2,7 @@
 
 Represents the **NuGet** versions.
 
-## v4.1.5
+## v4.1.6
 - *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been retired (removed).
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
 - *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.

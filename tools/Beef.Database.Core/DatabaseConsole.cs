@@ -176,15 +176,11 @@ namespace Beef.Database.Core
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
-            // http://www.patorjk.com/software/taag/#p=display&h=2&f=Big&t=Beef%20DB%20tool%0A
+            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Database%20Tool%0A
             _logger.LogInformation(@"
-  ____             __   _____  ____    _              _ 
- |  _ \           / _| |  __ \|  _ \  | |            | |
- | |_) | ___  ___| |_  | |  | | |_) | | |_ ___   ___ | |
- |  _ < / _ \/ _ \  _| | |  | |  _ <  | __/ _ \ / _ \| |
- | |_) |  __/  __/ |   | |__| | |_) | | || (_) | (_) | |
- |____/ \___|\___|_|   |_____/|____/   \__\___/ \___/|_|
-
+╔╗ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌┬┐┌─┐┌┐ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌─┐┬  
+╠╩╗├┤ ├┤ ├┤    ║║├─┤ │ ├─┤├┴┐├─┤└─┐├┤    ║ │ ││ ││  
+╚═╝└─┘└─┘└    ═╩╝┴ ┴ ┴ ┴ ┴└─┘┴ ┴└─┘└─┘   ╩ └─┘└─┘┴─┘
 ");
 
             _logger.LogInformation(App.Description);

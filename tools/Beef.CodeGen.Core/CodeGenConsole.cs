@@ -238,15 +238,11 @@ namespace Beef.CodeGen
         /// <param name="logger">The logger.</param>
         public static void WriteMasthead(ILogger logger)
         {
-            // http://www.patorjk.com/software/taag/#p=display&h=2&f=Big&t=Beef%20CodeGen%0A
+            // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Code-Gen%20Tool%0A
             logger.LogInformation(@"
-  ____             __    _____          _       _____            
- |  _ \           / _|  / ____|        | |     / ____|           
- | |_) | ___  ___| |_  | |     ___   __| | ___| |  __  ___ _ __  
- |  _ < / _ \/ _ \  _| | |    / _ \ / _` |/ _ \ | |_ |/ _ \ '_ \ 
- | |_) |  __/  __/ |   | |___| (_) | (_| |  __/ |__| |  __/ | | |
- |____/ \___|\___|_|    \_____\___/ \__,_|\___|\_____|\___|_| |_|
-                                                                 
+╔╗ ┌─┐┌─┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
+╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
+╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
 ");
         }
 

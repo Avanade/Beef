@@ -97,6 +97,32 @@ namespace Beef.Entities
         {
             return !(left == right);
         }
+
+        /// <summary>
+        /// Determines whether the <see cref="UniqueKey"/> is considered initial; i.e. all <see cref="Args"/> have their default value.
+        /// </summary>
+        /// <returns><c>true</c> indicates that the <see cref="UniqueKey"/> is initial; otherwise, <c>false</c>.</returns>
+        public bool IsInitial
+        {
+            get
+            {
+                if (_args == null || _args.Length == 0)
+                    return true;
+
+                foreach (var arg in _args)
+                {
+                    if (arg != null && !arg.Equals(GetDefaultValue(arg.GetType())))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets the default value for a specified <paramref name="type"/>.
+        /// </summary>
+        private static object? GetDefaultValue(Type type) => Check.NotNull(type, nameof(type)).IsValueType ? Activator.CreateInstance(type) : null;
     }
 
     /// <summary>
