@@ -7,9 +7,9 @@ The `Beef.Database.Core` tool is a console application provided to automate the 
 ## Key elements
 
 This is tool automates three key elements:
-- **Migrations** - being the upgrading of a database overtime using order-based migration scripts; the tool leverages the philosophy and NuGet packages of [DbUp](https://dbup.readthedocs.io/en/latest/philosophy-behind-dbup/) to enable.
-- **Schema** - there are a number of database schema objects that can be managed outside of the above migrations, that are dropped and applied to the database using their native `Create` statement.
-- **Data** - there is data, for example *Reference Data* that needs to be applied to a database. This provides a simpler configuration than specifying the required SQL statements directly. This is also useful for setting up Master and Transaction data for the likes of testing scenarios.
+- [**Migrations**](#Migrations) - being the upgrading of a database overtime using order-based migration scripts; the tool leverages the philosophy and NuGet packages of [DbUp](https://dbup.readthedocs.io/en/latest/philosophy-behind-dbup/) to enable.
+- [**Schema**](#Schema) - there are a number of database schema objects that can be managed outside of the above migrations, that are dropped and (re-)applied to the database using their native `Create` statement.
+- [**Data**](#Data) - there is data, for example *Reference Data* that needs to be applied to a database. This provides a simpler configuration than specifying the required SQL statements directly. This is _also_ useful for setting up Master and Transaction data for the likes of testing scenarios.
 
 <br/>
 
@@ -54,7 +54,7 @@ The data specified follows a basic indenting/levelling rule to enable:
 
 <br/>
 
-### Reference data
+#### Reference data
 
 [*Reference Data*](../../docs/Reference-Data.md) is treated as a special case. The first column name and value pair are treated as the `Code` and `Text` columns. Also the `IsActive` column will automatically be set to `true`, and the `SortOrder` column to the index (1-based) in which it is specified. 
 
@@ -64,7 +64,7 @@ Alternatively, a *Reference Data* reference could be the code itself, typically 
 
 <br/>
 
-### Yaml configuration
+#### Yaml configuration
 
 Example YAML configuration for *merging* reference data is as follows:
 ``` YAML
@@ -95,7 +95,7 @@ To simplify the database management here are some further considerations that ma
 
 - **Nullable everything** - all columns (except) the primary key should be defined as nullable. The business logic should validate the request to ensure data is provided where mandatory. Makes changes to the database schema easier over time without this constraint.
 - **Minimise constraints** - do not use database constraints unless absolutely necessary; only leverage where the database is the best and/or most efficient means to perform; i.e. uniqueness. The business logic should validate the request to ensure that any related data is provided, is valid and consistent. 
-- **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except special cases, such as `dbo` or `sec` (security where used) for example.
+- **No cross-schema referencing** - avoid referencing across `Schemas` where possible as this will impact the Migrations as part of this tooling; and we should not be using constraints as per prior point. Each schema is considered independent of others except in special cases, such as `dbo` or `sec` (security where used) for example.
 - **Standardise column lengths** - use a standard set of column lengths within the database and have the business logic manage the length constraint. As such the column length must be the same or greater that what is required.
 - **JSON for schema-less** - where there is data that needs to be persisted, but rarely searched on, a schema-less approach should be considered such that a JSON object is persisted versus having to define columns. This can further simplify the database requirements where the data is hierarchical in nature. To enable the [`ObjectToJsonConverter`](../../src/Beef.Core/Mapper/Converters/ObjectToJsonConverter.cs) should be used within the corresponding mapper (e.g. [`DatabasePropertyMapper`](../../src/Beef.Data.Database/DatabasePropertyMapper.cs)).
 

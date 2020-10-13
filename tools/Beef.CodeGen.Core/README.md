@@ -28,7 +28,9 @@ The code-gen is driven by a data source, in this case YAML, JSON or XML. This ac
 
 ## Code-gen templates
 
-Once the code-gen data source(s) have been defined, one or more templates will be required to drive the artefact output. These [templates](../../docs/Template-structure.md) are defined using XML - these have some basic language / logic capabilities to enable rich code generation output.
+Once the code-gen data source(s) have been defined, one or more templates will be required to drive the artefact output. These templates are defined using [Handlebars](https://handlebarsjs.com/guide/) and its syntax, or more specifically [Handlebars.Net](https://github.com/Handlebars-Net/Handlebars.Net).
+
+Additionally, _Handlebars_ has been [extended](./Generators/HandlebarsHelpers.cs) to add additional capabilities beyond what is available natively to enable the required generated output.
 
 The _Beef_ standard templates can be found [here](./Templates).
 
@@ -50,7 +52,7 @@ The following code generation is supported:
 
 ### Entity-driven code-gen
 
-The entity-driven gen-many code generation is enabled by an **Entity.xml** file that is responsible for defining the characteristics for an [Entity](../../docs/Entity-Entity-element.md), its [Properties](../../docs/Entity-Property-element.md), [Constants](../../docs/Entity-Const-element.md) and [Operations](../../docs/Entity-Operation-element.md) (and underlying [Parameters](../../docs/Entity-Parameter-element.md)). The entity definitions are wrapped by a root [CodeGeneration](../../docs/Entity-CodeGeneration-element.md) element.
+The entity-driven gen-many code generation is enabled by an **Entity** configuraion file that is responsible for defining the characteristics for an [Entity](../../docs/Entity-Entity-Config.md), its [Properties](../../docs/Entity-Property-Config.md), [Constants](../../docs/Entity-Const-Config.md) and [Operations](../../docs/Entity-Operation-Config.md) (and underlying [Parameters](../../docs/Entity-Parameter-Config.md)). The entity definitions are wrapped by a root [CodeGeneration](../../docs/Entity-CodeGeneration-Config.md) object.
 
 The hierarcy is as follows:
 
@@ -63,7 +65,9 @@ The hierarcy is as follows:
       └── Parameter(s)
 ```
 
-The **Entity.xml** is defined by a schema [codegen.entity.xsd](../../tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd). This schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
+The **Entity** configuration supported filenames are, in the order in which they are searched: `entity.beef.yaml`, `entity.beef.json`, `entity.beef.xml`, `{Company}.{AppName}.xml`.
+
+The **Entity** configuration is defined by a schema, YAML/JSON-based [entity.beef.json](../../tools/Beef.CodeGen.Core/Schema/entity.beef.json) and XML-based [codegen.entity.xsd](../../tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd). These schema should be used within the likes of Visual Studio when editing to enable real-time validation and basic intellisense capabilities.
 
 <br/>
 
@@ -93,7 +97,7 @@ This is not intended as an all purpose database schema generation capability. It
 
 ## Console application
 
-The `Beef.CodeGen.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities. 
+The `Beef.CodeGen.Core` can be executed as a console application directly; however, the experience has been optimised so that a new console application can reference and inherit the capabilities.
 
 <br/>
 
@@ -145,11 +149,3 @@ dotnet run entity -x configfilename.xml
 As described above _Beef_ has a set of defined (out-of-the-box) templates and scripts - these do not have to be used, or could be maintained, to achieve an alternate outcome as required.
 
 To avoid the need to clone the solution, and update, add the `Templates` and `Scripts` folders into this console application and embed the required resources. The underlying `Beef.CodeGen.Core` will probe the embedded resources and use the overridden version where provided, falling back on the _Beef_ version where not found. 
-
-<br/>
-
-## What about T4?
-
-There are multiple capabilities to perform code generation, such as the likes of [T4](https://docs.microsoft.com/en-au/visualstudio/modeling/code-generation-and-t4-text-templates) (arguably, it is a more fully featured code generation capability).
-
-The *Beef* code generation largely pre-dates T4, is highly-flexible achieving the desired code generation outcomes, and as such there has been no compelling reason to replatform to date - a high-cost, with a limited return.

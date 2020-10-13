@@ -54,7 +54,7 @@ namespace Beef.CodeGen.Generators
             if (!Enum.TryParse<ConfigurationEntity>(csa.Name, out var ce))
                 ce = ConfigurationEntity.CodeGen;
 
-            var fn = Path.Combine(path, $"{ct}-{csa.Name}-{(isYaml ? "Yaml" : "Xml")}.md");
+            var fn = Path.Combine(path, $"{ct}-{csa.Name}-{(isYaml ? "Config" : "Xml")}.md");
             Beef.Diagnostics.Logger.Default.LogWarning($" > Creating: {fn}");
             using var sw = File.CreateText(fn);
 
