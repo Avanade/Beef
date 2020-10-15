@@ -22,5 +22,5 @@ BEGIN
       [p].[UpdatedBy],
       [p].[UpdatedDate]
     FROM [Demo].[Person2] AS [p]
-    WHERE ISNULL([p].[IsDeleted], 0) = 0
+    WHERE ([p].[IsDeleted] IS NULL OR [p].[IsDeleted] = 0)
 END

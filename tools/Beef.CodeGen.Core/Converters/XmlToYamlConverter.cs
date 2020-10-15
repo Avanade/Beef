@@ -276,6 +276,11 @@ namespace Beef.CodeGen.Converters
         {
             "CodeGeneration" => (ConfigurationEntity.CodeGen, typeof(Config.Database.CodeGenConfig), ""),
             "Table" => (ConfigurationEntity.Table, typeof(Config.Database.TableConfig), "tables"),
+            "Query" => (ConfigurationEntity.Query, typeof(Config.Database.QueryConfig), "queries"),
+            "QueryJoin" => (ConfigurationEntity.QueryJoin, typeof(Config.Database.QueryJoinConfig), "joins"),
+            "QueryJoinOn" => (ConfigurationEntity.QueryJoinOn, typeof(Config.Database.QueryJoinOnConfig), "on"),
+            "QueryOrder" => (ConfigurationEntity.QueryOrder, typeof(Config.Database.QueryOrderConfig), "order"),
+            "QueryWhere" => (ConfigurationEntity.QueryWhere, typeof(Config.Database.QueryWhereConfig), "where"),
             "StoredProcedure" => (ConfigurationEntity.StoredProcedure, typeof(Config.Database.StoredProcedureConfig), "storedProcedures"),
             "Parameter" => (ConfigurationEntity.Parameter, typeof(Config.Database.ParameterConfig), "parameters"),
             "OrderBy" => (ConfigurationEntity.OrderBy, typeof(Config.Database.OrderByConfig), "orderby"),

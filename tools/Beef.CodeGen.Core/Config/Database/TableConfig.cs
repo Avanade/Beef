@@ -16,7 +16,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("CodeGen", Title = "Provides the **CodeGen** configuration to select via shorthand the code-gen artefacts.")]
     [CategorySchema("UDT", Title = "Provides the **UDT (user defined type)** configuration.")]
     [CategorySchema("Auth", Title = "Provides the **Authorization** configuration.")]
-    public class TableConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
+    public class TableConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
         #region Key
 
@@ -35,10 +35,10 @@ namespace Beef.CodeGen.Config.Database
         public string? Schema { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
+        /// Gets or sets the `Schema.Table` alias name.
         /// </summary>
         [JsonProperty("alias", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.",
+        [PropertySchema("Key", Title = "The `Schema.Table` alias name.",
             Description = "Will automatically default where not specified.")]
         public string? Alias { get; set; }
 
@@ -111,11 +111,27 @@ namespace Beef.CodeGen.Config.Database
         public bool? Delete { get; set; }
 
         /// <summary>
-        /// Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified.
+        /// Indicates whether a `View` is to be generated.
         /// </summary>
         [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified (only applies for a `Table`).")]
+        [PropertySchema("CodeGen", Title = "Indicates whether a `View` is to be generated.")]
         public bool? View { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `View` name.
+        /// </summary>
+        [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The `View` name.",
+            Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
+        public string? ViewName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the schema name of the `View`.
+        /// </summary>
+        [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The schema name for the `View`.",
+            Description = "Defaults to `Schema`.")]
+        public string? ViewSchema { get; set; }
 
         /// <summary>
         /// Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
@@ -282,57 +298,62 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
-        public List<ColumnConfig> Columns { get; } = new List<ColumnConfig>();
+        public List<TableColumnConfig> Columns { get; } = new List<TableColumnConfig>();
 
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public ColumnConfig ColumnIsDeleted => Columns.Where(x => x.Name == ColumnNameIsDeleted && ColumnNameIsDeleted != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
 
         /// <summary>
         /// Gets the related TenantId column.
         /// </summary>
-        public ColumnConfig ColumnTenantId => Columns.Where(x => x.Name == ColumnNameTenantId && ColumnNameTenantId != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnTenantId => GetSpecialColumn(ColumnNameTenantId);
 
         /// <summary>
         /// Gets the related OrgUnitId column.
         /// </summary>
-        public ColumnConfig ColumnOrgUnitId => Columns.Where(x => x.Name == ColumnNameOrgUnitId && ColumnNameOrgUnitId != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnOrgUnitId => GetSpecialColumn(ColumnNameOrgUnitId);
 
         /// <summary>
         /// Gets the related RowVersion column.
         /// </summary>
-        public ColumnConfig ColumnRowVersion => Columns.Where(x => x.Name == ColumnNameRowVersion && ColumnNameRowVersion != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnRowVersion => GetSpecialColumn(ColumnNameRowVersion);
 
         /// <summary>
         /// Gets the related CreatedBy column.
         /// </summary>
-        public ColumnConfig ColumnCreatedBy => Columns.Where(x => x.Name == ColumnNameCreatedBy && ColumnNameCreatedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnCreatedBy => GetSpecialColumn(ColumnNameCreatedBy);
 
         /// <summary>
         /// Gets the related CreatedDate column.
         /// </summary>
-        public ColumnConfig ColumnCreatedDate => Columns.Where(x => x.Name == ColumnNameCreatedDate && ColumnNameCreatedDate != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnCreatedDate => GetSpecialColumn(ColumnNameCreatedDate);
 
         /// <summary>
         /// Gets the related UpdatedBy column.
         /// </summary>
-        public ColumnConfig ColumnUpdatedBy => Columns.Where(x => x.Name == ColumnNameUpdatedBy && ColumnNameUpdatedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnUpdatedBy => GetSpecialColumn(ColumnNameUpdatedBy);
 
         /// <summary>
         /// Gets the related UpdatedDate column.
         /// </summary>
-        public ColumnConfig ColumnUpdatedDate => Columns.Where(x => x.Name == ColumnNameUpdatedDate && ColumnNameUpdatedDate != "None").SingleOrDefault();
+        public IColumnConfig? ColumnUpdatedDate => GetSpecialColumn(ColumnNameUpdatedDate);
 
         /// <summary>
         /// Gets the related DeletedBy column.
         /// </summary>
-        public ColumnConfig ColumnDeletedBy => Columns.Where(x => x.Name == ColumnNameDeletedBy && ColumnNameDeletedBy != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        public IColumnConfig? ColumnDeletedBy => GetSpecialColumn(ColumnNameDeletedBy);
 
         /// <summary>
         /// Gets the related DeletedDate column.
         /// </summary>
-        public ColumnConfig ColumnDeletedDate => Columns.Where(x => x.Name == ColumnNameDeletedDate && ColumnNameDeletedDate != "None").SingleOrDefault();
+        public IColumnConfig? ColumnDeletedDate => GetSpecialColumn(ColumnNameDeletedDate);
+
+        /// <summary>
+        /// Gets the named special colum.
+        /// </summary>
+        private TableColumnConfig? GetSpecialColumn(string? name) => Columns?.Where(x => x.Name == name && name != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
 
         /// <summary>
         /// Indicates whether there any audit columns.
@@ -367,22 +388,27 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the columns considered part of the primary key.
         /// </summary>
-        public List<ColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();
+        public List<TableColumnConfig> PrimaryKeyColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey).ToList();
 
         /// <summary>
         /// Gets the columns considered part of the primary key.
         /// </summary>
-        public List<ColumnConfig> PrimaryKeyIdentityColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey && x.DbColumn!.IsIdentity).ToList();
+        public List<TableColumnConfig> PrimaryKeyIdentityColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey && x.DbColumn!.IsIdentity).ToList();
 
         /// <summary>
         /// Gets the core columns (excludes special internal IsDeleted and TenantId columns).
         /// </summary>
-        public List<ColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnIsDeleted?.Name || x.Name == ColumnTenantId?.Name)).ToList();
+        public List<TableColumnConfig> CoreColumns => Columns.Where(x => x.DbColumn!.IsPrimaryKey || !(x.Name == ColumnIsDeleted?.Name || x.Name == ColumnTenantId?.Name)).ToList();
 
         /// <summary>
         /// Gets the UDT columns (excludes special columns).
         /// </summary>
-        public List<ColumnConfig> UdtColumns => Columns.Where(x => !x.IsAudit && !x.IsIsDeletedColumn && !x.IsTenantIdColumn && (UdtExcludeColumns == null || !UdtExcludeColumns.Contains(x.Name!))).ToList();
+        public List<TableColumnConfig> UdtColumns => Columns.Where(x => !x.IsAudit && !x.IsIsDeletedColumn && !x.IsTenantIdColumn && (UdtExcludeColumns == null || !UdtExcludeColumns.Contains(x.Name!))).ToList();
+
+        /// <summary>
+        /// Gets the table name.
+        /// </summary>
+        public string? Table => Name;
 
         /// <summary>
         /// Gets the corresponding (actual) database table configuration.
@@ -416,12 +442,14 @@ namespace Beef.CodeGen.Config.Database
         protected override void Prepare()
         {
             Schema = DefaultWhereNull(Schema, () => "dbo");
-            DbTable = Root!.DbTables.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
+            DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException($"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             EfModelName = DefaultWhereNull(EfModelName, () => Name);
+            ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
+            ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);
@@ -438,7 +466,7 @@ namespace Beef.CodeGen.Config.Database
 
             foreach (var c in DbTable.Columns)
             {
-                var cc = new ColumnConfig { Name = c.Name, DbColumn = c };
+                var cc = new TableColumnConfig { Name = c.Name, DbColumn = c };
                 cc.Prepare(Root!, this);
 
                 // Certain special columns have to always be included.

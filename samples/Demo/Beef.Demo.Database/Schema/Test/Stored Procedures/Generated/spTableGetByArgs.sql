@@ -36,5 +36,5 @@ BEGIN
       AND (@Name IS NULL OR [t].[Name] LIKE @Name)
       AND [t].[Count] >= @MinCount
       AND (@MaxCount IS NULL OR [t].[Count] <= @MaxCount)
-      AND ISNULL([t].[IsDeleted], 0) = 0
+      AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
 END

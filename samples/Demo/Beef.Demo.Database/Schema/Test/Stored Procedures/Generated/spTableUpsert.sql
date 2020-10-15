@@ -32,7 +32,7 @@ BEGIN
 
     -- Check exists.
     DECLARE @PrevRowVersion BINARY(8)
-    SET @PrevRowVersion = (SELECT TOP 1 [t].[RowVersion] FROM [Test].[Table] AS [t] WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ISNULL([t].[IsDeleted], 0) = 0)
+    SET @PrevRowVersion = (SELECT TOP 1 [t].[RowVersion] FROM [Test].[Table] AS [t] WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0))
     IF @PrevRowVersion IS NULL
     BEGIN
       -- Set audit details.
@@ -67,7 +67,7 @@ BEGIN
       -- Check user has permission to org unit.
       DECLARE @CurrOrgUnitId UNIQUEIDENTIFIER = NULL
       SET @CurrOrgUnitId = (SELECT TOP 1 [t].[OrgUnitId] FROM [Test].[Table] AS [t]
-        WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ISNULL([t].[IsDeleted], 0) = 0)
+        WHERE [t].[TableId] = @TableId AND [t].[TenantId] = @TenantId AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0))
 
       IF (@CurrOrgUnitId IS NOT NULL AND (SELECT COUNT(*) FROM [Sec].[fnGetUserOrgUnits]() AS orgunits WHERE orgunits.OrgUnitId = @CurrOrgUnitId) = 0)
       BEGIN
@@ -96,7 +96,7 @@ BEGIN
         FROM [Test].[Table] AS [t]
         WHERE [t].[TableId] = @TableId
           AND [t].[TenantId] = @TenantId
-          AND ISNULL([t].[IsDeleted], 0) = 0
+          AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
     END
 
     -- Commit the transaction.

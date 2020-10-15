@@ -1,0 +1,21 @@
+﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
+CREATE PROCEDURE [{{CdcSchema}}].[{{CdcName}}]
+AS
+  /*
+   * This is automatically generated; any changes will be lost.
+   */
+
+  SELECT
+{{#each SelectedColumns}}
+      {{.}}{{#unless @last}},{{/unless}}
+{{/each}}
+    FROM {{QualifiedName}} AS [{{Alias}}]
+{{#ifval ColumnOrgUnitId}}
+      INNER JOIN {{Root.OrgUnitJoinSql}} AS [orgunits] ON ([{{Alias}}].[{{ColumnOrgUnitId.Name}}] = [orgunits].[{{ColumnOrgUnitId.Name}}])
+{{/ifval}}
+{{#each Joins}}
+      {{JoinTypeSql}} {{QualifiedName}} AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{JoinOnSql}}{{/each}})
+{{/each}}
+{{#each Where}}
+    {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
+{{/each}}

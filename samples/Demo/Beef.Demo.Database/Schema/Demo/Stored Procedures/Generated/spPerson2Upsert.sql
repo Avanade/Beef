@@ -26,7 +26,7 @@ BEGIN
 
     -- Check exists.
     DECLARE @PrevRowVersion BINARY(8)
-    SET @PrevRowVersion = (SELECT TOP 1 [p].[RowVersion] FROM [Demo].[Person2] AS [p] WHERE [p].[PersonId] = @PersonId AND ISNULL([p].[IsDeleted], 0) = 0)
+    SET @PrevRowVersion = (SELECT TOP 1 [p].[RowVersion] FROM [Demo].[Person2] AS [p] WHERE [p].[PersonId] = @PersonId AND ([p].[IsDeleted] IS NULL OR [p].[IsDeleted] = 0))
     IF @PrevRowVersion IS NULL
     BEGIN
       -- Set audit details.
@@ -80,7 +80,7 @@ BEGIN
         [p].[UpdatedDate] = @UpdatedDate
         FROM [Demo].[Person2] AS [p]
         WHERE [p].[PersonId] = @PersonId
-          AND ISNULL([p].[IsDeleted], 0) = 0
+          AND ([p].[IsDeleted] IS NULL OR [p].[IsDeleted] = 0)
     END
 
     -- Commit the transaction.

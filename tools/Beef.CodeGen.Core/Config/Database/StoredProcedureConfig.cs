@@ -254,7 +254,7 @@ namespace Beef.CodeGen.Config.Database
                 return;
 
             var tenantId = Parent.ColumnTenantId == null ? null : new ParameterConfig { Name = Parent.ColumnTenantId.Name, IsWhere = true, WhereOnly = true };
-            var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, IsWhere = true, WhereOnly = true, WhereSql = $"ISNULL({Parent.ColumnIsDeleted.QualifiedName}, 0) = 0" };
+            var isDeleted = Parent.ColumnIsDeleted == null ? null : new ParameterConfig { Name = Parent.ColumnIsDeleted.Name, IsWhere = true, WhereOnly = true, WhereSql = $"({Parent.ColumnIsDeleted.QualifiedName} IS NULL OR {Parent.ColumnIsDeleted.QualifiedName} = 0)" };
 
             if (bookEnd)
             {
@@ -382,11 +382,11 @@ namespace Beef.CodeGen.Config.Database
                             MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = [List].[{c.Name}]");
                         else if (c.IsTenantIdColumn)
                         {
-                            MergeOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId.Name}");
-                            MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId.Name}");
+                            MergeOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId?.Name}");
+                            MergeListJoinOn.Add($"[{Parent.Alias}].[{c.Name}] = @{Parent.ColumnTenantId?.Name}");
                         }
                         else if (c.IsIsDeletedColumn)
-                            MergeListJoinOn.Add($"ISNULL([{Parent.Alias}].[{c.Name}], 0) = 0");
+                            MergeListJoinOn.Add($"([{Parent.Alias}].[{c.Name}] IS NULL OR [{Parent.Alias}].[{c.Name}] = 0)");
                         else if (!c.IsAudit && (Parent.UdtExcludeColumns == null || !Parent.UdtExcludeColumns!.Contains(c.Name!)))
                         {
                             MergeMatchSourceColumns.Add($"[list].[{c.Name}]");

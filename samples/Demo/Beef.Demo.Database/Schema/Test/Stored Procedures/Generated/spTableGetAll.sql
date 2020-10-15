@@ -30,6 +30,6 @@ BEGIN
     FROM [Test].[Table] AS [t]
     INNER JOIN [Sec].[fnGetUserOrgUnits]() AS orgunits ON [t].[OrgUnitId] = [orgunits].[OrgUnitId]
     WHERE [t].[TenantId] = @TenantId
-      AND ISNULL([t].[IsDeleted], 0) = 0
+      AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
     ORDER BY [t].[Name] DESC
 END

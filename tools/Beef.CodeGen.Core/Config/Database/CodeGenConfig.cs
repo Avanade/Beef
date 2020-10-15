@@ -18,7 +18,7 @@ namespace Beef.CodeGen.Config.Database
     [ClassSchema("CodeGeneration", Title = "The **CodeGeneration** is used as the global configuration for driving the underlying code-generation.", Description = "", Markdown = "")]
     [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
     [CategorySchema("Infer", Title = "Provides the **Column Name inference** configuration.")]
-    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig
+    public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
         #region RefData
 
@@ -212,6 +212,14 @@ namespace Beef.CodeGen.Config.Database
         public List<TableConfig>? Tables { get; set; }
 
         /// <summary>
+        /// Gets or sets the corresponding <see cref="QueryConfig"/> collection.
+        /// </summary>
+        [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Query` collection.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<QueryConfig>? Queries { get; set; }
+
+        /// <summary>
         /// Gets all the tables that require an EfModel to be generated.
         /// </summary>
         public List<TableConfig> EFModels => Tables!.Where(x => CompareValue(x.EfModel, true)).ToList();
@@ -257,6 +265,14 @@ namespace Beef.CodeGen.Config.Database
                 foreach (var table in Tables)
                 {
                     table.Prepare(Root!, this);
+                }
+            }
+
+            if (Queries != null && Queries.Count > 0)
+            {
+                foreach (var query in Queries)
+                {
+                    query.Prepare(Root!, this);
                 }
             }
         }

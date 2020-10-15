@@ -180,8 +180,9 @@ namespace Beef.CodeGen.Config.Database
                     return $"({ParameterName}Count = 0 OR [{Parent!.Parent!.Alias}].[{Column}] IN (SELECT [Value] FROM {ParameterName}))";
                 else
                 {
-                    var sql = $"[{Parent!.Parent!.Alias}].[{Column}] {SqlOperator} @{Name}";
-                    return CompareValue(Nullable, true) ? $"(@{Name} IS NULL OR {sql})" : sql;
+                    var sql = TreatColumnNullAs != null ? $"ISNULL([{Parent!.Parent!.Alias}].[{Column}], {TreatColumnNullAs})" : $"[{Parent!.Parent!.Alias}].[{Column}]";
+                    sql += $" {SqlOperator} @{Name}";
+                    return TreatColumnNullAs == null && CompareValue(Nullable, true) ? $"(@{Name} IS NULL OR {sql})" : sql;
                 }
             });
         }

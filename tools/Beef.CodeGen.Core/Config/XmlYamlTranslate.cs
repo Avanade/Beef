@@ -88,6 +88,14 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
+            (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Query, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+
             (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : XmlToGetAllOrderBy(xml)),
@@ -276,6 +284,16 @@ namespace Beef.CodeGen.Config
         Operation,
         /// <summary>Table configuration.</summary>
         Table,
+        /// <summary>Query configuration.</summary>
+        Query,
+        /// <summary>Query Join configuration.</summary>
+        QueryJoin,
+        /// <summary>Query Join On configuration.</summary>
+        QueryJoinOn,
+        /// <summary>Query Order configuration.</summary>
+        QueryOrder,
+        /// <summary>Query Where configuration.</summary>
+        QueryWhere,
         /// <summary>Stored procedure configuration.</summary>
         StoredProcedure,
         /// <summary>Parameter configuration.</summary>

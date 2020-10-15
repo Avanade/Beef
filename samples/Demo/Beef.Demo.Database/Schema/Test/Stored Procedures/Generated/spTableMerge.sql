@@ -33,7 +33,7 @@ BEGIN
     SET @RecordCount = (SELECT COUNT(*) FROM @List AS [list]
       INNER JOIN [Test].[Table] AS [t]
         ON [t].[TableId] = [List].[TableId]
-        AND ISNULL([t].[IsDeleted], 0) = 0
+        AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
         AND [t].[TenantId] = @TenantId
         AND [t].[RowVersion] = [List].[RowVersion])
 
@@ -81,7 +81,7 @@ BEGIN
         )
       WHEN NOT MATCHED BY SOURCE
         AND [t].[TenantId] = @TenantId
-        AND ISNULL([t].[IsDeleted], 0) = 0
+        AND ([t].[IsDeleted] IS NULL OR [t].[IsDeleted] = 0)
         THEN UPDATE SET
           [t].[IsDeleted] = 1,
           [t].[UpdatedBy] = @AuditBy,
