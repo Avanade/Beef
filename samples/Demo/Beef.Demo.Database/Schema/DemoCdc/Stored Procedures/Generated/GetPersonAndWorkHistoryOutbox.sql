@@ -1,5 +1,4 @@
-﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{CdcSchema}}].[{{CdcName}}]
+CREATE PROCEDURE [DemoCdc].[GetPersonAndWorkHistoryOutbox]
   @BatchIdToMarkComplete INT,
   @ReturnIncompleteBatches BIT,
   @MaxBatchSize int = 100
@@ -18,7 +17,7 @@ BEGIN
     -- Mark the batch as complete first.
     IF (@BatchIdToMarkComplete IS NOT NULL)
     BEGIN
-	  UPDATE [{{CdcSchema}}].[{{CdcEnvelope}}] SET
+	  UPDATE [DemoCdc].[PersonOutboxEnvelope] SET
         HasbeenCompleted = 1,
         ProcessedDate = GETUTCDATE()
 	    WHERE OutboxEnvelopeId = @BatchIdToMarkComplete 
@@ -33,10 +32,8 @@ BEGIN
 
     -- Declare required variables.
     DECLARE @existingBatchId INT 
-    DECLARE @min{{Name}}Lsn BINARY(10)
-{{#each CdcJoins}}
-    DECLARE @min{{Name}}Lsn BINARY(10)
-{{/each}}
+    DECLARE @minPersonLsn BINARY(10)
+    DECLARE @minWorkHistoryLsn BINARY(10)
     DECLARE @maxlsn BINARY(10)
 
     -- This is a flag to specify if we need the min change. If this is a new batch, we want the change AFTER this change as this is set to the highest in the batch before.
@@ -50,12 +47,10 @@ BEGIN
 	  -- Need to find the existing batch to return 
 	  SELECT TOP 1 
           @existingBatchId = [o].[OutboxEnvelopeId],
-          @min{{Name}}Lsn = [o].[FirstProcessedLSN],
-{{#each CdcJoins}}
-          @min{{Name}}Lsn = [o].[FirstProcessedLSN],
-{{/each}}
+          @minPersonLsn = [o].[FirstProcessedLSN],
+          @minWorkHistoryLsn = [o].[FirstProcessedLSN],
 		  @maxlsn = [o].[LastProcessedLSN]
-        FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
+        FROM [DemoCdc].[PersonOutboxEnvelope] AS [o] 
         WHERE [o].[HasBeenCompleted] = 0 
         ORDER BY [o].[OutboxEnvelopeId]
 
@@ -63,7 +58,7 @@ BEGIN
 	    IF @existingBatchId IS NOT NULL
 	    BEGIN
 		    -- Get the batch information from the table as this forms our first result set.
-		    SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
+		    SELECT * FROM [DemoCdc].[PersonOutboxEnvelope] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
 
 		    -- Mark the flag to include the first item in the batch too.
 		    SET @includeMin = 1
@@ -71,24 +66,20 @@ BEGIN
     END
 
     -- Where null then there isnt an existing batch, so we need to get these numbers.
-    IF @min{{Name}}Lsn IS NULL 
+    IF @minPersonLsn IS NULL 
     BEGIN
 	    -- Get them from the last batch generated.
 	    SELECT TOP 1
-            @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#ifne Joins.Count 0}},{{/ifne}}
-{{#each CdcJoins}}
-            @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#unless @last}},{{/unless}}
-{{/each}}
-	      FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
+            @minPersonLsn = [o].[LastProcessedLSN],
+            @minWorkHistoryLsn = [o].[LastProcessedLSN]
+	      FROM [DemoCdc].[PersonOutboxEnvelope] AS [o] 
 		  ORDER BY [o].[OutBoxEnvelopeId] DESC
 
 	    -- Where they are still NULL then this is the first batch ever, get them from the transaciton log.
 	    IF @minAddressLsn IS NULL 
 	    BEGIN
-		    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
-{{#each CdcJoins}}
-		    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
-{{/each}}
+		    SET @minPersonLsn = sys.fn_cdc_get_min_lsn('Demo_Person') 
+		    SET @minWorkHistoryLsn = sys.fn_cdc_get_min_lsn('Demo_WorkHistory') 
 
 		    -- Also include the first item here, because it should be in this batch.
 		    SET @includeMin = 1
@@ -103,42 +94,65 @@ BEGIN
 	INTO #changes
     FROM 
 	(
-        -- Get the {{QualifiedName}} changes.
+        -- Get the [Demo].[Person] changes.
         SELECT TOP (@MaxBatchSize)
-            '{{Name}}' AS [ChangeTable],
+            'Person' AS [ChangeTable],
             [_chg].[__$start_lsn] AS [start_lsn],
             [_chg].[__$operation],
             [_chg].[__$update_mask],
-{{#each SelectedColumns}}
-            {{QualifiedNameWithAlias}}{{#unless @last}},{{/unless}}
-{{/each}}
-          FROM cdc.fn_cdc_get_net_changes_{{lower Schema}}_{{lower Name}}(@min{{Name}}Lsn, @maxlsn, 'all') AS [_chg]
-          INNER JOIN {{QualifiedName}} AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
-{{#each Joins}}
-          {{JoinTypeSql}} {{QualifiedName}} AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{JoinOnSql}}{{/each}})
-{{/each}}
-          WHERE (@includeMin = 1 OR [_chg].[__$start_lsn] > @min{{Name}}Lsn)
+            [p].[PersonId],
+            [p].[FirstName],
+            [p].[LastName],
+            [p].[Birthday],
+            [p].[GenderId],
+            [p].[Street],
+            [p].[City],
+            [p].[RowVersion],
+            [p].[CreatedBy],
+            [p].[CreatedDate],
+            [p].[UpdatedBy],
+            [p].[UpdatedDate],
+            [p].[UniqueCode],
+            [p].[EyeColorCode],
+            [wh].[WorkHistoryId],
+            [wh].[Name],
+            [wh].[StartDate],
+            [wh].[EndDate]
+          FROM cdc.fn_cdc_get_net_changes_demo_person(@minPersonLsn, @maxlsn, 'all') AS [_chg]
+          INNER JOIN [Demo].[Person] AS [p] ON ([p].[PersonId] = [_chg].[PersonId])
+          INNER JOIN [Demo].[WorkHistory] AS [wh] ON ([wh].[PersonId] = [p].[PersonId])
+          WHERE (@includeMin = 1 OR [_chg].[__$start_lsn] > @minPersonLsn)
           ORDER BY [_chg].[__$start_lsn] ASC
-{{#each CdcJoins}}
       UNION
-        -- Get the {{QualifiedName}} changes.
+        -- Get the [Demo].[WorkHistory] changes.
         SELECT TOP (@MaxBatchSize)
-            '{{Name}}' AS [ChangeTable],
+            'WorkHistory' AS [ChangeTable],
             [_chg].[__$start_lsn] AS [start_lsn],
             [_chg].[__$operation],
             [_chg].[__$update_mask],
-  {{#each Parent.SelectedColumns}}
-            {{QualifiedNameWithAlias}}{{#unless @last}},{{/unless}}
-  {{/each}}
-          FROM cdc.fn_cdc_get_net_changes_{{lower Schema}}_{{lower Name}}(@min{{Name}}Lsn, @maxlsn, 'all') AS [_chg]
-          INNER JOIN {{QualifiedName}} AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
-          INNER JOIN {{Parent.QualifiedName}} AS [{{Parent.Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{JoinOnSql}}{{/each}})
-  {{#each OtherJoins}}
-          {{JoinTypeSql}} {{QualifiedName}} AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{JoinOnSql}}{{/each}})
-  {{/each}}
-          WHERE (@includeMin = 1 OR [_chg].[__$start_lsn] > @min{{Name}}Lsn)
+            [p].[PersonId],
+            [p].[FirstName],
+            [p].[LastName],
+            [p].[Birthday],
+            [p].[GenderId],
+            [p].[Street],
+            [p].[City],
+            [p].[RowVersion],
+            [p].[CreatedBy],
+            [p].[CreatedDate],
+            [p].[UpdatedBy],
+            [p].[UpdatedDate],
+            [p].[UniqueCode],
+            [p].[EyeColorCode],
+            [wh].[WorkHistoryId],
+            [wh].[Name],
+            [wh].[StartDate],
+            [wh].[EndDate]
+          FROM cdc.fn_cdc_get_net_changes_demo_workhistory(@minWorkHistoryLsn, @maxlsn, 'all') AS [_chg]
+          INNER JOIN [Demo].[WorkHistory] AS [wh] ON ([wh].[WorkHistoryId] = [_chg].[WorkHistoryId])
+          INNER JOIN [Demo].[Person] AS [p] ON ([wh].[PersonId] = [p].[PersonId])
+          WHERE (@includeMin = 1 OR [_chg].[__$start_lsn] > @minWorkHistoryLsn)
           ORDER BY [_chg].[__$start_lsn] ASC
-{{/each}}
     ) AS [_changes]
     ORDER BY start_lsn ASC -- We order by as we're taking TOP. We dont want to skip changes so we need them in LSN order
 
@@ -156,7 +170,7 @@ BEGIN
 		      FROM #changes
 
 		    -- Create the batch record in the table.
-		    INSERT INTO [{{CdcSchema}}].[{{CdcEnvelope}}] (
+		    INSERT INTO [DemoCdc].[PersonOutboxEnvelope] (
 			  [CreatedDate], 
               [FirstProcessedLSN],
               [LastProcessedLSN],
@@ -170,20 +184,35 @@ BEGIN
             )
 
 		    -- Return as the first result set. If we arent making a new batch then we already returned it.
-		    SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] WHERE [OutboxEnvelopeId] = @@IDENTITY
+		    SELECT * FROM [DemoCdc].[PersonOutboxEnvelope] WHERE [OutboxEnvelopeId] = @@IDENTITY
 	    END
     END
     ELSE
     BEGIN
 	    -- There are no changes so just return an empty result set.
-	    SELECT TOP 0 * FROM [{{CdcSchema}}].[{{CdcEnvelope}}]
+	    SELECT TOP 0 * FROM [DemoCdc].[PersonOutboxEnvelope]
     END
 
     -- Return the changes that we have.
     SELECT DISTINCT 
-{{#each SelectedColumns}}
-      [{{NameAlias}}]{{#unless @last}},{{/unless}}
-{{/each}}
+      [PersonId],
+      [FirstName],
+      [LastName],
+      [Birthday],
+      [GenderId],
+      [Street],
+      [City],
+      [RowVersion],
+      [CreatedBy],
+      [CreatedDate],
+      [UpdatedBy],
+      [UpdatedDate],
+      [UniqueCode],
+      [EyeColorCode],
+      [WorkHistoryId],
+      [Name],
+      [StartDate],
+      [EndDate]
     FROM #changes
 
     -- Commit the transaction.

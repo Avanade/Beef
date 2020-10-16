@@ -165,6 +165,11 @@ namespace Beef.CodeGen.Config.Database
         /// Gets the name alias.
         /// </summary>
         public string? NameAlias { get; }
+
+        /// <summary>
+        /// Gets the qualified name with the alias (used in a select).
+        /// </summary>
+        public string QualifiedNameWithAlias { get; }
     }
 
     /// <summary>
@@ -332,10 +337,16 @@ namespace Beef.CodeGen.Config.Database
         public string? NameAlias { get; set; }
 
         /// <summary>
+        /// Gets the qualified name with the alias (used in a select).
+        /// </summary>
+        public string QualifiedNameWithAlias => string.IsNullOrEmpty(NameAlias) || NameAlias == Name ? QualifiedName : $"{QualifiedName} AS [{NameAlias}]";
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
         {
+            NameAlias = DefaultWhereNull(NameAlias, () => Name);
             UpdateSqlProperties();
         }
 

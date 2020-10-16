@@ -7,8 +7,8 @@
     </QueryJoin>
   </Query>
 
-  <Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory">
-    <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Alias="whi">
+  <Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
+    <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Cdc="true">
       <QueryJoinOn Name="PersonId" />
     </QueryJoin>
   </Query>

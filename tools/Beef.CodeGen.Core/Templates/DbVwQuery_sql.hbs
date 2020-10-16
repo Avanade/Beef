@@ -7,7 +7,7 @@ AS
 
   SELECT
 {{#each SelectedColumns}}
-      {{.}}{{#unless @last}},{{/unless}}
+      {{QualifiedNameWithAlias}}{{#unless @last}},{{/unless}}
 {{/each}}
     FROM {{QualifiedName}} AS [{{Alias}}]
 {{#ifval ColumnOrgUnitId}}

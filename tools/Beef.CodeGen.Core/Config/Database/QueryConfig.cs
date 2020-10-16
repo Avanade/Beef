@@ -97,6 +97,41 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region Cdc
+
+        /// <summary>
+        /// Indicates whether a CDC Outbox stored procedure is to be generated.
+        /// </summary>
+        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CodeGen", Title = "Indicates whether a CDC Outbox stored procedure is to be generated.")]
+        public bool? Cdc { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `Cdc` stored procedure name.
+        /// </summary>
+        [JsonProperty("cdcName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The `View` name.",
+            Description = "Defaults to `sp` (literal) + `Name` + `Outbox` (literal); e.g. `spTableNameOutbox`.")]
+        public string? CdcName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the schema name for the `Cdc` stored procedure name.
+        /// </summary>
+        [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The schema name for the `Cdc` stored procedure name.",
+            Description = "Defaults to `Schema` + `Cdc` (literal).")]
+        public string? CdcSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the corresponding `Cdc` Outbox Envelope table name.
+        /// </summary>
+        [JsonProperty("cdcEnvelope", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The corresponding `Cdc` Outbox Envelope table name.",
+            Description = "Defaults to `Name` + `OutboxEnvelope` (literal).")]
+        public string? CdcEnvelope { get; set; }
+
+        #endregion
+
         #region Auth
 
         /// <summary>
@@ -220,12 +255,22 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the SQL formatted selected columns.
         /// </summary>
-        public List<string> SelectedColumns { get; } = new List<string>();
+        public List<IColumnConfig> SelectedColumns { get; } = new List<IColumnConfig>();
 
         /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
         public List<QueryColumnConfig> Columns { get; } = new List<QueryColumnConfig>();
+
+        /// <summary>
+        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are also CDC monitored.
+        /// </summary>
+        public List<QueryJoinConfig> CdcJoins => Joins!.Where(x => CompareValue(x.Cdc, true)).ToList();
+
+        /// <summary>
+        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are not flagged as CDC monitored.
+        /// </summary>
+        public List<QueryJoinConfig> NonCdcJoins => Joins!.Where(x => CompareNullOrValue(x.Cdc, false)).ToList();
 
         /// <summary>
         /// Gets the related IsDeleted column.
@@ -305,6 +350,11 @@ namespace Beef.CodeGen.Config.Database
         public DbTable? DbTable { get; private set; }
 
         /// <summary>
+        /// Gets the list of primary key columns.
+        /// </summary>
+        public List<QueryColumnConfig> PrimaryKeyColumns { get; } = new List<QueryColumnConfig>();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -318,8 +368,13 @@ namespace Beef.CodeGen.Config.Database
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
             ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
+
             if (!string.IsNullOrEmpty(Permission) && Permission.Split(".", StringSplitOptions.RemoveEmptyEntries).Length == 1)
                 Permission += ".Read";
+
+            CdcName = DefaultWhereNull(CdcName, () => $"sp{Name}Outbox");
+            CdcSchema = DefaultWhereNull(CdcSchema, () => Schema + "Cdc");
+            CdcEnvelope = DefaultWhereNull(CdcEnvelope, () => Name + "OutboxEnvelope");
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);
@@ -344,6 +399,13 @@ namespace Beef.CodeGen.Config.Database
 
             foreach (var c in DbTable.Columns)
             {
+                if (c.IsPrimaryKey)
+                {
+                    var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
+                    cc.Prepare(Root!, this);
+                    PrimaryKeyColumns.Add(cc);
+                }
+
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
                     var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c };
@@ -376,7 +438,11 @@ namespace Beef.CodeGen.Config.Database
             foreach (var c in Columns)
             {
                 if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
-                    SelectedColumns.Add(CreateSelectedColumnSql(c)!);
+                {
+                    var cc = new QueryColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
+                    cc.Prepare(Root!, this);
+                    SelectedColumns.Add(cc);
+                }
             }
 
             foreach (var j in Joins!)
@@ -390,7 +456,11 @@ namespace Beef.CodeGen.Config.Database
                 foreach (var c in j.Columns)
                 {
                     if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
-                        SelectedColumns.Add(CreateSelectedColumnSql(c)!);
+                    {
+                        var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
+                        cc.Prepare(Root!, j);
+                        SelectedColumns.Add(cc);
+                    }
                 }
             }
 
@@ -400,11 +470,6 @@ namespace Beef.CodeGen.Config.Database
                 where.Prepare(Root!, this);
             }
         }
-
-        /// <summary>
-        /// Create the selected column SQL.
-        /// </summary>
-        private static string? CreateSelectedColumnSql(IColumnConfig c) => string.IsNullOrEmpty(c?.NameAlias) ? c?.QualifiedName : $"{c?.QualifiedName} AS [{c?.NameAlias}]";
 
         /// <summary>
         /// Gets the fully qualified name schema.table name.

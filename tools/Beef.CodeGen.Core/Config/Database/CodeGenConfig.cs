@@ -260,20 +260,20 @@ namespace Beef.CodeGen.Config.Database
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
 
-            if (Tables != null && Tables.Count > 0)
+            if (Queries == null)
+                Queries = new List<QueryConfig>();
+
+            foreach (var query in Queries)
             {
-                foreach (var table in Tables)
-                {
-                    table.Prepare(Root!, this);
-                }
+                query.Prepare(Root!, this);
             }
 
-            if (Queries != null && Queries.Count > 0)
+            if (Tables == null)
+                Tables = new List<TableConfig>();
+
+            foreach (var table in Tables)
             {
-                foreach (var query in Queries)
-                {
-                    query.Prepare(Root!, this);
-                }
+                table.Prepare(Root!, this);
             }
         }
 

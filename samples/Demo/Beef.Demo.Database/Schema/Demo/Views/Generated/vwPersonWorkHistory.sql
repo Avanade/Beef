@@ -19,9 +19,9 @@ AS
       [p].[UpdatedDate],
       [p].[UniqueCode],
       [p].[EyeColorCode],
-      [whi].[WorkHistoryId],
-      [whi].[Name],
-      [whi].[StartDate],
-      [whi].[EndDate]
+      [wh].[WorkHistoryId],
+      [wh].[Name],
+      [wh].[StartDate],
+      [wh].[EndDate]
     FROM [Demo].[Person] AS [p]
-      INNER JOIN [Demo].[WorkHistory] AS [whi] ON ([whi].[PersonId] = [p].[PersonId])
+      INNER JOIN [Demo].[WorkHistory] AS [wh] ON ([wh].[PersonId] = [p].[PersonId])

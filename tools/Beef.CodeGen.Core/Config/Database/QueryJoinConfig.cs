@@ -82,6 +82,17 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region Cdc
+
+        /// <summary>
+        /// Indicates whether the joined table is also being monitored for CDC and should be included.
+        /// </summary>
+        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CodeGen", Title = "Indicates whether the joined table is also being monitored for CDC and should be included.")]
+        public bool? Cdc { get; set; }
+
+        #endregion
+
         #region Infer
 
         /// <summary>
@@ -175,6 +186,11 @@ namespace Beef.CodeGen.Config.Database
         public List<QueryJoinOnConfig>? On { get; set; }
 
         /// <summary>
+        /// Gets all the other joins excluding this.
+        /// </summary>
+        public List<QueryJoinConfig> OtherJoins => Parent!.Joins.Where(x => x != this).ToList();
+
+        /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
         public List<QueryJoinColumnConfig> Columns { get; } = new List<QueryJoinColumnConfig>();
@@ -257,6 +273,11 @@ namespace Beef.CodeGen.Config.Database
         public DbTable? DbTable { get; private set; }
 
         /// <summary>
+        /// Gets the list of primary key columns.
+        /// </summary>
+        public List<QueryJoinColumnConfig> PrimaryKeyColumns { get; } = new List<QueryJoinColumnConfig>();
+
+        /// <summary>
         /// Gets the Join table qualified name.
         /// </summary>
         public string QualifiedName => $"[{Schema}].[{Name}]";
@@ -301,6 +322,13 @@ namespace Beef.CodeGen.Config.Database
 
             foreach (var c in DbTable.Columns)
             {
+                if (c.IsPrimaryKey)
+                {
+                    var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c };
+                    cc.Prepare(Root!, this);
+                    PrimaryKeyColumns.Add(cc);
+                }
+
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
                     var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c };
