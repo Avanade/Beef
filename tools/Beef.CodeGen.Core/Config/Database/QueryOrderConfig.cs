@@ -10,8 +10,10 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("QueryOrder", Title = "The **Order** is used to define the query order", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("QueryOrder", Title = "'QueryOrder' object (database-driven)",
+        Description = "The `Order` object defines the query order.",
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryOrderConfig : ConfigBase<CodeGenConfig, QueryConfig>
     {
         #region Key

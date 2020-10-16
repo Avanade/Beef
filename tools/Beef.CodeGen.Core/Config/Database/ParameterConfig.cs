@@ -11,8 +11,10 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure parameter configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Parameter", Title = "The **Parameter** is used to define a Stored Procedure's Parameter and its charateristics.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("Parameter", Title = "'Parameter' object (database-driven)", 
+        Description = "The `Parameter` is used to define a stored procedure parameter and its charateristics.", 
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
         #region Key
@@ -36,7 +38,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the SQL type definition (overrides inherited Column definition) including length/precision/scale.
         /// </summary>
         [JsonProperty("sqlType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The SQL type definition (overrides inerhited Column definition) including length/precision/scale.")]
+        [PropertySchema("Key", Title = "The SQL type definition (overrides inherited Column definition) including length/precision/scale.")]
         public string? SqlType { get; set; }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("nullable", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "Indicates whether the parameter is nullable.",
-            Description = "Note that When the parameter value is `NULL` it will not be included in the query.")]
+            Description = "Note that when the parameter value is `NULL` it will not be included in the query.")]
         public bool? Nullable { get; set; }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace Beef.CodeGen.Config.Entity
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Entity", Title = "'Entity' object (entity-driven)",
-        Description = "The **Entity** is used as the primary configuration for driving the entity-driven code generation.",
+        Description = "The `Entity` is used as the primary configuration for driving the entity-driven code generation.",
         Markdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
 ``` yaml
 entities:
@@ -39,7 +39,7 @@ entities:
     [CategorySchema("DataSvc", Title = "Provides the _Data Services-layer_ configuration.")]
     [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CategorySchema("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.")]
-    [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework_ configuration where `AutoImplement` is `EntityFramework`.")]
+    [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement` is `EntityFramework`.")]
     [CategorySchema("Cosmos", Title = "Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.")]
     [CategorySchema("OData", Title = "Provides the specific _OData_ configuration where `AutoImplement` is `OData`.")]
     [CategorySchema("Model", Title = "Provides the data _Model_ configuration.")]
@@ -719,12 +719,16 @@ entities:
 
         #endregion
 
+        #region Collections
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="PropertyConfig"/> collection.
         /// </summary>
         [JsonProperty("properties", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Property` collection.")]
         public List<PropertyConfig>? Properties { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Gets the list of private properties to be implemented (that are not inherited).

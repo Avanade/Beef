@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -11,24 +8,30 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure additional statement configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Execute", Title = "The **Execute** statement to enable additional functionality to be added before or after the primary statement.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("Execute", Title = "'Execute' object (database-driven)", 
+        Description = "The _Execute_ object enables additional TSQL statements to be embedded within the stored procedure.", 
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class ExecuteConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
+        #region Key
+
         /// <summary>
-        /// Gets or sets the additiona statement (TSQL).
+        /// Gets or sets the additional TSQL statement.
         /// </summary>
         [JsonProperty("statement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The additional statement (TSQL).", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The additional TSQL statement.", IsMandatory = true, IsImportant = true)]
         public string? Statement { get; set; }
 
         /// <summary>
-        /// Gets or sets the location of the statement in relation to the primary statement.
+        /// Gets or sets the location of the statement in relation to the underlying primary stored procedure statement.
         /// </summary>
         [JsonProperty("location", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The location of the statement in relation to the primary statement.", IsImportant = true, Options = new string[] { "Before", "After" },
+        [PropertySchema("Key", Title = "The location of the statement in relation to the underlying primary stored procedure statement.", IsImportant = true, Options = new string[] { "Before", "After" },
             Description = "Defaults to `After`.")]
         public string? Location { get; set; }
+
+        #endregion
 
         /// <summary>
         /// <inheritdoc/>

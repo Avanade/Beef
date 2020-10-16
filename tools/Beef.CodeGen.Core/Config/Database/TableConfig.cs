@@ -2,6 +2,7 @@
 
 using Beef.CodeGen.DbModels;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,17 +12,24 @@ namespace Beef.CodeGen.Config.Database
     /// 
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Table", Title = "The **Table** is used to identify a database `Table` and define its code-generation characteristics.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    [CategorySchema("CodeGen", Title = "Provides the **CodeGen** configuration to select via shorthand the code-gen artefacts.")]
-    [CategorySchema("UDT", Title = "Provides the **UDT (user defined type)** configuration.")]
-    [CategorySchema("Auth", Title = "Provides the **Authorization** configuration.")]
+    [ClassSchema("Table", Title = "'Table' object (entity-driven)", 
+        Description = "The `Table` object identifies an existing database `Table` (or `View`) and defines its code-generation characteristics.", 
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CategorySchema("CodeGen", Title = "Provides the _Code Generation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `GetAll`, `Create`, `Update`, `Upsert`, `Delete` and `Merge`.")]
+    [CategorySchema("View", Title = "Provides the _View_ configuration.")]
+    [CategorySchema("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
+    [CategorySchema("UDT", Title = "Provides the _User Defined Table and Table-Valued Parameter_ configuration.")]
+    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class TableConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
         #region Key
 
         /// <summary>
-        /// Gets or sets the name of the `Table` in the database.
+        /// Gets or sets the name of the `Table` (or `View`) in the database.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The name of the `Table` in the database.", IsMandatory = true, IsImportant = true)]
@@ -50,8 +58,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
-            Description = "Where not specified this Indicates whether all `Columns` are to be included.")]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+            Description = "Where not specified this indicates that all `Columns` are to be included.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -59,7 +67,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
@@ -79,8 +87,18 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("getAll", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.")]
+        [PropertySchema("CodeGen", Title = "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.",
+            Description = "The `GetAllOrderBy` is used to specify the `GetAll` query sort order.")]
         public bool? GetAll { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.
+        /// </summary>
+        [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CodeGen", Title = "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
+            Description = "This relates to the `GetAll` selection.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? GetAllOrderBy { get; set; }
 
         /// <summary>
         /// Indicates whether a `Create` stored procedure is to be automatically generated where not otherwise explicitly specified.
@@ -111,17 +129,29 @@ namespace Beef.CodeGen.Config.Database
         public bool? Delete { get; set; }
 
         /// <summary>
+        /// Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.
+        /// </summary>
+        [JsonProperty("merge", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CodeGen", Title = "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
+            Description = "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.")]
+        public bool? Merge { get; set; }
+
+        #endregion
+
+        #region View
+
+        /// <summary>
         /// Indicates whether a `View` is to be generated.
         /// </summary>
         [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "Indicates whether a `View` is to be generated.")]
+        [PropertySchema("View", Title = "Indicates whether a `View` is to be generated.")]
         public bool? View { get; set; }
 
         /// <summary>
         /// Gets or sets the `View` name.
         /// </summary>
         [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The `View` name.",
+        [PropertySchema("View", Title = "The `View` name.",
             Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
         public string? ViewName { get; set; }
 
@@ -129,41 +159,45 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the schema name of the `View`.
         /// </summary>
         [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The schema name for the `View`.",
+        [PropertySchema("View", Title = "The schema name for the `View`.",
             Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
+
+        #endregion
+
+        #region EntityFramework
 
         /// <summary>
         /// Indicates whether an `Entity Framework` .NET (C#) model is to be generated.
         /// </summary>
         [JsonProperty("efModel", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.")]
+        [PropertySchema("EntityFramework", Title = "Indicates whether an `Entity Framework` .NET (C#) model is to be generated.")]
         public bool? EfModel { get; set; }
 
         /// <summary>
         /// Gets or sets the .NET (C#) EntityFramework (EF) model name.
         /// </summary>
         [JsonProperty("efModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "The .NET (C#) EntityFramework (EF) model name.",
+        [PropertySchema("EntityFramework", Title = "The .NET (C#) EntityFramework (EF) model name.",
             Description = "Defaults to `Name`.")]
         public string? EfModelName { get; set; }
 
         #endregion
 
-        #region Udt
+        #region UDT
 
         /// <summary>
         /// Indicates whether a `User Defined Table (UDT)` type should be created.
         /// </summary>
         [JsonProperty("udt", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Udt", Title = "Indicates whether a `User Defined Table (UDT)` type should be created.", IsImportant = true)]
+        [PropertySchema("UDT", Title = "Indicates whether a `User Defined Table (UDT)` type should be created.", IsImportant = true)]
         public bool? Udt { get; set; }
 
         /// <summary>
         /// Gets or sets the list of `Column` names to be excluded from the `User Defined Table (UDT)`.
         /// </summary>
         [JsonProperty("udtExcludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Udt", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
+        [PropertyCollectionSchema("UDT", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
             Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? UdtExcludeColumns { get; set; }
@@ -172,15 +206,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.
         /// </summary>
         [JsonProperty("tvp", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Udt", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
+        [PropertySchema("UDT", Title = "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.", IsImportant = true)]
         public string? Tvp { get; set; }
-
-        /// <summary>
-        /// Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.
-        /// </summary>
-        [JsonProperty("merge", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Udt", Title = "Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.")]
-        public bool? Merge { get; set; }
 
         #endregion
 
@@ -202,7 +229,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
-            Description = "Defaults to `IsDeleted`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
         /// <summary>
@@ -210,7 +237,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
-            Description = "Defaults to `TenantId`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
         /// <summary>
@@ -218,7 +245,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
-            Description = "Defaults to `OrgUnitId`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
         /// <summary>
@@ -226,7 +253,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
-            Description = "Defaults to `RowVersion`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
         /// <summary>
@@ -234,7 +261,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
-            Description = "Defaults to `CreatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
         /// <summary>
@@ -242,7 +269,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
-            Description = "Defaults to `CreatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
         /// <summary>
@@ -250,7 +277,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
         /// <summary>
@@ -258,7 +285,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
         /// <summary>
@@ -266,7 +293,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
         /// <summary>
@@ -274,26 +301,23 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
         #endregion
+
+        #region Collections
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="StoredProcedureConfig"/> collection.
         /// </summary>
         [JsonProperty("storedProcedures", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `StoredProcedure` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `StoredProcedure` collection.",
+            Markdown = "A `StoredProcedure` object defines the stored procedure code-generation characteristics.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<StoredProcedureConfig>? StoredProcedures { get; set; }
 
-        /// <summary>
-        /// Gets or sets the <see cref="GetAllOrderByConfig"/> collection).
-        /// </summary>
-        [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `GetAll` stored procedure `OrderBy` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
-        public List<GetAllOrderByConfig>? GetAllOrderBy { get; set; }
+        #endregion
 
         /// <summary>
         /// Gets the selected column configurations.
@@ -353,7 +377,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the named special colum.
         /// </summary>
-        private TableColumnConfig? GetSpecialColumn(string? name) => Columns?.Where(x => x.Name == name && name != "None" && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
+        private TableColumnConfig? GetSpecialColumn(string? name) => Columns?.Where(x => x.Name == name && !x.DbColumn!.IsPrimaryKey).SingleOrDefault();
 
         /// <summary>
         /// Indicates whether there any audit columns.
@@ -517,9 +541,13 @@ namespace Beef.CodeGen.Config.Database
                 if (GetAllOrderBy != null)
                 {
                     spc.OrderBy = new List<OrderByConfig>();
-                    foreach (var gaob in GetAllOrderBy)
+                    foreach (var ob in GetAllOrderBy)
                     {
-                        spc.OrderBy.Add(new OrderByConfig { Name = gaob.Name, Order = gaob.Order });
+                        var parts = ob.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length == 1)
+                            spc.OrderBy.Add(new OrderByConfig { Name = parts[0] }); 
+                        else if (parts.Length > 1)
+                            spc.OrderBy.Add(new OrderByConfig { Name = parts[0], Order = parts[1].StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending" });
                     }
                 }
                 else if (DbTable!.IsRefData)

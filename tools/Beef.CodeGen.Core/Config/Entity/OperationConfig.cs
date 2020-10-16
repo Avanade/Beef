@@ -421,12 +421,16 @@ operations: [
 
         #endregion
 
+        #region Collections
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="ParameterConfig"/> collection.
         /// </summary>
         [JsonProperty("parameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Parameter` collection.")]
         public List<ParameterConfig>? Parameters { get; set; }
+
+        #endregion 
 
         /// <summary>
         /// Gets the <see cref="ParameterConfig"/> collection filtered for data access.

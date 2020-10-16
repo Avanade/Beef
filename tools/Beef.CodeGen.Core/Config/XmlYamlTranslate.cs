@@ -98,7 +98,7 @@ namespace Beef.CodeGen.Config
 
             (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
-            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : XmlToGetAllOrderBy(xml)),
+            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
             (ConfigType.Database, ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
@@ -165,7 +165,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Key")
                 {
                     Title = "The comma separated list of `Column` names to be included in the underlying generated output.", IsImportant = true,
-                    Description = "Where not specified this Indicates whether all `Columns` are to be included."
+                    Description = "Where not specified this indicates that all `Columns` are to be included."
                 }),
             (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Key")
                 {
@@ -174,7 +174,7 @@ namespace Beef.CodeGen.Config
                 }),
             (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", typeof(string), new PropertySchemaAttribute("Key")
                 {
-                    Title = "The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order"
+                    Title = "The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order."
                 }),
             (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", typeof(string), new PropertySchemaAttribute("Udt")
                 {
@@ -201,32 +201,6 @@ namespace Beef.CodeGen.Config
                     Description = "Defaults to `Asc`."
                 })
         });
-
-        /// <summary>
-        /// Converts the GetAllOrderBy XML to YAML.
-        /// </summary>
-        private static string XmlToGetAllOrderBy(string xml)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var ob in xml.Split(',', StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (sb.Length == 0)
-                    sb.Append("[");
-                else
-                    sb.Append(",");
-
-                var parts = ob.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                sb.Append($" {{ name: {parts[0]}");
-                if (parts.Length > 1)
-                    sb.Append($", order: {(parts[1].StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "Descending" : "Ascending")}");
-
-                sb.Append(" }");
-            }
-
-            sb.Append(" ]");
-            return sb.ToString();
-        }
 
         /// <summary>
         /// Gets the YAML name from the XML name.

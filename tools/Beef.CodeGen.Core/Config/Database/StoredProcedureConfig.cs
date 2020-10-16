@@ -10,9 +10,14 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("StoredProcedure", Title = "The **StoredProcedure** is used to identify a database `Stored Procedure` and define its code-generation characteristics.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
-    [CategorySchema("Auth", Title = "Provides the **Authorization** configuration.")]
+    [ClassSchema("StoredProcedure", Title = "'StoredProcedure' object (database-driven)",
+        Description = "The `StoredProcedure` object defines the stored procedure code-generation characteristics.",
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
+    [CategorySchema("Additional", Title = "Provides _additional ad-hoc_ configuration.")]
+    [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class StoredProcedureConfig : ConfigBase<CodeGenConfig, TableConfig>
     {
         #region Key
@@ -41,37 +46,49 @@ namespace Beef.CodeGen.Config.Database
             Description = "This only applies where the stored procedure operation `Type` is `GetColl`.")]
         public bool? Paging { get; set; }
 
+        #endregion
+
+        #region Additional
+
         /// <summary>
         /// Gets or sets the SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.
         /// </summary>
         [JsonProperty("reselectStatement", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
+        [PropertySchema("Additional", Title = "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
             Description = "Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s).")]
         public string? ReselectStatement { get; set; }
 
         /// <summary>
-        /// Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data. 
+        /// Indicates whether to select into a `#TempTable` to allow other statements access to the selected data. 
         /// </summary>
         [JsonProperty("intoTempTable", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data.",
+        [PropertySchema("Additional", Title = "Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.",
             Description = "A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.")]
         public bool? IntoTempTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.
+        /// </summary>
+        [JsonProperty("withHints", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Additional", Title = "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.")]
+        public string? WithHints { get; set; }
+
+        #endregion
+
+        #region Merge
 
         /// <summary>
         /// Gets or sets the column names to be used in the `Merge` statement to determine whether to insert, update or delete.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         [JsonProperty("mergeOverrideIdentityColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
+        [PropertyCollectionSchema("Merge", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
             Description = "This is used to override the default behaviour of using the primary key column(s).")]
         public List<string>? MergeOverrideIdentityColumns { get; set; }
 
-        /// <summary>
-        /// Gets or sets the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.
-        /// </summary>
-        [JsonProperty("withHints", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.")]
-        public string? WithHints { get; set; }
+        #endregion
+
+        #region Auth
 
         /// <summary>
         /// Gets or sets the permission (full name being `name.action`) override to be used for security permission checking.
@@ -81,6 +98,8 @@ namespace Beef.CodeGen.Config.Database
         public string? Permission { get; set; }
 
         #endregion
+
+        #region Collections
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ParameterConfig"/> collection.
@@ -113,6 +132,8 @@ namespace Beef.CodeGen.Config.Database
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Execute` collection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ExecuteConfig>? Execute { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Gets the parameters to be used as the arguments parameters.

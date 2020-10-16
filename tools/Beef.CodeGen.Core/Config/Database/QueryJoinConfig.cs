@@ -12,8 +12,13 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the table join configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Join", Title = "The **Join** is used to define a join within a query.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("QueryJoin", Title = "'QueryJoin' object (database-driven)", 
+        Description = "The `Join` object defines a join within a query.", 
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
+    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
+    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
+    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     public class QueryJoinConfig : ConfigBase<CodeGenConfig, QueryConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
         #region Key
@@ -57,8 +62,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be included in the underlying generated output.
         /// </summary>
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
-            Description = "Where not specified this Indicates whether all `Columns` are to be included.")]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+            Description = "Where not specified this indicates that all `Columns` are to be included.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
 
@@ -66,7 +71,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` names to be excluded from the underlying generated output.
         /// </summary>
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
@@ -75,8 +80,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Key", Title = "The list of `Column` and `Alias` pairs to enables column renaming.", IsImportant = true,
-            Description = "A value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming.", IsImportant = true,
+            Description = "The value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? AliasColumns { get; set; }
 
@@ -88,7 +93,8 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates whether the joined table is also being monitored for CDC and should be included.
         /// </summary>
         [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "Indicates whether the joined table is also being monitored for CDC and should be included.")]
+        [PropertySchema("CDC", Title = "Indicates whether the joined table is also being monitored for Change Data Capture (CDC) and should be included accordingly.",
+            Description = "Otherwise, the `Join` is purely for filtering and/or column addition.")]
         public bool? Cdc { get; set; }
 
         #endregion
@@ -100,7 +106,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
-            Description = "Defaults to `IsDeleted`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
         /// <summary>
@@ -108,7 +114,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
-            Description = "Defaults to `TenantId`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
         /// <summary>
@@ -116,7 +122,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
-            Description = "Defaults to `OrgUnitId`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
         /// <summary>
@@ -124,7 +130,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
-            Description = "Defaults to `RowVersion`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
         /// <summary>
@@ -132,7 +138,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
-            Description = "Defaults to `CreatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
         /// <summary>
@@ -140,7 +146,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
-            Description = "Defaults to `CreatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
         /// <summary>
@@ -148,7 +154,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
         /// <summary>
@@ -156,7 +162,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
         /// <summary>
@@ -164,7 +170,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
         /// <summary>
@@ -172,7 +178,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CodeGeneration.UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
         #endregion
@@ -253,7 +259,7 @@ namespace Beef.CodeGen.Config.Database
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            var c = DbTable!.Columns.Where(x => x.Name == name && name != "None" && !x.IsPrimaryKey).SingleOrDefault();
+            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
             if (c == null)
                 return null;
 

@@ -15,23 +15,13 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the global database code-generation configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("CodeGeneration", Title = "The **CodeGeneration** is used as the global configuration for driving the underlying code-generation.", Description = "", Markdown = "")]
-    [CategorySchema("RefData", Title = "Provides the **Reference Data** configuration.")]
-    [CategorySchema("Infer", Title = "Provides the **Column Name inference** configuration.")]
+    [ClassSchema("CodeGeneration", Title = "'CodeGeneration' object (database-driven)",
+        Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
+        Markdown = "")]
+    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
-        #region RefData
-
-        /// <summary>
-        /// Gets or sets the schema name to identify the Reference Data related tables.
-        /// </summary>
-        [JsonProperty("refDatabaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "The schema name to identify the Reference Data related tables.", IsImportant = true,
-            Description = "Where not specified an attempt will be made to infer.")]
-        public string? RefDatabaseSchema { get; set; }
-
-        #endregion
-
         #region Infer
 
         /// <summary>
@@ -39,7 +29,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
-            Description = "Defaults to `IsDeleted`. To remove capability set to `None`.")]
+            Description = "Defaults to `IsDeleted`.")]
         public string? ColumnNameIsDeleted { get; set; }
 
         /// <summary>
@@ -47,7 +37,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameTenantId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `TenantId` capability.",
-            Description = "Defaults to `TenantId`. To remove capability set to `None`.")]
+            Description = "Defaults to `TenantId`.")]
         public string? ColumnNameTenantId { get; set; }
 
         /// <summary>
@@ -55,7 +45,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameOrgUnitId", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `OrgUnitId` capability.",
-            Description = "Defaults to `OrgUnitId`. To remove capability set to `None`.")]
+            Description = "Defaults to `OrgUnitId`.")]
         public string? ColumnNameOrgUnitId { get; set; }
 
         /// <summary>
@@ -63,7 +53,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
-            Description = "Defaults to `RowVersion`. To remove capability set to `None`.")]
+            Description = "Defaults to `RowVersion`.")]
         public string? ColumnNameRowVersion { get; set; }
 
         /// <summary>
@@ -71,7 +61,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedBy` capability.",
-            Description = "Defaults to `CreatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `CreatedBy`.")]
         public string? ColumnNameCreatedBy { get; set; }
 
         /// <summary>
@@ -79,7 +69,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameCreatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `CreatedDate` capability.",
-            Description = "Defaults to `CreatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `CreatedDate`.")]
         public string? ColumnNameCreatedDate { get; set; }
 
         /// <summary>
@@ -87,7 +77,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `UpdatedBy`.")]
         public string? ColumnNameUpdatedBy { get; set; }
 
         /// <summary>
@@ -95,7 +85,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameUpdatedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `UpdatedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `UpdatedDate`.")]
         public string? ColumnNameUpdatedDate { get; set; }
 
         /// <summary>
@@ -103,7 +93,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedBy` capability.",
-            Description = "Defaults to `UpdatedBy`. To remove capability set to `None`.")]
+            Description = "Defaults to `UpdatedBy`.")]
         public string? ColumnNameDeletedBy { get; set; }
 
         /// <summary>
@@ -111,7 +101,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("columnNameDeletedDate", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The column name for the `DeletedDate` capability.",
-            Description = "Defaults to `UpdatedDate`. To remove capability set to `None`.")]
+            Description = "Defaults to `UpdatedDate`.")]
         public string? ColumnNameDeletedDate { get; set; }
 
         /// <summary>
@@ -119,7 +109,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("orgUnitJoinSql", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Infer", Title = "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
-            Description = "Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`.")]
+            Description = "Defaults to `[Sec].[fnGetUserOrgUnits]()`.")]
         public string? OrgUnitJoinSql { get; set; }
 
         /// <summary>
@@ -207,7 +197,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
         [JsonProperty("tables", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Table` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Table` collection.", IsImportant = true,
+            Markdown = "A `Table` object provides the relationship to an existing table within the database.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<TableConfig>? Tables { get; set; }
 
@@ -215,7 +206,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding <see cref="QueryConfig"/> collection.
         /// </summary>
         [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Collections", Title = "The corresponding `Query` collection.")]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Query` collection.", IsImportant = true,
+            Markdown = "A `Query` object provides the primary configuration for a query, including multiple table joins.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<QueryConfig>? Queries { get; set; }
 

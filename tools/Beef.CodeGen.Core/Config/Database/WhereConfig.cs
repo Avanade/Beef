@@ -8,8 +8,10 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure where statement configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("Where", Title = "The **Where** statement is used to define additional filtering.", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("Where", Title = "'Where' object (database-driven)", 
+        Description = "The `Where` object defines the where `Statement` for a stored procedure.", 
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class WhereConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
         /// <summary>

@@ -5,7 +5,7 @@ using Beef.CodeGen.DbModels;
 namespace Beef.CodeGen.Config.Database
 {
     /// <summary>
-    /// Represents the column configuration.
+    /// Represents the settable column configuration.
     /// </summary>
     public class SettableColumnConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {

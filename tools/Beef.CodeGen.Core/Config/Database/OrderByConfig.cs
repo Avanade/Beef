@@ -9,8 +9,10 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the stored procedure order-by configuration.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    [ClassSchema("OrderBy", Title = "The **OrderBy** is used to define the query order", Description = "", Markdown = "")]
-    [CategorySchema("Key", Title = "Provides the **key** configuration.")]
+    [ClassSchema("OrderBy", Title = "'OrderBy' object (database-driven)", 
+        Description = "The `OrderBy` objected defines the query order.",
+        Markdown = "")]
+    [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class OrderByConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
         #region Key
@@ -19,7 +21,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the name of the column to order by.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Column` to order by; used to infer characteristics.", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `Column` to order by.", IsMandatory = true, IsImportant = true)]
         public string? Name { get; set; }
 
         /// <summary>
