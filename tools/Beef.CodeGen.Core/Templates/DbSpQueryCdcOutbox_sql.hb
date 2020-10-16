@@ -27,8 +27,8 @@ BEGIN
     -- Where the batch size is 0 then no-op; this is used when closing down the service - invoked to mark the batch complete but _not_ get a new one.
     IF (@MaxBatchSize = 0) 
     BEGIN
-	    COMMIT TRANSACTION
-	    RETURN 0;
+	  COMMIT TRANSACTION
+	  RETURN 0;
     END
 
     -- Declare required variables.
@@ -59,43 +59,43 @@ BEGIN
         WHERE [o].[HasBeenCompleted] = 0 
         ORDER BY [o].[OutboxEnvelopeId]
 
-	    -- Where a batch is found then return
-	    IF @existingBatchId IS NOT NULL
-	    BEGIN
-		    -- Get the batch information from the table as this forms our first result set.
-		    SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
+      -- Where a batch is found then return
+	  IF @existingBatchId IS NOT NULL
+	  BEGIN
+		-- Get the batch information from the table as this forms our first result set.
+		SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
 
-		    -- Mark the flag to include the first item in the batch too.
-		    SET @includeMin = 1
-	    END
+		-- Mark the flag to include the first item in the batch too.
+		SET @includeMin = 1
+	  END
     END
 
     -- Where null then there isnt an existing batch, so we need to get these numbers.
     IF @min{{Name}}Lsn IS NULL 
     BEGIN
-	    -- Get them from the last batch generated.
-	    SELECT TOP 1
-            @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#ifne Joins.Count 0}},{{/ifne}}
+	  -- Get them from the last batch generated.
+	  SELECT TOP 1
+          @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#ifne Joins.Count 0}},{{/ifne}}
 {{#each CdcJoins}}
-            @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#unless @last}},{{/unless}}
+          @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#unless @last}},{{/unless}}
 {{/each}}
-	      FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
-		  ORDER BY [o].[OutBoxEnvelopeId] DESC
+	    FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
+		ORDER BY [o].[OutBoxEnvelopeId] DESC
 
-	    -- Where they are still NULL then this is the first batch ever, get them from the transaciton log.
-	    IF @minAddressLsn IS NULL 
-	    BEGIN
-		    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
+	  -- Where they are still NULL then this is the first batch ever, get them from the transaciton log.
+	  IF @minAddressLsn IS NULL 
+	  BEGIN
+	    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
 {{#each CdcJoins}}
-		    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
+	    SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
 {{/each}}
 
-		    -- Also include the first item here, because it should be in this batch.
-		    SET @includeMin = 1
-	    END
+	    -- Also include the first item here, because it should be in this batch.
+	    SET @includeMin = 1
+	  END
 
-	    -- Get the current max LSN from the transaction log
-	    SET @maxlsn = sys.fn_cdc_get_max_lsn()  
+	  -- Get the current max LSN from the transaction log
+	  SET @maxlsn = sys.fn_cdc_get_max_lsn()  
     END
 
     -- Do not go larger than the max batch size; put into a temp table so we can aggregate it later.
@@ -145,38 +145,38 @@ BEGIN
     -- Where there are changes we can make a batch, otherwise we just need to return the empty results.
     IF EXISTS (SELECT TOP 1 * from #changes)
     BEGIN
-	    -- If we need to create a new batch coz we arent returning an old one.
-	    IF ( @ExistingBatchId   IS NULL)
-	    BEGIN
-		    DECLARE @MinBatchLSN BINARY(10)
-		    DECLARE @MaxBatchLSN BINARY(10)
+	  -- If we need to create a new batch coz we arent returning an old one.
+	  IF ( @ExistingBatchId   IS NULL)
+	  BEGIN
+	    DECLARE @MinBatchLSN BINARY(10)
+	    DECLARE @MaxBatchLSN BINARY(10)
 
-		    -- Figure out the min and MAX LSN in this batch.
-		    SELECT @MinBatchLSN = MIN( start_lsn), @MaxBatchLSN = MAX( start_lsn)
-		      FROM #changes
+	    -- Figure out the min and MAX LSN in this batch.
+	    SELECT @MinBatchLSN = MIN( start_lsn), @MaxBatchLSN = MAX( start_lsn)
+	      FROM #changes
 
-		    -- Create the batch record in the table.
-		    INSERT INTO [{{CdcSchema}}].[{{CdcEnvelope}}] (
-			  [CreatedDate], 
-              [FirstProcessedLSN],
-              [LastProcessedLSN],
-              [HasBeenCompleted]
-            ) 
-			VALUES (
-			  GETUTCDATE(),
-              @MinBatchLSN,
-              @MaxBatchLSN,
-              0
-            )
+	    -- Create the batch record in the table.
+	    INSERT INTO [{{CdcSchema}}].[{{CdcEnvelope}}] (
+		  [CreatedDate], 
+          [FirstProcessedLSN],
+          [LastProcessedLSN],
+          [HasBeenCompleted]
+        ) 
+		VALUES (
+		  GETUTCDATE(),
+          @MinBatchLSN,
+          @MaxBatchLSN,
+          0
+        )
 
-		    -- Return as the first result set. If we arent making a new batch then we already returned it.
-		    SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] WHERE [OutboxEnvelopeId] = @@IDENTITY
-	    END
+	    -- Return as the first result set. If we arent making a new batch then we already returned it.
+	    SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] WHERE [OutboxEnvelopeId] = @@IDENTITY
+	  END
     END
     ELSE
     BEGIN
-	    -- There are no changes so just return an empty result set.
-	    SELECT TOP 0 * FROM [{{CdcSchema}}].[{{CdcEnvelope}}]
+	  -- There are no changes so just return an empty result set.
+	  SELECT TOP 0 * FROM [{{CdcSchema}}].[{{CdcEnvelope}}]
     END
 
     -- Return the changes that we have.
