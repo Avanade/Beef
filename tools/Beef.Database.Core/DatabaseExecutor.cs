@@ -46,6 +46,11 @@ namespace Beef.Database.Core
         public DatabaseExecutorCommand Command { get; private set; }
 
         /// <summary>
+        /// Gets or sets the support commands (<see cref="DatabaseExecutorCommand"/>).
+        /// </summary>
+        public DatabaseExecutorCommand SupportedCommands { get; set; } = DatabaseExecutorCommand.All;
+
+        /// <summary>
         /// Gets the connection string.
         /// </summary>
         public string ConnectionString { get; private set; }
@@ -196,7 +201,7 @@ namespace Beef.Database.Core
                         return false;
                 }
 
-                if (_args.Command.HasFlag(DatabaseExecutorCommand.Create))
+                if (_args.Command.HasFlag(DatabaseExecutorCommand.Create) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Create))
                 {
                     if (ls == null)
                         ls = new LoggerSink(_logger);
@@ -208,7 +213,7 @@ namespace Beef.Database.Core
                         return false;
                 }
 
-                if (_args.Command.HasFlag(DatabaseExecutorCommand.Migrate))
+                if (_args.Command.HasFlag(DatabaseExecutorCommand.Migrate) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Migrate))
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
@@ -237,7 +242,7 @@ namespace Beef.Database.Core
                     }
                 }
 
-                if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen))
+                if (_args.Command.HasFlag(DatabaseExecutorCommand.CodeGen) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.CodeGen))
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
@@ -254,7 +259,7 @@ namespace Beef.Database.Core
                     }
                 }
 
-                if (_args.Command.HasFlag(DatabaseExecutorCommand.Schema))
+                if (_args.Command.HasFlag(DatabaseExecutorCommand.Schema) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Schema))
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
@@ -277,7 +282,7 @@ namespace Beef.Database.Core
                         return false;
                 }
 
-                if (_args.Command.HasFlag(DatabaseExecutorCommand.Data))
+                if (_args.Command.HasFlag(DatabaseExecutorCommand.Data) && _args.SupportedCommands.HasFlag(DatabaseExecutorCommand.Data))
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));

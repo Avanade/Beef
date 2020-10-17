@@ -32,6 +32,7 @@ namespace Beef.Database.Core
         private readonly CommandOption _outputOpt;
         private readonly CommandOption _paramsOpt;
         private readonly CommandOption _schemaOrder;
+        private readonly CommandOption<int> _supportedOpt;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -77,6 +78,7 @@ namespace Beef.Database.Core
                 .Accepts(v => v.Use(new ParamsValidator()));
 
             _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
+            _supportedOpt = App.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -157,7 +159,7 @@ namespace Beef.Database.Core
 
             WriteHeader(args);
 
-            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args };
+            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args, SupportedCommands = _supportedOpt.HasValue() ? (DatabaseExecutorCommand)_supportedOpt.ParsedValue : DatabaseExecutorCommand.All };
             if (_schemaOrder.HasValue())
                 dea.SchemaOrder.AddRange(_schemaOrder.Values);
 

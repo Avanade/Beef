@@ -7,11 +7,11 @@
     </QueryJoin>
   </Query>
 
-  <Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
+  <!--<Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
     <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Cdc="true">
       <QueryJoinOn Name="PersonId" />
     </QueryJoin>
-  </Query>
+  </Query>-->
   
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
