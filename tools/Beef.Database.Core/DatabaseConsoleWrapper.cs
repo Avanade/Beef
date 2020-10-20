@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen;
 using McMaster.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Beef.Database.Core
         /// Gets the command line template.
         /// </summary>
         public static string CommandLineTemplate { get; set; }
-            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{Company}}.{{AppName}}.Database.xml -s {{Script}} -o {{OutDir}} -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "{{Command}} \"{{ConnectionString}}\" {{Assembly}} -c {{ConfigFile}} -s {{Script}} -o {{OutDir}} -su {{Supported}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets the command line assembly portion template.
@@ -166,9 +167,18 @@ namespace Beef.Database.Core
             var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
             var cr = app.Option("-createref|--scriptnew-create-ref-table", "ScriptNew: use create reference data '[schema.]table' template.", CommandOptionType.SingleValue);
             var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
+            var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
 
             app.OnExecuteAsync(async (_) =>
             {
+                if (x2y.HasValue())
+                {
+                    if (cmd.ParsedValue != DatabaseExecutorCommand.CodeGen)
+                        throw new CommandParsingException(app, $"Command '{cmd.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
+
+                    return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName)).ConfigureAwait(false);
+                }
+
                 var sb = new StringBuilder();
                 if (eo.HasValue())
                     sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, Assembly.GetEntryAssembly()?.FullName!));
@@ -222,6 +232,7 @@ namespace Beef.Database.Core
         private string ReplaceMoustache(string text, string command, string connectionString, string assembly)
         {
             text = text.Replace("{{Command}}", command, StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{ConfigFile}}", CodeGen.CodeGenFileManager.GetConfigFilename(CodeGen.CommandType.Database, Company, AppName), StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{ConnectionString}}", connectionString, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Assembly}}", assembly, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Company}}", Company, StringComparison.OrdinalIgnoreCase);

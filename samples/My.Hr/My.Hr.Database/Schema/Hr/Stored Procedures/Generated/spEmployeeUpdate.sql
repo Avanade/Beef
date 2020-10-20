@@ -18,7 +18,7 @@ CREATE PROCEDURE [Hr].[spEmployeeUpdate]
 AS
 BEGIN
   /*
-   * This is automatically generated; any changes will be lost. 
+   * This is automatically generated; any changes will be lost.
    */
 
   SET NOCOUNT ON;
@@ -47,18 +47,18 @@ BEGIN
 
     -- Update the record.
     UPDATE [e] SET
-      [e].[Email] = @Email,
-      [e].[FirstName] = @FirstName,
-      [e].[LastName] = @LastName,
-      [e].[GenderCode] = @GenderCode,
-      [e].[Birthday] = @Birthday,
-      [e].[StartDate] = @StartDate,
-      [e].[TerminationDate] = @TerminationDate,
-      [e].[TerminationReasonCode] = @TerminationReasonCode,
-      [e].[PhoneNo] = @PhoneNo,
-      [e].[AddressJson] = @AddressJson,
-      [e].[UpdatedBy] = @UpdatedBy,
-      [e].[UpdatedDate] = @UpdatedDate
+        [e].[Email] = @Email,
+        [e].[FirstName] = @FirstName,
+        [e].[LastName] = @LastName,
+        [e].[GenderCode] = @GenderCode,
+        [e].[Birthday] = @Birthday,
+        [e].[StartDate] = @StartDate,
+        [e].[TerminationDate] = @TerminationDate,
+        [e].[TerminationReasonCode] = @TerminationReasonCode,
+        [e].[PhoneNo] = @PhoneNo,
+        [e].[AddressJson] = @AddressJson,
+        [e].[UpdatedBy] = @UpdatedBy,
+        [e].[UpdatedDate] = @UpdatedDate
       FROM [Hr].[Employee] AS [e]
       WHERE [e].[EmployeeId] = @EmployeeId
 
@@ -75,7 +75,7 @@ BEGIN
 
     THROW;
   END CATCH
-  
+
   -- Reselect record.
   IF @ReselectRecord = 1
   BEGIN
