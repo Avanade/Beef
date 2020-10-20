@@ -26,7 +26,7 @@ The key industralisation goals are:
 As a result of the _Beef_ [Architecture](#Architecture), supporting [Framework](#Framework) and included [Code Generation](#Code-generation) capabilities, enterprise-grade APIs can be developed in a matter of hours, not days, in a standardised and consistent manner.
 
 The APIs created will have the following capabilities out-of-the-box with limited developer effort, so the developer can focus on the key business value:
-- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICloneable`](./src/Beef.Core/Entities/ICloneable.cs), [`ICopyFrom`](./src/Beef.Core/Entities/ICopyFrom.cs), [`ICleanUp`](./src/Beef.Core/Entities/ICleanUp.cs), [`IUniueKey`](./src/Beef.Core/Entities/IUniqueKey.cs), etc.
+- Rich [Entity](./docs/Layer-Entity.md) (DTO) functionality including [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged), [`IEditableObject`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.ieditableobject), [`IEquatable`](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1), [`ICloneable`](./src/Beef.Core/Entities/ICloneable.cs), [`ICopyFrom`](./src/Beef.Core/Entities/ICopyFrom.cs), [`ICleanUp`](./src/Beef.Core/Entities/ICleanUp.cs), [`IUniqueKey`](./src/Beef.Core/Entities/IUniqueKey.cs), etc.
 - Rich [Reference data](./docs/Reference-Data.md) capabilities, including caching, optimised serialisation, and enriched API endpoints.
 - Rich [Validation](./docs/Beef-Validation.md) capability to simplify and ensure data integrity and consistency.
 - CRUD (Create, Read, Update and Delete) for Database ([Stored procedures](./src/Beef.Data.Database/README.md) and [Entity Framework](./src/Beef.Data.EntityFrameworkCore/README.md)), [Cosmos DB](./src/Beef.Data.Cosmos/README.md) and [OData](./src/Beef.Data.OData/README.md) in a standardised manner. 
@@ -239,7 +239,7 @@ One of the easiest ways to contribute is to participate in discussions on GitHub
 
 ### Coding guidelines
 
-The most general guideline is that we use all the VS default settings in terms of code formatting; if it doubt, follow the coding convention of the existing code base.
+The most general guideline is that we use all the VS default settings in terms of code formatting; if in doubt, follow the coding convention of the existing code base.
 1. Use four spaces of indentation (no tabs).
 2. Use `_camelCase` for private fields.
 3. Avoid `this.` unless absolutely necessary.
