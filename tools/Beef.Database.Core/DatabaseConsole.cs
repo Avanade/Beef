@@ -178,18 +178,27 @@ namespace Beef.Database.Core
         /// </summary>
         private void WriteHeader(CodeGenExecutorArgs args)
         {
+            WriteMasthead(_logger);
+            _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");
+            _logger.LogInformation($"  ConnectionString = {_connectionStringArg.Value}");
+            LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
+        }
+
+        /// <summary>
+        /// Writes the mast head information.
+        /// </summary>
+        public static void WriteMasthead(ILogger? logger = null)
+        {
+            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
+
             // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Database%20Tool%0A
-            _logger.LogInformation(@"
+            logger.LogInformation(@"
 ╔╗ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌┬┐┌─┐┌┐ ┌─┐┌─┐┌─┐  ╔╦╗┌─┐┌─┐┬  
 ╠╩╗├┤ ├┤ ├┤    ║║├─┤ │ ├─┤├┴┐├─┤└─┐├┤    ║ │ ││ ││  
 ╚═╝└─┘└─┘└    ═╩╝┴ ┴ ┴ ┴ ┴└─┘┴ ┴└─┘└─┘   ╩ └─┘└─┘┴─┘
 ");
-
-            _logger.LogInformation(App.Description);
-            _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"  Command = {_commandArg.ParsedValue}");
-            _logger.LogInformation($"  ConnectionString = {_connectionStringArg.Value}");
-            LogCodeGenExecutionArgs(args, !(_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen)));
+            logger.LogInformation("Business Entity Execution Framework (Beef) Database Tooling.");
+            logger.LogInformation(string.Empty);
         }
 
         /// <summary>

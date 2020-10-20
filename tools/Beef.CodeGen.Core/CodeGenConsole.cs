@@ -226,8 +226,6 @@ namespace Beef.CodeGen
         private void WriteHeader(CodeGenExecutorArgs args)
         {
             WriteMasthead(_logger);
-            _logger.LogInformation(App.Description);
-            _logger.LogInformation(string.Empty);
             LogCodeGenExecutionArgs(args);
             _logger.LogInformation(string.Empty);
         }
@@ -235,15 +233,18 @@ namespace Beef.CodeGen
         /// <summary>
         /// Writes the mast head information.
         /// </summary>
-        /// <param name="logger">The logger.</param>
-        public static void WriteMasthead(ILogger logger)
+        public static void WriteMasthead(ILogger? logger = null)
         {
+            logger ??= new ColoredConsoleLogger(nameof(CodeGenConsole));
+
             // http://www.patorjk.com/software/taag/#p=display&f=Calvin%20S&t=Beef%20Code-Gen%20Tool%0A
             logger.LogInformation(@"
 ╔╗ ┌─┐┌─┐┌─┐  ╔═╗┌─┐┌┬┐┌─┐  ╔═╗┌─┐┌┐┌  ╔╦╗┌─┐┌─┐┬  
 ╠╩╗├┤ ├┤ ├┤   ║  │ │ ││├┤───║ ╦├┤ │││   ║ │ ││ ││  
 ╚═╝└─┘└─┘└    ╚═╝└─┘─┴┘└─┘  ╚═╝└─┘┘└┘   ╩ └─┘└─┘┴─┘
 ");
+            logger.LogInformation("Business Entity Execution Framework (Beef) Code Generator.");
+            logger.LogInformation(string.Empty);
         }
 
         /// <summary>

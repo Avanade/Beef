@@ -176,6 +176,7 @@ namespace Beef.Database.Core
                     if (cmd.ParsedValue != DatabaseExecutorCommand.CodeGen)
                         throw new CommandParsingException(app, $"Command '{cmd.ParsedValue}' is not compatible with --xmlToYaml; the command must be '{DatabaseExecutorCommand.CodeGen}'.");
 
+                    DatabaseConsole.WriteMasthead();
                     return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName)).ConfigureAwait(false);
                 }
 

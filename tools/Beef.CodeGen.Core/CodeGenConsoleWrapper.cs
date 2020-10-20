@@ -204,6 +204,7 @@ namespace Beef.CodeGen
                     if (ct == CommandType.All)
                         throw new CommandParsingException(app, "Command 'All' is not compatible with --xmlToYaml; the command must be more specific when converting XML configuration to YAML.");
 
+                    CodeGenConsole.WriteMasthead();
                     return await CodeGenFileManager.ConvertXmlToYamlAsync(ct, cfn ?? CodeGenFileManager.GetConfigFilename(ct, Company, AppName)).ConfigureAwait(false);
                 }
 

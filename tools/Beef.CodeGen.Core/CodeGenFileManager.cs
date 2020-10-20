@@ -83,9 +83,6 @@ namespace Beef.CodeGen
         public static async Task<int> ConvertXmlToYamlAsync(CommandType type, string filename)
         {
             var logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
-            CodeGenConsole.WriteMasthead(logger);
-            logger.LogInformation("Business Entity Execution Framework (Beef) Code Generator.");
-            logger.LogInformation(string.Empty);
             logger.LogInformation($"Convert XML to YAML file configuration: {filename}");
             logger.LogInformation(string.Empty);
 
