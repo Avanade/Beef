@@ -17,6 +17,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
     [CategorySchema("Additional", Title = "Provides _additional ad-hoc_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
+    [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class StoredProcedureConfig : ConfigBase<CodeGenConfig, TableConfig>
     {
@@ -99,6 +100,28 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region Columns
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names to be included in the underlying generated output (further filters `Table.IncludeColumns`).
+        /// </summary>
+        [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).", IsImportant = true,
+            Description = "Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? IncludeColumns { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of `Column` names to be excluded from the underlying generated output (further filters `Table.ExcludeColumns`).
+        /// </summary>
+        [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).", IsImportant = true,
+            Description = "Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
+        public List<string>? ExcludeColumns { get; set; }
+
+        #endregion
+
         #region Collections
 
         /// <summary>
@@ -141,6 +164,16 @@ namespace Beef.CodeGen.Config.Database
         public List<ParameterConfig> ArgumentParameters => Parameters!.Where(x => !x.WhereOnly).ToList();
 
         /// <summary>
+        /// Gets the selected columns.
+        /// </summary>
+        public List<StoredProcedureColumnConfig> SelectedColumns => Parent!.CoreColumns.Where(x => IsSelectedColumn(x, false)).Select(c => { var cc = new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn }; cc.Prepare(Root!, this); return cc; }).ToList();
+
+        /// <summary>
+        /// Indicates whether the OrgUnitId column is included as a parameter.
+        /// </summary>
+        public bool HasOrgUnitIdParameter => ArgumentParameters.Any(x => x.Name == Parent!.ColumnNameOrgUnitId);
+
+        /// <summary>
         /// Gets the parameters defined as a collection.
         /// </summary>
         public List<ParameterConfig> CollectionParameters => Parameters!.Where(x => CompareValue(x.Collection, true)).ToList();
@@ -158,32 +191,32 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the settable columns.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumns { get; } = new List<SettableColumnConfig>();
+        public List<StoredProcedureColumnConfig> SettableColumns { get; } = new List<StoredProcedureColumnConfig>();
 
         /// <summary>
         /// Gets the settable columns for an insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsRowVersionColumn && !x.IsAudit) || (x.IsAudit && x.IsCreated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsInsert => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsRowVersionColumn && !x.IsAudit) || (x.IsAudit && x.IsCreated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for an update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for a delete.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsDelete => SettableColumns.Where(x => x.IsAudit && x.IsDeleted).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsDelete => SettableColumns.Where(x => x.IsAudit && x.IsDeleted).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-insert.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => !x.IsAudit || (x.IsAudit && x.IsCreated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsUpsertInsert => SettableColumns.Where(x => !x.IsAudit || (x.IsAudit && x.IsCreated)).ToList();
 
         /// <summary>
         /// Gets the settable columns for an upsert-update.
         /// </summary>
-        public List<SettableColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
+        public List<StoredProcedureColumnConfig> SettableColumnsUpsertUpdate => SettableColumns.Where(x => (!(x.DbColumn!.IsPrimaryKey && x.DbColumn.IsIdentity) && !x.IsTenantIdColumn && !x.IsAudit) || (x.IsAudit && x.IsUpdated)).ToList();
 
         /// <summary>
         /// Gets the primary merge on statements.
@@ -305,7 +338,8 @@ namespace Beef.CodeGen.Config.Database
                 case "Get":
                     foreach (var c in Parent!.PrimaryKeyColumns.AsEnumerable().Reverse())
                     {
-                        Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable, IsWhere = true });
+                        if (IsSelectedColumn(c, false))
+                            Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.DbColumn!.IsNullable, IsWhere = true });
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
@@ -322,12 +356,11 @@ namespace Beef.CodeGen.Config.Database
                         {
                             if (c.DbColumn!.IsPrimaryKey)
                                 Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = !c.DbColumn!.IsIdentity && c.DbColumn.IsNullable, Output = c.DbColumn.IsIdentity });
-                            else
+                            else if (IsSelectedColumn(c, true))
                                 Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn.IsNullable });
                         }
 
-                        if (!c.IsRowVersionColumn)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                        InsertSettableColumn(c);
                     }
 
                     break;
@@ -335,11 +368,10 @@ namespace Beef.CodeGen.Config.Database
                 case "Update":
                     foreach (var c in Parent!.Columns.Where(x => x.IsUpdateColumn && !x.IsIsDeletedColumn && !x.IsTenantIdColumn).Reverse())
                     {
-                        if (!c.IsTenantIdColumn)
+                        if (!c.IsTenantIdColumn && IsSelectedColumn(c, true))
                             Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
 
-                        if (!c.IsRowVersionColumn)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                        InsertSettableColumn(c);
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
@@ -350,11 +382,10 @@ namespace Beef.CodeGen.Config.Database
                     {
                         if (c.IsRowVersionColumn)
                             Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = true, IsWhere = false });
-                        else if (!c.IsTenantIdColumn)
+                        else if (!c.IsTenantIdColumn && IsSelectedColumn(c, true))
                             Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = c.IsAudit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey, Output = Type == "Create" && c.DbColumn.IsIdentity });
 
-                        if (!c.IsRowVersionColumn)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                        InsertSettableColumn(c);
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
@@ -370,7 +401,7 @@ namespace Beef.CodeGen.Config.Database
                         Parameters!.Insert(0, new ParameterConfig { Name = c.Name, Nullable = audit || c.DbColumn!.IsNullable, IsWhere = c.DbColumn!.IsPrimaryKey });
 
                         if (audit)
-                            SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
+                            InsertSettableColumn(c);
                     }
 
                     AddWhereOnlyParameters(bookEnd: false);
@@ -380,7 +411,7 @@ namespace Beef.CodeGen.Config.Database
                     foreach (var c in Parent!.Columns.Where(x => !(x == Parent.ColumnRowVersion || x == Parent.ColumnIsDeleted || x.DbColumn!.IsComputed)).Reverse())
                     {
                         var p = Parameters?.Where(x => (x.Column != null && c.Name == x.Column) || (x.Column == null && c.Name == x.Name)).SingleOrDefault();
-                        SettableColumns.Insert(0, new SettableColumnConfig { Name = c.Name, DbColumn = c.DbColumn, MergeValueSql = p?.ParameterName });
+                        SettableColumns.Insert(0, new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn, MergeValueSql = p?.ParameterName });
                     }
 
                     if (MergeOverrideIdentityColumns == null)
@@ -433,6 +464,20 @@ namespace Beef.CodeGen.Config.Database
                     AddWhereOnlyParameters(bookEnd: false);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Indicates whether the column is selcted (further column filtering applied).
+        /// </summary>
+        private bool IsSelectedColumn(TableColumnConfig c, bool mustIncludeAudit) => (mustIncludeAudit && c.IsAudit) || ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)));
+
+        /// <summary>
+        /// Insert as a settable column and further filter columns where appropriate.
+        /// </summary>
+        private void InsertSettableColumn(TableColumnConfig c)
+        {
+            if (!c.IsRowVersionColumn && IsSelectedColumn(c, true))
+                SettableColumns.Insert(0, new StoredProcedureColumnConfig { Name = c.Name, DbColumn = c.DbColumn });
         }
     }
 }

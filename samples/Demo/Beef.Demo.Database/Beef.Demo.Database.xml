@@ -15,7 +15,7 @@
   
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
-    <StoredProcedure Name="GetByArgs" Type="GetAll">
+    <StoredProcedure Name="GetByArgs" Type="GetAll" ExcludeColumns="Count">
       <Parameter Name="Name" IsNullable="true" Operator="LIKE" />
       <Parameter Name="MinCount" Operator="GE" Column="Count" />
       <Parameter Name="MaxCount" Operator="LE" Column="Count" IsNullable="true" />
@@ -24,6 +24,7 @@
       <Execute Statement="EXEC Demo.Before" Location="Before" />
       <Execute Statement="EXEC Demo.After" />
     </StoredProcedure>
+    <StoredProcedure Name="Update" Type="Update" ExcludeColumns="" />
   </Table>
   
   <!-- Reference data stored procedures -->

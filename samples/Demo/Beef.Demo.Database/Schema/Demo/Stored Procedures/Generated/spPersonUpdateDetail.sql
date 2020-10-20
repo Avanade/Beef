@@ -16,7 +16,7 @@ CREATE PROCEDURE [Demo].[spPersonUpdateDetail]
 AS
 BEGIN
   /*
-   * This is automatically generated; any changes will be lost. 
+   * This is automatically generated; any changes will be lost.
    */
 
   SET NOCOUNT ON;
@@ -45,16 +45,16 @@ BEGIN
 
     -- Update the record.
     UPDATE [p] SET
-      [p].[FirstName] = @FirstName,
-      [p].[LastName] = @LastName,
-      [p].[Birthday] = @Birthday,
-      [p].[GenderId] = @GenderId,
-      [p].[Street] = @Street,
-      [p].[City] = @City,
-      [p].[UpdatedBy] = @UpdatedBy,
-      [p].[UpdatedDate] = @UpdatedDate,
-      [p].[UniqueCode] = @UniqueCode,
-      [p].[EyeColorCode] = @EyeColorCode
+        [p].[FirstName] = @FirstName,
+        [p].[LastName] = @LastName,
+        [p].[Birthday] = @Birthday,
+        [p].[GenderId] = @GenderId,
+        [p].[Street] = @Street,
+        [p].[City] = @City,
+        [p].[UpdatedBy] = @UpdatedBy,
+        [p].[UpdatedDate] = @UpdatedDate,
+        [p].[UniqueCode] = @UniqueCode,
+        [p].[EyeColorCode] = @EyeColorCode
       FROM [Demo].[Person] AS [p]
       WHERE [p].[PersonId] = @PersonId
 
@@ -71,7 +71,7 @@ BEGIN
 
     THROW;
   END CATCH
-  
+
   -- Reselect record.
   IF @ReselectRecord = 1
   BEGIN

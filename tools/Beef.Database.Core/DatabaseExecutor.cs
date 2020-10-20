@@ -196,6 +196,7 @@ namespace Beef.Database.Core
                     ls = new LoggerSink(_logger);
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB DROP: Checking database existence and dropping where found...");
                     if (!await TimeExecutionAsync(() => { DropDatabase.For.SqlDatabase(_args.ConnectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
                         return false;
@@ -208,6 +209,7 @@ namespace Beef.Database.Core
 
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CREATE: Checking database existence and creating where not found...");
                     if (!await TimeExecutionAsync(() => { EnsureDatabase.For.SqlDatabase(_args.ConnectionString, ls); return Task.FromResult(true); }).ConfigureAwait(false))
                         return false;
@@ -217,6 +219,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB MIGRATE: Migrating the database...");
                     _logger.LogInformation($"Probing for embedded resources: {(string.Join(", ", GetNamespacesWithSuffix($"{MigrationsNamespace}.*.sql")))}");
 
@@ -246,6 +249,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB CODEGEN: Code-gen database objects...");
                     CodeGenConsole.LogCodeGenExecutionArgs(_args.CodeGenArgs!);
 
@@ -263,6 +267,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB SCHEMA: Drops and creates the database objects...");
 
                     if (_args.UseBeefDbo && !_args.SchemaOrder.Contains("dbo"))
@@ -276,6 +281,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB RESET: Resets database by dropping data from all tables...");
 
                     if (!await TimeExecutionAsync(() => DeleteAllAndResetAsync()).ConfigureAwait(false))
@@ -286,6 +292,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB DATA: Insert or merge the embedded YAML data...");
 
                     if (!await TimeExecutionAsync(() => InsertOrMergeYamlDataAsync()).ConfigureAwait(false))
@@ -296,6 +303,7 @@ namespace Beef.Database.Core
                 {
                     _logger.LogInformation(string.Empty);
                     _logger.LogInformation(new string('-', 80));
+                    _logger.LogInformation(string.Empty);
                     _logger.LogInformation("DB SCRIPTNEW: Creating a new SQL script from embedded template...");
 
                     if (!await TimeExecutionAsync(() => CreateScriptNewAsync()).ConfigureAwait(false))
@@ -533,21 +541,25 @@ namespace Beef.Database.Core
                     if (!_namespaces.Any(x => name.StartsWith(x + $".{DataNamespace}.", StringComparison.InvariantCulture) && name.EndsWith(".yaml", StringComparison.InvariantCulture)))
                         continue;
 
-                    _logger.LogInformation($"Parsing and executing: {name}");
+                    _logger.LogInformation("");
+                    _logger.LogInformation($"** Parsing and executing: {name}");
                     var sdm = SqlDataUpdater.ReadYaml(ass.GetManifestResourceStream(name)!);
                     await sdm.GenerateSqlAsync((a) =>
                     {
                         _logger.LogInformation("");
-                        _logger.LogInformation($"Executing: {a.OutputFileName} ->");
+                        _logger.LogInformation($"---- Executing {a.OutputFileName}:");
                         _logger.LogInformation(a.Content);
                         if (a.Content != null)
                         {
                             var rows = _db!.SqlStatement(a.Content).ScalarAsync<int>().GetAwaiter().GetResult();
                             _logger.LogInformation($"Result: {rows} rows affected.");
+                            _logger.LogInformation($"---- Executing {a.OutputFileName} complete.");
                         }
                     }).ConfigureAwait(false);
                 }
             }
+
+            _logger.LogInformation("");
 
             return true;
         }

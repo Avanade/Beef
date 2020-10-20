@@ -30,17 +30,17 @@ BEGIN
 
   -- Execute the primary select query.
   SELECT
-    [t].[TableId],
-    [t].[Name],
-    [t].[Count],
-    [t].[Amount],
-    [t].[GenderCode],
-    [t].[OrgUnitId],
-    [t].[RowVersion],
-    [t].[CreatedBy],
-    [t].[CreatedDate],
-    [t].[UpdatedBy],
-    [t].[UpdatedDate]
+      [t].[TableId],
+      [t].[Name],
+      [t].[Count],
+      [t].[Amount],
+      [t].[GenderCode],
+      [t].[OrgUnitId],
+      [t].[RowVersion],
+      [t].[CreatedBy],
+      [t].[CreatedDate],
+      [t].[UpdatedBy],
+      [t].[UpdatedDate]
     FROM [Test].[Table] AS [t] WITH (NOLOCK)
       WHERE [t].[TableId] = @TableId
         AND [t].[TenantId] = @TenantId

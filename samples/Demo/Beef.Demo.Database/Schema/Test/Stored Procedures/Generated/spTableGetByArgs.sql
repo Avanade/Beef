@@ -21,7 +21,6 @@ BEGIN
   SELECT
       [t].[TableId],
       [t].[Name],
-      [t].[Count],
       [t].[Amount],
       [t].[GenderCode],
       [t].[OrgUnitId],

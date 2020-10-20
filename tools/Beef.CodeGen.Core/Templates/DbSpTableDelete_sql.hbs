@@ -58,9 +58,9 @@ BEGIN
   {{/if}}
     -- Update the IsDeleted bit (logically delete).
     UPDATE [{{Parent.Alias}}] SET
-      {{Parent.ColumnIsDeleted.QualifiedName}} = 1{{#ifne SettableColumnsUpdate.Count 0}},{{/ifne}}
+        {{Parent.ColumnIsDeleted.QualifiedName}} = 1{{#ifne SettableColumnsUpdate.Count 0}},{{/ifne}}
   {{#each SettableColumnsUpdate}}
-      {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
+        {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
   {{/each}}
       FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
   {{#each Where}}

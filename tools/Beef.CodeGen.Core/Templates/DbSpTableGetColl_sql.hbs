@@ -46,7 +46,7 @@ BEGIN
 {{/each}}
   -- Select the requested data.
   SELECT
-{{#each Parent.CoreColumns}}
+{{#each SelectedColumns}}
       {{QualifiedName}}{{#unless @last}},{{/unless}}
 {{/each}}
 {{#if IntoTempTable}}

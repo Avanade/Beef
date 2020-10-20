@@ -13,7 +13,7 @@ CREATE PROCEDURE [Ref].[spGenderUpdate]
 AS
 BEGIN
   /*
-   * This is automatically generated; any changes will be lost. 
+   * This is automatically generated; any changes will be lost.
    */
 
   SET NOCOUNT ON;
@@ -42,14 +42,14 @@ BEGIN
 
     -- Update the record.
     UPDATE [g] SET
-      [g].[Code] = @Code,
-      [g].[Text] = @Text,
-      [g].[IsActive] = @IsActive,
-      [g].[SortOrder] = @SortOrder,
-      [g].[UpdatedBy] = @UpdatedBy,
-      [g].[UpdatedDate] = @UpdatedDate,
-      [g].[AlternateName] = @AlternateName,
-      [g].[TripCode] = @TripCode
+        [g].[Code] = @Code,
+        [g].[Text] = @Text,
+        [g].[IsActive] = @IsActive,
+        [g].[SortOrder] = @SortOrder,
+        [g].[UpdatedBy] = @UpdatedBy,
+        [g].[UpdatedDate] = @UpdatedDate,
+        [g].[AlternateName] = @AlternateName,
+        [g].[TripCode] = @TripCode
       FROM [Ref].[Gender] AS [g]
       WHERE [g].[GenderId] = @GenderId
 
@@ -63,7 +63,7 @@ BEGIN
 
     THROW;
   END CATCH
-  
+
   -- Reselect record.
   IF @ReselectRecord = 1
   BEGIN

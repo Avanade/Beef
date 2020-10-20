@@ -12,7 +12,7 @@ CREATE PROCEDURE [Test].[spTableUpdate]
 AS
 BEGIN
   /*
-   * This is automatically generated; any changes will be lost. 
+   * This is automatically generated; any changes will be lost.
    */
 
   SET NOCOUNT ON;
@@ -58,13 +58,13 @@ BEGIN
 
     -- Update the record.
     UPDATE [t] SET
-      [t].[Name] = @Name,
-      [t].[Count] = @Count,
-      [t].[Amount] = @Amount,
-      [t].[GenderCode] = @GenderCode,
-      [t].[OrgUnitId] = @OrgUnitId,
-      [t].[UpdatedBy] = @UpdatedBy,
-      [t].[UpdatedDate] = @UpdatedDate
+        [t].[Name] = @Name,
+        [t].[Count] = @Count,
+        [t].[Amount] = @Amount,
+        [t].[GenderCode] = @GenderCode,
+        [t].[OrgUnitId] = @OrgUnitId,
+        [t].[UpdatedBy] = @UpdatedBy,
+        [t].[UpdatedDate] = @UpdatedDate
       FROM [Test].[Table] AS [t]
       WHERE [t].[TableId] = @TableId
         AND [t].[TenantId] = @TenantId
@@ -80,7 +80,7 @@ BEGIN
 
     THROW;
   END CATCH
-  
+
   -- Reselect record.
   IF @ReselectRecord = 1
   BEGIN

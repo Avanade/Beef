@@ -20,9 +20,9 @@ BEGIN
 
     -- Update the IsDeleted bit (logically delete).
     UPDATE [p] SET
-      [p].[IsDeleted] = 1,
-      [p].[UpdatedBy] = @UpdatedBy,
-      [p].[UpdatedDate] = @UpdatedDate
+        [p].[IsDeleted] = 1,
+        [p].[UpdatedBy] = @UpdatedBy,
+        [p].[UpdatedDate] = @UpdatedDate
       FROM [Demo].[Person2] AS [p]
       WHERE [p].[PersonId] = @PersonId
         AND ([p].[IsDeleted] IS NULL OR [p].[IsDeleted] = 0)

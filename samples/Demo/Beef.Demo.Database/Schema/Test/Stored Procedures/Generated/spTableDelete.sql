@@ -37,9 +37,9 @@ BEGIN
 
     -- Update the IsDeleted bit (logically delete).
     UPDATE [t] SET
-      [t].[IsDeleted] = 1,
-      [t].[UpdatedBy] = @UpdatedBy,
-      [t].[UpdatedDate] = @UpdatedDate
+        [t].[IsDeleted] = 1,
+        [t].[UpdatedBy] = @UpdatedBy,
+        [t].[UpdatedDate] = @UpdatedDate
       FROM [Test].[Table] AS [t]
       WHERE [t].[TableId] = @TableId
         AND [t].[TenantId] = @TenantId

@@ -45,8 +45,8 @@ BEGIN
 {{/each}}
   -- Execute the primary select query.
   SELECT
-{{#each Parent.CoreColumns}}
-    {{QualifiedName}}{{#unless @last}},{{/unless}}
+{{#each SelectedColumns}}
+      {{QualifiedName}}{{#unless @last}},{{/unless}}
 {{/each}}
     FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]{{#ifval WithHints}} WITH ({{WithHints}}){{/ifval}}
 {{#each Where}}

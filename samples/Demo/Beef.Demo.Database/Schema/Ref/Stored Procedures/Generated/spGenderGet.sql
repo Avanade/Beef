@@ -10,18 +10,18 @@ BEGIN
 
   -- Execute the primary select query.
   SELECT
-    [g].[GenderId],
-    [g].[Code],
-    [g].[Text],
-    [g].[IsActive],
-    [g].[SortOrder],
-    [g].[RowVersion],
-    [g].[CreatedBy],
-    [g].[CreatedDate],
-    [g].[UpdatedBy],
-    [g].[UpdatedDate],
-    [g].[AlternateName],
-    [g].[TripCode]
+      [g].[GenderId],
+      [g].[Code],
+      [g].[Text],
+      [g].[IsActive],
+      [g].[SortOrder],
+      [g].[RowVersion],
+      [g].[CreatedBy],
+      [g].[CreatedDate],
+      [g].[UpdatedBy],
+      [g].[UpdatedDate],
+      [g].[AlternateName],
+      [g].[TripCode]
     FROM [Ref].[Gender] AS [g]
       WHERE [g].[GenderId] = @GenderId
 END

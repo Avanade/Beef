@@ -7,7 +7,7 @@ CREATE PROCEDURE [{{Parent.Schema}}].[sp{{Parent.Name}}{{Name}}]
 AS
 BEGIN
   /*
-   * This is automatically generated; any changes will be lost. 
+   * This is automatically generated; any changes will be lost.
    */
 
   SET NOCOUNT ON;
@@ -24,17 +24,17 @@ BEGIN
 {{/ifval}}
 {{#ifval Permission}}
     -- Check user has permission.
-    EXEC {{Root.CheckUserPermissionSql}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'{{ifval Parent.ColumnOrgUnitId}}, @{{Parent.ColumnOrgUnitId.Name}}{{/ifval}}
+    EXEC {{Root.CheckUserPermissionSql}} {{#ifval Parent.ColumnTenantId}}{{Parent.ColumnTenantId.ParameterName}}{{else}}NULL{{/ifval}}, NULL, '{{Permission}}'{{#if HasOrgUnitIdParameter}}, @{{Parent.ColumnOrgUnitId.Name}}{{/if}}
 
 {{/ifval}}
 {{#if Parent.HasAuditUpdated}}
     -- Set audit details.
-  {{#ifval Parent.ColumnUpdatedDate}}
+{{#ifval Parent.ColumnUpdatedDate}}
     EXEC @{{Parent.ColumnUpdatedDate.Name}} = fnGetTimestamp @{{Parent.ColumnUpdatedDate.Name}}
-  {{/ifval}}
-  {{#ifval Parent.ColumnUpdatedBy}}
+{{/ifval}}
+{{#ifval Parent.ColumnUpdatedBy}}
     EXEC @{{Parent.ColumnUpdatedBy.Name}} = fnGetUsername @{{Parent.ColumnUpdatedBy.Name}}
-  {{/ifval}}
+{{/ifval}}
 {{/if}}
 
     -- Check exists.
@@ -63,29 +63,29 @@ BEGIN
       EXEC spThrowConcurrencyException
     END
 {{#each ExecuteBefore}}
-  {{#if @first}}
+{{#if @first}}
     -- Execute additional (pre) statements.
-  {{/if}}
-    {{{Statement}}}
-  {{#if @last}}
+{{/if}}
+{{{Statement}}}
+{{#if @last}}
 
-  {{/if}}
+{{/if}}
 {{/each}}
 
     -- Update the record.
     UPDATE [{{Parent.Alias}}] SET
 {{#each SettableColumnsUpdate}}
-      {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
+        {{QualifiedName}} = {{ParameterName}}{{#unless @last}},{{/unless}}
 {{/each}}
       FROM {{Parent.QualifiedName}} AS [{{Parent.Alias}}]
 {{#each Where}}
       {{#if @first}}WHERE{{else}}  AND{{/if}} {{{Statement}}}
 {{/each}}
 {{#each ExecuteAfter}}
-  {{#if @first}}
+{{#if @first}}
 
     -- Execute additional statements.
-  {{/if}}
+{{/if}}
     {{{Statement}}}
 {{/each}}
 
@@ -99,14 +99,14 @@ BEGIN
 
     THROW;
   END CATCH
-  
+
   -- Reselect record.
   IF @ReselectRecord = 1
   BEGIN
-  {{#ifval ReselectStatement}}
+{{#ifval ReselectStatement}}
     {{{ReselectStatement}}}
-  {{else}}
+{{else}}
     EXEC [{{Parent.Schema}}].[sp{{Parent.Name}}Get] {{#each Parent.PrimaryKeyColumns}}@{{Name}}{{#unless @last}}, {{/unless}}{{/each}}
-  {{/ifval}}
+{{/ifval}}
   END
 END
