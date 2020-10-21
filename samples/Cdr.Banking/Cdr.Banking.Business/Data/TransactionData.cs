@@ -1,6 +1,7 @@
 ﻿using Beef;
 using Beef.Data.Cosmos;
 using Cdr.Banking.Common.Entities;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Cdr.Banking.Business.Data

@@ -84,7 +84,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Controllers
         [ProducesResponseType((int)HttpStatusCode.{{WebApiAlternateStatus}})]
     {{/ifne}}
   {{/if}}
-        public IActionResult {{Name}}({{#each PagingLessParameters}}{{#unless @first}}, {{/unless}}{{#ifeq WebApiFrom 'FromEntityProperties'}}{{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{#ifne ArgumentName JsonName}}[FromQuery(Name = "{{JsonName}}")] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/each}}{{else}}{{#ifne WebApiFrom 'FromQuery'}}[{{WebApiFrom}}] {{/ifne}}{{WebApiParameterType}} {{ArgumentName}}{{#ifval Default}} = {{Default}}{{/ifval}}{{/ifeq}}{{/each}})
+        public IActionResult {{Name}}({{#each PagingLessParameters}}{{#unless @first}}, {{/unless}}{{#ifeq WebApiFrom 'FromEntityProperties'}}{{#each RelatedEntity.Properties}}{{#unless @first}}, {{/unless}}{{#ifne ArgumentName JsonName}}[FromQuery(Name = "{{JsonName}}")] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/each}}{{else}}{{#ifne WebApiFrom 'FromQuery'}}[{{WebApiFrom}}] {{/ifne}}{{{WebApiParameterType}}} {{ArgumentName}} = {{#ifval Default}}{{Default}}{{else}}default{{/ifval}}{{/ifeq}}{{/each}})
         {
   {{#each Parameters}}
     {{#ifeq WebApiFrom 'FromEntityProperties'}}
