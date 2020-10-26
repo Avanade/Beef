@@ -169,9 +169,10 @@ namespace Beef.Demo.Common.Agents
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, WebApiRequestOptions? requestOptions = null);
+        Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, List<string>? names, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -424,11 +425,12 @@ namespace Beef.Demo.Common.Agents
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, WebApiRequestOptions? requestOptions = null) =>
+        public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, List<string>? names, WebApiRequestOptions? requestOptions = null) =>
             GetAsync<Person?>("api/v1/persons/null", requestOptions: requestOptions,
-                args: new WebApiArg[] { new WebApiArg<string?>("name", name) });
+                args: new WebApiArg[] { new WebApiArg<string?>("name", name), new WebApiArg<List<string>?>("names", names) });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.

@@ -7,6 +7,9 @@ Represents the **NuGet** versions.
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
 - *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
 
+## v4.1.6
+- *Fixed:* Issue [79](https://github.com/Avanade/Beef/issues/79) fixed. Integrated suggested Pull Request [78](https://github.com/Avanade/Beef/pull/78) with minor rollback of default logic. Removed the HTML escaping for the generated C# generic types.
+
 ## v4.1.5
 - *Fixed:* Issue 74 also resolved for Reference Data code-generation.
 

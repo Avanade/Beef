@@ -45,7 +45,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ParameterType}} {{ArgumentName}}{{/each}});
+        {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}});
 {{/each}}
     }
 }

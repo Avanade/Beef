@@ -1034,7 +1034,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
-                .Run(a => a.GetNullAsync("blah"));
+                .Run(a => a.GetNullAsync("blah", null));
         }
 
         [Test, TestSetUp]

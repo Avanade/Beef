@@ -81,7 +81,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ParameterType}} {{ArgumentName}}{{/each}})
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
   {{#if DataSvcCustom}}
             => DataSvcInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}){{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
   {{else}}
