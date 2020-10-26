@@ -295,14 +295,15 @@ namespace Beef.Demo.Api.Controllers
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
         [AllowAnonymous]
         [HttpGet("null")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetNull(string? name)
+        public IActionResult GetNull(string? name, List<string>? names = default)
         {
-            return new WebApiGet<Person?>(this, () => _manager.GetNullAsync(name),
+            return new WebApiGet<Person?>(this, () => _manager.GetNullAsync(name, names),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
         }
 

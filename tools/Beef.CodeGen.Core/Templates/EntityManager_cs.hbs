@@ -85,7 +85,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{ParameterType}} {{ArgumentName}}{{/each}})
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
         {
   {{#ifeq Type 'Create' 'Update'}}
             value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();

@@ -105,10 +105,10 @@ namespace Beef.Demo.Business
         private Func<Task>? _dataSvcCustomOnBeforeAsync;
         private Func<int, Task>? _dataSvcCustomOnAfterAsync;
 
-        private Func<string?, Task>? _getNullOnPreValidateAsync;
-        private Action<MultiValidator, string?>? _getNullOnValidate;
-        private Func<string?, Task>? _getNullOnBeforeAsync;
-        private Func<Person?, string?, Task>? _getNullOnAfterAsync;
+        private Func<string?, List<string>?, Task>? _getNullOnPreValidateAsync;
+        private Action<MultiValidator, string?, List<string>?>? _getNullOnValidate;
+        private Func<string?, List<string>?, Task>? _getNullOnBeforeAsync;
+        private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
 
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
         private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
@@ -552,22 +552,23 @@ namespace Beef.Demo.Business
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person?> GetNullAsync(string? name)
+        public Task<Person?> GetNullAsync(string? name, List<string>? names)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
-                Cleaner.CleanUp(name);
-                if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name).ConfigureAwait(false);
+                Cleaner.CleanUp(name, names);
+                if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name, names).ConfigureAwait(false);
 
                 MultiValidator.Create()
-                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name))
+                    .Additional((__mv) => _getNullOnValidate?.Invoke(__mv, name, names))
                     .Run().ThrowOnError();
 
-                if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name).ConfigureAwait(false);
-                var __result = await _dataService.GetNullAsync(name).ConfigureAwait(false);
-                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
+                if (_getNullOnBeforeAsync != null) await _getNullOnBeforeAsync(name, names).ConfigureAwait(false);
+                var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
+                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name, names).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
             });
         }

@@ -41,7 +41,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
   {{/each}}
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}WebApiPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{WebApiAgentParameterType}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}WebApiRequestOptions? requestOptions = null);
+        {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}WebApiPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}WebApiRequestOptions? requestOptions = null);
 {{/each}}
     }
 
@@ -68,7 +68,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
   {{/each}}
         /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
-        public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}WebApiPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{WebApiAgentParameterType}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}WebApiRequestOptions? requestOptions = null) =>
+        public {{{AgentOperationTaskReturnType}}} {{Name}}Async({{#ifeq Type 'Patch'}}WebApiPatchOption patchOption, {{/ifeq}}{{#each Parameters}}{{{WebApiAgentParameterType}}} {{ArgumentName}}{{#if IsPagingArgs}} = null{{/if}}, {{/each}}WebApiRequestOptions? requestOptions = null) =>
   {{#ifeq WebApiMethod 'HttpGet'}}
     {{#ifeq Type 'GetColl'}}
             GetCollectionResultAsync<{{BaseReturnType}}CollectionResult, {{BaseReturnType}}Collection, {{BaseReturnType}}>("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
@@ -91,7 +91,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
   {{#ifeq ValueLessParameters.Count 0}}
                 args: Array.Empty<WebApiArg>());
   {{else}}
-                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{WebApiAgentParameterType}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
+                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
   {{/ifeq}}
 {{/each}}
     }

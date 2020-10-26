@@ -134,7 +134,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
     {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
     {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{ParameterType}} {{ArgumentName}}{{/each}})
+        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
     {{#ifeq AutoImplement 'None'}}
       {{#if Parent.DataExtensions}}
             => DataInvoker.Current.InvokeAsync(this, () => {{Name}}OnImplementationAsync({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}), new BusinessInvokerArgs { ExceptionHandler = {{PrivateName}}OnException{{#if DataTransaction}}, IncludeTransactionScope = true{{/if}} });

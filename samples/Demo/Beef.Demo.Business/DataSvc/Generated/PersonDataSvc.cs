@@ -46,7 +46,7 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Person?, Task>? _getNoArgsOnAfterAsync;
         private Func<PersonDetail?, Guid, Task>? _getDetailOnAfterAsync;
         private Func<PersonDetail, Task>? _updateDetailOnAfterAsync;
-        private Func<Person?, string?, Task>? _getNullOnAfterAsync;
+        private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
@@ -312,13 +312,14 @@ namespace Beef.Demo.Business.DataSvc
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person?> GetNullAsync(string? name)
+        public Task<Person?> GetNullAsync(string? name, List<string>? names)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
-                var __result = await _data.GetNullAsync(name).ConfigureAwait(false);
-                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name).ConfigureAwait(false);
+                var __result = await _data.GetNullAsync(name, names).ConfigureAwait(false);
+                if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name, names).ConfigureAwait(false);
                 return __result;
             });
         }
