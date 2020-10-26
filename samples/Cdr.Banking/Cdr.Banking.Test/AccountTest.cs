@@ -159,7 +159,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void C110_GetDetail_NotFound()
         {
-            AgentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetDetailAsync("00000000"));
         }
@@ -167,7 +167,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void C120_GetDetail_Found()
         {
-            AgentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new AccountDetail
                 {
@@ -189,7 +189,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void C130_GetDetail_Found_NoAuth()
         {
-            AgentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
@@ -197,7 +197,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void C140_GetDetail_NoAuth()
         {
-            AgentTester.Test<AccountAgent, AccountDetail>()
+            AgentTester.Test<AccountAgent, AccountDetail?>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetDetailAsync("12345678"));
         }
@@ -209,7 +209,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jessica")]
         public void D110_GetBalance_Found()
         {
-            var v = AgentTester.Test<AccountAgent, Balance>()
+            var v = AgentTester.Test<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .Run(a => a.GetBalanceAsync("12345678")).Value;
 
@@ -219,7 +219,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("jenny")]
         public void D120_GetBalance_NotFound()
         {
-            AgentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }
@@ -228,7 +228,7 @@ namespace Cdr.Banking.Test
         public void D130_GetBalance_NotFound_Auth()
         {
             // Try with a known id that is valid for another user.
-            AgentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.NotFound)
                 .Run(a => a.GetBalanceAsync("12345678"));
         }
@@ -236,7 +236,7 @@ namespace Cdr.Banking.Test
         [Test, TestSetUp("john")]
         public void D140_GetBalance_NoAuth()
         {
-            AgentTester.Test<AccountAgent, Balance>()
+            AgentTester.Test<AccountAgent, Balance?>()
                 .ExpectStatusCode(HttpStatusCode.Forbidden)
                 .Run(a => a.GetBalanceAsync("00000000"));
         }

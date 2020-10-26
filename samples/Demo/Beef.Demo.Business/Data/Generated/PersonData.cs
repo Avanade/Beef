@@ -279,9 +279,10 @@ namespace Beef.Demo.Business.Data
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        public Task<Person?> GetNullAsync(string? name)
-            => DataInvoker.Current.InvokeAsync(this, () => GetNullOnImplementationAsync(name), new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
+        public Task<Person?> GetNullAsync(string? name, List<string>? names)
+            => DataInvoker.Current.InvokeAsync(this, () => GetNullOnImplementationAsync(name, names), new BusinessInvokerArgs { ExceptionHandler = _getNullOnException });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.

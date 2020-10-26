@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Beef.Demo.Business.Data
 {
@@ -147,7 +148,8 @@ namespace Beef.Demo.Business.Data
             return pd;
         }
 
-        private Task<Person> GetNullOnImplementationAsync(string _)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+        private Task<Person> GetNullOnImplementationAsync(string _, List<string> __)
         {
             return Task.FromResult<Person>(null);
         }

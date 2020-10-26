@@ -121,8 +121,9 @@ namespace Beef.Demo.Business.Data
         /// Get Null.
         /// </summary>
         /// <param name="name">The Name.</param>
+        /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        Task<Person?> GetNullAsync(string? name);
+        Task<Person?> GetNullAsync(string? name, List<string>? names);
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.

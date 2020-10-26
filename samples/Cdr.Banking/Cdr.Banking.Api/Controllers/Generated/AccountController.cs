@@ -65,7 +65,7 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("{accountId}")]
         [ProducesResponseType(typeof(AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetDetail(string? accountId = default)
+        public IActionResult GetDetail(string? accountId)
         {
             return new WebApiGet<AccountDetail?>(this, () => _manager.GetDetailAsync(accountId),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
@@ -80,7 +80,7 @@ namespace Cdr.Banking.Api.Controllers
         [HttpGet("{accountId}/balance")]
         [ProducesResponseType(typeof(Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult GetBalance(string? accountId = default)
+        public IActionResult GetBalance(string? accountId)
         {
             return new WebApiGet<Balance?>(this, () => _manager.GetBalanceAsync(accountId),
                 operationType: OperationType.Read, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NotFound);
