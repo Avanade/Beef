@@ -166,6 +166,11 @@ namespace Beef.CodeGen.DbModels
         }
 
         /// <summary>
+        /// Gets the owning (parent) <see cref="DbTable"/>.
+        /// </summary>
+        public DbTable? DbTable { get; set; }
+
+        /// <summary>
         /// Gets the column name.
         /// </summary>
         public string? Name { get; set; }

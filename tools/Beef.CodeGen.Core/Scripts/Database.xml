@@ -14,5 +14,7 @@
   <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelGenerator" Template="DbEfModel_cs.hbs" FileName="{{EFModelName}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data/EfModel" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelBuilderCodeGenerator" Template="DbEfModelBuilder_cs.hbs" FileName="ModelBuilderExtensions.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data/EfModel" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryViewCodeGenerator" Template="DbVwQuery_sql.hbs" FileName="{{ViewName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{ViewSchema}}/Views" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryCdcOutboxCodeGenerator" Template="DbSpQueryCdcOutbox_sql.hb" FileName="{{CdcName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Stored Procedures" />
+  <!--<Generate GenType="Beef.CodeGen.Generators.DatabaseQueryCdcOutboxCodeGenerator" Template="DbSpQueryCdcOutbox_sql.hb" FileName="{{CdcName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryCdcOutboxCodeGenerator" Template="DbTbQueryCdcEnvelope_sql.hb" FileName="{{CdcEnvelope}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Tables" />-->
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryCdcOutboxCodeGenerator" Template="DbCdcModel_cs.hb" FileName="{{pascal Name}}Cdc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/DotNet" />
 </Script>

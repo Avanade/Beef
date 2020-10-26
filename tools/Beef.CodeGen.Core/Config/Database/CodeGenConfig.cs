@@ -286,6 +286,7 @@ namespace Beef.CodeGen.Config.Database
 
             sw.Stop();
             Logger.Default.Log(LogLevel.Information, $"    Database query complete [{sw.ElapsedMilliseconds}ms]");
+            Logger.Default.Log(LogLevel.Information, string.Empty);
         }
 
         /// <summary>

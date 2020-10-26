@@ -207,7 +207,7 @@ namespace Beef.Database.Core
         private void WriteFooter(Stopwatch sw)
         {
             _logger.LogInformation(string.Empty);
-            _logger.LogInformation($"Database complete [{sw.ElapsedMilliseconds}ms].");
+            _logger.LogInformation($"Beef Database Tool complete [{sw.ElapsedMilliseconds}ms].");
             _logger.LogInformation(string.Empty);
         }
     }

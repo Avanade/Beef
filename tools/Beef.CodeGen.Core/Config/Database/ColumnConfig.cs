@@ -195,6 +195,11 @@ namespace Beef.CodeGen.Config.Database
         public string QualifiedName => $"[{Parent!.Alias}].[{Name}]";
 
         /// <summary>
+        /// Gets the schema/table qualified name.
+        /// </summary>
+        public string TableQualififiedName => "[].[]";
+
+        /// <summary>
         /// Gets the parameter name.
         /// </summary>
         public string ParameterName => "@" + Name;

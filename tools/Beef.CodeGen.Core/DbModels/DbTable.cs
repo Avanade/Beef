@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Data.Database;
-using Beef.Mapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Beef.CodeGen.DbModels
 {
@@ -139,6 +137,8 @@ namespace Beef.CodeGen.DbModels
             {
                 foreach (var c in t.Columns)
                 {
+                    c.DbTable = t;
+
                     if (c.ForeignTable == null)
                     {
                         if (c.Name!.Length > 2 && c.Name!.EndsWith("Id", StringComparison.InvariantCulture))

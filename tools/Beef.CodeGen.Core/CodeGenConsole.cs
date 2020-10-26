@@ -253,7 +253,7 @@ namespace Beef.CodeGen
         public static void WriteFooter(ILogger logger, Stopwatch sw)
         {
             logger.LogInformation(string.Empty);
-            logger.LogInformation($"CodeGen complete [{sw?.ElapsedMilliseconds}ms].");
+            logger.LogInformation($"Beef Code-Gen Tool complete [{sw?.ElapsedMilliseconds}ms].");
             logger.LogInformation(string.Empty);
         }
     }

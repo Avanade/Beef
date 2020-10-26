@@ -257,7 +257,7 @@ namespace Beef.Database.Core
                     {
                         var cge = new CodeGenExecutor(_args.CodeGenArgs!);
                         return await cge.RunAsync().ConfigureAwait(false);
-                    }).ConfigureAwait(false))
+                    }, true).ConfigureAwait(false))
                     {
                         return false;
                     }
@@ -273,7 +273,7 @@ namespace Beef.Database.Core
                     if (_args.UseBeefDbo && !_args.SchemaOrder.Contains("dbo"))
                         _args.SchemaOrder.Insert(0, "dbo");
 
-                    if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync()).ConfigureAwait(false))
+                    if (!await TimeExecutionAsync(() => DropAndCreateAllObjectsAsync(), true).ConfigureAwait(false))
                         return false;
                 }
 
@@ -310,6 +310,9 @@ namespace Beef.Database.Core
                         return false;
                 }
 
+                _logger.LogInformation(string.Empty);
+                _logger.LogInformation(new string('-', 80));
+
                 return true;
             }
             finally
@@ -322,13 +325,16 @@ namespace Beef.Database.Core
         /// <summary>
         /// Times the execution and reports result.
         /// </summary>
-        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action)
+        private async Task<bool> TimeExecutionAsync(Func<Task<bool>> action, bool addEmptyLineBeforeComplete = false)
         {
             try
             {
                 var sw = Stopwatch.StartNew();
                 var result = await action().ConfigureAwait(false);
                 sw.Stop();
+                if (addEmptyLineBeforeComplete)
+                    _logger.LogInformation(string.Empty);
+
                 _logger.LogInformation($"Complete [{sw.ElapsedMilliseconds}ms].");
                 return result;
             }
@@ -465,9 +471,10 @@ namespace Beef.Database.Core
                 return false;
 
             // Execute each script one-by-one.
+            _logger.LogInformation("Executing the create of all (known) database objects.");
             foreach (var sr in list.OrderBy(x => x.Order).ThenBy(x => x.Reader!.Order).ThenBy(x => x.Name))
             {
-                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {(sr.FileName ?? sr.Name)}").ConfigureAwait(false))
+                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {(sr.FileName ?? sr.Name)}", indent: 2).ConfigureAwait(false))
                     return false;
             }
 
@@ -495,13 +502,13 @@ namespace Beef.Database.Core
         /// <summary>
         /// Wraps the SQL statement(s) and reports success or failure.
         /// </summary>
-        private async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text, string? additionalInfo = null)
+        private async Task<bool> ExecuteSqlStatementAsync(Func<Task> func, string text, string? additionalInfo = null, int indent = 0)
         {
             try
             {
-                _logger.LogInformation($"Executing {text}");
+                _logger.LogInformation($"{new string(' ', indent)}Executing {text}");
                 if (additionalInfo != null)
-                    _logger.LogInformation(additionalInfo);
+                    _logger.LogInformation($"{new string(' ', indent)}{additionalInfo}");
 
                 await func().ConfigureAwait(false);
                 return true;
@@ -553,7 +560,6 @@ namespace Beef.Database.Core
                         {
                             var rows = _db!.SqlStatement(a.Content).ScalarAsync<int>().GetAwaiter().GetResult();
                             _logger.LogInformation($"Result: {rows} rows affected.");
-                            _logger.LogInformation($"---- Executing {a.OutputFileName} complete.");
                         }
                     }).ConfigureAwait(false);
                 }
