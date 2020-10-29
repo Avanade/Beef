@@ -340,14 +340,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifva
             var hash = new HashCode();
   {{#each CoreProperties}}
             hash.Add({{PropertyName}});
-    {{#if @last}}
+  {{/each}}
             return base.GetHashCode() ^ hash.ToHashCode();
         }
     
         #endregion
 
-    {{/if}}
-  {{/each}}
 {{/unless}}
 {{! ===== ICopyFrom ===== }}
         #region ICopyFrom

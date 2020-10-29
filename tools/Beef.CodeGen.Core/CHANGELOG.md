@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.7
+- *Fixed:* Issue [80](https://github.com/Avanade/Beef/issues/80) fixed. Was generating incomplete `GetHashCode()` where no properties specified.
+- *Fixed:* Issue [81](https://github.com/Avanade/Beef/issues/81) fixed. Was generating incorrect (non-compiling) code where `DataSvcCaching="false"`. 
+
 ## v4.1.6
 - *Fixed:* Issue [79](https://github.com/Avanade/Beef/issues/79) fixed. Integrated suggested Pull Request [78](https://github.com/Avanade/Beef/pull/78) with minor rollback of default logic. Removed the HTML escaping for the generated C# generic types.
 
