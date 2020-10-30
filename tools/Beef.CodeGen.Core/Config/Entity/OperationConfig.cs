@@ -540,7 +540,7 @@ operations: [
         /// <summary>
         /// Indicates whether the operation supports caching.
         /// </summary>
-        public bool SupportsCaching => new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type);
+        public bool SupportsCaching => CompareValue(Parent!.DataSvcCaching, true) && new string[] { "Get", "Create", "Update", "Delete" }.Contains(Type);
 
         /// <summary>
         /// Gets or sets the data arguments.

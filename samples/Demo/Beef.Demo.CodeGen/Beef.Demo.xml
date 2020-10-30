@@ -98,7 +98,7 @@
   </Entity>
 
   <!-- ODATA basic -->
-  <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" AutoInferImplements="false" WebApiRoutePrefix="api/v1/products" AutoImplement="OData" ODataName="TestOData" ODataEntity="Model.Product" ODataCollectionName="Products">
+  <Entity Name="Product" Text="Product" Collection="true" CollectionResult="true" AutoInferImplements="false" WebApiRoutePrefix="api/v1/products" DataSvcCaching="false" AutoImplement="OData" ODataName="TestOData" ODataEntity="Model.Product" ODataCollectionName="Products">
     <Property Name="Id" Text="{{Product}} identifier" Type="int" Immutable="true" UniqueKey="true" DataName="ID" EmitDefaultValue="true" />
     <Property Name="Name" Type="string"/>
     <Property Name="Description" Type="string"/>
