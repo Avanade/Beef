@@ -2,14 +2,14 @@
 
 Represents the **NuGet** versions.
 
-## v4.1.7
-- *Fixed:* Issue [80](https://github.com/Avanade/Beef/issues/80) fixed. Was generating incomplete `GetHashCode()` where no properties specified.
-- *Fixed:* Issue [81](https://github.com/Avanade/Beef/issues/81) fixed. Was generating incorrect (non-compiling) code where `DataSvcCaching="false"`. 
-
-## v4.1.6
+## v4.1.8
 - *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been retired (removed).
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
 - *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
+
+## v4.1.7
+- *Fixed:* Issue [80](https://github.com/Avanade/Beef/issues/80) fixed. Was generating incomplete `GetHashCode()` where no properties specified.
+- *Fixed:* Issue [81](https://github.com/Avanade/Beef/issues/81) fixed. Was generating incorrect (non-compiling) code where `DataSvcCaching="false"`. 
 
 ## v4.1.6
 - *Fixed:* Issue [79](https://github.com/Avanade/Beef/issues/79) fixed. Integrated suggested Pull Request [78](https://github.com/Avanade/Beef/pull/78) with minor rollback of default logic. Removed the HTML escaping for the generated C# generic types.
