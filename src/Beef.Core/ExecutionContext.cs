@@ -196,8 +196,9 @@ namespace Beef
         }
 
         /// <summary>
-        /// Gets or sets the correlation identifier (a unique identifier assigned to the request). <b>Note: </b> this is set internally by <i>Beef</i>, do not set directly.
+        /// Gets or sets the correlation identifier (a unique identifier assigned to the request).
         /// </summary>
+        /// <remarks>This may be set automatically by <i>Beef</i>; for example from an HTTP header using <see cref="WebApi.WebApiConsts.CorrelationIdHeaderName"/>.</remarks>
         public string? CorrelationId { get; set; }
 
         /// <summary>
