@@ -44,8 +44,12 @@ namespace Beef.Test.NUnit.Events
         /// <returns>The <see cref="Task"/>.</returns>
         protected override Task PublishEventsAsync(params EventData[] events)
         {
-            var list = _eventDict.GetOrAdd(ExecutionContext.Current.CorrelationId ?? throw new InvalidOperationException("The ExecutionContext.CorrelationId must be set for the ExpectEventPublisher to function conrrectly."), new List<EventData>());
-            list.AddRange(events);
+            if (ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null)
+            {
+                var list = _eventDict.GetOrAdd(ExecutionContext.Current.CorrelationId, new List<EventData>());
+                list.AddRange(events);
+            }
+
             return Task.CompletedTask;
         }
     }

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Fixed:* Issue [83](https://github.com/Avanade/Beef/issues/83) fixed. `ExpectEventPublisher` updated to swallow (ignore) events raised where the `ExecutionContext.CorrelationId` is `null`; versus throw an exception.
+
 ## v4.1.2
 - *Enhancement:* Added `ValidationTester` to enable simpler unit-tests (with services mocking) of validators external to the API. Provides a simpler and more test run-time performant means to validate versus having to create all the required test data within the underlying data source. 
 - *Enhancement* Added `ReplaceSingleton`, `ReplaceScoped` and `ReplaceTransient` extension methods to `IServiceCollection` which will replace if existing; otherwise, add.
