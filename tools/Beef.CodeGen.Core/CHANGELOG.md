@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.8
+- *Fixed:* Issue [85](https://github.com/Avanade/Beef/issues/85) fixed. Additional challenge identified with HTML encoding for generated code output. The `TextEncoding` for _Handlebars_ is now set to `null` so no encoding should now occur. This will fix this particular issue and others that have not been explicitly formatted using `{{{xxx}}}`.
+
 ## v4.1.7
 - *Fixed:* Issue [80](https://github.com/Avanade/Beef/issues/80) fixed. Was generating incomplete `GetHashCode()` where no properties specified.
 - *Fixed:* Issue [81](https://github.com/Avanade/Beef/issues/81) fixed. Was generating incorrect (non-compiling) code where `DataSvcCaching="false"`. 

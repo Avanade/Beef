@@ -89,6 +89,8 @@ namespace Beef.CodeGen.Generators
             if (!values.Any())
                 return;
 
+            Handlebars.Configuration.TextEncoder = null;
+
             var templateHandlebars = Handlebars.Compile(template);
             var outputFileNameHandlebars = Handlebars.Compile(OutputFileName ?? throw new InvalidOperationException($"The '{nameof(OutputFileName)}' must not be null."));
             var outputDirNameHandlebars = Handlebars.Compile(OutputDirName ?? throw new InvalidOperationException($"The '{nameof(OutputDirName)}' must not be null."));
