@@ -60,7 +60,7 @@
     <Operation Name="ThrowError" OperationType="Custom" ReturnType="void" WebApiRoute="error" AutoImplement="None" />
     
     <Operation Name="GetWithEf" OperationType="Get" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" />
-    <Operation Name="CreateWithEf" OperationType="Create" Validator="PersonValidator" WebApiRoute="ef" AutoImplement="EntityFramework" />
+    <Operation Name="CreateWithEf" OperationType="Create" Validator="PersonValidator" WebApiRoute="ef" AutoImplement="EntityFramework" EventPublish="false" />
     <Operation Name="UpdateWithEf" OperationType="Update" Validator="PersonValidator" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" />
     <Operation Name="DeleteWithEf" OperationType="Delete" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" EventSubject="Demo.Person.{id}" />
     <Operation Name="PatchWithEf" OperationType="Patch" Validator="PersonValidator" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" />

@@ -97,22 +97,24 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
       {{/ifeq}}
     {{/if}}         
                 {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
-    {{#ifeq Events.Count 1}}
-      {{#each Events}}
-                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}Async({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).ConfigureAwait(false);
-      {{/each}}
-    {{else}}
-      {{#ifeq Events.Count 0}}
-      {{else}}
-                await _evtPub.PublishAsync(
+    {{#if EventPublish}}
+      {{#ifeq Events.Count 1}}
         {{#each Events}}
-                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).ConfigureAwait(false);{{else}},{{/if}}
-          {{#if @last}}
-
-          {{/if}}
+                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}Async({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).ConfigureAwait(false);
         {{/each}}
+      {{else}}
+        {{#ifeq Events.Count 0}}
+        {{else}}
+                await _evtPub.PublishAsync(
+          {{#each Events}}
+                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).ConfigureAwait(false);{{else}},{{/if}}
+            {{#if @last}}
+
+            {{/if}}
+          {{/each}}
+        {{/ifeq}}
       {{/ifeq}}
-    {{/ifeq}}
+    {{/if}}
     {{#if SupportsCaching}}
       {{#ifeq Type 'Delete'}}
                 _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
