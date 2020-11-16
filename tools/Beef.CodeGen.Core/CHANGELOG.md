@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.9
+- *Fixed:* Issue [87](https://github.com/Avanade/Beef/issues/87) fixed. Event publish code was being incorrectly generated where `EventPublish="false"`.
+
 ## v4.1.8
 - *Fixed:* Issue [85](https://github.com/Avanade/Beef/issues/85) fixed. Additional challenge identified with HTML encoding for generated code output. The `TextEncoding` for _Handlebars_ is now set to `null` so no encoding should now occur. This will fix this particular issue and others that have not been explicitly formatted using `{{{xxx}}}`.
 
