@@ -14,8 +14,13 @@ namespace Beef.Demo.Business.Data
     public partial class PersonData
     {
         private readonly ILogger _logger;
+        private readonly Common.Agents.IPersonAgent _agent;
 
-        public PersonData(IDatabase db, IEfDb ef, ILogger<PersonData> logger) : this(db, ef) => _logger = Check.NotNull(logger, nameof(logger));
+        public PersonData(IDatabase db, IEfDb ef, ILogger<PersonData> logger, Common.Agents.IPersonAgent agent) : this(db, ef)
+        { 
+            _logger = Check.NotNull(logger, nameof(logger));
+            _agent = Check.NotNull(agent, nameof(agent));
+        }
 
         partial void PersonDataCtor()
         {
@@ -83,6 +88,12 @@ namespace Beef.Demo.Business.Data
         {
             _logger.LogWarning("The data is beyond corrupt and we cannot continue.");
             throw new InvalidOperationException("Data corruption error!");
+        }
+
+        private async Task<string> InvokeApiViaAgentOnImplementationAsync(Guid id)
+        {
+            var result = await _agent.GetAsync(id).ConfigureAwait(false);
+            return result.Value.LastName;
         }
 
         private async Task<PersonDetailCollectionResult> GetDetailByArgsOnImplementationAsync(PersonArgs args, PagingArgs paging)

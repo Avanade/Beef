@@ -59,6 +59,7 @@
     <None Remove="Templates\EntityIData_cs.hbs" />
     <None Remove="Templates\EntityIManager_cs.hbs" />
     <None Remove="Templates\EntityManager_cs.hbs" />
+    <None Remove="Templates\EntityWebApiAgentArgs_cs.hbs" />
     <None Remove="Templates\EntityWebApiAgent_cs.hbs" />
     <None Remove="Templates\EntityWebApiController_cs.hbs" />
     <None Remove="Templates\Entity_cs.hbs" />
@@ -134,6 +135,7 @@
     <EmbeddedResource Include="Templates\ReferenceDataI_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.hbs" />
+    <EmbeddedResource Include="Templates\EntityWebApiAgentArgs_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.hbs" />

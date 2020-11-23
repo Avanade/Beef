@@ -120,6 +120,11 @@ namespace Beef.Demo.Business
         private Func<Task>? _throwErrorOnBeforeAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
 
+        private Func<Guid, Task>? _invokeApiViaAgentOnPreValidateAsync;
+        private Action<MultiValidator, Guid>? _invokeApiViaAgentOnValidate;
+        private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
+        private Func<string, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+
         private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getWithEfOnValidate;
         private Func<Guid, Task>? _getWithEfOnBeforeAsync;
@@ -616,6 +621,30 @@ namespace Beef.Demo.Business
                 if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
+            });
+        }
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        public Task<string> InvokeApiViaAgentAsync(Guid id)
+        {
+            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Unspecified;
+                Cleaner.CleanUp(id);
+                if (_invokeApiViaAgentOnPreValidateAsync != null) await _invokeApiViaAgentOnPreValidateAsync(id).ConfigureAwait(false);
+
+                MultiValidator.Create()
+                    .Additional((__mv) => _invokeApiViaAgentOnValidate?.Invoke(__mv, id))
+                    .Run().ThrowOnError();
+
+                if (_invokeApiViaAgentOnBeforeAsync != null) await _invokeApiViaAgentOnBeforeAsync(id).ConfigureAwait(false);
+                var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
+                if (_invokeApiViaAgentOnAfterAsync != null) await _invokeApiViaAgentOnAfterAsync(__result, id).ConfigureAwait(false);
+                return Cleaner.Clean(__result);
             });
         }
 

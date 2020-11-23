@@ -26,7 +26,12 @@ namespace Beef.Test.NUnit.Tests
         {
             _serviceCollection.AddLogging(configure => configure.AddTestContext());
             _serviceCollection.AddSingleton(_ => new CachePolicyManager());
+
             _serviceCollection.AddTransient<IWebApiAgentArgs, WebApiAgentArgs>();
+            foreach (var kvp in TestSetUp._webApiAgentArgsTypes)
+            {
+                _serviceCollection.AddTransient(kvp.Key, kvp.Value);
+            }
 
             if (configureLocalRefData)
                 TestSetUp.ConfigureDefaultLocalReferenceData(_serviceCollection);

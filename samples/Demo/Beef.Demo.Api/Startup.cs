@@ -72,6 +72,11 @@ namespace Beef.Demo.Api
             else
                 services.AddBeefNullEventPublisher();
 
+            // Add custom services; in this instance to allow it to call itself for testing purposes.
+            services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));
+            services.AddScoped<Common.Agents.IDemoWebApiAgentArgs>(sp => new Common.Agents.DemoWebApiAgentArgs(sp.GetService<System.Net.Http.IHttpClientFactory>().CreateClient("demo")));
+            services.AddScoped<Common.Agents.IPersonAgent, Common.Agents.PersonAgent>();
+
             // Add services; note Beef requires NewtonsoftJson.
             services.AddControllers().AddNewtonsoftJson();
             services.AddGrpc();

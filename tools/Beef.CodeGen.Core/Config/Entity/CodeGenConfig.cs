@@ -137,6 +137,13 @@ entities:
             Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
 
+        /// <summary>
+        /// Indicates whether to create and use an application-based (domain) <see cref="WebApi.WebApiAgentArgs"/> to simplify dependency injection usage.
+        /// </summary>
+        [JsonProperty("appBasedAgentArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.")]
+        public bool AppBasedAgentArgs { get; set; }
+
         #endregion
 
         #region Manager

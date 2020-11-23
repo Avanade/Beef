@@ -93,8 +93,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public RobotAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public RobotAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="Robot"/>.

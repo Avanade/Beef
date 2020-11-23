@@ -20,7 +20,7 @@ Before a test executes, there is the requirement to perform set up activities, s
 
 ### One-time set-up for the set-up fixture
 
-Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for the [`SetUpFixture`](https://github.com/nunit/docs/wiki/SetUpFixture-Attribute) the `TestSetUp.RegisterSetUp` enables the configuration of the set up (including that which is re-invoked with the one-time set-up for the test fixture). Other set up logic including the starting of the API test server via `AgentTester.StartupTestServer` is initiated. Example as follows:
+Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for the [`SetUpFixture`](https://github.com/nunit/docs/wiki/SetUpFixture-Attribute) the `TestSetUp.RegisterSetUp` enables the configuration of the set up (including that which is re-invoked with the one-time set-up for the test fixture). Other set up logic including setting the defaults for the local _Reference Data_ (`TestSetUp.SetDefaultLocalReferenceData`) is initiated. An [example](../../samples/My.Hr/My.Hr.Test/FixtureSetup.cs) is as follows:
 
 ``` csharp
 [SetUpFixture]
@@ -29,23 +29,26 @@ public class FixtureSetUp
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
-        TestSetUp.RegisterSetUp((count, data) =>
-        {
-            return DatabaseExecutor.Run(
-                count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, 
-                AgentTester.Configuration["ConnectionStrings:BeefDemo"],
-                typeof(DatabaseExecutor).Assembly, typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) == 0;
-        });
+        TestSetUp.DefaultEnvironmentVariablePrefix = "Hr";
+        TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
+        TestSetUp.DefaultExpectNoEvents = true;
+        var config = AgentTester.BuildConfiguration<Startup>();
 
-        AgentTester.StartupTestServer<Startup>(environmentVariablesPrefix: "Beef_");
+        TestSetUp.RegisterSetUp(async (count, _) =>
+        {
+            return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
+                count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:Database"],
+                typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true } ).ConfigureAwait(false) == 0;
+        });
     }
+}
 ```
 
 <br/>
 
 ### One-time set-up for the test fixture
 
-Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for each [`TestFixture`](https://github.com/nunit/docs/wiki/TestFixture-Attribute) the `TestSetUp.Reset` should be invoked; this will flush all caches, clear out any mock objects, and re-invoke the registered set up (`TestSetUp.RegisterSetUp`). Example as follows:
+Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for each [`TestFixture`](https://github.com/nunit/docs/wiki/TestFixture-Attribute) the `TestSetUp.Reset` should be invoked; this will (re)invoke the registered set up (`TestSetUp.RegisterSetUp`). Example as follows:
 
 ``` csharp
 [TestFixture, NonParallelizable]
@@ -66,7 +69,7 @@ As _beef_ is largely about accelerating API development this testing capability 
 
 The [`AgentTester`](./AgentTester.cs) provides a means to invoke an API and _assert_ (expect) a given response to be considered valid. The `AgentTester` invokes the API via its corresponding [Service Agent](../../docs/Layer-ServiceAgent.md). The advantage of this is that the HTTP request/response, HTTP headers, URL parameterisation, etc. are verified, as well as the underlying _intra-domain_ business logic and corresponding data services. 
 
-The `AgentTester` has a `Create` method to simplify the construction to enable fluent-style method-chaining to _assert_ (expect) and execute a selected API operation; these _asserts_ are as follows:
+The `AgentTester` has a `Test` method to simplify the construction enabling fluent-style method-chaining to _assert_ (expect) and execute a selected API operation; these _asserts_ are as follows:
 
 Method | Description
 -|-
@@ -91,7 +94,7 @@ An example usage is as follows (see [`PersonTest`](../../samples/Demo/Beef.Demo.
 [Test, TestSetUp]
 public void A140_Validation_ServiceAgentInvalid()
 {
-    AgentTester.Create<PersonAgent, Person>()
+    AgentTester.Test<PersonAgent, Person>()
         .ExpectStatusCode(HttpStatusCode.BadRequest)
         .ExpectErrorType(ErrorType.ValidationError)
         .ExpectMessages(
@@ -100,28 +103,28 @@ public void A140_Validation_ServiceAgentInvalid()
             "Gender is invalid.",
             "Eye Color is invalid.",
             "Birthday must be less than or equal to Today.")
-        .Run((a) => a.Agent.UpdateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
+        .Run(a => a.UpdateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }, 1.ToGuid()));
 }
 ```
 
 Another example usage is as follows (see [`RobotTest`](../../samples/Demo/Beef.Demo.Test/RobotTest.cs) for more complete usage):
 
 ``` csharp
-AgentTester.Create<RobotAgent, Robot>()
+AgentTester.Test<RobotAgent, Robot>()
     .ExpectStatusCode(HttpStatusCode.OK)
     .ExpectChangeLogUpdated()
     .ExpectETag(v.ETag)
     .ExpectUniqueKey()
     .ExpectEventWithValue("Demo.Robot.*", "Update")
     .ExpectValue((t) => v)
-    .Run((a) => a.Agent.UpdateAsync(v, 1.ToGuid())).Value;
+    .Run(a => a.UpdateAsync(v, 1.ToGuid()));
 ```
 
 <br/>
 
 ## Mocking
 
-As stated earlier, for the likes of cross domain (_inter-domain_) dependencies should be mocked out. To support this, the [Moq](https://github.com/moq/moq4) framework is leveraged. Additional support is added to integrate into the _Beef_ [`Factory`](../../src/Beef.Core/Factory.cs) instantiation capability.
+As stated earlier, for the likes of cross domain (_inter-domain_) dependencies should be mocked out. To support this, the [Moq](https://github.com/moq/moq4) framework is leveraged.
 
 The `TestSetUp.CreateMock<T>()` method will create the Moq [`Mock`](http://www.nudoq.org/#!/Packages/Moq/Moq/Mock(T)) object and set within the _beef_ `Factory`; for example:
 
@@ -137,7 +140,6 @@ The following additional capabilities have been added to further aid testing:
 
 - [`ExpectException`](./ExpectException.cs) - Expects and asserts the specfied `Exception` type and its corresponding exception message.
 - [`ExpectValidationException`](./ExpectValidationException.cs) - Expects and asserts a [`ValidationException`](../../src/Beef.Core/ValidationException.cs) and its corresponding messages.
-- [`DependencyGroupAttribute`](./DependencyGroupAttribute.cs) - Provides a means to manage a group of test executions such that as soon as one fails the others within the dependency group will not execute as a success dependency is required.
 
 The following extension methods have beed added to aid testing:
 - [`int.ToGuid()`](./ExtensionMethods.cs) - Converts an `int` to a `Guid`. For example: `1.ToGuid()` will return `00000001-0000-0000-0000-000000000000`.

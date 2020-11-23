@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/demo/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Beef.Demo.Common.Entities" RefDataWebApiRoute="api/v1/demo/ref" MapperDefaultRefDataConverter="ReferenceDataInt32IdConverter" AppBasedAgentArgs="true" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- A Get/Create/Update/Delete are not required unless specific CRUD operations are required. -->
   <Entity Name="Country" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/countries" AutoImplement="Database" DatabaseSchema="Ref" />
   <Entity Name="USState" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/demo/ref/usStates" AutoImplement="Database" DatabaseSchema="Ref" />

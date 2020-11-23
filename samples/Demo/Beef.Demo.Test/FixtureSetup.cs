@@ -16,6 +16,7 @@ namespace Beef.Demo.Test
         {
             var config = AgentTester.BuildConfiguration<Startup>("Beef");
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
+            TestSetUp.AddWebApiAgentArgsType<IDemoWebApiAgentArgs, DemoWebApiAgentArgs>();
             TestSetUp.RegisterSetUp(async (count, data) =>
             {
                 var args = new DatabaseExecutorArgs(

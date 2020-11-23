@@ -52,8 +52,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Grpc
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public {{Name}}Agent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="{{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}}"/>.</param>
+        public {{Name}}Agent({{#if Root.AppBasedAgentArgs}}Common.Agents.I{{Root.AppName}}WebApiAgentArgs{{else}}IWebApiAgentArgs{{/if}} args) : base(args) { }
 {{#each GrpcOperations}}
 
         /// <summary>

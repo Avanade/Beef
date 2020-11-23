@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Beef.Test.NUnit.Tests
 {
@@ -119,7 +120,19 @@ namespace Beef.Test.NUnit.Tests
             if (agent != null)
                 return agent;
 
-            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs());
+            var ctors = typeof(TAgent).GetConstructors();
+            if (ctors.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor could not be determined.");
+
+            var pis = ctors[0].GetParameters();
+            if (pis.Length != 1)
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor must only have a single parameter.");
+
+            var pi = pis[0];
+            if (pi.ParameterType != typeof(IWebApiAgentArgs) && !pi.ParameterType.GetInterfaces().Contains(typeof(IWebApiAgentArgs)))
+                throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created; the constructor parameter must implement IWebApiAgentArgs.");
+
+            var obj = Activator.CreateInstance(typeof(TAgent), args ?? CreateAgentArgs(pi.ParameterType));
             if (obj == null)
                 throw new InvalidOperationException($"An instance of {typeof(TAgent).Name} was unable to be created.");
 

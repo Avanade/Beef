@@ -71,6 +71,7 @@ namespace Beef.Demo.Business.Data
         private Func<PersonCollectionResult, PersonArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Action<Exception>? _getByArgsWithEfOnException;
         private Action<Exception>? _throwErrorOnException;
+        private Action<Exception>? _invokeApiViaAgentOnException;
         private Func<Guid, IEfDbArgs, Task>? _getWithEfOnBeforeAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Action<Exception>? _getWithEfOnException;
@@ -308,6 +309,14 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         public Task ThrowErrorAsync()
             => DataInvoker.Current.InvokeAsync(this, () => ThrowErrorOnImplementationAsync(), new BusinessInvokerArgs { ExceptionHandler = _throwErrorOnException });
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        public Task<string> InvokeApiViaAgentAsync(Guid id)
+            => DataInvoker.Current.InvokeAsync(this, () => InvokeApiViaAgentOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _invokeApiViaAgentOnException });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.

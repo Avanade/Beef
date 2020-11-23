@@ -191,6 +191,14 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<string>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
@@ -242,8 +250,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public PersonAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public PersonAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Creates a new <see cref="Person"/>.
@@ -451,6 +459,16 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult> ThrowErrorAsync(WebApiRequestOptions? requestOptions = null) =>
             PostAsync("api/v1/persons/error", requestOptions: requestOptions,
                 args: Array.Empty<WebApiArg>());
+
+        /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<string>> InvokeApiViaAgentAsync(Guid id, WebApiRequestOptions? requestOptions = null) =>
+            PostAsync<string>("api/v1/persons/invokeApi", requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.

@@ -179,6 +179,12 @@ namespace Beef.Test.NUnit.Tests
         /// Creates an <see cref="IWebApiAgentArgs"/> instance using the <see cref="TesterBase.LocalServiceProvider"/>.
         /// </summary>
         /// <returns>An <see cref="IWebApiAgentArgs"/> instance.</returns>
-        public IWebApiAgentArgs CreateAgentArgs() => AgentTesterBase.LocalServiceProvider.GetService<IWebApiAgentArgs>() ?? throw new InvalidOperationException("An instance of IWebApiAgentArgs was unable to be created.");
+        public IWebApiAgentArgs CreateAgentArgs(Type type)
+        {
+            if (AgentTesterBase.LocalServiceProvider.GetService(type ?? throw new ArgumentNullException(nameof(type))) is IWebApiAgentArgs args)
+                return args;
+
+            return AgentTesterBase.LocalServiceProvider.GetService<IWebApiAgentArgs>() ?? throw new InvalidOperationException($"An instance of {type.Name} was unable to be created.");
+        }
     }
 }

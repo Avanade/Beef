@@ -338,6 +338,21 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        [AllowAnonymous]
+        [HttpPost("invokeApi")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public IActionResult InvokeApiViaAgent(Guid id)
+        {
+            return new WebApiPost<string>(this, () => _manager.InvokeApiViaAgentAsync(id),
+                operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

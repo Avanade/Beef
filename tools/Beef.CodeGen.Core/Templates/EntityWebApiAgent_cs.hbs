@@ -53,8 +53,8 @@ namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Agent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public {{Name}}Agent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs"/>.</param>
+        public {{Name}}Agent(I{{#if Root.AppBasedAgentArgs}}{{Root.AppName}}{{/if}}WebApiAgentArgs args) : base(args) { }
 {{#each WebApiAgentOperations}}
 
         /// <summary>

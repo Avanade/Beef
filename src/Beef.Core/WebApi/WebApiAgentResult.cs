@@ -3,6 +3,7 @@
 using Beef.Entities;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 
@@ -168,11 +169,18 @@ namespace Beef.WebApi
 
                 if (Content != null)
                 {
-                    _value = JsonConvert.DeserializeObject<T>(Content);
-                    if (_value != null && _value is IETag eTag)
+                    if (typeof(T) == typeof(string) && Response.Content.Headers.ContentType.MediaType == "text/plain")
                     {
-                        if (eTag.ETag == null && Response.Headers.ETag != null)
-                            eTag.ETag = Response.Headers.ETag.Tag;
+                        _value = (T)System.Convert.ChangeType(Content, typeof(T), CultureInfo.CurrentCulture);
+                    }
+                    else
+                    {
+                        _value = JsonConvert.DeserializeObject<T>(Content);
+                        if (_value != null && _value is IETag eTag)
+                        {
+                            if (eTag.ETag == null && Response.Headers.ETag != null)
+                                eTag.ETag = Response.Headers.ETag.Tag;
+                        }
                     }
                 }
 

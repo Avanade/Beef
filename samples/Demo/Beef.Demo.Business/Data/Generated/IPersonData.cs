@@ -139,6 +139,13 @@ namespace Beef.Demo.Business.Data
         Task ThrowErrorAsync();
 
         /// <summary>
+        /// Invoke Api Via Agent.
+        /// </summary>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>A resultant <see cref="string"/>.</returns>
+        Task<string> InvokeApiViaAgentAsync(Guid id);
+
+        /// <summary>
         /// Gets the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>

@@ -88,8 +88,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public ReferenceDataAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public ReferenceDataAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets all of the <see cref="RefDataNamespace.Country"/> items that match the filter arguments.

@@ -156,7 +156,7 @@ namespace Beef.Demo.Test
 
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.NotModified)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"" + p.ETag + "\""));
                 })).GetAsync(3.ToGuid()));
@@ -167,7 +167,7 @@ namespace Beef.Demo.Test
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
-                .RunOverride(() => new PersonAgent(new WebApiAgentArgs(AgentTester.GetHttpClient(), r =>
+                .RunOverride(() => new PersonAgent(new DemoWebApiAgentArgs(AgentTester.GetHttpClient(), r =>
                 {
                     r.Headers.IfNoneMatch.Add(new System.Net.Http.Headers.EntityTagHeaderValue("\"ABCDEFG\""));
                 })).GetAsync(3.ToGuid()));
@@ -1055,12 +1055,28 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
-        public void I150_GetNoArgs()
+        public void I160_GetNoArgs()
         {
             AgentTester.Test<PersonAgent, Person>()
                 .ExpectStatusCode(HttpStatusCode.OK)
                 .ExpectValue(_ => new Person { FirstName = "No", LastName = "Args" })
                 .Run(a => a.GetNoArgsAsync());
+        }
+
+        [Test, TestSetUp]
+        public void I210_InvokeApiViaAgent_Mocked()
+        {
+            Mock<IPersonAgent> mock = new Mock<IPersonAgent>();
+            mock.Setup(x => x.GetAsync(1.ToGuid(), null)).ReturnsWebApiAgentResultAsync(new Person { LastName = "Mockulater" });
+
+            var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped<IPersonAgent>(mock.Object));
+
+            using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+            
+            agentTester.Test<PersonAgent, string>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => "Mockulater")
+                .Run(a => a.InvokeApiViaAgentAsync(1.ToGuid()));
         }
 
         #endregion

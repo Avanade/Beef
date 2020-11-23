@@ -49,8 +49,8 @@ namespace Beef.Demo.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public ProductAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IDemoWebApiAgentArgs"/>.</param>
+        public ProductAgent(IDemoWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="Product"/>.
