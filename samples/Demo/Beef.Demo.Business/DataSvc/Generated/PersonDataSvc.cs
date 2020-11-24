@@ -414,7 +414,7 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"Demo.Person.{id}", "", id).ConfigureAwait(false);
+                await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
             });

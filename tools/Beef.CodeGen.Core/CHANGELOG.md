@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.10
+- *Fixed:* Issue [89](https://github.com/Avanade/Beef/issues/89) fixed. Event publish code was being incorrectly generated where the subject was being overridden; was missing the corresponding inferred `Action`.
+
 ## v4.1.9
 - *Fixed:* Issue [87](https://github.com/Avanade/Beef/issues/87) fixed. Event publish code was being incorrectly generated where `EventPublish="false"`.
 

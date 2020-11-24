@@ -804,6 +804,7 @@ namespace Beef.Demo.Test
             // Delete a person.
             AgentTester.Test<PersonAgent>()
                 .ExpectStatusCode(HttpStatusCode.NoContent)
+                .ExpectEvent("Demo.Person.*", "Delete")
                 .Run(a => a.DeleteWithEfAsync(2.ToGuid()));
 
             // Check person no longer exists.
