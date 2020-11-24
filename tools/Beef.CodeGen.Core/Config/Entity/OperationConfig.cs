@@ -838,6 +838,8 @@ operations: [
 
                 if (parts.Length > 1)
                     ed.Action = parts[1];
+                else
+                    ed.Action = ConvertEventAction(WebApiOperationType!);
 
                 if (Root!.EventSubjectRoot != null)
                     ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;
