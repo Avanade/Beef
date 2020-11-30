@@ -105,13 +105,13 @@ Each of the key layers / components above are further detailed (`Xxx` denotes th
 
 ### Event-driven
 
-To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) _Beef_ enables the key capabilities; the publishing and subscribing of events (messages) to and from an event-stream (or equivalent).
+To support the goals of an [Event-driven Architecture](https://en.wikipedia.org/wiki/Event-driven_architecture) _Beef_ enables the key capabilities; the publishing (Producer) and subscribing (Consumer) of events (messages) to and from an event-stream (or equivalent).
 
 ![Layers](./docs/images/EventDrivenArchitecture.png "Event-Driven Architecture")
 
-- **Publish** - the publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer.
+- **Producer / Publisher** - the publishing of events is integrated into the API processing pipeline; this is enabled within the [Service orchestration](./docs/Layer-DataSvc.md) layer to ensure consistency of approach. _Beef_ is largely agnostic to the underlying event/messaging infrastructure (event-stream) and must be implemented by the developer.
 
-- **Subscribe** - a event subscriber is then implemented to listen to events from the underlying event/messaging infrastructure (event-stream) and perform the related action. The event subscriber is encouraged to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a subscribing domain).
+- **Consumer / Subscriber** - a event subscriber is then implemented to listen to events from the underlying event/messaging infrastructure (event-stream) and perform the related action. The event subscriber is encouraged to re-use the underlying logic by hosting the _Beef_ capabilities to implement. The [Domain logic](./docs/Layer-Manager.md) layer can be re-leveraged to perform the underlying business logic on the receipt of an event (within the context of a subscribing domain).
 
 The _Beef_ support for an event-driven architecture is enabled by the [`Beef.Events`](./src/Beef.Events) assembly.
 
@@ -187,12 +187,12 @@ The following are references to additional documentation (these are all accessib
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
 - **Entity-driven** (.NET C#):
-  - [CodeGeneration](./docs/Entity-CodeGeneration-YAML.md)
-  - [Entity](./docs/Entity-Entity-YAML.md)
-  - [Property](./docs/Entity-Property-YAML.md)
-  - [Operation](./docs/Entity-Operation-YAML.md)
-  - [Parameter](./docs/Entity-Parameter-YAML.md)
-  - [Const](./docs/Entity-Const-YAML.md)
+  - [CodeGeneration](./docs/Entity-CodeGeneration-Config.md)
+  - [Entity](./docs/Entity-Entity-Config.md)
+  - [Property](./docs/Entity-Property-Config.md)
+  - [Operation](./docs/Entity-Operation-Config.md)
+  - [Parameter](./docs/Entity-Parameter-Config.md)
+  - [Const](./docs/Entity-Const-Config.md)
 - **Table-driven** ([database](./tools/Beef.Database.Core/README.md)):
   - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
   - [Table element](./docs/Table-Table-element.md)

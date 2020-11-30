@@ -14,7 +14,7 @@ In summary, **Intra-** is about _tight-coupling_, and **Inter-** is about _loose
 
 ## Test set up
 
-Before a test executes, there is the requirement to perform set up activities, such as a test data source, etc. for example. The [`TestSetUp`](./TestSetUp.cs) and [`TestSetUpAttribute`](./TestSetUpAttribute.cs) enable.
+Before a test executes, there may be a requirement to perform set up activities; such as a test data source, etc. for example. The [`TestSetUp`](./TestSetUp.cs) and [`TestSetUpAttribute`](./TestSetUpAttribute.cs) enable.
 
 <br/>
 
@@ -46,9 +46,9 @@ public class FixtureSetUp
 
 <br/>
 
-### One-time set-up for the test fixture
+### One-time set-up for the test class
 
-Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for each [`TestFixture`](https://github.com/nunit/docs/wiki/TestFixture-Attribute) the `TestSetUp.Reset` should be invoked; this will (re)invoke the registered set up (`TestSetUp.RegisterSetUp`). Example as follows:
+Within the [`OneTimeSetUp`](https://github.com/nunit/docs/wiki/OneTimeSetUp-Attribute) for each [`TestFixture`](https://github.com/nunit/docs/wiki/TestFixture-Attribute) the `TestSetUp.Reset` should be invoked; this will (re)invoke the registered set up (`TestSetUp.RegisterSetUp`). Example as follows
 
 ``` csharp
 [TestFixture, NonParallelizable]
@@ -61,11 +61,13 @@ public class PersonTest
     }
 ```
 
+Or, alternatively, by using the [`TestSetUpAttribute`](./TestSetUpAttribute.cs) on a test method this will perform the same function.
+
 <br/>
 
 ## Agent testing
 
-As _beef_ is largely about accelerating API development this testing capability further enables and simplifies the testing of APIs. The philosophy of this testing is to exercise the APIs end-to-end, including over the wire transport and protocols, and tightly-coupled backend data sources where applicable (_intra-domain_).
+As _beef_ is largely about accelerating API development this testing capability further enables and simplifies the testing of APIs directly. The philosophy of this testing is to exercise the APIs end-to-end, including over the wire transport and protocols, and tightly-coupled backend data sources where applicable (_intra-domain_).
 
 The [`AgentTester`](./AgentTester.cs) provides a means to invoke an API and _assert_ (expect) a given response to be considered valid. The `AgentTester` invokes the API via its corresponding [Service Agent](../../docs/Layer-ServiceAgent.md). The advantage of this is that the HTTP request/response, HTTP headers, URL parameterisation, etc. are verified, as well as the underlying _intra-domain_ business logic and corresponding data services. 
 
@@ -124,12 +126,44 @@ AgentTester.Test<RobotAgent, Robot>()
 
 ## Mocking
 
-As stated earlier, for the likes of cross domain (_inter-domain_) dependencies should be mocked out. To support this, the [Moq](https://github.com/moq/moq4) framework is leveraged.
-
-The `TestSetUp.CreateMock<T>()` method will create the Moq [`Mock`](http://www.nudoq.org/#!/Packages/Moq/Moq/Mock(T)) object and set within the _beef_ `Factory`; for example:
+As stated earlier, the likes of any cross domain (_inter-domain_) dependencies should be mocked out. Or any other layer within the _Beef_ to support a specific testing use case. To support this, both dependency injection (DI) and the [Moq](https://github.com/moq/moq4) framework is leveraged (or alternatively, any mocking framework can be used if required).
 
 ``` csharp
-UnitTestSetup.CreateMock<IPersonManager>().Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync(new Person());
+// Create the mock object (not use of the ReturnsWebApiAgentResultAsync helper in this scenario)
+Mock<IPersonAgent> mock = new Mock<IPersonAgent>();
+mock.Setup(x => x.GetAsync(1.ToGuid(), null)).ReturnsWebApiAgentResultAsync(new Person { LastName = "Mockulater" });
+
+// Replace the existing scoped item with the mock object.
+var svc = new Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>(sc => sc.ReplaceScoped<IPersonAgent>(mock.Object));
+
+// Use the alternative light-weight WebApplicationFactory (WAF) as the agent tester (optional).
+using var agentTester = Beef.Test.NUnit.AgentTester.CreateWaf<Startup>(svc);
+      
+// Execute the test.      
+agentTester.Test<PersonAgent, string>()
+    .ExpectStatusCode(HttpStatusCode.OK)
+    .ExpectValue(_ => "Mockulater")
+    .Run(a => a.InvokeApiViaAgentAsync(1.ToGuid()));
+```
+
+</br>
+
+## Validation testing
+
+To simplify the testing of validations, and limit the need to have the backing data source (by mocking) to improve testing run time performance, the [`ValidatorTester`](./ValidationTester.cs) manages the testing of a validator outside of an API execution context with integrated mocking of services as required. The `ValidationTester` uses a similar _assert_ (expect) approach to enable with integrated service mocking.
+
+The following is an example excerpt from [`EmployeeValidatorTest`](../../samples/My.Hr/My.Hr.Test/Validators/EmployeeValidatorTest.cs):
+
+``` csharp
+var eds = new Mock<IEmployeeDataSvc>();
+eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { Termination = new TerminationDetail { Date = DateTime.UtcNow } });
+
+ValidationTester.Test()
+    .OperationType(Beef.OperationType.Update)
+    .AddScopedService(_referenceData)
+    .AddScopedService(eds)
+    .ExpectErrorType(Beef.ErrorType.ValidationError, "Once an Employee has been Terminated the data can no longer be updated.")
+    .Run(() => EmployeeValidator.Default.Validate(e));
 ```
 
 </br>
@@ -162,7 +196,7 @@ User context is typically passed using the likes of [JWT](https://jwt.io/introdu
 There are two opportunities to set the username for a test (specifically for the consumer):
 
 - [`TestSetUpAttribute`](./TestSetUpAttribute.cs) - this has an overload in which the username is set for the test; behind the scenes this will set the `ExecutionContext` as the test starts.
-- [`AgentTester`](./AgentTester.cs) - the `Create` method has an overload in which the username is overridden for the test; behind the scenes this will override the `ExecutionContext`.
+- [`AgentTester`](./AgentTester.cs) - the `Test` method has an overload in which the username is overridden for the test; behind the scenes this will override the `ExecutionContext`.
 
 Each of the above have overloads that take an `object userIdentifer` to support consts or enum values. The `AgentTester.UsernameConverter` function enables logic to be added to convert the identifier to a corresponding username. 
 
@@ -175,3 +209,9 @@ Where the username is not set it will default to the `AgentTester.DefaultUsernam
 There is nothing in _Beef_ that by default will send the user context for an API; this is the responsibility of the developer to implement as there is no standard approach.
 
 To access each HTTP request before it is sent the `AgentTester.RegisterBeforeRequest` action should be set. This is passed the `HttpRequestMessage` which should be updated as required. The `ExecutionContext.Current.Username` should be used.
+
+An example of sending the user as a header is as follows; this code should be replaced with a bearer token in the form of a JWT for example:
+
+``` csharp
+AgentTester.RegisterBeforeRequest(r => r.Headers.Add("cdr-user", Beef.ExecutionContext.Current.Username));
+```
