@@ -23,7 +23,6 @@ namespace My.Hr.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Employee"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/employees")]
     public partial class EmployeeController : ControllerBase
     {
@@ -43,7 +42,6 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="Employee"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -58,7 +56,6 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <returns>The created <see cref="Employee"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Employee value)
@@ -73,7 +70,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Employee value, Guid id)
@@ -88,7 +84,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Employee"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="Employee"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
@@ -101,7 +96,6 @@ namespace My.Hr.Api.Controllers
         /// Deletes the specified <see cref="Employee"/>.
         /// </summary>
         /// <param name="id">The Id.</param>
-        [AllowAnonymous]
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
@@ -120,7 +114,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="startTo">The Start To.</param>
         /// <param name="isIncludeTerminated">Indicates whether Is Include Terminated.</param>
         /// <returns>The <see cref="EmployeeBaseCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(EmployeeBaseCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -137,7 +130,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="TerminationDetail"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="Employee"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("{id}/terminate")]
         [ProducesResponseType(typeof(Employee), (int)HttpStatusCode.OK)]
         public IActionResult Terminate([FromBody] TerminationDetail value, Guid id)

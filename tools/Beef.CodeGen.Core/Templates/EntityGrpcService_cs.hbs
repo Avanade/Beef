@@ -28,7 +28,9 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Grpc
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} gRPC Server functionality.
     /// </summary>
-    [{{WebApiAuthorize}}]
+{{#ifval WebApiAuthorize}}
+    [{{{WebApiAuthorize}}}]
+{{/ifval}}
     public partial class {{Name}}Service : {{Name}}GrpcService.{{Name}}GrpcServiceBase
     {
         private readonly I{{Name}}Manager _manager;
@@ -52,7 +54,9 @@ namespace {{Root.Company}}.{{Root.AppName}}.{{Root.ApiName}}.Grpc
         /// <param name="request">The <see cref="{{Parent.Name}}{{Name}}Request"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The {{#if HasReturnValue}}{{seecomments ReturnType}}{{else}}{{seecomments 'Google.Protobuf.WellKnownTypes.Empty'}}{{/if}}.</returns>
-        [{{WebApiAuthorize}}]
+  {{#ifval WebApiAuthorize}}
+        [{{{WebApiAuthorize}}}]
+  {{/ifval}}
         public override Task<{{#if HasReturnValue}}{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}> {{Name}}({{Parent.Name}}{{Name}}Request request, ServerCallContext context)
         {
             return new GrpcService<{{#if HasReturnValue}}{{ReturnType}}{{else}}Google.Protobuf.WellKnownTypes.Empty{{/if}}>(context, async () =>

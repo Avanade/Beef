@@ -23,7 +23,6 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <see cref="TripPerson"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/tripPeople")]
     public partial class TripPersonController : ControllerBase
     {
@@ -43,7 +42,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <returns>The selected <see cref="TripPerson"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -58,7 +56,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <returns>The created <see cref="TripPerson"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] TripPerson value)
@@ -73,7 +70,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="TripPerson"/>.</param>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
         /// <returns>The updated <see cref="TripPerson"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(TripPerson), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] TripPerson value, string? id)
@@ -86,7 +82,6 @@ namespace Beef.Demo.Api.Controllers
         /// Deletes the specified <see cref="TripPerson"/>.
         /// </summary>
         /// <param name="id">The <see cref="TripPerson"/> identifier (username).</param>
-        [AllowAnonymous]
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(string? id)

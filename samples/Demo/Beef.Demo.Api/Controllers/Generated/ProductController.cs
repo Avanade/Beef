@@ -23,7 +23,6 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Product"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/products")]
     public partial class ProductController : ControllerBase
     {
@@ -43,7 +42,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -59,7 +57,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="name">The Name.</param>
         /// <param name="description">The Description.</param>
         /// <returns>The <see cref="ProductCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(ProductCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

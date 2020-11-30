@@ -24,7 +24,6 @@ namespace My.Hr.Api.Controllers
     /// <summary>
     /// Provides the <b>ReferenceData</b> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     public partial class ReferenceDataController : ControllerBase
     {
         /// <summary> 
@@ -33,7 +32,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.Gender collection.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/genders")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.Gender>), (int)HttpStatusCode.OK)]
@@ -48,7 +46,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.TerminationReason collection.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/terminationReasons")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.TerminationReason>), (int)HttpStatusCode.OK)]
@@ -63,7 +60,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.RelationshipType collection.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/relationshipTypes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.RelationshipType>), (int)HttpStatusCode.OK)]
@@ -78,7 +74,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.USState collection.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/usStates")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.USState>), (int)HttpStatusCode.OK)]
@@ -93,7 +88,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="codes">The reference data code list.</param>
         /// <param name="text">The reference data text (including wildcards).</param>
         /// <returns>A RefDataNamespace.PerformanceOutcome collection.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref/performanceOutcomes")]
         [ProducesResponseType(typeof(IEnumerable<RefDataNamespace.PerformanceOutcome>), (int)HttpStatusCode.OK)]
@@ -106,7 +100,6 @@ namespace My.Hr.Api.Controllers
         /// Gets the reference data entries for the specified entities and codes from the query string; e.g: ?entity=codeX,codeY&amp;entity2=codeZ&amp;entity3
         /// </summary>
         /// <returns>A <see cref="ReferenceDataMultiCollection"/>.</returns>
-        [AllowAnonymous]
         [HttpGet()]
         [Route("api/v1/ref")]
         [ProducesResponseType(typeof(ReferenceDataMultiCollection), (int)HttpStatusCode.OK)]

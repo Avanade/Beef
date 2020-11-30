@@ -23,7 +23,6 @@ namespace Cdr.Banking.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Transaction"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/banking/accounts")]
     public partial class TransactionController : ControllerBase
     {
@@ -48,7 +47,6 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="maxAmount">The Max Amount.</param>
         /// <param name="text">The Text.</param>
         /// <returns>The <see cref="TransactionCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("{accountId}/transactions")]
         [ProducesResponseType(typeof(TransactionCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

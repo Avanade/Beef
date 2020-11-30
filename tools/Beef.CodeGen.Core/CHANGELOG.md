@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.11
+- *Fixed:* Issue [91](https://github.com/Avanade/Beef/issues/91) fixed. `WebApiAuthorize` attribute code-gen output reverted back to pre-_Handlebars_ behaviour. Controller-level will only output where specified; will no longer default to `AllowAnonymous`. Method-level will only output where specified; will no longer default to parent (entity) value.
+
 ## v4.1.10
 - *Fixed:* Issue [89](https://github.com/Avanade/Beef/issues/89) fixed. Event publish code was being incorrectly generated where the subject was being overridden; was missing the corresponding inferred `Action`.
 

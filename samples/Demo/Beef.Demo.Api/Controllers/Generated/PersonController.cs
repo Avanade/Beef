@@ -45,7 +45,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Person value)
@@ -58,7 +57,6 @@ namespace Beef.Demo.Api.Controllers
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        [AllowAnonymous]
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
@@ -72,7 +70,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -88,7 +85,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Person value, Guid id)
@@ -103,7 +99,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
@@ -116,7 +111,6 @@ namespace Beef.Demo.Api.Controllers
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="PersonCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("all")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -130,7 +124,6 @@ namespace Beef.Demo.Api.Controllers
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="PersonCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("allnopaging")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -147,7 +140,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -165,7 +157,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonDetailCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("argsdetail")]
         [ProducesResponseType(typeof(PersonDetailCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -182,7 +173,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="fromId">The from <see cref="Person"/> identifier.</param>
         /// <param name="toId">The to <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("merge")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult Merge(Guid fromId, Guid toId)
@@ -194,7 +184,6 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Mark <see cref="Person"/>.
         /// </summary>
-        [AllowAnonymous]
         [HttpPost("mark")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult Mark()
@@ -208,7 +197,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="coordinates">The Coordinates (see <see cref="Common.Entities.MapCoordinates"/>).</param>
         /// <returns>A resultant <see cref="MapCoordinates"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("map")]
         [ProducesResponseType(typeof(MapCoordinates), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -223,7 +211,6 @@ namespace Beef.Demo.Api.Controllers
         /// Get no arguments.
         /// </summary>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("noargsforme")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -238,7 +225,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="PersonDetail"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -254,7 +240,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="PersonDetail"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult UpdateDetail([FromBody] PersonDetail value, Guid id)
@@ -269,7 +254,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PersonDetail"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="PersonDetail"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("{id}/detail")]
         [ProducesResponseType(typeof(PersonDetail), (int)HttpStatusCode.OK)]
         public IActionResult PatchDetail([FromBody] JToken value, Guid id)
@@ -282,7 +266,6 @@ namespace Beef.Demo.Api.Controllers
         /// Actually validating the FromBody parameter generation.
         /// </summary>
         /// <param name="person">The Person (see <see cref="Common.Entities.Person"/>).</param>
-        [AllowAnonymous]
         [HttpPost("fromBody")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public IActionResult Add([FromBody] Person person)
@@ -297,7 +280,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="name">The Name.</param>
         /// <param name="names">The Names.</param>
         /// <returns>A resultant <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpGet("null")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -314,7 +296,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="lastName">The Last Name.</param>
         /// <param name="genders">The Genders (see <see cref="RefDataNamespace.Gender"/>).</param>
         /// <returns>The <see cref="PersonCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("args")]
         [ProducesResponseType(typeof(PersonCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -328,7 +309,6 @@ namespace Beef.Demo.Api.Controllers
         /// <summary>
         /// Throw Error.
         /// </summary>
-        [AllowAnonymous]
         [HttpPost("error")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult ThrowError()
@@ -342,7 +322,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The selected <see cref="Person"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -357,7 +336,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <returns>The created <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("ef")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.Created)]
         public IActionResult CreateWithEf([FromBody] Person value)
@@ -372,7 +350,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The updated <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult UpdateWithEf([FromBody] Person value, Guid id)
@@ -385,7 +362,6 @@ namespace Beef.Demo.Api.Controllers
         /// Deletes the specified <see cref="Person"/>.
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
-        [AllowAnonymous]
         [HttpDelete("ef/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult DeleteWithEf(Guid id)
@@ -400,7 +376,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>The patched <see cref="Person"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("ef/{id}")]
         [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
         public IActionResult PatchWithEf([FromBody] JToken value, Guid id)

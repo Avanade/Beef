@@ -120,7 +120,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
-            Description = "Defaults to the `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+            Description = "This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
 
         #endregion
@@ -408,7 +408,6 @@ namespace Beef.CodeGen.Config.Entity
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
-            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => "AllowAnonymous");
 
             if (Entities != null && Entities.Count > 0)
             {

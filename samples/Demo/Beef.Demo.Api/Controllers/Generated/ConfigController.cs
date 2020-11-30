@@ -23,7 +23,6 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <b>Config</b> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/envvars")]
     public partial class ConfigController : ControllerBase
     {
@@ -42,7 +41,6 @@ namespace Beef.Demo.Api.Controllers
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(System.Collections.IDictionary), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

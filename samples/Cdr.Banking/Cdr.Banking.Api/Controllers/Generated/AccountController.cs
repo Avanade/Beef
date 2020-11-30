@@ -23,7 +23,6 @@ namespace Cdr.Banking.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Account"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/banking/accounts")]
     public partial class AccountController : ControllerBase
     {
@@ -45,7 +44,6 @@ namespace Cdr.Banking.Api.Controllers
         /// <param name="openStatus">The Open Status (see <see cref="RefDataNamespace.OpenStatus"/>).</param>
         /// <param name="isOwned">Indicates whether Is Owned.</param>
         /// <returns>The <see cref="AccountCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(AccountCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -61,7 +59,6 @@ namespace Cdr.Banking.Api.Controllers
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="AccountDetail"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{accountId}")]
         [ProducesResponseType(typeof(AccountDetail), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -76,7 +73,6 @@ namespace Cdr.Banking.Api.Controllers
         /// </summary>
         /// <param name="accountId">The <see cref="Account"/> identifier.</param>
         /// <returns>The selected <see cref="Balance"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{accountId}/balance")]
         [ProducesResponseType(typeof(Balance), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
