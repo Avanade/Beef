@@ -133,8 +133,8 @@ entities:
         /// Gets or sets the authorize attribute value to be used for the corresponding entity Web API controller; generally either <c>Authorize</c> or <c>AllowAnonynous</c>.
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.", IsImportant = true,
-            Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
+        [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
+            Description = "This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).")]
         public string? WebApiAuthorize { get; set; }
 
         /// <summary>
@@ -430,7 +430,6 @@ entities:
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
-            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => "AllowAnonymous");
 
             if (Entities != null && Entities.Count > 0)
             {

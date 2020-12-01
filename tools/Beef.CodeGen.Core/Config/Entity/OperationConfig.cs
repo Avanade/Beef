@@ -262,7 +262,7 @@ operations: [
         /// </summary>
         [JsonProperty("webApiAuthorize", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
-            Description = "Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified.")]
+            Description = "Where not specified no attribute output will occur; it will then inherit as supported by .NET.")]
         public string? WebApiAuthorize { get; set; }
 
         /// <summary>
@@ -737,7 +737,6 @@ operations: [
 
             PrepareParameters();
 
-            WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiRoute = DefaultWhereNull(WebApiRoute, () => Type switch
             {
                 "GetColl" => "",

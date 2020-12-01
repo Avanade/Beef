@@ -43,7 +43,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The selected <see cref="Gender"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -58,7 +57,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <returns>The created <see cref="Gender"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Gender value)
@@ -73,7 +71,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="Gender"/>.</param>
         /// <param name="id">The <see cref="Gender"/> identifier.</param>
         /// <returns>The updated <see cref="Gender"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Gender), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Gender value, Guid id)

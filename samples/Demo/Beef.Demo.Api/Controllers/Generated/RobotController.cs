@@ -23,7 +23,6 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Robot"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/robots")]
     public partial class RobotController : ControllerBase
     {
@@ -43,7 +42,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -58,7 +56,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Robot value)
@@ -73,7 +70,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Robot value, Guid id)
@@ -88,7 +84,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The patched <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(Robot), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
@@ -101,7 +96,6 @@ namespace Beef.Demo.Api.Controllers
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        [AllowAnonymous]
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)
@@ -117,7 +111,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="serialNo">The Unique serial number.</param>
         /// <param name="powerSources">The Power Sources (see <see cref="RefDataNamespace.PowerSource"/>).</param>
         /// <returns>The <see cref="RobotCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(RobotCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -133,7 +126,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
-        [AllowAnonymous]
         [HttpPost("{id}/powerSource/{powerSource}")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         public IActionResult RaisePowerSourceChange(Guid id, string? powerSource)

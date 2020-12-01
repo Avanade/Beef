@@ -23,7 +23,6 @@ namespace My.Hr.Api.Controllers
     /// <summary>
     /// Provides the <see cref="PerformanceReview"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1")]
     public partial class PerformanceReviewController : ControllerBase
     {
@@ -43,7 +42,6 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The selected <see cref="PerformanceReview"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("reviews/{id}")]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -58,7 +56,6 @@ namespace My.Hr.Api.Controllers
         /// </summary>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The <see cref="PerformanceReviewCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("employees/{employeeId}/reviews")]
         [ProducesResponseType(typeof(PerformanceReviewCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -74,7 +71,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="employeeId">The <see cref="Employee.Id"/>.</param>
         /// <returns>The created <see cref="PerformanceReview"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("employees/{employeeId}/reviews")]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] PerformanceReview value, Guid employeeId)
@@ -89,7 +85,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The updated <see cref="PerformanceReview"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("reviews/{id}")]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] PerformanceReview value, Guid id)
@@ -104,7 +99,6 @@ namespace My.Hr.Api.Controllers
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="PerformanceReview"/>.</param>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
         /// <returns>The patched <see cref="PerformanceReview"/>.</returns>
-        [AllowAnonymous]
         [HttpPatch("reviews/{id}")]
         [ProducesResponseType(typeof(PerformanceReview), (int)HttpStatusCode.OK)]
         public IActionResult Patch([FromBody] JToken value, Guid id)
@@ -117,7 +111,6 @@ namespace My.Hr.Api.Controllers
         /// Deletes the specified <see cref="PerformanceReview"/>.
         /// </summary>
         /// <param name="id">The <see cref="Employee"/> identifier.</param>
-        [AllowAnonymous]
         [HttpDelete("reviews/{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)

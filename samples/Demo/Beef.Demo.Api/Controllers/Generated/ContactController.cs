@@ -23,7 +23,6 @@ namespace Beef.Demo.Api.Controllers
     /// <summary>
     /// Provides the <see cref="Contact"/> Web API functionality.
     /// </summary>
-    [AllowAnonymous]
     [Route("api/v1/contacts")]
     public partial class ContactController : ControllerBase
     {
@@ -42,7 +41,6 @@ namespace Beef.Demo.Api.Controllers
         /// Gets the <see cref="ContactCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <returns>The <see cref="ContactCollection"/></returns>
-        [AllowAnonymous]
         [HttpGet("")]
         [ProducesResponseType(typeof(ContactCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -57,7 +55,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The selected <see cref="Contact"/> where found.</returns>
-        [AllowAnonymous]
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -72,7 +69,6 @@ namespace Beef.Demo.Api.Controllers
         /// </summary>
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <returns>The created <see cref="Contact"/>.</returns>
-        [AllowAnonymous]
         [HttpPost("")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
         public IActionResult Create([FromBody] Contact value)
@@ -87,7 +83,6 @@ namespace Beef.Demo.Api.Controllers
         /// <param name="value">The <see cref="Contact"/>.</param>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
         /// <returns>The updated <see cref="Contact"/>.</returns>
-        [AllowAnonymous]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
         public IActionResult Update([FromBody] Contact value, Guid id)
@@ -100,7 +95,6 @@ namespace Beef.Demo.Api.Controllers
         /// Deletes the specified <see cref="Contact"/>.
         /// </summary>
         /// <param name="id">The <see cref="Contact"/> identifier.</param>
-        [AllowAnonymous]
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult Delete(Guid id)

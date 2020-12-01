@@ -22,7 +22,6 @@ namespace Beef.Demo.Api.Grpc
     /// <summary>
     /// Provides the <see cref="Robot"/> gRPC Server functionality.
     /// </summary>
-    [AllowAnonymous]
     public partial class RobotService : RobotGrpcService.RobotGrpcServiceBase
     {
         private readonly IRobotManager _manager;
@@ -42,7 +41,6 @@ namespace Beef.Demo.Api.Grpc
         /// <param name="request">The <see cref="RobotGetRequest"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         public override Task<Robot> Get(RobotGetRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -59,7 +57,6 @@ namespace Beef.Demo.Api.Grpc
         /// <param name="request">The <see cref="RobotCreateRequest"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         public override Task<Robot> Create(RobotCreateRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -76,7 +73,6 @@ namespace Beef.Demo.Api.Grpc
         /// <param name="request">The <see cref="RobotUpdateRequest"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The <see cref="Robot"/>.</returns>
-        [AllowAnonymous]
         public override Task<Robot> Update(RobotUpdateRequest request, ServerCallContext context)
         {
             return new GrpcService<Robot>(context, async () =>
@@ -93,7 +89,6 @@ namespace Beef.Demo.Api.Grpc
         /// <param name="request">The <see cref="RobotDeleteRequest"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The <see cref="Google.Protobuf.WellKnownTypes.Empty"/>.</returns>
-        [AllowAnonymous]
         public override Task<Google.Protobuf.WellKnownTypes.Empty> Delete(RobotDeleteRequest request, ServerCallContext context)
         {
             return new GrpcService<Google.Protobuf.WellKnownTypes.Empty>(context, async () =>
@@ -110,7 +105,6 @@ namespace Beef.Demo.Api.Grpc
         /// <param name="request">The <see cref="RobotGetByArgsRequest"/>.</param>
         /// <param name="context">The <see cref="ServerCallContext"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        [AllowAnonymous]
         public override Task<RobotCollectionResult> GetByArgs(RobotGetByArgsRequest request, ServerCallContext context)
         {
             return new GrpcService<RobotCollectionResult>(context, async () =>
