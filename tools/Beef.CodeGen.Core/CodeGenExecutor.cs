@@ -279,25 +279,37 @@ namespace Beef.CodeGen
         {
             try
             {
+                ConfigBase config;
+
+                // Load the configuration inferring type from file extension.
                 switch (_args.ConfigFile!.Extension.ToUpperInvariant())
                 {
                     case ".XML":
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            return LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml));
+                            config = LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml));
                         }
+
+                        break;
 
                     case ".YAML":
                     case ".YML":
-                        return LoadConfigFileFromYaml(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+                        config = LoadConfigFileFromYaml(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+                        break;
 
                     case ".JSON":
                     case ".JSN":
-                        return LoadConfigFileFromJson(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+                        config = LoadConfigFileFromJson(configType, File.ReadAllText(_args.ConfigFile!.FullName));
+                        break;
 
                     default: throw new CodeGenException($"The Config file '{_args.ConfigFile!.FullName}' is not a supported file type.");
                 }
+
+                // Validate the file to ensure general data consistency.
+                ConfigValidator.Validate(config);
+
+                return config;
             }
             catch (CodeGenException) { throw; }
             catch (Exception ex) { throw new CodeGenException($"The contents of the Config File {_args.ConfigFile!.Name} are not valid.", ex); }

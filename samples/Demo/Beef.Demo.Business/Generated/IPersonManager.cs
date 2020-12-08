@@ -163,7 +163,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        Task<string> InvokeApiViaAgentAsync(Guid id);
+        Task<string?> InvokeApiViaAgentAsync(Guid id);
 
         /// <summary>
         /// Gets the specified <see cref="Person"/>.

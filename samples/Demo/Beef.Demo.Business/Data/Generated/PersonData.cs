@@ -315,7 +315,7 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string> InvokeApiViaAgentAsync(Guid id)
+        public Task<string?> InvokeApiViaAgentAsync(Guid id)
             => DataInvoker.Current.InvokeAsync(this, () => InvokeApiViaAgentOnImplementationAsync(id), new BusinessInvokerArgs { ExceptionHandler = _invokeApiViaAgentOnException });
 
         /// <summary>

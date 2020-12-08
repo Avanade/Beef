@@ -327,7 +327,7 @@ namespace Beef.Demo.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public IActionResult InvokeApiViaAgent(Guid id)
         {
-            return new WebApiPost<string>(this, () => _manager.InvokeApiViaAgentAsync(id),
+            return new WebApiPost<string?>(this, () => _manager.InvokeApiViaAgentAsync(id),
                 operationType: OperationType.Unspecified, statusCode: HttpStatusCode.OK, alternateStatusCode: HttpStatusCode.NoContent);
         }
 

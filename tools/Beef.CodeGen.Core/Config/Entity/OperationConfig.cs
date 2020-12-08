@@ -612,6 +612,9 @@ operations: [
             else if (Type != "Custom")
                 ReturnTypeNullable = false;
 
+            if (ReturnType == "string")
+                ReturnTypeNullable = true;
+
             if (ReturnType != null && Type == "GetColl")
                 ReturnType += "CollectionResult";
 
@@ -748,22 +751,22 @@ operations: [
             {
                 PatchGetOperation = DefaultWhereNull(PatchGetOperation, () => "Get");
                 var parts = string.IsNullOrEmpty(PatchGetOperation) ? Array.Empty<string>() : PatchGetOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0].Substring(1));
+                PatchGetVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
                     PatchGetOperation = parts[1];
                     if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
-                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0].Substring(1), Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
 
                 PatchUpdateOperation = DefaultWhereNull(PatchUpdateOperation, () => "Update");
                 parts = string.IsNullOrEmpty(PatchUpdateOperation) ? Array.Empty<string>() : PatchUpdateOperation.Split(".", StringSplitOptions.RemoveEmptyEntries);
-                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0].Substring(1));
+                PatchUpdateVariable = parts.Length <= 1 ? "_manager" : StringConversion.ToPrivateCase(parts[0][1..]);
                 if (parts.Length > 1)
                 {
                     PatchUpdateOperation = parts[1];
                     if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
-                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0].Substring(1), Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
             }
 

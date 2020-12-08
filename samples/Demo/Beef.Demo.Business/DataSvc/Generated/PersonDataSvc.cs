@@ -49,7 +49,7 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnAfterAsync;
         private Func<Task>? _throwErrorOnAfterAsync;
-        private Func<string, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+        private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
         private Func<Person?, Guid, Task>? _getWithEfOnAfterAsync;
         private Func<Person, Task>? _createWithEfOnAfterAsync;
         private Func<Person, Task>? _updateWithEfOnAfterAsync;
@@ -358,7 +358,7 @@ namespace Beef.Demo.Business.DataSvc
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string> InvokeApiViaAgentAsync(Guid id)
+        public Task<string?> InvokeApiViaAgentAsync(Guid id)
         {
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {

@@ -26,6 +26,12 @@ namespace Beef.CodeGen.Config
         /// Resets the runtime parameters.
         /// </summary>
         void ResetRuntimeParameters();
+
+        /// <summary>
+        /// Validate (extend) the configuration.
+        /// </summary>
+        /// <param name="args">The <see cref="ConfigValidatorArgs"/>.</param>
+        void Validate(ConfigValidatorArgs args);
     }
 
     /// <summary>
@@ -193,6 +199,13 @@ namespace Beef.CodeGen.Config
         /// <param name="root">The root <see cref="ConfigBase"/>.</param>
         /// <param name="parent">The parent <see cref="ConfigBase"/>.</param>
         protected internal abstract void Prepare(object root, object parent);
+
+        /// <summary>
+        /// Validate (extend) the configuration.
+        /// </summary>
+        /// <param name="args">The <see cref="ConfigValidatorArgs"/>.</param>
+        /// <remarks>The validation occurs after all other validations have occured (properties and nested collections).</remarks>
+        public virtual void Validate(ConfigValidatorArgs args) { }
     }
 
     /// <summary>

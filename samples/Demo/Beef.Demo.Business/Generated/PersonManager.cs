@@ -123,7 +123,7 @@ namespace Beef.Demo.Business
         private Func<Guid, Task>? _invokeApiViaAgentOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _invokeApiViaAgentOnValidate;
         private Func<Guid, Task>? _invokeApiViaAgentOnBeforeAsync;
-        private Func<string, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
+        private Func<string?, Guid, Task>? _invokeApiViaAgentOnAfterAsync;
 
         private Func<Guid, Task>? _getWithEfOnPreValidateAsync;
         private Action<MultiValidator, Guid>? _getWithEfOnValidate;
@@ -629,7 +629,7 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string> InvokeApiViaAgentAsync(Guid id)
+        public Task<string?> InvokeApiViaAgentAsync(Guid id)
         {
             return ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
