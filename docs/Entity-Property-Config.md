@@ -1,4 +1,4 @@
-# 'Property' object (entity-driven)
+# 'Property' object (entity-driven) - YAML/JSON
 
 The `Property` object defines an `Entity` property and its charateristics.
 

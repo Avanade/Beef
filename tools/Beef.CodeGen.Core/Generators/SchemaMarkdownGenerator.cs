@@ -54,7 +54,7 @@ namespace Beef.CodeGen.Generators
             if (!Enum.TryParse<ConfigurationEntity>(csa.Name, out var ce))
                 ce = ConfigurationEntity.CodeGen;
 
-            var fn = Path.Combine(path, $"{ct}-{csa.Name}-{(isYaml ? "Config" : "Xml")}.md");
+            var fn = Path.Combine(path, $"{ct}-{csa.Name}-{(isYaml ? "Config" : "Config-Xml")}.md");
             Beef.Diagnostics.Logger.Default.LogWarning($" > Creating: {fn}");
             using var sw = File.CreateText(fn);
 
@@ -76,7 +76,9 @@ namespace Beef.CodeGen.Generators
                 if (!isYaml)
                 {
                     pd.Name = XmlYamlTranslate.GetXmlName(ct, ce, pd.Name!);
-                    pd.Psa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, pd.Name).Attribute;
+                    var xpsa = XmlYamlTranslate.GetXmlPropertySchemaAttribute(ct, ce, pd.Name).Attribute;
+                    if (xpsa != null)
+                        pd.Psa = xpsa;
                 }
 
                 if (pd.Psa == null)
@@ -93,10 +95,10 @@ namespace Beef.CodeGen.Generators
                 pdlist.Add(pd);
             }
 
-            sw.WriteLine($"# {csa.Title}");
+            sw.WriteLine($"# {csa.Title} - {(isYaml ? "YAML/JSON" : "XML")}");
             sw.WriteLine();
             sw.WriteLine(csa.Description);
-            if (csa.Markdown != null)
+            if (isYaml && !string.IsNullOrEmpty(csa.Markdown))
             {
                 sw.WriteLine();
                 sw.WriteLine(csa.Markdown);
@@ -156,7 +158,7 @@ namespace Beef.CodeGen.Generators
                     {
                         var pt = ComplexTypeReflector.GetItemType(p.Property!.PropertyType);
                         var ptcsa = pt.GetCustomAttribute<ClassSchemaAttribute>()!;
-                        WriteTableItem(sw, p.Name, $"The corresponding [`{ptcsa.Name}`]({ct}-{ptcsa.Name}-{(isYaml ? "Yaml" : "Xml")}.md) collection.", p.Pcsa!.Description, p.Pcsa.Markdown, p.Pcsa.IsImportant);
+                        WriteTableItem(sw, p.Name, $"The corresponding [`{ptcsa.Name}`]({ct}-{ptcsa.Name}-{(isYaml ? "Config" : "Config-Xml")}.md) collection.", p.Pcsa!.Description, p.Pcsa.Markdown, p.Pcsa.IsImportant);
                     }
                 }
 

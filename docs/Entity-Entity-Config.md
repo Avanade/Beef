@@ -1,6 +1,6 @@
-# 'Entity' object (entity-driven)
+# 'Entity' object (entity-driven) - YAML/JSON
 
-The **Entity** is used as the primary configuration for driving the entity-driven code generation.
+The `Entity` is used as the primary configuration for driving the entity-driven code generation.
 
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
 ``` yaml
@@ -34,7 +34,7 @@ Category | Description
 [`DataSvc`](#DataSvc) | Provides the _Data Services-layer_ configuration.
 [`Data`](#Data) | Provides the generic _Data-layer_ configuration.
 [`Database`](#Database) | Provides the specific _Database (ADO.NET)_ configuration where `AutoImplement` is `Database`.
-[`EntityFramework`](#EntityFramework) | Provides the specific _Entity Framework_ configuration where `AutoImplement` is `EntityFramework`.
+[`EntityFramework`](#EntityFramework) | Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement` is `EntityFramework`.
 [`Cosmos`](#Cosmos) | Provides the specific _Cosmos_ configuration where `AutoImplement` is `Cosmos`.
 [`OData`](#OData) | Provides the specific _OData_ configuration where `AutoImplement` is `OData`.
 [`Model`](#Model) | Provides the data _Model_ configuration.
@@ -183,7 +183,7 @@ Property | Description
 <br/>
 
 ## EntityFramework
-Provides the specific _Entity Framework_ configuration where `AutoImplement` is `EntityFramework`.
+Provides the specific _Entity Framework (EF)_ configuration where `AutoImplement` is `EntityFramework`.
 
 Property | Description
 -|-
@@ -264,9 +264,9 @@ Provides related child (hierarchical) configuration.
 
 Property | Description
 -|-
-`properties` | The corresponding [`Property`](Entity-Property-Yaml.md) collection.
-`operations` | The corresponding [`Operation`](Entity-Operation-Yaml.md) collection.
-`consts` | The corresponding [`Const`](Entity-Const-Yaml.md) collection.
+`properties` | The corresponding [`Property`](Entity-Property-Config.md) collection.
+`operations` | The corresponding [`Operation`](Entity-Operation-Config.md) collection.
+`consts` | The corresponding [`Const`](Entity-Const-Config.md) collection.
 
 <br/>
 

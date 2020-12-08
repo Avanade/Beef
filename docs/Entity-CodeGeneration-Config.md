@@ -1,4 +1,4 @@
-# 'CodeGeneration' object (entity-driven)
+# 'CodeGeneration' object (entity-driven) - YAML/JSON
 
 The `CodeGeneration` object defines global properties that are used to drive the underlying entity-driven code generation.
 
@@ -65,7 +65,8 @@ Provides the _Web API (Controller)_ configuration.
 
 Property | Description
 -|-
-**`webApiAuthorize`** | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).
+`webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s).
+`appBasedAgentArgs` | Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.
 
 <br/>
 
@@ -153,7 +154,7 @@ Provides related child (hierarchical) configuration.
 
 Property | Description
 -|-
-**`entities`** | The corresponding [`Entity`](Entity-Entity-Yaml.md) collection. An `Entity` object provides the primary configuration for an entity, its properties and operations.
+**`entities`** | The corresponding [`Entity`](Entity-Entity-Config.md) collection. An `Entity` object provides the primary configuration for an entity, its properties and operations.
 
 <br/>
 

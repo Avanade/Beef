@@ -52,9 +52,7 @@ The following code generation is supported:
 
 ### Entity-driven code-gen
 
-The entity-driven gen-many code generation is enabled by an **Entity** configuraion file that is responsible for defining the characteristics for an [Entity](../../docs/Entity-Entity-Config.md), its [Properties](../../docs/Entity-Property-Config.md), [Constants](../../docs/Entity-Const-Config.md) and [Operations](../../docs/Entity-Operation-Config.md) (and underlying [Parameters](../../docs/Entity-Parameter-Config.md)). The entity definitions are wrapped by a root [CodeGeneration](../../docs/Entity-CodeGeneration-Config.md) object.
-
-The hierarcy is as follows:
+The entity-driven gen-many code generation is enabled by an **Entity** configuration file that is responsible for defining the characteristics used by the code-gen tooling. The hierarchy is as follows:
 
 ```
 └── CodeGeneration
@@ -64,6 +62,14 @@ The hierarcy is as follows:
     └── Operation(s)
       └── Parameter(s)
 ```
+
+Configuration details for each of the above are as follows:
+- CodeGeneration - [YAML/JSON](../../docs/Entity-CodeGeneration-Config.md) or [XML](../../docs/Entity-CodeGeneration-Config-Xml.md)
+- Entity - [YAML/JSON](../../docs/Entity-Entity-Config.md) or [XML](../../docs/Entity-Entity-Config-Xml.md)
+- Properties - [YAML/JSON](../../docs/Entity-Property-Config.md) or [XML](../../docs/Entity-Property-Config-Xml.md)
+- Constants - [YAML/JSON](../../docs/Entity-Const-Config.md) or [XML](../../docs/Entity-Const-Config-Xml.md)
+- Operations - [YAML/JSON](../../docs/Entity-Operation-Config.md) or [XML](../../docs/Entity-Operation-Config-Xml.md)
+- Parameters - [YAML/JSON](../../docs/Entity-Parameter-Config.md) or [XML](../../docs/Entity-Parameter-Config-Xml.md)
 
 The **Entity** configuration supported filenames are, in the order in which they are searched: `entity.beef.yaml`, `entity.beef.json`, `entity.beef.xml`, `{Company}.{AppName}.xml`.
 

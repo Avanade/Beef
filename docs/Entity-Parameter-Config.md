@@ -1,4 +1,4 @@
-# 'Parameter' object (entity-driven)
+# 'Parameter' object (entity-driven) - YAML/JSON
 
 The `Parameter` object defines an `Operation` parameter and its charateristics.
 

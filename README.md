@@ -187,12 +187,12 @@ The following are references to additional documentation (these are all accessib
 
 - [Code generation](./tools/Beef.CodeGen.Core/README.md)
 - **Entity-driven** (.NET C#):
-  - [CodeGeneration](./docs/Entity-CodeGeneration-Config.md)
-  - [Entity](./docs/Entity-Entity-Config.md)
-  - [Property](./docs/Entity-Property-Config.md)
-  - [Operation](./docs/Entity-Operation-Config.md)
-  - [Parameter](./docs/Entity-Parameter-Config.md)
-  - [Const](./docs/Entity-Const-Config.md)
+  - CodeGeneration - [YAML/JSON](./docs/Entity-CodeGeneration-Config.md) or [XML](./docs/Entity-CodeGeneration-Config-Xml.md)
+  - Entity - [YAML/JSON](./docs/Entity-Entity-Config.md) or [XML](./docs/Entity-Entity-Config-Xml.md)
+  - Properties - [YAML/JSON](./docs/Entity-Property-Config.md) or [XML](./docs/Entity-Property-Config-Xml.md)
+  - Constants - [YAML/JSON](./docs/Entity-Const-Config.md) or [XML](./docs/Entity-Const-Config-Xml.md)
+  - Operations - [YAML/JSON](./docs/Entity-Operation-Config.md) or [XML](./docs/Entity-Operation-Config-Xml.md)
+  - Parameters - [YAML/JSON](./docs/Entity-Parameter-Config.md) or [XML](./docs/Entity-Parameter-Config-Xml.md)
 - **Table-driven** ([database](./tools/Beef.Database.Core/README.md)):
   - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
   - [Table element](./docs/Table-Table-element.md)

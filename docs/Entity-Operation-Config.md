@@ -1,4 +1,4 @@
-# 'CodeGeneration' object (entity-driven)
+# 'CodeGeneration' object (entity-driven) - YAML/JSON
 
 The code generation for an `Operation` is primarily driven by the `OperationType` attribute. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.
 
@@ -82,7 +82,7 @@ Provides the data _Web API_ configuration.
 Property | Description
 -|-
 **`webApiRoute`** | The Web API `RouteAtttribute` to be appended to the `Entity.WebApiRoutePrefix`.
-`webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified.
+`webApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. Where not specified no attribute output will occur; it will then inherit as supported by .NET.
 **`webApiMethod`** | The HTTP Method for the operation. Valid options are: `HttpGet`, `HttpPost`, `HttpPut`, `HttpDelete`. The value defaults as follows: `HttpGet` for `Operation.Type` value `Get` or `GetColl`, `HttpPost` for `Operation.Type` value `Create` or `Custom`, `HttpPut` for `Operation.Type` value `Update`, and `HttpDelete` for `Operation.Type` value `Delete`. An `Operation.Type` value `Patch` can not be specified and will always default to `HttpPatch`.
 `webApiStatus` | The primary HTTP Status Code that will be returned for the operation where there is a non-`null` return value. Valid options are: `OK`, `Accepted`, `Created`, `NoContent`, `NotFound`. The value defaults as follows: `OK` for `Operation.Type` value `Get`, `GetColl`, `Update`, `Delete` or `Custom`, `Created` for `Operation.Type` value `Create`.
 `webApiAlternateStatus` | The primary HTTP Status Code that will be returned for the operation where there is a `null` return value. Valid options are: `OK`, `Accepted`, `Created`, `NoContent`, `NotFound`, `ThrowException`. The value defaults as follows: `NotFound` for `Operation.Type` value `Get`, `NoContent` for `Operation.Type` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.
@@ -159,7 +159,7 @@ Provides related child (hierarchical) configuration.
 
 Property | Description
 -|-
-`parameters` | The corresponding [`Parameter`](Entity-Parameter-Yaml.md) collection.
+`parameters` | The corresponding [`Parameter`](Entity-Parameter-Config.md) collection.
 
 <br/>
 

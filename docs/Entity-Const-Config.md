@@ -1,4 +1,4 @@
-# 'Const' object (entity-driven)
+# 'Const' object (entity-driven) - YAML/JSON
 
 The `Const` object is used to define a .NET (C#) constant value for an `Entity`.
 
