@@ -38,6 +38,8 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckOptionsProperties();
+
             Location = DefaultWhereNull(Location, () => "After");
         }
     }

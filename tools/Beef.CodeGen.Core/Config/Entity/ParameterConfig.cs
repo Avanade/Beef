@@ -27,6 +27,12 @@ parameters: [
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, OperationConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Parameter", Name);
+
         #region Key
 
         /// <summary>
@@ -256,7 +262,10 @@ parameters: [
         /// </summary>
         protected override void Prepare()
         {
-            var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Name);
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
+            var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Property);
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
             if (Type!.EndsWith("?", StringComparison.InvariantCulture))

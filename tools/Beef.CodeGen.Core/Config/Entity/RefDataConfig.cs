@@ -40,7 +40,7 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         protected override void Prepare()
         {
-            var oc = new OperationConfig();
+            var oc = new OperationConfig { Name = "<internal>" };
             oc.Prepare(Root!, new EntityConfig { Name = "RefData" });
 
             // Data constructors.

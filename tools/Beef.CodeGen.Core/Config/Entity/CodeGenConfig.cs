@@ -419,6 +419,7 @@ entities:
         /// </summary>
         protected override void Prepare()
         {
+            CheckOptionsProperties();
             RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");
             EventPublish = DefaultWhereNull(EventPublish, () => true);

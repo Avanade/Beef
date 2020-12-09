@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.Config;
 using System;
 
 namespace Beef.CodeGen
@@ -33,5 +34,13 @@ namespace Beef.CodeGen
         /// <param name="message">The message text.</param>
         /// <param name="innerException">The inner <see cref="Exception"/>.</param>
         public CodeGenException(string message, Exception innerException) : base(message, innerException) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CodeGenException"/> class for a specified <paramref name="config"/>.
+        /// </summary>
+        /// <param name="config">The <see cref="ConfigBase"/> that the excpetion is related to.</param>
+        /// <param name="propertyName">The corresponding property name that is in error.</param>
+        /// <param name="message">The message that describes the error.</param>
+        public CodeGenException(ConfigBase config, string propertyName, string message) : base($"{Check.NotNull(config, nameof(config)).BuildFullyQualifiedName(propertyName)}: {message}") { }
     }
 }

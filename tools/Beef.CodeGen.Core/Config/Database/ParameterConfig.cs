@@ -17,6 +17,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Parameter", Name);
+
         #region Key
 
         /// <summary>
@@ -113,8 +119,11 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-                Name = Name.Substring(1);
+                Name = Name[1..];
 
             Column = DefaultWhereNull(Column, () => Name);
             Operator = DefaultWhereNull(Operator, () => "EQ");
@@ -125,12 +134,12 @@ namespace Beef.CodeGen.Config.Database
             {
                 var c = Parent!.Parent!.Columns.Where(x => x.Name == Column).SingleOrDefault()?.DbColumn;
                 if (c == null)
-                    throw new CodeGenException($"Parameter '{Name}' specified Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
+                    throw new CodeGenException(this, nameof(Column), $"Column '{Column}' (Schema.Table '{Parent!.Parent!.Schema}.{Parent!.Parent!.Name}') not found in database.");
 
                 var sb = new StringBuilder();
                 if (CompareValue(Collection, true))
                 {
-                    var udt = c.Type!.ToUpperInvariant() switch
+                    var udt = c!.Type!.ToUpperInvariant() switch
                     {
                         "UNIQUEIDENTIFIER" => "UniqueIdentifier",
                         "NVARCHAR" => "NVarChar",
@@ -144,7 +153,7 @@ namespace Beef.CodeGen.Config.Database
                 }
                 else
                 {
-                    sb.Append($"{c.Type!.ToUpperInvariant()}");
+                    sb.Append($"{c!.Type!.ToUpperInvariant()}");
                     if (Beef.CodeGen.DbModels.DbColumn.TypeIsString(c.Type))
                         sb.Append(c.Length.HasValue && c.Length.Value > 0 ? $"({c.Length.Value})" : "(MAX)");
 

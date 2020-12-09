@@ -21,6 +21,12 @@ consts: [
     public class ConstConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
         /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Const", Name);
+
+        /// <summary>
         /// Gets or sets the unique constant name.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -58,6 +64,8 @@ consts: [
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
             DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name));
         }
     }

@@ -16,6 +16,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryJoinOnConfig : ConfigBase<CodeGenConfig, QueryJoinConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("QueryJoinOn", Name);
+
         #region Key
 
         /// <summary>
@@ -66,15 +72,17 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-                Name = Name.Substring(1);
+                Name = Name[1..];
 
             var c = Parent!.DbTable!.Columns.Where(x => x.Name == Name).SingleOrDefault();
             if (c == null)
-                throw new CodeGenException($"JoinOn '{Name}' (Schema.Table '{Parent!.Schema}.{Parent!.Name}') not found in database.");
+                throw new CodeGenException(this, nameof(Name), $"JoinOn '{Name}' (Schema.Table '{Parent!.Schema}.{Parent!.Name}') not found in database.");
 
             if (string.IsNullOrEmpty(ToStatement))
             {
@@ -84,12 +92,12 @@ namespace Beef.CodeGen.Config.Database
 
                 c = Root!.DbTables.Where(x => x.Schema == ToSchema && x.Name == ToTable).SingleOrDefault()?.Columns.Where(x => x.Name == ToColumn).SingleOrDefault();
                 if (c == null)
-                    throw new CodeGenException($"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in database.");
+                    throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in database.");
 
                 if (ToSchema == Parent!.Parent!.Schema && ToTable == Parent!.Parent!.Name)
                 {
                     if (Parent!.Parent!.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() == null)
-                        throw new CodeGenException($"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in Table/Join configuration.");
+                        throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in Table/Join configuration.");
 
                     ToStatement = $"[{Parent!.Parent!.Alias}].[{ToColumn}]";
                 }
@@ -101,7 +109,7 @@ namespace Beef.CodeGen.Config.Database
                         ToStatement = $"[{t.Alias}].[{ToColumn}]";
                     }
                     else
-                        throw new CodeGenException($"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in Table/Join configuration.");
+                        throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{ToSchema}.{ToTable}') not found in Table/Join configuration.");
                 }
             }
         }

@@ -28,6 +28,9 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        protected override void Prepare() { }
+        protected override void Prepare() 
+        {
+            CheckOptionsProperties();
+        }
     }
 }

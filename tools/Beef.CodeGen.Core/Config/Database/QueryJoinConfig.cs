@@ -21,6 +21,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     public class QueryJoinConfig : ConfigBase<CodeGenConfig, QueryConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("QueryJoin", Name);
+
         #region Key
 
         /// <summary>
@@ -305,13 +311,16 @@ namespace Beef.CodeGen.Config.Database
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-                Name = Name.Substring(1);
+                Name = Name[1..];
 
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
             DbTable = Root!.DbTables.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
-                throw new CodeGenException($"Specified Schema.Table '{Schema}.{Name}' not found in database.");
+                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 

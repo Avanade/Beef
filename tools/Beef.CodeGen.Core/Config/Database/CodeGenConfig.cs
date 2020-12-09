@@ -236,6 +236,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckOptionsProperties();
             LoadDbTablesConfig();
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");

@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Beef.CodeGen.Config
 {
@@ -26,12 +30,6 @@ namespace Beef.CodeGen.Config
         /// Resets the runtime parameters.
         /// </summary>
         void ResetRuntimeParameters();
-
-        /// <summary>
-        /// Validate (extend) the configuration.
-        /// </summary>
-        /// <param name="args">The <see cref="ConfigValidatorArgs"/>.</param>
-        void Validate(ConfigValidatorArgs args);
     }
 
     /// <summary>
@@ -191,7 +189,90 @@ namespace Beef.CodeGen.Config
             return $"<see cref=\"{ReplaceGenericsBracketWithCommentsBracket(text)}\"/>";
         }
 
+        /// <summary>
+        /// Build the standardized qualified key name.
+        /// </summary>
+        /// <param name="configName">The <see cref="ConfigBase"/> name.</param>
+        /// <param name="keyValue">The key value.</param>
+        /// <param name="keyName">The corresponding key name; defaults to 'Name'.</param>
+        /// <returns></returns>
+        protected static string BuildQualifiedKeyName(string configName, string? keyValue, string keyName = "Name")
+            => $"{configName}({keyName}='{(string.IsNullOrEmpty(keyValue) ? "<not specified>" : keyValue)}')";
+
         #endregion
+
+        /// <summary>
+        /// Gets the <b>Root</b> configuration.
+        /// </summary>
+        protected internal ConfigBase? RootConfig { get; set; }
+
+        /// <summary>
+        /// Gets the <b>Parent</b> configuration.
+        /// </summary>
+        protected internal ConfigBase? ParentConfig { get; set; }
+
+        /// <summary>
+        /// Gets the qualified key name for the configuration.
+        /// </summary>
+        /// <remarks>Used in error messages to assist navigation within configuration.</remarks>
+        public virtual string? QualifiedKeyName { get; } = null;
+
+        /// <summary>
+        /// Build the fully qualified name for the specified <paramref name="propertyName"/>.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns>The fully qualified name.</returns>
+        public string? BuildFullyQualifiedName(string propertyName)
+        {
+            var hier = new List<string?> { propertyName };
+            ConfigBase? cb = this;
+            while (true)
+            {
+                hier.Add(cb.QualifiedKeyName);
+                if (cb.ParentConfig == null || cb == cb.ParentConfig)
+                    break;
+
+                cb = cb.ParentConfig;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var qn in hier.Reverse<string?>())
+            {
+                if (!string.IsNullOrEmpty(qn))
+                {
+                    if (sb.Length > 0)
+                        sb.Append(".");
+
+                    sb.Append(qn);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Check that the key has a value and throw an error where not specified.
+        /// </summary>
+        /// <param name="keyValue">The key value.</param>
+        /// <param name="keyName">The corresponding key name; defaults to 'Name'.</param>
+        protected void CheckKeyHasValue(string? keyValue, string keyName = "Name")
+        {
+            if (string.IsNullOrEmpty(keyValue))
+                throw new CodeGenException(this, keyName, "Value is mandatory.");
+        }
+
+        /// <summary>
+        /// Checks all properties that use the <see cref="PropertySchemaAttribute.Options"/> to ensure the value is considered valid.
+        /// </summary>
+        protected void CheckOptionsProperties()
+        {
+            foreach (var pi in GetType().GetProperties())
+            {
+                var psa = pi.GetCustomAttribute<PropertySchemaAttribute>();
+                if (psa != null && psa.Options != null && psa.Options.Length > 0 && pi.GetValue(this) is string val && !psa.Options.Contains(val))
+                    throw new CodeGenException(this, pi.Name, $"Value '{val}' is invalid; valid values are: {string.Join(", ", psa.Options)}.");
+            }
+        }
 
         /// <summary>
         /// Prepares the configuration properties in advance of the code-generation execution (Internal use!).
@@ -199,13 +280,6 @@ namespace Beef.CodeGen.Config
         /// <param name="root">The root <see cref="ConfigBase"/>.</param>
         /// <param name="parent">The parent <see cref="ConfigBase"/>.</param>
         protected internal abstract void Prepare(object root, object parent);
-
-        /// <summary>
-        /// Validate (extend) the configuration.
-        /// </summary>
-        /// <param name="args">The <see cref="ConfigValidatorArgs"/>.</param>
-        /// <remarks>The validation occurs after all other validations have occured (properties and nested collections).</remarks>
-        public virtual void Validate(ConfigValidatorArgs args) { }
     }
 
     /// <summary>
@@ -239,8 +313,8 @@ namespace Beef.CodeGen.Config
         /// <param name="parent">The parent <see cref="ConfigBase"/>.</param>
         public void Prepare(TRoot root, TParent parent)
         {
-            Root = root;
-            Parent = parent;
+            RootConfig = Root = root;
+            ParentConfig = Parent = parent;
             Prepare();
         }
 

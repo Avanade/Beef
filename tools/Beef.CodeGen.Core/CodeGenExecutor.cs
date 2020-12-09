@@ -306,9 +306,6 @@ namespace Beef.CodeGen
                     default: throw new CodeGenException($"The Config file '{_args.ConfigFile!.FullName}' is not a supported file type.");
                 }
 
-                // Validate the file to ensure general data consistency.
-                ConfigValidator.Validate(config);
-
                 return config;
             }
             catch (CodeGenException) { throw; }
@@ -387,13 +384,13 @@ namespace Beef.CodeGen
 
                 UpdatedCount++;
                 File.WriteAllText(fi.FullName, e.Content);
-                _args.Logger.LogWarning("    Updated -> {0}", fi.FullName.Substring(outputDir.Length));
+                _args.Logger.LogWarning("    Updated -> {0}", fi.FullName[outputDir.Length..]);
             }
             else
             {
                 CreatedCount++;
                 File.WriteAllText(fi.FullName, e.Content);
-                _args.Logger.LogWarning("    Created -> {0}", fi.FullName.Substring(outputDir.Length));
+                _args.Logger.LogWarning("    Created -> {0}", fi.FullName[outputDir.Length..]);
             }
         }
     }

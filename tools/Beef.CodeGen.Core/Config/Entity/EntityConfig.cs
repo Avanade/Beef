@@ -49,6 +49,12 @@ entities:
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Entity", Name);
+
         #region Key
 
         /// <summary>
@@ -974,6 +980,8 @@ entities:
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
             Text = ToComments(DefaultWhereNull(Text, () => StringConversion.ToSentenceCase(Name)));
             FileName = DefaultWhereNull(FileName, () => Name);
             EntityScope = DefaultWhereNull(EntityScope, () => "Common");
@@ -1208,7 +1216,7 @@ entities:
         private void PrepareConstructors()
         {
             // DataSvc constructors.
-            var oc = new OperationConfig();
+            var oc = new OperationConfig { Name = "<internal>" };
             oc.Prepare(Root!, this);
 
             if (RequiresData)

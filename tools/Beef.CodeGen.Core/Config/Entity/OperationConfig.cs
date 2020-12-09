@@ -52,6 +52,12 @@ operations: [
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class OperationConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Operation", Name);
+
         #region Key
 
         /// <summary>
@@ -587,6 +593,9 @@ operations: [
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             BaseReturnType = DefaultWhereNull(ReturnType, () => Type switch
             {
                 "Get" => Parent!.EntityName,
@@ -855,7 +864,7 @@ operations: [
         /// </summary>
         private void PrepareData()
         {
-            DataArgs = new ParameterConfig { PrivateName = "__dataArgs" };
+            DataArgs = new ParameterConfig { Name = "<internal>", PrivateName = "__dataArgs" };
             switch (AutoImplement)
             {
                 case "Database":

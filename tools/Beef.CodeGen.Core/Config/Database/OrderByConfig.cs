@@ -15,6 +15,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class OrderByConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("OrderBy", Name);
+
         #region Key
 
         /// <summary>
@@ -44,8 +50,11 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-                Name = Name.Substring(1);
+                Name = Name[1..];
 
             Order = DefaultWhereNull(Order, () => "Ascending");
         }

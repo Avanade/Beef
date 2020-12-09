@@ -24,6 +24,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class QueryConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Query", Name);
+
         #region Key
 
         /// <summary>
@@ -379,10 +385,13 @@ namespace Beef.CodeGen.Config.Database
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             Schema = DefaultWhereNull(Schema, () => "dbo");
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
-                throw new CodeGenException($"Specified Schema.Table '{Schema}.{Name}' not found in database.");
+                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);

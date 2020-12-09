@@ -16,6 +16,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryOrderConfig : ConfigBase<CodeGenConfig, QueryConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("QueryOrder", Name);
+
         #region Key
 
         /// <summary>
@@ -62,8 +68,11 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             if (Name != null && Name.StartsWith("@", StringComparison.OrdinalIgnoreCase))
-                Name = Name.Substring(1);
+                Name = Name[1..];
 
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
             Table = DefaultWhereNull(Table, () => Parent!.Name);
@@ -71,12 +80,12 @@ namespace Beef.CodeGen.Config.Database
 
             var c = Root!.DbTables.Where(x => x.Schema == Schema && x.Name == Table).SingleOrDefault()?.Columns.Where(x => x.Name == Name).SingleOrDefault();
             if (c == null)
-                throw new CodeGenException($"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in database.");
+                throw new CodeGenException(this, nameof(Name), $"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in database.");
 
             if (Schema == Parent!.Schema && Table == Parent!.Name)
             {
                 if (Parent!.DbTable!.Columns.Where(x => x.Name == Name).SingleOrDefault() == null)
-                    throw new CodeGenException($"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in Table/Join configuration.");
+                    throw new CodeGenException(this, nameof(Name), $"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in Table/Join configuration.");
 
                 OrderBySql = $"[{Parent!.Alias}].[{Name}]";
             }
@@ -86,7 +95,7 @@ namespace Beef.CodeGen.Config.Database
                 if (t != null && t.DbTable!.Columns.Where(x => x.Name == Name).SingleOrDefault() != null)
                     OrderBySql = $"[{t.Alias}].[{Name}]";
                 else
-                    throw new CodeGenException($"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in Table/Join configuration.");
+                    throw new CodeGenException(this, nameof(Name), $"OrderBy '{Name}' (Schema.Table '{Schema}.{Table}') not found in Table/Join configuration.");
             }
 
             OrderBySql += $" {(Order!.StartsWith("Des", StringComparison.OrdinalIgnoreCase) ? "DESC" : "ASC")}";

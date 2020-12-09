@@ -21,6 +21,12 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class StoredProcedureConfig : ConfigBase<CodeGenConfig, TableConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("StoredProcedure", Name);
+
         #region Key
 
         /// <summary>
@@ -243,6 +249,9 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             Type = DefaultWhereNull(Type, () => "GetColl");
             Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch
             {

@@ -37,6 +37,12 @@ properties: [
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     public class PropertyConfig : ConfigBase<CodeGenConfig, EntityConfig>
     {
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <remarks><inheritdoc/></remarks>
+        public override string? QualifiedKeyName => BuildQualifiedKeyName("Property", Name);
+
         #region Key
 
         /// <summary>
@@ -548,6 +554,9 @@ properties: [
         /// </summary>
         protected override void Prepare()
         {
+            CheckKeyHasValue(Name);
+            CheckOptionsProperties();
+
             Type = DefaultWhereNull(Type, () => "string");
             if (Type!.StartsWith("RefDataNamespace.", StringComparison.InvariantCulture))
                 RefDataType = DefaultWhereNull(RefDataType, () => "string");
