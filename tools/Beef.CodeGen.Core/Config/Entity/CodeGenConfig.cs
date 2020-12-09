@@ -12,7 +12,7 @@ namespace Beef.CodeGen.Config.Entity
     /// </summary>
     [ClassSchema("CodeGeneration", Title = "'CodeGeneration' object (entity-driven)",
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying entity-driven code generation.",
-        Markdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
+        ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 refDataNamespace: My.Hr.Common.Entities
 refDataText: true

@@ -10,8 +10,8 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("OrderBy", Title = "'OrderBy' object (database-driven)", 
-        Description = "The `OrderBy` objected defines the query order.",
-        Markdown = "")]
+        Description = "The `OrderBy` object defines the query order. Only valid for `StoredProcedure.Type` of `GetAll`.",
+        ExampleMarkdown = @"Under Construction.")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class OrderByConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {

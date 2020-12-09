@@ -1,6 +1,16 @@
 # 'CodeGeneration' object (entity-driven) - XML
 
-The code generation for an `Operation` is primarily driven by the `OperationType` attribute. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.
+The code generation for an `Operation` is primarily driven by the `Type` property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting fully customised operations as required.
+
+The valid `Type` values are as follows:
+
+- **`Get`** - indicates a get (read) returning a single entity value.
+- **`GetColl`** - indicates a get (read) returning an entity collection.
+- **`Create`** - indicates the creation of an entity.
+- **`Update`** - indicates the updating of an entity.
+- **[`Patch`](./Http-Patch.md)** - indicates the patching (update) of an entity (leverages `Get` and `Update` to perform).
+- **`Delete`** - indicates the deleting of an entity.
+- **`Custom`** - indicates a customised operation where arguments and return value will be explicitly defined. As this is a customised operation there is no `AutoImplement` and as such the underlying data implementation will need to be performed by the developer.
 
 <br/>
 
@@ -136,3 +146,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

@@ -2,6 +2,10 @@
 
 The `Entity` is used as the primary configuration for driving the entity-driven code generation.
 
+<br/>
+
+## Example
+
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
 ``` yaml
 entities:
@@ -270,3 +274,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

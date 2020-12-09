@@ -49,7 +49,7 @@ namespace Beef.CodeGen.Generators
         {
             var csa = type.GetCustomAttribute<ClassSchemaAttribute>();
             if (csa == null)
-                throw new InvalidOperationException($"Type '{type.Name}' does not have a required ClassSchemaAttribute.");
+                return;
 
             if (!Enum.TryParse<ConfigurationEntity>(csa.Name, out var ce))
                 ce = ConfigurationEntity.CodeGen;
@@ -98,7 +98,7 @@ namespace Beef.CodeGen.Generators
             sw.WriteLine($"# {csa.Title} - {(isYaml ? "YAML/JSON" : "XML")}");
             sw.WriteLine();
             sw.WriteLine(csa.Description);
-            if (isYaml && !string.IsNullOrEmpty(csa.Markdown))
+            if (!string.IsNullOrEmpty(csa.Markdown))
             {
                 sw.WriteLine();
                 sw.WriteLine(csa.Markdown);
@@ -107,6 +107,16 @@ namespace Beef.CodeGen.Generators
             sw.WriteLine();
             sw.WriteLine("<br/>");
             sw.WriteLine();
+
+            if (isYaml && !string.IsNullOrEmpty(csa.ExampleMarkdown))
+            {
+                sw.WriteLine("## Example");
+                sw.WriteLine();
+                sw.WriteLine(csa.ExampleMarkdown);
+                sw.WriteLine();
+                sw.WriteLine("<br/>");
+                sw.WriteLine();
+            }
 
             var cats = type.GetCustomAttributes<CategorySchemaAttribute>();
 
@@ -158,7 +168,10 @@ namespace Beef.CodeGen.Generators
                     {
                         var pt = ComplexTypeReflector.GetItemType(p.Property!.PropertyType);
                         var ptcsa = pt.GetCustomAttribute<ClassSchemaAttribute>()!;
-                        WriteTableItem(sw, p.Name, $"The corresponding [`{ptcsa.Name}`]({ct}-{ptcsa.Name}-{(isYaml ? "Config" : "Config-Xml")}.md) collection.", p.Pcsa!.Description, p.Pcsa.Markdown, p.Pcsa.IsImportant);
+                        if (ptcsa != null)
+                            WriteTableItem(sw, p.Name, $"The corresponding [`{ptcsa.Name}`]({ct}-{ptcsa.Name}-{(isYaml ? "Config" : "Config-Xml")}.md) collection.", p.Pcsa!.Description, p.Pcsa.Markdown, p.Pcsa.IsImportant);
+                        else if (p.Pcsa != null)
+                            WriteTableItem(sw, p.Name, p.Pcsa.Title, p.Pcsa.Description, p.Pcsa.Markdown, p.Pcsa.IsImportant);
                     }
                 }
 
@@ -166,6 +179,8 @@ namespace Beef.CodeGen.Generators
                 sw.WriteLine("<br/>");
                 sw.WriteLine();
             }
+
+            sw.WriteLine("<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>");
 
             // Done, close file, then move onto children.
             sw.Close();

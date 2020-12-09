@@ -11,7 +11,7 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("QueryJoinOn", Title = "'QueryJoinOn' object (database-driven)",
-        Description = "The `JoinOn` object defines the join on characteristics for a join within a query.",
+        Description = "The `QueryJoinOn` object defines the join on characteristics for a join within a query.",
         Markdown = "")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryJoinOnConfig : ConfigBase<CodeGenConfig, QueryJoinConfig>

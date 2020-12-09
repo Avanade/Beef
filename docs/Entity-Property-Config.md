@@ -2,6 +2,10 @@
 
 The `Property` object defines an `Entity` property and its charateristics.
 
+<br/>
+
+## Example
+
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 properties: [
@@ -180,3 +184,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

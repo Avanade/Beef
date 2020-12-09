@@ -39,6 +39,8 @@ namespace Beef.CodeGen
                     case "--GENERATEDATABASEJSONSCHEMA": return SpecialActivitiesCenter("Generate Database JSON Schema", "./Schema/database.beef.json", fn => File.WriteAllText(fn, JsonSchemaGenerator.Create<Config.Database.CodeGenConfig>("JSON Schema for Beef Database code-generation (https://github.com/Avanade/Beef).")));
                     case "--GENERATEENTITYMARKDOWN": return SpecialActivitiesCenter("Generate Entity YAML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Entity.CodeGenConfig>(fn, ConfigType.Entity, true));
                     case "--GENERATEENTITYXMLMARKDOWN": return SpecialActivitiesCenter("Generate Entity XML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Entity.CodeGenConfig>(fn, ConfigType.Entity, false));
+                    case "--GENERATEDATABASEMARKDOWN": return SpecialActivitiesCenter("Generate Database YAML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Database.CodeGenConfig>(fn, ConfigType.Database, true));
+                    case "--GENERATEDATABASEXMLMARKDOWN": return SpecialActivitiesCenter("Generate Database XML documentation markdown file(s)", "../../docs/", fn => SchemaMarkdownGenerator.Create<Config.Database.CodeGenConfig>(fn, ConfigType.Database, false));
                 }
             }
 

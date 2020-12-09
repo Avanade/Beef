@@ -2,6 +2,10 @@
 
 The `CodeGeneration` object defines global properties that are used to drive the underlying entity-driven code generation.
 
+<br/>
+
+## Example
+
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 refDataNamespace: My.Hr.Common.Entities
@@ -158,3 +162,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

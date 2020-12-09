@@ -12,8 +12,8 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Parameter", Title = "'Parameter' object (database-driven)", 
-        Description = "The `Parameter` is used to define a stored procedure parameter and its charateristics.", 
-        Markdown = "")]
+        Description = "The `Parameter` is used to define a stored procedure parameter and its charateristics. These are in addition to those that are automatically inferred (added) by the selected `StoredProcedure.Type`.", 
+        ExampleMarkdown = "Under construction.")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class ParameterConfig : ConfigBase<CodeGenConfig, StoredProcedureConfig>
     {

@@ -11,7 +11,7 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("QueryOrder", Title = "'QueryOrder' object (database-driven)",
-        Description = "The `Order` object defines the query order.",
+        Description = "The `QueryOrder` object that defines the query order.",
         Markdown = "")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryOrderConfig : ConfigBase<CodeGenConfig, QueryConfig>

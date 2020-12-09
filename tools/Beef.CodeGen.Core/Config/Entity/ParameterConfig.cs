@@ -12,7 +12,7 @@ namespace Beef.CodeGen.Config.Entity
     /// </summary>
     [ClassSchema("Parameter", Title = "'Parameter' object (entity-driven)",
         Description = "The `Parameter` object defines an `Operation` parameter and its charateristics.", 
-        Markdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
+        ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 parameters: [
   { name: Id, property: Id, isMandatory: true, validatorCode: Common(EmployeeValidator.CanDelete) }

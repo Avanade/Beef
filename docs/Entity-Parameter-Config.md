@@ -2,6 +2,10 @@
 
 The `Parameter` object defines an `Operation` parameter and its charateristics.
 
+<br/>
+
+## Example
+
 A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) is as follows:
 ``` yaml
 parameters: [
@@ -100,3 +104,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

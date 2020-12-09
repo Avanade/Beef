@@ -9,7 +9,7 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("QueryWhere", Title = "'QueryWhere' object (database-driven)",
-        Description = "The `QueryWhere` object is used to define additional filtering.",
+        Description = "The `QueryWhere` object defines an additional where `Statement` to be added.",
         Markdown = "")]
     [CategorySchema("Key", Title = "Provides the **key** configuration.")]
     public class QueryWhereConfig : ConfigBase<CodeGenConfig, QueryConfig>

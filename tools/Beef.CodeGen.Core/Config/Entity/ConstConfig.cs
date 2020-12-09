@@ -10,7 +10,7 @@ namespace Beef.CodeGen.Config.Entity
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Const", Title = "'Const' object (entity-driven)", 
         Description = "The `Const` object is used to define a .NET (C#) constant value for an `Entity`.", 
-        Markdown = @"A YAML configuration example is as follows:
+        ExampleMarkdown = @"A YAML configuration example is as follows:
 ``` yaml
 consts: [
   { name: Female, value: F },

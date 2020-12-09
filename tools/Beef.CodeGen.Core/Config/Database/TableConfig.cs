@@ -14,13 +14,17 @@ namespace Beef.CodeGen.Config.Database
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Table", Title = "'Table' object (entity-driven)", 
         Description = "The `Table` object identifies an existing database `Table` (or `View`) and defines its code-generation characteristics.", 
-        Markdown = "")]
+        Markdown = @"The columns for the table (or view) are inferred from the database schema definition. The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns from all the `StoredProcedure` children. A table can be defined more that once to enable different column configurations as required.
+
+In addition to the primary [`Stored Procedures`](#Collections) generation, the following types of artefacts can also be generated:
+- [Entity Framework](#EntityFramework) - Enables the generation of C# model code for [Entity Framework](https://docs.microsoft.com/en-us/ef/) data access.
+- [UDT and TVP](#UDT) - Enables the [User-Defined Tables (UDT)](https://docs.microsoft.com/en-us/sql/relational-databases/server-management-objects-smo/tasks/using-user-defined-tables) and [Table-Valued Parameters (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) to enable collections of data to be passed bewteen SQL Server and .NET.")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("CodeGen", Title = "Provides the _Code Generation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `GetAll`, `Create`, `Update`, `Upsert`, `Delete` and `Merge`.")]
     [CategorySchema("View", Title = "Provides the _View_ configuration.")]
     [CategorySchema("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
-    [CategorySchema("UDT", Title = "Provides the _User Defined Table and Table-Valued Parameter_ configuration.")]
+    [CategorySchema("UDT", Title = "Provides the _User Defined Table_ and _Table-Valued Parameter_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]

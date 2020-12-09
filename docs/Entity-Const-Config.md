@@ -2,6 +2,10 @@
 
 The `Const` object is used to define a .NET (C#) constant value for an `Entity`.
 
+<br/>
+
+## Example
+
 A YAML configuration example is as follows:
 ``` yaml
 consts: [
@@ -23,3 +27,4 @@ Property | Description
 
 <br/>
 
+<sub><sup>Note: This markdown file is generated; any changes will be lost.</sup></sub>

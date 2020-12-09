@@ -15,7 +15,7 @@ namespace Beef.CodeGen.Config.Entity
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Entity", Title = "'Entity' object (entity-driven)",
         Description = "The `Entity` is used as the primary configuration for driving the entity-driven code generation.",
-        Markdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
+        ExampleMarkdown = @"A YAML configuration [example](../samples/My.Hr/My.Hr.CodeGen/entity.beef.yaml) for a _standard_ entity is as follows:
 ``` yaml
 entities:
 - { name: Employee, inherits: EmployeeBase, validator: EmployeeValidator, webApiRoutePrefix: api/v1/employees, autoImplement: Database, databaseSchema: Hr, databaseMapperInheritsFrom: EmployeeBaseData.DbMapper, entityFrameworkModel: EfModel.Employee, entityFrameworkCustomMapper: true,

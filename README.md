@@ -193,14 +193,19 @@ The following are references to additional documentation (these are all accessib
   - Constants - [YAML/JSON](./docs/Entity-Const-Config.md) or [XML](./docs/Entity-Const-Config-Xml.md)
   - Operations - [YAML/JSON](./docs/Entity-Operation-Config.md) or [XML](./docs/Entity-Operation-Config-Xml.md)
   - Parameters - [YAML/JSON](./docs/Entity-Parameter-Config.md) or [XML](./docs/Entity-Parameter-Config-Xml.md)
-- **Table-driven** ([database](./tools/Beef.Database.Core/README.md)):
-  - [CodeGeneration element](./docs/Table-CodeGeneration-element.md)
-  - [Table element](./docs/Table-Table-element.md)
-  - [Stored procedure element](./docs/Table-StoredProcedure-element.md)
-  - [Parameter element](./docs/Table-Parameter-element.md)
-  - [Where element](./docs/Table-Where-element.md)
-  - [OrderBy element](./docs/Table-OrderBy-element.md)
-  - [Execute element](./docs/Table-Execute-element.md)
+- **Database-driven** ([database](./tools/Beef.Database.Core/README.md)):
+  - CodeGeneration - [YAML/JSON](./docs/Database-CodeGeneration-Config.md) or [XML](./docs/Database-CodeGeneration-Config-Xml.md)
+  - Query - [YAML/JSON](./docs/Database-Query-Config.md) or [XML](./docs/Database-Query-Config-Xml.md)
+  - QueryJoin - [YAML/JSON](./docs/Database-QueryJoin-Config.md) or [XML](./docs/Database-QueryJoin-Config-Xml.md)
+  - QueryJoinOn - [YAML/JSON](./docs/Database-QueryJoinOn-Config.md) or [XML](./docs/Database-QueryJoinOn-Config-Xml.md)
+  - QueryWhere - [YAML/JSON](./docs/Database-QueryWhere-Config.md) or [XML](./docs/Database-QueryWhere-Config-Xml.md)
+  - QueryOrder - [YAML/JSON](./docs/Database-QueryOrder-Config.md) or [XML](./docs/Database-QueryOrder-Config-Xml.md)
+  - Table - [YAML/JSON](./docs/Database-Table-Config.md) or [XML](./docs/Database-Table-Config-Xml.md)
+  - StoredProcedure - [YAML/JSON](./docs/Database-StoredProcedure-Config.md) or [XML](./docs/Database-StoredProcedure-Config-Xml.md)
+  - Parameter - [YAML/JSON](./docs/Database-Parameter-Config.md) or [XML](./docs/Database-Parameter-Config-Xml.md)
+  - Where - [YAML/JSON](./docs/Database-Where-Config.md) or [XML](./docs/Database-Where-Config-Xml.md)
+  - OrderBy - [YAML/JSON](./docs/Database-OrderBy-Config.md) or [XML](./docs/Database-OrderBy-Config-Xml.md)
+  - Execute - [YAML/JSON](./docs/Database-Execute-Config.md) or [XML](./docs/Database-Execute-Config-Xml.md)
 
 ### Major/significant versions
 

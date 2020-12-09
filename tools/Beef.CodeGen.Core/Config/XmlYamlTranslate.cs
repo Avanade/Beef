@@ -164,21 +164,21 @@ namespace Beef.CodeGen.Config
                     Description = "Defaults to the `Entity.WebApiAuthorize` configuration property (inherits) where not specified."
                 }),
 
-            (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Key")
+            (ConfigType.Database, ConfigurationEntity.Table, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
                 {
                     Title = "The comma separated list of `Column` names to be included in the underlying generated output.", IsImportant = true,
                     Description = "Where not specified this indicates that all `Columns` are to be included."
                 }),
-            (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Key")
+            (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
                 {
                     Title = "The comma seperated list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
                     Description = "Where not specified this indicates no `Columns` are to be excluded."
                 }),
-            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", typeof(string), new PropertySchemaAttribute("Key")
+            (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", typeof(string), new PropertySchemaAttribute("CodeGen")
                 {
                     Title = "The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order."
                 }),
-            (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", typeof(string), new PropertySchemaAttribute("Udt")
+            (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", typeof(string), new PropertySchemaAttribute("UDT")
                 {
                     Title = "The comma seperated list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
                     Description = "Where not specified this indicates that no `Columns` are to be excluded."
@@ -190,7 +190,7 @@ namespace Beef.CodeGen.Config
                     Options = new string[] { "Get", "GetAll", "Create", "Update", "Upsert", "Delete", "Merge" },
                     Description = "Defaults to `GetAll`."
                 }),
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", typeof(string), new PropertySchemaAttribute("Key")
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "MergeOverrideIdentityColumns", typeof(string), new PropertySchemaAttribute("Merge")
                 {
                     Title = "The comma seperated list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
                     Description = "This is used to override the default behaviour of using the primary key column(s)."
@@ -201,6 +201,38 @@ namespace Beef.CodeGen.Config
                     Title = "The corresponding sort order.",
                     Options = new string[] { "Asc", "Desc" },
                     Description = "Defaults to `Asc`."
+                }),
+
+            (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma separated list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this indicates that all `Columns` are to be included."
+                }),
+            (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma seperated list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this indicates no `Columns` are to be excluded."
+                }),
+            (ConfigType.Database, ConfigurationEntity.Query, "AliasColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma seperated list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+                    Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`"
+                }),
+
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "IncludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma separated list of `Column` names to be included in the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this indicates that all `Columns` are to be included."
+                }),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "ExcludeColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma seperated list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
+                    Description = "Where not specified this indicates no `Columns` are to be excluded."
+                }),
+            (ConfigType.Database, ConfigurationEntity.QueryJoin, "AliasColumns", typeof(string), new PropertySchemaAttribute("Columns")
+                {
+                    Title = "The comma seperated list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+                    Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`"
                 })
         });
 

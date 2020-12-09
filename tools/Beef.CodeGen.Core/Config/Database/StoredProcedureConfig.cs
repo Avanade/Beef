@@ -11,8 +11,16 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("StoredProcedure", Title = "'StoredProcedure' object (database-driven)",
-        Description = "The `StoredProcedure` object defines the stored procedure code-generation characteristics.",
-        Markdown = "")]
+        Description = "The code generation for an `StoredProcedure` is primarily driven by the `Type` property. This encourages (enforces) a consistent implementation for the standardised **CRUD** (Create, Read, Update and Delete) actions, as well as supporting `Upsert`, `Merge` and ad-hoc queries as required.",
+        Markdown = @"The valid `Type` values are as follows:
+
+- **`Get`** - indicates a get (read) returning a single row value. The primary key is automatically added as a `Parameter`.
+- **`GetAll`** - indicates an ad-hoc query/get (read) returning one or more rows (collection). No `Parameter`s are automatically added.
+- **`Create`** - indicates the creation of a row. All columns are added as `Parameter`s.
+- **`Update`** - indicates the updating of a row. All columns are added as `Parameter`s.
+- **`Upsert`** - indicates the upserting (create or update) of a row. All columns are added as `Parameter`s.
+- **`Delete`** - indicates the deleting of a row. The primary key is automatically added as a `Parameter`.
+- **`Merge`** - indicates the merging (create, update or delete) of one or more rows (collection) through the use of a [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) Type parameter.")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
     [CategorySchema("Additional", Title = "Provides _additional ad-hoc_ configuration.")]

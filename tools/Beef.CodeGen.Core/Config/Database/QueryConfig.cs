@@ -13,8 +13,10 @@ namespace Beef.CodeGen.Config.Database
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("Query", Title = "'Query' object (database-driven)",
-        Description = "The `Query` object defines the primary table and drives the primary query-based code-generation configuration.",
-        Markdown = "")]
+        Description = "The `Query` object enables the definition of more complex multi-table queries (`Joins`) that would primarily result in a database _View_. The primary table `Name` for the query is required to be specified. Multiple queries can be specified for the same table(s)."
+            + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name)."
+            + " Additional `Where` and `Order` configuration can also be added as required.",
+        ExampleMarkdown = "Under construction.")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("View", Title = "Provides the _View_ configuration.")]
@@ -81,8 +83,8 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the list of `Column` and `Alias` pairs to enable column renaming.
         /// </summary>
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming.", IsImportant = true,
-            Description = "The value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
+        [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
+            Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? AliasColumns { get; set; }
 
