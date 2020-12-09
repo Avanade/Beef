@@ -48,7 +48,7 @@ entities:
       # - Get - Get by unique identifier which it infers from the properties marked as UniqueKey; data access cannot be automatically implemented given complexity.
       # - Create/Update/Patch - infers UniqueKey where appropriate; data access cannot be automatically implemented given complexity (Patch is Controller-only, reuses Get and Update to perform).
       # - Delete - explictly defining so that we can tie further validation to the identifier check.
-      # - Using the Property attribute to copy configuration from the Entity itself.
+      # - Using the Property reference for the parameter to copy configuration from the Entity itself.
       # - Providing further validation by using the Common extension method to invoke the EmployeeValidator.CanDelete.
       { name: Get, type: Get, uniqueKey: true, webApiRoute: '{id}', autoImplement: None },
       { name: Create, type: Create, webApiRoute: , autoImplement: None },

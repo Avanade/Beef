@@ -102,7 +102,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("View", Title = "The `View` name.",
-            Description = "Defaults to `CodeGeneration.vw` + `Name`; e.g. `vwTableName`.")]
+            Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
         public string? ViewName { get; set; }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("View", Title = "The schema name for the `View`.",
-            Description = "Defaults to `CodeGeneration.Schema`.")]
+            Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
 
         #endregion
@@ -497,6 +497,10 @@ namespace Beef.CodeGen.Config.Database
             {
                 where.Prepare(Root!, this);
             }
+
+            // Update the centralised view metadata.
+            if (CompareValue(View, true))
+                UpdateViewMetadata();
         }
 
         /// <summary>
@@ -531,6 +535,29 @@ namespace Beef.CodeGen.Config.Database
             {
                 join.PrepareJoinOn();
             }
+        }
+
+        /// <summary>
+        /// Adds or updates the existing view so that the latest information can be referenced by other stored procedures etc.
+        /// </summary>
+        private void UpdateViewMetadata()
+        {
+            var dt = new DbTable { Schema = ViewSchema, Name = ViewName, IsAView = true };
+            foreach (var c in SelectedColumns)
+            {
+                var dc = c.DbColumn!.Clone();
+                dc.DbTable = dt;
+                dc.Name = c.NameAlias;
+                dt.Columns.Add(dc);
+            }
+
+            // Remove existing view if exists.
+            var vwx = Root!.DbTables!.Where(x => x.Name == ViewName && x.Schema == ViewSchema).SingleOrDefault();
+            if (vwx != null)
+                Root!.DbTables!.Remove(vwx);
+
+            // Add new/updated version.
+            Root!.DbTables!.Add(dt);
         }
     }
 }

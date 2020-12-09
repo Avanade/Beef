@@ -266,6 +266,8 @@ parameters: [
             CheckOptionsProperties();
 
             var pc = Property == null ? null : Parent!.Parent!.Properties.FirstOrDefault(x => x.Name == Property);
+            if (Property != null && pc == null)
+                throw new CodeGenException(this, nameof(Property), $"Specified Property '{Property}' not found in Entity.");
 
             Type = DefaultWhereNull(Type, () => pc == null ? "string" : pc.Type);
             if (Type!.EndsWith("?", StringComparison.InvariantCulture))

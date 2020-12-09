@@ -290,6 +290,35 @@ namespace Beef.CodeGen.DbModels
         /// Indicates whether the column is considered an audit column.
         /// </summary>
         public bool IsAudit => Name == DatabaseColumns.CreatedByName || Name == DatabaseColumns.CreatedDateName || Name == DatabaseColumns.UpdatedByName || Name == DatabaseColumns.UpdatedDateName || Name == DatabaseColumns.DeletedByName || Name == DatabaseColumns.DeletedDateName;
+
+        /// <summary>
+        /// Clones the <see cref="DbColumn"/> creating a new instance.
+        /// </summary>
+        /// <returns></returns>
+        public DbColumn Clone()
+        {
+            return new DbColumn
+            {
+                DbTable = DbTable,
+                Name = Name,
+                Type = Type,
+                IsNullable = IsNullable,
+                Length = Length,
+                Precision = Precision,
+                Scale = Scale,
+                IsIdentity = IsIdentity,
+                IdentityIncrement = IdentityIncrement,
+                IdentitySeed = IdentitySeed,
+                IsComputed = IsComputed,
+                DefaultValue = DefaultValue,
+                IsPrimaryKey = IsPrimaryKey,
+                IsUnique = IsUnique,
+                ForeignTable = ForeignTable,
+                ForeignSchema = ForeignSchema,
+                ForeignColumn = ForeignColumn,
+                IsForeignRefData = IsForeignRefData
+            };
+        }
     }
 
     /// <summary>

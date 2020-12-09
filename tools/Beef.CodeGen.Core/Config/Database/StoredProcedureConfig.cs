@@ -30,10 +30,11 @@ namespace Beef.CodeGen.Config.Database
         #region Key
 
         /// <summary>
-        /// Gets or sets the name of the `StoredProcedure` in the database.
+        /// Gets or sets the name of the `StoredProcedure`.
         /// </summary>
         [JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `StoredProcedure` in the database.", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc.", IsMandatory = true, IsImportant = true,
+            Description = "See `StoredProcedureName` for the actual name used in the database.")]
         public string? Name { get; set; }
 
         /// <summary>
@@ -52,6 +53,14 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("Key", Title = "Indicates whether standardized paging support should be added.", IsImportant = true,
             Description = "This only applies where the stored procedure operation `Type` is `GetColl`.")]
         public bool? Paging { get; set; }
+
+        /// <summary>
+        /// Gets or sets the `StoredProcedure` name in the database.
+        /// </summary>
+        [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The `StoredProcedure` name in the database.",
+            Description = "Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`.")]
+        public string? StoredProcedureName { get; set; }
 
         #endregion
 
@@ -252,6 +261,7 @@ namespace Beef.CodeGen.Config.Database
             CheckKeyHasValue(Name);
             CheckOptionsProperties();
 
+            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"sp{Parent!.Name}{Name}");
             Type = DefaultWhereNull(Type, () => "GetColl");
             Permission = DefaultWhereNull(Permission?.ToUpperInvariant(), () => Parent!.Permission == null ? null : Parent!.Permission!.ToUpperInvariant() + "." + Type switch
             {

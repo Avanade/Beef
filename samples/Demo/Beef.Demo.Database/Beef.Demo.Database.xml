@@ -7,6 +7,13 @@
     </QueryJoin>
   </Query>
 
+  <!-- Override the OrgUnitId to bypass the automatic handling as already applied wihin the underlying view. -->
+  <Table Name="vwTestQuery" Schema="Test" ColumnNameOrgUnitId="N/A">
+    <StoredProcedure Name="GetByArgs" Type="GetAll" StoredProcedureName="spTestQueryGetByArgs">
+      <Parameter Name="Name" IsNullable="true" Operator="LIKE" />
+    </StoredProcedure>
+  </Table>
+
   <!--<Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
     <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Cdc="true">
       <QueryJoinOn Name="PersonId" />

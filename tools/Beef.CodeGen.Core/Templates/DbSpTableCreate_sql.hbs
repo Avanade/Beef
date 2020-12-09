@@ -1,5 +1,5 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{Parent.Schema}}].[sp{{Parent.Name}}{{Name}}]
+CREATE PROCEDURE [{{Parent.Schema}}].[{{StoredProcedureName}}]
 {{#each ArgumentParameters}}
   {{ParameterSql}},
 {{/each}}
