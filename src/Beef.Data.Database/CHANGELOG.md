@@ -4,6 +4,7 @@ Represents the **NuGet** versions.
 
 ## v4.1.3
 - *Enhancement:* Added `DeletedByName` and `DeletedDateName` to `DatabaseColumns`. These are currently required for the database code-generation tooling.
+- *Fixed:* `DatabaseWildcard` needed `#pragma warning disable CS8618` added based on errant compiler warning introduced with Visual Studio 2019 v16.8.2.
 
 ## v4.1.2
 - *Fixed:* The `DatabasePropertyMapper.MapToDb()` where mapping to a sub-property (via a `DatabaseMapper` was mapping each sub-property where the overarching property value was `null`. This resulted in each `DbParameter` being set to its default value (from a .NET perspective) which did not account for database nullability. The underlying `DatabaseMapper` will now _not_ be invoked where `null` and the properties should default as per the invoked stored procedure definition.
