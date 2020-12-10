@@ -18,7 +18,29 @@ namespace Beef.CodeGen.Config.Database
 
 In addition to the primary [`Stored Procedures`](#Collections) generation, the following types of artefacts can also be generated:
 - [Entity Framework](#EntityFramework) - Enables the generation of C# model code for [Entity Framework](https://docs.microsoft.com/en-us/ef/) data access.
-- [UDT and TVP](#UDT) - Enables the [User-Defined Tables (UDT)](https://docs.microsoft.com/en-us/sql/relational-databases/server-management-objects-smo/tasks/using-user-defined-tables) and [Table-Valued Parameters (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) to enable collections of data to be passed bewteen SQL Server and .NET.")]
+- [UDT and TVP](#UDT) - Enables the [User-Defined Tables (UDT)](https://docs.microsoft.com/en-us/sql/relational-databases/server-management-objects-smo/tasks/using-user-defined-tables) and [Table-Valued Parameters (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) to enable collections of data to be passed bewteen SQL Server and .NET.",
+        ExampleMarkdown = @"A YAML example is as follows:
+``` yaml
+tables:
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], permission: TestSec,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE },
+          { name: MinCount, operator: GE, column: Count },
+          { name: MaxCount, operator: LE, column: Count, nullable: true }
+        ]
+      },
+      { name: Get, type: Get, withHints: NOLOCK,
+        execute: [
+          { statement: EXEC Demo.Before, location: Before },
+          { statement: EXEC Demo.After }
+        ]
+      },
+      { name: Update, type: Update }
+    ]
+  }
+```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("CodeGen", Title = "Provides the _Code Generation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `GetAll`, `Create`, `Update`, `Upsert`, `Delete` and `Merge`.")]
@@ -105,7 +127,7 @@ In addition to the primary [`Stored Procedures`](#Collections) generation, the f
         /// Gets or sets the list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.
         /// </summary>
         [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CodeGen", Title = "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
+        [PropertyCollectionSchema("CodeGen", Title = "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
             Description = "This relates to the `GetAll` selection.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? GetAllOrderBy { get; set; }

@@ -2,25 +2,25 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.beef.com/codegen/2015/01/entity" attributeFormDefault="unqualified" elementFormDefault="qualified">
   <xs:element name="CodeGeneration">
     <xs:annotation>
-      <xs:documentation>The **CodeGeneration** is used as the global configuration for driving the underlying code-generation.</xs:documentation>
+      <xs:documentation>'CodeGeneration' object (database-driven)</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
         <xs:element name="Table" minOccurs="0" maxOccurs="unbounded">
           <xs:annotation>
-            <xs:documentation>The **Table** is used to identify a database `Table` and define its code-generation characteristics.</xs:documentation>
+            <xs:documentation>'Table' object (entity-driven)</xs:documentation>
           </xs:annotation>
           <xs:complexType>
             <xs:sequence>
               <xs:element name="StoredProcedure" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                  <xs:documentation>The **StoredProcedure** is used to identify a database `Stored Procedure` and define its code-generation characteristics.</xs:documentation>
+                  <xs:documentation>'StoredProcedure' object (database-driven)</xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The **Parameter** is used to define a Stored Procedure's Parameter and its charateristics.</xs:documentation>
+                        <xs:documentation>'Parameter' object (database-driven)</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
                         <xs:attribute name="Name" use="required" type="xs:string">
@@ -35,12 +35,12 @@
                         </xs:attribute>
                         <xs:attribute name="SqlType" use="optional" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The SQL type definition (overrides inerhited Column definition) including length/precision/scale.</xs:documentation>
+                            <xs:documentation>The SQL type definition (overrides inherited Column definition) including length/precision/scale.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="IsNullable" use="optional" type="xs:boolean">
                           <xs:annotation>
-                            <xs:documentation>Indicates whether the parameter is nullable. Note that When the parameter value is `NULL` it will not be included in the query.</xs:documentation>
+                            <xs:documentation>Indicates whether the parameter is nullable. Note that when the parameter value is `NULL` it will not be included in the query.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="TreatColumnNullAs" use="optional" type="xs:boolean">
@@ -73,7 +73,7 @@
                     </xs:element>
                     <xs:element name="Where" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The **Where** statement is used to define additional filtering.</xs:documentation>
+                        <xs:documentation>'Where' object (database-driven)</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
                         <xs:attribute name="Statement" use="required" type="xs:string">
@@ -85,12 +85,12 @@
                     </xs:element>
                     <xs:element name="OrderBy" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The **OrderBy** is used to define the query order</xs:documentation>
+                        <xs:documentation>'OrderBy' object (database-driven)</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
                         <xs:attribute name="Name" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The name of the `Column` to order by; used to infer characteristics.</xs:documentation>
+                            <xs:documentation>The name of the `Column` to order by.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="Order" use="optional">
@@ -108,17 +108,17 @@
                     </xs:element>
                     <xs:element name="Execute" minOccurs="0" maxOccurs="unbounded">
                       <xs:annotation>
-                        <xs:documentation>The **Execute** statement to enable additional functionality to be added before or after the primary statement.</xs:documentation>
+                        <xs:documentation>'Execute' object (database-driven)</xs:documentation>
                       </xs:annotation>
                       <xs:complexType>
                         <xs:attribute name="Statement" use="required" type="xs:string">
                           <xs:annotation>
-                            <xs:documentation>The additional statement (TSQL).</xs:documentation>
+                            <xs:documentation>The additional TSQL statement.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
                         <xs:attribute name="Location" use="optional">
                           <xs:annotation>
-                            <xs:documentation>The location of the statement in relation to the primary statement. Defaults to `After`.</xs:documentation>
+                            <xs:documentation>The location of the statement in relation to the underlying primary stored procedure statement. Defaults to `After`.</xs:documentation>
                           </xs:annotation>
                           <xs:simpleType>
                             <xs:restriction base="xs:string">
@@ -132,7 +132,7 @@
                   </xs:sequence>
                   <xs:attribute name="Name" use="required" type="xs:string">
                     <xs:annotation>
-                      <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
+                      <xs:documentation>The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc. See `StoredProcedureName` for the actual name used in the database.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="Type" use="optional">
@@ -156,6 +156,11 @@
                       <xs:documentation>Indicates whether standardized paging support should be added. This only applies where the stored procedure operation `Type` is `GetColl`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="StoredProcedureName" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The `StoredProcedure` name in the database. Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="ReselectStatement" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`. Defaults to `[{{Table.Schema}}].[sp{{Table.Name}}Get]` passing the primary key column(s).</xs:documentation>
@@ -163,12 +168,7 @@
                   </xs:attribute>
                   <xs:attribute name="IntoTempTable" use="optional" type="xs:boolean">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data. A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.</xs:documentation>
-                    </xs:annotation>
-                  </xs:attribute>
-                  <xs:attribute name="MergeOverrideIdentityColumns" use="optional" type="xs:string">
-                    <xs:annotation>
-                      <xs:documentation>The comma seperated list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_. This is used to override the default behaviour of using the primary key column(s).</xs:documentation>
+                      <xs:documentation>Indicates whether to select into a `#TempTable` to allow other statements access to the selected data. A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="WithHints" use="optional" type="xs:string">
@@ -176,33 +176,15 @@
                       <xs:documentation>the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="MergeOverrideIdentityColumns" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The comma seperated list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_. This is used to override the default behaviour of using the primary key column(s).</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="Permission" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The name of the `StoredProcedure` in the database.</xs:documentation>
                     </xs:annotation>
-                  </xs:attribute>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="GetAllOrderBy" minOccurs="0" maxOccurs="unbounded">
-                <xs:annotation>
-                  <xs:documentation>The **OrderBy** is used to define the `GetAll` query order</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                  <xs:attribute name="Name" use="required" type="xs:string">
-                    <xs:annotation>
-                      <xs:documentation>The name of the column to order by.</xs:documentation>
-                    </xs:annotation>
-                  </xs:attribute>
-                  <xs:attribute name="Order" use="optional">
-                    <xs:annotation>
-                      <xs:documentation>The corresponding column name; used to infer characteristics. Defaults to `Ascending`.</xs:documentation>
-                    </xs:annotation>
-                    <xs:simpleType>
-                      <xs:restriction base="xs:string">
-                        <xs:enumeration value="Ascending" />
-                        <xs:enumeration value="Descending" />
-                      </xs:restriction>
-                    </xs:simpleType>
                   </xs:attribute>
                 </xs:complexType>
               </xs:element>
@@ -219,12 +201,12 @@
             </xs:attribute>
             <xs:attribute name="Alias" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The name of the `Schema` where the `Table` is defined in the database. Will automatically default where not specified.</xs:documentation>
+                <xs:documentation>The `Schema.Table` alias name. Will automatically default where not specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="IncludeColumns" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma separated list of `Column` names to be included in the underlying generated output. Where not specified this Indicates whether all `Columns` are to be included.</xs:documentation>
+                <xs:documentation>The comma separated list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ExcludeColumns" use="optional" type="xs:string">
@@ -239,7 +221,12 @@
             </xs:attribute>
             <xs:attribute name="GetAll" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
+                <xs:documentation>Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified. The `GetAllOrderBy` is used to specify the `GetAll` query sort order.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="GetAllOrderBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="Create" use="optional" type="xs:boolean">
@@ -262,9 +249,24 @@
                 <xs:documentation>Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="Merge" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified. This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="View" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified (only applies for a `Table`).</xs:documentation>
+                <xs:documentation>Indicates whether a `View` is to be generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ViewName" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The `View` name. Defaults to `vw` + `Name`; e.g. `vwTableName`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ViewSchema" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The schema name for the `View`. Defaults to `Schema`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="EfModel" use="optional" type="xs:boolean">
@@ -292,11 +294,6 @@
                 <xs:documentation>The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Merge" use="optional" type="xs:boolean">
-              <xs:annotation>
-                <xs:documentation>Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="Permission" use="optional" type="xs:string">
               <xs:annotation>
                 <xs:documentation>The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure).</xs:documentation>
@@ -304,120 +301,423 @@
             </xs:attribute>
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `TenantId` capability. Defaults to `TenantId`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `TenantId` capability. Defaults to `CodeGeneration.TenantId`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `OrgUnitId`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `CodeGeneration.OrgUnitId`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `RowVersion`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CreatedBy`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CodeGeneration.CreatedBy`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CreatedDate`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CodeGeneration.CreatedDate`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+                <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="GetAllOrderBy" use="optional" type="xs:string">
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Query" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>'Query' object (database-driven)</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="QueryJoin" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>'QueryJoin' object (database-driven)</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="QueryJoinOn" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>'QueryJoinOn' object (database-driven)</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:attribute name="Name" use="required" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The name of the join column (from the `Join` table).</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ToSchema" use="optional" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The name of the other join to table schema. Defaults to `Table.Schema`; i.e. same schema. See also `ToTable` and `ToColumn` as these all relate.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ToTable" use="optional" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The name of the other join to table. Defaults to `Table.Name`; i.e. primary table. See also `ToSchema` and `ToColumn` as these all relate.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ToColumn" use="optional" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The name of the other join to column. Defaults to `Name`; i.e. assumes same name. See also `ToSchema` and `ToTable` as these all relate.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="ToStatement" use="optional" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The fully qualified name (`Alias.Name`) of the other column being joined to or other valid SQL (e.g. function) bypassing the corresponding `Schema`, `Table` and `Column` logic.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Name" use="required" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the table to join.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Schema" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The schema name of the table to join. Defaults to `Table.Schema`; i.e. same schema.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Alias" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The `Schema.Table` alias name. Will automatically default where not specified.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Type" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The SQL join type. Defaults to `Inner`.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Inner" />
+                        <xs:enumeration value="Left" />
+                        <xs:enumeration value="Right" />
+                        <xs:enumeration value="Full" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="IncludeColumns" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The comma separated list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ExcludeColumns" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The comma seperated list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="AliasColumns" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The comma seperated list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Cdc" use="optional" type="xs:boolean">
+                    <xs:annotation>
+                      <xs:documentation>Indicates whether the joined table is also being monitored for Change Data Capture (CDC) and should be included accordingly. Otherwise, the `Join` is purely for filtering and/or column addition.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `TenantId` capability. Defaults to `CodeGeneration.TenantId`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `CodeGeneration.OrgUnitId`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CodeGeneration.CreatedBy`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CodeGeneration.CreatedDate`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="QueryOrder" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>'QueryOrder' object (database-driven)</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="Name" use="required" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the `Column` to order by. See also `Schema` and `Table` as these all relate.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Schema" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of order by table schema. See also `Name` and `Column` as these all relate. Defaults to `Query.Schema`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Table" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the order by table. Defaults to `Table.Name`; i.e. primary table. See also `Schema` and `Column` as these all relate.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Order" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The corresponding sort order. Defaults to `Ascending`.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Ascending" />
+                        <xs:enumeration value="Descending" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="QueryWhere" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>'QueryWhere' object (database-driven)</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="Statement" use="required" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The where TSQL statement.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Name" use="required" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma seperated list of `Column` names (including sort order ASC/DESC) to be used as the `GetAll` query sort order</xs:documentation>
+                <xs:documentation>The name of the primary table of the query.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Schema" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The schema name of the primary table of the view. Defaults to `CodeGeneration.dbo`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Alias" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The `Schema.Table` alias name. Will automatically default where not specified.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IncludeColumns" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma separated list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ExcludeColumns" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="AliasColumns" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="View" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether a `View` is to be generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ViewName" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The `View` name. Defaults to `vw` + `Name`; e.g. `vwTableName`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ViewSchema" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The schema name for the `View`. Defaults to `Schema`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Cdc" use="optional" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Indicates whether the Change Data Capture (CDC) related artefacts are to be generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CdcName" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The `View` name. Defaults to `CodeGeneration.sp` (literal) + `Name` + `Outbox` (literal); e.g. `spTableNameOutbox`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CdcSchema" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The schema name for the `Cdc`-related database artefacts. Defaults to `CodeGeneration.Schema` + `Cdc` (literal).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="CdcEnvelope" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The corresponding `Cdc` Outbox Envelope table name. Defaults to `CodeGeneration.Name` + `OutboxEnvelope` (literal).</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Permission" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The permission to be used for security permission checking. The suffix is optional, and where not specified will default to `.READ`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `TenantId` capability. Defaults to `CodeGeneration.TenantId`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `CodeGeneration.OrgUnitId`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CodeGeneration.CreatedBy`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CodeGeneration.CreatedDate`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `CodeGeneration.UpdatedBy`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `CodeGeneration.UpdatedDate`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="RefDatabaseSchema" use="optional" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The schema name to identify the Reference Data related tables. Where not specified an attempt will be made to infer.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
       <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameTenantId" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `TenantId` capability. Defaults to `TenantId`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `TenantId` capability. Defaults to `TenantId`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameOrgUnitId" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `OrgUnitId`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `OrgUnitId` capability. Defaults to `OrgUnitId`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `RowVersion` capability. Defaults to `RowVersion`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `RowVersion` capability. Defaults to `RowVersion`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameCreatedBy" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CreatedBy`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `CreatedBy` capability. Defaults to `CreatedBy`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameCreatedDate" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CreatedDate`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `CreatedDate` capability. Defaults to `CreatedDate`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameUpdatedBy" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `UpdatedBy` capability. Defaults to `UpdatedBy`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameUpdatedDate" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `UpdatedDate` capability. Defaults to `UpdatedDate`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameDeletedBy" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `UpdatedBy`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `DeletedBy` capability. Defaults to `UpdatedBy`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="ColumnNameDeletedDate" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `UpdatedDate`. To remove capability set to `None`.</xs:documentation>
+          <xs:documentation>The column name for the `DeletedDate` capability. Defaults to `UpdatedDate`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="OrgUnitJoinSql" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification. Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`.</xs:documentation>
+          <xs:documentation>The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification. Defaults to `[Sec].[fnGetUserOrgUnits]()`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="CheckUserPermissionSql" use="optional" type="xs:string">

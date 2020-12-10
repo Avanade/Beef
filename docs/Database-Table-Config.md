@@ -10,6 +10,33 @@ In addition to the primary [`Stored Procedures`](#Collections) generation, the f
 
 <br/>
 
+## Example
+
+A YAML example is as follows:
+``` yaml
+tables:
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], permission: TestSec,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE },
+          { name: MinCount, operator: GE, column: Count },
+          { name: MaxCount, operator: LE, column: Count, nullable: true }
+        ]
+      },
+      { name: Get, type: Get, withHints: NOLOCK,
+        execute: [
+          { statement: EXEC Demo.Before, location: Before },
+          { statement: EXEC Demo.After }
+        ]
+      },
+      { name: Update, type: Update }
+    ]
+  }
+```
+
+<br/>
+
 ## Property categories
 The `Table` object supports a number of properties that control the generated code output. These properties are separated into a series of logical categories. The properties with a bold name are those that are more typically used (considered more important).
 

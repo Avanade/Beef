@@ -4,6 +4,24 @@ The `QueryJoinOn` object defines the join on characteristics for a join within a
 
 <br/>
 
+## Example
+
+A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```
+
+<br/>
+
 ## Properties
 The `QueryJoinOn` object supports a number of properties that control the generated code output. The properties with a bold name are those that are more typically used (considered more important).
 

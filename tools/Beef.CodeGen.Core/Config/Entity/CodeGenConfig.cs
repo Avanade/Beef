@@ -142,7 +142,7 @@ entities:
         /// </summary>
         [JsonProperty("appBasedAgentArgs", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "Indicates whether to create and use a domain-specific `WebApi.WebApiAgentArgs` to simplify dependency injection usage.")]
-        public bool AppBasedAgentArgs { get; set; }
+        public bool? AppBasedAgentArgs { get; set; }
 
         #endregion
 

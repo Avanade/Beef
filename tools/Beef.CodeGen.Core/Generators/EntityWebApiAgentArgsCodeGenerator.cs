@@ -16,6 +16,6 @@ namespace Beef.CodeGen.Generators
         /// <param name="config"><inheritdoc/></param>
         /// <returns><inheritdoc/></returns>
         protected override IEnumerable<CodeGenConfig> SelectGenConfig(CodeGenConfig config)
-            => Check.NotNull(config, nameof(config)).AppBasedAgentArgs ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
+            => IsTrue(Check.NotNull(config, nameof(config)).AppBasedAgentArgs) ? new CodeGenConfig[] { config } : System.Array.Empty<CodeGenConfig>();
     }
 }

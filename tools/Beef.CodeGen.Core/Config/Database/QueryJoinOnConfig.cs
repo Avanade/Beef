@@ -12,7 +12,19 @@ namespace Beef.CodeGen.Config.Database
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("QueryJoinOn", Title = "'QueryJoinOn' object (database-driven)",
         Description = "The `QueryJoinOn` object defines the join on characteristics for a join within a query.",
-        Markdown = "")]
+        ExampleMarkdown = @"A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     public class QueryJoinOnConfig : ConfigBase<CodeGenConfig, QueryJoinConfig>
     {

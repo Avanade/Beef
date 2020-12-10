@@ -20,7 +20,29 @@ namespace Beef.CodeGen.Config.Database
 - **`Update`** - indicates the updating of a row. All columns are added as `Parameter`s.
 - **`Upsert`** - indicates the upserting (create or update) of a row. All columns are added as `Parameter`s.
 - **`Delete`** - indicates the deleting of a row. The primary key is automatically added as a `Parameter`.
-- **`Merge`** - indicates the merging (create, update or delete) of one or more rows (collection) through the use of a [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) Type parameter.")]
+- **`Merge`** - indicates the merging (create, update or delete) of one or more rows (collection) through the use of a [Table-Valued Parameter (TVP)](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters) Type parameter.",
+        ExampleMarkdown = @"A YAML example is as follows:
+``` yaml
+tables:
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], permission: TestSec,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE },
+          { name: MinCount, operator: GE, column: Count },
+          { name: MaxCount, operator: LE, column: Count, nullable: true }
+        ]
+      },
+      { name: Get, type: Get, withHints: NOLOCK,
+        execute: [
+          { statement: EXEC Demo.Before, location: Before },
+          { statement: EXEC Demo.After }
+        ]
+      },
+      { name: Update, type: Update }
+    ]
+  }
+```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Merge", Title = "Provides _Merge_ configuration (where `Type` is `Merge`).")]
     [CategorySchema("Additional", Title = "Provides _additional ad-hoc_ configuration.")]

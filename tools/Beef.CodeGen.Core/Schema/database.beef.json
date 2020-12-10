@@ -3,65 +3,60 @@
   "$schema": "http://json-schema.org/draft-04/schema",
   "type": "object",
   "properties": {
-    "refDatabaseSchema": {
-      "type": "string",
-      "title": "The schema name to identify the Reference Data related tables.",
-      "description": "Where not specified an attempt will be made to infer."
-    },
     "columnNameIsDeleted": {
       "type": "string",
       "title": "The column name for the `IsDeleted` capability.",
-      "description": "Defaults to `IsDeleted`. To remove capability set to `None`."
+      "description": "Defaults to `IsDeleted`."
     },
     "columnNameTenantId": {
       "type": "string",
       "title": "The column name for the `TenantId` capability.",
-      "description": "Defaults to `TenantId`. To remove capability set to `None`."
+      "description": "Defaults to `TenantId`."
     },
     "columnNameOrgUnitId": {
       "type": "string",
       "title": "The column name for the `OrgUnitId` capability.",
-      "description": "Defaults to `OrgUnitId`. To remove capability set to `None`."
+      "description": "Defaults to `OrgUnitId`."
     },
     "columnNameRowVersion": {
       "type": "string",
       "title": "The column name for the `RowVersion` capability.",
-      "description": "Defaults to `RowVersion`. To remove capability set to `None`."
+      "description": "Defaults to `RowVersion`."
     },
     "columnNameCreatedBy": {
       "type": "string",
       "title": "The column name for the `CreatedBy` capability.",
-      "description": "Defaults to `CreatedBy`. To remove capability set to `None`."
+      "description": "Defaults to `CreatedBy`."
     },
     "columnNameCreatedDate": {
       "type": "string",
       "title": "The column name for the `CreatedDate` capability.",
-      "description": "Defaults to `CreatedDate`. To remove capability set to `None`."
+      "description": "Defaults to `CreatedDate`."
     },
     "columnNameUpdatedBy": {
       "type": "string",
       "title": "The column name for the `UpdatedBy` capability.",
-      "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+      "description": "Defaults to `UpdatedBy`."
     },
     "columnNameUpdatedDate": {
       "type": "string",
       "title": "The column name for the `UpdatedDate` capability.",
-      "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+      "description": "Defaults to `UpdatedDate`."
     },
     "columnNameDeletedBy": {
       "type": "string",
       "title": "The column name for the `DeletedBy` capability.",
-      "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+      "description": "Defaults to `UpdatedBy`."
     },
     "columnNameDeletedDate": {
       "type": "string",
       "title": "The column name for the `DeletedDate` capability.",
-      "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+      "description": "Defaults to `UpdatedDate`."
     },
     "orgUnitJoinSql": {
       "type": "string",
       "title": "The SQL table or function that is to be used to join against for security-based `OrgUnitId` verification.",
-      "description": "Defaults to `[Sec].[fnGetUserOrgUnits]()`. To remove capability set `OrgUnitId` to `None`."
+      "description": "Defaults to `[Sec].[fnGetUserOrgUnits]()`."
     },
     "checkUserPermissionSql": {
       "type": "string",
@@ -90,13 +85,13 @@
             },
             "alias": {
               "type": "string",
-              "title": "The name of the `Schema` where the `Table` is defined in the database.",
+              "title": "The `Schema.Table` alias name.",
               "description": "Will automatically default where not specified."
             },
             "includeColumns": {
               "type": "array",
               "title": "The list of `Column` names to be included in the underlying generated output.",
-              "description": "Where not specified this Indicates whether all `Columns` are to be included.",
+              "description": "Where not specified this indicates that all `Columns` are to be included.",
               "items": [
                 {
                   "type": "string",
@@ -121,7 +116,19 @@
             },
             "getAll": {
               "type": "boolean",
-              "title": "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified."
+              "title": "Indicates whether a `GetAll` stored procedure is to be automatically generated where not otherwise explicitly specified.",
+              "description": "The `GetAllOrderBy` is used to specify the `GetAll` query sort order."
+            },
+            "getAllOrderBy": {
+              "type": "array",
+              "title": "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
+              "description": "This relates to the `GetAll` selection.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
             },
             "create": {
               "type": "boolean",
@@ -139,9 +146,24 @@
               "type": "boolean",
               "title": "Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified."
             },
+            "merge": {
+              "type": "boolean",
+              "title": "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
+              "description": "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function."
+            },
             "view": {
               "type": "boolean",
-              "title": "Indicates whether a `View` is to be automatically generated where not otherwise explicitly specified (only applies for a `Table`)."
+              "title": "Indicates whether a `View` is to be generated."
+            },
+            "viewName": {
+              "type": "string",
+              "title": "The `View` name.",
+              "description": "Defaults to `vw` + `Name`; e.g. `vwTableName`."
+            },
+            "viewSchema": {
+              "type": "string",
+              "title": "The schema name for the `View`.",
+              "description": "Defaults to `Schema`."
             },
             "efModel": {
               "type": "boolean",
@@ -171,10 +193,6 @@
               "type": "string",
               "title": "The name of the .NET entity associated with the `Udt` so that it can be expressed (created) as a Table-Valued Parameter for usage within the corresponding `DbMapper`."
             },
-            "merge": {
-              "type": "boolean",
-              "title": "Indicates whether a `Merge` (upsert of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified."
-            },
             "permission": {
               "type": "string",
               "title": "The permission (prefix) to be used for security permission checking (suffix defaults to `Read`, `Write` or `Delete` and can be overridden in the underlying stored procedure)."
@@ -182,52 +200,52 @@
             "columnNameIsDeleted": {
               "type": "string",
               "title": "The column name for the `IsDeleted` capability.",
-              "description": "Defaults to `IsDeleted`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
             },
             "columnNameTenantId": {
               "type": "string",
               "title": "The column name for the `TenantId` capability.",
-              "description": "Defaults to `TenantId`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.TenantId`."
             },
             "columnNameOrgUnitId": {
               "type": "string",
               "title": "The column name for the `OrgUnitId` capability.",
-              "description": "Defaults to `OrgUnitId`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.OrgUnitId`."
             },
             "columnNameRowVersion": {
               "type": "string",
               "title": "The column name for the `RowVersion` capability.",
-              "description": "Defaults to `RowVersion`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.RowVersion`."
             },
             "columnNameCreatedBy": {
               "type": "string",
               "title": "The column name for the `CreatedBy` capability.",
-              "description": "Defaults to `CreatedBy`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.CreatedBy`."
             },
             "columnNameCreatedDate": {
               "type": "string",
               "title": "The column name for the `CreatedDate` capability.",
-              "description": "Defaults to `CreatedDate`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.CreatedDate`."
             },
             "columnNameUpdatedBy": {
               "type": "string",
               "title": "The column name for the `UpdatedBy` capability.",
-              "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
             },
             "columnNameUpdatedDate": {
               "type": "string",
               "title": "The column name for the `UpdatedDate` capability.",
-              "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
             },
             "columnNameDeletedBy": {
               "type": "string",
               "title": "The column name for the `DeletedBy` capability.",
-              "description": "Defaults to `UpdatedBy`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
             },
             "columnNameDeletedDate": {
               "type": "string",
               "title": "The column name for the `DeletedDate` capability.",
-              "description": "Defaults to `UpdatedDate`. To remove capability set to `None`."
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
             },
             "storedProcedures": {
               "type": "array",
@@ -238,7 +256,8 @@
                   "properties": {
                     "name": {
                       "type": "string",
-                      "title": "The name of the `StoredProcedure` in the database."
+                      "title": "The name of the `StoredProcedure`; generally the verb/action, i.e. `Get`, `Update`, etc.",
+                      "description": "See `StoredProcedureName` for the actual name used in the database."
                     },
                     "type": {
                       "type": "string",
@@ -259,6 +278,11 @@
                       "title": "Indicates whether standardized paging support should be added.",
                       "description": "This only applies where the stored procedure operation `Type` is `GetColl`."
                     },
+                    "storedProcedureName": {
+                      "type": "string",
+                      "title": "The `StoredProcedure` name in the database.",
+                      "description": "Defaults to `sp` + `Table.Name` + `Name`; e.g. `spTableName` or `spPersonGet`."
+                    },
                     "reselectStatement": {
                       "type": "string",
                       "title": "The SQL statement to perform the reselect after a `Create`, `Update` or `Upsert` stored procedure operation `Type`.",
@@ -266,8 +290,12 @@
                     },
                     "intoTempTable": {
                       "type": "boolean",
-                      "title": "Indicates whether to select into a `#TempTable` to allow other statements to get access to the selected data.",
+                      "title": "Indicates whether to select into a `#TempTable` to allow other statements access to the selected data.",
                       "description": "A `Select * from #TempTable` is also performed (code-generated) where the stored procedure operation `Type` is `GetColl`."
+                    },
+                    "withHints": {
+                      "type": "string",
+                      "title": "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`."
                     },
                     "mergeOverrideIdentityColumns": {
                       "type": "array",
@@ -280,13 +308,31 @@
                         }
                       ]
                     },
-                    "withHints": {
-                      "type": "string",
-                      "title": "the table hints using the SQL Server `WITH()` statement; the value specified will be used as-is; e.g. `NOLOCK` will result in `WITH(NOLOCK)`."
-                    },
                     "permission": {
                       "type": "string",
                       "title": "The name of the `StoredProcedure` in the database."
+                    },
+                    "includeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).",
+                      "description": "Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).",
+                      "description": "Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
                     },
                     "parameters": {
                       "type": "array",
@@ -306,12 +352,12 @@
                             },
                             "sqlType": {
                               "type": "string",
-                              "title": "The SQL type definition (overrides inerhited Column definition) including length/precision/scale."
+                              "title": "The SQL type definition (overrides inherited Column definition) including length/precision/scale."
                             },
                             "nullable": {
                               "type": "boolean",
                               "title": "Indicates whether the parameter is nullable.",
-                              "description": "Note that When the parameter value is `NULL` it will not be included in the query."
+                              "description": "Note that when the parameter value is `NULL` it will not be included in the query."
                             },
                             "treatColumnNullAs": {
                               "type": "boolean",
@@ -369,7 +415,7 @@
                           "properties": {
                             "name": {
                               "type": "string",
-                              "title": "The name of the `Column` to order by; used to infer characteristics."
+                              "title": "The name of the `Column` to order by."
                             },
                             "order": {
                               "type": "string",
@@ -396,11 +442,11 @@
                           "properties": {
                             "statement": {
                               "type": "string",
-                              "title": "The additional statement (TSQL)."
+                              "title": "The additional TSQL statement."
                             },
                             "location": {
                               "type": "string",
-                              "title": "The location of the statement in relation to the primary statement.",
+                              "title": "The location of the statement in relation to the underlying primary stored procedure statement.",
                               "description": "Defaults to `After`.",
                               "enum": [
                                 "Before",
@@ -420,21 +466,346 @@
                   ]
                 }
               ]
+            }
+          },
+          "required": [
+            "name",
+            "schema"
+          ]
+        }
+      ]
+    },
+    "queries": {
+      "type": "array",
+      "title": "The corresponding `Query` collection.",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "The name of the primary table of the query."
             },
-            "getAllOrderBy": {
+            "schema": {
+              "type": "string",
+              "title": "The schema name of the primary table of the view.",
+              "description": "Defaults to `CodeGeneration.dbo`."
+            },
+            "alias": {
+              "type": "string",
+              "title": "The `Schema.Table` alias name.",
+              "description": "Will automatically default where not specified."
+            },
+            "includeColumns": {
               "type": "array",
-              "title": "The corresponding `GetAll` stored procedure `OrderBy` collection.",
+              "title": "The list of `Column` names to be included in the underlying generated output.",
+              "description": "Where not specified this indicates that all `Columns` are to be included.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "excludeColumns": {
+              "type": "array",
+              "title": "The list of `Column` names to be excluded from the underlying generated output.",
+              "description": "Where not specified this indicates no `Columns` are to be excluded.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "aliasColumns": {
+              "type": "array",
+              "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.",
+              "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
+            "view": {
+              "type": "boolean",
+              "title": "Indicates whether a `View` is to be generated."
+            },
+            "viewName": {
+              "type": "string",
+              "title": "The `View` name.",
+              "description": "Defaults to `vw` + `Name`; e.g. `vwTableName`."
+            },
+            "viewSchema": {
+              "type": "string",
+              "title": "The schema name for the `View`.",
+              "description": "Defaults to `Schema`."
+            },
+            "cdc": {
+              "type": "boolean",
+              "title": "Indicates whether the Change Data Capture (CDC) related artefacts are to be generated."
+            },
+            "cdcName": {
+              "type": "string",
+              "title": "The `View` name.",
+              "description": "Defaults to `CodeGeneration.sp` (literal) + `Name` + `Outbox` (literal); e.g. `spTableNameOutbox`."
+            },
+            "cdcSchema": {
+              "type": "string",
+              "title": "The schema name for the `Cdc`-related database artefacts.",
+              "description": "Defaults to `CodeGeneration.Schema` + `Cdc` (literal)."
+            },
+            "cdcEnvelope": {
+              "type": "string",
+              "title": "The corresponding `Cdc` Outbox Envelope table name.",
+              "description": "Defaults to `CodeGeneration.Name` + `OutboxEnvelope` (literal)."
+            },
+            "permission": {
+              "type": "string",
+              "title": "The permission to be used for security permission checking.",
+              "description": "The suffix is optional, and where not specified will default to `.READ`."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
+            },
+            "columnNameTenantId": {
+              "type": "string",
+              "title": "The column name for the `TenantId` capability.",
+              "description": "Defaults to `CodeGeneration.TenantId`."
+            },
+            "columnNameOrgUnitId": {
+              "type": "string",
+              "title": "The column name for the `OrgUnitId` capability.",
+              "description": "Defaults to `CodeGeneration.OrgUnitId`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `CodeGeneration.RowVersion`."
+            },
+            "columnNameCreatedBy": {
+              "type": "string",
+              "title": "The column name for the `CreatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedBy`."
+            },
+            "columnNameCreatedDate": {
+              "type": "string",
+              "title": "The column name for the `CreatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.CreatedDate`."
+            },
+            "columnNameUpdatedBy": {
+              "type": "string",
+              "title": "The column name for the `UpdatedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameUpdatedDate": {
+              "type": "string",
+              "title": "The column name for the `UpdatedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "columnNameDeletedBy": {
+              "type": "string",
+              "title": "The column name for the `DeletedBy` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedBy`."
+            },
+            "columnNameDeletedDate": {
+              "type": "string",
+              "title": "The column name for the `DeletedDate` capability.",
+              "description": "Defaults to `CodeGeneration.UpdatedDate`."
+            },
+            "joins": {
+              "type": "array",
+              "title": "The corresponding `Join` collection.",
               "items": [
                 {
                   "type": "object",
                   "properties": {
                     "name": {
                       "type": "string",
-                      "title": "The name of the column to order by."
+                      "title": "The name of the table to join."
+                    },
+                    "schema": {
+                      "type": "string",
+                      "title": "The schema name of the table to join.",
+                      "description": "Defaults to `Table.Schema`; i.e. same schema."
+                    },
+                    "alias": {
+                      "type": "string",
+                      "title": "The `Schema.Table` alias name.",
+                      "description": "Will automatically default where not specified."
+                    },
+                    "type": {
+                      "type": "string",
+                      "title": "The SQL join type.",
+                      "description": "Defaults to `Inner`.",
+                      "enum": [
+                        "Inner",
+                        "Left",
+                        "Right",
+                        "Full"
+                      ]
+                    },
+                    "includeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be included in the underlying generated output.",
+                      "description": "Where not specified this indicates that all `Columns` are to be included.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "excludeColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` names to be excluded from the underlying generated output.",
+                      "description": "Where not specified this indicates no `Columns` are to be excluded.",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "aliasColumns": {
+                      "type": "array",
+                      "title": "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming.",
+                      "description": "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`",
+                      "items": [
+                        {
+                          "type": "string",
+                          "uniqueItems": true
+                        }
+                      ]
+                    },
+                    "cdc": {
+                      "type": "boolean",
+                      "title": "Indicates whether the joined table is also being monitored for Change Data Capture (CDC) and should be included accordingly.",
+                      "description": "Otherwise, the `Join` is purely for filtering and/or column addition."
+                    },
+                    "columnNameIsDeleted": {
+                      "type": "string",
+                      "title": "The column name for the `IsDeleted` capability.",
+                      "description": "Defaults to `CodeGeneration.IsDeleted`."
+                    },
+                    "columnNameTenantId": {
+                      "type": "string",
+                      "title": "The column name for the `TenantId` capability.",
+                      "description": "Defaults to `CodeGeneration.TenantId`."
+                    },
+                    "columnNameOrgUnitId": {
+                      "type": "string",
+                      "title": "The column name for the `OrgUnitId` capability.",
+                      "description": "Defaults to `CodeGeneration.OrgUnitId`."
+                    },
+                    "columnNameRowVersion": {
+                      "type": "string",
+                      "title": "The column name for the `RowVersion` capability.",
+                      "description": "Defaults to `CodeGeneration.RowVersion`."
+                    },
+                    "columnNameCreatedBy": {
+                      "type": "string",
+                      "title": "The column name for the `CreatedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.CreatedBy`."
+                    },
+                    "columnNameCreatedDate": {
+                      "type": "string",
+                      "title": "The column name for the `CreatedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.CreatedDate`."
+                    },
+                    "columnNameUpdatedBy": {
+                      "type": "string",
+                      "title": "The column name for the `UpdatedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedBy`."
+                    },
+                    "columnNameUpdatedDate": {
+                      "type": "string",
+                      "title": "The column name for the `UpdatedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedDate`."
+                    },
+                    "columnNameDeletedBy": {
+                      "type": "string",
+                      "title": "The column name for the `DeletedBy` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedBy`."
+                    },
+                    "columnNameDeletedDate": {
+                      "type": "string",
+                      "title": "The column name for the `DeletedDate` capability.",
+                      "description": "Defaults to `CodeGeneration.UpdatedDate`."
+                    },
+                    "on": {
+                      "type": "array",
+                      "title": "The corresponding `JoinOn` collection.",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "title": "The name of the join column (from the `Join` table)."
+                            },
+                            "toSchema": {
+                              "type": "string",
+                              "title": "The name of the other join to table schema.",
+                              "description": "Defaults to `Table.Schema`; i.e. same schema. See also `ToTable` and `ToColumn` as these all relate."
+                            },
+                            "toTable": {
+                              "type": "string",
+                              "title": "The name of the other join to table.",
+                              "description": "Defaults to `Table.Name`; i.e. primary table. See also `ToSchema` and `ToColumn` as these all relate."
+                            },
+                            "toColumn": {
+                              "type": "string",
+                              "title": "The name of the other join to column.",
+                              "description": "Defaults to `Name`; i.e. assumes same name. See also `ToSchema` and `ToTable` as these all relate."
+                            },
+                            "toStatement": {
+                              "type": "string",
+                              "title": "The fully qualified name (`Alias.Name`) of the other column being joined to or other valid SQL (e.g. function) bypassing the corresponding `Schema`, `Table` and `Column` logic."
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "order": {
+              "type": "array",
+              "title": "The corresponding `Order` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "The name of the `Column` to order by.",
+                      "description": "See also `Schema` and `Table` as these all relate."
+                    },
+                    "schema": {
+                      "type": "string",
+                      "title": "The name of order by table schema. See also `Name` and `Column` as these all relate.",
+                      "description": "Defaults to `Query.Schema`."
+                    },
+                    "table": {
+                      "type": "string",
+                      "title": "The name of the order by table.",
+                      "description": "Defaults to `Table.Name`; i.e. primary table. See also `Schema` and `Column` as these all relate."
                     },
                     "order": {
                       "type": "string",
-                      "title": "The corresponding column name; used to infer characteristics.",
+                      "title": "The corresponding sort order.",
                       "description": "Defaults to `Ascending`.",
                       "enum": [
                         "Ascending",
@@ -447,11 +818,28 @@
                   ]
                 }
               ]
+            },
+            "where": {
+              "type": "array",
+              "title": "The corresponding `Where` collection.",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "statement": {
+                      "type": "string",
+                      "title": "The where TSQL statement."
+                    }
+                  },
+                  "required": [
+                    "statement"
+                  ]
+                }
+              ]
             }
           },
           "required": [
-            "name",
-            "schema"
+            "name"
           ]
         }
       ]

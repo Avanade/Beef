@@ -6,7 +6,19 @@ The `Query` object enables the definition of more complex multi-table queries (`
 
 ## Example
 
-Under construction.
+A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```
 
 <br/>
 

@@ -6,7 +6,28 @@ The `Parameter` is used to define a stored procedure parameter and its charateri
 
 ## Example
 
-Under construction.
+A YAML example is as follows:
+``` yaml
+tables:
+- { name: Table, schema: Test, create: true, update: true, upsert: true, delete: true, merge: true, udt: true, getAll: true, getAllOrderBy: [ Name Des ], excludeColumns: [ Other ], permission: TestSec,
+    storedProcedures: [
+      { name: GetByArgs, type: GetColl, excludeColumns: [ Count ],
+        parameters: [
+          { name: Name, nullable: true, operator: LIKE },
+          { name: MinCount, operator: GE, column: Count },
+          { name: MaxCount, operator: LE, column: Count, nullable: true }
+        ]
+      },
+      { name: Get, type: Get, withHints: NOLOCK,
+        execute: [
+          { statement: EXEC Demo.Before, location: Before },
+          { statement: EXEC Demo.After }
+        ]
+      },
+      { name: Update, type: Update }
+    ]
+  }
+```
 
 <br/>
 

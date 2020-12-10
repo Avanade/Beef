@@ -16,7 +16,19 @@ namespace Beef.CodeGen.Config.Database
         Description = "The `Query` object enables the definition of more complex multi-table queries (`Joins`) that would primarily result in a database _View_. The primary table `Name` for the query is required to be specified. Multiple queries can be specified for the same table(s)."
             + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name)."
             + " Additional `Where` and `Order` configuration can also be added as required.",
-        ExampleMarkdown = "Under construction.")]
+        ExampleMarkdown = @"A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("View", Title = "Provides the _View_ configuration.")]

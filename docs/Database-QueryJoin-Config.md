@@ -4,6 +4,24 @@ The `QueryJoin` object defines a join to another (or same) table within a query.
 
 <br/>
 
+## Example
+
+A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```
+
+<br/>
+
 ## Property categories
 The `QueryJoin` object supports a number of properties that control the generated code output. These properties are separated into a series of logical categories. The properties with a bold name are those that are more typically used (considered more important).
 

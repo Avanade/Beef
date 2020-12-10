@@ -14,8 +14,20 @@ namespace Beef.CodeGen.Config.Database
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     [ClassSchema("QueryJoin", Title = "'QueryJoin' object (database-driven)", 
         Description = "The `QueryJoin` object defines a join to another (or same) table within a query. The `Type` defines the join type, such as inner join, etc."
-            + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name).", 
-        ExampleMarkdown = "")]
+            + " The `IncludeColumns` and `ExcludeColumns` provide a shorthand to include or exclude selected columns; with the `AliasColumns` providing a means to rename where required (for example duplicate name).",
+        ExampleMarkdown = @"A YAML configuration example is as follows:
+``` yaml
+queries:
+- { name: Table, schema: Test, view: true, viewName: vwTestQuery, excludeColumns: [CreatedBy, UpdatedBy], permission: TestSec,
+    joins: [
+      { name: Person, schema: Demo, excludeColumns: [CreatedDate, UpdatedDate], aliasColumns: [RowVersion ^ RowVersionP],
+        on: [
+          { name: PersonId, toColumn: TableId }
+        ]
+      }
+    ]
+  }
+```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
