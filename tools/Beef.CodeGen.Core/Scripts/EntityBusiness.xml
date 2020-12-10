@@ -14,7 +14,7 @@
   <Generate GenType="Beef.CodeGen.Generators.IEntityManagerCodeGenerator" Template="IEntityManager_cs.hbs" FileName="I{{Name}}Manager.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business" HelpText="IEntityManagerCodeGenerator: Business" />
   <Generate GenType="Beef.CodeGen.Generators.EntityManagerCodeGenerator" Template="EntityManager_cs.hbs" FileName="{{Name}}Manager.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business" HelpText="EntityManagerCodeGenerator: Business" />
 
-  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ServiceCollectionExtensionsManager_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business" HelpText="RootEntityCodeGenerator: Business" />
-  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ServiceCollectionExtensionsDataSvc_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" HelpText="RootEntityCodeGenerator: Business|DataSvc" />
-  <Generate GenType="Beef.CodeGen.Generators.RootEntityCodeGenerator" Template="ServiceCollectionExtensionsData_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business/Data" HelpText="RootEntityCodeGenerator: Business|Data" />
+  <Generate GenType="Beef.CodeGen.Generators.EntitySceManagerCodeGenerator" Template="ServiceCollectionExtensionsManager_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business" HelpText="EntitySceManagerCodeGenerator: Business" />
+  <Generate GenType="Beef.CodeGen.Generators.EntitySceDataSvcCodeGenerator" Template="ServiceCollectionExtensionsDataSvc_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business/DataSvc" HelpText="EntitySceDataSvcCodeGenerator: Business|DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntitySceDataCodeGenerator" Template="ServiceCollectionExtensionsData_cs.hbs" FileName="ServiceCollectionExtensions.cs" OutDir="{{Company}}.{{AppName}}.Business/Data" HelpText="EntitySceDataCodeGenerator: Business|Data" />
 </Script>

@@ -41,7 +41,9 @@ namespace Beef.Data.Database
         /// <param name="singleWildcard">The database single wildcard character.</param>
         /// <param name="charactersToEscape">The list of characters that are to be escaped (defaults to <see cref="DefaultCharactersToEscape"/>).</param>
         /// <param name="escapeFormat">The escaping format string when one of the <see cref="CharactersToEscape"/> is found (defaults to <see cref="DefaultEscapeFormat"/>).</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Somehow the compiler thinks CharactersToEscape can be null; so not true.
         public DatabaseWildcard(Wildcard? wildcard = null, char multiWildcard = MultiWildcardCharacter, char singleWildcard = SingleWildcardCharacter,
+#pragma warning restore CS8618
             char[]? charactersToEscape = null, string? escapeFormat = null)
         {
             Wildcard = wildcard ?? Wildcard.Default ?? Wildcard.MultiAll;

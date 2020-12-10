@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.12
+- *Fixed:* Issue [93](https://github.com/Avanade/Beef/issues/93) fixed. The `XxxServiceCollectionExtensions.cs` classes were errantly being generated where there are no corresponding operations that would require.
+
 ## v4.1.11
 - *Fixed:* Issue [91](https://github.com/Avanade/Beef/issues/91) fixed. `WebApiAuthorize` attribute code-gen output reverted back to pre-_Handlebars_ behaviour. Controller-level will only output where specified; will no longer default to `AllowAnonymous`. Method-level will only output where specified; will no longer default to parent (entity) value.
 
