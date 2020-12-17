@@ -7,15 +7,22 @@
 #pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
 #pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a database model.
 
+using Beef.Entities;
+using Beef.Data.Database.Cdc;
 using System;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.Data.Cdc.Models
+namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data.Model
 {
     /// <summary>
-    /// Represents the CDC model for database object '{{Schema}}.{{Name}}'.
+    /// Represents the CDC model for primary database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{pascal Name}}Cdc
+    public partial class {{CdcModelName}}Cdc : ICdcModel
     {
+        /// <summary>
+        /// Gets or sets the database CDC <see cref="OperationType"/>.
+        /// </summary>
+        public OperationType DatabaseOperationType { get; set; }
+
 {{#each SelectedColumns}}
         /// <summary>
         /// Gets or sets the '{{Name}}' column value (database object '{{DbColumn.DbTable.Schema}}.{{DbColumn.DbTable.Name}}').
@@ -28,6 +35,21 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data.Cdc.Models
 
   {{/unless}}
 {{/each}}
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public bool HasUniqueKey => true;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
     }
 }
 

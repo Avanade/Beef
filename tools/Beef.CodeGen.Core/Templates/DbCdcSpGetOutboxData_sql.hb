@@ -1,8 +1,8 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE PROCEDURE [{{CdcSchema}}].[{{CdcName}}]
-  @BatchIdToMarkComplete INT,
-  @ReturnIncompleteBatches BIT,
-  @MaxBatchSize int = 100
+CREATE PROCEDURE [{{CdcSchema}}].[{{CdcStoredProcedureName}}]
+  @EnvelopeIdToMarkComplete INT NULL = NULL,
+  @ReturnIncompleteBatches BIT = 0,
+  @MaxBatchSize INT = 100
 AS
 BEGIN
   /*
@@ -16,12 +16,12 @@ BEGIN
     BEGIN TRANSACTION
 
     -- Mark the batch as complete first.
-    IF (@BatchIdToMarkComplete IS NOT NULL)
+    IF (@EnvelopeIdToMarkComplete IS NOT NULL)
     BEGIN
-      UPDATE [{{CdcSchema}}].[{{CdcEnvelope}}] SET
+      UPDATE [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] SET
         HasbeenCompleted = 1,
         ProcessedDate = GETUTCDATE()
-        WHERE OutboxEnvelopeId = @BatchIdToMarkComplete 
+        WHERE OutboxEnvelopeId = @EnvelopeIdToMarkComplete 
     END
 
     -- Where the batch size is 0 then no-op; this is used when closing down the service - invoked to mark the batch complete but _not_ get a new one.
@@ -55,7 +55,7 @@ BEGIN
           @min{{Name}}Lsn = [o].[FirstProcessedLSN],
 {{/each}}
           @maxlsn = [o].[LastProcessedLSN]
-        FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
+        FROM [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] AS [o] 
         WHERE [o].[HasBeenCompleted] = 0 
         ORDER BY [o].[OutboxEnvelopeId]
 
@@ -63,7 +63,7 @@ BEGIN
       IF @existingBatchId IS NOT NULL
       BEGIN
         -- Get the batch information from the table as this forms our first result set.
-        SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
+        SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] AS [o] WHERE [o].[OutboxEnvelopeId] = @ExistingBatchId
 
         -- Mark the flag to include the first item in the batch too.
         SET @includeMin = 1
@@ -79,11 +79,11 @@ BEGIN
 {{#each CdcJoins}}
           @min{{Name}}Lsn = [o].[LastProcessedLSN]{{#unless @last}},{{/unless}}
 {{/each}}
-        FROM [{{CdcSchema}}].[{{CdcEnvelope}}] AS [o] 
+        FROM [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] AS [o] 
         ORDER BY [o].[OutBoxEnvelopeId] DESC
 
-      -- Where they are still NULL then this is the first batch ever, get them from the transaciton log.
-      IF @minAddressLsn IS NULL 
+      -- Where they are still NULL then this is the first batch ever, get them from the transaction log.
+      IF @min{{Name}}Lsn IS NULL 
       BEGIN
         SET @min{{Name}}Lsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}') 
 {{#each CdcJoins}}
@@ -105,15 +105,18 @@ BEGIN
     (
         -- Get the {{QualifiedName}} changes.
         SELECT TOP (@MaxBatchSize)
-            '{{Name}}' AS [ChangeTable],
-            [_chg].[__$start_lsn] AS [start_lsn],
-            [_chg].[__$operation],
-            [_chg].[__$update_mask],
-{{#each SelectedColumns}}
+            '{{Name}}' AS [__ChangeTable],
+            [_chg].[__$start_lsn] AS [__StartLsn],
+            [_chg].[__$operation] AS [__Operation],
+            [_chg].[__$update_mask] AS [__UpdateMask],
+{{#each PrimaryKeyColumns}}
+            [_chg].[{{Name}}],
+{{/each}}
+{{#each SelectedColumnsExcludingPrimaryKey}}
             {{QualifiedNameWithAlias}}{{#unless @last}},{{/unless}}
 {{/each}}
           FROM cdc.fn_cdc_get_net_changes_{{lower Schema}}_{{lower Name}}(@min{{Name}}Lsn, @maxlsn, 'all') AS [_chg]
-          INNER JOIN {{QualifiedName}} AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+          LEFT OUTER JOIN {{QualifiedName}} AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
 {{#each Joins}}
           {{JoinTypeSql}} {{QualifiedName}} AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{JoinOnSql}}{{/each}})
 {{/each}}
@@ -123,10 +126,10 @@ BEGIN
       UNION
         -- Get the {{QualifiedName}} changes.
         SELECT TOP (@MaxBatchSize)
-            '{{Name}}' AS [ChangeTable],
-            [_chg].[__$start_lsn] AS [start_lsn],
-            [_chg].[__$operation],
-            [_chg].[__$update_mask],
+            '{{Name}}' AS [__ChangeTable],
+            [_chg].[__$start_lsn] AS [__StartLsn],
+            [_chg].[__$operation] AS [__Operation],
+            [_chg].[__$update_mask] AS [__UpdateMask],
   {{#each Parent.SelectedColumns}}
             {{QualifiedNameWithAlias}}{{#unless @last}},{{/unless}}
   {{/each}}
@@ -140,7 +143,7 @@ BEGIN
           ORDER BY [_chg].[__$start_lsn] ASC
 {{/each}}
     ) AS [_changes]
-    ORDER BY start_lsn ASC -- We order by as we're taking TOP. We dont want to skip changes so we need them in LSN order
+    ORDER BY [__StartLsn] ASC -- We order by as we're taking TOP. We dont want to skip changes so we need them in LSN order
 
     -- Where there are changes we can make a batch, otherwise we just need to return the empty results.
     IF EXISTS (SELECT TOP 1 * from #changes)
@@ -152,11 +155,11 @@ BEGIN
         DECLARE @MaxBatchLSN BINARY(10)
 
         -- Figure out the min and MAX LSN in this batch.
-        SELECT @MinBatchLSN = MIN( start_lsn), @MaxBatchLSN = MAX( start_lsn)
+        SELECT @MinBatchLSN = MIN([__StartLsn]), @MaxBatchLSN = MAX([__StartLsn])
           FROM #changes
 
         -- Create the batch record in the table.
-        INSERT INTO [{{CdcSchema}}].[{{CdcEnvelope}}] (
+        INSERT INTO [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] (
           [CreatedDate], 
           [FirstProcessedLSN],
           [LastProcessedLSN],
@@ -170,17 +173,18 @@ BEGIN
         )
 
         -- Return as the first result set. If we arent making a new batch then we already returned it.
-        SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelope}}] WHERE [OutboxEnvelopeId] = @@IDENTITY
+        SELECT * FROM [{{CdcSchema}}].[{{CdcEnvelopeTableName}}] WHERE [OutboxEnvelopeId] = @@IDENTITY
       END
     END
     ELSE
     BEGIN
       -- There are no changes so just return an empty result set.
-      SELECT TOP 0 * FROM [{{CdcSchema}}].[{{CdcEnvelope}}]
+      SELECT TOP 0 * FROM [{{CdcSchema}}].[{{CdcEnvelopeTableName}}]
     END
 
     -- Return the changes that we have.
     SELECT DISTINCT 
+      [__Operation]
 {{#each SelectedColumns}}
       [{{NameAlias}}]{{#unless @last}},{{/unless}}
 {{/each}}

@@ -35,10 +35,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Templates\DbCdcData_cs.hb" />
+    <None Remove="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcModel_cs.hb" />
+    <None Remove="Templates\DbCdcSpGetOutboxData_sql.hb" />
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
-    <None Remove="Templates\DbSpQueryCdcOutbox_sql.hb" />
     <None Remove="Templates\DbSpTableCreate_sql.hbs" />
     <None Remove="Templates\DbSpTableDelete_sql.hbs" />
     <None Remove="Templates\DbSpTableGetColl_sql.hbs" />
@@ -46,7 +48,6 @@
     <None Remove="Templates\DbSpTableMerge_sql.hbs" />
     <None Remove="Templates\DbSpTableUpdate_sql.hbs" />
     <None Remove="Templates\DbSpTableUpsert_sql.hbs" />
-    <None Remove="Templates\DbTbQueryCdcEnvelope_sql.hb" />
     <None Remove="Templates\DbTvpTable_cs.hbs" />
     <None Remove="Templates\DbUdtTableList_sql.hbs" />
     <None Remove="Templates\DbVwQuery_sql.hbs" />
@@ -95,12 +96,13 @@
     <EmbeddedResource Include="Scripts\EntityWebApiCoreAgent.xml" />
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
+    <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
     <EmbeddedResource Include="Templates\DbCdcModel_cs.hb" />
-    <EmbeddedResource Include="Templates\DbTbQueryCdcEnvelope_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbSpQueryCdcOutbox_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpGetOutboxData_sql.hb" />
     <EmbeddedResource Include="Templates\DbVwQuery_sql.hbs" />
     <EmbeddedResource Include="Templates\DbVwTable_sql.hbs" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.hbs" />

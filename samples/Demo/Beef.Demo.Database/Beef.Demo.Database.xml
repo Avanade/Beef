@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration RefDatabaseSchema="Ref" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration EventSubjectRoot="Legacy" EventActionFormat="PastTense" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Avanade/Beef/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- New "Query" configuration. -->
   <Query Name="Table" Schema="Test" View="true" ViewName="vwTestQuery" ExcludeColumns="CreatedBy, UpdatedBy" Permission="TestSec">
     <QueryJoin Name="Person" Schema="Demo" ExcludeColumns="CreatedDate, UpdatedDate" AliasColumns="RowVersion^RowVersionP">
@@ -14,12 +14,36 @@
     </StoredProcedure>
   </Table>
 
+  <!--<Query Name="People" Schema="Legacy" Cdc="true" CdcSchema="DemoCdc" />
+
+  <Query Name="Posts" Schema="Legacy" Cdc="true" CdcSchema="DemoCdc">
+    <QueryJoin Name="Comments" Type="Left" ExcludeColumns="PostsId" Cdc="true" AliasColumns="Text^CText,Date^CDate">
+      <QueryJoinOn Name="PostsId" />
+    </QueryJoin>
+  </Query>-->
+
+  <Cdc Name="Posts" Schema="Legacy" CdcSchema="DemoCdc">
+    <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
+      <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
+    </CdcJoin>
+    <CdcJoin Name="Tags" Schema="Legacy" JoinTo="Comments">
+      <CdcJoinOn Name="ParentType" ToStatement="'C'" />
+      <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
+    </CdcJoin>
+    <CdcJoin Name="Tags" Schema="Legacy" JoinTo="Posts">
+      <CdcJoinOn Name="ParentType" ToStatement="'P'" />
+      <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
+    </CdcJoin>
+    <CdcJoin Name="Blah" Schema="Legacy" JoinTo="Posts" NonCdc="true">
+    </CdcJoin>
+  </Cdc>
+
   <!--<Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
     <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Cdc="true">
       <QueryJoinOn Name="PersonId" />
     </QueryJoin>
   </Query>-->
-  
+
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
     <StoredProcedure Name="GetByArgs" Type="GetAll" ExcludeColumns="Count">
@@ -33,7 +57,7 @@
     </StoredProcedure>
     <StoredProcedure Name="Update" Type="Update" ExcludeColumns="" />
   </Table>
-  
+
   <!-- Reference data stored procedures -->
   <Table Name="Gender" Schema="Ref" GetAll="true" Get="true" Create="true" Update="true" />
   <Table Name="Country" Schema="Ref" GetAll="true" />
@@ -41,7 +65,7 @@
 
   <!-- Reference data entity framework -->
   <Table Name="EyeColor" Schema="Ref" EfModel="true" />
-  
+
   <!-- Master data stored procedures. -->
   <Table Name="Person" Schema="Demo" Get="true" Create="true" Update="true" Delete="true" EfModel="true">
     <StoredProcedure Name="GetAll" Paging="true">

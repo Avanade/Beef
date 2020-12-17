@@ -1,0 +1,12 @@
+-- Migration Script
+
+BEGIN TRANSACTION
+
+CREATE TABLE [Legacy].[Comments] (
+  [CommentsId] INT NOT NULL IDENTITY(1, 1) PRIMARY KEY,
+  [PostsId] INT NOT NULL,
+  [Text] NVARCHAR(256) NULL UNIQUE,
+  [Date] DATE NULL
+);
+
+COMMIT TRANSACTION

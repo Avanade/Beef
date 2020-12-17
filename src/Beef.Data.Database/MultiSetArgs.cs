@@ -52,9 +52,9 @@ namespace Beef.Data.Database
         where TItem : class, new()
     {
         /// <summary>
-        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
+        /// Gets the <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        DatabaseMapper<TItem> Mapper { get; }
+        IDatabaseMapper<TItem> Mapper { get; }
     }
 
     /// <summary>
@@ -123,11 +123,11 @@ namespace Beef.Data.Database
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiSetSingleArgs{TItem}"/> class.
         /// </summary>
-        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
+        /// <param name="mapper">The <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
         /// <param name="result">The action that will be invoked with the result of the set.</param>
         /// <param name="isMandatory">Indicates whether the value is mandatory; defaults to <c>true</c>.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetSingleArgs(DatabaseMapper<TItem> mapper, Action<TItem> result, bool isMandatory = true, bool stopOnNull = false)
+        public MultiSetSingleArgs(IDatabaseMapper<TItem> mapper, Action<TItem> result, bool isMandatory = true, bool stopOnNull = false)
             : base(isMandatory, stopOnNull)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
@@ -137,7 +137,7 @@ namespace Beef.Data.Database
         /// <summary>
         /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        public DatabaseMapper<TItem> Mapper { get; private set; }
+        public IDatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
@@ -145,7 +145,7 @@ namespace Beef.Data.Database
         /// <param name="dr">The <see cref="DatabaseRecord"/>.</param>
         public override void DatasetRecord(DatabaseRecord dr)
         {
-            _value = Mapper.MapFromDb(dr, OperationType);
+            _value = Mapper.MapFromDb(dr, OperationType, null!);
         }
 
         /// <summary>
@@ -224,12 +224,12 @@ namespace Beef.Data.Database
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiSetCollArgs{TColl, TItem}"/> class.
         /// </summary>
-        /// <param name="mapper">The <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
+        /// <param name="mapper">The <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.</param>
         /// <param name="result">The action that will be invoked with the result of the set.</param>
         /// <param name="minRows">The minimum number of rows allowed.</param>
         /// <param name="maxRows">The maximum number of rows allowed.</param>
         /// <param name="stopOnNull">Indicates whether to stop further query result set processing where the current set has resulted in a null (i.e. no records).</param>
-        public MultiSetCollArgs(DatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
+        public MultiSetCollArgs(IDatabaseMapper<TItem> mapper, Action<TColl> result, int minRows = 0, int? maxRows = null, bool stopOnNull = false)
             : base(minRows, maxRows, stopOnNull)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
@@ -237,9 +237,9 @@ namespace Beef.Data.Database
         }
 
         /// <summary>
-        /// Gets the <see cref="DatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
+        /// Gets the <see cref="IDatabaseMapper{TItem}"/> for the <see cref="DatabaseRecord"/>.
         /// </summary>
-        public DatabaseMapper<TItem> Mapper { get; private set; }
+        public IDatabaseMapper<TItem> Mapper { get; private set; }
 
         /// <summary>
         /// The <see cref="DatabaseRecord"/> method invoked for each record for its respective dataset.
@@ -253,7 +253,7 @@ namespace Beef.Data.Database
             if (_coll == null)
                 _coll = new TColl();
 
-            var item = Mapper.MapFromDb(dr, OperationType);
+            var item = Mapper.MapFromDb(dr, OperationType, null!);
             if (item != null)
                 _coll.Add(item);
         }

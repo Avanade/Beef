@@ -397,4 +397,14 @@ namespace Beef.CodeGen.Config.Database
     /// Represents the <see cref="QueryJoinConfig"/> column configuration.
     /// </summary>
     public class QueryJoinColumnConfig : ColumnConfigBase<CodeGenConfig, QueryJoinConfig> { }
+
+    /// <summary>
+    /// Represents the <see cref="QueryConfig"/> column configuration.
+    /// </summary>
+    public class CdcColumnConfig : ColumnConfigBase<CodeGenConfig, CdcConfig> { }
+
+    /// <summary>
+    /// Represents the <see cref="QueryJoinConfig"/> column configuration.
+    /// </summary>
+    public class CdcJoinColumnConfig : ColumnConfigBase<CodeGenConfig, CdcJoinConfig> { }
 }

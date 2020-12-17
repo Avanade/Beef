@@ -1,0 +1,2 @@
+CREATE SCHEMA [Legacy]
+    AUTHORIZATION [dbo];

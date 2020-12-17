@@ -32,7 +32,6 @@ queries:
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("View", Title = "Provides the _View_ configuration.")]
-    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
@@ -126,41 +125,6 @@ queries:
         [PropertySchema("View", Title = "The schema name for the `View`.",
             Description = "Defaults to `Schema`.")]
         public string? ViewSchema { get; set; }
-
-        #endregion
-
-        #region Cdc
-
-        /// <summary>
-        /// Indicates whether the Change Data Capture (CDC) related artefacts are to be generated.
-        /// </summary>
-        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether the Change Data Capture (CDC) related artefacts are to be generated.")]
-        public bool? Cdc { get; set; }
-
-        /// <summary>
-        /// Gets or sets the `Cdc` outbox stored procedure name.
-        /// </summary>
-        [JsonProperty("cdcName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The `View` name.",
-            Description = "Defaults to `CodeGeneration.sp` (literal) + `Name` + `Outbox` (literal); e.g. `spTableNameOutbox`.")]
-        public string? CdcName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the schema name for the `Cdc`-related database artefacts.
-        /// </summary>
-        [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The schema name for the `Cdc`-related database artefacts.",
-            Description = "Defaults to `CodeGeneration.Schema` + `Cdc` (literal).")]
-        public string? CdcSchema { get; set; }
-
-        /// <summary>
-        /// Gets or sets the corresponding `Cdc` Outbox Envelope table name.
-        /// </summary>
-        [JsonProperty("cdcEnvelope", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The corresponding `Cdc` Outbox Envelope table name.",
-            Description = "Defaults to `CodeGeneration.Name` + `OutboxEnvelope` (literal).")]
-        public string? CdcEnvelope { get; set; }
 
         #endregion
 
@@ -297,19 +261,19 @@ queries:
         public List<IColumnConfig> SelectedColumns { get; } = new List<IColumnConfig>();
 
         /// <summary>
+        /// Gets the list of primary key columns.
+        /// </summary>
+        public List<QueryColumnConfig> PrimaryKeyColumns { get; } = new List<QueryColumnConfig>();
+
+        /// <summary>
+        /// Gets the SQL formatted selected columns excluding the <see cref="PrimaryKeyColumns"/>.
+        /// </summary>
+        public List<IColumnConfig> SelectedColumnsExcludingPrimaryKey => SelectedColumns.Where(x => !(x.DbColumn!.DbTable == DbTable && x.DbColumn.IsPrimaryKey)).ToList();
+
+        /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
         public List<QueryColumnConfig> Columns { get; } = new List<QueryColumnConfig>();
-
-        /// <summary>
-        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are also CDC monitored.
-        /// </summary>
-        public List<QueryJoinConfig> CdcJoins => Joins!.Where(x => CompareValue(x.Cdc, true)).ToList();
-
-        /// <summary>
-        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are not flagged as CDC monitored.
-        /// </summary>
-        public List<QueryJoinConfig> NonCdcJoins => Joins!.Where(x => CompareNullOrValue(x.Cdc, false)).ToList();
 
         /// <summary>
         /// Gets the related IsDeleted column.
@@ -389,11 +353,6 @@ queries:
         public DbTable? DbTable { get; private set; }
 
         /// <summary>
-        /// Gets the list of primary key columns.
-        /// </summary>
-        public List<QueryColumnConfig> PrimaryKeyColumns { get; } = new List<QueryColumnConfig>();
-
-        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -413,10 +372,6 @@ queries:
 
             if (!string.IsNullOrEmpty(Permission) && Permission.Split(".", StringSplitOptions.RemoveEmptyEntries).Length == 1)
                 Permission += ".Read";
-
-            CdcName = DefaultWhereNull(CdcName, () => $"sp{Name}Outbox");
-            CdcSchema = DefaultWhereNull(CdcSchema, () => Schema + "Cdc");
-            CdcEnvelope = DefaultWhereNull(CdcEnvelope, () => Name + "OutboxEnvelope");
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);

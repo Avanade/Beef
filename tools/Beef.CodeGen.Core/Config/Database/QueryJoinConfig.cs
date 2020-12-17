@@ -30,7 +30,6 @@ queries:
 ```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     public class QueryJoinConfig : ConfigBase<CodeGenConfig, QueryConfig>, ITableReference, ISpecialColumnNames, ISpecialColumns
     {
@@ -103,18 +102,6 @@ queries:
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? AliasColumns { get; set; }
-
-        #endregion
-
-        #region Cdc
-
-        /// <summary>
-        /// Indicates whether the joined table is also being monitored for CDC and should be included.
-        /// </summary>
-        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether the joined table is also being monitored for Change Data Capture (CDC) and should be included accordingly.",
-            Description = "Otherwise, the `Join` is purely for filtering and/or column addition.")]
-        public bool? Cdc { get; set; }
 
         #endregion
 

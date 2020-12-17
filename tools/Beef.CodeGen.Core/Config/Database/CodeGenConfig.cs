@@ -19,6 +19,7 @@ namespace Beef.CodeGen.Config.Database
         Description = "The `CodeGeneration` object defines global properties that are used to drive the underlying database-driven code generation.",
         Markdown = "")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
+    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
@@ -130,6 +131,26 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region CDC
+
+        /// <summary>
+        /// Gets or sets the root for the event name by prepending to all event subject names.
+        /// </summary>
+        [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The root for the event name by prepending to all event subject names.",
+            Description = "Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).", IsImportant = true)]
+        public string? EventSubjectRoot { get; set; }
+
+        /// <summary>
+        /// Gets or sets the formatting for the Action when an Event is published.
+        /// </summary>
+        [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "UpperCase", "PastTense", "PastTenseUpperCase" }, IsImportant = true,
+            Description = "Defaults to `None` (no formatting required)`.")]
+        public string? EventActionFormat { get; set; }
+
+        #endregion
+
         #region RuntimeParameters
 
         /// <summary>
@@ -212,6 +233,15 @@ namespace Beef.CodeGen.Config.Database
         public List<QueryConfig>? Queries { get; set; }
 
         /// <summary>
+        /// Gets or sets the corresponding <see cref="CdcConfig"/> collection.
+        /// </summary>
+        [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
+            Markdown = "A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
+        public List<CdcConfig>? Cdc { get; set; }
+
+        /// <summary>
         /// Gets all the tables that require an EfModel to be generated.
         /// </summary>
         public List<TableConfig> EFModels => Tables!.Where(x => CompareValue(x.EfModel, true)).ToList();
@@ -252,6 +282,7 @@ namespace Beef.CodeGen.Config.Database
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
+            EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
 
             if (Queries == null)
                 Queries = new List<QueryConfig>();
@@ -267,6 +298,14 @@ namespace Beef.CodeGen.Config.Database
             foreach (var table in Tables)
             {
                 table.Prepare(Root!, this);
+            }
+
+            if (Cdc == null)
+                Cdc = new List<CdcConfig>();
+
+            foreach (var cdc in Cdc)
+            {
+                cdc.Prepare(Root!, this);
             }
         }
 

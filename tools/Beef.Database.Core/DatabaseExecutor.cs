@@ -464,7 +464,8 @@ namespace Beef.Database.Core
             var sb = new StringBuilder();
             foreach (var sr in list.OrderByDescending(x => x.Order).ThenByDescending(x => x.Reader!.Order).ThenByDescending(x => x.Name))
             {
-                sb.AppendLine($"  DROP {sr.Reader!.Type} IF EXISTS [{sr.Reader.Schema}].[{sr.Reader.Name}]");
+                if (sr.Reader!.Order > 0)
+                    sb.AppendLine($"  DROP {sr.Reader.Type} IF EXISTS [{sr.Reader.Schema}].[{sr.Reader.Name}]");
             }
 
             if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sb.ToString()).NonQueryAsync(), "the drop of all existing (known) database objects.", sb.ToString()).ConfigureAwait(false))
@@ -474,7 +475,7 @@ namespace Beef.Database.Core
             _logger.LogInformation("Executing the create of all (known) database objects.");
             foreach (var sr in list.OrderBy(x => x.Order).ThenBy(x => x.Reader!.Order).ThenBy(x => x.Name))
             {
-                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {(sr.FileName ?? sr.Name)}", indent: 2).ConfigureAwait(false))
+                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {sr.FileName ?? sr.Name}{(sr.Reader!.CreateOnlyIfNotExists ? " [IF NOT EXISTS]" : "")}", indent: 2).ConfigureAwait(false))
                     return false;
             }
 

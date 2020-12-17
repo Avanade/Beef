@@ -1,5 +1,4 @@
-﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
-CREATE TABLE [{{CdcSchema}}].[{{CdcEnvelope}}] (
+CREATE TABLE [DemoCdc].[PostsOutboxEnvelope] (
   /*
    * This is automatically generated; any changes will be lost.
    */

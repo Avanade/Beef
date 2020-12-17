@@ -1,0 +1,12 @@
+-- Migration Script
+
+BEGIN TRANSACTION
+
+CREATE TABLE [Legacy].[Tags] (
+  [TagsId] INT NOT NULL IDENTITY(1, 1) PRIMARY KEY,
+  [ParentType] NVARCHAR(1) NOT NULL,
+  [ParentId] INT NOT NULL,
+  [Text] NVARCHAR(50) NOT NULL
+);
+
+COMMIT TRANSACTION
