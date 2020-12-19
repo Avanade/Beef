@@ -3,22 +3,21 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a database model.
+#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;
 using Microsoft.Extensions.Logging;
 using System;
-using Beef.Demo.Cdc.Data.Model;
+using Beef.Demo.Cdc.Entities;
 
 namespace Beef.Demo.Cdc.Data
 {
     /// <summary>
     /// Provides the CDC data access for database object 'Legacy.Posts' .
     /// </summary>
-    public partial class PostsCdcData : CdcExecutor<PostsCdc>
+    public partial class PostsCdcData : CdcExecutor<Cdc>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PostsCdcData"/> class.
@@ -27,7 +26,7 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public PostsCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PostsCdcData> logger) :
-            base(db, "[DemoCdc].[spGetPostsOutboxData]", DbMapper.Default, evtPub, logger) => PostsCdcDataCtor();
+            base(db, "[DemoCdc].[spGetPostsEnvelopeData]", DbMapper.Default, evtPub, logger) => PostsCdcDataCtor();
 
         partial void PostsCdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -36,32 +35,32 @@ namespace Beef.Demo.Cdc.Data
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
 
+        public partial class PostsCdcRoot : PostsCdc
+        {
+            /// <summary>
+            /// Gets or sets the database CDC <see cref="OperationType"/>.
+            /// </summary>
+            public OperationType DatabaseOperationType { get; set; }
+        }
+
         /// <summary>
-        /// Provides the database object 'Legacy.Posts' property and database column mapping.
+        /// Provides the root database object 'Legacy.Posts' property and database column mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
-        public partial class DbMapper : DatabaseMapper<PostsCdc, DbMapper>
+        public partial class PostsDbMapper : DatabaseMapper<PostsCdcRoot, PostsDbMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="DbMapper"/> class.
             /// </summary>
-            public DbMapper()
+            public PostsDbMapper()
             {
                 Property(s => s.DatabaseOperationType, "__Operation").SetConverter(CdcOperationTypeConverter.Default);
                 Property(s => s.PostsId, "PostsId");
                 Property(s => s.Text, "Text");
                 Property(s => s.Date, "Date");
-                Property(s => s.CommentsId, "CommentsId");
-                Property(s => s.CText, "CText");
-                Property(s => s.CDate, "CDate");
-                DbMapperCtor();
             }
-            
-            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
         }
     }
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 #nullable restore

@@ -17,5 +17,5 @@
   <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcSpGetEnvelopeData_sql.hb" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Stored Procedures" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{EnvelopeTableName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Tables" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcModel_cs.hb" FileName="{{ModelName}}Cdc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Entities" />
-  <!--<Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{CdcModelName}}CdcData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />-->
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{ModelName}}CdcData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />
 </Script>

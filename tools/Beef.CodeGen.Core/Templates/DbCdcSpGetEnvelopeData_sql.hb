@@ -33,9 +33,9 @@ BEGIN
     END
 
     -- Declare variables.
-    DECLARE @{{Alias}}MinLsn BINARY(10), @{{Alias}}MaxLsn BINARY(10)
+    DECLARE @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{#each Joins}}
-    DECLARE @{{Alias}}MinLsn BINARY(10), @{{Alias}}MaxLsn BINARY(10)
+    DECLARE @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{/each}}
     DECLARE @EnvelopeId INT
 
@@ -43,11 +43,11 @@ BEGIN
     IF (@ReturnIncompleteBatches = 1)
     BEGIN
       SELECT TOP 1
-          @{{Alias}}MinLsn = [_outbox].[{{pascal Alias}}MinLsn],
-          @{{Alias}}MaxLsn = [_outbox].[{{pascal Alias}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
+          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{#each Joins}}
-          @{{Alias}}MinLsn = [_outbox].[{{pascal Alias}}MinLsn],
-          @{{Alias}}MaxLsn = [_outbox].[{{pascal Alias}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
+          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{/each}}
           @EnvelopeId = [EnvelopeId]
         FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
@@ -70,9 +70,9 @@ BEGIN
 
       SELECT TOP 1
           @EnvelopeId = [_outbox].[EnvelopeId],
-          @{{Alias}}MinLsn = [_outbox].[{{pascal Alias}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{#each Joins}}
-          @{{Alias}}MinLsn = [_outbox].[{{pascal Alias}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
 {{/each}}
           @IsComplete = [_outbox].IsComplete
         FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
@@ -90,15 +90,15 @@ BEGIN
 
       IF (@IsComplete IS NULL)
       BEGIN
-        SET @{{Alias}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
+        SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
 {{#each Joins}}
-        SET @{{Alias}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
+        SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
 {{/each}}
       END
 
-      SET @{{Alias}}MaxLsn = sys.fn_cdc_get_max_lsn();
+      SET @{{pascal Name}}MaxLsn = sys.fn_cdc_get_max_lsn();
 {{#each Joins}}
-      SET @{{Alias}}MaxLsn = @{{Parent.Alias}}MaxLsn
+      SET @{{pascal Name}}MaxLsn = @{{pascal Parent.Name}}MaxLsn
 {{/each}}
 
       IF (@MaxBatchSize IS NULL OR @MaxBatchSize < 1 OR @MaxBatchSize > 10000)
@@ -115,15 +115,15 @@ BEGIN
         [_cdc].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
 {{/each}}
       INTO #_changes
-      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{Alias}}MinLsn, @{{Alias}}MaxLsn, 'all') AS [_cdc]
+      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
-      SELECT @{{Alias}}MinLsn = MIN([_Lsn]), @{{Alias}}MaxLsn = MAX([_Lsn]) FROM #_changes
+      SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #_changes
     END
 
 {{#each Joins}}
-    -- Find changes on related table: {{Schema}}.{{Name}} - assume all are 'update' operation (i.e. it doesn't matter).
+    -- Find changes on related table: {{Name}} ({{Schema}}.{{TableName}}) - assume all are 'update' operation (i.e. it doesn't matter).
     SELECT TOP (@MaxBatchSize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         4 AS [_Op],
@@ -131,14 +131,14 @@ BEGIN
         [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
   {{/each}}
       INTO #{{Alias}}
-      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{Alias}}MinLsn, @{{Alias}}MaxLsn, 'all') AS [_cdc]
+      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
   {{#each JoinHierarchy}}
       INNER JOIN [{{JoinToSchema}}].[{{JoinTo}}] AS [{{JoinToAlias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{#if Parent.IsFirstInJoinHierarchy}}[_cdc]{{else}}[{{Parent.Alias}}]{{/if}}.[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
-      SELECT @{{Alias}}MinLsn = MIN([_Lsn]), @{{Alias}}MaxLsn = MAX([_Lsn]) FROM #{{Alias}}
+      SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #{{Alias}}
     END
 
     INSERT INTO #_changes
@@ -153,22 +153,22 @@ BEGIN
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [{{CdcSchema}}].[{{EnvelopeTableName}}] (
-          [{{pascal Alias}}MinLsn],
-          [{{pascal Alias}}MaxLsn],
+          [{{pascal Name}}MinLsn],
+          [{{pascal Name}}MaxLsn],
 {{#each Joins}}
-          [{{pascal Alias}}MinLsn],
-          [{{pascal Alias}}MaxLsn],
+          [{{pascal Name}}MinLsn],
+          [{{pascal Name}}MaxLsn],
 {{/each}}
           [CreatedDate],
           [IsComplete]
         ) 
         OUTPUT inserted.EnvelopeId INTO @InsertedEnvelopeId
         VALUES (
-          @{{Alias}}MinLsn,
-          @{{Alias}}MaxLsn,
+          @{{pascal Name}}MinLsn,
+          @{{pascal Name}}MaxLsn,
 {{#each Joins}}
-          @{{Alias}}MinLsn,
-          @{{Alias}}MaxLsn,
+          @{{pascal Name}}MinLsn,
+          @{{pascal Name}}MaxLsn,
 {{/each}}
           GETUTCDATE(),
           0
@@ -195,7 +195,7 @@ BEGIN
       LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
 
 {{#each Joins}}
-    -- Related table: {{Schema}}.{{Name}} - only use INNER JOINS to get what is actually there right now.
+    -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now.
     SELECT
   {{#each Columns}}
         [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
@@ -203,7 +203,7 @@ BEGIN
       FROM #_changes AS [_chg]
       INNER JOIN [{{Parent.Schema}}].[{{Parent.Table}}] AS [{{Parent.Alias}}] WITH (NOLOCK) ON ({{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
   {{#each JoinHierarchyReverse}}
-      INNER JOIN [{{Schema}}].[{{Name}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+      INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
       WHERE [_chg].[_Op] <> 1
 

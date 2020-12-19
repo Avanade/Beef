@@ -4,62 +4,64 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a database model.
+#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;
 using Microsoft.Extensions.Logging;
 using System;
-using {{Root.Company}}.{{Root.AppName}}.Cdc.Data.Model;
+using {{Root.Company}}.{{Root.AppName}}.Cdc.Entities;
 
 namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
 {
     /// <summary>
     /// Provides the CDC data access for database object '{{Schema}}.{{Name}}' .
     /// </summary>
-    public partial class {{CdcModelName}}CdcData : CdcExecutor<{{CdcModelName}}Cdc>
+    public partial class {{ModelName}}CdcData : CdcExecutor<{{CdcModelName}}Cdc>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="{{CdcModelName}}CdcData"/> class.
+        /// Initializes a new instance of the <see cref="{{ModelName}}CdcData"/> class.
         /// </summary>
-        /// <param name="db">The <see cref="{{CdcDatabaseName}}"/>.</param>
+        /// <param name="db">The <see cref="{{DatabaseName}}"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        {{lower CdcDataConstructor}} {{CdcModelName}}CdcData({{CdcDatabaseName}} db, IEventPublisher evtPub, ILogger<{{CdcModelName}}CdcData> logger) :
-            base(db, "[{{CdcSchema}}].[{{CdcStoredProcedureName}}]", DbMapper.Default, evtPub, logger) => {{CdcModelName}}CdcDataCtor();
+        {{lower DataConstructor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger) :
+            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", DbMapper.Default, evtPub, logger) => {{ModelName}}CdcDataCtor();
 
-        partial void {{CdcModelName}}CdcDataCtor(); // Enables additional functionality to be added to the constructor.
+        partial void {{ModelName}}CdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
+        public partial class {{ModelName}}CdcRoot : {{ModelName}}Cdc
+        {
+            /// <summary>
+            /// Gets or sets the database CDC <see cref="OperationType"/>.
+            /// </summary>
+            public OperationType DatabaseOperationType { get; set; }
+        }
+
         /// <summary>
-        /// Provides the database object '{{Schema}}.{{Name}}' property and database column mapping.
+        /// Provides the root database object '{{Schema}}.{{Name}}' property and database column mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
-        public partial class DbMapper : DatabaseMapper<{{CdcModelName}}Cdc, DbMapper>
+        public partial class {{ModelName}}DbMapper : DatabaseMapper<{{ModelName}}CdcRoot, {{ModelName}}DbMapper>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="DbMapper"/> class.
             /// </summary>
-            public DbMapper()
+            public {{ModelName}}DbMapper()
             {
                 Property(s => s.DatabaseOperationType, "__Operation").SetConverter(CdcOperationTypeConverter.Default);
 {{#each SelectedColumns}}
                 Property(s => s.{{pascal NameAlias}}, "{{NameAlias}}");
 {{/each}}
-                DbMapperCtor();
             }
-            
-            partial void DbMapperCtor(); // Enables the DbMapper constructor to be extended.
         }
     }
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 #nullable restore

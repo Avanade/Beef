@@ -6,11 +6,11 @@ CREATE TABLE [{{CdcSchema}}].[{{EnvelopeTableName}}] (
 
   [EnvelopeId] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY CLUSTERED ([EnvelopeId] ASC),
   [CreatedDate] DATETIME NOT NULL,
-  [{{pascal Alias}}MinLsn] BINARY(10) NOT NULL,  -- Primary table: {{Schema}}.{{Name}}
-  [{{pascal Alias}}MaxLsn] BINARY(10) NOT NULL,
+  [{{pascal Name}}MinLsn] BINARY(10) NOT NULL,  -- Primary table: {{Schema}}.{{Name}}
+  [{{pascal Name}}MaxLsn] BINARY(10) NOT NULL,
 {{#each Joins}}
-  [{{pascal Alias}}MinLsn] BINARY(10) NOT NULL,  -- Related table: {{Schema}}.{{Name}}
-  [{{pascal Alias}}MaxLsn] BINARY(10) NOT NULL,
+  [{{pascal Name}}MinLsn] BINARY(10) NOT NULL,  -- Related table: {{Schema}}.{{TableName}}
+  [{{pascal Name}}MaxLsn] BINARY(10) NOT NULL,
 {{/each}}
   [IsComplete] BIT NOT NULL,
   [CompletedDate] DATETIME NULL

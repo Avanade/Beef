@@ -3,12 +3,13 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0005, CA2227, CA1819, CA1056
+#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Entities;
 using Beef.Data.Database.Cdc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Beef.Demo.Cdc.Entities
 {
@@ -39,12 +40,12 @@ namespace Beef.Demo.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsCollection"/> (database object 'Legacy.Comments').
         /// </summary>
-        public PostsCdc.CommentsCollection Commentss { get; set; }
+        public PostsCdc.CommentsCdcCollection? Comments { get; set; }
 
         /// <summary>
-        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.TagsCollection"/> (database object 'Legacy.Tags').
+        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.PostsTagsCollection"/> (database object 'Legacy.PostsTags').
         /// </summary>
-        public PostsCdc.TagsCollection Tagss { get; set; }
+        public PostsCdc.PostsTagsCdcCollection? PostsTags { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -61,11 +62,13 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         public string[] UniqueKeyProperties => new string[] { nameof(PostsId) };
 
+        #region CommentsCdc
+
         /// <summary>
         /// Represents the CDC model for the related (child) database table 'Legacy.Comments'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class Comments
+        public partial class CommentsCdc
         {
             /// <summary>
             /// Gets or sets the 'CommentsId' column value.
@@ -92,9 +95,9 @@ namespace Beef.Demo.Cdc.Entities
             public DateTime? Date { get; set; }
 
             /// <summary>
-            /// Gets or sets the related (one-to-many) <see cref="PostsCdc.TagsCollection"/> (database object 'Legacy.Tags').
+            /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsTagsCollection"/> (database object 'Legacy.CommentsTags').
             /// </summary>
-            public PostsCdc.TagsCollection Tagss { get; set; }
+            public PostsCdc.CommentsTagsCdcCollection? CommentsTags { get; set; }
 
             /// <summary>
             /// <inheritdoc/>
@@ -113,10 +116,19 @@ namespace Beef.Demo.Cdc.Entities
         }
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.Tags'.
+        /// Represents the CDC model for the related (child) database table collection 'Legacy.Comments'.
+        /// </summary>
+        public partial class CommentsCdcCollection : List<CommentsCdc> { }
+
+        #endregion
+
+        #region CommentsTagsCdc
+
+        /// <summary>
+        /// Represents the CDC model for the related (child) database table 'Legacy.CommentsTags'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class Tags
+        public partial class CommentsTagsCdc
         {
             /// <summary>
             /// Gets or sets the 'TagsId' column value.
@@ -159,10 +171,19 @@ namespace Beef.Demo.Cdc.Entities
         }
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.Tags'.
+        /// Represents the CDC model for the related (child) database table collection 'Legacy.CommentsTags'.
+        /// </summary>
+        public partial class CommentsTagsCdcCollection : List<CommentsTagsCdc> { }
+
+        #endregion
+
+        #region PostsTagsCdc
+
+        /// <summary>
+        /// Represents the CDC model for the related (child) database table 'Legacy.PostsTags'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class Tags
+        public partial class PostsTagsCdc
         {
             /// <summary>
             /// Gets or sets the 'TagsId' column value.
@@ -203,8 +224,15 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
         }
+
+        /// <summary>
+        /// Represents the CDC model for the related (child) database table collection 'Legacy.PostsTags'.
+        /// </summary>
+        public partial class PostsTagsCdcCollection : List<PostsTagsCdc> { }
+
+        #endregion
     }
 }
 
-#pragma warning restore IDE0079, IDE0005, CA2227, CA1819, CA1056
+#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 #nullable restore

@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0005, CA2227, CA1819, CA1056
+#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Entities;
 using Beef.Data.Database.Cdc;
@@ -12,6 +12,7 @@ using Beef.Data.Database.Cdc;
 using Newtonsoft.Json;
 {{/ifeq}}
 using System;
+using System.Collections.Generic;
 
 namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
 {
@@ -41,12 +42,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
-        public {{Parent.ModelName}}Cdc.{{ModelName}}Collection {{PropertyName}} { get; set; }
+        public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
   {{else}}
         /// <summary>
         /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
-        public {{Parent.ModelName}}Cdc.{{ModelName}} {{PropertyName}} { get; set; }
+        public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
   {{/ifeq}}
 {{/each}}
 
@@ -66,13 +67,15 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
 {{#each Joins}}
 
+        #region {{ModelName}}Cdc
+
         /// <summary>
         /// Represents the CDC model for the related (child) database table '{{Schema}}.{{Name}}'.
         /// </summary>
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}
+        public partial class {{ModelName}}Cdc
         {
   {{#each Columns}}
             /// <summary>
@@ -92,12 +95,12 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// <summary>
             /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
-            public {{Parent.ModelName}}Cdc.{{ModelName}}Collection {{PropertyName}} { get; set; }
+            public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
     {{else}}
             /// <summary>
             /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
-            public {{Parent.ModelName}}Cdc.{{ModelName}} {{PropertyName}} { get; set; }
+            public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
     {{/ifeq}}
   {{/each}}
 
@@ -116,9 +119,18 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// </summary>
             public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
         }
+  {{#ifeq JoinCardinality 'OneToMany'}}
+
+        /// <summary>
+        /// Represents the CDC model for the related (child) database table collection '{{Schema}}.{{Name}}'.
+        /// </summary>
+        public partial class {{ModelName}}CdcCollection : List<{{ModelName}}Cdc> { }
+
+        #endregion
+  {{/ifeq}}
 {{/each}}
     }
 }
 
-#pragma warning restore IDE0079, IDE0005, CA2227, CA1819, CA1056
+#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 #nullable restore

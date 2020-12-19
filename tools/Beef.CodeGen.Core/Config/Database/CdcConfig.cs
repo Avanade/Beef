@@ -397,13 +397,13 @@ namespace Beef.CodeGen.Config.Database
             }
 
             // Do some further validation.
-            if (Joins.Any(x => x.Schema == Schema && x.Name == Name))
-                throw new CodeGenException(this, nameof(Name), $"The Schema.Name '{Schema}.{Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to enable.");
+            if (Joins.Any(x => x.Name == Name))
+                throw new CodeGenException(this, nameof(Name), $"The Name '{Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to correct.");
 
             foreach (var j in Joins)
             {
-                if (Joins.Any(x => x != j && x.Schema == j.Schema && x.Name == j.Name))
-                    throw new CodeGenException(this, nameof(Joins), $"The Schema.Name '{j.Schema}.{j.Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to enable.");
+                if (Joins.Any(x => x != j && x.Name == j.Name))
+                    throw new CodeGenException(this, nameof(Joins), $"The Name '{j.Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to correct.");
             }
         }
     }

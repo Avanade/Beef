@@ -157,6 +157,13 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).")]
         public string? JsonSerializer { get; set; }
 
+        /// <summary>
+        /// Indicates whether the .NET collection properties should be pluralized.
+        /// </summary>
+        [JsonProperty("pluralizeCollectionProperties", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "Indicates whether the .NET collection properties should be pluralized.")]
+        public bool? PluralizeCollectionProperties { get; set; }
+
         #endregion
 
         #region RuntimeParameters

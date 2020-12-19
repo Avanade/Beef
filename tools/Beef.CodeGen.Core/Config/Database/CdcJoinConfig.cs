@@ -284,28 +284,28 @@ namespace Beef.CodeGen.Config.Database
 
             TableName = DefaultWhereNull(TableName, () => Name);
             Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
-            DbTable = Root!.DbTables.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
+            DbTable = Root!.DbTables.Where(x => x.Name == TableName && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
-                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");
+                throw new CodeGenException(this, nameof(TableName), $"Specified Schema.Table '{Schema}.{TableName}' not found in database.");
 
             if (DbTable.IsAView)
-                throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' cannot be a view.");
+                throw new CodeGenException(this, nameof(TableName), $"Specified Schema.Table '{Schema}.{TableName}' cannot be a view.");
 
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
             JoinTo = DefaultWhereNull(JoinTo, () => Parent!.Name);
             JoinToSchema = DefaultWhereNull(JoinToSchema, () => Parent!.Schema);
             JoinCardinality = DefaultWhereNull(JoinCardinality, () => "OneToMany");
-            PropertyName = DefaultWhereNull(PropertyName, () => JoinCardinality == "OneToMany" ? $"{ModelName}{(Name!.EndsWith("s", StringComparison.InvariantCulture) ? "s" : "es")}" : ModelName);
+            PropertyName = DefaultWhereNull(PropertyName, () => CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{ModelName}{(Name!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : ModelName);
 
             // Get the JoinTo CdcJoinConfig.
             CdcJoinConfig? jtc = null;
             if (JoinTo != Parent!.Name || JoinToSchema != Parent!.Schema)
             {
-                var tables = Parent!.Joins!.Where(x => x.Name == JoinTo && x.Schema == JoinToSchema).ToList();
+                var tables = Parent!.Joins!.Where(x => x.TableName == JoinTo && x.Schema == JoinToSchema).ToList();
                 if (tables.Count == 0 || Parent!.Joins!.IndexOf(this) < Parent!.Joins!.IndexOf(tables[0]))
-                    throw new CodeGenException(this, nameof(Name), $"Specified JoinTo Schema.Table '{JoinToSchema}.{JoinTo}' must be previously specified.");
+                    throw new CodeGenException(this, nameof(JoinTo), $"Specified JoinTo Schema.Table '{JoinToSchema}.{JoinTo}' must be previously specified.");
                 else if (tables.Count > 1)
-                    throw new CodeGenException(this, nameof(Name), $"Specified JoinTo Schema.Table '{JoinToSchema}.{JoinTo}' is ambiguous (more than one found).");
+                    throw new CodeGenException(this, nameof(JoinTo), $"Specified JoinTo Schema.Table '{JoinToSchema}.{JoinTo}' is ambiguous (more than one found).");
 
                 jtc = tables[0];
                 JoinToAlias = tables[0].Alias;
@@ -368,6 +368,7 @@ namespace Beef.CodeGen.Config.Database
             var j = new CdcJoinConfig
             {
                 Name = Name,
+                TableName = TableName,
                 Schema = Schema,
                 Alias = Alias,
                 JoinTo = JoinTo,
