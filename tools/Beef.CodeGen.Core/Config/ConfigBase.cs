@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,6 +29,31 @@ namespace Beef.CodeGen.Config
         /// Resets the runtime parameters.
         /// </summary>
         void ResetRuntimeParameters();
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        string? KV1 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        string? KV2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        string? KV3 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        string? KV4 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        string? KV5 { get; set; }
     }
 
     /// <summary>
@@ -292,12 +316,12 @@ namespace Beef.CodeGen.Config
         /// <summary>
         /// Gets the <b>Root</b> (set via <see cref="Prepare(TRoot, TParent)"/> execution).
         /// </summary>
-        public TRoot? Root { get; private set; }
+        public TRoot? Root { get; set; }
 
         /// <summary>
         /// Gets the <b>Parent</b> (set via <see cref="Prepare(TRoot, TParent)"/> execution).
         /// </summary>
-        public TParent? Parent { get; private set; }
+        public TParent? Parent { get; set; }
 
         /// <summary>
         /// Prepares the configuration properties in advance of the code-generation execution (Internal use!).

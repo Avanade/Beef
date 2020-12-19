@@ -2,7 +2,9 @@
 
 using Beef.CodeGen.Config;
 using HandlebarsDotNet;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,17 +16,17 @@ namespace Beef.CodeGen.Generators
     /// </summary>
     public static class HandlebarsHelpers
     {
-        private static bool _areRegiestered = false;
+        private static bool _areRegistered = false;
 
         /// <summary>
         /// Registers all of the required Handlebars helpers.
         /// </summary>
         public static void RegisterHelpers()
         {
-            if (_areRegiestered)
+            if (_areRegistered)
                 return;
 
-            _areRegiestered = true;
+            _areRegistered = true;
 
             // Will check that the first argument equals at least one of the subsequent arguments.
             Handlebars.RegisterHelper("ifeq", (writer, context, parameters, args) =>
@@ -112,6 +114,11 @@ namespace Beef.CodeGen.Generators
                 context.Inverse(writer, parameters);
             });
 
+            Handlebars.RegisterHelper("setkv1", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV1 = v); });
+            Handlebars.RegisterHelper("setkv2", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV2 = v); });
+            Handlebars.RegisterHelper("setkv3", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV3 = v); });
+            Handlebars.RegisterHelper("setkv4", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV4 = v); });
+            Handlebars.RegisterHelper("setkv5", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV5 = v); });
 
             // Converts a value to lowercase.
 #pragma warning disable CA1308 // Normalize strings to uppercase; this is an explicit and required call to lowercase.
@@ -208,6 +215,15 @@ namespace Beef.CodeGen.Generators
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Sets the Key value.
+        /// </summary>
+        private static void SetKeyValue(object context, object[] parameters, Action<IRootConfig, string?> action)
+        {
+            if (context is ConfigBase cb && cb.RootConfig is IRootConfig rc)
+                action(rc, parameters.Length == 0 ? null : parameters[0].ToString());
         }
     }
 }

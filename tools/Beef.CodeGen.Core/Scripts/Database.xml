@@ -14,8 +14,8 @@
   <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelGenerator" Template="DbEfModel_cs.hbs" FileName="{{EFModelName}}.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data/EfModel" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseEfModelBuilderCodeGenerator" Template="DbEfModelBuilder_cs.hbs" FileName="ModelBuilderExtensions.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Business/Data/EfModel" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseQueryViewCodeGenerator" Template="DbVwQuery_sql.hbs" FileName="{{ViewName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{ViewSchema}}/Views" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcSpGetOutboxData_sql.hb" FileName="{{CdcStoredProcedureName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Stored Procedures" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{CdcEnvelopeTableName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Tables" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcModel_cs.hb" FileName="{{CdcModelName}}Cdc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data/Model" />
-  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{CdcModelName}}CdcData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcSpGetEnvelopeData_sql.hb" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{EnvelopeTableName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Tables" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcModel_cs.hb" FileName="{{ModelName}}Cdc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Entities" />
+  <!--<Generate GenType="Beef.CodeGen.Generators.DatabaseChangeDataCaptureCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{CdcModelName}}CdcData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />-->
 </Script>

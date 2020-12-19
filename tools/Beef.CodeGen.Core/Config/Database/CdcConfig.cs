@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Beef.CodeGen.Config.Database
 {
@@ -92,33 +91,33 @@ namespace Beef.CodeGen.Config.Database
         #region Cdc
 
         /// <summary>
-        /// Gets or sets the `Cdc` get outbox stored procedure name.
+        /// Gets or sets the `Cdc` get envelope data stored procedure name.
         /// </summary>
-        [JsonProperty("cdcStoredProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The `CDC` get outbox stored procedure name.",
-            Description = "Defaults to `spGet` (literal) + `Name` + `OutboxData` (literal); e.g. `spGetTableNameOutboxData`.")]
+        [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The `CDC` get envelope data stored procedure name.",
+            Description = "Defaults to `spGet` (literal) + `Name` + `EnvelopeData` (literal); e.g. `spGetTableNameEnvelopeData`.")]
         public string? StoredProcedureName { get; set; }
 
         /// <summary>
         /// Gets or sets the schema name for the `Cdc`-related database artefacts.
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The schema name for the `CDC`-related database artefacts.",
+        [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
             Description = "Defaults to `Schema` + `Cdc` (literal).")]
         public string? CdcSchema { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding `Cdc` Outbox Envelope table name.
+        /// Gets or sets the corresponding `Cdc` Envelope table name.
         /// </summary>
-        [JsonProperty("cdcEnvelopeTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The corresponding `CDC` Outbox Envelope table name.",
-            Description = "Defaults to `Name` + `OutboxEnvelope` (literal).")]
+        [JsonProperty("envelopeTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The corresponding `CDC` Envelope table name.",
+            Description = "Defaults to `Name` + `Envelope` (literal).")]
         public string? EnvelopeTableName { get; set; }
 
         /// <summary>
         /// Gets or sets the `Cdc` .NET model name.
         /// </summary>
-        [JsonProperty("cdcModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("modelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The .NET model name.",
             Description = "Defaults to `Name`.")]
         public string? ModelName { get; set; }
@@ -126,7 +125,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the access modifier for the generated CDC `Data` constructor.
         /// </summary>
-        [JsonProperty("cdcDataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("dataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataConstructor { get; set; }
@@ -134,7 +133,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the CDC .NET database interface name.
         /// </summary>
-        [JsonProperty("cdcDatabaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("databaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The .NET database interface name.",
             Description = "Defaults to `IDatabase`.")]
         public string? DatabaseName { get; set; }
@@ -211,7 +210,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the SQL formatted selected columns.
         /// </summary>
-        public List<IColumnConfig> SelectedColumns { get; } = new List<IColumnConfig>();
+        public List<CdcColumnConfig> SelectedColumns { get; } = new List<CdcColumnConfig>();
 
         /// <summary>
         /// Gets the list of primary key columns.
@@ -221,7 +220,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the SQL formatted selected columns excluding the <see cref="PrimaryKeyColumns"/>.
         /// </summary>
-        public List<IColumnConfig> SelectedColumnsExcludingPrimaryKey => SelectedColumns.Where(x => !(x.DbColumn!.DbTable == DbTable && x.DbColumn.IsPrimaryKey)).ToList();
+        public List<CdcColumnConfig> SelectedColumnsExcludingPrimaryKey => SelectedColumns.Where(x => !(x.DbColumn!.DbTable == DbTable && x.DbColumn.IsPrimaryKey)).ToList();
 
         /// <summary>
         /// Gets the selected column configurations.
@@ -237,6 +236,11 @@ namespace Beef.CodeGen.Config.Database
         /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are not flagged as CDC monitored.
         /// </summary>
         public List<CdcJoinConfig> NonCdcJoins => Joins!.Where(x => CompareValue(x.NonCdc, false)).ToList();
+
+        /// <summary>
+        /// Gets the list of joined children.
+        /// </summary>
+        public List<CdcJoinConfig> JoinChildren => Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema).ToList();
 
         /// <summary>
         /// Gets the table name.
@@ -272,9 +276,9 @@ namespace Beef.CodeGen.Config.Database
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 
-            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spGet{StringConversion.ToPascalCase(Name)}OutboxData");
+            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spGet{StringConversion.ToPascalCase(Name)}EnvelopeData");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Schema + "Cdc");
-            EnvelopeTableName = DefaultWhereNull(EnvelopeTableName, () => Name + "OutboxEnvelope");
+            EnvelopeTableName = DefaultWhereNull(EnvelopeTableName, () => Name + "Envelope");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
@@ -369,6 +373,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Prepares the joins.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         private void PrepareJoins()
         {
             if (Joins == null)
@@ -378,7 +383,8 @@ namespace Beef.CodeGen.Config.Database
             var dict = new Dictionary<string, int> { { Alias!, 1 } };
             foreach (var join in Joins)
             {
-                join.Prepare(Root!, this);
+                join.Alias = DefaultWhereNull(join.Alias, () => new string(StringConversion.ToSentenceCase(join.Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
+
                 if (dict.TryGetValue(join.Alias!, out var val))
                 {
                     dict[join.Alias!] = val++;
@@ -386,12 +392,18 @@ namespace Beef.CodeGen.Config.Database
                 }
                 else
                     dict.Add(join.Alias!, 1);
+
+                join.Prepare(Root!, this);
             }
 
-            // Now that the alias has been updated we can prepare accordingly.
-            foreach (var join in Joins)
+            // Do some further validation.
+            if (Joins.Any(x => x.Schema == Schema && x.Name == Name))
+                throw new CodeGenException(this, nameof(Name), $"The Schema.Name '{Schema}.{Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to enable.");
+
+            foreach (var j in Joins)
             {
-                join.PrepareJoinOn();
+                if (Joins.Any(x => x != j && x.Schema == j.Schema && x.Name == j.Name))
+                    throw new CodeGenException(this, nameof(Joins), $"The Schema.Name '{j.Schema}.{j.Name}' is ambiguous (not unique); please make 'Name' unique and set 'TableName' to the actual table name to enable.");
             }
         }
     }

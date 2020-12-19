@@ -52,11 +52,6 @@ namespace Beef.CodeGen.Config.Database
         #endregion
 
         /// <summary>
-        /// Gets the formatted Join On SQL statement.
-        /// </summary>
-        public string JoinOnSql => $"[{Parent!.Alias}].[{Name}] = {ToStatement}";
-
-        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -83,15 +78,11 @@ namespace Beef.CodeGen.Config.Database
                 {
                     if (Parent!.Parent!.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() == null)
                         throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{Parent.JoinToSchema}.{Parent.JoinTo}') not found in Table/Join configuration.");
-
-                    ToStatement = $"[{Parent!.Parent!.Alias}].[{ToColumn}]";
                 }
                 else
                 {
                     var t = Parent!.Parent!.Joins!.Where(x => Parent.JoinToSchema == x.Schema && Parent.JoinTo == x.Name).SingleOrDefault();
-                    if (t != null && t.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() != null)
-                        ToStatement = $"[{t.Alias}].[{ToColumn}]";
-                    else
+                    if (t == null || t.DbTable!.Columns.Where(x => x.Name == ToColumn).SingleOrDefault() == null)
                         throw new CodeGenException(this, nameof(ToColumn), $"JoinOn To '{ToColumn}' (Schema.Table '{Parent.JoinToSchema}.{Parent.JoinTo}') not found in Table/Join configuration.");
                 }
             }

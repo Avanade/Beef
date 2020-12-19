@@ -412,7 +412,7 @@ namespace Beef.Database.Core
                                 return false;
                             }
 
-                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName.Substring(_args.CodeGenArgs.OutputPath.FullName.Length + 1) };
+                            var sr = new SqlSchemaScript { Name = name, Reader = sor, FileName = fi.FullName[(_args.CodeGenArgs.OutputPath.FullName.Length + 1)..] };
                             sr.Order = _args.SchemaOrder.IndexOf(sr.Reader.Schema!);
                             if (sr.Order < 0)
                                 sr.Order = _args.SchemaOrder.Count;
@@ -487,7 +487,7 @@ namespace Beef.Database.Core
         /// </summary>
         private string RenameFileToResourceName(FileInfo fi)
         {
-            var dir = RenameFileToResourceNameReplace(fi.DirectoryName.Substring(_args.CodeGenArgs!.OutputPath!.FullName.Length + 1));
+            var dir = RenameFileToResourceNameReplace(fi.DirectoryName[(_args.CodeGenArgs!.OutputPath!.FullName.Length + 1)..]);
             var file = RenameFileToResourceNameReplace(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
             return dir + "." + file + RenameFileToResourceNameReplace(fi.Extension);
         }

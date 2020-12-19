@@ -4,36 +4,50 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a database model.
+#pragma warning disable IDE0079, IDE0005, CA2227, CA1819, CA1056
 
 using Beef.Entities;
 using Beef.Data.Database.Cdc;
+{{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+using Newtonsoft.Json;
+{{/ifeq}}
 using System;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data.Model
+namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
 {
     /// <summary>
-    /// Represents the CDC model for primary database object '{{Schema}}.{{Name}}'.
+    /// Represents the CDC model for the root (primary) database table '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{CdcModelName}}Cdc : ICdcModel
+{{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+{{/ifeq}}
+    public partial class {{ModelName}}Cdc
     {
-        /// <summary>
-        /// Gets or sets the database CDC <see cref="OperationType"/>.
-        /// </summary>
-        public OperationType DatabaseOperationType { get; set; }
-
 {{#each SelectedColumns}}
         /// <summary>
-        /// Gets or sets the '{{Name}}' column value (database object '{{DbColumn.DbTable.Schema}}.{{DbColumn.DbTable.Name}}').
+        /// Gets or sets the '{{Name}}' column value.
         /// </summary>
-  {{#if IsNameEndsWithUrl}}
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1056:Uri properties should not be strings", Justification = "Named by design; OK for Model")]
-  {{/if}}
+  {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{camel Name}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+  {{/ifeq}}
         public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
   {{#unless @last}}
 
   {{/unless}}
+{{/each}}
+{{#each JoinChildren}}
+
+  {{#ifeq JoinCardinality 'OneToMany'}}
+        /// <summary>
+        /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
+        /// </summary>
+        public {{Parent.ModelName}}Cdc.{{ModelName}}Collection {{PropertyName}} { get; set; }
+  {{else}}
+        /// <summary>
+        /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
+        /// </summary>
+        public {{Parent.ModelName}}Cdc.{{ModelName}} {{PropertyName}} { get; set; }
+  {{/ifeq}}
 {{/each}}
 
         /// <summary>
@@ -50,9 +64,61 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data.Model
         /// <inheritdoc/>
         /// </summary>
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+{{#each Joins}}
+
+        /// <summary>
+        /// Represents the CDC model for the related (child) database table '{{Schema}}.{{Name}}'.
+        /// </summary>
+  {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
+  {{/ifeq}}
+        public partial class {{ModelName}}
+        {
+  {{#each Columns}}
+            /// <summary>
+            /// Gets or sets the '{{Name}}' column value.
+            /// </summary>
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+            [JsonProperty("{{camel Name}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+     {{/ifeq}}
+            public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
+    {{#unless @last}}
+
+    {{/unless}}
+  {{/each}}
+  {{#each JoinChildren}}
+
+    {{#ifeq JoinCardinality 'OneToMany'}}
+            /// <summary>
+            /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
+            /// </summary>
+            public {{Parent.ModelName}}Cdc.{{ModelName}}Collection {{PropertyName}} { get; set; }
+    {{else}}
+            /// <summary>
+            /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
+            /// </summary>
+            public {{Parent.ModelName}}Cdc.{{ModelName}} {{PropertyName}} { get; set; }
+    {{/ifeq}}
+  {{/each}}
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            public bool HasUniqueKey => true;
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
+
+            /// <summary>
+            /// <inheritdoc/>
+            /// </summary>
+            public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+        }
+{{/each}}
     }
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0005, CA2227, CA1819, CA1056
 #nullable restore

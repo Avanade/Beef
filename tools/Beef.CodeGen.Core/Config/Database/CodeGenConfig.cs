@@ -149,6 +149,14 @@ namespace Beef.CodeGen.Config.Database
             Description = "Defaults to `None` (no formatting required)`.")]
         public string? EventActionFormat { get; set; }
 
+        /// <summary>
+        /// Get or sets the JSON Serializer to use for JSON property attribution.
+        /// </summary>
+        [JsonProperty("jsonSerializer", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The JSON Serializer to use for JSON property attribution.", Options = new string[] { "None", "Newtonsoft" },
+            Description = "Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).")]
+        public string? JsonSerializer { get; set; }
+
         #endregion
 
         #region RuntimeParameters
@@ -214,6 +222,35 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region KeyValue
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        public string? KV1 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        public string? KV2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        public string? KV3 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        public string? KV4 { get; set; }
+
+        /// <summary>
+        /// Gets or sets Key1 value. 
+        /// </summary>
+        public string? KV5 { get; set; }
+
+        #endregion
+
         /// <summary>
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>
@@ -235,7 +272,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets or sets the corresponding <see cref="CdcConfig"/> collection.
         /// </summary>
-        [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
             Markdown = "A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
@@ -283,6 +320,7 @@ namespace Beef.CodeGen.Config.Database
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
+            JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
 
             if (Queries == null)
                 Queries = new List<QueryConfig>();

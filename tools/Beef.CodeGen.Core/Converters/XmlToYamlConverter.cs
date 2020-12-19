@@ -216,7 +216,7 @@ namespace Beef.CodeGen.Converters
 
                 if (!(val.StartsWith("[", StringComparison.OrdinalIgnoreCase) && val.EndsWith("]", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"' }) >= 0)
+                    if (val.IndexOfAny(new char[] { ':', '{', '}', '[', ']', ',', '&', '*', '#', '?', '|', '-', '<', '>', '=', '!', '%', '@', '\\', '\"', '\'' }) >= 0)
                         val = $"'{val.Replace("'", "''", StringComparison.InvariantCultureIgnoreCase)}'";
 
                     if (string.Compare(val, "NULL", StringComparison.InvariantCultureIgnoreCase) == 0)
@@ -281,6 +281,9 @@ namespace Beef.CodeGen.Converters
             "QueryJoinOn" => (ConfigurationEntity.QueryJoinOn, typeof(Config.Database.QueryJoinOnConfig), "on"),
             "QueryOrder" => (ConfigurationEntity.QueryOrder, typeof(Config.Database.QueryOrderConfig), "order"),
             "QueryWhere" => (ConfigurationEntity.QueryWhere, typeof(Config.Database.QueryWhereConfig), "where"),
+            "Cdc" => (ConfigurationEntity.Cdc, typeof(Config.Database.CdcConfig), "cdc"),
+            "CdcJoin" => (ConfigurationEntity.CdcJoin, typeof(Config.Database.CdcJoinConfig), "joins"),
+            "CdcJoinOn" => (ConfigurationEntity.CdcJoinOn, typeof(Config.Database.CdcJoinOnConfig), "on"),
             "StoredProcedure" => (ConfigurationEntity.StoredProcedure, typeof(Config.Database.StoredProcedureConfig), "storedProcedures"),
             "Parameter" => (ConfigurationEntity.Parameter, typeof(Config.Database.ParameterConfig), "parameters"),
             "OrderBy" => (ConfigurationEntity.OrderBy, typeof(Config.Database.OrderByConfig), "orderby"),

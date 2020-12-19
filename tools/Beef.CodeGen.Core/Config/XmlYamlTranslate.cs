@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.CodeGen.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Beef.CodeGen.Config
 {
@@ -302,6 +300,12 @@ namespace Beef.CodeGen.Config
         QueryOrder,
         /// <summary>Query Where configuration.</summary>
         QueryWhere,
+        /// <summary>Cdc configuration.</summary>
+        Cdc,
+        /// <summary>Cdc Join configuration.</summary>
+        CdcJoin,
+        /// <summary>Cdc Join On configuration.</summary>
+        CdcJoinOn,
         /// <summary>Stored procedure configuration.</summary>
         StoredProcedure,
         /// <summary>Parameter configuration.</summary>
