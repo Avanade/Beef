@@ -317,52 +317,6 @@ namespace Beef.CodeGen.Config.Database
                 cc.Prepare(Root!, this);
                 SelectedColumns.Add(cc);
             }
-
-            //foreach (var j in Joins!)
-            //{
-            //    if (j.ColumnTenantId != null)
-            //        Where.Add(new QueryWhereConfig { Statement = $"[{j.Alias}].[{j.ColumnTenantId.Name}] = dbo.fnGetTenantId(NULL)" });
-
-            //    if (j.ColumnIsDeleted != null)
-            //        Where.Add(new QueryWhereConfig { Statement = $"([{j.Alias}].[{j.ColumnIsDeleted.Name}] IS NULL OR [{j.Alias}].[{j.ColumnIsDeleted.Name}] = 0)" });
-
-            //    foreach (var c in j.Columns)
-            //    {
-            //        if (!c.IsIsDeletedColumn && !c.IsTenantIdColumn)
-            //        {
-            //            var cc = new QueryJoinColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
-            //            cc.Prepare(Root!, j);
-            //            SelectedColumns.Add(cc);
-            //        }
-            //    }
-            //}
-
-            //// Prepare the where clauses.
-            //foreach (var where in Where)
-            //{
-            //    where.Prepare(Root!, this);
-            //}
-
-            //CdcEventSubject = DefaultWhereNull(CdcEventSubject, () =>
-            //{
-            //    var sb = new StringBuilder();
-
-            //    foreach (var pkc in PrimaryKeyColumns)
-            //    {
-            //        if (sb.Length == 0)
-            //            sb.Append($"{CdcModelName}.");
-            //        else
-            //            sb.Append(",");
-
-            //        sb.Append("{model.");
-            //        sb.Append(StringConversion.ToPascalCase(pkc.NameAlias));
-            //        sb.Append("}");
-            //    }
-
-            //    return sb.ToString();
-            //});
-
-            //CdcEventSubjectFormat = string.IsNullOrEmpty(Root.EventSubjectRoot) ? CdcEventSubject : $"{Root.EventSubjectRoot}.{CdcEventSubject}";
         }
 
         /// <summary>

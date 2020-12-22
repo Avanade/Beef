@@ -134,6 +134,9 @@ namespace Beef.CodeGen.Generators
             // Converts a value to the c# '<see cref="value"/>' comments equivalent.
             Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(ConfigBase.ToSeeComments(parameters.FirstOrDefault()?.ToString())));
 
+            // Inserts indent spaces based on the passed index value.
+            Handlebars.RegisterHelper("indent", (writer, context, parameters) => writer.WriteSafeString(new string(' ', 4 * (int)(parameters.FirstOrDefault() ?? 0))));
+
             // Adds a value to a value.
             Handlebars.RegisterHelper("add", (writer, context, parameters) =>
             {

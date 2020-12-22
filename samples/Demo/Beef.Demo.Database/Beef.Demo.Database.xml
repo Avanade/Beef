@@ -26,11 +26,11 @@
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
       <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
     </CdcJoin>
-    <CdcJoin Name="CommentsTags" Schema="Legacy" TableName="Tags" JoinTo="Comments">
+    <CdcJoin Name="CommentsTags" Schema="Legacy" TableName="Tags" JoinTo="Comments" ExcludeColumns="ParentType" AliasColumns="ParentId^CommentsId">
       <CdcJoinOn Name="ParentType" ToStatement="'C'" />
       <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
     </CdcJoin>
-    <CdcJoin Name="PostsTags" Schema="Legacy" TableName="Tags" JoinTo="Posts">
+    <CdcJoin Name="PostsTags" Schema="Legacy" TableName="Tags" JoinTo="Posts" ExcludeColumns="ParentType" AliasColumns="ParentId^PostsId">
       <CdcJoinOn Name="ParentType" ToStatement="'P'" />
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
     </CdcJoin>

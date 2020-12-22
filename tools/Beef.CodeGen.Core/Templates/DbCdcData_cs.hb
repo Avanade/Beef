@@ -9,17 +9,26 @@
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;
+using Beef.Mapper;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using {{Root.Company}}.{{Root.AppName}}.Cdc.Entities;
 
 namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
 {
     /// <summary>
-    /// Provides the CDC data access for database object '{{Schema}}.{{Name}}' .
+    /// Provides the CDC data access for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{ModelName}}CdcData : CdcExecutor<{{CdcModelName}}Cdc>
+    public partial class {{ModelName}}CdcData : CdcExecutor<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper>
     {
+        private static readonly DatabaseMapper<{{ModelName}}CdcWrapper> _{{camel ModelName}}CdcWrapperMapper = DatabaseMapper.CreateAuto<{{ModelName}}CdcWrapper>();
+{{#each Joins}}
+        private static readonly DatabaseMapper<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc> _{{camel ModelName}}CdcMapper = DatabaseMapper.CreateAuto<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc>();
+{{/each}}
+
         /// <summary>
         /// Initializes a new instance of the <see cref="{{ModelName}}CdcData"/> class.
         /// </summary>
@@ -27,39 +36,66 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         {{lower DataConstructor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger) :
-            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", DbMapper.Default, evtPub, logger) => {{ModelName}}CdcDataCtor();
+            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", evtPub, logger) => {{ModelName}}CdcDataCtor();
 
         partial void {{ModelName}}CdcDataCtor(); // Enables additional functionality to be added to the constructor.
+
+        /// <summary>
+        /// Gets the envelope entity data from the database.
+        /// </summary>
+        /// <param name="maxBatchSize">The recommended maximum batch size.</param>
+        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
+        /// <returns>The corresponding result.</returns>
+        protected override async Task<CdcExecutorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        {
+            var {{Alias}}Coll = new {{ModelName}}CdcWrapperCollection();
+
+            var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
+                new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne Joins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
+{{#each Joins}}
+                new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>{{setkv1 Parent.Alias '// Is the Root Alias'}}{{setkv2 'r' '// Is the collection'}}{{setkv3 Parent.Alias}}
+                {
+  {{#each JoinHierarchyReverse}}
+                    {{indent IndentIndex}}foreach (var {{Alias}} in {{Root.KV2}}{{#unless @first}}.Coll{{/unless}}.GroupBy(x => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}x.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}} }).Select(g => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}g.Key.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}, Coll = g.{{#if @last}}ToCollection<{{../Parent.ModelName}}Cdc.{{../ModelName}}CdcCollection, {{../Parent.ModelName}}Cdc.{{../ModelName}}Cdc>{{else}}ToList{{/if}}() })) // Join table: {{Name}} ({{Schema}}.{{TableName}}){{setkv4 Alias}}
+                   {{indent IndentIndex}} {
+    {{#unless @last}}
+                   {{indent IndentIndex}}     var {{Root.KV3}}Item = {{Root.KV3}}Coll.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}};{{setkv2 Alias '// Override collection'}}
+    {{else}}
+                   {{indent IndentIndex}}     {{Root.KV1}}{{#if @first}}Coll{{else}}Item{{/if}}.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}} = {{Root.KV4}}.Coll;
+    {{/unless}}
+  {{/each}}
+  {{#each JoinHierarchy}}
+                   {{indent IndentIndex}} }
+  {{/each}}
+                }){{#unless @last}},{{/unless}} // Related table: {{Name}} ({{Schema}}.{{TableName}})
+{{/each}}
+                ).ConfigureAwait(false);
+
+            result.Result.AddRange({{Alias}}Coll);
+            return result;
+        }
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
-        public partial class {{ModelName}}CdcRoot : {{ModelName}}Cdc
+        /// <summary>
+        /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
+        /// </summary>
+        public class {{ModelName}}CdcWrapper : {{ModelName}}Cdc, ICdcOperationType
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.
             /// </summary>
+            [MapperProperty("_OperationType", ConverterType = typeof(CdcOperationTypeConverter))]
             public OperationType DatabaseOperationType { get; set; }
         }
 
         /// <summary>
-        /// Provides the root database object '{{Schema}}.{{Name}}' property and database column mapping.
+        /// Represents a <see cref="{{ModelName}}CdcWrapper"/> collection.
         /// </summary>
-        public partial class {{ModelName}}DbMapper : DatabaseMapper<{{ModelName}}CdcRoot, {{ModelName}}DbMapper>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbMapper"/> class.
-            /// </summary>
-            public {{ModelName}}DbMapper()
-            {
-                Property(s => s.DatabaseOperationType, "__Operation").SetConverter(CdcOperationTypeConverter.Default);
-{{#each SelectedColumns}}
-                Property(s => s.{{pascal NameAlias}}, "{{NameAlias}}");
-{{/each}}
-            }
-        }
+        public class {{ModelName}}CdcWrapperCollection : List<{{ModelName}}CdcWrapper> { }
     }
 }
 

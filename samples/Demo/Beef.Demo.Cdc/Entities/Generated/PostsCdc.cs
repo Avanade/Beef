@@ -6,7 +6,7 @@
 #pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Entities;
-using Beef.Data.Database.Cdc;
+using Beef.Mapper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (primary) database table 'Legacy.Posts'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PostsCdc
+    public partial class PostsCdc : IUniqueKey
     {
         /// <summary>
         /// Gets or sets the 'PostsId' column value.
@@ -40,26 +40,31 @@ namespace Beef.Demo.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsCollection"/> (database object 'Legacy.Comments').
         /// </summary>
+        [MapperIgnore()]
         public PostsCdc.CommentsCdcCollection? Comments { get; set; }
 
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="PostsCdc.PostsTagsCollection"/> (database object 'Legacy.PostsTags').
         /// </summary>
+        [MapperIgnore()]
         public PostsCdc.PostsTagsCdcCollection? PostsTags { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public bool HasUniqueKey => true;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey(PostsId);
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(PostsId) };
 
         #region CommentsCdc
@@ -68,28 +73,28 @@ namespace Beef.Demo.Cdc.Entities
         /// Represents the CDC model for the related (child) database table 'Legacy.Comments'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class CommentsCdc
+        public partial class CommentsCdc : IUniqueKey
         {
             /// <summary>
-            /// Gets or sets the 'CommentsId' column value.
+            /// Gets or sets the 'CommentsId' (Comments.CommentsId) column value.
             /// </summary>
             [JsonProperty("commentsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int CommentsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'PostsId' column value.
+            /// Gets or sets the 'PostsId' (Comments.PostsId) column value.
             /// </summary>
             [JsonProperty("postsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int PostsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Text' column value.
+            /// Gets or sets the 'Text' (Comments.Text) column value.
             /// </summary>
             [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Text { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'Date' column value.
+            /// Gets or sets the 'Date' (Comments.Date) column value.
             /// </summary>
             [JsonProperty("date", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public DateTime? Date { get; set; }
@@ -97,21 +102,25 @@ namespace Beef.Demo.Cdc.Entities
             /// <summary>
             /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsTagsCollection"/> (database object 'Legacy.CommentsTags').
             /// </summary>
+            [MapperIgnore()]
             public PostsCdc.CommentsTagsCdcCollection? CommentsTags { get; set; }
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey(CommentsId);
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(CommentsId) };
         }
 
@@ -128,28 +137,22 @@ namespace Beef.Demo.Cdc.Entities
         /// Represents the CDC model for the related (child) database table 'Legacy.CommentsTags'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class CommentsTagsCdc
+        public partial class CommentsTagsCdc : IUniqueKey
         {
             /// <summary>
-            /// Gets or sets the 'TagsId' column value.
+            /// Gets or sets the 'TagsId' (Tags.TagsId) column value.
             /// </summary>
             [JsonProperty("tagsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int TagsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'ParentType' column value.
+            /// Gets or sets the 'CommentsId' (Tags.ParentId) column value.
             /// </summary>
-            [JsonProperty("parentType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            public string? ParentType { get; set; }
+            [JsonProperty("commentsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public int CommentsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'ParentId' column value.
-            /// </summary>
-            [JsonProperty("parentId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            public int ParentId { get; set; }
-
-            /// <summary>
-            /// Gets or sets the 'Text' column value.
+            /// Gets or sets the 'Text' (Tags.Text) column value.
             /// </summary>
             [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Text { get; set; }
@@ -157,17 +160,26 @@ namespace Beef.Demo.Cdc.Entities
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey(TagsId);
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
+
+            /// <summary>
+            /// Gets or sets the 'Posts_PostsId' additional joining column (informational); for internal join use only (not serialized).
+            /// </summary>
+            [MapperIgnore()]
+            public int Posts_PostsId { get; set; }
         }
 
         /// <summary>
@@ -183,28 +195,22 @@ namespace Beef.Demo.Cdc.Entities
         /// Represents the CDC model for the related (child) database table 'Legacy.PostsTags'.
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public partial class PostsTagsCdc
+        public partial class PostsTagsCdc : IUniqueKey
         {
             /// <summary>
-            /// Gets or sets the 'TagsId' column value.
+            /// Gets or sets the 'TagsId' (Tags.TagsId) column value.
             /// </summary>
             [JsonProperty("tagsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public int TagsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'ParentType' column value.
+            /// Gets or sets the 'PostsId' (Tags.ParentId) column value.
             /// </summary>
-            [JsonProperty("parentType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            public string? ParentType { get; set; }
+            [JsonProperty("postsId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            public int PostsId { get; set; }
 
             /// <summary>
-            /// Gets or sets the 'ParentId' column value.
-            /// </summary>
-            [JsonProperty("parentId", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            public int ParentId { get; set; }
-
-            /// <summary>
-            /// Gets or sets the 'Text' column value.
+            /// Gets or sets the 'Text' (Tags.Text) column value.
             /// </summary>
             [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
             public string? Text { get; set; }
@@ -212,16 +218,19 @@ namespace Beef.Demo.Cdc.Entities
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey(TagsId);
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
         }
 

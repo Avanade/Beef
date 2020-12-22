@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Beef.CodeGen.DbModels;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -52,6 +53,11 @@ namespace Beef.CodeGen.Config.Database
         #endregion
 
         /// <summary>
+        /// Gets the <see cref="ToColumn"/> <see cref="DbColumn"/>.
+        /// </summary>
+        public DbColumn? ToDbColumn { get; private set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -69,9 +75,8 @@ namespace Beef.CodeGen.Config.Database
             if (string.IsNullOrEmpty(ToStatement))
             {
                 ToColumn = DefaultWhereNull(ToColumn, () => Name);
-
-                c = Root!.DbTables.Where(x => x.Schema == Parent.JoinToSchema && x.Name == Parent.JoinTo).SingleOrDefault()?.Columns.Where(x => x.Name == ToColumn).SingleOrDefault();
-                if (c == null)
+                ToDbColumn = Root!.DbTables.Where(x => x.Schema == Parent.JoinToSchema && x.Name == Parent.JoinTo).SingleOrDefault()?.Columns.Where(x => x.Name == ToColumn).SingleOrDefault();
+                if (ToDbColumn == null)
                     throw new CodeGenException(this, nameof(ToColumn), $"ToColumn '{ToColumn}' (Schema.Table '{Parent.JoinToSchema}.{Parent.JoinTo}') not found in database.");
 
                 if (Parent.JoinToSchema == Parent!.Parent!.Schema && Parent.JoinTo == Parent!.Parent!.Name)

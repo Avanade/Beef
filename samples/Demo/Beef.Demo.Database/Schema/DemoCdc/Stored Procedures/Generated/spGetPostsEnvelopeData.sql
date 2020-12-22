@@ -240,9 +240,9 @@ BEGIN
 
     -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
     SELECT
+        [p].[PostsId] AS [Posts_PostsId],  -- Additional joining column (informational).
         [ct].[TagsId] AS [TagsId],
-        [ct].[ParentType] AS [ParentType],
-        [ct].[ParentId] AS [ParentId],
+        [ct].[ParentId] AS [CommentsId],
         [ct].[Text] AS [Text]
       FROM #_changes AS [_chg]
       INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
@@ -253,8 +253,7 @@ BEGIN
     -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
     SELECT
         [pt].[TagsId] AS [TagsId],
-        [pt].[ParentType] AS [ParentType],
-        [pt].[ParentId] AS [ParentId],
+        [pt].[ParentId] AS [PostsId],
         [pt].[Text] AS [Text]
       FROM #_changes AS [_chg]
       INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])

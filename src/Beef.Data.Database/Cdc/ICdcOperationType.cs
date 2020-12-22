@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Entities;
-
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Provides the required CDC model properties.
+    /// Provides the required CDC database <see cref="OperationType"/>.
     /// </summary>
-    public interface ICdcModel : IUniqueKey
+    public interface ICdcOperationType
     {
         /// <summary>
         /// Gets or sets the database CDC <see cref="OperationType"/>.

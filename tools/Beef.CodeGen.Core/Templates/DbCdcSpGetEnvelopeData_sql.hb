@@ -197,6 +197,13 @@ BEGIN
 {{#each Joins}}
     -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now.
     SELECT
+  {{#each JoinHierarchyReverse}}
+    {{#unless @last}}
+      {{#each OnSelectColumns}}
+        [{{Parent.JoinToAlias}}].[{{ToColumn}}] AS [{{pascal Parent.JoinTo}}_{{Name}}],  -- Additional joining column (informational).
+      {{/each}}
+    {{/unless}}
+  {{/each}}
   {{#each Columns}}
         [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
   {{/each}}

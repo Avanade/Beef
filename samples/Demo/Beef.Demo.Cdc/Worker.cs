@@ -9,10 +9,10 @@ namespace Beef.Demo.Cdc
 {
     public class Worker : BackgroundService
     {
-        private readonly PeopleCdcData _data;
+        private readonly PostsCdcData _data;
         private readonly IServiceProvider _sp;
 
-        public Worker(PeopleCdcData data, IServiceProvider sp)
+        public Worker(PostsCdcData data, IServiceProvider sp)
         {
             _data = data;
             _sp = sp;
@@ -23,12 +23,12 @@ namespace Beef.Demo.Cdc
             ExecutionContext.Reset();
             ExecutionContext.SetCurrent(new ExecutionContext { ServiceProvider = _sp });
 
-            CdcOutboxEnvelope envelope;
+            CdcExecutorResult cer;
 
             do
             {
-                envelope = await _data.ExecuteNextBatchAsync(100, cancellationToken).ConfigureAwait(false);
-            } while (envelope != null && !cancellationToken.IsCancellationRequested);
+                cer = await _data.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
+            } while (cer.CanContinue && !cancellationToken.IsCancellationRequested);
         }
     }
 }

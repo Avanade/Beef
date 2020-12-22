@@ -226,6 +226,11 @@ namespace Beef.CodeGen.Config.Database
         public List<CdcJoinOnConfig>? On { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="On"/> select columns; i.e. those without a specific statement.
+        /// </summary>
+        public List<CdcJoinOnConfig> OnSelectColumns => On!.Where(x => x.ToStatement == null).ToList();
+
+        /// <summary>
         /// Gets the selected column configurations.
         /// </summary>
         public List<CdcJoinColumnConfig> Columns { get; } = new List<CdcJoinColumnConfig>();
@@ -271,9 +276,18 @@ namespace Beef.CodeGen.Config.Database
         public bool IsFirstInJoinHierarchy { get; private set; }
 
         /// <summary>
+        /// Gets the parent <see cref="CdcJoinConfig"/> in the hierarchy.
+        /// </summary>
+        public CdcJoinConfig? HierarchyParent { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the indentation index.
+        /// </summary>
+        public int IndentIndex { get; set; } = 0;
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             CheckKeyHasValue(Name);
@@ -323,14 +337,14 @@ namespace Beef.CodeGen.Config.Database
             }
 
             // Wire up the hierarchy.
-            JoinHierarchy.Add(this.PartialClone(true));
+            JoinHierarchy.Add(PartialClone(true, jtc == null ? 0 : jtc.JoinHierarchy.Count));
 
             if (jtc != null)
             {
-                JoinHierarchy.Add(jtc);
+                JoinHierarchy.Add(jtc); //.PartialClone(false, 1));
                 for (int i = 1; i < jtc.JoinHierarchy.Count; i++)
                 {
-                    JoinHierarchy.Add(jtc.JoinHierarchy[i].PartialClone(false));
+                    JoinHierarchy.Add(jtc.JoinHierarchy[i].PartialClone(false, jtc.JoinHierarchy.Count - i));
                 }
             }
 
@@ -363,7 +377,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Performs a partial clone.
         /// </summary>
-        private CdcJoinConfig PartialClone(bool isFirst)
+        private CdcJoinConfig PartialClone(bool isFirst, int indentIndex)
         {
             var j = new CdcJoinConfig
             {
@@ -374,12 +388,15 @@ namespace Beef.CodeGen.Config.Database
                 JoinTo = JoinTo,
                 JoinToSchema = JoinToSchema,
                 JoinToAlias = JoinToAlias,
+                ModelName = ModelName,
+                PropertyName = PropertyName,
                 NonCdc = NonCdc,
                 IsFirstInJoinHierarchy = isFirst,
                 On = new List<CdcJoinOnConfig>(),
                 DbTable = DbTable,
                 Root = Root,
-                Parent = Parent
+                Parent = Parent,
+                IndentIndex = indentIndex
             };
 
             foreach (var item in On!)

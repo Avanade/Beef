@@ -8,17 +8,26 @@
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;
+using Beef.Mapper;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Beef.Demo.Cdc.Entities;
 
 namespace Beef.Demo.Cdc.Data
 {
     /// <summary>
-    /// Provides the CDC data access for database object 'Legacy.Posts' .
+    /// Provides the CDC data access for database object 'Legacy.Posts'.
     /// </summary>
-    public partial class PostsCdcData : CdcExecutor<Cdc>
+    public partial class PostsCdcData : CdcExecutor<PostsCdc, PostsCdcData.PostsCdcWrapperCollection, PostsCdcData.PostsCdcWrapper>
     {
+        private static readonly DatabaseMapper<PostsCdcWrapper> _postsCdcWrapperMapper = DatabaseMapper.CreateAuto<PostsCdcWrapper>();
+        private static readonly DatabaseMapper<PostsCdc.CommentsCdc> _commentsCdcMapper = DatabaseMapper.CreateAuto<PostsCdc.CommentsCdc>();
+        private static readonly DatabaseMapper<PostsCdc.CommentsTagsCdc> _commentsTagsCdcMapper = DatabaseMapper.CreateAuto<PostsCdc.CommentsTagsCdc>();
+        private static readonly DatabaseMapper<PostsCdc.PostsTagsCdc> _postsTagsCdcMapper = DatabaseMapper.CreateAuto<PostsCdc.PostsTagsCdc>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PostsCdcData"/> class.
         /// </summary>
@@ -26,39 +35,74 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public PostsCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PostsCdcData> logger) :
-            base(db, "[DemoCdc].[spGetPostsEnvelopeData]", DbMapper.Default, evtPub, logger) => PostsCdcDataCtor();
+            base(db, "[DemoCdc].[spGetPostsEnvelopeData]", evtPub, logger) => PostsCdcDataCtor();
 
         partial void PostsCdcDataCtor(); // Enables additional functionality to be added to the constructor.
+
+        /// <summary>
+        /// Gets the envelope entity data from the database.
+        /// </summary>
+        /// <param name="maxBatchSize">The recommended maximum batch size.</param>
+        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
+        /// <returns>The corresponding result.</returns>
+        protected override async Task<CdcExecutorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        {
+            var pColl = new PostsCdcWrapperCollection();
+
+            var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
+                new MultiSetCollArgs<PostsCdcWrapperCollection, PostsCdcWrapper>(_postsCdcWrapperMapper, r => pColl = r, stopOnNull: true), // Root table: Legacy.Posts
+                new MultiSetCollArgs<PostsCdc.CommentsCdcCollection, PostsCdc.CommentsCdc>(_commentsCdcMapper, r =>
+                {
+                    foreach (var c in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.CommentsCdcCollection, PostsCdc.CommentsCdc>() })) // Join table: Comments (Legacy.Comments)
+                    {
+                        pColl.Single(x => x.PostsId == c.PostsId).Comments = .Coll;
+                    }
+                }), // Related table: Comments (Legacy.Comments)
+                new MultiSetCollArgs<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>(_commentsTagsCdcMapper, r =>
+                {
+                    foreach (var c in r.GroupBy(x => new { x.Posts_PostsId }).Select(g => new { g.Key.Posts_PostsId, Coll = g.ToList() })) // Join table: Comments (Legacy.Comments)
+                    {
+                        var pItem = pColl.Single(x => x.PostsId == c.Posts_PostsId).Comments;
+                        foreach (var ct in c.Coll.GroupBy(x => new { x.CommentsId }).Select(g => new { g.Key.CommentsId, Coll = g.ToCollection<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>() })) // Join table: CommentsTags (Legacy.Tags)
+                        {
+                            pItem.Single(x => x.CommentsId == ct.CommentsId).CommentsTags = c.Coll;
+                        }
+                    }
+                }), // Related table: CommentsTags (Legacy.Tags)
+                new MultiSetCollArgs<PostsCdc.PostsTagsCdcCollection, PostsCdc.PostsTagsCdc>(_postsTagsCdcMapper, r =>
+                {
+                    foreach (var pt in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.PostsTagsCdcCollection, PostsCdc.PostsTagsCdc>() })) // Join table: PostsTags (Legacy.Tags)
+                    {
+                        pColl.Single(x => x.PostsId == pt.PostsId).PostsTags = c.Coll;
+                    }
+                }) // Related table: PostsTags (Legacy.Tags)
+                ).ConfigureAwait(false);
+
+            result.Result.AddRange(pColl);
+            return result;
+        }
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.
         /// </summary>
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
 
-        public partial class PostsCdcRoot : PostsCdc
+        /// <summary>
+        /// Represents a <see cref="PostsCdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
+        /// </summary>
+        public class PostsCdcWrapper : PostsCdc, ICdcOperationType
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.
             /// </summary>
+            [MapperProperty("_OperationType", ConverterType = typeof(CdcOperationTypeConverter))]
             public OperationType DatabaseOperationType { get; set; }
         }
 
         /// <summary>
-        /// Provides the root database object 'Legacy.Posts' property and database column mapping.
+        /// Represents a <see cref="PostsCdcWrapper"/> collection.
         /// </summary>
-        public partial class PostsDbMapper : DatabaseMapper<PostsCdcRoot, PostsDbMapper>
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbMapper"/> class.
-            /// </summary>
-            public PostsDbMapper()
-            {
-                Property(s => s.DatabaseOperationType, "__Operation").SetConverter(CdcOperationTypeConverter.Default);
-                Property(s => s.PostsId, "PostsId");
-                Property(s => s.Text, "Text");
-                Property(s => s.Date, "Date");
-            }
-        }
+        public class PostsCdcWrapperCollection : List<PostsCdcWrapper> { }
     }
 }
 

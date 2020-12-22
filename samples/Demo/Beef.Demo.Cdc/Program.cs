@@ -19,7 +19,7 @@ namespace Beef.Demo.Cdc
                     services.AddBeefExecutionContext();
                     services.AddBeefDatabaseServices(() => new Database("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True"));
                     services.AddBeefNullEventPublisher();
-                    services.AddScoped<PeopleCdcData>();
+                    services.AddScoped<PostsCdcData>();
                     services.AddHostedService<Worker>();
                 });
     }

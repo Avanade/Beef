@@ -7,7 +7,7 @@
 #pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
 using Beef.Entities;
-using Beef.Data.Database.Cdc;
+using Beef.Mapper;
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
 using Newtonsoft.Json;
 {{/ifeq}}
@@ -22,7 +22,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc
+    public partial class {{ModelName}}Cdc : IUniqueKey
     {
 {{#each SelectedColumns}}
         /// <summary>
@@ -42,11 +42,13 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
+        [MapperIgnore()]
         public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
   {{else}}
         /// <summary>
         /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
+        [MapperIgnore()]
         public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
   {{/ifeq}}
 {{/each}}
@@ -54,16 +56,19 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public bool HasUniqueKey => true;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
 {{#each Joins}}
 
@@ -75,14 +80,14 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
   {{/ifeq}}
-        public partial class {{ModelName}}Cdc
+        public partial class {{ModelName}}Cdc : IUniqueKey
         {
   {{#each Columns}}
             /// <summary>
-            /// Gets or sets the '{{Name}}' column value.
+            /// Gets or sets the '{{NameAlias}}' ({{Parent.TableName}}.{{Name}}) column value.
             /// </summary>
     {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-            [JsonProperty("{{camel Name}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+            [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
      {{/ifeq}}
             public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
     {{#unless @last}}
@@ -95,11 +100,13 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// <summary>
             /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
+            [MapperIgnore()]
             public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
     {{else}}
             /// <summary>
             /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
+            [MapperIgnore()]
             public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
     {{/ifeq}}
   {{/each}}
@@ -107,17 +114,32 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public bool HasUniqueKey => true;
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public UniqueKey UniqueKey => new UniqueKey({{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}{{pascal NameAlias}}{{/each}});
 
             /// <summary>
             /// <inheritdoc/>
             /// </summary>
+            [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+  {{#each JoinHierarchyReverse}}
+    {{#unless @last}}
+      {{#each OnSelectColumns}}
+
+            /// <summary>
+            /// Gets or sets the '{{Parent.JoinTo}}_{{Name}}' additional joining column (informational); for internal join use only (not serialized).
+            /// </summary>
+            [MapperIgnore()]
+            public {{ToDbColumn.DotNetType}} {{Parent.JoinTo}}_{{Name}} { get; set; }
+      {{/each}}
+    {{/unless}}
+  {{/each}}
         }
   {{#ifeq JoinCardinality 'OneToMany'}}
 
