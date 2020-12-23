@@ -91,11 +91,11 @@ namespace Beef.CodeGen.Config.Database
         #region Cdc
 
         /// <summary>
-        /// Gets or sets the `Cdc` get envelope data stored procedure name.
+        /// Gets or sets the `Cdc` execute envelope stored procedure name.
         /// </summary>
         [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The `CDC` get envelope data stored procedure name.",
-            Description = "Defaults to `spGet` (literal) + `Name` + `EnvelopeData` (literal); e.g. `spGetTableNameEnvelopeData`.")]
+            Description = "Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.")]
         public string? StoredProcedureName { get; set; }
 
         /// <summary>
@@ -137,6 +137,14 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("CDC", Title = "The .NET database interface name.",
             Description = "Defaults to `IDatabase`.")]
         public string? DatabaseName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event subject.
+        /// </summary>
+        [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The event subject.",
+            Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.")]
+        public string? EventSubject { get; set; }
 
         #endregion
 
@@ -276,10 +284,11 @@ namespace Beef.CodeGen.Config.Database
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 
-            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spGet{StringConversion.ToPascalCase(Name)}EnvelopeData");
+            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcEnvelope");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Schema + "Cdc");
             EnvelopeTableName = DefaultWhereNull(EnvelopeTableName, () => Name + "Envelope");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
+            EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
 

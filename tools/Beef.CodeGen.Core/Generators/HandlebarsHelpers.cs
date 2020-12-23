@@ -200,14 +200,8 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Check the arguments to validate for correctness.
         /// </summary>
-        private static bool CheckArgs(string name, TextWriter writer, object[] args, int max = int.MaxValue)
+        private static bool CheckArgs(string name, TextWriter writer, object[] args)
         {
-            if (args.Length > max)
-            {
-                writer.WriteLine($"!!! {name}: {args.Length} arguments passed where max of {max} expected !!!");
-                return false;
-            }
-
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] != null && args[i].GetType().Name == "UndefinedBindingResult")

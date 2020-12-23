@@ -38,7 +38,7 @@
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcModel_cs.hb" />
-    <None Remove="Templates\DbCdcSpGetEnvelopeData_sql.hb" />
+    <None Remove="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
     <None Remove="Templates\DbSpTableCreate_sql.hbs" />
@@ -102,7 +102,7 @@
     <EmbeddedResource Include="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbCdcSpGetEnvelopeData_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
     <EmbeddedResource Include="Templates\DbVwQuery_sql.hbs" />
     <EmbeddedResource Include="Templates\DbVwTable_sql.hbs" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.hbs" />

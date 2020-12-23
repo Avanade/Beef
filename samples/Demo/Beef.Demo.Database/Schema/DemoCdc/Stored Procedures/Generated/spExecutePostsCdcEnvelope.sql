@@ -1,4 +1,4 @@
-CREATE PROCEDURE [DemoCdc].[spGetPostsEnvelopeData]
+CREATE PROCEDURE [DemoCdc].[spExecutePostsCdcEnvelope]
   @EnvelopeIdToMarkComplete INT NULL = NULL,
   @ReturnIncompleteBatches BIT NULL = 0,
   @MaxBatchSize INT NULL = 100
@@ -37,6 +37,7 @@ BEGIN
     DECLARE @CommentsTagsMinLsn BINARY(10), @CommentsTagsMaxLsn BINARY(10)
     DECLARE @PostsTagsMinLsn BINARY(10), @PostsTagsMaxLsn BINARY(10)
     DECLARE @EnvelopeId INT
+    DECLARE @IncludeMin BIT
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
     IF (@ReturnIncompleteBatches = 1)
@@ -63,6 +64,7 @@ BEGIN
       END
 
       SET @MaxBatchSize = 1000000  -- Override to a very large number.
+      SET @IncludeMin = 1
     END
     ELSE
     BEGIN
@@ -79,7 +81,7 @@ BEGIN
         FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
         ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[EnvelopeId] DESC
 
-      IF (@IsComplete = 0)
+      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete envelope; must be completed.
       BEGIN
         SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
           FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
@@ -88,13 +90,18 @@ BEGIN
         COMMIT TRANSACTION
         RETURN -1;
       END
+      ELSE
+      BEGIN
+        SET @EnvelopeId = null -- Force creation of a new envelope.
+      END
 
-      IF (@IsComplete IS NULL)
+      IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
         SET @PostsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Posts');
         SET @CommentsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Comments');
         SET @CommentsTagsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
         SET @PostsTagsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
+        SET @IncludeMin = 1
       END
 
       SET @PostsMaxLsn = sys.fn_cdc_get_max_lsn();
@@ -115,6 +122,8 @@ BEGIN
         [_cdc].[PostsId] AS [PostsId]
       INTO #_changes
       FROM cdc.fn_cdc_get_net_changes_Legacy_Posts(@PostsMinLsn, @PostsMaxLsn, 'all') AS [_cdc]
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @PostsMinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -129,6 +138,8 @@ BEGIN
       INTO #c
       FROM cdc.fn_cdc_get_net_changes_Legacy_Comments(@CommentsMinLsn, @CommentsMaxLsn, 'all') AS [_cdc]
       INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[PostsId] = [p].[PostsId])
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @CommentsMinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -149,6 +160,8 @@ BEGIN
       FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@CommentsTagsMinLsn, @CommentsTagsMaxLsn, 'all') AS [_cdc]
       INNER JOIN [Legacy].[Comments] AS [c] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'C' AND [_cdc].[ParentId] = [c].[CommentsId])
       INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([c].[PostsId] = [p].[PostsId])
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @CommentsTagsMinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -168,6 +181,8 @@ BEGIN
       INTO #pt
       FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@PostsTagsMinLsn, @PostsTagsMaxLsn, 'all') AS [_cdc]
       INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'P' AND [_cdc].[ParentId] = [p].[PostsId])
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @PostsTagsMinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -182,6 +197,14 @@ BEGIN
     -- Create a new envelope where not processing an existing.
     IF (@EnvelopeId IS NULL)
     BEGIN
+      DECLARE @RowCount INT
+      SELECT @RowCount = COUNT(*) FROM #_changes
+      IF @RowCount = 0
+      BEGIN
+        COMMIT TRANSACTION
+        RETURN 0;
+      END
+
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [DemoCdc].[PostsEnvelope] (

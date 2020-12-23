@@ -281,6 +281,11 @@ namespace Beef.CodeGen.Config.Database
         public CdcJoinConfig? HierarchyParent { get; private set; }
 
         /// <summary>
+        /// Gets the child <see cref="CdcJoinConfig"/> in the hierarchy.
+        /// </summary>
+        public CdcJoinConfig? HierarchyChild { get; private set; }
+
+        /// <summary>
         /// Gets or sets the indentation index.
         /// </summary>
         public int IndentIndex { get; set; } = 0;
@@ -336,18 +341,29 @@ namespace Beef.CodeGen.Config.Database
                 on.Prepare(Root!, this);
             }
 
-            // Wire up the hierarchy.
-            JoinHierarchy.Add(PartialClone(true, jtc == null ? 0 : jtc.JoinHierarchy.Count));
+            // Wire up the hierarchy (parent and child).
+            var jhp = PartialClone(true, jtc == null ? 0 : jtc.JoinHierarchy.Count, null);
+            JoinHierarchy.Add(jhp);
 
             if (jtc != null)
             {
-                JoinHierarchy.Add(jtc); //.PartialClone(false, 1));
+                jhp = jtc.PartialClone(false, jtc.JoinHierarchy.Count - 1, jhp);
+                JoinHierarchy.Add(jhp);
                 for (int i = 1; i < jtc.JoinHierarchy.Count; i++)
                 {
-                    JoinHierarchy.Add(jtc.JoinHierarchy[i].PartialClone(false, jtc.JoinHierarchy.Count - i));
+                    jhp = jtc.JoinHierarchy[i].PartialClone(false, jtc.JoinHierarchy.Count - i, jhp);
+                    JoinHierarchy.Add(jhp);
                 }
             }
 
+            jhp = null;
+            foreach (var jhr in JoinHierarchyReverse)
+            {
+                jhr.HierarchyChild = jhp;
+                jhp = jhr;
+            }
+
+            // Deal with the columns.
             foreach (var c in DbTable.Columns)
             {
                 if (c.IsPrimaryKey)
@@ -377,7 +393,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Performs a partial clone.
         /// </summary>
-        private CdcJoinConfig PartialClone(bool isFirst, int indentIndex)
+        private CdcJoinConfig PartialClone(bool isFirst, int indentIndex, CdcJoinConfig? hierarchyParent)
         {
             var j = new CdcJoinConfig
             {
@@ -396,7 +412,8 @@ namespace Beef.CodeGen.Config.Database
                 DbTable = DbTable,
                 Root = Root,
                 Parent = Parent,
-                IndentIndex = indentIndex
+                IndentIndex = indentIndex,
+                HierarchyParent = hierarchyParent
             };
 
             foreach (var item in On!)
@@ -406,6 +423,7 @@ namespace Beef.CodeGen.Config.Database
                     Name = item.Name,
                     ToColumn = item.ToColumn,
                     ToStatement = item.ToStatement,
+                    ToDbColumn = item.ToDbColumn,
                     Root = j.Root,
                     Parent = j
                 };

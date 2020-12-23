@@ -900,7 +900,11 @@ namespace Beef.Data.Database
                             if (multiSetArg.MaxRows.HasValue && records > multiSetArg.MaxRows.Value)
                                 throw new InvalidOperationException($"SelectQueryMultiSet (multiSetArgs[{index}]) has returned more records than expected ({multiSetArg.MaxRows.Value}).");
 
-                            multiSetArg.DatasetRecord(new DatabaseRecord(this, (IDataRecord)dr));
+                            var databaseRecord = new DatabaseRecord(this, dr);
+                            if (multiSetArg.StopOnPredicate != null && multiSetArg.StopOnPredicate(databaseRecord))
+                                return;
+
+                            multiSetArg.DatasetRecord(databaseRecord);
                         }
 
                         if (records < multiSetArg.MinRows)
@@ -915,7 +919,7 @@ namespace Beef.Data.Database
                     index++;
                 } while (dr.NextResult());
 
-                if (index < multiSetArgs.Length)
+                if (index < multiSetArgs.Length && !multiSetArgs[index].StopOnNull)
                     throw new InvalidOperationException($"SelectQueryMultiSet has returned less ({index}) record sets than expected ({multiSetArgs.Length}).");
             });
         }

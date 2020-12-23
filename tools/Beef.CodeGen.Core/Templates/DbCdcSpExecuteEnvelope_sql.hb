@@ -38,6 +38,7 @@ BEGIN
     DECLARE @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{/each}}
     DECLARE @EnvelopeId INT
+    DECLARE @IncludeMin BIT
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
     IF (@ReturnIncompleteBatches = 1)
@@ -62,6 +63,7 @@ BEGIN
       END
 
       SET @MaxBatchSize = 1000000  -- Override to a very large number.
+      SET @IncludeMin = 1
     END
     ELSE
     BEGIN
@@ -78,7 +80,7 @@ BEGIN
         FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
         ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[EnvelopeId] DESC
 
-      IF (@IsComplete = 0)
+      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete envelope; must be completed.
       BEGIN
         SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
           FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
@@ -87,13 +89,18 @@ BEGIN
         COMMIT TRANSACTION
         RETURN -1;
       END
+      ELSE
+      BEGIN
+        SET @EnvelopeId = null -- Force creation of a new envelope.
+      END
 
-      IF (@IsComplete IS NULL)
+      IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
         SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
 {{#each Joins}}
         SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
 {{/each}}
+        SET @IncludeMin = 1
       END
 
       SET @{{pascal Name}}MaxLsn = sys.fn_cdc_get_max_lsn();
@@ -116,6 +123,8 @@ BEGIN
 {{/each}}
       INTO #_changes
       FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @{{pascal Name}}MinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -135,6 +144,8 @@ BEGIN
   {{#each JoinHierarchy}}
       INNER JOIN [{{JoinToSchema}}].[{{JoinTo}}] AS [{{JoinToAlias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{#if Parent.IsFirstInJoinHierarchy}}[_cdc]{{else}}[{{Parent.Alias}}]{{/if}}.[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
+      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @{{pascal Name}}MinLsn
+      ORDER BY [_cdc].[__$start_lsn]
 
     IF (@@ROWCOUNT <> 0)
     BEGIN
@@ -150,6 +161,14 @@ BEGIN
     -- Create a new envelope where not processing an existing.
     IF (@EnvelopeId IS NULL)
     BEGIN
+      DECLARE @RowCount INT
+      SELECT @RowCount = COUNT(*) FROM #_changes
+      IF @RowCount = 0
+      BEGIN
+        COMMIT TRANSACTION
+        RETURN 0;
+      END
+
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [{{CdcSchema}}].[{{EnvelopeTableName}}] (

@@ -55,7 +55,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the <see cref="ToColumn"/> <see cref="DbColumn"/>.
         /// </summary>
-        public DbColumn? ToDbColumn { get; private set; }
+        public DbColumn? ToDbColumn { get; set; }
 
         /// <summary>
         /// <inheritdoc/>

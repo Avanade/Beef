@@ -35,7 +35,7 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public PostsCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PostsCdcData> logger) :
-            base(db, "[DemoCdc].[spGetPostsEnvelopeData]", evtPub, logger) => PostsCdcDataCtor();
+            base(db, "[DemoCdc].[spExecutePostsCdcEnvelope]", evtPub, logger) => PostsCdcDataCtor();
 
         partial void PostsCdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -55,7 +55,7 @@ namespace Beef.Demo.Cdc.Data
                 {
                     foreach (var c in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.CommentsCdcCollection, PostsCdc.CommentsCdc>() })) // Join table: Comments (Legacy.Comments)
                     {
-                        pColl.Single(x => x.PostsId == c.PostsId).Comments = .Coll;
+                        pColl.Single(x => x.PostsId == c.PostsId).Comments = c.Coll;
                     }
                 }), // Related table: Comments (Legacy.Comments)
                 new MultiSetCollArgs<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>(_commentsTagsCdcMapper, r =>
@@ -65,7 +65,7 @@ namespace Beef.Demo.Cdc.Data
                         var pItem = pColl.Single(x => x.PostsId == c.Posts_PostsId).Comments;
                         foreach (var ct in c.Coll.GroupBy(x => new { x.CommentsId }).Select(g => new { g.Key.CommentsId, Coll = g.ToCollection<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>() })) // Join table: CommentsTags (Legacy.Tags)
                         {
-                            pItem.Single(x => x.CommentsId == ct.CommentsId).CommentsTags = c.Coll;
+                            pItem.Single(x => x.CommentsId == ct.CommentsId).CommentsTags = ct.Coll;
                         }
                     }
                 }), // Related table: CommentsTags (Legacy.Tags)
@@ -73,7 +73,7 @@ namespace Beef.Demo.Cdc.Data
                 {
                     foreach (var pt in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.PostsTagsCdcCollection, PostsCdc.PostsTagsCdc>() })) // Join table: PostsTags (Legacy.Tags)
                     {
-                        pColl.Single(x => x.PostsId == pt.PostsId).PostsTags = c.Coll;
+                        pColl.Single(x => x.PostsId == pt.PostsId).PostsTags = pt.Coll;
                     }
                 }) // Related table: PostsTags (Legacy.Tags)
                 ).ConfigureAwait(false);
@@ -81,6 +81,11 @@ namespace Beef.Demo.Cdc.Data
             result.Result.AddRange(pColl);
             return result;
         }
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// </summary>
+        protected override string EventSubject => "Legacy.Posts";
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.

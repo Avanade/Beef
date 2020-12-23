@@ -5,6 +5,7 @@ using Beef.Events;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +13,26 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
+    /// Provides the core Change Data Capture (CDC) execution capability.
+    /// </summary>
+    public interface ICdcExecutor
+    {
+        /// <summary>
+        /// Executes the next (new) envelope.
+        /// </summary>
+        /// <param name="maxBatchSize">The maximum batch size. Defaults to 100.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="CdcExecutorResult"/>.</returns>
+        public Task<CdcExecutorResult> ExecuteNextAsync(int maxBatchSize, CancellationToken? cancellationToken);
+    }
+
+    /// <summary>
     /// Manages the Change Data Capture (CDC) execution.
     /// </summary>
     /// <typeparam name="TCdcEntity">The CDC database entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcEntityWrapperColl">The <typeparamref name="TCdcEntityWrapper"/> collection <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcEntityWrapper">The <typeparamref name="TCdcEntity"/> wrapper <see cref="Type"/>.</typeparam>
-    public abstract class CdcExecutor<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper>
+    public abstract class CdcExecutor<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper> : ICdcExecutor
         where TCdcEntity : class, IUniqueKey, new() where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() where TCdcEntityWrapper : class, TCdcEntity, ICdcOperationType, new()
     {
         private const string EnvelopeIdParamName = "EnvelopeIdToMarkComplete";
@@ -62,6 +77,16 @@ namespace Beef.Data.Database.Cdc
         public ILogger Logger { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="EventData.Subject"/>.
+        /// </summary>
+        protected abstract string EventSubject { get; }
+
+        /// <summary>
+        /// Gets the <see cref="Events.EventActionFormat"/>.
+        /// </summary>
+        protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
+
+        /// <summary>
         /// Marks an existing envelope as complete.
         /// </summary>
         /// <param name="envelopeId">The envelope identifier.</param>
@@ -80,7 +105,16 @@ namespace Beef.Data.Database.Cdc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcExecutorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
         public Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteIncompleteAsync(int maxBatchSize = 100, CancellationToken? cancellationToken = null)
-            => ExecuteSelectedBatchAsync("incomplete batch", true, maxBatchSize, cancellationToken ?? CancellationToken.None);
+            => ExecuteSelectedBatchAsync("incomplete envelope", true, maxBatchSize, cancellationToken ?? CancellationToken.None);
+
+        /// <summary>
+        /// Executes the next (new) envelope.
+        /// </summary>
+        /// <param name="maxBatchSize">The maximum batch size. Defaults to 100.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="CdcExecutorResult"/>.</returns>
+        async Task<CdcExecutorResult> ICdcExecutor.ExecuteNextAsync(int maxBatchSize, CancellationToken? cancellationToken)
+            => await ExecuteNextAsync(maxBatchSize < 1 ? 100 : maxBatchSize, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes the next (new) envelope.
@@ -89,7 +123,7 @@ namespace Beef.Data.Database.Cdc
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcExecutorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
         public Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(int maxBatchSize = 100, CancellationToken? cancellationToken = null)
-            => ExecuteSelectedBatchAsync("next batch", false, maxBatchSize, cancellationToken ?? CancellationToken.None);
+            => ExecuteSelectedBatchAsync("next envelope", false, maxBatchSize, cancellationToken ?? CancellationToken.None);
 
         /// <summary>
         /// Execute selected batch.
@@ -100,43 +134,36 @@ namespace Beef.Data.Database.Cdc
             Logger.LogInformation($"Query {text} with maximum batch size of {maxBatchSize}.");
             var result = await GetEnvelopeEntityDataAsync(maxBatchSize, incomplete).ConfigureAwait(false);
 
+            if (result.ReturnCode < 0)
+            {
+                if (result.Envelope != null)
+                    Logger.LogError($"Existing Envelope '{result.Envelope.Id}' created on '{result.Envelope.CreatedDate}' is not complete; this must be completed to continue.");
+                else
+                    Logger.LogCritical($"Unexpected execution outcome (return code '{result.ReturnCode}') with no incomplete envelope; this is not expected.");
+
+                return result;
+            }
+
             if (result.Envelope == null)
             {
-                Logger.LogInformation($"Query did not result in any change data.");
-                return null!;
+                Logger.LogInformation($"No new change data capture data was found.");
+                return result;
             }
 
             if (cancellationToken.IsCancellationRequested)
+            {
+                Logger.LogWarning($"Cancellation has resulted in an incomplete envelope.");
                 return await Task.FromCanceled<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken).ConfigureAwait(false);
-
-            // Convert the batch into events.
-            //if (result.Envelope)
-            //Logger.LogInformation($"Envelope '{result.Envelope.Id}' found with no change data.");
-            //else
-            //{
-            //Logger.LogInformation($"Envelope '{result.Envelope.Id}' found.");
-
-            // Group the items in the batch by operation and key - there could be more than one record; i.e. where there is a one-to-many relationship involved.
-            //var events = new List<EventData>();
-            //foreach (var grp in items.GroupBy(x => new { x.DatabaseOperationType, x.UniqueKey }).Select(g => g.ToList()))
-            //{
-            //    if (cancellationToken.IsCancellationRequested)
-            //        return await Task.FromCanceled<CdcOutboxEnvelope>(cancellationToken).ConfigureAwait(false);
-
-            //    events.AddRange(await CreateEventDataAsync(grp, cancellationToken).ConfigureAwait(false));
-            //}
+            }
 
             // Publish the events.
-            //if (cancellationToken.IsCancellationRequested)
-            //    return await Task.FromCanceled<CdcOutboxEnvelope>(cancellationToken).ConfigureAwait(false);
+            var events = (await CreateEventsAsync(result.Result, cancellationToken).ConfigureAwait(false)).ToArray();
+            await EventPublisher.PublishAsync(events).ConfigureAwait(false);
+            Logger.LogInformation($"{events.Length} event(s) were published successfully.");
 
-            //await EventPublisher.PublishAsync(events.ToArray()).ConfigureAwait(false);
-            //Logger.LogInformation($"{events.Count} event(s) were published successfully.");
-            //}
-
-            // Complete the batch (ignore cancel as event(s) published and we *must* complete to minimise chance of sending more than once).
-            //await MarkEnvelopeAsCompleteAsync(envelope.Id).ConfigureAwait(false);
-            //Logger.LogInformation($"Envelope '{envelope.Id}' marked as completed.");
+            // Complete the batch (ignore any further cancel as event(s) published and we *must* complete to minimise chance of sending more than once).
+            await MarkEnvelopeAsCompleteAsync(result.Envelope.Id).ConfigureAwait(false);
+            Logger.LogInformation($"Envelope '{result.Envelope.Id}' marked as completed.");
 
             return result;
         }
@@ -170,11 +197,6 @@ namespace Beef.Data.Database.Cdc
         /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
         /// <returns>A <typeparamref name="TCdcEntityWrapperColl"/>.</returns>
         protected abstract Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete);
-
-        /// <summary>
-        /// Gets the <see cref="Events.EventActionFormat"/>.
-        /// </summary>
-        protected virtual EventActionFormat EventActionFormat { get; } = EventActionFormat.None;
 
         /// <summary>
         /// Creates an <see cref="EventData{T}"/> for the specified <paramref name="value"/>.
@@ -279,14 +301,21 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Creates none or more <see cref="EventData">events</see> from the entity <paramref name="coll">collection (an entity may have one or more records due to one-to-many database relationships).</paramref>.
+        /// Creates none or more <see cref="EventData">events</see> from the entity <paramref name="coll">collection.</paramref>.
         /// </summary>
         /// <param name="coll">The wrapper entity collection.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>None or more <see cref="EventData">events</see> to be published.</returns>
-        protected virtual Task<IEnumerable<EventData>> CreateEventDataAsync(List<TCdcEntityWrapper> coll, CancellationToken? cancellationToken = null)
+        protected virtual Task<IEnumerable<EventData>> CreateEventsAsync(TCdcEntityWrapperColl coll, CancellationToken? cancellationToken = null)
         {
-            return Task.FromResult<IEnumerable<EventData>>(null!);
+            var events = new List<EventData>();
+
+            foreach (var item in coll ?? throw new ArgumentNullException(nameof(coll)))
+            {
+                events.Add(CreateValueEvent(item, EventSubject, item.DatabaseOperationType));
+            }
+
+            return Task.FromResult(events.AsEnumerable());
         }
     }
 
@@ -301,9 +330,14 @@ namespace Beef.Data.Database.Cdc
         public int ReturnCode { get; internal set; }
 
         /// <summary>
-        /// Indicates that the execution was successful and can continue.
+        /// Gets or sets the <see cref="CdcEnvelope"/>.
         /// </summary>
-        public bool CanContinue => ReturnCode == 0;
+        public CdcEnvelope? Envelope { get; internal set; }
+
+        /// <summary>
+        /// Indicates that a envelope execution was successful and can continue.
+        /// </summary>
+        public bool EnvelopeExecuted => ReturnCode == 0 && Envelope != null;
     }
 
     /// <summary>
@@ -314,11 +348,6 @@ namespace Beef.Data.Database.Cdc
     public class CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> : CdcExecutorResult
         where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() where TCdcEntityWrapper : class, ICdcOperationType
     {
-        /// <summary>
-        /// Gets or sets the <see cref="CdcEnvelope"/>.
-        /// </summary>
-        public CdcEnvelope? Envelope { get; internal set; }
-
         /// <summary>
         /// Gets the resulting <typeparamref name="TCdcEntityWrapperColl"/>.
         /// </summary>

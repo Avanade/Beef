@@ -17,8 +17,10 @@ namespace Beef.Demo.Cdc.Entities
     /// Represents the CDC model for the root (primary) database table 'Legacy.Posts'.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PostsCdc : IUniqueKey
+    public partial class PostsCdc : IUniqueKey, IETag
     {
+        private string? _etag;
+
         /// <summary>
         /// Gets or sets the 'PostsId' column value.
         /// </summary>
@@ -66,6 +68,27 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(PostsId) };
+
+        /// <summary>
+        /// Returns the hash code.
+        /// </summary>
+        /// <returns>The hash code.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(PostsId);
+            hash.Add(Text);
+            hash.Add(Date);
+            Comments?.ForEach(x => hash.Add(x));
+            PostsTags?.ForEach(x => hash.Add(x));
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+
+        /// <summary>
+        /// Gets or sets the entity tag.
+        /// </summary>
+        [MapperIgnore()]
+        public string? ETag { get => _etag ??= Convert.ToBase64String(BitConverter.GetBytes(GetHashCode())); set => _etag = value; }
 
         #region CommentsCdc
 
@@ -122,6 +145,21 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(CommentsId) };
+
+            /// <summary>
+            /// Returns the hash code.
+            /// </summary>
+            /// <returns>The hash code.</returns>
+            public override int GetHashCode()
+            {
+                var hash = new HashCode();
+                hash.Add(CommentsId);
+                hash.Add(PostsId);
+                hash.Add(Text);
+                hash.Add(Date);
+                CommentsTags?.ForEach(x => hash.Add(x));
+                return base.GetHashCode() ^ hash.ToHashCode();
+            }
         }
 
         /// <summary>
@@ -176,9 +214,21 @@ namespace Beef.Demo.Cdc.Entities
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
 
             /// <summary>
+            /// Returns the hash code.
+            /// </summary>
+            /// <returns>The hash code.</returns>
+            public override int GetHashCode()
+            {
+                var hash = new HashCode();
+                hash.Add(TagsId);
+                hash.Add(CommentsId);
+                hash.Add(Text);
+                return base.GetHashCode() ^ hash.ToHashCode();
+            }
+
+            /// <summary>
             /// Gets or sets the 'Posts_PostsId' additional joining column (informational); for internal join use only (not serialized).
             /// </summary>
-            [MapperIgnore()]
             public int Posts_PostsId { get; set; }
         }
 
@@ -232,6 +282,19 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
+
+            /// <summary>
+            /// Returns the hash code.
+            /// </summary>
+            /// <returns>The hash code.</returns>
+            public override int GetHashCode()
+            {
+                var hash = new HashCode();
+                hash.Add(TagsId);
+                hash.Add(PostsId);
+                hash.Add(Text);
+                return base.GetHashCode() ^ hash.ToHashCode();
+            }
         }
 
         /// <summary>

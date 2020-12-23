@@ -53,15 +53,15 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
             var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
                 new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne Joins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
 {{#each Joins}}
-                new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>{{setkv1 Parent.Alias '// Is the Root Alias'}}{{setkv2 'r' '// Is the collection'}}{{setkv3 Parent.Alias}}
+                new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>
                 {
   {{#each JoinHierarchyReverse}}
-                    {{indent IndentIndex}}foreach (var {{Alias}} in {{Root.KV2}}{{#unless @first}}.Coll{{/unless}}.GroupBy(x => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}x.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}} }).Select(g => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}g.Key.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}, Coll = g.{{#if @last}}ToCollection<{{../Parent.ModelName}}Cdc.{{../ModelName}}CdcCollection, {{../Parent.ModelName}}Cdc.{{../ModelName}}Cdc>{{else}}ToList{{/if}}() })) // Join table: {{Name}} ({{Schema}}.{{TableName}}){{setkv4 Alias}}
+                    {{indent IndentIndex}}foreach (var {{Alias}} in {{#if @first}}r{{else}}{{HierarchyChild.Alias}}{{/if}}{{#unless @first}}.Coll{{/unless}}.GroupBy(x => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}x.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}} }).Select(g => new { {{#each OnSelectColumns}}{{#unless @last}}, {{/unless}}g.Key.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}, Coll = g.{{#if @last}}ToCollection<{{../Parent.ModelName}}Cdc.{{../ModelName}}CdcCollection, {{../Parent.ModelName}}Cdc.{{../ModelName}}Cdc>{{else}}ToList{{/if}}() })) // Join table: {{Name}} ({{Schema}}.{{TableName}})
                    {{indent IndentIndex}} {
     {{#unless @last}}
-                   {{indent IndentIndex}}     var {{Root.KV3}}Item = {{Root.KV3}}Coll.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}};{{setkv2 Alias '// Override collection'}}
+                   {{indent IndentIndex}}     var {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Item = {{#ifval HierarchyChild}}{{HierarchyChild.Alias}}{{else}}{{Parent.Alias}}{{/ifval}}Coll.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}};
     {{else}}
-                   {{indent IndentIndex}}     {{Root.KV1}}{{#if @first}}Coll{{else}}Item{{/if}}.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}} = {{Root.KV4}}.Coll;
+                   {{indent IndentIndex}}     {{#if @first}}{{Parent.Alias}}Coll{{else}}{{#ifnull HierarchyChild.HierarchyChild}}{{Parent.Alias}}{{else}}HierarchyChild.HierarchyChild.Alias{{/ifnull}}Item{{/if}}.Single(x => {{#each OnSelectColumns}}{{#unless @last}} && {{/unless}}x.{{ToColumn}} == {{Parent.Alias}}.{{#if @../last}}{{ToColumn}}{{else}}{{pascal Parent.JoinTo}}_{{Name}}{{/if}}{{/each}}).{{PropertyName}} = {{Alias}}.Coll;
     {{/unless}}
   {{/each}}
   {{#each JoinHierarchy}}
@@ -74,6 +74,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
             result.Result.AddRange({{Alias}}Coll);
             return result;
         }
+
+        /// <summary>
+        /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
+        /// </summary>
+        protected override string EventSubject => "{{#ifval Root.EventSubjectRoot}}{{Root.EventSubjectRoot}}.{{/ifval}}{{EventSubject}}";
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.

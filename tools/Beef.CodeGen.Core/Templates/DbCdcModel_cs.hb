@@ -22,8 +22,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey
+    public partial class {{ModelName}}Cdc : IUniqueKey, IETag
     {
+        private string? _etag;
+
 {{#each SelectedColumns}}
         /// <summary>
         /// Gets or sets the '{{Name}}' column value.
@@ -70,6 +72,32 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+
+        /// <summary>
+        /// Returns the hash code.
+        /// </summary>
+        /// <returns>The hash code.</returns>
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+{{#each SelectedColumns}}
+            hash.Add({{pascal NameAlias}});
+{{/each}}
+{{#each JoinChildren}}
+  {{#ifeq JoinCardinality 'OneToMany'}}
+            {{PropertyName}}?.ForEach(x => hash.Add(x));
+  {{else}}
+            hash.Add({{pascal PropertyName}});
+  {{/ifeq}}
+{{/each}}
+            return base.GetHashCode() ^ hash.ToHashCode();
+        }
+
+        /// <summary>
+        /// Gets or sets the entity tag.
+        /// </summary>
+        [MapperIgnore()]
+        public string? ETag { get => _etag ??= Convert.ToBase64String(BitConverter.GetBytes(GetHashCode())); set => _etag = value; }
 {{#each Joins}}
 
         #region {{ModelName}}Cdc
@@ -128,6 +156,26 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
+
+            /// <summary>
+            /// Returns the hash code.
+            /// </summary>
+            /// <returns>The hash code.</returns>
+            public override int GetHashCode()
+            {
+                var hash = new HashCode();
+  {{#each Columns}}
+                hash.Add({{pascal NameAlias}});
+  {{/each}}
+  {{#each JoinChildren}}
+    {{#ifeq JoinCardinality 'OneToMany'}}
+                {{PropertyName}}?.ForEach(x => hash.Add(x));
+    {{else}}
+                hash.Add({{pascal PropertyName}});
+    {{/ifeq}}
+  {{/each}}
+                return base.GetHashCode() ^ hash.ToHashCode();
+            }
   {{#each JoinHierarchyReverse}}
     {{#unless @last}}
       {{#each OnSelectColumns}}
@@ -135,7 +183,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// <summary>
             /// Gets or sets the '{{Parent.JoinTo}}_{{Name}}' additional joining column (informational); for internal join use only (not serialized).
             /// </summary>
-            [MapperIgnore()]
             public {{ToDbColumn.DotNetType}} {{Parent.JoinTo}}_{{Name}} { get; set; }
       {{/each}}
     {{/unless}}
