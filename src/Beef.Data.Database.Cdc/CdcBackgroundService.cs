@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
-using Beef.Data.Database.Cdc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Beef.Demo.Cdc.Data
+namespace Beef.Data.Database.Cdc
 {
     /// <summary>
     /// Provides the base capabilities for the Change Data Capture (CDC) background services.
@@ -67,7 +66,7 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcExecutor}"/> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing) { }
@@ -76,7 +75,7 @@ namespace Beef.Demo.Cdc.Data
     /// <summary>
     /// Represents the base class for Change Data Capture (CDC) background services.
     /// </summary>
-    public abstract class CdcBackgroundService<TCdcExecutor> : CdcBackgroundService, IHostedService where TCdcExecutor : ICdcExecutor
+    public abstract class CdcBackgroundService<TCdcDataOrchestrator> : CdcBackgroundService, IHostedService where TCdcDataOrchestrator : ICdcDataOrchestrator
     {
         private static readonly Random _random = new Random();
 
@@ -89,16 +88,16 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
         /// </summary>
-        /// <param name="cdcExecutor">The <see cref="ICdcExecutor"/>.</param>
+        /// <param name="cdcDataOrchestrator">The <see cref="ICdcDataOrchestrator"/>.</param>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcBackgroundService(TCdcExecutor cdcExecutor, IServiceProvider serviceProvider, ILogger logger) : base(serviceProvider, logger)
-            => CdcExecutor = cdcExecutor ?? throw new ArgumentNullException(nameof(cdcExecutor));
+        public CdcBackgroundService(TCdcDataOrchestrator cdcDataOrchestrator, IServiceProvider serviceProvider, ILogger logger) : base(serviceProvider, logger)
+            => CdcDataOrchestrator = cdcDataOrchestrator ?? throw new ArgumentNullException(nameof(cdcDataOrchestrator));
 
         /// <summary>
-        /// Gets the <typeparamref name="TCdcExecutor"/>.
+        /// Gets the <typeparamref name="TCdcDataOrchestrator"/>.
         /// </summary>
-        protected TCdcExecutor CdcExecutor { get; private set; }
+        protected TCdcDataOrchestrator CdcDataOrchestrator { get; private set; }
 
         /// <summary>
         /// Triggered when the application host is ready to start the service.
@@ -134,37 +133,37 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Executes <see cref="ICdcExecutor.ExecuteNextAsync(int, CancellationToken?)"/>.
+        /// Executes <see cref="ICdcDataOrchestrator.ExecuteNextAsync(int, CancellationToken?)"/>.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task"/> that represents the long running operations.</returns>
         protected virtual async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            CdcExecutorResult cer;
+            CdcDataOrchestratorResult cdor;
 
             while (true)
             {
                 if (_processIncomplete)
-                    cer = await CdcExecutor.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
+                    cdor = await CdcDataOrchestrator.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    cer = await CdcExecutor.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
+                    cdor = await CdcDataOrchestrator.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
                 // Where successful, then the next envelope should be attempted immediately.
-                if (cer.EnvelopeExecuted)
+                if (cdor.EnvelopeExecuted)
                     _processIncomplete = false;
                 else
                 {
                     // Nothing found to process so retry later.
-                    if (cer.Envelope == null)
+                    if (cdor.Envelope == null)
                         return;
 
-                    if (!cer.Envelope.IsComplete && !_processIncomplete)
+                    if (!cdor.Envelope.IsComplete && !_processIncomplete)
                     {
                         _processIncomplete = true;
-                        Logger.LogInformation($"Subsequent executions will attempt to complete envelope '{cer.Envelope.Id}' prior to executing next.");
+                        Logger.LogInformation($"Subsequent executions will attempt to complete envelope '{cdor.Envelope.Id}' prior to executing next.");
                     }
                     else
                         return; // Retry later.
@@ -195,7 +194,7 @@ namespace Beef.Demo.Cdc.Data
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcExecutor}"/> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="CdcBackgroundService{TCdcDataOrchestrator}"/> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)

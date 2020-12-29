@@ -19,9 +19,14 @@ using Beef.Demo.Cdc.Entities;
 namespace Beef.Demo.Cdc.Data
 {
     /// <summary>
+    /// Enables the CDC data access for database object 'Legacy.Posts'.
+    /// </summary>
+    public partial interface IPostsCdcData : ICdcDataOrchestrator { }
+
+    /// <summary>
     /// Provides the CDC data access for database object 'Legacy.Posts'.
     /// </summary>
-    public partial class PostsCdcData : CdcExecutor<PostsCdc, PostsCdcData.PostsCdcWrapperCollection, PostsCdcData.PostsCdcWrapper, CdcTrackingDbMapper>
+    public partial class PostsCdcData : CdcDataOrchestrator<PostsCdc, PostsCdcData.PostsCdcWrapperCollection, PostsCdcData.PostsCdcWrapper, CdcTrackingDbMapper>, IPostsCdcData
     {
         private static readonly DatabaseMapper<PostsCdcWrapper> _postsCdcWrapperMapper = DatabaseMapper.CreateAuto<PostsCdcWrapper>();
         private static readonly DatabaseMapper<PostsCdc.CommentsCdc> _commentsCdcMapper = DatabaseMapper.CreateAuto<PostsCdc.CommentsCdc>();
@@ -45,7 +50,7 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="maxBatchSize">The recommended maximum batch size.</param>
         /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcExecutorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
         {
             var pColl = new PostsCdcWrapperCollection();
 
@@ -93,9 +98,9 @@ namespace Beef.Demo.Cdc.Data
         protected override EventActionFormat EventActionFormat => EventActionFormat.PastTense;
 
         /// <summary>
-        /// Represents a <see cref="PostsCdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
+        /// Represents a <see cref="PostsCdc"/> wrapper to append the required (additional) database properties.
         /// </summary>
-        public class PostsCdcWrapper : PostsCdc, ICdcDatabase
+        public class PostsCdcWrapper : PostsCdc, ICdcWrapper
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.

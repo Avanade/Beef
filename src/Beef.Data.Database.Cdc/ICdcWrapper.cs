@@ -3,9 +3,9 @@
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Provides the required CDC database <see cref="OperationType"/>.
+    /// Provides the required CDC wrapper <see cref="DatabaseOperationType"/> and <see cref="DatabaseTrackingHash"/> properties.
     /// </summary>
-    public interface ICdcDatabase
+    public interface ICdcWrapper
     {
         /// <summary>
         /// Gets or sets the database CDC <see cref="OperationType"/>.

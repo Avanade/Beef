@@ -21,4 +21,6 @@
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{EnvelopeTableName}}.sql" OutDir="{{Root.Company}}.{{Root.AppName}}.Database/Schema/{{CdcSchema}}/Tables" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcModel_cs.hb" FileName="{{ModelName}}Cdc.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Entities" />
   <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{ModelName}}CdcData.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcBackgroundService_cs.hb" FileName="{{ModelName}}CdcBackgroundService.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Services" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcDataSce_cs.hb" FileName="ServiceCollectionsExtension.cs" OutDir="{{Root.Company}}.{{Root.AppName}}.Cdc/Data" />
 </Script>

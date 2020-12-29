@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Represents the <c>CdcExecutor</c> result.
+    /// Represents the <c>CdcDataOrchestrator</c> result.
     /// </summary>
-    public abstract class CdcExecutorResult
+    public abstract class CdcDataOrchestratorResult
     {
         /// <summary>
         /// Gets or sets the database return code.
@@ -27,12 +27,12 @@ namespace Beef.Data.Database.Cdc
     }
 
     /// <summary>
-    /// Represents the typed-<see cref="CdcExecutorResult"/> result.
+    /// Represents the typed-<see cref="CdcDataOrchestratorResult"/> result.
     /// </summary>
     /// <typeparam name="TCdcEntityWrapperColl">The <typeparamref name="TCdcEntityWrapper"/> collection <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcEntityWrapper">The entity wrapper <see cref="Type"/>.</typeparam>
-    public class CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> : CdcExecutorResult
-        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() where TCdcEntityWrapper : class, ICdcDatabase
+    public class CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper> : CdcDataOrchestratorResult
+        where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() where TCdcEntityWrapper : class, ICdcWrapper
     {
         /// <summary>
         /// Gets the resulting <typeparamref name="TCdcEntityWrapperColl"/>.

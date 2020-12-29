@@ -20,9 +20,14 @@ using {{Root.Company}}.{{Root.AppName}}.Cdc.Entities;
 namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
 {
     /// <summary>
+    /// Enables the CDC data access for database object '{{Schema}}.{{Name}}'.
+    /// </summary>
+    public partial interface I{{ModelName}}CdcData : ICdcDataOrchestrator { }
+
+    /// <summary>
     /// Provides the CDC data access for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{ModelName}}CdcData : CdcExecutor<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper, CdcTrackingDbMapper>
+    public partial class {{ModelName}}CdcData : CdcDataOrchestrator<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper, CdcTrackingDbMapper>, I{{ModelName}}CdcData
     {
         private static readonly DatabaseMapper<{{ModelName}}CdcWrapper> _{{camel ModelName}}CdcWrapperMapper = DatabaseMapper.CreateAuto<{{ModelName}}CdcWrapper>();
 {{#each Joins}}
@@ -46,7 +51,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
         /// <param name="maxBatchSize">The recommended maximum batch size.</param>
         /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcExecutorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
         {
             var {{Alias}}Coll = new {{ModelName}}CdcWrapperCollection();
 
@@ -86,9 +91,9 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
         protected override EventActionFormat EventActionFormat => EventActionFormat.{{Root.EventActionFormat}};
 
         /// <summary>
-        /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
+        /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database properties.
         /// </summary>
-        public class {{ModelName}}CdcWrapper : {{ModelName}}Cdc, ICdcDatabase
+        public class {{ModelName}}CdcWrapper : {{ModelName}}Cdc, ICdcWrapper
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.

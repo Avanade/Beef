@@ -1,5 +1,6 @@
 ﻿using Beef.Data.Database;
 using Beef.Demo.Cdc.Data;
+using Beef.Demo.Cdc.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -22,7 +23,7 @@ namespace Beef.Demo.Cdc
                     services.AddBeefExecutionContext();
                     services.AddBeefDatabaseServices(() => new Database("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True"));
                     services.AddBeefNullEventPublisher();
-                    services.AddScoped<PostsCdcData>();
+                    services.AddGeneratedCdcDataServices();
                     services.AddHostedService<PostsCdcBackgroundService>();
                 });
     }

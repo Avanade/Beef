@@ -13,16 +13,16 @@ using System.Threading.Tasks;
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Manages the Change Data Capture (CDC) execution.
+    /// Manages the Change Data Capture (CDC) data orchestration.
     /// </summary>
     /// <typeparam name="TCdcEntity">The CDC database entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcEntityWrapperColl">The <typeparamref name="TCdcEntityWrapper"/> collection <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcEntityWrapper">The <typeparamref name="TCdcEntity"/> wrapper <see cref="Type"/>.</typeparam>
     /// <typeparam name="TCdcTrackingMapper">The tracking database mapper <see cref="Type"/>.</typeparam>
-    public abstract class CdcExecutor<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper, TCdcTrackingMapper> : ICdcExecutor
+    public abstract class CdcDataOrchestrator<TCdcEntity, TCdcEntityWrapperColl, TCdcEntityWrapper, TCdcTrackingMapper> : ICdcDataOrchestrator
         where TCdcEntity : class, IUniqueKey, IETag, new() 
         where TCdcEntityWrapperColl : List<TCdcEntityWrapper>, new() 
-        where TCdcEntityWrapper : class, TCdcEntity, ICdcDatabase, new() 
+        where TCdcEntityWrapper : class, TCdcEntity, ICdcWrapper, new() 
         where TCdcTrackingMapper : ITrackingTvp, new()
     {
         private const string EnvelopeIdParamName = "EnvelopeIdToMarkComplete";
@@ -34,13 +34,13 @@ namespace Beef.Data.Database.Cdc
         private static readonly TCdcTrackingMapper _trackingMapper = new TCdcTrackingMapper();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CdcExecutor{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class.
+        /// Initializes a new instance of the <see cref="CdcDataOrchestrator{TCdcEntity, TCdcEntityWrapper, TCdcEntityWrapperColl, TCdcTrackingMapper}"/> class.
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="storedProcedureName">The name of the get outbox data stored procedure.</param>
         /// <param name="eventPublisher">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcExecutor(IDatabase db, string storedProcedureName, IEventPublisher eventPublisher, ILogger logger)
+        public CdcDataOrchestrator(IDatabase db, string storedProcedureName, IEventPublisher eventPublisher, ILogger logger)
         {
             Db = Check.NotNull(db, nameof(db));
             StoredProcedureName = Check.NotEmpty(storedProcedureName, nameof(storedProcedureName));
@@ -96,16 +96,16 @@ namespace Beef.Data.Database.Cdc
         /// Executes any previously incomplete envelope.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcExecutorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        async Task<CdcExecutorResult> ICdcExecutor.ExecuteIncompleteAsync(CancellationToken? cancellationToken)
+        /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
+        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteIncompleteAsync(CancellationToken? cancellationToken)
             => await ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes any previously incomplete envelope.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcExecutorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        public Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteIncompleteAsync(CancellationToken? cancellationToken = null)
+        /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
+        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteIncompleteAsync(CancellationToken? cancellationToken = null)
             => ExecuteSelectedInternalAsync($"Query for previously incomplete Change Data Capture envelope.", true, -1, cancellationToken ?? CancellationToken.None);
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Beef.Data.Database.Cdc
         /// </summary>
         /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcExecutorResult"/>.</returns>
-        async Task<CdcExecutorResult> ICdcExecutor.ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken)
+        /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>
+        async Task<CdcDataOrchestratorResult> ICdcDataOrchestrator.ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken)
             => await ExecuteNextAsync(maxQuerySize < 1 ? 100 : maxQuerySize, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -122,14 +122,14 @@ namespace Beef.Data.Database.Cdc
         /// </summary>
         /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="CdcExecutorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
-        public Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(int maxQuerySize = 100, CancellationToken? cancellationToken = null)
+        /// <returns>The <see cref="CdcDataOrchestratorResult{TCdcEntityWrapper, TCdcEntityWrapperColl}"/>.</returns>
+        public Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteNextAsync(int maxQuerySize = 100, CancellationToken? cancellationToken = null)
             => ExecuteSelectedInternalAsync($"Query for next (new) Change Data Capture envelope with maximum query size of {maxQuerySize}.", false, maxQuerySize, cancellationToken ?? CancellationToken.None);
 
         /// <summary>
         /// Execute selected (internal).
         /// </summary>
-        private async Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteSelectedInternalAsync(string text, bool incomplete, int maxQuerySize, CancellationToken cancellationToken)
+        private async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> ExecuteSelectedInternalAsync(string text, bool incomplete, int maxQuerySize, CancellationToken cancellationToken)
         {
             // Get the requested envelope data.
             Logger.LogInformation(text);
@@ -154,7 +154,7 @@ namespace Beef.Data.Database.Cdc
             if (cancellationToken.IsCancellationRequested)
             {
                 Logger.LogWarning($"Cancellation has resulted in incomplete envelope '{result.Envelope.Id}'.");
-                return await Task.FromCanceled<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken).ConfigureAwait(false);
+                return await Task.FromCanceled<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>>(cancellationToken).ConfigureAwait(false);
             }
 
             // Determine whether anything may have been sent before and exclude (i.e. do not send again).
@@ -193,9 +193,9 @@ namespace Beef.Data.Database.Cdc
         /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
         /// <param name="multiSetArgs">One or more <see cref="IMultiSetArgs"/>.</param>
         /// <returns>The resultant return value and <see cref="CdcEnvelope"/>.</returns>
-        protected async Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(int maxQuerySize, bool incomplete, params IMultiSetArgs[] multiSetArgs)
+        protected async Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> SelectQueryMultiSetAsync(int maxQuerySize, bool incomplete, params IMultiSetArgs[] multiSetArgs)
         {
-            var result = new CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>();
+            var result = new CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>();
             var msa = new List<IMultiSetArgs> { new MultiSetSingleArgs<CdcEnvelope>(_envelopeMapper, r => result.Envelope = r, isMandatory: false, stopOnNull: true) };
             msa.AddRange(multiSetArgs);
 
@@ -214,7 +214,7 @@ namespace Beef.Data.Database.Cdc
         /// <param name="maxQuerySize">The recommended maximum query size.</param>
         /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
         /// <returns>A <typeparamref name="TCdcEntityWrapperColl"/>.</returns>
-        protected abstract Task<CdcExecutorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetEnvelopeEntityDataAsync(int maxQuerySize, bool incomplete);
+        protected abstract Task<CdcDataOrchestratorResult<TCdcEntityWrapperColl, TCdcEntityWrapper>> GetEnvelopeEntityDataAsync(int maxQuerySize, bool incomplete);
 
         /// <summary>
         /// Creates an <see cref="EventData{T}"/> for the specified <paramref name="value"/>.

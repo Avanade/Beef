@@ -22,6 +22,12 @@
     </QueryJoin>
   </Query>-->
 
+  <Cdc Name="Contact" Schema="Legacy">
+    <CdcJoin Name="Address" JoinCardinality="OneToOne">
+      <CdcJoinOn Name="Id" ToColumn="AddressId" />
+    </CdcJoin>
+  </Cdc>
+
   <Cdc Name="Posts" Schema="Legacy">
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
       <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
