@@ -24,8 +24,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
 {{/ifeq}}
     public partial class {{ModelName}}Cdc : IUniqueKey, IETag
     {
-        private string? _etag;
-
 {{#each SelectedColumns}}
         /// <summary>
         /// Gets or sets the '{{Name}}' column value.
@@ -44,12 +42,14 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
+        [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
         public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
   {{else}}
         /// <summary>
         /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
         /// </summary>
+        [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
         public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
   {{/ifeq}}
@@ -74,30 +74,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
 
         /// <summary>
-        /// Returns the hash code.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-{{#each SelectedColumns}}
-            hash.Add({{pascal NameAlias}});
-{{/each}}
-{{#each JoinChildren}}
-  {{#ifeq JoinCardinality 'OneToMany'}}
-            {{PropertyName}}?.ForEach(x => hash.Add(x));
-  {{else}}
-            hash.Add({{pascal PropertyName}});
-  {{/ifeq}}
-{{/each}}
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-
-        /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
-        public string? ETag { get => _etag ??= Convert.ToBase64String(BitConverter.GetBytes(GetHashCode())); set => _etag = value; }
+        public string? ETag { get; set; }
 {{#each Joins}}
 
         #region {{ModelName}}Cdc
@@ -128,12 +109,14 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// <summary>
             /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
+            [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
             [MapperIgnore()]
             public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
     {{else}}
             /// <summary>
             /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
             /// </summary>
+            [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
             [MapperIgnore()]
             public {{Parent.ModelName}}Cdc.{{ModelName}}Cdc? {{PropertyName}} { get; set; }
     {{/ifeq}}
@@ -156,26 +139,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
-
-            /// <summary>
-            /// Returns the hash code.
-            /// </summary>
-            /// <returns>The hash code.</returns>
-            public override int GetHashCode()
-            {
-                var hash = new HashCode();
-  {{#each Columns}}
-                hash.Add({{pascal NameAlias}});
-  {{/each}}
-  {{#each JoinChildren}}
-    {{#ifeq JoinCardinality 'OneToMany'}}
-                {{PropertyName}}?.ForEach(x => hash.Add(x));
-    {{else}}
-                hash.Add({{pascal PropertyName}});
-    {{/ifeq}}
-  {{/each}}
-                return base.GetHashCode() ^ hash.ToHashCode();
-            }
   {{#each JoinHierarchyReverse}}
     {{#unless @last}}
       {{#each OnSelectColumns}}

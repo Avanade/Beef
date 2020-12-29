@@ -22,7 +22,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
     /// <summary>
     /// Provides the CDC data access for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public partial class {{ModelName}}CdcData : CdcExecutor<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper>
+    public partial class {{ModelName}}CdcData : CdcExecutor<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper, CdcTrackingDbMapper>
     {
         private static readonly DatabaseMapper<{{ModelName}}CdcWrapper> _{{camel ModelName}}CdcWrapperMapper = DatabaseMapper.CreateAuto<{{ModelName}}CdcWrapper>();
 {{#each Joins}}
@@ -88,13 +88,19 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
         /// <summary>
         /// Represents a <see cref="{{ModelName}}Cdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
         /// </summary>
-        public class {{ModelName}}CdcWrapper : {{ModelName}}Cdc, ICdcOperationType
+        public class {{ModelName}}CdcWrapper : {{ModelName}}Cdc, ICdcDatabase
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.
             /// </summary>
             [MapperProperty("_OperationType", ConverterType = typeof(CdcOperationTypeConverter))]
             public OperationType DatabaseOperationType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the database tracking hash code.
+            /// </summary>
+            [MapperProperty("_TrackingHash")]
+            public string? DatabaseTrackingHash { get; set; }
         }
 
         /// <summary>

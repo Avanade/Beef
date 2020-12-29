@@ -21,7 +21,7 @@ namespace Beef.Demo.Cdc.Data
     /// <summary>
     /// Provides the CDC data access for database object 'Legacy.Posts'.
     /// </summary>
-    public partial class PostsCdcData : CdcExecutor<PostsCdc, PostsCdcData.PostsCdcWrapperCollection, PostsCdcData.PostsCdcWrapper>
+    public partial class PostsCdcData : CdcExecutor<PostsCdc, PostsCdcData.PostsCdcWrapperCollection, PostsCdcData.PostsCdcWrapper, CdcTrackingDbMapper>
     {
         private static readonly DatabaseMapper<PostsCdcWrapper> _postsCdcWrapperMapper = DatabaseMapper.CreateAuto<PostsCdcWrapper>();
         private static readonly DatabaseMapper<PostsCdc.CommentsCdc> _commentsCdcMapper = DatabaseMapper.CreateAuto<PostsCdc.CommentsCdc>();
@@ -65,7 +65,7 @@ namespace Beef.Demo.Cdc.Data
                         var pItem = pColl.Single(x => x.PostsId == c.Posts_PostsId).Comments;
                         foreach (var ct in c.Coll.GroupBy(x => new { x.CommentsId }).Select(g => new { g.Key.CommentsId, Coll = g.ToCollection<PostsCdc.CommentsTagsCdcCollection, PostsCdc.CommentsTagsCdc>() })) // Join table: CommentsTags (Legacy.Tags)
                         {
-                            pItem.Single(x => x.CommentsId == ct.CommentsId).CommentsTags = ct.Coll;
+                            pItem.Single(x => x.CommentsId == ct.CommentsId).Tags = ct.Coll;
                         }
                     }
                 }), // Related table: CommentsTags (Legacy.Tags)
@@ -73,7 +73,7 @@ namespace Beef.Demo.Cdc.Data
                 {
                     foreach (var pt in r.GroupBy(x => new { x.PostsId }).Select(g => new { g.Key.PostsId, Coll = g.ToCollection<PostsCdc.PostsTagsCdcCollection, PostsCdc.PostsTagsCdc>() })) // Join table: PostsTags (Legacy.Tags)
                     {
-                        pColl.Single(x => x.PostsId == pt.PostsId).PostsTags = pt.Coll;
+                        pColl.Single(x => x.PostsId == pt.PostsId).Tags = pt.Coll;
                     }
                 }) // Related table: PostsTags (Legacy.Tags)
                 ).ConfigureAwait(false);
@@ -95,13 +95,19 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Represents a <see cref="PostsCdc"/> wrapper to append the required (additional) database <see cref="OperationType"/>.
         /// </summary>
-        public class PostsCdcWrapper : PostsCdc, ICdcOperationType
+        public class PostsCdcWrapper : PostsCdc, ICdcDatabase
         {
             /// <summary>
             /// Gets or sets the database CDC <see cref="OperationType"/>.
             /// </summary>
             [MapperProperty("_OperationType", ConverterType = typeof(CdcOperationTypeConverter))]
             public OperationType DatabaseOperationType { get; set; }
+
+            /// <summary>
+            /// Gets or sets the database tracking hash code.
+            /// </summary>
+            [MapperProperty("_TrackingHash")]
+            public string? DatabaseTrackingHash { get; set; }
         }
 
         /// <summary>

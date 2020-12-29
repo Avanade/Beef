@@ -103,7 +103,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
-            Description = "Defaults to `Schema` + `Cdc` (literal).")]
+            Description = "Defaults to `CodeGenConfig.CdcSchema`.")]
         public string? CdcSchema { get; set; }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace Beef.CodeGen.Config.Database
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 
             StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcEnvelope");
-            CdcSchema = DefaultWhereNull(CdcSchema, () => Schema + "Cdc");
+            CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
             EnvelopeTableName = DefaultWhereNull(EnvelopeTableName, () => Name + "Envelope");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);

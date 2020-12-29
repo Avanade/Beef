@@ -158,7 +158,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("propertyName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The .NET property name.",
-            Description = "Defaults to `ModelName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `ModelName` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.")]
+            Description = "Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.")]
         public string? PropertyName { get; set; }
 
         #endregion
@@ -314,7 +314,7 @@ namespace Beef.CodeGen.Config.Database
             JoinTo = DefaultWhereNull(JoinTo, () => Parent!.Name);
             JoinToSchema = DefaultWhereNull(JoinToSchema, () => Parent!.Schema);
             JoinCardinality = DefaultWhereNull(JoinCardinality, () => "OneToMany");
-            PropertyName = DefaultWhereNull(PropertyName, () => CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{ModelName}{(Name!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : ModelName);
+            PropertyName = DefaultWhereNull(PropertyName, () => StringConversion.ToPascalCase(CompareValue(Root.PluralizeCollectionProperties, true) && JoinCardinality == "OneToMany" ? $"{TableName!}{(TableName!.EndsWith("s", StringComparison.InvariantCulture) ? "es" : "s")}" : TableName));
 
             // Get the JoinTo CdcJoinConfig.
             CdcJoinConfig? jtc = null;

@@ -19,8 +19,6 @@ namespace Beef.Demo.Cdc.Entities
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public partial class PostsCdc : IUniqueKey, IETag
     {
-        private string? _etag;
-
         /// <summary>
         /// Gets or sets the 'PostsId' column value.
         /// </summary>
@@ -42,14 +40,16 @@ namespace Beef.Demo.Cdc.Entities
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsCollection"/> (database object 'Legacy.Comments').
         /// </summary>
+        [JsonProperty("comments", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
         public PostsCdc.CommentsCdcCollection? Comments { get; set; }
 
         /// <summary>
         /// Gets or sets the related (one-to-many) <see cref="PostsCdc.PostsTagsCollection"/> (database object 'Legacy.PostsTags').
         /// </summary>
+        [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
-        public PostsCdc.PostsTagsCdcCollection? PostsTags { get; set; }
+        public PostsCdc.PostsTagsCdcCollection? Tags { get; set; }
 
         /// <summary>
         /// <inheritdoc/>
@@ -70,25 +70,11 @@ namespace Beef.Demo.Cdc.Entities
         public string[] UniqueKeyProperties => new string[] { nameof(PostsId) };
 
         /// <summary>
-        /// Returns the hash code.
-        /// </summary>
-        /// <returns>The hash code.</returns>
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(PostsId);
-            hash.Add(Text);
-            hash.Add(Date);
-            Comments?.ForEach(x => hash.Add(x));
-            PostsTags?.ForEach(x => hash.Add(x));
-            return base.GetHashCode() ^ hash.ToHashCode();
-        }
-
-        /// <summary>
         /// Gets or sets the entity tag.
         /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
-        public string? ETag { get => _etag ??= Convert.ToBase64String(BitConverter.GetBytes(GetHashCode())); set => _etag = value; }
+        public string? ETag { get; set; }
 
         #region CommentsCdc
 
@@ -125,8 +111,9 @@ namespace Beef.Demo.Cdc.Entities
             /// <summary>
             /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsTagsCollection"/> (database object 'Legacy.CommentsTags').
             /// </summary>
+            [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
             [MapperIgnore()]
-            public PostsCdc.CommentsTagsCdcCollection? CommentsTags { get; set; }
+            public PostsCdc.CommentsTagsCdcCollection? Tags { get; set; }
 
             /// <summary>
             /// <inheritdoc/>
@@ -145,21 +132,6 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(CommentsId) };
-
-            /// <summary>
-            /// Returns the hash code.
-            /// </summary>
-            /// <returns>The hash code.</returns>
-            public override int GetHashCode()
-            {
-                var hash = new HashCode();
-                hash.Add(CommentsId);
-                hash.Add(PostsId);
-                hash.Add(Text);
-                hash.Add(Date);
-                CommentsTags?.ForEach(x => hash.Add(x));
-                return base.GetHashCode() ^ hash.ToHashCode();
-            }
         }
 
         /// <summary>
@@ -212,19 +184,6 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
-
-            /// <summary>
-            /// Returns the hash code.
-            /// </summary>
-            /// <returns>The hash code.</returns>
-            public override int GetHashCode()
-            {
-                var hash = new HashCode();
-                hash.Add(TagsId);
-                hash.Add(CommentsId);
-                hash.Add(Text);
-                return base.GetHashCode() ^ hash.ToHashCode();
-            }
 
             /// <summary>
             /// Gets or sets the 'Posts_PostsId' additional joining column (informational); for internal join use only (not serialized).
@@ -282,19 +241,6 @@ namespace Beef.Demo.Cdc.Entities
             /// </summary>
             [MapperIgnore()]
             public string[] UniqueKeyProperties => new string[] { nameof(TagsId) };
-
-            /// <summary>
-            /// Returns the hash code.
-            /// </summary>
-            /// <returns>The hash code.</returns>
-            public override int GetHashCode()
-            {
-                var hash = new HashCode();
-                hash.Add(TagsId);
-                hash.Add(PostsId);
-                hash.Add(Text);
-                return base.GetHashCode() ^ hash.ToHashCode();
-            }
         }
 
         /// <summary>

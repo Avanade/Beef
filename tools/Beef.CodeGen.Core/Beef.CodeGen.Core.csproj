@@ -39,6 +39,9 @@
     <None Remove="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcModel_cs.hb" />
     <None Remove="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
+    <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
+    <None Remove="Templates\DbCdcTrackingUdt_sql.hb" />
     <None Remove="Templates\DbEfModelBuilder_cs.hbs" />
     <None Remove="Templates\DbEfModel_cs.hbs" />
     <None Remove="Templates\DbSpTableCreate_sql.hbs" />
@@ -97,6 +100,9 @@
     <EmbeddedResource Include="Scripts\RefDataCore.xml" />
     <EmbeddedResource Include="Scripts\RefDataCoreCrud.xml" />
     <EmbeddedResource Include="Templates\DbCdcData_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingTvp_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
     <EmbeddedResource Include="Templates\DbCdcModel_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcEnvelopeTableCreate_sql.hb" />

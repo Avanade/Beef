@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace Beef.CodeGen.Generators
 {
     /// <summary>
-    /// Represents the Database View code generator.
+    /// Represents the Database Change Data Capture (CDC) generator.
     /// </summary>
-    public class DatabaseChangeDataCaptureCodeGenerator : CodeGeneratorBase<CodeGenConfig, CdcConfig>
+    public class DatabaseCdcCodeGenerator : CodeGeneratorBase<CodeGenConfig, CdcConfig>
     {
         /// <summary>
         /// <inheritdoc/>

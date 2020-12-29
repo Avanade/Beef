@@ -1,8 +1,9 @@
 ﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
 CREATE PROCEDURE [{{CdcSchema}}].[{{StoredProcedureName}}]
+  @MaxQuerySize INT NULL = 100,
+  @GetIncompleteEnvelope BIT NULL = 0,
   @EnvelopeIdToMarkComplete INT NULL = NULL,
-  @ReturnIncompleteBatches BIT NULL = 0,
-  @MaxBatchSize INT NULL = 100
+  @CompleteTrackingList AS [{{Root.CdcSchema}}].[udt{{Root.CdcTrackingTableName}}List] READONLY
 AS
 BEGIN
   /*
@@ -15,18 +16,29 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
-    -- Mark the batch as complete; then return the updated envelope data and stop!
+    -- Mark the envelope as complete and merge the tracking info; then return the updated envelope data and stop!
     IF (@EnvelopeIdToMarkComplete IS NOT NULL)
     BEGIN
-      UPDATE [_outbox] SET
-          [_outbox].[IsComplete] = 1,
-          [_outbox].[CompletedDate] = GETUTCDATE()
-        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
+      UPDATE [_env] SET
+          [_env].[IsComplete] = 1,
+          [_env].[CompletedDate] = GETUTCDATE()
+        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
         WHERE EnvelopeId = @EnvelopeIdToMarkComplete 
 
-      SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
-        WHERE [_outbox].EnvelopeId = @EnvelopeIdToMarkComplete 
+      MERGE INTO [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] WITH (HOLDLOCK) AS [_ct]
+        USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Table}}' AND [_ct].[Key] = [_list].[Key])
+        WHEN MATCHED AND EXISTS (
+            SELECT [_list].[Key], [_list].[Hash]
+            EXCEPT
+            SELECT [_ct].[Key], [_ct].[Hash])
+          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[EnvelopeId] = @EnvelopeIdToMarkComplete
+        WHEN NOT MATCHED BY TARGET
+          THEN INSERT ([Schema], [Table], [Key], [Hash], [EnvelopeId])
+            VALUES ('{{Schema}}', '{{Table}}', [_list].[Key], [_list].[Hash], @EnvelopeIdToMarkComplete);
+
+      SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
+        WHERE [_env].EnvelopeId = @EnvelopeIdToMarkComplete
 
       COMMIT TRANSACTION
       RETURN 0;
@@ -41,19 +53,19 @@ BEGIN
     DECLARE @IncludeMin BIT
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
-    IF (@ReturnIncompleteBatches = 1)
+    IF (@GetIncompleteEnvelope = 1)
     BEGIN
       SELECT TOP 1
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
-          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MinLsn],
+          @{{pascal Name}}MaxLsn = [_env].[{{pascal Name}}MaxLsn],
 {{#each Joins}}
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MinLsn],
-          @{{pascal Name}}MaxLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MinLsn],
+          @{{pascal Name}}MaxLsn = [_env].[{{pascal Name}}MaxLsn],
 {{/each}}
           @EnvelopeId = [EnvelopeId]
-        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
-        WHERE [_outbox].[EnvelopeId] = @EnvelopeIdToMarkComplete 
-        ORDER BY [_outbox].[EnvelopeId]
+        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
+        WHERE [_env].[IsComplete] = 0 
+        ORDER BY [_env].[EnvelopeId]
 
       -- Where no incomplete envelope is found then stop!
       IF (@EnvelopeId IS NULL)
@@ -62,7 +74,7 @@ BEGIN
         RETURN 0;
       END
 
-      SET @MaxBatchSize = 1000000  -- Override to a very large number.
+      SET @MaxQuerySize = 1000000  -- Override to a very large number.
       SET @IncludeMin = 1
     END
     ELSE
@@ -71,20 +83,20 @@ BEGIN
       DECLARE @IsComplete BIT
 
       SELECT TOP 1
-          @EnvelopeId = [_outbox].[EnvelopeId],
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @EnvelopeId = [_env].[EnvelopeId],
+          @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MaxLsn],
 {{#each Joins}}
-          @{{pascal Name}}MinLsn = [_outbox].[{{pascal Name}}MaxLsn],
+          @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MaxLsn],
 {{/each}}
-          @IsComplete = [_outbox].IsComplete
-        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
-        ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[EnvelopeId] DESC
+          @IsComplete = [_env].IsComplete
+        FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
+        ORDER BY [_env].[IsComplete] ASC, [_env].[EnvelopeId] DESC
 
       IF (@IsComplete = 0) -- Cannot continue where there is an incomplete envelope; must be completed.
       BEGIN
-        SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-          FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
-          WHERE [_outbox].EnvelopeId = @EnvelopeId 
+        SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+          FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
+          WHERE [_env].EnvelopeId = @EnvelopeId 
 
         COMMIT TRANSACTION
         RETURN -1;
@@ -108,14 +120,14 @@ BEGIN
       SET @{{pascal Name}}MaxLsn = @{{pascal Parent.Name}}MaxLsn
 {{/each}}
 
-      IF (@MaxBatchSize IS NULL OR @MaxBatchSize < 1 OR @MaxBatchSize > 10000)
+      IF (@MaxQuerySize IS NULL OR @MaxQuerySize < 1 OR @MaxQuerySize > 10000)
       BEGIN
-        SET @MaxBatchSize = 100  -- Reset where the value appears invalid. 
+        SET @MaxQuerySize = 100  -- Reset where the value appears invalid. 
       END
     END
 
     -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         [_cdc].[__$operation] AS [_Op],
 {{#each PrimaryKeyColumns}}
@@ -133,7 +145,7 @@ BEGIN
 
 {{#each Joins}}
     -- Find changes on related table: {{Name}} ({{Schema}}.{{TableName}}) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         4 AS [_Op],
   {{#each Parent.PrimaryKeyColumns}}
@@ -197,12 +209,13 @@ BEGIN
     END
 
     -- Return the *latest* envelope data.
-    SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-      FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_outbox]
-      WHERE [_outbox].EnvelopeId = @EnvelopeId 
+    SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+      FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
+      WHERE [_env].EnvelopeId = @EnvelopeId 
 
     -- Root table: {{Schema}}.{{Name}} - uses LEFT OUTER JOIN so we get the deleted records too.
     SELECT
+        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
 {{#each PrimaryKeyColumns}}
         [_chg].[{{Name}}] AS [{{NameAlias}}]{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}
@@ -211,6 +224,7 @@ BEGIN
         [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
 {{/each}}
       FROM #_changes AS [_chg]
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] WITH (NOLOCK) ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
       LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
 
 {{#each Joins}}

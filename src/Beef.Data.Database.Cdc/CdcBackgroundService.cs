@@ -84,6 +84,7 @@ namespace Beef.Demo.Cdc.Data
         private Timer? _timer;
         private Task? _executeTask;
         private bool _disposed;
+        private bool _processIncomplete;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
@@ -141,10 +142,34 @@ namespace Beef.Demo.Cdc.Data
         {
             CdcExecutorResult cer;
 
-            do
+            while (true)
             {
-                cer = await CdcExecutor.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
-            } while (cer.EnvelopeExecuted && !cancellationToken.IsCancellationRequested);
+                if (_processIncomplete)
+                    cer = await CdcExecutor.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
+                else
+                    cer = await CdcExecutor.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                // Where successful, then the next envelope should be attempted immediately.
+                if (cer.EnvelopeExecuted)
+                    _processIncomplete = false;
+                else
+                {
+                    // Nothing found to process so retry later.
+                    if (cer.Envelope == null)
+                        return;
+
+                    if (!cer.Envelope.IsComplete && !_processIncomplete)
+                    {
+                        _processIncomplete = true;
+                        Logger.LogInformation($"Subsequent executions will attempt to complete envelope '{cer.Envelope.Id}' prior to executing next.");
+                    }
+                    else
+                        return; // Retry later.
+                }
+            } 
         }
 
         /// <summary>
@@ -178,11 +203,11 @@ namespace Beef.Demo.Cdc.Data
             if (!_disposed)
                 return;
 
+            _disposed = true;
             _timer?.Dispose();
             _cts?.Cancel();
             _cts?.Dispose();
             base.Dispose(disposing);
-            _disposed = true;
         }
     }
 }

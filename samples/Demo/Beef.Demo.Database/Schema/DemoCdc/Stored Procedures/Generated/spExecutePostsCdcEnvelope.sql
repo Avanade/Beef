@@ -1,7 +1,8 @@
 CREATE PROCEDURE [DemoCdc].[spExecutePostsCdcEnvelope]
+  @MaxQuerySize INT NULL = 100,
+  @GetIncompleteEnvelope BIT NULL = 0,
   @EnvelopeIdToMarkComplete INT NULL = NULL,
-  @ReturnIncompleteBatches BIT NULL = 0,
-  @MaxBatchSize INT NULL = 100
+  @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
 AS
 BEGIN
   /*
@@ -14,18 +15,29 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
-    -- Mark the batch as complete; then return the updated envelope data and stop!
+    -- Mark the envelope as complete and merge the tracking info; then return the updated envelope data and stop!
     IF (@EnvelopeIdToMarkComplete IS NOT NULL)
     BEGIN
-      UPDATE [_outbox] SET
-          [_outbox].[IsComplete] = 1,
-          [_outbox].[CompletedDate] = GETUTCDATE()
-        FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
+      UPDATE [_env] SET
+          [_env].[IsComplete] = 1,
+          [_env].[CompletedDate] = GETUTCDATE()
+        FROM [DemoCdc].[PostsEnvelope] AS [_env]
         WHERE EnvelopeId = @EnvelopeIdToMarkComplete 
 
-      SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-        FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
-        WHERE [_outbox].EnvelopeId = @EnvelopeIdToMarkComplete 
+      MERGE INTO [DemoCdc].[CdcTracking] WITH (HOLDLOCK) AS [_ct]
+        USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = [_list].[Key])
+        WHEN MATCHED AND EXISTS (
+            SELECT [_list].[Key], [_list].[Hash]
+            EXCEPT
+            SELECT [_ct].[Key], [_ct].[Hash])
+          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[EnvelopeId] = @EnvelopeIdToMarkComplete
+        WHEN NOT MATCHED BY TARGET
+          THEN INSERT ([Schema], [Table], [Key], [Hash], [EnvelopeId])
+            VALUES ('Legacy', 'Posts', [_list].[Key], [_list].[Hash], @EnvelopeIdToMarkComplete);
+
+      SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+        FROM [DemoCdc].[PostsEnvelope] AS [_env]
+        WHERE [_env].EnvelopeId = @EnvelopeIdToMarkComplete
 
       COMMIT TRANSACTION
       RETURN 0;
@@ -40,21 +52,21 @@ BEGIN
     DECLARE @IncludeMin BIT
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
-    IF (@ReturnIncompleteBatches = 1)
+    IF (@GetIncompleteEnvelope = 1)
     BEGIN
       SELECT TOP 1
-          @PostsMinLsn = [_outbox].[PostsMinLsn],
-          @PostsMaxLsn = [_outbox].[PostsMaxLsn],
-          @CommentsMinLsn = [_outbox].[CommentsMinLsn],
-          @CommentsMaxLsn = [_outbox].[CommentsMaxLsn],
-          @CommentsTagsMinLsn = [_outbox].[CommentsTagsMinLsn],
-          @CommentsTagsMaxLsn = [_outbox].[CommentsTagsMaxLsn],
-          @PostsTagsMinLsn = [_outbox].[PostsTagsMinLsn],
-          @PostsTagsMaxLsn = [_outbox].[PostsTagsMaxLsn],
+          @PostsMinLsn = [_env].[PostsMinLsn],
+          @PostsMaxLsn = [_env].[PostsMaxLsn],
+          @CommentsMinLsn = [_env].[CommentsMinLsn],
+          @CommentsMaxLsn = [_env].[CommentsMaxLsn],
+          @CommentsTagsMinLsn = [_env].[CommentsTagsMinLsn],
+          @CommentsTagsMaxLsn = [_env].[CommentsTagsMaxLsn],
+          @PostsTagsMinLsn = [_env].[PostsTagsMinLsn],
+          @PostsTagsMaxLsn = [_env].[PostsTagsMaxLsn],
           @EnvelopeId = [EnvelopeId]
-        FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
-        WHERE [_outbox].[EnvelopeId] = @EnvelopeIdToMarkComplete 
-        ORDER BY [_outbox].[EnvelopeId]
+        FROM [DemoCdc].[PostsEnvelope] AS [_env]
+        WHERE [_env].[IsComplete] = 0 
+        ORDER BY [_env].[EnvelopeId]
 
       -- Where no incomplete envelope is found then stop!
       IF (@EnvelopeId IS NULL)
@@ -63,7 +75,7 @@ BEGIN
         RETURN 0;
       END
 
-      SET @MaxBatchSize = 1000000  -- Override to a very large number.
+      SET @MaxQuerySize = 1000000  -- Override to a very large number.
       SET @IncludeMin = 1
     END
     ELSE
@@ -72,20 +84,20 @@ BEGIN
       DECLARE @IsComplete BIT
 
       SELECT TOP 1
-          @EnvelopeId = [_outbox].[EnvelopeId],
-          @PostsMinLsn = [_outbox].[PostsMaxLsn],
-          @CommentsMinLsn = [_outbox].[CommentsMaxLsn],
-          @CommentsTagsMinLsn = [_outbox].[CommentsTagsMaxLsn],
-          @PostsTagsMinLsn = [_outbox].[PostsTagsMaxLsn],
-          @IsComplete = [_outbox].IsComplete
-        FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
-        ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[EnvelopeId] DESC
+          @EnvelopeId = [_env].[EnvelopeId],
+          @PostsMinLsn = [_env].[PostsMaxLsn],
+          @CommentsMinLsn = [_env].[CommentsMaxLsn],
+          @CommentsTagsMinLsn = [_env].[CommentsTagsMaxLsn],
+          @PostsTagsMinLsn = [_env].[PostsTagsMaxLsn],
+          @IsComplete = [_env].IsComplete
+        FROM [DemoCdc].[PostsEnvelope] AS [_env]
+        ORDER BY [_env].[IsComplete] ASC, [_env].[EnvelopeId] DESC
 
       IF (@IsComplete = 0) -- Cannot continue where there is an incomplete envelope; must be completed.
       BEGIN
-        SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-          FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
-          WHERE [_outbox].EnvelopeId = @EnvelopeId 
+        SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+          FROM [DemoCdc].[PostsEnvelope] AS [_env]
+          WHERE [_env].EnvelopeId = @EnvelopeId 
 
         COMMIT TRANSACTION
         RETURN -1;
@@ -109,14 +121,14 @@ BEGIN
       SET @CommentsTagsMaxLsn = @PostsMaxLsn
       SET @PostsTagsMaxLsn = @PostsMaxLsn
 
-      IF (@MaxBatchSize IS NULL OR @MaxBatchSize < 1 OR @MaxBatchSize > 10000)
+      IF (@MaxQuerySize IS NULL OR @MaxQuerySize < 1 OR @MaxQuerySize > 10000)
       BEGIN
-        SET @MaxBatchSize = 100  -- Reset where the value appears invalid. 
+        SET @MaxQuerySize = 100  -- Reset where the value appears invalid. 
       END
     END
 
     -- Find changes on the root table: Legacy.Posts - this determines overall operation type: 'create', 'update' or 'delete'.
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         [_cdc].[__$operation] AS [_Op],
         [_cdc].[PostsId] AS [PostsId]
@@ -131,7 +143,7 @@ BEGIN
     END
 
     -- Find changes on related table: Comments (Legacy.Comments) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         4 AS [_Op],
         [p].[PostsId] AS [PostsId]
@@ -152,7 +164,7 @@ BEGIN
         WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_c].[PostsId])
 
     -- Find changes on related table: CommentsTags (Legacy.Tags) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         4 AS [_Op],
         [p].[PostsId] AS [PostsId]
@@ -174,7 +186,7 @@ BEGIN
         WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_ct].[PostsId])
 
     -- Find changes on related table: PostsTags (Legacy.Tags) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxBatchSize)
+    SELECT TOP (@MaxQuerySize)
         [_cdc].[__$start_lsn] AS [_Lsn],
         4 AS [_Op],
         [p].[PostsId] AS [PostsId]
@@ -237,17 +249,19 @@ BEGIN
     END
 
     -- Return the *latest* envelope data.
-    SELECT [_outbox].[EnvelopeId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
-      FROM [DemoCdc].[PostsEnvelope] AS [_outbox]
-      WHERE [_outbox].EnvelopeId = @EnvelopeId 
+    SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
+      FROM [DemoCdc].[PostsEnvelope] AS [_env]
+      WHERE [_env].EnvelopeId = @EnvelopeId 
 
     -- Root table: Legacy.Posts - uses LEFT OUTER JOIN so we get the deleted records too.
     SELECT
+        [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
         [_chg].[PostsId] AS [PostsId],
         [p].[Text] AS [Text],
         [p].[Date] AS [Date]
       FROM #_changes AS [_chg]
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] WITH (NOLOCK) ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR))
       LEFT OUTER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
 
     -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now.

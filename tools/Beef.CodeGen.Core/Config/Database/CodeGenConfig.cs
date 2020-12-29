@@ -134,6 +134,22 @@ namespace Beef.CodeGen.Config.Database
         #region CDC
 
         /// <summary>
+        /// Gets or sets the schema name for the `Cdc`-related database artefacts.
+        /// </summary>
+        [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
+            Description = "Defaults to `Cdc` (literal).")]
+        public string? CdcSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name for the `Cdc`-Tracking.
+        /// </summary>
+        [JsonProperty("cdcAuditTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("CDC", Title = "The table name for the `Cdc`-Tracking.",
+            Description = "Defaults to `CdcTracking` (literal).")]
+        public string? CdcTrackingTableName { get; set; }
+
+        /// <summary>
         /// Gets or sets the root for the event name by prepending to all event subject names.
         /// </summary>
         [JsonProperty("eventSubjectRoot", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -326,6 +342,8 @@ namespace Beef.CodeGen.Config.Database
             OrgUnitJoinSql = DefaultWhereNull(OrgUnitJoinSql, () => "[Sec].[fnGetUserOrgUnits]()");
             CheckUserPermissionSql = DefaultWhereNull(CheckUserPermissionSql, () => "[Sec].[spCheckUserHasPermission]");
             GetUserPermissionSql = DefaultWhereNull(GetUserPermissionSql, () => "[Sec].[fnGetUserHasPermission]");
+            CdcSchema = DefaultWhereNull(CdcSchema, () => "Cdc");
+            CdcTrackingTableName = DefaultWhereNull(CdcTrackingTableName, () => "CdcTracking");
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
 
