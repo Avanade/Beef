@@ -29,7 +29,6 @@ Category | Description
 -|-
 [`Key`](#Key) | Provides the _key_ configuration.
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
-[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 
 <br/>
@@ -54,15 +53,6 @@ Property | Description
 **`includeColumns`** | The list of `Column` names to be included in the underlying generated output. Where not specified this indicates that all `Columns` are to be included.
 **`excludeColumns`** | The list of `Column` names to be excluded from the underlying generated output. Where not specified this indicates no `Columns` are to be excluded.
 **`aliasColumns`** | The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column renaming. Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`
-
-<br/>
-
-## CDC
-Provides the _Change Data Capture (CDC)_ configuration.
-
-Property | Description
--|-
-`cdc` | Indicates whether the joined table is also being monitored for Change Data Capture (CDC) and should be included accordingly. Otherwise, the `Join` is purely for filtering and/or column addition.
 
 <br/>
 

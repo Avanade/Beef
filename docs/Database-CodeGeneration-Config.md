@@ -10,6 +10,7 @@ The `CodeGeneration` object supports a number of properties that control the gen
 Category | Description
 -|-
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
+[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -35,6 +36,20 @@ Property | Description
 
 <br/>
 
+## CDC
+Provides the _Change Data Capture (CDC)_ configuration.
+
+Property | Description
+-|-
+`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `Cdc` (literal).
+`cdcAuditTableName` | The table name for the `Cdc`-Tracking. Defaults to `CdcTracking` (literal).
+**`eventSubjectRoot`** | The root for the event name by prepending to all event subject names. Used to enable the sending of messages to the likes of EventHub, Service Broker, SignalR, etc. This can be overidden within the `Entity`(s).
+**`eventActionFormat`** | The formatting for the Action when an Event is published. Valid options are: `None`, `UpperCase`, `PastTense`, `PastTenseUpperCase`. Defaults to `None` (no formatting required)`.
+`jsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`. Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
+`pluralizeCollectionProperties` | Indicates whether the .NET collection properties should be pluralized.
+
+<br/>
+
 ## Collections
 Provides related child (hierarchical) configuration.
 
@@ -42,6 +57,7 @@ Property | Description
 -|-
 **`tables`** | The corresponding [`Table`](Database-Table-Config.md) collection. A `Table` object provides the relationship to an existing table within the database.
 **`queries`** | The corresponding [`Query`](Database-Query-Config.md) collection. A `Query` object provides the primary configuration for a query, including multiple table joins.
+**`cdc`** | The corresponding [`Cdc`](Database-Cdc-Config.md) collection. A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.
 
 <br/>
 

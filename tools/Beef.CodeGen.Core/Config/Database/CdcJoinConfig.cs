@@ -149,7 +149,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the .NET model name.
         /// </summary>
         [JsonProperty("modelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The .NET model name.",
+        [PropertySchema("DotNet", Title = "The .NET model name.",
             Description = "Defaults to `Name`.")]
         public string? ModelName { get; set; }
 
@@ -157,7 +157,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the .NET property name.
         /// </summary>
         [JsonProperty("propertyName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The .NET property name.",
+        [PropertySchema("DotNet", Title = "The .NET property name.",
             Description = "Defaults to `TableName` where `JoinCardinality` is `OneToOne`; otherwise, it will be `Name` suffixed by an `s` except when already ending in `s` where it will be suffixed by an `es`.")]
         public string? PropertyName { get; set; }
 

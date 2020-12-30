@@ -12,7 +12,6 @@ Category | Description
 [`Key`](#Key) | Provides the _key_ configuration.
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
 [`View`](#View) | Provides the _View_ configuration.
-[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
@@ -49,18 +48,6 @@ Property | Description
 `View` | Indicates whether a `View` is to be generated.
 `ViewName` | The `View` name. Defaults to `vw` + `Name`; e.g. `vwTableName`.
 `ViewSchema` | The schema name for the `View`. Defaults to `Schema`.
-
-<br/>
-
-## CDC
-Provides the _Change Data Capture (CDC)_ configuration.
-
-Property | Description
--|-
-`Cdc` | Indicates whether the Change Data Capture (CDC) related artefacts are to be generated.
-`CdcName` | The `View` name. Defaults to `CodeGeneration.sp` (literal) + `Name` + `Outbox` (literal); e.g. `spTableNameOutbox`.
-`CdcSchema` | The schema name for the `Cdc`-related database artefacts. Defaults to `CodeGeneration.Schema` + `Cdc` (literal).
-`CdcEnvelope` | The corresponding `Cdc` Outbox Envelope table name. Defaults to `CodeGeneration.Name` + `OutboxEnvelope` (literal).
 
 <br/>
 

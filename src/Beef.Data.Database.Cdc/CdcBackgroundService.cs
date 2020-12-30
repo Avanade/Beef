@@ -132,11 +132,14 @@ namespace Beef.Data.Database.Cdc
         {
             // Create a scope in which to perform the execution.
             using var scope = ServiceProvider.CreateScope();
+
+            // Set up the execution context.
             ExecutionContext.Reset();
             var ec = scope.ServiceProvider.GetService<ExecutionContext>();
             ec.ServiceProvider = scope.ServiceProvider;
             ExecutionContext.SetCurrent(ec);
 
+            // Instantiate data orchestrator and execute.
             var cdo = scope.ServiceProvider.GetService<TCdcDataOrchestrator>() ?? throw new InvalidOperationException($"An instance of {typeof(TCdcDataOrchestrator).Name} could not be instantiated.");
             await ExecuteAsync(cdo, cancellationToken).ConfigureAwait(false);
         }
