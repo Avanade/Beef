@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -32,7 +33,7 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Gets the <see cref="IServiceProvider"/>.
         /// </summary>
-        protected IServiceProvider ServiceProvider { get; private set; }
+        internal IServiceProvider ServiceProvider { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ILogger"/>.
@@ -88,16 +89,9 @@ namespace Beef.Data.Database.Cdc
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
         /// </summary>
-        /// <param name="cdcDataOrchestrator">The <see cref="ICdcDataOrchestrator"/>.</param>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public CdcBackgroundService(TCdcDataOrchestrator cdcDataOrchestrator, IServiceProvider serviceProvider, ILogger logger) : base(serviceProvider, logger)
-            => CdcDataOrchestrator = cdcDataOrchestrator ?? throw new ArgumentNullException(nameof(cdcDataOrchestrator));
-
-        /// <summary>
-        /// Gets the <typeparamref name="TCdcDataOrchestrator"/>.
-        /// </summary>
-        protected TCdcDataOrchestrator CdcDataOrchestrator { get; private set; }
+        public CdcBackgroundService(IServiceProvider serviceProvider, ILogger logger) : base(serviceProvider, logger) { }
 
         /// <summary>
         /// Triggered when the application host is ready to start the service.
@@ -122,10 +116,7 @@ namespace Beef.Data.Database.Cdc
             _timer!.Change(Timeout.Infinite, Timeout.Infinite);
             Logger.LogInformation($"{ServiceName} execution triggered by timer.");
 
-            ExecutionContext.Reset();
-            ExecutionContext.SetCurrent(new ExecutionContext { ServiceProvider = ServiceProvider });
-
-            _executeTask = Task.Run(async () => await ExecuteAsync(_cts!.Token).ConfigureAwait(false));
+            _executeTask = Task.Run(async () => await ScopedExecuteAsync(_cts!.Token).ConfigureAwait(false));
             _executeTask.Wait();
 
             Logger.LogInformation($"{ServiceName} execution completed.");
@@ -133,20 +124,39 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Executes <see cref="ICdcDataOrchestrator.ExecuteNextAsync(int, CancellationToken?)"/>.
+        /// Executes the data orchestration for the next envelope and/or incomplete envelope.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task"/> that represents the long running operations.</returns>
-        protected virtual async Task ExecuteAsync(CancellationToken cancellationToken)
+        private async Task ScopedExecuteAsync(CancellationToken cancellationToken)
         {
+            // Create a scope in which to perform the execution.
+            using var scope = ServiceProvider.CreateScope();
+            ExecutionContext.Reset();
+            var ec = scope.ServiceProvider.GetService<ExecutionContext>();
+            ec.ServiceProvider = scope.ServiceProvider;
+            ExecutionContext.SetCurrent(ec);
+
+            var cdo = scope.ServiceProvider.GetService<TCdcDataOrchestrator>() ?? throw new InvalidOperationException($"An instance of {typeof(TCdcDataOrchestrator).Name} could not be instantiated.");
+            await ExecuteAsync(cdo, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Executes the data orchestration for the next envelope and/or incomplete envelope.
+        /// </summary>
+        /// <param name="cdcDataOrchestrator">The <typeparamref name="TCdcDataOrchestrator"/> instance.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task"/> that represents the long running operations.</returns>
+        protected virtual async Task ExecuteAsync(TCdcDataOrchestrator cdcDataOrchestrator, CancellationToken cancellationToken)
+        { 
             CdcDataOrchestratorResult cdor;
 
             while (true)
             {
                 if (_processIncomplete)
-                    cdor = await CdcDataOrchestrator.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
+                    cdor = await cdcDataOrchestrator.ExecuteIncompleteAsync(cancellationToken).ConfigureAwait(false);
                 else
-                    cdor = await CdcDataOrchestrator.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
+                    cdor = await cdcDataOrchestrator.ExecuteNextAsync(100, cancellationToken).ConfigureAwait(false);
 
                 if (cancellationToken.IsCancellationRequested)
                     return;

@@ -20,7 +20,8 @@ namespace Beef.Demo.Cdc.Data
         /// <returns>The <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddGeneratedCdcDataServices(this IServiceCollection services)
         {
-            return services.AddScoped<IPostsCdcData, PostsCdcData>();
+            return services.AddScoped<IContactCdcData, ContactCdcData>()
+                           .AddScoped<IPostsCdcData, PostsCdcData>();
         }
     }
 }

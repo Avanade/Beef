@@ -151,7 +151,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
     {{/unless}}
   {{/each}}
         }
-  {{#ifeq JoinCardinality 'OneToMany'}}
 
         /// <summary>
         /// Represents the CDC model for the related (child) database table collection '{{Schema}}.{{Name}}'.
@@ -159,7 +158,6 @@ namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
         public partial class {{ModelName}}CdcCollection : List<{{ModelName}}Cdc> { }
 
         #endregion
-  {{/ifeq}}
 {{/each}}
     }
 }

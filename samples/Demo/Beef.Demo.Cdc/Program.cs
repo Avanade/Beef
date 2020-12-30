@@ -25,6 +25,7 @@ namespace Beef.Demo.Cdc
                     services.AddBeefNullEventPublisher();
                     services.AddGeneratedCdcDataServices();
                     services.AddHostedService<PostsCdcBackgroundService>();
+                    services.AddHostedService<ContactCdcBackgroundService>();
                 });
     }
 }

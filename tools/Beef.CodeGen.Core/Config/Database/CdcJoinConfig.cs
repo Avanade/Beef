@@ -404,6 +404,7 @@ namespace Beef.CodeGen.Config.Database
                 JoinTo = JoinTo,
                 JoinToSchema = JoinToSchema,
                 JoinToAlias = JoinToAlias,
+                JoinCardinality = JoinCardinality,
                 ModelName = ModelName,
                 PropertyName = PropertyName,
                 NonCdc = NonCdc,

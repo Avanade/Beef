@@ -24,12 +24,11 @@ namespace Beef.Demo.Cdc.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="PostsCdcBackgroundService"/> class.
         /// </summary>
-        /// <param name="data">The <see cref="IPostsCdcData"/>.</param>
         /// <param name="config">The <see cref="IConfiguration"/>.</param>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public PostsCdcBackgroundService(IPostsCdcData data, IConfiguration config, IServiceProvider serviceProvider, ILogger<PostsCdcBackgroundService> logger) :
-            base(data, serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
+        public PostsCdcBackgroundService(IConfiguration config, IServiceProvider serviceProvider, ILogger<PostsCdcBackgroundService> logger) :
+            base(serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
 
         /// <summary>
         /// Gets the service name.
