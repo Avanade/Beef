@@ -12,7 +12,7 @@ Category | Description
 [`Key`](#Key) | Provides the _key_ configuration.
 [`JoinTo`](#JoinTo) | Provides the _join to_ configuration.
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
-[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
+[`Database`](#Database) | Provides the _database_ configuration.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
@@ -52,12 +52,12 @@ Property | Description
 
 <br/>
 
-## CDC
-Provides the _Change Data Capture (CDC)_ configuration.
+## Database
+Provides the _database_ configuration.
 
 Property | Description
 -|-
-`NonCdc` | Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns. Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping.
+`JoinOnly` | Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns. Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping.
 
 <br/>
 

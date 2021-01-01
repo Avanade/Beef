@@ -162,7 +162,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("eventActionFormat", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("CDC", Title = "The formatting for the Action when an Event is published.", Options = new string[] { "None", "UpperCase", "PastTense", "PastTenseUpperCase" }, IsImportant = true,
-            Description = "Defaults to `None` (no formatting required)`.")]
+            Description = "Defaults to `None` (no formatting required).")]
         public string? EventActionFormat { get; set; }
 
         /// <summary>

@@ -21,7 +21,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("JoinTo", Title = "Provides the _join to_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
+    [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcJoinConfig : ConfigBase<CodeGenConfig, CdcConfig>, ITableReference, ISpecialColumns
@@ -131,15 +131,15 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region Cdc
+        #region Database
 
         /// <summary>
-        /// Indicates whether the joined table is not being monitored for CDC and will include the selected columns.
+        /// Indicates whether the joined table is not being monitored for CDC and will include the selected columns only.
         /// </summary>
-        [JsonProperty("nonCdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns.",
+        [JsonProperty("joinOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns.",
             Description = "Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping.")]
-        public bool? NonCdc { get; set; }
+        public bool? JoinOnly { get; set; }
 
         #endregion
 
@@ -407,7 +407,7 @@ namespace Beef.CodeGen.Config.Database
                 JoinCardinality = JoinCardinality,
                 ModelName = ModelName,
                 PropertyName = PropertyName,
-                NonCdc = NonCdc,
+                JoinOnly = JoinOnly,
                 IsFirstInJoinHierarchy = isFirst,
                 On = new List<CdcJoinOnConfig>(),
                 DbTable = DbTable,

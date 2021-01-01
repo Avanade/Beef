@@ -11,7 +11,8 @@ Category | Description
 -|-
 [`Key`](#Key) | Provides the _key_ configuration.
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
-[`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
+[`Database`](#Database) | Provides the _database_ configuration.
+[`DotNet`](#DotNet) | Provides the _.NET_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -38,14 +39,22 @@ Property | Description
 
 <br/>
 
-## CDC
-Provides the _Change Data Capture (CDC)_ configuration.
+## Database
+Provides the _database_ configuration.
 
 Property | Description
 -|-
 `StoredProcedureName` | The `CDC` get envelope data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.
 `CdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGenConfig.CdcSchema`.
 `EnvelopeTableName` | The corresponding `CDC` Envelope table name. Defaults to `Name` + `Envelope` (literal).
+
+<br/>
+
+## DotNet
+Provides the _.NET_ configuration.
+
+Property | Description
+-|-
 `ModelName` | The .NET model name. Defaults to `Name`.
 `DataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `DatabaseName` | The .NET database interface name. Defaults to `IDatabase`.

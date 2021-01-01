@@ -40,7 +40,7 @@
       <CdcJoinOn Name="ParentType" ToStatement="'P'" />
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
     </CdcJoin>
-    <!--<CdcJoin Name="Blah" Schema="Legacy" JoinTo="Posts" NonCdc="true">
+    <!--<CdcJoin Name="Blah" Schema="Legacy" JoinTo="Posts" JoinOnly="true">
     </CdcJoin>-->
   </Cdc>
 

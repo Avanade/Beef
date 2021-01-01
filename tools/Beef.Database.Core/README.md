@@ -39,6 +39,8 @@ The schema scripts must be marked as embedded resources, and reside under the `S
 
 The `Schema` folder is used to encourage the usage of database schemas. Therefore, directly under should be the schema name, for example `dbo` or `Ref`. Then sub-folders for the object types as per [Azure Data Studio](https://docs.microsoft.com/en-au/sql/azure-data-studio/what-is), for example `Functions`, `Stored Procedures` or `Types\User-Defined Table Types`. 
 
+_Note_: The is a _special case_ where a [Table](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql) object is found, then this will only be enacted where it does not previously exist. An `IF NOT EXIST` statement is automatically prepended prior to executing. These will be applied in advance of the objects listed earlier (no attempt to delete or update will occur).
+
 Code generation is also supported / enabled using the _Beef_ [Code-Gen](../Beef.CodeGen.Core/README.md) capabilities. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the code generation execution.
 
 <br/>

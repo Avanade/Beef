@@ -20,7 +20,8 @@ namespace Beef.CodeGen.Config.Database
 ```")]
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
-    [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
+    [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
+    [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumns
     {
@@ -88,13 +89,13 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region Cdc
+        #region Database
 
         /// <summary>
         /// Gets or sets the `Cdc` execute envelope stored procedure name.
         /// </summary>
         [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The `CDC` get envelope data stored procedure name.",
+        [PropertySchema("Database", Title = "The `CDC` get envelope data stored procedure name.",
             Description = "Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.")]
         public string? StoredProcedureName { get; set; }
 
@@ -102,7 +103,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the schema name for the `Cdc`-related database artefacts.
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The schema name for the generated `CDC`-related database artefacts.",
+        [PropertySchema("Database", Title = "The schema name for the generated `CDC`-related database artefacts.",
             Description = "Defaults to `CodeGenConfig.CdcSchema`.")]
         public string? CdcSchema { get; set; }
 
@@ -110,15 +111,19 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the corresponding `Cdc` Envelope table name.
         /// </summary>
         [JsonProperty("envelopeTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The corresponding `CDC` Envelope table name.",
+        [PropertySchema("Database", Title = "The corresponding `CDC` Envelope table name.",
             Description = "Defaults to `Name` + `Envelope` (literal).")]
         public string? EnvelopeTableName { get; set; }
+
+        #endregion
+
+        #region DotNet
 
         /// <summary>
         /// Gets or sets the `Cdc` .NET model name.
         /// </summary>
         [JsonProperty("modelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The .NET model name.",
+        [PropertySchema("DotNet", Title = "The .NET model name.",
             Description = "Defaults to `Name`.")]
         public string? ModelName { get; set; }
 
@@ -126,7 +131,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the access modifier for the generated CDC `Data` constructor.
         /// </summary>
         [JsonProperty("dataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
+        [PropertySchema("DotNet", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataConstructor { get; set; }
 
@@ -134,7 +139,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the CDC .NET database interface name.
         /// </summary>
         [JsonProperty("databaseName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The .NET database interface name.",
+        [PropertySchema("DotNet", Title = "The .NET database interface name.",
             Description = "Defaults to `IDatabase`.")]
         public string? DatabaseName { get; set; }
 
@@ -142,7 +147,7 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the event subject.
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("CDC", Title = "The event subject.",
+        [PropertySchema("DotNet", Title = "The event subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
 
@@ -238,12 +243,12 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are also CDC monitored.
         /// </summary>
-        public List<CdcJoinConfig> CdcJoins => Joins!.Where(x => CompareNullOrValue(x.NonCdc, true)).ToList();
+        public List<CdcJoinConfig> CdcJoins => Joins!.Where(x => CompareNullOrValue(x.JoinOnly, true)).ToList();
 
         /// <summary>
         /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are not flagged as CDC monitored.
         /// </summary>
-        public List<CdcJoinConfig> NonCdcJoins => Joins!.Where(x => CompareValue(x.NonCdc, false)).ToList();
+        public List<CdcJoinConfig> NonCdcJoins => Joins!.Where(x => CompareValue(x.JoinOnly, false)).ToList();
 
         /// <summary>
         /// Gets the list of joined children.
