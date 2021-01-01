@@ -45,12 +45,18 @@ BEGIN
     END
 
     -- Declare variables.
-    DECLARE @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
+    DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{#each Joins}}
-    DECLARE @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
+    DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{/each}}
     DECLARE @EnvelopeId INT
     DECLARE @IncludeMin BIT
+
+    -- Get the latest 'base' minimum.
+    SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
+{{#each Joins}}
+    SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
+{{/each}}
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
     IF (@GetIncompleteEnvelope = 1)
@@ -108,79 +114,96 @@ BEGIN
 
       IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
-        SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
+        SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
 {{#each Joins}}
-        SET @{{pascal Name}}MinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
+        SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
 {{/each}}
         SET @IncludeMin = 1
       END
+      ELSE
+      BEGIN
+        -- Increment the minimum as the last has already been processed.
+        SET @{{pascal Name}}MinLsn = sys.fn_cdc_increment_lsn(@{{pascal Name}}MinLsn)
+{{#each Joins}}
+        SET @{{pascal Name}}MinLsn = sys.fn_cdc_increment_lsn(@{{pascal Name}}MinLsn)
+{{/each}}
+      END
 
+      -- Get the maximum LSN.
       SET @{{pascal Name}}MaxLsn = sys.fn_cdc_get_max_lsn();
 {{#each Joins}}
       SET @{{pascal Name}}MaxLsn = @{{pascal Parent.Name}}MaxLsn
 {{/each}}
 
+      -- Verify the maximum query size and correct (reset) where applicable.
       IF (@MaxQuerySize IS NULL OR @MaxQuerySize < 1 OR @MaxQuerySize > 10000)
       BEGIN
-        SET @MaxQuerySize = 100  -- Reset where the value appears invalid. 
+        SET @MaxQuerySize = 100
       END
     END
 
-    -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        [_cdc].[__$operation] AS [_Op],
-{{#each PrimaryKeyColumns}}
-        [_cdc].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
+{{#each Joins}}
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
 {{/each}}
-      INTO #_changes
-      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @{{pascal Name}}MinLsn
-      ORDER BY [_cdc].[__$start_lsn]
 
-    IF (@@ROWCOUNT <> 0)
+    -- Find changes on the root table: {{Schema}}.{{Name}} - this determines overall operation type: 'create', 'update' or 'delete'.
+    DECLARE @hasChanges BIT
+    SET @hasChanges = 0
+
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}MaxLsn)
     BEGIN
-      SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #_changes
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          [_cdc].[__$operation] AS [_Op],
+{{#each PrimaryKeyColumns}}
+          [_cdc].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+{{/each}}
+        INTO #_changes
+        FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{Name}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
+        ORDER BY [_cdc].[__$start_lsn]
+
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #_changes
+      END
     END
 
 {{#each Joins}}
     -- Find changes on related table: {{Name}} ({{Schema}}.{{TableName}}) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        4 AS [_Op],
-  {{#each Parent.PrimaryKeyColumns}}
-        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
-  {{/each}}
-      INTO #{{Alias}}
-      FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
-  {{#each JoinHierarchy}}
-      INNER JOIN [{{JoinToSchema}}].[{{JoinTo}}] AS [{{JoinToAlias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{#if Parent.IsFirstInJoinHierarchy}}[_cdc]{{else}}[{{Parent.Alias}}]{{/if}}.[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
-  {{/each}}
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @{{pascal Name}}MinLsn
-      ORDER BY [_cdc].[__$start_lsn]
-
-    IF (@@ROWCOUNT <> 0)
+    IF (@{{pascal Name}}MinLsn < @{{pascal Name}}MaxLsn)
     BEGIN
-      SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #{{Alias}}
-    END
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          4 AS [_Op],
+  {{#each Parent.PrimaryKeyColumns}}
+          [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+  {{/each}}
+        INTO #{{Alias}}
+        FROM cdc.fn_cdc_get_net_changes_{{Schema}}_{{TableName}}(@{{pascal Name}}MinLsn, @{{pascal Name}}MaxLsn, 'all') AS [_cdc]
+  {{#each JoinHierarchy}}
+        INNER JOIN [{{JoinToSchema}}].[{{JoinTo}}] AS [{{JoinToAlias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}{{#if Parent.IsFirstInJoinHierarchy}}[_cdc]{{else}}[{{Parent.Alias}}]{{/if}}.[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+  {{/each}}
+        ORDER BY [_cdc].[__$start_lsn]
 
-    INSERT INTO #_changes
-      SELECT * 
-        FROM #{{Alias}} AS [_{{Alias}}]{{setkv1 Alias}}
-        WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[_chg].[{{Name}}] = [_{{Root.KV1}}].[{{Name}}]{{/each}})
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @{{pascal Name}}MinLsn = MIN([_Lsn]), @{{pascal Name}}MaxLsn = MAX([_Lsn]) FROM #{{Alias}}
+
+        INSERT INTO #_changes
+          SELECT * 
+            FROM #{{Alias}} AS [_{{Alias}}]{{setkv1 Alias}}
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[_chg].[{{Name}}] = [_{{Root.KV1}}].[{{Name}}]{{/each}})
+      END
+    END
 
 {{/each}}
     -- Create a new envelope where not processing an existing.
-    IF (@EnvelopeId IS NULL)
+    IF (@EnvelopeId IS NULL AND @hasChanges = 1)
     BEGIN
-      DECLARE @RowCount INT
-      SELECT @RowCount = COUNT(*) FROM #_changes
-      IF @RowCount = 0
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [{{CdcSchema}}].[{{EnvelopeTableName}}] (
@@ -213,7 +236,14 @@ BEGIN
       FROM [{{CdcSchema}}].[{{EnvelopeTableName}}] AS [_env]
       WHERE [_env].EnvelopeId = @EnvelopeId 
 
-    -- Root table: {{Schema}}.{{Name}} - uses LEFT OUTER JOIN so we get the deleted records too.
+    -- Exit here if there were no changes found.
+    IF (@hasChanges = 0)
+    BEGIN
+      COMMIT TRANSACTION
+      RETURN 0
+    END
+
+    -- Root table: {{Schema}}.{{Name}} - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],

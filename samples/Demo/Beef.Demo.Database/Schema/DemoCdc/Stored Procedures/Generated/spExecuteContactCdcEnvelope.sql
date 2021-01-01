@@ -44,10 +44,14 @@ BEGIN
     END
 
     -- Declare variables.
-    DECLARE @ContactMinLsn BINARY(10), @ContactMaxLsn BINARY(10)
-    DECLARE @AddressMinLsn BINARY(10), @AddressMaxLsn BINARY(10)
+    DECLARE @ContactBaseMinLsn BINARY(10), @ContactMinLsn BINARY(10), @ContactMaxLsn BINARY(10)
+    DECLARE @AddressBaseMinLsn BINARY(10), @AddressMinLsn BINARY(10), @AddressMaxLsn BINARY(10)
     DECLARE @EnvelopeId INT
     DECLARE @IncludeMin BIT
+
+    -- Get the latest 'base' minimum.
+    SET @ContactBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Contact');
+    SET @AddressBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Address');
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
     IF (@GetIncompleteEnvelope = 1)
@@ -101,67 +105,80 @@ BEGIN
 
       IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
-        SET @ContactMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Contact');
-        SET @AddressMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Address');
+        SET @ContactMinLsn = @ContactBaseMinLsn;
+        SET @AddressMinLsn = @AddressBaseMinLsn;
         SET @IncludeMin = 1
       END
+      ELSE
+      BEGIN
+        -- Increment the minimum as the last has already been processed.
+        SET @ContactMinLsn = sys.fn_cdc_increment_lsn(@ContactMinLsn)
+        SET @AddressMinLsn = sys.fn_cdc_increment_lsn(@AddressMinLsn)
+      END
 
+      -- Get the maximum LSN.
       SET @ContactMaxLsn = sys.fn_cdc_get_max_lsn();
       SET @AddressMaxLsn = @ContactMaxLsn
 
+      -- Verify the maximum query size and correct (reset) where applicable.
       IF (@MaxQuerySize IS NULL OR @MaxQuerySize < 1 OR @MaxQuerySize > 10000)
       BEGIN
-        SET @MaxQuerySize = 100  -- Reset where the value appears invalid. 
+        SET @MaxQuerySize = 100
       END
     END
 
-    -- Find changes on the root table: Legacy.Contact - this determines overall operation type: 'create', 'update' or 'delete'.
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        [_cdc].[__$operation] AS [_Op],
-        [_cdc].[ContactId] AS [ContactId]
-      INTO #_changes
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Contact(@ContactMinLsn, @ContactMaxLsn, 'all') AS [_cdc]
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @ContactMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
+    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
+    IF (@ContactMinLsn < @ContactBaseMinLsn) BEGIN SET @ContactMinLsn = @ContactBaseMinLsn END
+    IF (@AddressMinLsn < @AddressBaseMinLsn) BEGIN SET @AddressMinLsn = @AddressBaseMinLsn END
 
-    IF (@@ROWCOUNT <> 0)
+    -- Find changes on the root table: Legacy.Contact - this determines overall operation type: 'create', 'update' or 'delete'.
+    DECLARE @hasChanges BIT
+    SET @hasChanges = 0
+
+    IF (@ContactMinLsn < @ContactMaxLsn)
     BEGIN
-      SELECT @ContactMinLsn = MIN([_Lsn]), @ContactMaxLsn = MAX([_Lsn]) FROM #_changes
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          [_cdc].[__$operation] AS [_Op],
+          [_cdc].[ContactId] AS [ContactId]
+        INTO #_changes
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Contact(@ContactMinLsn, @ContactMaxLsn, 'all') AS [_cdc]
+        ORDER BY [_cdc].[__$start_lsn]
+
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @ContactMinLsn = MIN([_Lsn]), @ContactMaxLsn = MAX([_Lsn]) FROM #_changes
+      END
     END
 
     -- Find changes on related table: Address (Legacy.Address) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        4 AS [_Op],
-        [c].[ContactId] AS [ContactId]
-      INTO #a
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Address(@AddressMinLsn, @AddressMaxLsn, 'all') AS [_cdc]
-      INNER JOIN [Legacy].[Contact] AS [c] WITH (NOLOCK) ON ([_cdc].[Id] = [c].[AddressId])
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @AddressMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
-
-    IF (@@ROWCOUNT <> 0)
+    IF (@AddressMinLsn < @AddressMaxLsn)
     BEGIN
-      SELECT @AddressMinLsn = MIN([_Lsn]), @AddressMaxLsn = MAX([_Lsn]) FROM #a
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          4 AS [_Op],
+          [c].[ContactId] AS [ContactId]
+        INTO #a
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Address(@AddressMinLsn, @AddressMaxLsn, 'all') AS [_cdc]
+        INNER JOIN [Legacy].[Contact] AS [c] WITH (NOLOCK) ON ([_cdc].[Id] = [c].[AddressId])
+        ORDER BY [_cdc].[__$start_lsn]
+
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @AddressMinLsn = MIN([_Lsn]), @AddressMaxLsn = MAX([_Lsn]) FROM #a
+
+        INSERT INTO #_changes
+          SELECT * 
+            FROM #a AS [_a]
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[ContactId] = [_a].[ContactId])
+      END
     END
 
-    INSERT INTO #_changes
-      SELECT * 
-        FROM #a AS [_a]
-        WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[ContactId] = [_a].[ContactId])
-
     -- Create a new envelope where not processing an existing.
-    IF (@EnvelopeId IS NULL)
+    IF (@EnvelopeId IS NULL AND @hasChanges = 1)
     BEGIN
-      DECLARE @RowCount INT
-      SELECT @RowCount = COUNT(*) FROM #_changes
-      IF @RowCount = 0
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [DemoCdc].[ContactEnvelope] (
@@ -190,7 +207,14 @@ BEGIN
       FROM [DemoCdc].[ContactEnvelope] AS [_env]
       WHERE [_env].EnvelopeId = @EnvelopeId 
 
-    -- Root table: Legacy.Contact - uses LEFT OUTER JOIN so we get the deleted records too.
+    -- Exit here if there were no changes found.
+    IF (@hasChanges = 0)
+    BEGIN
+      COMMIT TRANSACTION
+      RETURN 0
+    END
+
+    -- Root table: Legacy.Contact - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],

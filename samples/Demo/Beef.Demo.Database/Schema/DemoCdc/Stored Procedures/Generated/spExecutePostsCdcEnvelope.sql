@@ -44,12 +44,18 @@ BEGIN
     END
 
     -- Declare variables.
-    DECLARE @PostsMinLsn BINARY(10), @PostsMaxLsn BINARY(10)
-    DECLARE @CommentsMinLsn BINARY(10), @CommentsMaxLsn BINARY(10)
-    DECLARE @CommentsTagsMinLsn BINARY(10), @CommentsTagsMaxLsn BINARY(10)
-    DECLARE @PostsTagsMinLsn BINARY(10), @PostsTagsMaxLsn BINARY(10)
+    DECLARE @PostsBaseMinLsn BINARY(10), @PostsMinLsn BINARY(10), @PostsMaxLsn BINARY(10)
+    DECLARE @CommentsBaseMinLsn BINARY(10), @CommentsMinLsn BINARY(10), @CommentsMaxLsn BINARY(10)
+    DECLARE @CommentsTagsBaseMinLsn BINARY(10), @CommentsTagsMinLsn BINARY(10), @CommentsTagsMaxLsn BINARY(10)
+    DECLARE @PostsTagsBaseMinLsn BINARY(10), @PostsTagsMinLsn BINARY(10), @PostsTagsMaxLsn BINARY(10)
     DECLARE @EnvelopeId INT
     DECLARE @IncludeMin BIT
+
+    -- Get the latest 'base' minimum.
+    SET @PostsBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Posts');
+    SET @CommentsBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Comments');
+    SET @CommentsTagsBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
+    SET @PostsTagsBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
 
     -- Where requesting for incomplete envelope, get first that is marked as incomplete.
     IF (@GetIncompleteEnvelope = 1)
@@ -109,114 +115,137 @@ BEGIN
 
       IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
-        SET @PostsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Posts');
-        SET @CommentsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Comments');
-        SET @CommentsTagsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
-        SET @PostsTagsMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Tags');
+        SET @PostsMinLsn = @PostsBaseMinLsn;
+        SET @CommentsMinLsn = @CommentsBaseMinLsn;
+        SET @CommentsTagsMinLsn = @CommentsTagsBaseMinLsn;
+        SET @PostsTagsMinLsn = @PostsTagsBaseMinLsn;
         SET @IncludeMin = 1
       END
+      ELSE
+      BEGIN
+        -- Increment the minimum as the last has already been processed.
+        SET @PostsMinLsn = sys.fn_cdc_increment_lsn(@PostsMinLsn)
+        SET @CommentsMinLsn = sys.fn_cdc_increment_lsn(@CommentsMinLsn)
+        SET @CommentsTagsMinLsn = sys.fn_cdc_increment_lsn(@CommentsTagsMinLsn)
+        SET @PostsTagsMinLsn = sys.fn_cdc_increment_lsn(@PostsTagsMinLsn)
+      END
 
+      -- Get the maximum LSN.
       SET @PostsMaxLsn = sys.fn_cdc_get_max_lsn();
       SET @CommentsMaxLsn = @PostsMaxLsn
       SET @CommentsTagsMaxLsn = @PostsMaxLsn
       SET @PostsTagsMaxLsn = @PostsMaxLsn
 
+      -- Verify the maximum query size and correct (reset) where applicable.
       IF (@MaxQuerySize IS NULL OR @MaxQuerySize < 1 OR @MaxQuerySize > 10000)
       BEGIN
-        SET @MaxQuerySize = 100  -- Reset where the value appears invalid. 
+        SET @MaxQuerySize = 100
       END
     END
 
-    -- Find changes on the root table: Legacy.Posts - this determines overall operation type: 'create', 'update' or 'delete'.
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        [_cdc].[__$operation] AS [_Op],
-        [_cdc].[PostsId] AS [PostsId]
-      INTO #_changes
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Posts(@PostsMinLsn, @PostsMaxLsn, 'all') AS [_cdc]
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @PostsMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
+    -- The minimum can not be less than the base or an error will occur, so realign where not correct.
+    IF (@PostsMinLsn < @PostsBaseMinLsn) BEGIN SET @PostsMinLsn = @PostsBaseMinLsn END
+    IF (@CommentsMinLsn < @CommentsBaseMinLsn) BEGIN SET @CommentsMinLsn = @CommentsBaseMinLsn END
+    IF (@CommentsTagsMinLsn < @CommentsTagsBaseMinLsn) BEGIN SET @CommentsTagsMinLsn = @CommentsTagsBaseMinLsn END
+    IF (@PostsTagsMinLsn < @PostsTagsBaseMinLsn) BEGIN SET @PostsTagsMinLsn = @PostsTagsBaseMinLsn END
 
-    IF (@@ROWCOUNT <> 0)
+    -- Find changes on the root table: Legacy.Posts - this determines overall operation type: 'create', 'update' or 'delete'.
+    DECLARE @hasChanges BIT
+    SET @hasChanges = 0
+
+    IF (@PostsMinLsn < @PostsMaxLsn)
     BEGIN
-      SELECT @PostsMinLsn = MIN([_Lsn]), @PostsMaxLsn = MAX([_Lsn]) FROM #_changes
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          [_cdc].[__$operation] AS [_Op],
+          [_cdc].[PostsId] AS [PostsId]
+        INTO #_changes
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Posts(@PostsMinLsn, @PostsMaxLsn, 'all') AS [_cdc]
+        ORDER BY [_cdc].[__$start_lsn]
+
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @PostsMinLsn = MIN([_Lsn]), @PostsMaxLsn = MAX([_Lsn]) FROM #_changes
+      END
     END
 
     -- Find changes on related table: Comments (Legacy.Comments) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        4 AS [_Op],
-        [p].[PostsId] AS [PostsId]
-      INTO #c
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Comments(@CommentsMinLsn, @CommentsMaxLsn, 'all') AS [_cdc]
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[PostsId] = [p].[PostsId])
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @CommentsMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
-
-    IF (@@ROWCOUNT <> 0)
+    IF (@CommentsMinLsn < @CommentsMaxLsn)
     BEGIN
-      SELECT @CommentsMinLsn = MIN([_Lsn]), @CommentsMaxLsn = MAX([_Lsn]) FROM #c
-    END
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          4 AS [_Op],
+          [p].[PostsId] AS [PostsId]
+        INTO #c
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Comments(@CommentsMinLsn, @CommentsMaxLsn, 'all') AS [_cdc]
+        INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[PostsId] = [p].[PostsId])
+        ORDER BY [_cdc].[__$start_lsn]
 
-    INSERT INTO #_changes
-      SELECT * 
-        FROM #c AS [_c]
-        WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_c].[PostsId])
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @CommentsMinLsn = MIN([_Lsn]), @CommentsMaxLsn = MAX([_Lsn]) FROM #c
+
+        INSERT INTO #_changes
+          SELECT * 
+            FROM #c AS [_c]
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_c].[PostsId])
+      END
+    END
 
     -- Find changes on related table: CommentsTags (Legacy.Tags) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        4 AS [_Op],
-        [p].[PostsId] AS [PostsId]
-      INTO #ct
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@CommentsTagsMinLsn, @CommentsTagsMaxLsn, 'all') AS [_cdc]
-      INNER JOIN [Legacy].[Comments] AS [c] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'C' AND [_cdc].[ParentId] = [c].[CommentsId])
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([c].[PostsId] = [p].[PostsId])
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @CommentsTagsMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
-
-    IF (@@ROWCOUNT <> 0)
+    IF (@CommentsTagsMinLsn < @CommentsTagsMaxLsn)
     BEGIN
-      SELECT @CommentsTagsMinLsn = MIN([_Lsn]), @CommentsTagsMaxLsn = MAX([_Lsn]) FROM #ct
-    END
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          4 AS [_Op],
+          [p].[PostsId] AS [PostsId]
+        INTO #ct
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@CommentsTagsMinLsn, @CommentsTagsMaxLsn, 'all') AS [_cdc]
+        INNER JOIN [Legacy].[Comments] AS [c] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'C' AND [_cdc].[ParentId] = [c].[CommentsId])
+        INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([c].[PostsId] = [p].[PostsId])
+        ORDER BY [_cdc].[__$start_lsn]
 
-    INSERT INTO #_changes
-      SELECT * 
-        FROM #ct AS [_ct]
-        WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_ct].[PostsId])
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @CommentsTagsMinLsn = MIN([_Lsn]), @CommentsTagsMaxLsn = MAX([_Lsn]) FROM #ct
+
+        INSERT INTO #_changes
+          SELECT * 
+            FROM #ct AS [_ct]
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_ct].[PostsId])
+      END
+    END
 
     -- Find changes on related table: PostsTags (Legacy.Tags) - assume all are 'update' operation (i.e. it doesn't matter).
-    SELECT TOP (@MaxQuerySize)
-        [_cdc].[__$start_lsn] AS [_Lsn],
-        4 AS [_Op],
-        [p].[PostsId] AS [PostsId]
-      INTO #pt
-      FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@PostsTagsMinLsn, @PostsTagsMaxLsn, 'all') AS [_cdc]
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'P' AND [_cdc].[ParentId] = [p].[PostsId])
-      WHERE @IncludeMin = 1 OR [_cdc].[__$start_lsn] > @PostsTagsMinLsn
-      ORDER BY [_cdc].[__$start_lsn]
-
-    IF (@@ROWCOUNT <> 0)
+    IF (@PostsTagsMinLsn < @PostsTagsMaxLsn)
     BEGIN
-      SELECT @PostsTagsMinLsn = MIN([_Lsn]), @PostsTagsMaxLsn = MAX([_Lsn]) FROM #pt
+      SELECT TOP (@MaxQuerySize)
+          [_cdc].[__$start_lsn] AS [_Lsn],
+          4 AS [_Op],
+          [p].[PostsId] AS [PostsId]
+        INTO #pt
+        FROM cdc.fn_cdc_get_net_changes_Legacy_Tags(@PostsTagsMinLsn, @PostsTagsMaxLsn, 'all') AS [_cdc]
+        INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([_cdc].[ParentType] = 'P' AND [_cdc].[ParentId] = [p].[PostsId])
+        ORDER BY [_cdc].[__$start_lsn]
+
+      IF (@@ROWCOUNT <> 0)
+      BEGIN
+        SET @hasChanges = 1
+        SELECT @PostsTagsMinLsn = MIN([_Lsn]), @PostsTagsMaxLsn = MAX([_Lsn]) FROM #pt
+
+        INSERT INTO #_changes
+          SELECT * 
+            FROM #pt AS [_pt]
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_pt].[PostsId])
+      END
     END
 
-    INSERT INTO #_changes
-      SELECT * 
-        FROM #pt AS [_pt]
-        WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE [_chg].[PostsId] = [_pt].[PostsId])
-
     -- Create a new envelope where not processing an existing.
-    IF (@EnvelopeId IS NULL)
+    IF (@EnvelopeId IS NULL AND @hasChanges = 1)
     BEGIN
-      DECLARE @RowCount INT
-      SELECT @RowCount = COUNT(*) FROM #_changes
-      IF @RowCount = 0
-      BEGIN
-        COMMIT TRANSACTION
-        RETURN 0;
-      END
-
       DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
 
       INSERT INTO [DemoCdc].[PostsEnvelope] (
@@ -253,7 +282,14 @@ BEGIN
       FROM [DemoCdc].[PostsEnvelope] AS [_env]
       WHERE [_env].EnvelopeId = @EnvelopeId 
 
-    -- Root table: Legacy.Posts - uses LEFT OUTER JOIN so we get the deleted records too.
+    -- Exit here if there were no changes found.
+    IF (@hasChanges = 0)
+    BEGIN
+      COMMIT TRANSACTION
+      RETURN 0
+    END
+
+    -- Root table: Legacy.Posts - uses LEFT OUTER JOIN's to get the deleted records, as well as any previous Tracking Hash value.
     SELECT
         [_ct].[Hash] AS [_TrackingHash],
         [_chg].[_Op] AS [_OperationType],
