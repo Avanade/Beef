@@ -8,10 +8,10 @@
 using System;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
-using entities = Beef.Demo.Common.Entities;
-using proto = Beef.Demo.Common.Grpc.Proto;
+using entities = {{Root.NamespaceCommon}}.Entities;
+using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
 
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Grpc
+namespace {{Root.NamespaceCommon}}.Grpc
 {
     /// <summary>
     /// Provides entity to gRpc transformations (conversion and/or mapping).

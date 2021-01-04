@@ -8,14 +8,14 @@
 using Microsoft.Extensions.DependencyInjection;
 {{#if IsRefData}}
   {{#ifeq EntityUsing 'Business' 'All'}}
-using {{Company}}.{{AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
   {{/ifeq}}
   {{#ifeq EntityUsing 'Common' 'All'}}
-using {{Company}}.{{AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
 {{/if}}
 
-namespace {{Company}}.{{AppName}}.Business
+namespace {{Root.NamespaceBusiness}}
 {
     /// <summary>
     /// Provides the generated <b>Manager</b>-layer services.

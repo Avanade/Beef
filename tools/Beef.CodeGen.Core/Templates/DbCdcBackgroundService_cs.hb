@@ -11,9 +11,9 @@ using Beef.Data.Database.Cdc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using {{Root.Company}}.{{Root.AppName}}.Cdc.Data;
+using {{Root.NamespaceCdc}}.Data;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Services
+namespace {{Root.NamespaceCdc}}.Services
 {
     /// <summary>
     /// Provides the CDC background service for database object '{{Schema}}.{{Name}}'.

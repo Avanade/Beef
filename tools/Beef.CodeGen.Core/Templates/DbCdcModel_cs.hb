@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Entities
+namespace {{Root.NamespaceCdc}}.Entities
 {
     /// <summary>
     /// Represents the CDC model for the root (primary) database table '{{Schema}}.{{Name}}'.

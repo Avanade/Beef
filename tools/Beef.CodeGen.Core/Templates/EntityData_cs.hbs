@@ -44,10 +44,10 @@ using Beef.Entities;
 using Beef.Mapper;
 using Beef.Mapper.Converters;
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifeq Root.EntityUsing 'Business' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -59,7 +59,7 @@ using RefDataNamespace = {{Root.RefDataBusNamespace}};
 using Soc = Simple.OData.Client;
 {{/if}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
+namespace {{Root.NamespaceBusiness}}.Data
 {
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} data access.

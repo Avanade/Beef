@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 using Beef;
 using Beef.Entities;
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifeq Root.EntityUsing 'Business' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -25,7 +25,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
+namespace {{Root.NamespaceBusiness}}.Data
 {
     /// <summary>
     /// Defines the {{{EntityNameSeeComments}}} data access.

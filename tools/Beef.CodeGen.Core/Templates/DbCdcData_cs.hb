@@ -15,9 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using {{Root.Company}}.{{Root.AppName}}.Cdc.Entities;
+using {{Root.NamespaceCdc}}.Entities;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
+namespace {{Root.NamespaceCdc}}.Data
 {
     /// <summary>
     /// Enables the CDC data access for database object '{{Schema}}.{{Name}}'.

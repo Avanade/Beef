@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.Grpc;
 using Beef.WebApi;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
-using proto = {{Root.Company}}.{{Root.AppName}}.Common.Grpc.Proto;
+using {{Root.NamespaceCommon}}.Entities;
+using proto = {{Root.NamespaceCommon}}.Grpc.Proto;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Grpc
+namespace {{Root.NamespaceCommon}}.Grpc
 {
     /// <summary>
     /// Defines the {{{EntityNameSeeComments}}} gRPC agent.

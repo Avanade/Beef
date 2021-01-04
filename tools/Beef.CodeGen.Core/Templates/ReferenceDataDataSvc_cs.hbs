@@ -15,7 +15,7 @@ using Beef;
 using Beef.Business;
 using Beef.RefData;
 using Beef.RefData.Caching;
-using {{Root.Company}}.{{Root.AppName}}.Business.Data;
+using {{Root.NamespaceBusiness}}.Data;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
@@ -23,7 +23,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business.DataSvc
+namespace {{Root.NamespaceBusiness}}.DataSvc
 {
     /// <summary>
     /// Provides the <b>ReferenceData</b> data services.

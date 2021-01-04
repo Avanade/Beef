@@ -20,6 +20,8 @@ namespace Beef.CodeGen.Config.Database
         Markdown = "")]
     [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
+    [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
+    [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
@@ -182,6 +184,54 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
+        #region Path
+
+        /// <summary>
+        /// Gets or sets the path (directory) for the Database-related artefacts.
+        /// </summary>
+        [JsonProperty("pathDatabase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the Database-related artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`.")]
+        public string? PathDatabase { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path (directory) for the Business-related (.NET) artefacts.
+        /// </summary>
+        [JsonProperty("pathBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.")]
+        public string? PathBusiness { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path (directory) for the CDC-related (.NET) artefacts.
+        /// </summary>
+        [JsonProperty("pathCdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
+        public string? PathCdc { get; set; }
+
+        #endregion
+
+        #region Namespace
+
+        /// <summary>
+        /// Gets or sets the root Namespace for the Business-related (.NET) artefacts.
+        /// </summary>
+        [JsonProperty("namespaceBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Namespace", Title = "The root Namespace for the Business-related (.NET) artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.")]
+        public string? NamespaceBusiness { get; set; }
+
+        /// <summary>
+        /// Gets or sets the root Namespace for the CDC-related (.NET) artefacts.
+        /// </summary>
+        [JsonProperty("namespaceCdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Namespace", Title = "The path (directory) for the CDC-related (.NET) artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.")]
+        public string? NamespaceCdc { get; set; }
+
+        #endregion
+
         #region RuntimeParameters
 
         /// <summary>
@@ -328,6 +378,12 @@ namespace Beef.CodeGen.Config.Database
         {
             CheckOptionsProperties();
             LoadDbTablesConfig();
+
+            PathDatabase = DefaultWhereNull(PathDatabase, () => $"{Company}.{AppName}.Database");
+            PathBusiness = DefaultWhereNull(PathBusiness, () => $"{Company}.{AppName}.Business");
+            PathCdc = DefaultWhereNull(PathCdc, () => $"{Company}.{AppName}.Cdc");
+            NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{Company}.{AppName}.Business");
+            NamespaceCdc = DefaultWhereNull(NamespaceCdc, () => $"{Company}.{AppName}.Cdc");
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");

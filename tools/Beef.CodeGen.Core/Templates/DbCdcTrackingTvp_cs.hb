@@ -10,7 +10,7 @@ using System.Data;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
+namespace {{Root.NamespaceCdc}}.Data
 {
     /// <summary>
     /// Provides the <see cref="CdcTracker"/> data access.

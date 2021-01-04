@@ -29,7 +29,7 @@ using {{Root.UsingNamespace3}};
 {{/if}}
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
   {{#ifeq EntityScope 'Business'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
   {{/ifeq}}
 {{/ifeq}}
 {{#ifval Root.RefDataNamespace}}
@@ -40,7 +40,7 @@ using RefDataBusNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
 {{! ===== Class ===== }}
-namespace {{Root.Company}}.{{Root.AppName}}.{{Root.EntityScope}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
+namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Entities{{#ifval Namespace}}.{{Namespace}}{{/ifval}}
 {
     /// <summary>
     /// Represents the {{{Text}}} entity.

@@ -15,14 +15,14 @@ using Beef.Business;
 using Beef.Entities;
 using Beef.Validation;
 {{#ifeq Root.EntityUsing 'Common' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{/ifeq}}
 {{#ifeq Root.EntityUsing 'Business' 'All'}}
-using {{Root.Company}}.{{Root.AppName}}.Business.Entities;
+using {{Root.NamespaceBusiness}}.Entities;
 {{/ifeq}}
-using {{Root.Company}}.{{Root.AppName}}.Business.DataSvc;
+using {{Root.NamespaceBusiness}}.DataSvc;
 {{#if UsesValidators}}
-using {{Root.Company}}.{{Root.AppName}}.{{Root.ValidatorLayer}}.Validation;
+using {{#ifeq Root.ValidatorLayer 'Common'}}{{Root.NamespaceCommon}}{{else}}{{Root.NamespaceBusiness}}{{/ifeq}}.Validation;
 {{/if}}
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
@@ -31,7 +31,7 @@ using RefDataNamespace = {{Root.RefDataNamespace}};
 using RefDataNamespace = {{Root.RefDataBusNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Business
+namespace {{Root.NamespaceBusiness}}
 {
     /// <summary>
     /// Provides the {{{EntityNameSeeComments}}} business functionality.

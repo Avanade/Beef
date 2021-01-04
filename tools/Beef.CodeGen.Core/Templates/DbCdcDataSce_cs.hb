@@ -7,7 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace {{Root.Company}}.{{Root.AppName}}.Cdc.Data
+namespace {{Root.NamespaceCdc}}.Data
 {
     /// <summary>
     /// Provides the generated CDC <b>Data</b>-layer services.

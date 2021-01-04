@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.WebApi;
 using Newtonsoft.Json.Linq;
-using {{Root.Company}}.{{Root.AppName}}.Common.Entities;
+using {{Root.NamespaceCommon}}.Entities;
 {{#ifval Root.RefDataNamespace}}
 using RefDataNamespace = {{Root.RefDataNamespace}};
 {{/ifval}}
 
-namespace {{Root.Company}}.{{Root.AppName}}.Common.Agents
+namespace {{Root.NamespaceCommon}}.Agents
 {
     /// <summary>
     /// Defines the {{{EntityNameSeeComments}}} Web API agent.
