@@ -98,6 +98,9 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.Table, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "GetAllOrderBy", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Table, "UdtExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Table, "View", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
+            (ConfigType.Database, ConfigurationEntity.Table, "ViewName", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
+            (ConfigType.Database, ConfigurationEntity.Table, "ViewSchema", (xml) => throw new CodeGenException("Table.View property is no longer supported; please use the new Query capability (more advanced).")),
 
             (ConfigType.Database, ConfigurationEntity.StoredProcedure, "Type", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "GetAll" ? "GetColl" : xml)),
             (ConfigType.Database, ConfigurationEntity.StoredProcedure, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),

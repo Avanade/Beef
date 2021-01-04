@@ -14,28 +14,40 @@
     </StoredProcedure>
   </Table>
 
-  <!--<Query Name="People" Schema="Legacy" Cdc="true" CdcSchema="DemoCdc" />
-
-  <Query Name="Posts" Schema="Legacy" Cdc="true" CdcSchema="DemoCdc">
-    <QueryJoin Name="Comments" Type="Left" ExcludeColumns="PostsId" Cdc="true" AliasColumns="Text^CText,Date^CDate">
-      <QueryJoinOn Name="PostsId" />
-    </QueryJoin>
-  </Query>-->
-
+  <!-- Set up CDC for primary table Legacy.Contact. -->
   <Cdc Name="Contact" Schema="Legacy">
+    <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
+         Join on Address.Id = Contact.AddressId. -->
     <CdcJoin Name="Address" JoinCardinality="OneToOne">
       <CdcJoinOn Name="Id" ToColumn="AddressId" />
     </CdcJoin>
   </Cdc>
 
+  <!-- Set up CDC for primary table Legacy.Posts. 
+       Relational hierarchy: Legacy.Posts
+                              - Legacy.Comments (1:n)
+                                 - Legacy.Tags (1:n)
+                              - Legacy.Tags (1:n). -->
   <Cdc Name="Posts" Schema="Legacy">
+    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Comments (1:n).
+         Join on Comments.PostsId = Posts.PostsId. -->
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
       <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
     </CdcJoin>
+    <!-- Set up secondary One-To-Many relationship from Legacy.Comments to Legacy.Tags (1:n).
+         Name as 'CommentsTags' for uniqueness for join referencing.
+         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
+         Rename 'ParentId' column to `CommentsId`.
+         Join on Tags.ParentType = 'C' AND Tags.ParentId = Comments.CommentsId. -->
     <CdcJoin Name="CommentsTags" Schema="Legacy" TableName="Tags" JoinTo="Comments" ExcludeColumns="ParentType" AliasColumns="ParentId^CommentsId">
       <CdcJoinOn Name="ParentType" ToStatement="'C'" />
       <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
     </CdcJoin>
+    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Tags (1:n).
+         Name as 'PostsTags' for uniqueness for join referencing.
+         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
+         Rename 'ParentId' column to `PostsId`.
+         Join on Tags.ParentType = 'P' AND Tags.ParentId = Posts.PostsId. -->
     <CdcJoin Name="PostsTags" Schema="Legacy" TableName="Tags" JoinTo="Posts" ExcludeColumns="ParentType" AliasColumns="ParentId^PostsId">
       <CdcJoinOn Name="ParentType" ToStatement="'P'" />
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
@@ -43,12 +55,6 @@
     <!--<CdcJoin Name="Blah" Schema="Legacy" JoinTo="Posts" JoinOnly="true">
     </CdcJoin>-->
   </Cdc>
-
-  <!--<Query Name="Person" Schema="Demo" View="true" ViewName="vwPersonWorkHistory" Cdc="true" CdcName="GetPersonAndWorkHistoryOutbox" CdcSchema="DemoCdc" CdcEnvelope="PersonOutboxEnvelope">
-    <QueryJoin Name="WorkHistory" ExcludeColumns="PersonId" Cdc="true">
-      <QueryJoinOn Name="PersonId" />
-    </QueryJoin>
-  </Query>-->
 
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">
@@ -118,7 +124,7 @@
   </Table>
 
   <!-- Check the generated output for the IsDeleted. -->
-  <Table Name="Person2" Schema="Demo" Create="true" Update="true" Upsert="true" Delete="true" Get="true" GetAll="true" View="true" />
+  <Table Name="Person2" Schema="Demo" Create="true" Update="true" Upsert="true" Delete="true" Get="true" GetAll="true" />
 
   <!-- Basic table with no row version or change log. -->
   <Table Name="Contact" Schema="Demo" EfModel="true" />

@@ -44,7 +44,6 @@ tables:
     [CategorySchema("Key", Title = "Provides the _key_ configuration.")]
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("CodeGen", Title = "Provides the _Code Generation_ configuration.", Description = "These primarily provide a shorthand to create the standard `Get`, `GetAll`, `Create`, `Update`, `Upsert`, `Delete` and `Merge`.")]
-    [CategorySchema("View", Title = "Provides the _View_ configuration.")]
     [CategorySchema("EntityFramework", Title = "Provides the _Entity Framework (EF) model_ configuration.")]
     [CategorySchema("UDT", Title = "Provides the _User Defined Table_ and _Table-Valued Parameter_ configuration.")]
     [CategorySchema("Auth", Title = "Provides the _Authorization_ configuration.")]
@@ -167,33 +166,6 @@ tables:
         [PropertySchema("CodeGen", Title = "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
             Description = "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.")]
         public bool? Merge { get; set; }
-
-        #endregion
-
-        #region View
-
-        /// <summary>
-        /// Indicates whether a `View` is to be generated.
-        /// </summary>
-        [JsonProperty("view", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "Indicates whether a `View` is to be generated.")]
-        public bool? View { get; set; }
-
-        /// <summary>
-        /// Gets or sets the `View` name.
-        /// </summary>
-        [JsonProperty("viewName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The `View` name.",
-            Description = "Defaults to `vw` + `Name`; e.g. `vwTableName`.")]
-        public string? ViewName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the schema name of the `View`.
-        /// </summary>
-        [JsonProperty("viewSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("View", Title = "The schema name for the `View`.",
-            Description = "Defaults to `Schema`.")]
-        public string? ViewSchema { get; set; }
 
         #endregion
 
@@ -477,16 +449,6 @@ tables:
         public string? QualifiedName => DbTable!.QualifiedName;
 
         /// <summary>
-        /// Inidicates whether the source of the EfModel is a database View.
-        /// </summary>
-        public bool EfIsAView => CompareValue(View, true) || DbTable!.IsAView;
-
-        /// <summary>
-        /// Gets the Ef database object name.
-        /// </summary>
-        public string EfDbName => CompareValue(View, true) ? "vw" + Name! : Name!;
-
-        /// <summary>
         /// Gets or sets the view where statements.
         /// </summary>
         public List<string>? ViewWhere { get; private set; }
@@ -507,8 +469,6 @@ tables:
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
             EfModelName = DefaultWhereNull(EfModelName, () => Name);
-            ViewName = DefaultWhereNull(ViewName, () => "vw" + Name);
-            ViewSchema = DefaultWhereNull(ViewSchema, () => Schema);
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => Root!.ColumnNameTenantId);
@@ -542,7 +502,7 @@ tables:
                 storedProcedure.Prepare(Root!, this);
             }
 
-            if (CompareValue(View, true))
+            if (CompareValue(DbTable.IsAView, true))
                 PrepareView();
         }
 

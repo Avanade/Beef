@@ -50,7 +50,6 @@ BEGIN
     DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{/each}}
     DECLARE @EnvelopeId INT
-    DECLARE @IncludeMin BIT
 
     -- Get the latest 'base' minimum.
     SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
@@ -80,8 +79,7 @@ BEGIN
         RETURN 0;
       END
 
-      SET @MaxQuerySize = 1000000  -- Override to a very large number.
-      SET @IncludeMin = 1
+      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
     END
     ELSE
     BEGIN
@@ -118,7 +116,6 @@ BEGIN
 {{#each Joins}}
         SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
 {{/each}}
-        SET @IncludeMin = 1
       END
       ELSE
       BEGIN

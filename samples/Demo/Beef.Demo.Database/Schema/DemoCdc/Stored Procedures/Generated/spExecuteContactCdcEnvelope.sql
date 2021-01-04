@@ -47,7 +47,6 @@ BEGIN
     DECLARE @ContactBaseMinLsn BINARY(10), @ContactMinLsn BINARY(10), @ContactMaxLsn BINARY(10)
     DECLARE @AddressBaseMinLsn BINARY(10), @AddressMinLsn BINARY(10), @AddressMaxLsn BINARY(10)
     DECLARE @EnvelopeId INT
-    DECLARE @IncludeMin BIT
 
     -- Get the latest 'base' minimum.
     SET @ContactBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Contact');
@@ -73,8 +72,7 @@ BEGIN
         RETURN 0;
       END
 
-      SET @MaxQuerySize = 1000000  -- Override to a very large number.
-      SET @IncludeMin = 1
+      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
     END
     ELSE
     BEGIN
@@ -107,7 +105,6 @@ BEGIN
       BEGIN
         SET @ContactMinLsn = @ContactBaseMinLsn;
         SET @AddressMinLsn = @AddressBaseMinLsn;
-        SET @IncludeMin = 1
       END
       ELSE
       BEGIN

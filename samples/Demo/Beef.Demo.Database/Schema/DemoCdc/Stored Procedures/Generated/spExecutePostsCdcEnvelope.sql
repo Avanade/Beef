@@ -49,7 +49,6 @@ BEGIN
     DECLARE @CommentsTagsBaseMinLsn BINARY(10), @CommentsTagsMinLsn BINARY(10), @CommentsTagsMaxLsn BINARY(10)
     DECLARE @PostsTagsBaseMinLsn BINARY(10), @PostsTagsMinLsn BINARY(10), @PostsTagsMaxLsn BINARY(10)
     DECLARE @EnvelopeId INT
-    DECLARE @IncludeMin BIT
 
     -- Get the latest 'base' minimum.
     SET @PostsBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Posts');
@@ -81,8 +80,7 @@ BEGIN
         RETURN 0;
       END
 
-      SET @MaxQuerySize = 1000000  -- Override to a very large number.
-      SET @IncludeMin = 1
+      SET @MaxQuerySize = 1000000  -- Override to a very large number to get all rows within the existing range!
     END
     ELSE
     BEGIN
@@ -119,7 +117,6 @@ BEGIN
         SET @CommentsMinLsn = @CommentsBaseMinLsn;
         SET @CommentsTagsMinLsn = @CommentsTagsBaseMinLsn;
         SET @PostsTagsMinLsn = @PostsTagsBaseMinLsn;
-        SET @IncludeMin = 1
       END
       ELSE
       BEGIN

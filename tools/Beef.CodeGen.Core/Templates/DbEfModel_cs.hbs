@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace {{Root.NamespaceBusiness}}.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{EfDbName}}'.
+    /// Represents the Entity Framework (EF) model for database object '{{Schema}}.{{Name}}'.
     /// </summary>
     public partial class {{EfModelName}}
     {
@@ -37,9 +37,9 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
             if (modelBuilder == null)
                 throw new ArgumentNullException(nameof(modelBuilder));
 
-            modelBuilder.Entity<{{EfDbName}}>(entity =>
+            modelBuilder.Entity<{{Name}}>(entity =>
             {
-                entity.{{#if EfIsAView}}ToView{{else}}ToTable{{/if}}("{{EfDbName}}", "{{Schema}}");
+                entity.{{#if DbTable.IsAView}}ToView{{else}}ToTable{{/if}}("{{Name}}", "{{Schema}}");
                 entity.HasKey({{#each PrimaryKeyColumns}}"{{Name}}"{{#unless @last}}, {{/unless}}{{/each}});
 {{#each CoreColumns}}
                 entity.Property(p => p.{{Name}}).HasColumnType("{{EfSqlType}}"){{#if DbColumn.IsComputed}}.ValueGeneratedOnAddOrUpdate(){{/if}}{{#if IsRowVersionColumn}}.IsRowVersion(){{/if}}{{#if IsCreated}}.ValueGeneratedOnUpdate(){{/if}}{{#if IsUpdated}}.ValueGeneratedOnAdd(){{/if}};
@@ -51,7 +51,7 @@ namespace {{Root.NamespaceBusiness}}.Data.EfModel
         /// <summary>
         /// Enables further configuration of the underlying <see cref="EntityTypeBuilder"/> when configuring the <see cref="ModelBuilder"/>.
         /// </summary>
-        static partial void AddToModel(EntityTypeBuilder<{{EfDbName}}> entity);
+        static partial void AddToModel(EntityTypeBuilder<{{Name}}> entity);
     }
 }
 
