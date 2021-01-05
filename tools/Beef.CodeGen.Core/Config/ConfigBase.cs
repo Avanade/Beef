@@ -29,31 +29,6 @@ namespace Beef.CodeGen.Config
         /// Resets the runtime parameters.
         /// </summary>
         void ResetRuntimeParameters();
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        string? KV1 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        string? KV2 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        string? KV3 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        string? KV4 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        string? KV5 { get; set; }
     }
 
     /// <summary>

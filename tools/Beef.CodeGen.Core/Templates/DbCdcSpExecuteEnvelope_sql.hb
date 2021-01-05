@@ -192,8 +192,8 @@ BEGIN
 
         INSERT INTO #_changes
           SELECT * 
-            FROM #{{Alias}} AS [_{{Alias}}]{{setkv1 Alias}}
-            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[_chg].[{{Name}}] = [_{{Root.KV1}}].[{{Name}}]{{/each}})
+            FROM #{{Alias}} AS [_{{Alias}}]
+            WHERE NOT EXISTS (SELECT * FROM #_changes AS [_chg] WHERE {{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[_chg].[{{Name}}] = [_{{../Alias}}].[{{Name}}]{{/each}})
       END
     END
 

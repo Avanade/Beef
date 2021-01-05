@@ -98,14 +98,14 @@ BEGIN
 {{#each Where}}
         AND {{{Statement}}}
 {{/each}}
-{{ifval Parent.ColumnIsDeleted}}        THEN UPDATE SET
+{{#if Parent.ColumnIsDeleted}}        THEN UPDATE SET
           {{Parent.ColumnIsDeleted.QualifiedName}} = 1{{#ifne SettableColumnsDelete.Count 0}},{{/ifne}}
   {{#each SettableColumnsDelete}}
           {{QualifiedName}} = {{#if IsAudit}}{{AuditParameterName}}{{else}}{{ParameterName}}{{/if}}{{#if @last}};{{else}},{{/if}}
   {{/each}}
 {{else}}
         THEN DELETE;
-{{/ifval}}
+{{/if}}
 {{#each ExecuteAfter}}
   {{#if @first}}
 

@@ -110,9 +110,7 @@ namespace Beef.CodeGen
                 {
                     Assemblies.Add(Assembly.Load(name!));
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design.
                 catch (Exception ex)
-#pragma warning restore CA1031
                 {
                     return new ValidationResult($"The specified assembly '{name}' is invalid: {ex.Message}");
                 }

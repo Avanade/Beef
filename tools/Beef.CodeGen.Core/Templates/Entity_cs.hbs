@@ -110,7 +110,7 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         public {{{PrivateType}}} {{PropertyName}}
         {
             get => {{PropertyPrivateName}};
-            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
+            set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq RefDataType 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}));
         }
     {{#unless SerializationIgnore}}
       {{#unless RefDataList}}
@@ -185,7 +185,7 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         {
   {{#if RefDataMapping}}
             get => GetMapping<string>(nameof({{Name}}));
-            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
+            set { var _{{PropertyPrivateName}} = GetMapping<{{{PropertyType}}}>(nameof({{Name}})) ?? default; SetValue(ref _{{PropertyPrivateName}}, value, {{lower Immutable}}, {{#if RefDataList}}false{{else}}{{#ifeq Type 'string'}}StringTrim.UseDefault, StringTransform.UseDefault{{else}}false{{/ifeq}}{{/if}}, nameof({{Name}}{{#ifval SecondaryPropertyChanged}}, SecondaryPropertyChanged{{/ifval}})); SetMapping(nameof({{Name}}), _{{PropertyPrivateName}}!); }
   {{else}}
             get => {{#if AutoCreate}}GetAutoValue(ref {{/if}}{{PropertyPrivateName}}{{#if AutoCreate}}){{/if}};
             set => SetValue(ref {{PropertyPrivateName}}, value, {{lower Immutable}}, {{#ifeq Type 'string'}}StringTrim.{{StringTrim}}, StringTransform.{{StringTransform}}{{else}}{{#ifeq Type 'DateTime'}}DateTimeTransform.{{DateTimeTransform}}{{else}}{{lower BubblePropertyChanged}}{{/ifeq}}{{/ifeq}}, nameof({{Name}}){{#ifval SecondaryPropertyChanged}}, {{SecondaryPropertyChanged}}{{/ifval}});

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
+<Script ConfigType="Database">
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcTrackingTableCreate_sql.hb" FileName="{{Root.CdcTrackingTableName}}.sql" OutDir="{{Root.PathDatabase}}/Schema/{{Root.CdcSchema}}/Tables" HelpText="DatabaseCdcRootCodeGenerator: Database/Schema/Xxx/Tables" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcTrackingUdt_sql.hb" FileName="udt{{Root.CdcTrackingTableName}}List.sql" OutDir="{{Root.PathDatabase}}/Schema/{{Root.CdcSchema}}/Types/User-Defined Table Types" HelpText="DatabaseCdcRootCodeGenerator: Database/Schema/Xxx/Types/User-Defined Table Types" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcTrackingTvp_cs.hb" FileName="CdcTrackingDbMapper.cs" OutDir="{{Root.PathCdc}}/Data" HelpText="DatabaseCdcRootCodeGenerator: Cdc/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{EnvelopeTableName}}.sql" OutDir="{{Root.PathDatabase}}/Schema/{{CdcSchema}}/Tables" HelpText="DatabaseCdcCodeGenerator: Database/Schema/Xxx/Tables" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcSpExecuteEnvelope_sql.hb" FileName="{{StoredProcedureName}}.sql" OutDir="{{Root.PathDatabase}}/Schema/{{CdcSchema}}/Stored Procedures" HelpText="DatabaseCdcCodeGenerator: Database/Schema/Xxx/Stored Procedures" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcEntity_cs.hb" FileName="{{ModelName}}Cdc.cs" OutDir="{{Root.PathCdc}}/Entities" HelpText="DatabaseCdcCodeGenerator: Cdc/Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcData_cs.hb" FileName="{{ModelName}}CdcData.cs" OutDir="{{Root.PathCdc}}/Data" HelpText="DatabaseCdcCodeGenerator: Cdc/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcCodeGenerator" Template="DbCdcBackgroundService_cs.hb" FileName="{{ModelName}}CdcBackgroundService.cs" OutDir="{{Root.PathCdc}}/Services" HelpText="DatabaseCdcCodeGenerator: Cdc/Services" />
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcRootCodeGenerator" Template="DbCdcDataSce_cs.hb" FileName="ServiceCollectionsExtension.cs" OutDir="{{Root.PathCdc}}/Data" HelpText="DatabaseCdcRootCodeGenerator: Cdc/Data" />
+</Script>

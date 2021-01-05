@@ -65,8 +65,7 @@ namespace Beef.Database.Core
             _configOpt = App.Option("-c|--config", "CodeGeneration configuration XML file.", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingFile());
 
-            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue)
-                .Accepts(v => v.Use(new FileResourceValidator()));
+            _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name (defaults to Database.Xml) for code generation.", CommandOptionType.SingleValue);
 
             _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources) for code generation.", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());

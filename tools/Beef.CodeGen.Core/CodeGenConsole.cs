@@ -186,7 +186,7 @@ namespace Beef.CodeGen
             if (pos < 0)
                 return Array.Empty<string>();
 
-            return new string[] { text.Substring(0, pos), text.Substring(pos + 1) };
+            return new string[] { text.Substring(0, pos), text[(pos + 1)..] };
         }
 
         /// <summary>

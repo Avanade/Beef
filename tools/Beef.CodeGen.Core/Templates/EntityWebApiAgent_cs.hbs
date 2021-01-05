@@ -86,12 +86,12 @@ namespace {{Root.NamespaceCommon}}.Agents
             PatchAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", patchOption, {{#if HasValue}}Beef.Check.NotNull(value, nameof(value)), {{/if}}requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq WebApiMethod 'HttpDelete'}}
-            DeleteAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", {{/if}}requestOptions: requestOptions,
+            DeleteAsync{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}("{{Parent.WebApiRoutePrefix}}{{#ifval WebApiRoute}}{{#ifne WebApiRoute ''}}/{{WebApiRoute}}{{/ifne}}{{/ifval}}", requestOptions: requestOptions,
   {{/ifeq}}
   {{#ifeq ValueLessParameters.Count 0}}
                 args: Array.Empty<WebApiArg>());
   {{else}}
-                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
+                args: new WebApiArg[] { {{#each CoreParameters}}{{#unless @first}}, {{/unless}}new WebApiArg<{{{WebApiAgentParameterType}}}>("{{ArgumentName}}", {{ArgumentName}}{{#ifval WebApiAgentFrom}}, WebApiArgType.{{WebApiAgentFrom}}{{/ifval}}){{/each}}{{#if Paging}}{{#ifne CoreParameters.Count 0}}, {{/ifne}}new WebApiPagingArgsArg("paging", paging){{/if}} });
   {{/ifeq}}
 {{/each}}
     }

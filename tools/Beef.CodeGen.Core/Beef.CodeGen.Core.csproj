@@ -25,6 +25,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageTags>beef codegen</PackageTags>
     <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,6 +36,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\DatabaseCdc.xml" />
+    <None Remove="Scripts\DatabaseWithCdc.xml" />
     <None Remove="Templates\DbCdcBackgroundService_cs.hb" />
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
@@ -94,6 +97,8 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
     <EmbeddedResource Include="Scripts\Database.xml" />
     <EmbeddedResource Include="Scripts\EntityBusiness.xml" />
     <EmbeddedResource Include="Scripts\DataModelOnly.xml" />
@@ -154,12 +159,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Handlebars.Net" Version="1.10.1" />
+    <PackageReference Include="Handlebars.Net" Version="2.0.3" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
   </ItemGroup>
 

@@ -114,16 +114,8 @@ namespace Beef.CodeGen.Generators
                 context.Inverse(writer, parameters);
             });
 
-            Handlebars.RegisterHelper("setkv1", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV1 = v); });
-            Handlebars.RegisterHelper("setkv2", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV2 = v); });
-            Handlebars.RegisterHelper("setkv3", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV3 = v); });
-            Handlebars.RegisterHelper("setkv4", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV4 = v); });
-            Handlebars.RegisterHelper("setkv5", (writer, context, parameters) => { SetKeyValue((object)context, parameters, (r, v) => r.KV5 = v); });
-
             // Converts a value to lowercase.
-#pragma warning disable CA1308 // Normalize strings to uppercase; this is an explicit and required call to lowercase.
             Handlebars.RegisterHelper("lower", (writer, context, parameters) => writer.WriteSafeString(parameters.FirstOrDefault()?.ToString()?.ToLowerInvariant() ?? ""));
-#pragma warning restore CA1308
 
             // Converts a value to camelcase.
             Handlebars.RegisterHelper("camel", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToCamelCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
@@ -158,7 +150,7 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Perform the actual IfEq equality check.
         /// </summary>
-        private static bool IfEq(object[] args)
+        private static bool IfEq(Arguments args)
         {
             bool func()
             {
@@ -200,27 +192,18 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Check the arguments to validate for correctness.
         /// </summary>
-        private static bool CheckArgs(string name, TextWriter writer, object[] args)
+        private static bool CheckArgs(string name, EncodedTextWriter writer, Arguments args)
         {
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] != null && args[i].GetType().Name == "UndefinedBindingResult")
                 {
-                    writer.WriteLine($"!!! {name}: Arg[{i}] == UndefinedBindingResult !!!");
+                    writer.Write($"!!! {name}: Arg[{i}] == UndefinedBindingResult !!!");
                     return false;
                 }
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Sets the Key value.
-        /// </summary>
-        private static void SetKeyValue(object context, object[] parameters, Action<IRootConfig, string?> action)
-        {
-            if (context is ConfigBase cb && cb.RootConfig is IRootConfig rc)
-                action(rc, parameters.Length == 0 ? null : parameters[0].ToString());
         }
     }
 }

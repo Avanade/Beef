@@ -295,35 +295,6 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region KeyValue
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        public string? KV1 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        public string? KV2 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        public string? KV3 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        public string? KV4 { get; set; }
-
-        /// <summary>
-        /// Gets or sets Key1 value. 
-        /// </summary>
-        public string? KV5 { get; set; }
-
-        #endregion
-
         /// <summary>
         /// Gets or sets the corresponding <see cref="TableConfig"/> collection.
         /// </summary>

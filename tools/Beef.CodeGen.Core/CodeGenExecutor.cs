@@ -159,7 +159,7 @@ namespace Beef.CodeGen
             try
             {
                 // Load the script configuration.
-                var (scripts, configType) = await LoadScriptConfigAsync().ConfigureAwait(false);
+                var (scripts, configType) = await LoadScriptConfigAsync(_args.ScriptFile!).ConfigureAwait(false);
 
                 var cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
                 var rcfg = (IRootConfig)cfg;
@@ -220,31 +220,49 @@ namespace Beef.CodeGen
         /// <summary>
         /// Load the code-gen scripts configuration.
         /// </summary>
-        private async Task<(List<CodeGenScriptArgs>, ConfigType)> LoadScriptConfigAsync()
+        private async Task<(List<CodeGenScriptArgs>, ConfigType)> LoadScriptConfigAsync(FileInfo scriptFile)
         {
             var list = new List<CodeGenScriptArgs>();
 
             // Load the script XML content.
             XElement xmlScript;
-            if (_args.ScriptFile!.Exists)
+            if (scriptFile!.Exists)
             {
-                using var fs = File.OpenText(_args.ScriptFile.FullName);
+                using var fs = File.OpenText(scriptFile.FullName);
                 xmlScript = await XElement.LoadAsync(fs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
             }
             else
             {
-                var c = await ResourceManager.GetScriptContentAsync(_args.ScriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
+                var c = await ResourceManager.GetScriptContentAsync(scriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
                 if (c == null)
-                    throw new CodeGenException("The Script XML does not exist.");
+                    throw new CodeGenException($"The Script XML '{scriptFile.FullName}' does not exist (either as a file or as an embedded resource).");
 
                 xmlScript = XElement.Parse(c);
             }
 
             if (xmlScript?.Name != "Script")
-                throw new CodeGenException("The Script XML file must have a root element named 'Script'.");
+                throw new CodeGenException($"The Script XML '{scriptFile.FullName}' file must have a root element named 'Script'.");
 
-            if (!xmlScript.Elements("Generate").Any())
-                throw new CodeGenException("The Script XML file must have at least a single 'Generate' element.");
+            var ct = xmlScript.Attribute("ConfigType")?.Value ?? throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' must have an attribute named 'ConfigType' within the root 'Script' element.");
+            if (!Enum.TryParse<ConfigType>(ct, true, out var configType))
+                throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' attribute named 'ConfigType' has an invalid value '{ct}'.");
+
+            var ia = xmlScript.Attribute("Inherits")?.Value;
+            if (ia != null)
+            {
+                foreach (var ian in ia.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var fi = new FileInfo(Path.Combine(scriptFile.DirectoryName, ian.Trim()));
+                    var result = await LoadScriptConfigAsync(fi).ConfigureAwait(false);
+                    if (result.Item2 != configType)
+                        throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' inherits '{fi.FullName}' which has a different 'ConfigType'; this must be the same.");
+
+                    list.AddRange(result.Item1);
+                }
+            }
+
+            if (ia == null && !xmlScript.Elements("Generate").Any())
+                throw new CodeGenException($"The Script XML '{scriptFile.FullName}' file must have at least a single 'Generate' element.");
 
             foreach (var scriptEle in xmlScript.Elements("Generate"))
             {
@@ -265,11 +283,7 @@ namespace Beef.CodeGen
                 list.Add(args);
             }
 
-            var ct = xmlScript.Attribute("ConfigType")?.Value ?? throw new CodeGenException("The Script XML file must have an attribute named 'ConfigType' within the root 'Script' element.");
-            if (Enum.TryParse<ConfigType>(ct, true, out var configType))
-                return (list, configType);
-
-            throw new CodeGenException($"The Script XML file attribute named 'ConfigType' has an invalid value '{ct}'.");
+            return (list, configType);
         }
 
         /// <summary>
