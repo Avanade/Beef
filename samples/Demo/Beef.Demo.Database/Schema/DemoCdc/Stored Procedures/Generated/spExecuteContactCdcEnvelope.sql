@@ -221,10 +221,12 @@ BEGIN
         [c].[Email] AS [Email],
         [c].[Active] AS [Active],
         [c].[DontCallList] AS [DontCallList],
-        [c].[AddressId] AS [AddressId]
+        [c].[AddressId] AS [AddressId],
+        [cm].[UniqueId] AS [UniqueId]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] WITH (NOLOCK) ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR))
-      LEFT OUTER JOIN [Legacy].[Contact] AS [c] WITH (NOLOCK) ON ([c].[ContactId] = [_chg].[ContactId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR))
+      LEFT OUTER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
+      INNER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
 
     -- Related table: Address (Legacy.Address) - only use INNER JOINS to get what is actually there right now.
     SELECT
@@ -235,8 +237,8 @@ BEGIN
         [a].[State] AS [State],
         [a].[PostalZipCode] AS [PostalZipCode]
       FROM #_changes AS [_chg]
-      INNER JOIN [Legacy].[Contact] AS [c] WITH (NOLOCK) ON ([c].[ContactId] = [_chg].[ContactId])
-      INNER JOIN [Legacy].[Address] AS [a] WITH (NOLOCK) ON ([a].[Id] = [c].[AddressId])
+      INNER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
+      INNER JOIN [Legacy].[Address] AS [a] ON ([a].[Id] = [c].[AddressId])
       WHERE [_chg].[_Op] <> 1
 
     -- Commit the transaction.

@@ -14,10 +14,12 @@ namespace Beef.Data.Database.Cdc
     /// </summary>
     public abstract class CdcBackgroundService : IDisposable
     {
+        private string? _name;
+
         /// <summary>
-        /// Gets or sets the default interval seconds used where the specified <see cref="IntervalSeconds"/> is less than or equal to zero. Defaults to <b>five</b> minutes.
+        /// Gets or sets the default interval seconds used where the specified <see cref="IntervalSeconds"/> is less than or equal to zero. Defaults to <b>one</b> minute.
         /// </summary>
-        public static int DefaultIntervalSeconds { get; set; } = 5 * 60;
+        public static int DefaultIntervalSeconds { get; set; } = 60;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CdcBackgroundService"/> class.
@@ -41,20 +43,20 @@ namespace Beef.Data.Database.Cdc
         protected ILogger Logger { get; private set; }
 
         /// <summary>
-        /// Gets the service name.
+        /// Gets the service name (used for logging).
         /// </summary>
-        public abstract string ServiceName { get; }
+        public virtual string ServiceName => _name ??= GetType().Name;
 
         /// <summary>
         /// Gets the interval seconds between each execution.
         /// </summary>
         /// <remarks>The interval seconds must be greater than zero otherwise the <see cref="DefaultIntervalSeconds"/> will be used.</remarks>
-        public abstract int IntervalSeconds { get; }
+        public virtual int? IntervalSeconds { get; }
 
         /// <summary>
         /// Gets the <see cref="IntervalSeconds"/> as a <see cref="TimeSpan"/>.
         /// </summary>
-        protected TimeSpan IntervalTimespan => TimeSpan.FromSeconds(IntervalSeconds > 0 ? IntervalSeconds
+        protected TimeSpan IntervalTimespan => TimeSpan.FromSeconds(IntervalSeconds.HasValue && IntervalSeconds.Value > 0 ? IntervalSeconds.Value
             : (DefaultIntervalSeconds <= 1 ? throw new InvalidOperationException("The DefaultIntervalSeconds value must be greater than zero.") : DefaultIntervalSeconds));
 
         /// <summary>

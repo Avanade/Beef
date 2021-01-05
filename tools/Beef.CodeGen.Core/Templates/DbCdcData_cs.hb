@@ -30,7 +30,7 @@ namespace {{Root.NamespaceCdc}}.Data
     public partial class {{ModelName}}CdcData : CdcDataOrchestrator<{{ModelName}}Cdc, {{ModelName}}CdcData.{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcData.{{ModelName}}CdcWrapper, CdcTrackingDbMapper>, I{{ModelName}}CdcData
     {
         private static readonly DatabaseMapper<{{ModelName}}CdcWrapper> _{{camel ModelName}}CdcWrapperMapper = DatabaseMapper.CreateAuto<{{ModelName}}CdcWrapper>();
-{{#each Joins}}
+{{#each CdcJoins}}
         private static readonly DatabaseMapper<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc> _{{camel ModelName}}CdcMapper = DatabaseMapper.CreateAuto<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc>();
 {{/each}}
 
@@ -57,7 +57,7 @@ namespace {{Root.NamespaceCdc}}.Data
 
             var result = await SelectQueryMultiSetAsync(maxBatchSize, incomplete,
                 new MultiSetCollArgs<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>(_{{camel ModelName}}CdcWrapperMapper, r => {{Alias}}Coll = r, stopOnNull: true){{#ifne Joins.Count 0}},{{/ifne}} // Root table: {{Schema}}.{{Name}}
-{{#each Joins}}
+{{#each CdcJoins}}
                 new MultiSetCollArgs<{{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection, {{Parent.ModelName}}Cdc.{{ModelName}}Cdc>(_{{camel ModelName}}CdcMapper, r =>
                 {
   {{#each JoinHierarchyReverse}}

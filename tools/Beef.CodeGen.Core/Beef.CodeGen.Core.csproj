@@ -38,8 +38,8 @@
     <None Remove="Templates\DbCdcBackgroundService_cs.hb" />
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
+    <None Remove="Templates\DbCdcEntity_cs.hb" />
     <None Remove="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
-    <None Remove="Templates\DbCdcModel_cs.hb" />
     <None Remove="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
@@ -108,7 +108,7 @@
     <EmbeddedResource Include="Templates\DbCdcTrackingUdt_sql.hb" />
     <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbCdcModel_cs.hb" />
+    <EmbeddedResource Include="Templates\DbCdcEntity_cs.hb" />
     <EmbeddedResource Include="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />

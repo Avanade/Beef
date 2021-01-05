@@ -21,6 +21,13 @@
     <CdcJoin Name="Address" JoinCardinality="OneToOne">
       <CdcJoinOn Name="Id" ToColumn="AddressId" />
     </CdcJoin>
+    
+    <!-- Set up inner join relationship from Legacy.Contact to Legacy.ContactMapping.
+         Inner Join (only outputs where exists) on ContactMapping.ContactId = Contact.ContactId. 
+         Only include the joined 'UniqueId' column. -->
+    <CdcJoin Name="ContactMapping" Type="Inner" IncludeColumns="UniqueId">
+      <CdcJoinOn Name="ContactId" />
+    </CdcJoin>
   </Cdc>
 
   <!-- Set up CDC for primary table Legacy.Posts. 
@@ -34,6 +41,7 @@
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
       <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
     </CdcJoin>
+    
     <!-- Set up secondary One-To-Many relationship from Legacy.Comments to Legacy.Tags (1:n).
          Name as 'CommentsTags' for uniqueness for join referencing.
          Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
@@ -43,6 +51,7 @@
       <CdcJoinOn Name="ParentType" ToStatement="'C'" />
       <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
     </CdcJoin>
+    
     <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Tags (1:n).
          Name as 'PostsTags' for uniqueness for join referencing.
          Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
@@ -52,8 +61,6 @@
       <CdcJoinOn Name="ParentType" ToStatement="'P'" />
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
     </CdcJoin>
-    <!--<CdcJoin Name="Blah" Schema="Legacy" JoinTo="Posts" JoinOnly="true">
-    </CdcJoin>-->
   </Cdc>
 
   <!-- Special test to generate all variations. -->

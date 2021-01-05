@@ -46,14 +46,14 @@ BEGIN
 
     -- Declare variables.
     DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
-{{#each Joins}}
+{{#each CdcJoins}}
     DECLARE @{{pascal Name}}BaseMinLsn BINARY(10), @{{pascal Name}}MinLsn BINARY(10), @{{pascal Name}}MaxLsn BINARY(10)
 {{/each}}
     DECLARE @EnvelopeId INT
 
     -- Get the latest 'base' minimum.
     SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{Name}}');
-{{#each Joins}}
+{{#each CdcJoins}}
     SET @{{pascal Name}}BaseMinLsn = sys.fn_cdc_get_min_lsn('{{Schema}}_{{TableName}}');
 {{/each}}
 
@@ -63,7 +63,7 @@ BEGIN
       SELECT TOP 1
           @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MinLsn],
           @{{pascal Name}}MaxLsn = [_env].[{{pascal Name}}MaxLsn],
-{{#each Joins}}
+{{#each CdcJoins}}
           @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MinLsn],
           @{{pascal Name}}MaxLsn = [_env].[{{pascal Name}}MaxLsn],
 {{/each}}
@@ -89,7 +89,7 @@ BEGIN
       SELECT TOP 1
           @EnvelopeId = [_env].[EnvelopeId],
           @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MaxLsn],
-{{#each Joins}}
+{{#each CdcJoins}}
           @{{pascal Name}}MinLsn = [_env].[{{pascal Name}}MaxLsn],
 {{/each}}
           @IsComplete = [_env].IsComplete
@@ -113,7 +113,7 @@ BEGIN
       IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
       BEGIN
         SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
-{{#each Joins}}
+{{#each CdcJoins}}
         SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn;
 {{/each}}
       END
@@ -121,14 +121,14 @@ BEGIN
       BEGIN
         -- Increment the minimum as the last has already been processed.
         SET @{{pascal Name}}MinLsn = sys.fn_cdc_increment_lsn(@{{pascal Name}}MinLsn)
-{{#each Joins}}
+{{#each CdcJoins}}
         SET @{{pascal Name}}MinLsn = sys.fn_cdc_increment_lsn(@{{pascal Name}}MinLsn)
 {{/each}}
       END
 
       -- Get the maximum LSN.
       SET @{{pascal Name}}MaxLsn = sys.fn_cdc_get_max_lsn();
-{{#each Joins}}
+{{#each CdcJoins}}
       SET @{{pascal Name}}MaxLsn = @{{pascal Parent.Name}}MaxLsn
 {{/each}}
 
@@ -141,7 +141,7 @@ BEGIN
 
     -- The minimum can not be less than the base or an error will occur, so realign where not correct.
     IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
-{{#each Joins}}
+{{#each CdcJoins}}
     IF (@{{pascal Name}}MinLsn < @{{pascal Name}}BaseMinLsn) BEGIN SET @{{pascal Name}}MinLsn = @{{pascal Name}}BaseMinLsn END
 {{/each}}
 
@@ -168,7 +168,7 @@ BEGIN
       END
     END
 
-{{#each Joins}}
+{{#each CdcJoins}}
     -- Find changes on related table: {{Name}} ({{Schema}}.{{TableName}}) - assume all are 'update' operation (i.e. it doesn't matter).
     IF (@{{pascal Name}}MinLsn < @{{pascal Name}}MaxLsn)
     BEGIN
@@ -206,7 +206,7 @@ BEGIN
       INSERT INTO [{{CdcSchema}}].[{{EnvelopeTableName}}] (
           [{{pascal Name}}MinLsn],
           [{{pascal Name}}MaxLsn],
-{{#each Joins}}
+{{#each CdcJoins}}
           [{{pascal Name}}MinLsn],
           [{{pascal Name}}MaxLsn],
 {{/each}}
@@ -217,7 +217,7 @@ BEGIN
         VALUES (
           @{{pascal Name}}MinLsn,
           @{{pascal Name}}MaxLsn,
-{{#each Joins}}
+{{#each CdcJoins}}
           @{{pascal Name}}MinLsn,
           @{{pascal Name}}MaxLsn,
 {{/each}}
@@ -248,13 +248,21 @@ BEGIN
         [_chg].[{{Name}}] AS [{{NameAlias}}]{{#ifne Parent.SelectedColumnsExcludingPrimaryKey.Count 0}},{{/ifne}}
 {{/each}}
 {{#each SelectedColumnsExcludingPrimaryKey}}
-        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
+{{/each}}
+{{#each JoinNonCdcChildren}}
+  {{#each Columns}}
+        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#unless @../last}},{{/unless}}{{/unless}}
+  {{/each}}
 {{/each}}
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] WITH (NOLOCK) ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
-      LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+      LEFT OUTER JOIN [{{Root.CdcSchema}}].[{{Root.CdcTrackingTableName}}] AS [_ct] ON ([_ct].[Schema] = '{{Schema}}' AND [_ct].[Table] = '{{Name}}' AND [_ct].[Key] = {{#ifeq PrimaryKeyColumns.Count 1}}{{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{/each}}{{else}}CONCAT({{#each PrimaryKeyColumns}}CAST([_chg].[{{Name}}] AS NVARCHAR)){{#unless @last}}, ',', {{/unless}}{{/each}}){{/ifeq}}
+      LEFT OUTER JOIN [{{Schema}}].[{{Table}}] AS [{{Alias}}] ON ({{#each PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+{{#each JoinNonCdcChildren}}
+      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+{{/each}}
 
-{{#each Joins}}
+{{#each CdcJoins}}
     -- Related table: {{Name}} ({{Schema}}.{{TableName}}) - only use INNER JOINS to get what is actually there right now.
     SELECT
   {{#each JoinHierarchyReverse}}
@@ -265,12 +273,20 @@ BEGIN
     {{/unless}}
   {{/each}}
   {{#each Columns}}
-        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{/unless}}
+        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#ifne Parent.JoinNonCdcChildren.Count 0}},{{/ifne}}{{/unless}}
+  {{/each}}
+  {{#each JoinNonCdcChildren}}
+    {{#each Columns}}
+        [{{Parent.Alias}}].[{{Name}}] AS [{{NameAlias}}]{{#unless @last}},{{else}}{{#unless @../last}},{{/unless}}{{/unless}}
+    {{/each}}
   {{/each}}
       FROM #_changes AS [_chg]
-      INNER JOIN [{{Parent.Schema}}].[{{Parent.Table}}] AS [{{Parent.Alias}}] WITH (NOLOCK) ON ({{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
+      INNER JOIN [{{Parent.Schema}}].[{{Parent.Table}}] AS [{{Parent.Alias}}] ON ({{#each Parent.PrimaryKeyColumns}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = [_chg].[{{Name}}]{{/each}})
   {{#each JoinHierarchyReverse}}
-      INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] WITH (NOLOCK) ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+      INNER JOIN [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
+  {{/each}}
+  {{#each JoinNonCdcChildren}}
+      {{JoinTypeSql}} [{{Schema}}].[{{TableName}}] AS [{{Alias}}] ON ({{#each On}}{{#unless @first}} AND {{/unless}}[{{Parent.Alias}}].[{{Name}}] = {{#ifval ToStatement}}{{ToStatement}}{{else}}[{{Parent.JoinToAlias}}].[{{ToColumn}}]{{/ifval}}{{/each}})
   {{/each}}
       WHERE [_chg].[_Op] <> 1
 

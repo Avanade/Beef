@@ -100,7 +100,20 @@ namespace Beef
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton<IEventPublisher>(_ => new NullEventPublisher());
+            return services.AddSingleton<IEventPublisher, NullEventPublisher>();
+        }
+
+        /// <summary>
+        /// Adds a singleton service to instantiate a new <see cref="IEventPublisher"/> <see cref="LoggerEventPublisher"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+        /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
+        public static IServiceCollection AddBeefLoggerEventPublisher(this IServiceCollection services)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            return services.AddSingleton<IEventPublisher, LoggerEventPublisher>();
         }
 
         /// <summary>

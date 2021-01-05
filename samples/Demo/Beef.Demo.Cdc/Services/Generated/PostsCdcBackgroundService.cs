@@ -31,14 +31,9 @@ namespace Beef.Demo.Cdc.Services
             base(serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
 
         /// <summary>
-        /// Gets the service name.
-        /// </summary>
-        public override string ServiceName => nameof(PostsCdcBackgroundService);
-
-        /// <summary>
         /// Gets the interval seconds between each execution.
         /// </summary>
-        public override int IntervalSeconds => _config.GetValue<int>("PostsCdcIntervalSeconds");
+        public override int? IntervalSeconds => _config.GetValue<int?>("PostsCdcIntervalSeconds");
     }
 }
 

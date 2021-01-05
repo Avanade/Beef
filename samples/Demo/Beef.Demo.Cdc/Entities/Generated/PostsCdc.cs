@@ -38,14 +38,14 @@ namespace Beef.Demo.Cdc.Entities
         public DateTime? Date { get; set; }
 
         /// <summary>
-        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsCollection"/> (database object 'Legacy.Comments').
+        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsCollection"/> (database table 'Legacy.Comments').
         /// </summary>
         [JsonProperty("comments", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
         public PostsCdc.CommentsCdcCollection? Comments { get; set; }
 
         /// <summary>
-        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.PostsTagsCollection"/> (database object 'Legacy.PostsTags').
+        /// Gets or sets the related (one-to-many) <see cref="PostsCdc.PostsTagsCollection"/> (database table 'Legacy.Tags').
         /// </summary>
         [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
@@ -79,7 +79,7 @@ namespace Beef.Demo.Cdc.Entities
         #region CommentsCdc
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.Comments'.
+        /// Represents the CDC model for the related (child) database table 'Legacy.Comments' (known uniquely as 'Comments').
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public partial class CommentsCdc : IUniqueKey
@@ -109,7 +109,7 @@ namespace Beef.Demo.Cdc.Entities
             public DateTime? Date { get; set; }
 
             /// <summary>
-            /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsTagsCollection"/> (database object 'Legacy.CommentsTags').
+            /// Gets or sets the related (one-to-many) <see cref="PostsCdc.CommentsTagsCollection"/> (database table 'Legacy.Tags').
             /// </summary>
             [JsonProperty("tags", DefaultValueHandling = DefaultValueHandling.Ignore)]
             [MapperIgnore()]
@@ -144,7 +144,7 @@ namespace Beef.Demo.Cdc.Entities
         #region CommentsTagsCdc
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.CommentsTags'.
+        /// Represents the CDC model for the related (child) database table 'Legacy.Tags' (known uniquely as 'CommentsTags').
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public partial class CommentsTagsCdc : IUniqueKey
@@ -201,7 +201,7 @@ namespace Beef.Demo.Cdc.Entities
         #region PostsTagsCdc
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.PostsTags'.
+        /// Represents the CDC model for the related (child) database table 'Legacy.Tags' (known uniquely as 'PostsTags').
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public partial class PostsTagsCdc : IUniqueKey

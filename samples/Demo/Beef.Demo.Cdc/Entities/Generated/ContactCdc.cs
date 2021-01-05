@@ -62,7 +62,13 @@ namespace Beef.Demo.Cdc.Entities
         public int? AddressId { get; set; }
 
         /// <summary>
-        /// Gets or sets the related (one-to-one) <see cref="ContactCdc.Address"/> (database object 'Legacy.Address').
+        /// Gets or sets the 'UniqueId' column value (join table 'Legacy.ContactMapping').
+        /// </summary>
+        [JsonProperty("uniqueId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Guid UniqueId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the related (one-to-one) <see cref="ContactCdc.Address"/> (database table 'Legacy.Address').
         /// </summary>
         [JsonProperty("address", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MapperIgnore()]
@@ -96,7 +102,7 @@ namespace Beef.Demo.Cdc.Entities
         #region AddressCdc
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table 'Legacy.Address'.
+        /// Represents the CDC model for the related (child) database table 'Legacy.Address' (known uniquely as 'Address').
         /// </summary>
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
         public partial class AddressCdc : IUniqueKey

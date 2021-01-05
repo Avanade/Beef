@@ -8,7 +8,7 @@ CREATE TABLE [{{CdcSchema}}].[{{EnvelopeTableName}}] (
   [CreatedDate] DATETIME NOT NULL,
   [{{pascal Name}}MinLsn] BINARY(10) NOT NULL,  -- Primary table: {{Schema}}.{{Name}}
   [{{pascal Name}}MaxLsn] BINARY(10) NOT NULL,
-{{#each Joins}}
+{{#each CdcJoins}}
   [{{pascal Name}}MinLsn] BINARY(10) NOT NULL,  -- Related table: {{Schema}}.{{TableName}}
   [{{pascal Name}}MaxLsn] BINARY(10) NOT NULL,
 {{/each}}

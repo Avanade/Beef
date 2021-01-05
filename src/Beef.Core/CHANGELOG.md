@@ -8,6 +8,7 @@ Represents the **NuGet** versions.
 - *Fixed:* `WebApiAgentResult` was failing where the response `Value` type is a `string` and the response content media type is `text/plain`; was attempting to perform a JSON deserialization which has now been corrected.
 - *Fixed:* Fixed new compile-time error for `InvokerBase` introduced with Visual Studio v16.8.2.
 - *Enhancement:* Added `EntityBasicBase.GenerateETag` that will generate an ETag for a value by serializing to JSON and performing an MD5 hash.
+- *Enhancement:* Added `LoggerEventPublisher` that simply logs the `Subject`, `Action` and `Value` and then swallows/discards.
 
 ## v4.1.2
 - *Enhancement:* The `CodeGen` namespace has been moved to `Beef.CodeGen.Core`. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`). The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine.

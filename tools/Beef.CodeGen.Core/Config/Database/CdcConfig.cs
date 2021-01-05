@@ -241,19 +241,24 @@ namespace Beef.CodeGen.Config.Database
         public List<CdcColumnConfig> Columns { get; } = new List<CdcColumnConfig>();
 
         /// <summary>
-        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are also CDC monitored.
+        /// Gets the <see cref="QueryJoinConfig"/> collection for "all" those that are also CDC monitored.
         /// </summary>
-        public List<CdcJoinConfig> CdcJoins => Joins!.Where(x => CompareNullOrValue(x.JoinOnly, true)).ToList();
+        public List<CdcJoinConfig> CdcJoins => Joins!.Where(x => CompareNullOrValue(x.Type, "Cdc")).ToList();
 
         /// <summary>
-        /// Gets the  <see cref="QueryJoinConfig"/> collection for those that are not flagged as CDC monitored.
+        /// Gets the <see cref="QueryJoinConfig"/> collection for "all" those that are not flagged as CDC monitored.
         /// </summary>
-        public List<CdcJoinConfig> NonCdcJoins => Joins!.Where(x => CompareValue(x.JoinOnly, false)).ToList();
+        public List<CdcJoinConfig> NonCdcJoins => Joins!.Where(x => !CompareNullOrValue(x.Type, "Cdc")).ToList();
 
         /// <summary>
-        /// Gets the list of joined children.
+        /// Gets the list of CDC joined "directly related" children.
         /// </summary>
-        public List<CdcJoinConfig> JoinChildren => Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema).ToList();
+        public List<CdcJoinConfig> JoinCdcChildren => Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema && CompareNullOrValue(x.Type, "Cdc")).ToList();
+
+        /// <summary>
+        /// Gets the list of non-CDC joined "directly related" children.
+        /// </summary>
+        public List<CdcJoinConfig> JoinNonCdcChildren => Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema && !CompareNullOrValue(x.Type, "Cdc")).ToList();
 
         /// <summary>
         /// Gets the table name.

@@ -294,8 +294,8 @@ BEGIN
         [p].[Text] AS [Text],
         [p].[Date] AS [Date]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] WITH (NOLOCK) ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR))
-      LEFT OUTER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR))
+      LEFT OUTER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
 
     -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now.
     SELECT
@@ -304,8 +304,8 @@ BEGIN
         [c].[Text] AS [Text],
         [c].[Date] AS [Date]
       FROM #_changes AS [_chg]
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
-      INNER JOIN [Legacy].[Comments] AS [c] WITH (NOLOCK) ON ([c].[PostsId] = [p].[PostsId])
+      INNER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
+      INNER JOIN [Legacy].[Comments] AS [c] ON ([c].[PostsId] = [p].[PostsId])
       WHERE [_chg].[_Op] <> 1
 
     -- Related table: CommentsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
@@ -315,9 +315,9 @@ BEGIN
         [ct].[ParentId] AS [CommentsId],
         [ct].[Text] AS [Text]
       FROM #_changes AS [_chg]
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
-      INNER JOIN [Legacy].[Comments] AS [c] WITH (NOLOCK) ON ([c].[PostsId] = [p].[PostsId])
-      INNER JOIN [Legacy].[Tags] AS [ct] WITH (NOLOCK) ON ([ct].[ParentType] = 'C' AND [ct].[ParentId] = [c].[CommentsId])
+      INNER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
+      INNER JOIN [Legacy].[Comments] AS [c] ON ([c].[PostsId] = [p].[PostsId])
+      INNER JOIN [Legacy].[Tags] AS [ct] ON ([ct].[ParentType] = 'C' AND [ct].[ParentId] = [c].[CommentsId])
       WHERE [_chg].[_Op] <> 1
 
     -- Related table: PostsTags (Legacy.Tags) - only use INNER JOINS to get what is actually there right now.
@@ -326,8 +326,8 @@ BEGIN
         [pt].[ParentId] AS [PostsId],
         [pt].[Text] AS [Text]
       FROM #_changes AS [_chg]
-      INNER JOIN [Legacy].[Posts] AS [p] WITH (NOLOCK) ON ([p].[PostsId] = [_chg].[PostsId])
-      INNER JOIN [Legacy].[Tags] AS [pt] WITH (NOLOCK) ON ([pt].[ParentType] = 'P' AND [pt].[ParentId] = [p].[PostsId])
+      INNER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
+      INNER JOIN [Legacy].[Tags] AS [pt] ON ([pt].[ParentType] = 'P' AND [pt].[ParentId] = [p].[PostsId])
       WHERE [_chg].[_Op] <> 1
 
     -- Commit the transaction.

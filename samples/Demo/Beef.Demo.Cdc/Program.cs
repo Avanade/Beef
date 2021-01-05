@@ -22,7 +22,7 @@ namespace Beef.Demo.Cdc
                 {
                     services.AddBeefExecutionContext();
                     services.AddBeefDatabaseServices(() => new Database("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True"));
-                    services.AddBeefNullEventPublisher();
+                    services.AddBeefLoggerEventPublisher();
                     services.AddGeneratedCdcDataServices();
                     services.AddHostedService<PostsCdcBackgroundService>();
                     services.AddHostedService<ContactCdcBackgroundService>();

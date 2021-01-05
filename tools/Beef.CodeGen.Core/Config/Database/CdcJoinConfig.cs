@@ -134,12 +134,12 @@ namespace Beef.CodeGen.Config.Database
         #region Database
 
         /// <summary>
-        /// Indicates whether the joined table is not being monitored for CDC and will include the selected columns only.
+        /// Gets or sets the join type option.
         /// </summary>
-        [JsonProperty("joinOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns.",
-            Description = "Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping.")]
-        public bool? JoinOnly { get; set; }
+        [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The SQL join type.", IsImportant = true, Options = new string[] { "Cdc", "Inner", "Left", "Right", "Full" },
+            Description = "Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.")]
+        public string? Type { get; set; }
 
         #endregion
 
@@ -266,9 +266,14 @@ namespace Beef.CodeGen.Config.Database
         public List<CdcJoinConfig> JoinHierarchyReverse => JoinHierarchy.Reverse<CdcJoinConfig>().ToList();
 
         /// <summary>
-        /// Gets the list of joined children.
+        /// Gets the list of joined "directly related" children.
         /// </summary>
-        public List<CdcJoinConfig> JoinChildren => Parent!.Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema).ToList();
+        public List<CdcJoinConfig> JoinCdcChildren => Parent!.Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema && CompareNullOrValue(x.Type, "Cdc")).ToList();
+
+        /// <summary>
+        /// Gets the list of non-CDC joined "directly related" children.
+        /// </summary>
+        public List<CdcJoinConfig> JoinNonCdcChildren => Parent!.Joins.Where(x => x.JoinTo == Name && x.JoinToSchema == Schema && !CompareNullOrValue(x.Type, "Cdc")).ToList();
 
         /// <summary>
         /// Inidicates whether it is first in the JoinHierarchy.
@@ -289,6 +294,17 @@ namespace Beef.CodeGen.Config.Database
         /// Gets or sets the indentation index.
         /// </summary>
         public int IndentIndex { get; set; } = 0;
+
+        /// <summary>
+        /// Gets the join <see cref="Type"/> as SQL.
+        /// </summary>
+        public string JoinTypeSql => Type?.ToUpperInvariant() switch
+        {
+            "LEFT" => "LEFT OUTER JOIN",
+            "RIGHT" => "RIGHT OUTER JOIN",
+            "FULL" => "FULL OUTER JOIN",
+            _ => "INNER JOIN"
+        };
 
         /// <summary>
         /// <inheritdoc/>
@@ -407,7 +423,7 @@ namespace Beef.CodeGen.Config.Database
                 JoinCardinality = JoinCardinality,
                 ModelName = ModelName,
                 PropertyName = PropertyName,
-                JoinOnly = JoinOnly,
+                Type = Type,
                 IsFirstInJoinHierarchy = isFirst,
                 On = new List<CdcJoinOnConfig>(),
                 DbTable = DbTable,

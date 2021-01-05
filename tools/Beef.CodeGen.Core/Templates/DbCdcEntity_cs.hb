@@ -29,25 +29,47 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// Gets or sets the '{{Name}}' column value.
         /// </summary>
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
-        [JsonProperty("{{camel Name}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+        [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
   {{/ifeq}}
         public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
   {{#unless @last}}
 
+  {{else}}
+    {{#ifne Parent.JoinNonCdcChildren.Count 0}}
+
+    {{/ifne}}
   {{/unless}}
 {{/each}}
-{{#each JoinChildren}}
+{{#each JoinNonCdcChildren}}
+  {{#each Columns}}
+        /// <summary>
+        /// Gets or sets the '{{Name}}' column value (join table '{{Parent.Schema}}.{{Parent.Name}}').
+        /// </summary>
+    {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+        [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+    {{/ifeq}}
+        public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
+    {{#unless @last}}
+
+    {{else}}
+      {{#unless @../last}}
+
+      {{/unless}}
+    {{/unless}}
+  {{/each}}
+{{/each}}
+{{#each JoinCdcChildren}}
 
   {{#ifeq JoinCardinality 'OneToMany'}}
         /// <summary>
-        /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
+        /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database table '{{Schema}}.{{TableName}}').
         /// </summary>
         [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
         public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
   {{else}}
         /// <summary>
-        /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
+        /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database table '{{Schema}}.{{TableName}}').
         /// </summary>
         [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
@@ -79,12 +101,12 @@ namespace {{Root.NamespaceCdc}}.Entities
         [JsonProperty("etag", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
         [MapperIgnore()]
         public string? ETag { get; set; }
-{{#each Joins}}
+{{#each CdcJoins}}
 
         #region {{ModelName}}Cdc
 
         /// <summary>
-        /// Represents the CDC model for the related (child) database table '{{Schema}}.{{Name}}'.
+        /// Represents the CDC model for the related (child) database table '{{Schema}}.{{TableName}}' (known uniquely as '{{Name}}').
         /// </summary>
   {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -97,24 +119,46 @@ namespace {{Root.NamespaceCdc}}.Entities
             /// </summary>
     {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
             [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-     {{/ifeq}}
+    {{/ifeq}}
             public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
     {{#unless @last}}
 
+    {{else}}
+      {{#ifne Parent.JoinNonCdcChildren.Count 0}}
+
+      {{/ifne}}
     {{/unless}}
   {{/each}}
-  {{#each JoinChildren}}
+  {{#each JoinNonCdcChildren}}
+    {{#each Columns}}
+            /// <summary>
+            /// Gets or sets the '{{Name}}' column value (join table '{{Parent.Schema}}.{{Parent.Name}}').
+            /// </summary>
+      {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
+            [JsonProperty("{{camel NameAlias}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+      {{/ifeq}}
+            public {{DotNetType}}{{#if IsDotNetNullable}}?{{/if}} {{pascal NameAlias}} { get; set; }
+      {{#unless @last}}
+
+      {{else}}
+        {{#unless @../last}}
+
+        {{/unless}}
+      {{/unless}}
+    {{/each}}
+  {{/each}}
+  {{#each JoinCdcChildren}}
 
     {{#ifeq JoinCardinality 'OneToMany'}}
             /// <summary>
-            /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database object '{{Schema}}.{{Name}}').
+            /// Gets or sets the related (one-to-many) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}Collection"/> (database table '{{Schema}}.{{TableName}}').
             /// </summary>
             [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
             [MapperIgnore()]
             public {{Parent.ModelName}}Cdc.{{ModelName}}CdcCollection? {{PropertyName}} { get; set; }
     {{else}}
             /// <summary>
-            /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database object '{{Schema}}.{{Name}}').
+            /// Gets or sets the related (one-to-one) <see cref="{{Parent.ModelName}}Cdc.{{ModelName}}"/> (database table '{{Schema}}.{{TableName}}').
             /// </summary>
             [JsonProperty("{{camel PropertyName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
             [MapperIgnore()]

@@ -32,14 +32,9 @@ namespace {{Root.NamespaceCdc}}.Services
             base(serviceProvider, logger) => _config = Check.NotNull(config, nameof(config));
 
         /// <summary>
-        /// Gets the service name.
-        /// </summary>
-        public override string ServiceName => nameof({{ModelName}}CdcBackgroundService);
-
-        /// <summary>
         /// Gets the interval seconds between each execution.
         /// </summary>
-        public override int IntervalSeconds => _config.GetValue<int>("{{ModelName}}CdcIntervalSeconds");
+        public override int? IntervalSeconds => _config.GetValue<int?>("{{ModelName}}CdcIntervalSeconds");
     }
 }
 
