@@ -215,6 +215,14 @@ namespace Beef.CodeGen.Config.Database
         #region Namespace
 
         /// <summary>
+        /// Gets or sets the root Namespace for the Common-related (.NET) artefacts.
+        /// </summary>
+        [JsonProperty("namespaceCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Namespace", Title = "The root Namespace for the Common-related (.NET) artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.")]
+        public string? NamespaceCommon { get; set; }
+
+        /// <summary>
         /// Gets or sets the root Namespace for the Business-related (.NET) artefacts.
         /// </summary>
         [JsonProperty("namespaceBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -353,6 +361,7 @@ namespace Beef.CodeGen.Config.Database
             PathDatabase = DefaultWhereNull(PathDatabase, () => $"{Company}.{AppName}.Database");
             PathBusiness = DefaultWhereNull(PathBusiness, () => $"{Company}.{AppName}.Business");
             PathCdc = DefaultWhereNull(PathCdc, () => $"{Company}.{AppName}.Cdc");
+            NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{Company}.{AppName}.Common");
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{Company}.{AppName}.Business");
             NamespaceCdc = DefaultWhereNull(NamespaceCdc, () => $"{Company}.{AppName}.Cdc");
 

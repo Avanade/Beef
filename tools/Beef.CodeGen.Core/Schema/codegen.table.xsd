@@ -254,21 +254,6 @@
                 <xs:documentation>Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified. This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="View" use="optional" type="xs:boolean">
-              <xs:annotation>
-                <xs:documentation>Indicates whether a `View` is to be generated.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="ViewName" use="optional" type="xs:string">
-              <xs:annotation>
-                <xs:documentation>The `View` name. Defaults to `vw` + `Name`; e.g. `vwTableName`.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="ViewSchema" use="optional" type="xs:string">
-              <xs:annotation>
-                <xs:documentation>The schema name for the `View`. Defaults to `Schema`.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="EfModel" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether an `Entity Framework` .NET (C#) model is to be generated.</xs:documentation>
@@ -715,10 +700,19 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
-                  <xs:attribute name="NonCdc" use="optional" type="xs:boolean">
+                  <xs:attribute name="Type" use="optional">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns. Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping.</xs:documentation>
+                      <xs:documentation>The SQL join type. Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.</xs:documentation>
                     </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Cdc" />
+                        <xs:enumeration value="Inner" />
+                        <xs:enumeration value="Left" />
+                        <xs:enumeration value="Right" />
+                        <xs:enumeration value="Full" />
+                      </xs:restriction>
+                    </xs:simpleType>
                   </xs:attribute>
                   <xs:attribute name="ModelName" use="optional" type="xs:string">
                     <xs:annotation>
@@ -875,7 +869,7 @@
       </xs:attribute>
       <xs:attribute name="EventActionFormat" use="optional">
         <xs:annotation>
-          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required)`.</xs:documentation>
+          <xs:documentation>The formatting for the Action when an Event is published. Defaults to `None` (no formatting required).</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -900,6 +894,36 @@
       <xs:attribute name="PluralizeCollectionProperties" use="optional" type="xs:boolean">
         <xs:annotation>
           <xs:documentation>Indicates whether the .NET collection properties should be pluralized.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathDatabase" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathBusiness" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathCdc" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceCommon" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root Namespace for the Common-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceBusiness" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root Namespace for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceCdc" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

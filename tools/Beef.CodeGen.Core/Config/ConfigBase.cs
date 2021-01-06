@@ -240,7 +240,7 @@ namespace Beef.CodeGen.Config
                 if (!string.IsNullOrEmpty(qn))
                 {
                     if (sb.Length > 0)
-                        sb.Append(".");
+                        sb.Append('.');
 
                     sb.Append(qn);
                 }

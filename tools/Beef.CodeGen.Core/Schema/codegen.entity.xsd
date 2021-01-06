@@ -1378,6 +1378,36 @@
           <xs:documentation>Indicates whether gRPC support (more specifically service-side) is required. gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="PathCommon" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathBusiness" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathApi" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the API-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceCommon" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root Namespace for the Common-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceBusiness" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root Namespace for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceApi" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The root Namespace for the Api-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 </xs:schema>

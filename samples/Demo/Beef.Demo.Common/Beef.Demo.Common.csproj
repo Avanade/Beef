@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include=".\Grpc\Generated\beef.demo.proto" GrpcServices="Client,Server" />
+    <Protobuf Include=".\Grpc\Generated\beef.demo.common.grpc.proto" GrpcServices="Client,Server" />
   </ItemGroup>
 
   <ItemGroup>

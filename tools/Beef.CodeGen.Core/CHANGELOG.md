@@ -2,12 +2,13 @@
 
 Represents the **NuGet** versions.
 
-## v4.1.**
+## v4.1.13
 - *Enhancement:* The last stage of the custom code-gen capability retirement; now completely replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine. The _database_ related code-generation has been ported. The existing engine has been deprecated (removed).
 - *Enhancement:* The _Entity_ and _Database_ related XML schemas are now generated from the internal configuration model; these have been re-gen'd.
 - *Enhancement:* New [`database.beef.json`](./Schema/database.beef.json) and [`entity.beef.json`](./Schema/entity.beef.json) JSON schemas are now also generated from the internal configuration model to support alternate JSON and YAML configurations - to be introduced in a later release. These will be added to the [JSON Schema Store](https://www.schemastore.org/json/) to enable editor support (validation and intellisense) prior to introduction proper.
 - *Enhancement:* To simplify testing of _Agents_ with the recent introduction of dependency injection (DI) a new code-gen global setting `AppBasedAgentArgs="true"` has been added. This will result in a new `{{Company}}.{{AppName}}.Common.Agents.I{{AppName}}WebApiAgentArgs` and `{{Company}}.{{AppName}}.Common.Agents.{{AppName}}WebApiAgentArgs` classes created; all _Agents_ will then use this for the constructor versus the default `IWebApiAgentArgs`. These new generated artefacts can then be addressed directly to simplify DI for both general usage and testing.
 - *Enhancement:* A return type of `string` will always be treated as nullable. This is because the `Cleaner.Clean` (based on settings) could override the return value with `null`.
+- *Enhancement:* The code-gen `Scripts` XML files support a new `Inherits` attribute to enable references to one or more other `Scripts` files. This allows referencing to remove the need to duplicate setting across multiple files.
 
 ## v4.1.12
 - *Fixed:* Issue [93](https://github.com/Avanade/Beef/issues/93) fixed. The `XxxServiceCollectionExtensions.cs` classes were errantly being generated where there are no corresponding operations that would require.

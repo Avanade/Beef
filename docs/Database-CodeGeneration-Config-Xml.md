@@ -11,6 +11,8 @@ Category | Description
 -|-
 [`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 [`CDC`](#CDC) | Provides the _Change Data Capture (CDC)_ configuration.
+[`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
+[`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -47,6 +49,28 @@ Property | Description
 **`EventActionFormat`** | The formatting for the Action when an Event is published. Valid options are: `None`, `UpperCase`, `PastTense`, `PastTenseUpperCase`. Defaults to `None` (no formatting required).
 `JsonSerializer` | The JSON Serializer to use for JSON property attribution. Valid options are: `None`, `Newtonsoft`. Defaults to `Newtonsoft`. This can be overridden within the `Entity`(s).
 `PluralizeCollectionProperties` | Indicates whether the .NET collection properties should be pluralized.
+
+<br/>
+
+## Path
+Provides the _Path (Directory)_ configuration for the generated artefacts.
+
+Property | Description
+-|-
+`PathDatabase` | The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`.
+`PathBusiness` | The path (directory) for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.
+`PathCdc` | The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
+
+<br/>
+
+## Namespace
+Provides the _.NET Namespace_ configuration for the generated artefacts.
+
+Property | Description
+-|-
+`NamespaceCommon` | The root Namespace for the Common-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.
+`NamespaceBusiness` | The root Namespace for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.
+`NamespaceCdc` | The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.
 
 <br/>
 

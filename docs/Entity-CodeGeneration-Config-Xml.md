@@ -20,6 +20,8 @@ Category | Description
 [`Cosmos`](#Cosmos) | Provides the _CosmosDB Data-layer_ configuration.
 [`OData`](#OData) | Provides the _OData Data-layer_ configuration.
 [`gRPC`](#gRPC) | Provides the _gRPC_ configuration.
+[`Path`](#Path) | Provides the _Path (Directory)_ configuration for the generated artefacts.
+[`Namespace`](#Namespace) | Provides the _.NET Namespace_ configuration for the generated artefacts.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -137,6 +139,28 @@ Provides the _gRPC_ configuration.
 Property | Description
 -|-
 **`Grpc`** | Indicates whether gRPC support (more specifically service-side) is required. gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically.
+
+<br/>
+
+## Path
+Provides the _Path (Directory)_ configuration for the generated artefacts.
+
+Property | Description
+-|-
+`PathCommon` | The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.
+`PathBusiness` | The path (directory) for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.
+`PathApi` | The path (directory) for the API-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
+
+<br/>
+
+## Namespace
+Provides the _.NET Namespace_ configuration for the generated artefacts.
+
+Property | Description
+-|-
+`NamespaceCommon` | The root Namespace for the Common-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.
+`NamespaceBusiness` | The root Namespace for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.
+`NamespaceApi` | The root Namespace for the Api-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.
 
 <br/>
 

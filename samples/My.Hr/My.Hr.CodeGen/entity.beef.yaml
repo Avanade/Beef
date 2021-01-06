@@ -175,4 +175,3 @@ entities:
       { name: Delete, type: Delete, uniqueKey: true, webApiRoute: 'reviews/{id}' }
     ]
   }
-

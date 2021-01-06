@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System;
+
 namespace Beef.CodeGen
 {
     /// <summary>
     /// Represents the command type.
     /// </summary>
+    [Flags]
     public enum CommandType
     {
         /// <summary>

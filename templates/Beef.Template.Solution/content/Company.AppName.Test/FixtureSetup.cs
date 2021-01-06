@@ -30,16 +30,20 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
+            var config = AgentTester.BuildConfiguration<Startup>("AppName");
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
-            TestSetUp.DefaultExpectNoEvents = true;
-            var config = AgentTester.BuildConfiguration<Startup>();
+            TestSetUp.DefaultExpectNoEvents = false;
+            TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
-                return await DatabaseExecutor.RunAsync(new DatabaseExecutorArgs(
-                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData, config["ConnectionStrings:Database"],
-                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) { UseBeefDbo = true } ).ConfigureAwait(false) == 0;
+                var args = new DatabaseExecutorArgs(
+                    count == 0 ? DatabaseExecutorCommand.ResetAndDatabase : DatabaseExecutorCommand.ResetAndData,
+                    config["ConnectionStrings:Database"],
+                    typeof(Database.Program).Assembly, Assembly.GetExecutingAssembly()) 
+                { UseBeefDbo = true };
+
+                return await DatabaseExecutor.RunAsync(args).ConfigureAwait(false) == 0;
             });
         }
 #endif
@@ -50,10 +54,10 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
+            var config = AgentTester.BuildConfiguration<Startup>("AppName");
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
-            TestSetUp.DefaultExpectNoEvents = true;
-            var config = AgentTester.BuildConfiguration<Startup>();
+            TestSetUp.DefaultExpectNoEvents = false;
+            TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {

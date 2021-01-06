@@ -18,7 +18,6 @@ Category | Description
 [`Key`](#Key) | Provides the _key_ configuration.
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
 [`CodeGen`](#CodeGen) | Provides the _Code Generation_ configuration.
-[`View`](#View) | Provides the _View_ configuration.
 [`EntityFramework`](#EntityFramework) | Provides the _Entity Framework (EF) model_ configuration.
 [`UDT`](#UDT) | Provides the _User Defined Table_ and _Table-Valued Parameter_ configuration.
 [`Auth`](#Auth) | Provides the _Authorization_ configuration.
@@ -61,17 +60,6 @@ Property | Description
 `Upsert` | Indicates whether a `Upsert` stored procedure is to be automatically generated where not otherwise explicitly specified.
 `Delete` | Indicates whether a `Delete` stored procedure is to be automatically generated where not otherwise explicitly specified.
 `Merge` | Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified. This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function.
-
-<br/>
-
-## View
-Provides the _View_ configuration.
-
-Property | Description
--|-
-`View` | Indicates whether a `View` is to be generated.
-`ViewName` | The `View` name. Defaults to `vw` + `Name`; e.g. `vwTableName`.
-`ViewSchema` | The schema name for the `View`. Defaults to `Schema`.
 
 <br/>
 

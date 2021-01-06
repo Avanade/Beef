@@ -86,7 +86,7 @@
     "eventActionFormat": {
       "type": "string",
       "title": "The formatting for the Action when an Event is published.",
-      "description": "Defaults to `None` (no formatting required)`.",
+      "description": "Defaults to `None` (no formatting required).",
       "enum": [
         "None",
         "UpperCase",
@@ -106,6 +106,36 @@
     "pluralizeCollectionProperties": {
       "type": "boolean",
       "title": "Indicates whether the .NET collection properties should be pluralized."
+    },
+    "pathDatabase": {
+      "type": "string",
+      "title": "The path (directory) for the Database-related artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`."
+    },
+    "pathBusiness": {
+      "type": "string",
+      "title": "The path (directory) for the Business-related (.NET) artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+    },
+    "pathCdc": {
+      "type": "string",
+      "title": "The path (directory) for the CDC-related (.NET) artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+    },
+    "namespaceCommon": {
+      "type": "string",
+      "title": "The root Namespace for the Common-related (.NET) artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`."
+    },
+    "namespaceBusiness": {
+      "type": "string",
+      "title": "The root Namespace for the Business-related (.NET) artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+    },
+    "namespaceCdc": {
+      "type": "string",
+      "title": "The path (directory) for the CDC-related (.NET) artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
     },
     "tables": {
       "type": "array",
@@ -189,20 +219,6 @@
               "type": "boolean",
               "title": "Indicates whether a `Merge` (insert/update/delete of `Udt` list) stored procedure is to be automatically generated where not otherwise explicitly specified.",
               "description": "This will also require a `Udt` (SQL User Defined Table) and `Tvp` (.NET Table-Valued Parameter) to function."
-            },
-            "view": {
-              "type": "boolean",
-              "title": "Indicates whether a `View` is to be generated."
-            },
-            "viewName": {
-              "type": "string",
-              "title": "The `View` name.",
-              "description": "Defaults to `vw` + `Name`; e.g. `vwTableName`."
-            },
-            "viewSchema": {
-              "type": "string",
-              "title": "The schema name for the `View`.",
-              "description": "Defaults to `Schema`."
             },
             "efModel": {
               "type": "boolean",
@@ -1031,10 +1047,17 @@
                         }
                       ]
                     },
-                    "nonCdc": {
-                      "type": "boolean",
-                      "title": "Indicates whether the joined table is *not* being monitored for Change Data Capture (CDC) and will include the selected columns with the `Parent` columns.",
-                      "description": "Can only join against the `Parent` table. This is primarily provided to enable key/identifier mapping."
+                    "type": {
+                      "type": "string",
+                      "title": "The SQL join type.",
+                      "description": "Defaults to `Cdc`. The `Cdc` value indicates this is a related secondary table that also has Change Data Capture turned on and equally needs to be monitored for changes.",
+                      "enum": [
+                        "Cdc",
+                        "Inner",
+                        "Left",
+                        "Right",
+                        "Full"
+                      ]
                     },
                     "modelName": {
                       "type": "string",
