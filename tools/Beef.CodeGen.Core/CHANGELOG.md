@@ -9,6 +9,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* To simplify testing of _Agents_ with the recent introduction of dependency injection (DI) a new code-gen global setting `AppBasedAgentArgs="true"` has been added. This will result in a new `{{Company}}.{{AppName}}.Common.Agents.I{{AppName}}WebApiAgentArgs` and `{{Company}}.{{AppName}}.Common.Agents.{{AppName}}WebApiAgentArgs` classes created; all _Agents_ will then use this for the constructor versus the default `IWebApiAgentArgs`. These new generated artefacts can then be addressed directly to simplify DI for both general usage and testing.
 - *Enhancement:* A return type of `string` will always be treated as nullable. This is because the `Cleaner.Clean` (based on settings) could override the return value with `null`.
 - *Enhancement:* The code-gen `Scripts` XML files support a new `Inherits` attribute to enable references to one or more other `Scripts` files. This allows referencing to remove the need to duplicate setting across multiple files.
+- *Enhancement:* The code-gen has been updated to enable [personalization of code-generation](./README.md#personalization-andor-overriding); to either override an existing template or execute entirely new templates; including the ability to access additive configuration.
 
 ## v4.1.12
 - *Fixed:* Issue [93](https://github.com/Avanade/Beef/issues/93) fixed. The `XxxServiceCollectionExtensions.cs` classes were errantly being generated where there are no corresponding operations that would require.

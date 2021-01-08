@@ -896,34 +896,44 @@
           <xs:documentation>Indicates whether the .NET collection properties should be pluralized.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="PathBase" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="PathDatabase" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`.</xs:documentation>
+          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `PathBase` + `.Database` (literal). For example `Beef.Demo.Database`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathBusiness" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+          <xs:documentation>The path (directory) for the Business-related (.NET) artefacts. Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathCdc" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+          <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NamespaceBase" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The base Namespace (root) for the .NET artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="NamespaceCommon" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root Namespace for the Common-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.</xs:documentation>
+          <xs:documentation>The Namespace (root) for the Common-related .NET artefacts. Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="NamespaceBusiness" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The root Namespace for the Business-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
+          <xs:documentation>The Namespace (root) for the Business-related .NET artefacts. Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="NamespaceCdc" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the CDC-related (.NET) artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
+          <xs:documentation>The Namespace (root) for the CDC-related .NET artefacts. Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

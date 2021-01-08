@@ -165,35 +165,45 @@
       "title": "Indicates whether gRPC support (more specifically service-side) is required.",
       "description": "gRPC support is an explicit opt-in model. Must be set to `true` for any of the subordinate gRPC capabilities to be code-generated. Will require each `Entity`, and corresponding `Property` and `Operation` to be opted-in specifically."
     },
+    "pathBase": {
+      "type": "string",
+      "title": "The path (directory) for the Database-related artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
+    },
     "pathCommon": {
       "type": "string",
       "title": "The path (directory) for the Database-related artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`."
+      "description": "Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`."
     },
     "pathBusiness": {
       "type": "string",
       "title": "The path (directory) for the Business-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+      "description": "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
     "pathApi": {
       "type": "string",
       "title": "The path (directory) for the API-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
+      "description": "Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
+    },
+    "namespaceBase": {
+      "type": "string",
+      "title": "The base Namespace (root) for the .NET artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
     },
     "namespaceCommon": {
       "type": "string",
-      "title": "The root Namespace for the Common-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`."
+      "title": "The Namespace (root) for the Common-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`."
     },
     "namespaceBusiness": {
       "type": "string",
-      "title": "The root Namespace for the Business-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+      "title": "The Namespace (root) for the Business-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
     "namespaceApi": {
       "type": "string",
-      "title": "The root Namespace for the Api-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
+      "title": "The Namespace (root) for the Api-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
     },
     "entities": {
       "type": "array",

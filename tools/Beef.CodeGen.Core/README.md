@@ -34,7 +34,7 @@ The code-generation is composed of the following:
 
 - [Configuration](#Configuration) - this is the configuration that is used to both control the generated artefacts and their respective content.
 - [Templates](#Templates) - these are the [Handlebars](https://handlebarsjs.com/guide/) templates that define a specific artefact's content.
-- [Scripts](#Scripts) - these script (orchestrate) the templates (one or more) to 
+- [Scripts](#Scripts) - these script (orchestrate) the templates (one or more) that should be used to generate an artefact.
 
 <br/>
 

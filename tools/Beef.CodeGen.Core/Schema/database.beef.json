@@ -107,35 +107,45 @@
       "type": "boolean",
       "title": "Indicates whether the .NET collection properties should be pluralized."
     },
+    "pathBase": {
+      "type": "string",
+      "title": "The path (directory) for the Database-related artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
+    },
     "pathDatabase": {
       "type": "string",
       "title": "The path (directory) for the Database-related artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Database` (literal). For example `Beef.Demo.Database`."
+      "description": "Defaults to `PathBase` + `.Database` (literal). For example `Beef.Demo.Database`."
     },
     "pathBusiness": {
       "type": "string",
       "title": "The path (directory) for the Business-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+      "description": "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
     "pathCdc": {
       "type": "string",
       "title": "The path (directory) for the CDC-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+      "description": "Defaults to `PathBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+    },
+    "namespaceBase": {
+      "type": "string",
+      "title": "The base Namespace (root) for the .NET artefacts.",
+      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
     },
     "namespaceCommon": {
       "type": "string",
-      "title": "The root Namespace for the Common-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`."
+      "title": "The Namespace (root) for the Common-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`."
     },
     "namespaceBusiness": {
       "type": "string",
-      "title": "The root Namespace for the Business-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`."
+      "title": "The Namespace (root) for the Business-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`."
     },
     "namespaceCdc": {
       "type": "string",
-      "title": "The path (directory) for the CDC-related (.NET) artefacts.",
-      "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
+      "title": "The Namespace (root) for the CDC-related .NET artefacts.",
+      "description": "Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
     },
     "tables": {
       "type": "array",
