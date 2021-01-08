@@ -325,7 +325,7 @@ namespace Beef.CodeGen
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            config = LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml, true) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml, true));
+                            config = LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml).Yaml);
                         }
 
                         break;

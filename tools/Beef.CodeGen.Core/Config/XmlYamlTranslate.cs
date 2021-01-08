@@ -11,7 +11,7 @@ namespace Beef.CodeGen.Config
     /// </summary>
     internal static class XmlYamlTranslate
     {
-        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, string YamlName)> _config = new List<(ConfigType, ConfigurationEntity, string, string)>(new (ConfigType, ConfigurationEntity, string, string)[] 
+        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, string YamlName)> _config = new List<(ConfigType, ConfigurationEntity, string, string)>(new (ConfigType, ConfigurationEntity, string, string)[]
         {
             // Entity oriented configuration.
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
@@ -30,7 +30,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper"),
- 
+
             (ConfigType.Entity, ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
             (ConfigType.Entity, ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
             (ConfigType.Entity, ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),
@@ -60,6 +60,9 @@ namespace Beef.CodeGen.Config
 
         private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToYamlConvert = new List<(ConfigType, ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigType, ConfigurationEntity, string, Func<string?, string?>)[]
         {
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xmlns", (xml) => NullValue()),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "xsi", (xml) => NullValue()),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeEntity", (xml) => ConvertBoolToYesNo(xml)),
@@ -85,6 +88,10 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeWebApiAgent", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "ExcludeGrpcAgent", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
+
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "xmlns", (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "xsi", (xml) => NullValue()),
+            (ConfigType.Database, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
 
             (ConfigType.Database, ConfigurationEntity.Query, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Query, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
@@ -119,6 +126,8 @@ namespace Beef.CodeGen.Config
         });
 
         private static string? ConvertBoolToYesNo(string? xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? ConfigBase.YesOption : null);
+
+        private static string? NullValue() => (string?)null!;
 
         private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Type OverrideType, PropertySchemaAttribute Attribute)> _xmlSpecificPropertySchema = new List<(ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)>(new (ConfigType, ConfigurationEntity, string, Type, PropertySchemaAttribute)[]
         {

@@ -113,9 +113,9 @@ namespace Beef.CodeGen
             {
                 using var xfs = xfi.OpenRead();
                 var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                var yaml = type == CommandType.Database ? new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml) : new EntityXmlToYamlConverter().ConvertXmlToYaml(xml);
+                var result = type == CommandType.Database ? new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml) : new EntityXmlToYamlConverter().ConvertXmlToYaml(xml);
                 using var ysw = yfi.CreateText();
-                await ysw.WriteAsync(yaml).ConfigureAwait(false);
+                await ysw.WriteAsync(result.Yaml).ConfigureAwait(false);
 
                 logger.LogWarning($"YAML file created: {yfi.Name}");
                 logger.LogInformation(string.Empty);
@@ -123,6 +123,17 @@ namespace Beef.CodeGen
                 logger.LogInformation(string.Empty);
                 logger.LogInformation("Note: the existing XML formatting and comments may not have been converted correctly; these will need to be refactored manually.");
                 logger.LogInformation("Note: the YAML file will now be used as the configuration source even where the existing XML file exists; if this is not the desired state then the YAML file should be deleted.");
+
+                if (result.UnknownAttributes.Count > 0)
+                {
+                    logger.LogInformation(string.Empty);
+                    logger.LogWarning("The following element.attributes combinations are not considered core Beef; please delete if no longer required:");
+                    foreach (var ua in result.UnknownAttributes)
+                    {
+                        logger.LogInformation($" > {ua}");
+                    }
+                }
+
                 logger.LogInformation(string.Empty);
             }
 #pragma warning disable CA1031 // Do not catch general exception types; is OK.

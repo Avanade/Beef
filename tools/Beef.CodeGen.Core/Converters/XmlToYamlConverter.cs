@@ -3,6 +3,7 @@
 using Beef.CodeGen.Config;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -43,9 +44,9 @@ namespace Beef.CodeGen.Converters
         public bool HasAttributes { get; set; }
 
         /// <summary>
-        /// Indicates whether to write any unknown attributes.
+        /// Gets the list of unknown attribute names.
         /// </summary>
-        public bool WriteUnknown { get; set; }
+        public List<string> UnknownAttributes { get; } = new List<string>();
 
         /// <summary>
         /// Writes the close squiggly bracket accounting for a needed space if an attribute has proceeded it.
@@ -76,9 +77,8 @@ namespace Beef.CodeGen.Converters
         /// Converts an existing XML document into the equivlent new YAML format.
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
-        /// <param name="writeUnknown">Indicates whether to write any unknown attributes.</param>
-        /// <returns>The new YAML formatted <see cref="string"/>.</returns>
-        internal string ConvertXmlToYaml(XDocument xml, bool writeUnknown = false)
+        /// <returns>The corresponding YAML and the list of unknown attributes.</returns>
+        internal (string Yaml, List<string> UnknownAttributes) ConvertXmlToYaml(XDocument xml)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -87,13 +87,16 @@ namespace Beef.CodeGen.Converters
                 throw new ArgumentException("Root element must be named 'CodeGeneration'.", nameof(xml));
 
             var sb = new StringBuilder();
+            List<string> unknownAttributes;
             using (var sw = new StringWriter(sb))
             {
                 var (entity, type, _) = GetEntityConfigInfo(xml.Root.Name.LocalName);
-                WriteElement(new YamlFormatArgs(sw) { WriteUnknown = writeUnknown }, xml.Root, ConfigType, entity, type);
+                var yfa = new YamlFormatArgs(sw);
+                WriteElement(yfa, xml.Root, ConfigType, entity, type);
+                unknownAttributes = yfa.UnknownAttributes;
             }
 
-            return sb.ToString();
+            return (sb.ToString(), unknownAttributes);
         }
 
         /// <summary>
@@ -210,20 +213,15 @@ namespace Beef.CodeGen.Converters
             {
                 var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
                 var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
-                string? val;
-                if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
-                {
-                    if (!args.WriteUnknown)
-                        continue;
-
-                    jname = att.Name.LocalName;
-                    val = att.Value;
-                }
-                else
-                    val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
-
+                var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
                 if (val == null)
                     continue;
+
+                if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
+                {
+                    jname = att.Name.LocalName;
+                    args.UnknownAttributes.Add($"{xml.Name.LocalName}.{jname} = {val}");
+                }
 
                 if (needsComma)
                     args.Writer.Write(", ");
