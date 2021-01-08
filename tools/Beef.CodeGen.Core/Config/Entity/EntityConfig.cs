@@ -65,7 +65,7 @@ entities:
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the overridding text for use in comments.
+        /// Gets or sets the overriding text for use in comments.
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The overriding text for use in comments.",
@@ -133,10 +133,10 @@ entities:
         public string? RefDataType { get; set; }
 
         /// <summary>
-        /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overridding the <c>CodeGeneration.RefDataText</c> selection.
+        /// Indicates whether a corresponding <i>text</i> property is added when generating a Reference Data property overriding the <c>CodeGeneration.RefDataText</c> selection.
         /// </summary>
         [JsonProperty("refDataText", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overridding the `CodeGeneration.RefDataText` selection.",
+        [PropertySchema("RefData", Title = "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.",
             Description = "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).")]
         public bool? RefDataText { get; set; }
 

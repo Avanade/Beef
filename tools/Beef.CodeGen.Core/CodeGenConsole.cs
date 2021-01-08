@@ -57,8 +57,7 @@ namespace Beef.CodeGen
                 .Accepts(v => v.ExistingFile());
 
             _scriptOpt = App.Option("-s|--script", "Execution script file or embedded resource name.", CommandOptionType.SingleValue)
-                .IsRequired()
-                .Accepts(v => v.Use(new FileResourceValidator()));
+                .IsRequired();
 
             _templateOpt = App.Option("-t|--template", "Templates path (defaults to embedded resources).", CommandOptionType.SingleValue)
                 .Accepts(v => v.ExistingDirectory());
@@ -76,14 +75,7 @@ namespace Beef.CodeGen
 
             _logger = (Logger.Default ??= new ColoredConsoleLogger(nameof(CodeGenConsole)));
 
-            App.OnExecuteAsync(async (_) =>
-            {
-                // Check the Execution script file or embedded resource names.
-                if (!File.Exists(_scriptOpt.Value()) && await ResourceManager.GetScriptContentAsync(_scriptOpt.Value()!).ConfigureAwait(false) == null)
-                    throw new InvalidOperationException($"The file or embedded resource '{_scriptOpt.Value()}' does not exist.");
-
-                return await RunRunAwayAsync().ConfigureAwait(false);
-            });
+            App.OnExecuteAsync(async (_) => await RunRunAwayAsync().ConfigureAwait(false));
         }
     
         /// <summary>

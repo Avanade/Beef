@@ -19,7 +19,7 @@ namespace Beef.Data.Database
         string DestParameterName { get; set; }
 
         /// <summary>
-        /// Gets or sets the destination <see cref="DbType"/> (overridding inferred).
+        /// Gets or sets the destination <see cref="DbType"/> (overriding inferred).
         /// </summary>
         /// <remarks>A <c>null</c> value indicates that the <see cref="DbType"/> is to be inferred.</remarks>
         DbType? DestDbType { get; set; }
@@ -102,7 +102,7 @@ namespace Beef.Data.Database
         public string DestParameterName { get; set; }
 
         /// <summary>
-        /// Gets or sets the destination <see cref="DbType"/> (overridding inferred).
+        /// Gets or sets the destination <see cref="DbType"/> (overriding inferred).
         /// </summary>
         /// <remarks>A <c>null</c> value indicates that the <see cref="DbType"/> is to be inferred.</remarks>
         public DbType? DestDbType { get; set; }

@@ -12,32 +12,6 @@ using System.Reflection;
 namespace Beef.CodeGen
 {
     /// <summary>
-    /// Validates either existence of file or embedded resource.
-    /// </summary>
-    public class FileResourceValidator : IOptionValidator
-    {
-        /// <summary>
-        /// Performs the validation.
-        /// </summary>
-        /// <param name="option">The <see cref="CommandOption"/>.</param>
-        /// <param name="context">The <see cref="ValidationContext"/>.</param>
-        /// <returns>The <see cref="ValidationResult"/>.</returns>
-        public ValidationResult GetValidationResult(CommandOption option, ValidationContext context)
-        {
-            if (option == null)
-                throw new ArgumentNullException(nameof(option));
-
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            if (option.Value() != null && !File.Exists(option.Value()) && ResourceManager.GetScriptContentAsync(option.Value()!).GetAwaiter().GetResult() == null)
-                return new ValidationResult($"The file or embedded resource '{option.Value()}' does not exist.");
-
-            return ValidationResult.Success;
-        }
-    }
-
-    /// <summary>
     /// Validate the Params to ensure format is correct and values are not duplicated.
     /// </summary>
     public class ParamsValidator : IOptionValidator

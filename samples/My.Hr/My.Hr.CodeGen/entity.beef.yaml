@@ -61,7 +61,7 @@ entities:
       },
       # Search operation
       # - OperationType is GetColl which indicates that a collection is the expected result.
-      # - ReturnType is overridding the default Employee as we want to use EmployeeBase (reduced set of fields).
+      # - ReturnType is overriding the default Employee as we want to use EmployeeBase (reduced set of fields).
       # - PagingArgs indicates to Beef that paging support is required and to be automatically enabled for the operation.
       # - AutoImplement of EntityFramework informs code-gen to output EntityFramework code versus database stored procedures.
       # - Parameter defines the parameter being the EmployeeArgs (defined) and that the value should be validated.

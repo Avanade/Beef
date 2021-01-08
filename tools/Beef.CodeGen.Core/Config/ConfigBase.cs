@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -279,6 +281,90 @@ namespace Beef.CodeGen.Config
         /// <param name="root">The root <see cref="ConfigBase"/>.</param>
         /// <param name="parent">The parent <see cref="ConfigBase"/>.</param>
         protected internal abstract void Prepare(object root, object parent);
+
+        /// <summary>
+        /// Gets or sets the <see cref="Dictionary{TKey, TValue}"/> that houses any additional/extra properties/attributes deserialized within the configuration.
+        /// </summary>
+        [JsonExtensionData]
+        public Dictionary<string, JToken>? ExtraProperties { get; set; }
+
+        /// <summary>
+        /// Gets the property value from <see cref="ExtraProperties"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="defaultValue">The default value where the property is not found.</param>
+        /// <returns>The value.</returns>
+        public T GetExtraProperty<T>(string key, T defaultValue = default)
+        {
+            if (ExtraProperties != null && ExtraProperties.TryGetValue(key, out var val))
+                return (T)Convert.ChangeType(val.ToString(), typeof(T));
+            else
+                return defaultValue!;
+        }
+
+        /// <summary>
+        /// Trys to get the property value from <see cref="ExtraProperties"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The corresponding value.</param>
+        /// <returns><c>true</c> if the <paramref name="key"/> is found; otherwise, <c>false</c>.</returns>
+        public bool TryGetExtraProperty<T>(string key, out T value)
+        {
+            if (ExtraProperties != null && ExtraProperties.TryGetValue(key, out var val))
+            {
+                value = (T)Convert.ChangeType(val.ToString(), typeof(T));
+                return true;
+            }
+            else
+            {
+                value = default!;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Dictionary{TKey, TValue}"/> that allows for custom property values to be manipulated at runtime.
+        /// </summary>
+        [JsonIgnore]
+        public Dictionary<string, object> CustomProperties { get; } = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Gets the property value from <see cref="CustomProperties"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="defaultValue">The default value where the property is not found.</param>
+        /// <returns>The value.</returns>
+        public T GetCustomProperty<T>(string key, T defaultValue = default)
+        {
+            if (CustomProperties != null && CustomProperties.TryGetValue(key, out var val))
+                return (T)Convert.ChangeType(val, typeof(T));
+            else
+                return defaultValue!;
+        }
+
+        /// <summary>
+        /// Trys to get the property value from <see cref="CustomProperties"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The corresponding value.</param>
+        /// <returns><c>true</c> if the <paramref name="key"/> is found; otherwise, <c>false</c>.</returns>
+        public bool TryGetCustomProperty<T>(string key, out T value)
+        {
+            if (CustomProperties != null && CustomProperties.TryGetValue(key, out var val))
+            {
+                value = (T)Convert.ChangeType(val, typeof(T));
+                return true;
+            }
+            else
+            {
+                value = default!;
+                return false;
+            }
+        }
     }
 
     /// <summary>

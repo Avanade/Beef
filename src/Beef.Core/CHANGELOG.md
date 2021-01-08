@@ -46,7 +46,7 @@ Represents the **NuGet** versions.
 
 ## v3.1.8
 - *Fixed:* The `PropertyMapper` will only auto map sub-entities at mapping execution time where no converter or mapper has been specified; was previously always auto mapping at construction, often unnecessarily where a converter or mapper was later being specified.
-- *Enhanced:* The `PropertyMapper` will check if a _collection_ property is writeable (i.e. read-only) before overridding value; if not, will using the underlying `Add` method to update.
+- *Enhanced:* The `PropertyMapper` will check if a _collection_ property is writeable (i.e. read-only) before overriding value; if not, will using the underlying `Add` method to update.
 - *Enhanced:* The `ComplexTypeReflector` now exposes a `MethodInfo? AddMethod` property for an underlying _collection_ (where found). 
 
 ## v3.1.7
@@ -106,7 +106,7 @@ Represents the **NuGet** versions.
 - *Fixed:* `ReferenceDataFilter.ApplyFilter` would throw a `NullReferenceException` where a code was null within the array; this is fixed.
 
 ## v2.1.20
-- *Added:* Reference data updated to support multiple run-time providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created (code-gen updated to enable).
+- *Added:* Reference data updated to support multiple runtime providers, versus the previous single only. A new `IReferenceDataProvider` enables a provider to be created (code-gen updated to enable).
 - *Added:* Reference data now supports a `ReferenceDataFilter` to filter by a list of codes and/or text wildcard. Leveraged by the code-gen `XxxController` to enable filtering against the in-memory cache.
 
 ## v2.1.19
@@ -159,7 +159,7 @@ Represents the **NuGet** versions.
 - *New:* Added `ExecutionContext.PartitionKey` support.
 
 ## v2.1.7
-- *Enhancement:* Support overridding of HttpClient creation through the WebApiServiceAgentManager - enables the likes of HttpClientFactory to be used where required.
+- *Enhancement:* Support overriding of HttpClient creation through the WebApiServiceAgentManager - enables the likes of HttpClientFactory to be used where required.
 - *Enhancement:* Renamed WebApiInvoker to WebApiServiceAgentInvoker to make its intended purpose more explicit.
 
 ## v2.1.6

@@ -74,7 +74,7 @@ operations: [
         public string? Type { get; set; }
 
         /// <summary>
-        /// Gets or sets the overridding text for use in comments.
+        /// Gets or sets the overriding text for use in comments.
         /// </summary>
         [JsonProperty("text", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Key", Title = "The text for use in comments.",

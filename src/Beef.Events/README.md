@@ -106,7 +106,7 @@ Property | Description
 
 _Warning:_ The [`ResultHandling.Stop`](./Subscribe/ResultHandling.cs) implies that the data is currently unable to be processed; and should be attempted again (it could be transient) - this however could result in a _poison_ message that could stop further processing until resolved. Consider the `ResultHandling.ContinueWithAudit`, `ResultHandling.ContinueWithLogging` or `ResultHandling.ContinueSilent` as an alternative.
 
-The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can be overridden by overridding the `CreateExecutionContext` method where neccessary.
+The [`ExecutionContext`](../../src/Beef.Core/ExecutionContext.cs) creation can be overridden by overriding the `CreateExecutionContext` method where neccessary.
 
 > To subscribe to Azure Event Hubs the [`EventHubSubscriberHost`](../../src/Beef.Events/Subscribe/EventHubSubscriberHost.cs) can be used. 
 
@@ -172,7 +172,7 @@ Option | Description
 
 ### Constraints
 
-The following run-time constraints exist:
+The following runtime constraints exist:
 
 - Given the required resiliency retry requirements within this trigger it is unable to be executed on an Azure consumption plan; i.e. must be **always-on**.
 - The invoked function can only accept a single `EventData` parameter; i.e. arrays are **not** supported.

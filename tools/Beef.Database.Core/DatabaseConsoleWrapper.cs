@@ -120,7 +120,7 @@ namespace Beef.Database.Core
         /// </summary>
         /// <param name="script">The execution script file or embedded resource name.</param>
         /// <returns>The current instance to supported fluent-style method-chaining.</returns>
-        public DatabaseConsoleWrapper ExecutionScript(string script)
+        public DatabaseConsoleWrapper DatabaseScript(string script)
         {
             _script = Check.NotEmpty(script, nameof(script));
             return this;

@@ -44,7 +44,7 @@ namespace Beef.Data.OData
         /// Initializes a new instance of the <see cref="ODataArgs{T, TModel}"/> class with a <paramref name="mapper"/>.
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         public ODataArgs(IEntityMapper<T, TModel> mapper, string? collectionName = null)
         {
             Mapper = Check.NotNull(mapper, nameof(mapper));
@@ -56,7 +56,7 @@ namespace Beef.Data.OData
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         public ODataArgs(IEntityMapper<T, TModel> mapper, PagingArgs paging, string? collectionName = null) 
             : this(mapper, new PagingResult(Check.NotNull(paging, nameof(paging))), collectionName) { }
 
@@ -65,7 +65,7 @@ namespace Beef.Data.OData
         /// </summary>
         /// <param name="mapper">The <see cref="IEntityMapper{T, TModel}"/>.</param>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         public ODataArgs(IEntityMapper<T, TModel> mapper, PagingResult paging, string? collectionName = null) : this(mapper, collectionName)
         {
             Paging = Check.NotNull(paging, nameof(paging));
@@ -92,7 +92,7 @@ namespace Beef.Data.OData
         public PagingResult? Paging { get; private set; }
 
         /// <summary>
-        /// Gets or sets the entity collection name where overridding the default.
+        /// Gets or sets the entity collection name where overriding the default.
         /// </summary>
         public string? CollectionName { get; set; }
 

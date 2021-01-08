@@ -7,12 +7,14 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace Beef.CodeGen
@@ -159,15 +161,21 @@ namespace Beef.CodeGen
             try
             {
                 // Load the script configuration.
-                var (scripts, configType) = await LoadScriptConfigAsync(_args.ScriptFile!).ConfigureAwait(false);
+                var sc = await LoadScriptConfigAsync(_args.ScriptFile!).ConfigureAwait(false);
 
-                var cfg = await LoadConfigFileAsync(configType).ConfigureAwait(false);
+                var cfg = await LoadConfigFileAsync(sc.ConfigType).ConfigureAwait(false);
                 var rcfg = (IRootConfig)cfg;
                 rcfg.ReplaceRuntimeParameters(_args.Parameters);
                 cfg.Prepare(cfg, cfg);
 
+                // Execute any config editors.
+                foreach (var ce in sc.ConfigEditors)
+                {
+                    ce.EditConfig(cfg);
+                }
+
                 // Execute each of the script instructions.
-                foreach (var script in scripts)
+                foreach (var script in sc.Scripts)
                 {
                     NotChangedCount = 0;
                     UpdatedCount = 0;
@@ -220,9 +228,10 @@ namespace Beef.CodeGen
         /// <summary>
         /// Load the code-gen scripts configuration.
         /// </summary>
-        private async Task<(List<CodeGenScriptArgs>, ConfigType)> LoadScriptConfigAsync(FileInfo scriptFile)
+        private async Task<(List<CodeGenScriptArgs> Scripts, ConfigType ConfigType, List<IConfigEditor> ConfigEditors)> LoadScriptConfigAsync(FileInfo scriptFile)
         {
             var list = new List<CodeGenScriptArgs>();
+            var editors = new List<IConfigEditor>();
 
             // Load the script XML content.
             XElement xmlScript;
@@ -235,17 +244,17 @@ namespace Beef.CodeGen
             {
                 var c = await ResourceManager.GetScriptContentAsync(scriptFile.Name, _args.Assemblies.ToArray()).ConfigureAwait(false);
                 if (c == null)
-                    throw new CodeGenException($"The Script XML '{scriptFile.FullName}' does not exist (either as a file or as an embedded resource).");
+                    throw new CodeGenException($"The Script XML '{scriptFile.Name}' does not exist (either as a file or as an embedded resource).");
 
                 xmlScript = XElement.Parse(c);
             }
 
             if (xmlScript?.Name != "Script")
-                throw new CodeGenException($"The Script XML '{scriptFile.FullName}' file must have a root element named 'Script'.");
+                throw new CodeGenException($"The Script XML '{scriptFile.Name}' must have a root element named 'Script'.");
 
             var ct = xmlScript.Attribute("ConfigType")?.Value ?? throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' must have an attribute named 'ConfigType' within the root 'Script' element.");
             if (!Enum.TryParse<ConfigType>(ct, true, out var configType))
-                throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' attribute named 'ConfigType' has an invalid value '{ct}'.");
+                throw new CodeGenException($"The Script XML '{scriptFile.Name}' attribute named 'ConfigType' has an invalid value '{ct}'.");
 
             var ia = xmlScript.Attribute("Inherits")?.Value;
             if (ia != null)
@@ -254,15 +263,29 @@ namespace Beef.CodeGen
                 {
                     var fi = new FileInfo(Path.Combine(scriptFile.DirectoryName, ian.Trim()));
                     var result = await LoadScriptConfigAsync(fi).ConfigureAwait(false);
-                    if (result.Item2 != configType)
-                        throw new CodeGenException($"The Script XML file '{scriptFile.FullName}' inherits '{fi.FullName}' which has a different 'ConfigType'; this must be the same.");
+                    if (result.ConfigType != configType)
+                        throw new CodeGenException($"The Script XML '{scriptFile.Name}' inherits '{fi.FullName}' which has a different 'ConfigType'; this must be the same.");
 
-                    list.AddRange(result.Item1);
+                    list.AddRange(result.Scripts);
+                    editors.AddRange(result.ConfigEditors);
                 }
             }
 
+            var ce = xmlScript.Attribute("ConfigEditor")?.Value;
+            if (ce != null)
+            {
+                var t = Type.GetType(ce, false);
+                if (t == null)
+                    throw new CodeGenException($"The Script XML '{scriptFile.Name}' references CodeEditor Type '{ce}' which could not be found/loaded.");
+
+                if (!typeof(IConfigEditor).IsAssignableFrom(t))
+                    throw new CodeGenException($"The Script XML '{scriptFile.Name}' references CodeEditor Type '{ce}' which does not implement IConfigEditor.");
+
+                editors.Add((IConfigEditor)(Activator.CreateInstance(t) ?? throw new CodeGenException($"The Script XML '{scriptFile.Name}' references CodeEditor Type '{ce}' which could not be instantiated.")));
+            }
+
             if (ia == null && !xmlScript.Elements("Generate").Any())
-                throw new CodeGenException($"The Script XML '{scriptFile.FullName}' file must have at least a single 'Generate' element.");
+                throw new CodeGenException($"The Script XML '{scriptFile.Name}' file must have at least a single 'Generate' element.");
 
             foreach (var scriptEle in xmlScript.Elements("Generate"))
             {
@@ -283,7 +306,7 @@ namespace Beef.CodeGen
                 list.Add(args);
             }
 
-            return (list, configType);
+            return (list, configType, editors);
         }
 
         /// <summary>
@@ -302,7 +325,7 @@ namespace Beef.CodeGen
                         using (var xfs = _args.ConfigFile!.OpenRead())
                         {
                             var xml = await XDocument.LoadAsync(xfs, LoadOptions.None, CancellationToken.None).ConfigureAwait(false);
-                            config = LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml));
+                            config = LoadConfigFileFromYaml(configType, configType == ConfigType.Entity ? new EntityXmlToYamlConverter().ConvertXmlToYaml(xml, true) : new DatabaseXmlToYamlConverter().ConvertXmlToYaml(xml, true));
                         }
 
                         break;

@@ -153,7 +153,7 @@
                   </xs:attribute>
                   <xs:attribute name="RefDataText" use="optional" type="xs:boolean">
                     <xs:annotation>
-                      <xs:documentation>Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overridding the `Entity.RefDataText` selection. This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).</xs:documentation>
+                      <xs:documentation>Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection. This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="RefDataMapping" use="optional" type="xs:boolean">
@@ -793,7 +793,7 @@
             </xs:attribute>
             <xs:attribute name="RefDataText" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overridding the `CodeGeneration.RefDataText` selection. This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).</xs:documentation>
+                <xs:documentation>Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection. This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="RefDataSortOrder" use="optional">

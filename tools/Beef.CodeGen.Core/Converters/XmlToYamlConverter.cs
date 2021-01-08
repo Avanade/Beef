@@ -43,6 +43,11 @@ namespace Beef.CodeGen.Converters
         public bool HasAttributes { get; set; }
 
         /// <summary>
+        /// Indicates whether to write any unknown attributes.
+        /// </summary>
+        public bool WriteUnknown { get; set; }
+
+        /// <summary>
         /// Writes the close squiggly bracket accounting for a needed space if an attribute has proceeded it.
         /// </summary>
         public void WriteClosingSquigglyBracket()
@@ -71,8 +76,9 @@ namespace Beef.CodeGen.Converters
         /// Converts an existing XML document into the equivlent new YAML format.
         /// </summary>
         /// <param name="xml">The existing <see cref="XDocument"/>.</param>
+        /// <param name="writeUnknown">Indicates whether to write any unknown attributes.</param>
         /// <returns>The new YAML formatted <see cref="string"/>.</returns>
-        internal string ConvertXmlToYaml(XDocument xml)
+        internal string ConvertXmlToYaml(XDocument xml, bool writeUnknown = false)
         {
             if (xml == null)
                 throw new ArgumentNullException(nameof(xml));
@@ -84,7 +90,7 @@ namespace Beef.CodeGen.Converters
             using (var sw = new StringWriter(sb))
             {
                 var (entity, type, _) = GetEntityConfigInfo(xml.Root.Name.LocalName);
-                WriteElement(new YamlFormatArgs(sw), xml.Root, ConfigType, entity, type);
+                WriteElement(new YamlFormatArgs(sw) { WriteUnknown = writeUnknown }, xml.Root, ConfigType, entity, type);
             }
 
             return sb.ToString();
@@ -204,10 +210,18 @@ namespace Beef.CodeGen.Converters
             {
                 var jname = XmlYamlTranslate.GetYamlName(ct, ce, att.Name.LocalName);
                 var pi = type.GetProperty(StringConversion.ToPascalCase(jname)!);
+                string? val;
                 if (pi == null || pi.GetCustomAttribute<JsonPropertyAttribute>() == null)
-                    continue;
+                {
+                    if (!args.WriteUnknown)
+                        continue;
 
-                var val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
+                    jname = att.Name.LocalName;
+                    val = att.Value;
+                }
+                else
+                    val = XmlYamlTranslate.GetYamlValue(ct, ce, att.Name.LocalName, att.Value);
+
                 if (val == null)
                     continue;
 

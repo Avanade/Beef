@@ -131,7 +131,7 @@ A key accelerator for _Beef_ is achieved using a flexible [code generation](./to
 
 An extensive framework of capabilities has also been developed to support this entity-based development. Specifically around entities and their collections, entity mapping, reference data, validation, standardised exceptions, standardised messaging, basic caching, logging, flat-file reader/writer, RESTful API support, ADO.NET database access, Entity Framework (EF) data access, OData access, Azure Service Bus, long running (execution and triggers) processes, etc.
 
-The **key** capabilities for _Beef_ are enabled by the following run-time assemblies:
+The **key** capabilities for _Beef_ are enabled by the following runtime assemblies:
 
 Assembly | Description | NuGet | Changes
 -|-|-|-

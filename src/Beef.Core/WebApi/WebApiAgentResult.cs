@@ -131,7 +131,7 @@ namespace Beef.WebApi
         /// Initializes a new instance of the <see cref="WebApiAgentResult{T}"/> class.
         /// </summary>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
-        /// <param name="overrideValue">The value overridding the internal content deserialization.</param>
+        /// <param name="overrideValue">The value overriding the internal content deserialization.</param>
         public WebApiAgentResult(HttpResponseMessage response, T overrideValue = default!) : base(response)
         {
             if (Comparer<T>.Default.Compare(overrideValue, default!) != 0)
@@ -145,7 +145,7 @@ namespace Beef.WebApi
         /// Initializes a new instance of the <see cref="WebApiAgentResult{T}"/> class using an existing <see cref="WebApiAgentResult"/>.
         /// </summary>
         /// <param name="result">The result containing the <see cref="WebApiAgentResult.Content"/> to deserialize.</param>
-        /// <param name="overrideValue">The value overridding the internal content deserialization.</param>
+        /// <param name="overrideValue">The value overriding the internal content deserialization.</param>
         public WebApiAgentResult(WebApiAgentResult result, T overrideValue = default!) : this(Check.NotNull(result, nameof(result)).Response, overrideValue)
         {
             Content = result.Content;

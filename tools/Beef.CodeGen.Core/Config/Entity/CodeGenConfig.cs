@@ -282,11 +282,19 @@ entities:
         #region Path
 
         /// <summary>
+        /// Gets or sets the base path (directory) for the artefacts.
+        /// </summary>
+        [JsonProperty("pathBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the Database-related artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
+        public string? PathBase { get; set; }
+
+        /// <summary>
         /// Gets or sets the path (directory) for the Common-related artefacts.
         /// </summary>
         [JsonProperty("pathCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Path", Title = "The path (directory) for the Database-related artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.")]
+            Description = "Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`.")]
         public string? PathCommon { get; set; }
 
         /// <summary>
@@ -294,7 +302,7 @@ entities:
         /// </summary>
         [JsonProperty("pathBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Path", Title = "The path (directory) for the Business-related (.NET) artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.")]
+            Description = "Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? PathBusiness { get; set; }
 
         /// <summary>
@@ -302,7 +310,7 @@ entities:
         /// </summary>
         [JsonProperty("pathApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Path", Title = "The path (directory) for the API-related (.NET) artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
+            Description = "Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
         public string? PathApi { get; set; }
 
         #endregion
@@ -310,27 +318,35 @@ entities:
         #region Namespace
 
         /// <summary>
-        /// Gets or sets the root Namespace for the Common-related (.NET) artefacts.
+        /// Gets or sets the base Namespace (root) for the .NET artefacts.
+        /// </summary>
+        [JsonProperty("namespaceBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Namespace", Title = "The base Namespace (root) for the .NET artefacts.",
+            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
+        public string? NamespaceBase { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Namespace (root) for the Common-related .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceCommon", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The root Namespace for the Common-related (.NET) artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Common` (literal). For example `Beef.Demo.Common`.")]
+        [PropertySchema("Namespace", Title = "The Namespace (root) for the Common-related .NET artefacts.",
+            Description = "Defaults to `NamespaceBase` + `.Common` (literal). For example `Beef.Demo.Common`.")]
         public string? NamespaceCommon { get; set; }
 
         /// <summary>
-        /// Gets or sets the root Namespace for the Business-related (.NET) artefacts.
+        /// Gets or sets the Namespace (root) for the Business-related .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceBusiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The root Namespace for the Business-related (.NET) artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `.Business` (literal). For example `Beef.Demo.Business`.")]
+        [PropertySchema("Namespace", Title = "The Namespace (root) for the Business-related .NET artefacts.",
+            Description = "Defaults to `NamespaceBase` + `.Business` (literal). For example `Beef.Demo.Business`.")]
         public string? NamespaceBusiness { get; set; }
 
         /// <summary>
-        /// Gets or sets the root Namespace for the Api-related (.NET) artefacts.
+        /// Gets or sets the Namespace (root) for the Api-related .NET artefacts.
         /// </summary>
         [JsonProperty("namespaceApi", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Namespace", Title = "The root Namespace for the Api-related (.NET) artefacts.",
-            Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter) + `` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
+        [PropertySchema("Namespace", Title = "The Namespace (root) for the Api-related .NET artefacts.",
+            Description = "Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.")]
         public string? NamespaceApi { get; set; }
 
         #endregion
@@ -479,12 +495,14 @@ entities:
         {
             CheckOptionsProperties();
 
-            PathCommon = DefaultWhereNull(PathCommon, () => $"{Company}.{AppName}.Common");
-            PathBusiness = DefaultWhereNull(PathBusiness, () => $"{Company}.{AppName}.Business");
-            PathApi = DefaultWhereNull(PathApi, () => $"{Company}.{AppName}.{ApiName}");
-            NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{Company}.{AppName}.Common");
-            NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{Company}.{AppName}.Business");
-            NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{Company}.{AppName}.{ApiName}");
+            PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
+            PathCommon = DefaultWhereNull(PathCommon, () => $"{PathBase}.Common");
+            PathBusiness = DefaultWhereNull(PathBusiness, () => $"{PathBase}.Business");
+            PathApi = DefaultWhereNull(PathApi, () => $"{PathBase}.{ApiName}");
+            NamespaceBase = DefaultWhereNull(NamespaceBase, () => $"{Company}.{AppName}");
+            NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{NamespaceBase}.Common");
+            NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
+            NamespaceApi = DefaultWhereNull(NamespaceApi, () => $"{NamespaceBase}.{ApiName}");
 
             RefDataCache = DefaultWhereNull(RefDataCache, () => "ReferenceDataCache");
             ValidatorLayer = DefaultWhereNull(ValidatorLayer, () => "Business");

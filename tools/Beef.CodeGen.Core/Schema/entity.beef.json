@@ -261,7 +261,7 @@
             },
             "refDataText": {
               "type": "boolean",
-              "title": "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overridding the `CodeGeneration.RefDataText` selection.",
+              "title": "Indicates whether a corresponding `Text` property is added when generating a Reference Data `Property` overriding the `CodeGeneration.RefDataText` selection.",
               "description": "This is used where serializing within the Web API`Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`)."
             },
             "refDataSortOrder": {
@@ -788,7 +788,7 @@
                     },
                     "refDataText": {
                       "type": "boolean",
-                      "title": "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overridding the `Entity.RefDataText` selection.",
+                      "title": "Indicates whether a corresponding `Text` property is added when generating a Reference Data property, overriding the `Entity.RefDataText` selection.",
                       "description": "This is used where serializing within the Web API `Controller` and the `ExecutionContext.IsRefDataTextSerializationEnabled` is set to `true` (which is automatically set where the url contains `$text=true`)."
                     },
                     "refDataMapping": {

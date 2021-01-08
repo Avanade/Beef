@@ -1,0 +1,3 @@
+﻿<Script ConfigType="Entity" Inherits="EntityWebApiCoreAgent.xml" ConfigEditor="Beef.Demo.CodeGen.Config.TestConfigEditor, Beef.Demo.CodeGen">
+  <Generate GenType="Beef.Demo.CodeGen.Generators.TestCodeGenerator, Beef.Demo.CodeGen" Template="Test_cs.hb" FileName="{{Name}}CodeGenTest.cs" OutDir="{{Root.PathBase}}.CodeGen" HelpText="TestCodeGenerator: Beef.Demo.CodeGen (Testing only!)" />
+</Script>

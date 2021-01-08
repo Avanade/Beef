@@ -56,7 +56,7 @@ namespace Beef.Data.OData
         /// <summary>
         /// Creates a <see cref="ODataArgs{T, TModel}"/>.
         /// </summary>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         /// <returns>A <see cref="ODataArgs{T, TModel}"/>.</returns>
         public ODataArgs<T, TModel> CreateArgs(string? collectionName = null) => new ODataArgs<T, TModel>(this, collectionName);
 
@@ -64,7 +64,7 @@ namespace Beef.Data.OData
         /// Creates a <see cref="ODataArgs{T, TModel}"/> with a <see cref="PagingArgs"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         /// <returns>A <see cref="ODataArgs{T, TModel}"/>.</returns>
         public ODataArgs<T, TModel> CreateArgs(PagingArgs paging, string? collectionName = null) => new ODataArgs<T, TModel>(this, paging, collectionName);
 
@@ -72,7 +72,7 @@ namespace Beef.Data.OData
         /// Creates a <see cref="ODataArgs{T, TModel}"/> with a <see cref="PagingResult"/>.
         /// </summary>
         /// <param name="paging">The <see cref="PagingResult"/>.</param>
-        /// <param name="collectionName">The entity collection name where overridding default.</param>
+        /// <param name="collectionName">The entity collection name where overriding default.</param>
         /// <returns>A <see cref="ODataArgs{T, TModel}"/>.</returns>
         public ODataArgs<T, TModel> CreateArgs(PagingResult paging, string? collectionName = null) => new ODataArgs<T, TModel>(this, paging, collectionName);
 

@@ -13,49 +13,34 @@ namespace Beef.CodeGen
     /// </summary>
     public class CodeGenConsoleWrapper
     {
-        /// <summary>
-        /// Gets or sets the <see cref="CommandType.Entity"/> filename template.
-        /// </summary>
-        public static string EntityFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.xml";
-
-        /// <summary>
-        /// Gets or sets the <see cref="CommandType.Database"/> filename template.
-        /// </summary>
-        public static string DatabaseFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.Database.xml";
-
-        /// <summary>
-        /// Gets or sets the <see cref="CommandType.RefData"/> filename template.
-        /// </summary>
-        public static string RefDataFileNameTemplate { get; set; } = "{{Company}}.RefData.xml";
-
-        /// <summary>
-        /// Gets or sets the <see cref="CommandType.DataModel"/> filename template.
-        /// </summary>
-        public static string DataModelFileNameTemplate { get; set; } = "{{Company}}.{{AppName}}.DataModel.xml";
+        private string _entityScript = "EntityWebApiCoreAgent.xml";
+        private string _refDataScript = "RefDataCoreCrud.xml";
+        private string _dataModelScript = "DataModelOnly.xml";
+        private string _databaseScript = "Database.xml";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Entity"/> command line template.
         /// </summary>
         public static string EntityCommandLineTemplate { get; set; }
-            = "-s EntityWebApiCoreAgent.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.Database"/> command line template.
         /// </summary>
         public static string DatabaseCommandLineTemplate { get; set; } 
-            = "-s Database.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
+            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p AppDir={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.RefData"/> command line template.
         /// </summary>
         public static string RefDataCommandLineTemplate { get; set; }
-            = "-s RefDataCoreCrud.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
+            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}} -p ApiName={{ApiName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="CommandType.DataModel"/> command line template.
         /// </summary>
         public static string DataModelCommandLineTemplate { get; set; }
-            = "-s DataModelOnly.xml -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}}";
+            = "-s {{Script}} -o {{OutDir}} -p Company={{Company}} -p AppName={{AppName}}";
 
         /// <summary>
         /// Gets or sets the <see cref="Assembly"/> portion command line template.
@@ -169,6 +154,50 @@ namespace Beef.CodeGen
         }
 
         /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.Database"/> (defaults to <c>EntityWebApiCoreAgent.xml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsoleWrapper EntityScript(string script)
+        {
+            _entityScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.DataModel"/> (defaults to <c>DataModelOnly.xml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsoleWrapper DataModelScript(string script)
+        {
+            _dataModelScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.RefData"/> (defaults to <c>RefDataCoreCrud.xml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsoleWrapper RefDataScript(string script)
+        {
+            _refDataScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
+        /// Sets (overrides) the execution script file or embedded resource name for the <see cref="CommandType.Database"/> (defaults to <c>Database.Xml</c>).
+        /// </summary>
+        /// <param name="script">The execution script file or embedded resource name.</param>
+        /// <returns>The current instance to supported fluent-style method-chaining.</returns>
+        public CodeGenConsoleWrapper DatabaseScript(string script)
+        {
+            _databaseScript = Check.NotEmpty(script, nameof(script));
+            return this;
+        }
+
+        /// <summary>
         /// Executes the underlying <see cref="CodeGenConsole"/> using the code generation arguments.
         /// </summary>
         /// <param name="args">The code generation arguments.</param>
@@ -184,7 +213,8 @@ namespace Beef.CodeGen
             var cmd = app.Argument<CommandType>("command", "Execution command type: Entity, Database, RefData or All.", false).IsRequired();
             var cs = app.Option("-cs|--connectionString", "Override the connection string for Database.", CommandOptionType.SingleValue);
             var cf = app.Option("-cf|--configFile", "Override the filename for the configuration.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
-            var enc = app.Option("-enc|--expectNoChanges", "Expect no changes in the output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
+            var sf = app.Option("-s|--scriptFile", "Override the filename for the script orchestration.", CommandOptionType.SingleValue).Accepts(v => v.ExistingFile());
+            var enc = app.Option("-enc|--expectNoChanges", "Expect no changes in the artefact output and error where changes are detected (e.g. within build pipeline).", CommandOptionType.NoValue);
             var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
 
             app.OnExecuteAsync(async (_) =>
@@ -197,6 +227,15 @@ namespace Beef.CodeGen
                         throw new CommandParsingException(app, "Command 'All' is not compatible with --configFile; the command must be more specific when using a specified configuration file.");
 
                     cfn = cf.Value()!;
+                }
+
+                string? sfn = null;
+                if (sf.HasValue())
+                {
+                    if (ct == CommandType.All)
+                        throw new CommandParsingException(app, "Command 'All' is not compatible with --scriptFile; the command must be more specific when using a specified script file.");
+
+                    sfn = sf.Value()!;
                 }
 
                 if (x2y.HasValue())
@@ -212,16 +251,16 @@ namespace Beef.CodeGen
 
                 var rc = 0;
                 if (IsDatabaseSupported && ct.HasFlag(CommandType.Database))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName) + " " + DatabaseCommandLineTemplate) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName) + " " + DatabaseCommandLineTemplate, sfn ?? _databaseScript) + (cs.HasValue() ? $" -p \"ConnectionString={cs.Value()}\"" : "") + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsRefDataSupported && ct.HasFlag(CommandType.RefData))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.RefData, Company, AppName) + " " + RefDataCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.RefData, Company, AppName) + " " + RefDataCommandLineTemplate, sfn ?? _refDataScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsEntitySupported && ct.HasFlag(CommandType.Entity))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Entity, Company, AppName) + " " + EntityCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.Entity, Company, AppName) + " " + EntityCommandLineTemplate, sfn ?? _entityScript) + encArg)).ConfigureAwait(false);
 
                 if (rc == 0 && IsDataModelSupported && ct.HasFlag(CommandType.DataModel))
-                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.DataModel, Company, AppName) + " " + DataModelCommandLineTemplate) + encArg)).ConfigureAwait(false);
+                    rc = await CodeGenConsole.Create().RunAsync(AppendAssemblies(ReplaceMoustache(cfn ?? CodeGenFileManager.GetConfigFilename(CommandType.DataModel, Company, AppName) + " " + DataModelCommandLineTemplate, sfn ?? _dataModelScript) + encArg)).ConfigureAwait(false);
 
                 return rc;
             });
@@ -240,8 +279,9 @@ namespace Beef.CodeGen
         /// <summary>
         /// Replace the moustache placeholders.
         /// </summary>
-        private string ReplaceMoustache(string text)
+        private string ReplaceMoustache(string text, string script)
         {
+            text = text.Replace("{{Script}}", script, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Company}}", Company, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{AppName}}", AppName, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{ApiName}}", ApiName, StringComparison.OrdinalIgnoreCase);
