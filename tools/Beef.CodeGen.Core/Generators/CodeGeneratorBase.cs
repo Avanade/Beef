@@ -99,7 +99,6 @@ namespace Beef.CodeGen.Generators
             var templateHandlebars = Handlebars.Compile(template);
             var outputFileNameHandlebars = Handlebars.Compile(OutputFileName ?? throw new InvalidOperationException($"The '{nameof(OutputFileName)}' must not be null."));
             var outputDirNameHandlebars = Handlebars.Compile(OutputDirName ?? throw new InvalidOperationException($"The '{nameof(OutputDirName)}' must not be null."));
-            var outputGenDirNameGenHandlebars = Handlebars.Compile(OutputGenDirName ?? throw new InvalidOperationException($"The '{nameof(OutputGenDirName)}' must not be null."));
 
             foreach (var val in values)
             {
@@ -108,7 +107,6 @@ namespace Beef.CodeGen.Generators
                     Content = templateHandlebars(val),
                     OutputFileName = outputFileNameHandlebars(val),
                     OutputDirName = outputDirNameHandlebars(val),
-                    OutputGenDirName = outputGenDirNameGenHandlebars(val)
                 };
 
                 codeGenerated?.Invoke(args);

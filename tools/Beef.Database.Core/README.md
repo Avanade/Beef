@@ -19,7 +19,7 @@ As stated, [DbUp](https://dbup.readthedocs.io/en/latest/) is used enabling a dat
 
 Over time there will be more than one script updating a single object, for example a `Table`. In this case the first script operation will be a `Create`, followed by subsequent `Alter` operations. The scripts should be considered immutable, in that they cannot be changed once they have been applied; ongoing changes will need additional scripts.
 
-The migration scripts must be marked as embedded resources, and reside under the `Migrations` folder within the c# project. A naming convention should be used to ensure they are to be executed in the correct order; it is recommended that the name be prefixed by the date and time, following by a description of the purpose. For example: `20181218-081540-create-demo-person-table.sql`
+The migration scripts must be marked as embedded resources, and reside under the `Migrations` folder within the c# project. A naming convention should be used to ensure they are to be executed in the correct order; it is recommended that the name be prefixed by the date and time, followed by a brief description of the purpose. For example: `20181218-081540-create-demo-person-table.sql`
 
 It is recommended that each script be enclosed by a transaction that can be rolled back in the case of error; otherwise, a script could be partially applied and will then need manual intervention to resolve.
 
@@ -39,7 +39,7 @@ The schema scripts must be marked as embedded resources, and reside under the `S
 
 The `Schema` folder is used to encourage the usage of database schemas. Therefore, directly under should be the schema name, for example `dbo` or `Ref`. Then sub-folders for the object types as per [Azure Data Studio](https://docs.microsoft.com/en-au/sql/azure-data-studio/what-is), for example `Functions`, `Stored Procedures` or `Types\User-Defined Table Types`. 
 
-_Note_: The is a _special case_ where a [Table](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql) object is found, then this will only be enacted where it does not previously exist. An `IF NOT EXIST` statement is automatically prepended prior to executing. These will be applied in advance of the objects listed earlier (no attempt to delete or update will occur).
+_Note_: There is a _special case_ where a [Table](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql) object create script is found, then this will only be enacted where it does not previously exist. An `IF NOT EXIST` statement is automatically wrapped (integrated) prior to executing. These will be applied in advance of the objects listed earlier (_no_ attempt to delete or update will occur).
 
 Code generation is also supported / enabled using the _Beef_ [Code-Gen](../Beef.CodeGen.Core/README.md) capabilities. The tooling looks for the schema objects in the file system (as well as embedded resources) to allow for additions/changes during the code generation execution.
 
@@ -51,7 +51,7 @@ Data can be defined using [YAML](https://en.wikipedia.org/wiki/YAML) to enable s
 
 The data specified follows a basic indenting/levelling rule to enable:
 1. **Schema** - specifies Schema name.
-2. **Table** - specifies the Table name within the Schema; this will be validated to ensure it exists within the database as the underlying table schema (columns) will be inferred. The underyling rows will be [inserted](https://docs.microsoft.com/en-us/sql/t-sql/statements/insert-transact-sql) by default, by prefixing with a `$` character a [merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql) operation will be performed instead.
+2. **Table** - specifies the Table name within the Schema; this will be validated to ensure it exists within the database as the underlying table schema (columns) will be inferred. The underyling rows will be [inserted](https://docs.microsoft.com/en-us/sql/t-sql/statements/insert-transact-sql) by default; or alternatively by prefixing with a `$` character a [merge](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql) operation will be performed instead.
 3. **Rows** - each row specifies the column name and the corresponding values (except for reference data described below). The tooling will parse each column value according to the underying SQL type.
 
 <br/>
@@ -125,7 +125,7 @@ Command | Description
 `Reset` | Resets the database by deleting all existing data.
 `Data` | Inserts or merges **Data** from embedded YAML files.
 
-The remainder are common combinations of the above:
+The following are common combinations of the above.
 
 Command | Description
 -|-
@@ -136,7 +136,7 @@ Command | Description
 `DropAndDatabase` | Performs `Drop` and `Database`.
 `ResetAndDatabase` | Performs `Reset` and `Database`.
 
-There are multiple scripting options (create new script file in the `Migrate` folder:
+There are multiple options to create a new script file in the `Migrate` folder to simplify the process for the developer.
 
 Command | Description
 -|-
@@ -144,6 +144,26 @@ Command | Description
 `ScriptNew -create Schema.Table` | Creates a new table create script file for the named schema and table.
 `ScriptNew -createref Schema.Table` | Creates a new reference data table create script file for the named schema and table.
 `ScriptNew -alter Schema.Table` | Creates a new table alter script file for the named schema and table.
+
+Additionally, there are a number of command line options that can be used.
+
+Option | Description
+-|-
+`-cs` or `--connectionString` | Overrides the connection string for the database.
+`-eo` or `--entry-assembly-only` | Overrides the assemblies to use the entry assembly only. This will avoid any dependent Scripts and Schema being (re-)invoked.
+`-x2y` or `--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
+
+<br/>
+
+### Environment Variable
+
+Finally, the connection string can be overriden using an environment variable. This is useful where a developer can not use the default instance, or within automated deployments to a build or destination server where specifying the connection string on the command would not be considered good security practice.
+
+The default environment variable is named `{Company}_{AppName}_ConnectionString`. Any `.` characters will be automatically replaced by an `_` character.
+
+For example, where `Company` is `Foo.Bar` and `AppName` is `Blah`, then the environment variable would be `Foo_Bar_Blah_ConnectionString`.
+
+There is an additional command line option to enable overriding of the environment variable name: `-evn` or `--environmentVariableName`
 
 <br/>
 
@@ -179,3 +199,18 @@ dotnet run all
 dotnet run database -cs "Data Source=.;Initial atalog=Beef.Test;Integrated Security=True"
 dotnet run scriptnew -createref Ref.Eyecolor
 ```
+
+<br/>
+
+## Direct / consolidated execution
+
+The `Beef.Core.Database` can be invoked directly using the customized assemblies as a source to provide multiple Scripts and Schema within a single invocation. This is useful where needing to perform a single consolidated deployment versus invoking one-by-one.
+
+One of the previously described [commands](DatabaseExecutorCommand.cs) is required. Additionally, a `connectionString` command is also required; unless the `--environmenVariableName` option is supplied to override.
+
+ Additionally, there are the following command line options that can also be used.
+
+Option | Description
+-|-
+`-a` or `--assembly` | One or more [Assembly Names](https://docs.microsoft.com/en-us/dotnet/standard/assembly/names); being the assemblies that contain the required Scripts and Schema. These should be specified in the order in which they should be executed. Where the _Beef_ standard `dbo` objects should be added then the `Beef.Database.Core` assembly must also be specified.
+`-so` or `--schemaorder` | One or more Schema names in the order in which they should be executed (otherwise, the default is alphabetical). This provides an additional level of control in addition to the specified Assembly order.

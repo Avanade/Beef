@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Entity" Inherits="RefDataCore.xml">
-  <Generate GenType="Beef.CodeGen.Generators.EntityIDataCodeGenerator" Template="EntityIData_cs.hbs" FileName="I{{Name}}Data.cs" OutDir="{{Root.PathBusiness}}/Data" HelpText="IEntityDataCodeGenerator: Business/Data" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityDataCodeGenerator" Template="EntityData_cs.hbs" FileName="{{Name}}Data.cs" OutDir="{{Root.PathBusiness}}/Data" HelpText="EntityDataCodeGenerator: Business/Data" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityIDataSvcCodeGenerator" Template="EntityIDataSvc_cs.hbs" FileName="I{{Name}}DataSvc.cs" OutDir="{{Root.PathBusiness}}/DataSvc" HelpText="IEntityDataSvcCodeGenerator: Business/DataSvc" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityDataSvcCodeGenerator" Template="EntityDataSvc_cs.hbs" FileName="{{Name}}DataSvc.cs" OutDir="{{Root.PathBusiness}}/DataSvc" HelpText="EntityDataSvcCodeGenerator: Business/DataSvc" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityIManagerCodeGenerator" Template="EntityIManager_cs.hbs" FileName="I{{Name}}Manager.cs" OutDir="{{Root.PathBusiness}}" HelpText="IEntityManagerCodeGenerator: Business" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityManagerCodeGenerator" Template="EntityManager_cs.hbs" FileName="{{Name}}Manager.cs" OutDir="{{Root.PathBusiness}}" HelpText="EntityManagerCodeGenerator: Business" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityIDataCodeGenerator" Template="EntityIData_cs.hbs" FileName="I{{Name}}Data.cs" OutDir="{{Root.PathBusiness}}/Data/Generated" HelpText="IEntityDataCodeGenerator: Business/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityDataCodeGenerator" Template="EntityData_cs.hbs" FileName="{{Name}}Data.cs" OutDir="{{Root.PathBusiness}}/Data/Generated" HelpText="EntityDataCodeGenerator: Business/Data" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityIDataSvcCodeGenerator" Template="EntityIDataSvc_cs.hbs" FileName="I{{Name}}DataSvc.cs" OutDir="{{Root.PathBusiness}}/DataSvc/Generated" HelpText="IEntityDataSvcCodeGenerator: Business/DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityDataSvcCodeGenerator" Template="EntityDataSvc_cs.hbs" FileName="{{Name}}DataSvc.cs" OutDir="{{Root.PathBusiness}}/DataSvc/Generated" HelpText="EntityDataSvcCodeGenerator: Business/DataSvc" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityIManagerCodeGenerator" Template="EntityIManager_cs.hbs" FileName="I{{Name}}Manager.cs" OutDir="{{Root.PathBusiness}}/Generated" HelpText="IEntityManagerCodeGenerator: Business" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityManagerCodeGenerator" Template="EntityManager_cs.hbs" FileName="{{Name}}Manager.cs" OutDir="{{Root.PathBusiness}}/Generated" HelpText="EntityManagerCodeGenerator: Business" />
 
-  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator" Template="EntityWebApiController_cs.hbs" FileName="{{Name}}Controller.cs" OutDir="{{Root.PathApi}}/Controllers" EntityScope="Common" HelpText="EntityWebApiControllerCodeGenerator: Api/Controllers" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiAgentCodeGenerator" Template="EntityWebApiAgent_cs.hbs" FileName="{{Name}}Agent.cs" OutDir="{{Root.PathCommon}}/Agents" EntityScope="Common" HelpText="EntityWebApiAgentCodeGenerator: Common/Agents" />
-  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiAgentArgsCodeGenerator" Template="EntityWebApiAgentArgs_cs.hbs" FileName="{{Root.AppName}}WebApiAgentArgs.cs" OutDir="{{Root.PathCommon}}/Agents" EntityScope="Common" HelpText="EntityIWebApiAgentArgsCodeGenerator: Common/Agents" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiControllerCodeGenerator" Template="EntityWebApiController_cs.hbs" FileName="{{Name}}Controller.cs" OutDir="{{Root.PathApi}}/Controllers/Generated" EntityScope="Common" HelpText="EntityWebApiControllerCodeGenerator: Api/Controllers" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiAgentCodeGenerator" Template="EntityWebApiAgent_cs.hbs" FileName="{{Name}}Agent.cs" OutDir="{{Root.PathCommon}}/Agents/Generated" EntityScope="Common" HelpText="EntityWebApiAgentCodeGenerator: Common/Agents" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityWebApiAgentArgsCodeGenerator" Template="EntityWebApiAgentArgs_cs.hbs" FileName="{{Root.AppName}}WebApiAgentArgs.cs" OutDir="{{Root.PathCommon}}/Agents/Generated" EntityScope="Common" HelpText="EntityIWebApiAgentArgsCodeGenerator: Common/Agents" />
 </Script>

@@ -10,11 +10,6 @@ namespace Beef.CodeGen
     public class CodeGeneratorEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets or sets the generated directory name.
-        /// </summary>
-        public string? OutputGenDirName { get; set; }
-
-        /// <summary>
         /// Gets or sets the optional directory name.
         /// </summary>
         public string? OutputDirName { get; set; }
@@ -25,9 +20,9 @@ namespace Beef.CodeGen
         public string? OutputFileName { get; set; }
 
         /// <summary>
-        /// Indicates whether the file is only output when new; i.e. does not already exist.
+        /// Indicates whether the file is only generated once; i.e. only created where it does not already exist.
         /// </summary>
-        public bool IsOutputNewOnly { get; set; }
+        public bool GenOnce { get; set; }
 
         /// <summary>
         /// Gets or sets the generated output content.

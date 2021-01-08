@@ -168,6 +168,7 @@ namespace Beef.Database.Core
             var cr = app.Option("-createref|--scriptnew-create-ref-table", "ScriptNew: use create reference data '[schema.]table' template.", CommandOptionType.SingleValue);
             var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
             var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
+            var evn = app.Option("-evn|--environmentVariableName", "Override the default environment variable name for the connection string.", CommandOptionType.SingleValue);
 
             app.OnExecuteAsync(async (_) =>
             {

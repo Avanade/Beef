@@ -33,6 +33,8 @@ namespace Beef.Database.Core
         private readonly CommandOption _paramsOpt;
         private readonly CommandOption _schemaOrder;
         private readonly CommandOption<int> _supportedOpt;
+        private readonly CommandOption _envVarNameOpt;
+        private string? _connectionString;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -58,8 +60,8 @@ namespace Beef.Database.Core
             App.HelpOption(true);
 
             _commandArg = App.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
-            _connectionStringArg = App.Argument("connectionstring", "Database connection string.").IsRequired();
-            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified).", CommandOptionType.MultipleValue)
+            _connectionStringArg = App.Argument("connectionstring", "Database connection string.");
+            App.Option("-a|--assembly", "Assembly name containing scripts (multiple can be specified, in order of use).", CommandOptionType.MultipleValue)
                 .Accepts(v => v.Use(new AssemblyValidator(_scriptAssemblies)));
 
             _configOpt = App.Option("-c|--config", "CodeGeneration configuration XML file.", CommandOptionType.SingleValue)
@@ -78,6 +80,7 @@ namespace Beef.Database.Core
 
             _schemaOrder = App.Option("-so|--schemaorder", "Schema priority order.", CommandOptionType.MultipleValue);
             _supportedOpt = App.Option<int>("-su|--supported", "Supported commands (integer)", CommandOptionType.SingleValue);
+            _envVarNameOpt = App.Option<string>("-evn|--environmentVariableName", "Override the connection string using the specified environment variable name.", CommandOptionType.SingleValue);
 
             Logger.Default = _logger = new ColoredConsoleLogger(nameof(CodeGenConsole));
 
@@ -90,11 +93,12 @@ namespace Beef.Database.Core
         /// </summary>
         private ValidationResult OnValidate()
         {
-            if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen))
-            {
-                if (_configOpt.Value() == null)
-                    return new ValidationResult($"The --config option is required when CodeGen is selected.");
-            }
+            _connectionString = _envVarNameOpt.HasValue() ? Environment.GetEnvironmentVariable(_envVarNameOpt.Value()!) : _connectionStringArg.Value;
+            if (_connectionString == null)
+                return new ValidationResult($"The connectionString command and/or --environmentVariableName option must be specified; with the latter at least resulting in a non-null value.");
+
+            if (_commandArg.ParsedValue.HasFlag(DatabaseExecutorCommand.CodeGen) && _configOpt.Value() == null)
+                return new ValidationResult($"The --config option is required when CodeGen is selected.");
 
             return ValidationResult.Success;
         }
@@ -150,15 +154,15 @@ namespace Beef.Database.Core
         {
             var args = new CodeGenExecutorArgs(_logger, _scriptAssemblies, CreateParamDict(_paramsOpt))
             {
-                ConfigFile = new FileInfo(_configOpt.Value()),
-                ScriptFile = new FileInfo(_scriptOpt.Value()),
+                ConfigFile = _configOpt.HasValue() ? new FileInfo(_configOpt.Value()) : null,
+                ScriptFile = _scriptOpt.HasValue() ? new FileInfo(_scriptOpt.Value()) : null,
                 TemplatePath = _templateOpt.HasValue() ? new DirectoryInfo(_templateOpt.Value()) : null,
                 OutputPath = new DirectoryInfo(_outputOpt.HasValue() ? _outputOpt.Value() : Environment.CurrentDirectory)
             };
 
             WriteHeader(args);
 
-            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionStringArg.Value!, _scriptAssemblies.ToArray()) { CodeGenArgs = args, SupportedCommands = _supportedOpt.HasValue() ? (DatabaseExecutorCommand)_supportedOpt.ParsedValue : DatabaseExecutorCommand.All };
+            var dea = new DatabaseExecutorArgs(_commandArg.ParsedValue, _connectionString!, _scriptAssemblies.ToArray()) { CodeGenArgs = args, SupportedCommands = _supportedOpt.HasValue() ? (DatabaseExecutorCommand)_supportedOpt.ParsedValue : DatabaseExecutorCommand.All };
             if (_schemaOrder.HasValue())
                 dea.SchemaOrder.AddRange(_schemaOrder.Values);
 

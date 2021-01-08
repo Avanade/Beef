@@ -7,14 +7,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace Beef.CodeGen
@@ -108,6 +106,11 @@ namespace Beef.CodeGen
         public string? OutDir { get; set; }
 
         /// <summary>
+        /// Indicates whether the file is only generated once; i.e. only created where it does not already exist.
+        /// </summary>
+        public bool GenOnce { get; set; }
+
+        /// <summary>
         /// Gets or sets the help text.
         /// </summary>
         public string? HelpText { get; set; }
@@ -180,7 +183,7 @@ namespace Beef.CodeGen
                     NotChangedCount = 0;
                     UpdatedCount = 0;
                     CreatedCount = 0;
-                    
+
                     // Log progress.
                     _args.Logger.LogInformation("  Template: {0} {1}", script.Template!, script.HelpText == null ? string.Empty : $"({script.HelpText})");
 
@@ -196,7 +199,11 @@ namespace Beef.CodeGen
                     var cg = (CodeGeneratorBase)(Activator.CreateInstance(gt) ?? throw new CodeGenException($"GenType '{script.GenType}' was unable to be instantiated."));
                     cg.OutputFileName = script.FileName;
                     cg.OutputDirName = script.OutDir;
-                    cg.Generate(template, cfg!, e => CodeGenerated(_args.OutputPath!.FullName, e));
+                    cg.Generate(template, cfg!, e =>
+                    {
+                        e.GenOnce = script.GenOnce;
+                        CodeGenerated(_args.OutputPath!.FullName, e);
+                    });
 
                     // Provide statistics.
                     _args.Logger.LogInformation("   [Files: Unchanged = {0}, Updated = {1}, Created = {2}]", NotChangedCount, UpdatedCount, CreatedCount);
@@ -298,6 +305,7 @@ namespace Beef.CodeGen
                         case "FileName": args.FileName = att.Value; break;
                         case "Template": args.Template = att.Value; break;
                         case "OutDir": args.OutDir = att.Value; break;
+                        case "GenOnce": args.GenOnce = string.Compare(att.Value, "true", true) == 0; break;
                         case "HelpText": args.HelpText = att.Value; break;
                         default: args.OtherParameters.Add(att.Name.LocalName, att.Value); break;
                     }
@@ -400,16 +408,13 @@ namespace Beef.CodeGen
             if (!string.IsNullOrEmpty(e.OutputDirName))
                 dir = Path.Combine(dir, e.OutputDirName);
 
-            if (!string.IsNullOrEmpty(e.OutputGenDirName))
-                dir = Path.Combine(dir, e.OutputGenDirName);
-
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
             var fi = new FileInfo(Path.Combine(dir, e.OutputFileName!));
             if (fi.Exists)
             {
-                if (e.IsOutputNewOnly)
+                if (e.GenOnce)
                     return; 
 
                 var prevContent = File.ReadAllText(fi.FullName);

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
 <Script ConfigType="Entity">
-  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathCommon}}/Entities" EntityScope="Common" HelpText="EntityCodeGenerator: Common/Entities" />
+  <Generate GenType="Beef.CodeGen.Generators.EntityCodeGenerator" Template="Entity_cs.hbs" FileName="{{Name}}.cs" OutDir="{{Root.PathCommon}}/Entities/Generated" EntityScope="Common" HelpText="EntityCodeGenerator: Common/Entities" />
 </Script>

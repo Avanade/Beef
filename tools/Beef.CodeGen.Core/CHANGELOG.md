@@ -10,6 +10,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* A return type of `string` will always be treated as nullable. This is because the `Cleaner.Clean` (based on settings) could override the return value with `null`.
 - *Enhancement:* The code-gen `Scripts` XML files support a new `Inherits` attribute to enable references to one or more other `Scripts` files. This allows referencing to remove the need to duplicate setting across multiple files.
 - *Enhancement:* The code-gen has been updated to enable [personalization of code-generation](./README.md#personalization-andor-overriding); to either override an existing template or execute entirely new templates; including the ability to access additive configuration.
+- *Enhancement:* Added new configuration and templates to support Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capability. Additionally, [`Beef.Data.Database.Cdc`](./../../src/Beef.Data.Database.Cdc/README.md) has been added to support; this documentation also describes its usage.
 
 ## v4.1.12
 - *Fixed:* Issue [93](https://github.com/Avanade/Beef/issues/93) fixed. The `XxxServiceCollectionExtensions.cs` classes were errantly being generated where there are no corresponding operations that would require.

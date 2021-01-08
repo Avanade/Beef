@@ -7,7 +7,10 @@ namespace Beef.Demo.Database
     {
         static Task<int> Main(string[] args)
         {
-            return DatabaseConsoleWrapper.Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True", "Beef", "Demo").ExecutionScript("DatabaseWithCdc.xml").RunAsync(args);
+            return DatabaseConsoleWrapper
+                .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated Security=True", "Beef", "Demo")
+                .DatabaseScript("DatabaseWithCdc.xml")
+                .RunAsync(args);
         }
     }
 }
