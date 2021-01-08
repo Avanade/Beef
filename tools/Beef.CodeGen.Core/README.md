@@ -242,12 +242,12 @@ The [`Beef.Demo.Codegen`](./../../samples/Demo/Beef.Demo.Codegen) provides an ex
 
 Code | Description
 -|-
-[`TestConfigEditor.cs`](./../../samples/Demo/Beef.Demo.Codegen/Config/TestConfigEditor.cs) | This implements [`IConfigEditor`](./Config/IConfigEditor.cs) and demonstrates `ConfigBase.TryGetExtraProperty` and `ConfigBase.CustomProperties` usage.
-[`TestCodeGenerator.cs`](./../../samples/Demo/Beef.Demo.Codegen/Generators/TestCodeGenerator.cs) | This inherits from [`CodeGeneratorBase<TRootConfig, TGenConfig>`](./Generators/CodeGeneratorBase.cs) overriding the `SelectGenConfig` to select the configuration that will be used by the associated Template.
-[`Test_cs.hbs`](./../../samples/Demo/Beef.Demo.Codegen/Templates/Test_cs.hbs) | This demonstrates how to reference both the `ExtraProperties` and `CustomProperties` using _Handlebars_ syntax. Must be added as an embedded resource.
-[`TestScript.xml`](./../../samples/Demo/Beef.Demo.Codegen/Scripts/TestScript.xml) | This demonstrates the required configuration to wire-up the previous so that they are leveraged apprpropriately at runtime. Must be added as an embedded resource.
+[`TestConfigEditor.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Config/TestConfigEditor.cs) | This implements [`IConfigEditor`](./Config/IConfigEditor.cs) and demonstrates `ConfigBase.TryGetExtraProperty` and `ConfigBase.CustomProperties` usage.
+[`TestCodeGenerator.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Generators/TestCodeGenerator.cs) | This inherits from [`CodeGeneratorBase<TRootConfig, TGenConfig>`](./Generators/CodeGeneratorBase.cs) overriding the `SelectGenConfig` to select the configuration that will be used by the associated Template.
+[`Test_cs.hbs`](./../../samples/Demo/Beef.Demo.CodeGen/Templates/Test_cs.hbs) | This demonstrates how to reference both the `ExtraProperties` and `CustomProperties` using _Handlebars_ syntax. Must be added as an embedded resource.
+[`TestScript.xml`](./../../samples/Demo/Beef.Demo.CodeGen/Scripts/TestScript.xml) | This demonstrates the required configuration to wire-up the previous so that they are leveraged apprpropriately at runtime. Must be added as an embedded resource.
 
-Finally the [`Program.cs`](./../../samples/Demo/Beef.Demo.Codegen/Program.cs) will need to be updated similar as follows to use the new Scripts resource.
+Finally the [`Program.cs`](./../../samples/Demo/Beef.Demo.CodeGen/Program.cs) will need to be updated similar as follows to use the new Scripts resource.
 
 ``` csharp
 return CodeGenConsoleWrapper
