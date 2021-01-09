@@ -572,33 +572,33 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Creates the new script from the template.dotnet run 
+        /// Creates the new script from the template.
         /// </summary>
         private async Task<bool> CreateScriptNewAsync()
         {
-            var data = new
-            {
-                Action = _args.CodeGenArgs!.Parameters.TryGetValue("ScriptNew", out var s) ? s : null,
-                Schema = _args.CodeGenArgs.Parameters.TryGetValue("Schema", out s) ? s : "Schema",
-                Table = _args.CodeGenArgs.Parameters.TryGetValue("Table", out s) ? s : "Table",
-            };
-
-#pragma warning disable CA1308 // Normalize strings to uppercase; by-design as lowercase is desired.
-            var name = (string.Compare(data.Action, "createref", StringComparison.OrdinalIgnoreCase) == 0 ? "create" : data.Action)?.ToLowerInvariant();
-#pragma warning restore CA1308 
+            var data = new { _args.CodeGenArgs!.Parameters };
+            var p0 = _args.CodeGenArgs.Parameters?.SingleOrDefault(x => string.Compare(x.Key, "Param0", StringComparison.InvariantCultureIgnoreCase) == 0).Value;
+            var rn = typeof(DatabaseExecutor).Assembly.GetManifestResourceNames().SingleOrDefault(x => string.Compare(x, $"Beef.Database.Core.Resources.{p0 ?? "Default"}_sql.hbs", StringComparison.InvariantCultureIgnoreCase) == 0);
+            if (rn == null)
+                throw new InvalidOperationException($"The ScriptNew '{p0}' argument is invalid.");
+            
+            var fn = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
+            if (_args.CodeGenArgs!.Parameters == null || _args.CodeGenArgs!.Parameters.Count == 0)
+                fn += "-comment-text";
+            else
+                _args.CodeGenArgs!.Parameters.Where(x => x.Key.StartsWith("Param", StringComparison.InvariantCultureIgnoreCase)).ForEach(x => fn += $"-{x.Value}");
 
             var di = new DirectoryInfo(Environment.CurrentDirectory);
-            var fi = string.IsNullOrEmpty(data.Action)
-                ? new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-comment-text.sql"))
-                : new FileInfo(Path.Combine(di.FullName, MigrationsNamespace,
-                    $"{DateTime.Now.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture)}-{name}-{data.Schema}-{data.Table}.sql"));
-
+#pragma warning disable CA1308 // Normalize strings to uppercase; desire/require lowercase for this thanks!
+            var fi = new FileInfo(Path.Combine(di.FullName, MigrationsNamespace, $"{fn.ToLowerInvariant()}.sql"));
+#pragma warning restore CA1308
             if (!fi.Directory.Exists)
                 fi.Directory.Create();
 
-            using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream("Beef.Database.Core.Resources.ScriptNew_sql.hbs"))
+            using (var st = typeof(DatabaseExecutor).Assembly.GetManifestResourceStream(rn))
             {
                 using var tr = new StreamReader(st!);
+                
                 HandlebarsHelpers.RegisterHelpers();
                 var hb = Handlebars.Compile(tr.ReadToEnd());
                 await File.WriteAllTextAsync(fi.FullName, hb.Invoke(data)).ConfigureAwait(false);

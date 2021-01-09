@@ -2,6 +2,7 @@
 
 using Beef.Entities;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -382,34 +383,39 @@ entities:
         public void ResetRuntimeParameters() => RuntimeParameters.Clear();
 
         /// <summary>
-        /// Gets the specified runtime parameter value.
+        /// Gets the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="name">The parameter name.</param>
-        /// <param name="isRequired">Indicates whether the parameter is mandatory and therefore must exist and have non-<c>null</c> value.</param>
-        /// <returns>The runtime parameter value.</returns>
-        internal string? GetRuntimeParameter(string name, bool isRequired = false)
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="defaultValue">The default value where the property is not found.</param>
+        /// <returns>The value.</returns>
+        public T GetRuntimeParameter<T>(string key, T defaultValue = default)
         {
-            if ((!RuntimeParameters.TryGetValue(name, out var value) && isRequired) || (isRequired && string.IsNullOrEmpty(value)))
-                throw new CodeGenException($"Runtime parameter '{name}' was not found or had no value; this is required to function.");
+            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
+                return (T)Convert.ChangeType(val.ToString(), typeof(T));
             else
-                return value;
+                return defaultValue!;
         }
 
         /// <summary>
-        /// Gets the specified runtime parameter value as a <see cref="bool"/>.
+        /// Trys to get the property value from <see cref="RuntimeParameters"/> using the specified <paramref name="key"/> as <see cref="Type"/> <typeparamref name="T"/>.
         /// </summary>
-        /// <param name="name">The parameter name.</param>
-        /// <returns>The runtime parameter value.</returns>
-        internal bool GetRuntimeBoolParameter(string name)
+        /// <typeparam name="T">The property <see cref="Type"/>.</typeparam>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The corresponding value.</param>
+        /// <returns><c>true</c> if the <paramref name="key"/> is found; otherwise, <c>false</c>.</returns>
+        public bool TryGetRuntimeParameter<T>(string key, out T value)
         {
-            var val = GetRuntimeParameter(name);
-            if (string.IsNullOrEmpty(val))
+            if (RuntimeParameters != null && RuntimeParameters.TryGetValue(key, out var val))
+            {
+                value = (T)Convert.ChangeType(val.ToString(), typeof(T));
+                return true;
+            }
+            else
+            {
+                value = default!;
                 return false;
-
-            if (bool.TryParse(val, out var value))
-                return value;
-
-            throw new CodeGenException($"Runtime parameter '{name}' must be a boolean; value '{val}' is invalid.");
+            }
         }
 
         #endregion
@@ -451,37 +457,37 @@ entities:
         /// <summary>
         /// Gets the company name from the <see cref="RuntimeParameters"/>.
         /// </summary>
-        public string Company => GetRuntimeParameter("Company", true)!;
+        public string? Company => GetRuntimeParameter<string?>("Company")!;
 
         /// <summary>
         /// Gets the application name from the <see cref="RuntimeParameters"/>.
         /// </summary>
-        public string AppName => GetRuntimeParameter("AppName", true)!;
+        public string? AppName => GetRuntimeParameter<string?>("AppName")!;
 
         /// <summary>
         /// Gets the API name from the <see cref="RuntimeParameters"/>.
         /// </summary>
-        public string ApiName => DefaultWhereNull(GetRuntimeParameter("ApiName"), () => "Api")!;
+        public string? ApiName => DefaultWhereNull(GetRuntimeParameter<string?>("ApiName"), () => "Api")!;
 
         /// <summary>
         /// Gets the entity scope from the from the <see cref="RuntimeParameters"/> (defaults to 'Common').
         /// </summary>
-        public string EntityScope => DefaultWhereNull(GetRuntimeParameter("EntityScope"), () => "Common")!;
+        public string EntityScope => DefaultWhereNull(GetRuntimeParameter<string?>("EntityScope"), () => "Common")!;
 
         /// <summary>
         /// Indicates whether to generate an <c>Entity</c> as a <c>DataModel</c> where the <see cref="EntityConfig.DataModel"/> is selected (from the <see cref="RuntimeParameters"/>).
         /// </summary>
-        public bool ModelFromEntity => GetRuntimeBoolParameter("ModelFromEntity");
+        public bool ModelFromEntity => GetRuntimeParameter<bool>("ModelFromEntity");
 
         /// <summary>
         /// Indicates whether the intended Entity code generation is a Data Model and therefore should not inherit from <see cref="EntityBase"/> (from the <see cref="RuntimeParameters"/>).
         /// </summary>
-        public bool IsDataModel => GetRuntimeBoolParameter("IsDataModel");
+        public bool IsDataModel => GetRuntimeParameter<bool>("IsDataModel");
 
         /// <summary>
         /// Indicates whether the intended code generation is explicitly for Reference Data.
         /// </summary>
-        public bool IsRefData => GetRuntimeBoolParameter("IsRefData");
+        public bool IsRefData => GetRuntimeParameter<bool>("IsRefData");
 
         /// <summary>
         /// Gets the reference data specific properties.

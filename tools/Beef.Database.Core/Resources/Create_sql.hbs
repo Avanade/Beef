@@ -1,0 +1,19 @@
+﻿{{! Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef }}
+-- Create table: {{lookup Parameters 'Param1'}}.{{lookup Parameters 'Param2'}}
+
+BEGIN TRANSACTION
+
+CREATE TABLE [{{lookup Parameters 'Param1'}}].[{{lookup Parameters 'Param2'}}] (
+  [{{lookup Parameters 'Param2'}}Id] UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWSEQUENTIALID()) PRIMARY KEY,
+  -- [Code] NVARCHAR(50) NULL UNIQUE,
+  -- [Text] NVARCHAR(250) NULL,
+  -- [Bool] BIT NULL,
+  -- [Date] DATE NULL,
+  [RowVersion] TIMESTAMP NOT NULL,
+  [CreatedBy] NVARCHAR(250) NULL,
+  [CreatedDate] DATETIME2 NULL,
+  [UpdatedBy] NVARCHAR(250) NULL,
+  [UpdatedDate] DATETIME2 NULL
+);
+
+COMMIT TRANSACTION

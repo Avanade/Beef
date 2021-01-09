@@ -136,22 +136,43 @@ Command | Description
 `DropAndDatabase` | Performs `Drop` and `Database`.
 `ResetAndDatabase` | Performs `Reset` and `Database`.
 
-There are multiple options to create a new script file in the `Migrate` folder to simplify the process for the developer.
-
-Command | Description
--|-
-`ScriptNew` | Creates a new (skeleton) script file using the defined naming convention.
-`ScriptNew -create Schema.Table` | Creates a new table create script file for the named schema and table.
-`ScriptNew -createref Schema.Table` | Creates a new reference data table create script file for the named schema and table.
-`ScriptNew -alter Schema.Table` | Creates a new table alter script file for the named schema and table.
-
 Additionally, there are a number of command line options that can be used.
 
 Option | Description
 -|-
-`-cs` or `--connectionString` | Overrides the connection string for the database.
-`-eo` or `--entry-assembly-only` | Overrides the assemblies to use the entry assembly only. This will avoid any dependent Scripts and Schema being (re-)invoked.
-`-x2y` or `--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
+`--connectionString` | Overrides the connection string for the database.
+`--entry-assembly-only` | Overrides the assemblies to use the entry assembly only. This will avoid any dependent Scripts and Schema being (re-)invoked.
+`--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
+`--param` | Additional parameter with a `Name:Value` pair value.
+`--script` | Overrides the script resource name.
+
+<br/>
+
+### New migration script file
+
+To simplify the process for the developer _Beef_ enables the creation of new migration script files into the `Migrations` folder. This will name the script file correctly and output the basic SQL statements to perform the selected function. The date and time stamp will use [DateTime.UtcNow](https://docs.microsoft.com/en-us/dotnet/api/system.datetime.utcnow) as this should avoid conflicts where being co-developed across time zones. 
+
+This requires the usage of the `ScriptNew` command, plus optional sub-command, and zero or more optional arguments (these are will depend on the sub-command). The optional arguments must appear in the order listed; where not specified it will appear as blank within the script file.
+
+Sub-command | Argument(s) | Description
+-|-
+N/A | N/A | Creates a new empty skeleton script file.
+`Create` | `Schema` and `Table` | Creates a new table create script file for the named schema and table.
+`CreateRef` | `Schema` and `Table` | Creates a new reference data table create script file for the named schema and table.
+`Alter` | `Schema` and `Table` | Creates a new table alter script file for the named schema and table.
+`CdcDb` | N/A | Creates a new `sys.sp_cdc_enable_db` script file for the database.
+`Cdc` | `Schema` and `Table` | Creates a new `sys.sp_cdc_enable_table` script file for the named schema and table.
+
+Examples as follows.
+
+```
+dotnet run scriptnew
+dotnet run scriptnew create Foo Bar
+dotnet run scriptnew alter Foo Bar
+dotnet run scriptnew createref Foo Gender
+dotnet run scriptnew cdcdb
+dotnet run scriptnew cdc Foo Bar
+```
 
 <br/>
 
@@ -212,5 +233,6 @@ One of the previously described [commands](DatabaseExecutorCommand.cs) is requir
 
 Option | Description
 -|-
-`-a` or `--assembly` | One or more [Assembly Names](https://docs.microsoft.com/en-us/dotnet/standard/assembly/names); being the assemblies that contain the required Scripts and Schema. These should be specified in the order in which they should be executed. Where the _Beef_ standard `dbo` objects should be added then the `Beef.Database.Core` assembly must also be specified.
-`-so` or `--schemaorder` | One or more Schema names in the order in which they should be executed (otherwise, the default is alphabetical). This provides an additional level of control in addition to the specified Assembly order.
+`--assembly` | One or more [Assembly Names](https://docs.microsoft.com/en-us/dotnet/standard/assembly/names); being the assemblies that contain the required Scripts and Schema. These should be specified in the order in which they should be executed. Where the _Beef_ standard `dbo` objects should be added then the `Beef.Database.Core` assembly must also be specified.
+`--schemaorder` | One or more Schema names in the order in which they should be executed (otherwise, the default is alphabetical). This provides an additional level of control in addition to the specified Assembly order.
+`--param` | Additional parameter with a `Name:Value` pair value.

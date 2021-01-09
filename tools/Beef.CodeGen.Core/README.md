@@ -198,11 +198,11 @@ Additionally, there are a number of command line options that can be used.
 
 Option | Description
 -|-
-`-cs` or `--connectionString` | Overrides the connection string for the database.
-`-cf` or `--configFile` | Overrides the filename for the configuration.
-`-s` or `--scriptFile` | Overrides the filename for the script orchestration.
-`-enc` or `--expectNoChanges` | Expect no changes in the artefact output and error where changes are detected. This is intended for use with the likes of the build pipeline.
-`-x2y` or `--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
+`--connectionString` | Overrides the connection string for the database.
+`--configFile` | Overrides the filename for the configuration.
+`--scriptFile` | Overrides the filename for the script orchestration.
+`--expectNoChanges` | Expect no changes in the artefact output and error where changes are detected. This is intended for use with the likes of the build pipeline.
+`--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
 
 <br/>
 
@@ -233,7 +233,7 @@ dotnet run datamodel   -- Default filename: Company.AppName.DataModel.xml
 dotnet run all         -- All of the above
 
 -- Override the configuration filename.
-dotnet run entity -cf configfilename.xml
+dotnet run entity --configFile configfilename.xml
 ```
 
 </br>

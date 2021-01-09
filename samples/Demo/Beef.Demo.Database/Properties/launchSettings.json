@@ -2,7 +2,7 @@
   "profiles": {
     "Beef.Demo.Database": {
       "commandName": "Project",
-      "commandLineArgs": "codegen",
+      "commandLineArgs": "scriptnew",
       "workingDirectory": "C:\\Users\\eric.sibly\\source\\repos\\Avanade\\Beef\\samples\\Demo\\Beef.Demo.Database"
     }
   }

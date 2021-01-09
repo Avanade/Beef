@@ -365,6 +365,11 @@ namespace Beef.CodeGen.Config
                 return false;
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime.UtcNow"/> as a formatted timestamp.
+        /// </summary>
+        public string UtcDateTimeStamp => DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     /// <summary>

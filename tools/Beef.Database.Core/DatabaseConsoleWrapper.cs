@@ -162,13 +162,13 @@ namespace Beef.Database.Core
             };
 
             var cmd = app.Argument<DatabaseExecutorCommand>("command", "Database command.").IsRequired();
+            var sn = app.Argument("parameters", "Additional parameters used by the ScriptNew command.", multipleValues: true);
             var cs = app.Option("-cs|--connectionstring", "Override the database connection string.", CommandOptionType.SingleValue);
             var eo = app.Option("-eo|--entry-assembly-only", "Override assemblies to use the entry assembly only.", CommandOptionType.NoValue);
-            var ct = app.Option("-create|--scriptnew-create-table", "ScriptNew: use create '[schema.]table' template.", CommandOptionType.SingleValue);
-            var cr = app.Option("-createref|--scriptnew-create-ref-table", "ScriptNew: use create reference data '[schema.]table' template.", CommandOptionType.SingleValue);
-            var at = app.Option("-alter|--scriptnew-alter-table", "ScriptNew: use alter '[schema.]table' template.", CommandOptionType.SingleValue);
             var x2y = app.Option("-x2y|--xmlToYaml", "Convert the XML configuration into YAML equivalent (will not codegen).", CommandOptionType.NoValue);
             var evn = app.Option("-evn|--environmentVariableName", "Override the default environment variable name for the connection string.", CommandOptionType.SingleValue);
+            var ps = app.Option("-p|--param", "Name=Value pair.", CommandOptionType.MultipleValue).Accepts(v => v.Use(new ParamsValidator()));
+            var so = app.Option("-s|--script", "Override the script resource name.", CommandOptionType.SingleValue);
 
             app.OnExecuteAsync(async (_) =>
             {
@@ -181,19 +181,24 @@ namespace Beef.Database.Core
                     return await CodeGenFileManager.ConvertXmlToYamlAsync(CommandType.Database, CodeGenFileManager.GetConfigFilename(CommandType.Database, Company, AppName)).ConfigureAwait(false);
                 }
 
+                var script = so.HasValue() ? so.Value() : _script;
                 var sb = new StringBuilder();
                 if (eo.HasValue())
-                    sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, Assembly.GetEntryAssembly()?.FullName!));
+                    sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, Assembly.GetEntryAssembly()?.FullName!, script!));
                 else
-                    _assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, a.FullName!)));
+                    _assemblies.ForEach(a => sb.Append(ReplaceMoustache(CommandLineAssemblyTemplate, null!, null!, a.FullName!, script!)));
 
-                var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value!, cs.Value() ?? ConnectionString, sb.ToString());
-                if (ct.HasValue())
-                    rargs += GetTableSchemaParams("Create", ct.Value()!);
-                else if (cr.HasValue())
-                    rargs += GetTableSchemaParams("CreateRef", cr.Value()!);
-                else if (at.HasValue())
-                    rargs += GetTableSchemaParams("Alter", at.Value()!);
+                var rargs = ReplaceMoustache(CommandLineTemplate, cmd.Value!, cs.Value() ?? ConnectionString, sb.ToString(), script!);
+
+                for (int i = 0; i < sn.Values.Count; i++)
+                {
+                    rargs += $" -p Param{i}={sn.Values[i]}";
+                }
+
+                foreach (var p in ps.Values)
+                {
+                    rargs += $" -p {p}";
+                }
 
                 _schemaOrder.ForEach(so => rargs += $" -so {so}");
 
@@ -212,26 +217,9 @@ namespace Beef.Database.Core
         }
 
         /// <summary>
-        /// Get the table and schema paramaters from the argument.
-        /// </summary>
-        private string GetTableSchemaParams(string action, string arg)
-        {
-            if (string.IsNullOrEmpty(arg))
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
-
-            var parts = arg.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length == 1)
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table={parts[0]}";
-            else if (parts.Length == 2)
-                return $" -p ScriptNew={action} -p Schema={parts[0]} -p Table={parts[1]}";
-            else
-                return $" -p ScriptNew={action} -p Schema={AppName} -p Table=Xxx";
-        }
-
-        /// <summary>
         /// Replace the moustache placeholders.
         /// </summary>
-        private string ReplaceMoustache(string text, string command, string connectionString, string assembly)
+        private string ReplaceMoustache(string text, string command, string connectionString, string assembly, string script)
         {
             text = text.Replace("{{Command}}", command, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{ConfigFile}}", CodeGen.CodeGenFileManager.GetConfigFilename(CodeGen.CommandType.Database, Company, AppName), StringComparison.OrdinalIgnoreCase);
@@ -239,7 +227,7 @@ namespace Beef.Database.Core
             text = text.Replace("{{Assembly}}", assembly, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Company}}", Company, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{AppName}}", AppName, StringComparison.OrdinalIgnoreCase);
-            text = text.Replace("{{Script}}", _script, StringComparison.OrdinalIgnoreCase);
+            text = text.Replace("{{Script}}", script, StringComparison.OrdinalIgnoreCase);
             text = text.Replace("{{Supported}}", ((int)_supports).ToString(System.Globalization.CultureInfo.InvariantCulture), StringComparison.OrdinalIgnoreCase);
             return text.Replace("{{OutDir}}", _outDir, StringComparison.OrdinalIgnoreCase);
         }

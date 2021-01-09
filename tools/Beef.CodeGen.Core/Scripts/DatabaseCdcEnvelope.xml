@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
+<Script ConfigType="Database">
+  <Generate GenType="Beef.CodeGen.Generators.DatabaseCdcNamedCodeGenerator" Template="DbCdcEnvelopeTableCreate_sql.hb" FileName="{{Root.UtcDateTimeStamp}}-create-cdc-{{lower EnvelopeTableName}}.sql" OutDir="{{Root.PathDatabase}}/Migrations" HelpText="DatabaseCdcCodeGenerator: Database/Schema/Xxx/Tables" />
+</Script>
