@@ -901,9 +901,14 @@
           <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="PathDatabase" use="optional" type="xs:string">
+      <xs:attribute name="PathDatabaseSchema" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `PathBase` + `.Database` (literal). For example `Beef.Demo.Database`.</xs:documentation>
+          <xs:documentation>The path (directory) for the Schema Database-related artefacts. Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PathDatabaseMigrations" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path (directory) for the Schema Database-related artefacts. Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathBusiness" use="optional" type="xs:string">

@@ -112,10 +112,15 @@
       "title": "The path (directory) for the Database-related artefacts.",
       "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
     },
-    "pathDatabase": {
+    "pathDatabaseSchema": {
       "type": "string",
-      "title": "The path (directory) for the Database-related artefacts.",
-      "description": "Defaults to `PathBase` + `.Database` (literal). For example `Beef.Demo.Database`."
+      "title": "The path (directory) for the Schema Database-related artefacts.",
+      "description": "Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`."
+    },
+    "pathDatabaseMigrations": {
+      "type": "string",
+      "title": "The path (directory) for the Schema Database-related artefacts.",
+      "description": "Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`."
     },
     "pathBusiness": {
       "type": "string",
