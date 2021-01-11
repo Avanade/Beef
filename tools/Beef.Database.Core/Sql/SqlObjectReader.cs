@@ -20,14 +20,13 @@ namespace Beef.Database.Core.Sql
         /// <summary>
         /// Gets the list of supported object types and their application order.
         /// </summary>
-        private readonly List<Tuple<string, int, bool>> SupportedObjectTypes = new List<Tuple<string, int, bool>>()
+        private readonly List<(string Type, int Order)> _supportedObjectTypes = new List<(string, int)>
         {
-            new Tuple<string, int, bool>("TABLE", 0, true),
-            new Tuple<string, int, bool>("TYPE", 1, false),
-            new Tuple<string, int, bool>("FUNCTION", 2, false),
-            new Tuple<string, int, bool>("VIEW", 3, false),
-            new Tuple<string, int, bool>("PROCEDURE", 4, false),
-            new Tuple<string, int, bool>("PROC", 5, false)
+            ("TYPE", 1),
+            ("FUNCTION", 2),
+            ("VIEW", 3),
+            ("PROCEDURE", 4),
+            ("PROC", 5)
         };
 
         /// <summary>
@@ -92,9 +91,8 @@ namespace Beef.Database.Core.Sql
                 return;
 
             Type = SqlObjectType!.Value!;
-            var sot = SupportedObjectTypes.Where(x => string.Compare(x.Item1, Type, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
-            Order = sot == null ? -1 : sot.Item2;
-            CreateOnlyIfNotExists = sot != null && sot.Item3;
+            var sot = _supportedObjectTypes.Where(x => string.Compare(x.Type, Type, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
+            Order = sot.Type == null ? -1 : sot.Order;
 
             var parts = SqlObjectName!.Value!.Split('.');
             if (parts.Length == 1)
@@ -207,8 +205,8 @@ namespace Beef.Database.Core.Sql
             if (SqlObjectType == null)
                 return -1;
 
-            var sot = SupportedObjectTypes.Where(x => string.Compare(x.Item1, SqlObjectType.Value, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
-            return sot == null ? -1 : sot.Item2;
+            var sot = _supportedObjectTypes.Where(x => string.Compare(x.Item1, SqlObjectType.Value, StringComparison.InvariantCultureIgnoreCase) == 0).SingleOrDefault();
+            return sot.Type == null ? -1 : sot.Order;
         }
 
         /// <summary>
@@ -247,29 +245,13 @@ namespace Beef.Database.Core.Sql
         public int Order { get; private set; }
 
         /// <summary>
-        /// Creates only if the object does not already exist.
-        /// </summary>
-        public bool CreateOnlyIfNotExists { get; private set; }
-
-        /// <summary>
         /// Gets the SQL <see cref="string"/>.
         /// </summary>
         /// <returns>The SQL.</returns>
         public string GetSql()
         {
             var sb = new StringBuilder();
-
-            if (CreateOnlyIfNotExists)
-            {
-                sb.AppendLine($"IF NOT EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id (N'[{Schema}].[{Name}]'))");
-                sb.AppendLine("BEGIN");
-            }
-
             _lines.ForEach((l) => sb.AppendLine(l));
-
-            if (CreateOnlyIfNotExists)
-                sb.AppendLine("END");
-
             return sb.ToString();
         }
     }

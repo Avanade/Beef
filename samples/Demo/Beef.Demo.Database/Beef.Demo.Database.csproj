@@ -35,7 +35,6 @@
 
   <ItemGroup>
     <Folder Include="Schema\DemoCdc\Stored Procedures\Generated\" />
-    <Folder Include="Schema\DemoCdc\Tables\Generated\" />
     <Folder Include="Schema\Demo\Stored Procedures\" />
     <Folder Include="Schema\Ref\" />
   </ItemGroup>

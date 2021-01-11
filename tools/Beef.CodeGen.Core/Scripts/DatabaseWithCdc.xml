@@ -1,4 +1,3 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef -->
-<Script ConfigType="Database" Inherits="Database.xml;DatabaseCdc.xml">
-</Script>
+<Script ConfigType="Database" Inherits="Database.xml;DatabaseCdc.xml" />

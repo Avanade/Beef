@@ -2,7 +2,7 @@
 
 [![NuGet version](https://badge.fury.io/nu/Beef.Data.Database.Cdc.svg)](https://badge.fury.io/nu/Beef.Data.Database.Cdc)
 
-Adds specific Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capabilities. Specifically the ability to monitor changes to one or more related tables, that represent an _entity_, to be published to an event stream.
+Adds Microsoft SQL Server [Change Data Capture](https://docs.microsoft.com/en-us/sql/relational-databases/track-changes/about-change-data-capture-sql-server) (CDC) capabilities. Specifically the ability to monitor changes to one or more related tables, that represent an _entity_, to be published to an event stream.
 
 Similar to core _Beef_, the CDC capability is enabled by both code-generation and supporting framework to enable.
 
@@ -18,17 +18,17 @@ This [article](https://www.mssqltips.com/sqlservertip/5212/sql-server-temporal-t
 
 The CDC approach taken here is to consolidate the tracking of individual tables (one or more) into a central entity to simplify the publishing to an event stream (or equivalent). The advantage of this is where a change occurs to any of the rows related to an entity, even where multiples rows are updated, this will only result in a single event. This makes it easier (more logical) for downstream subscribers to consume.
 
-This is achieved by defining (configuring) the entity, being the primary (parent) table, and it's related secondary (child) tables. For example, a Sales Order, may be made up multiple tables - when any of these change then a single _SalesOrder_ event should occur. These relationships can be defined with a cardinality of either `OneToMany` or `OneToOne`.
+This is achieved by defining (configuring) the entity, being the primary (parent) table, and it's related secondary (child) tables. For example, a Sales Order, may be made up multiple tables - when any of these change then a single _SalesOrder_ event should occur. These relationships are also defined with a cardinality of either `OneToMany` or `OneToOne`.
 
 ```
 SalesOrder             // Parent
-└── SalesOrderAddress  // Child 1:n - One or more addresses (e.g. Postal and Shipping)
+└── SalesOrderAddress  // Child 1:n - One or more addresses (e.g. Billing and Shipping)
 └── SalesOrderItem     // Child 1:n - One or more items
 ``` 
 
-The CDC capability is used specifically as a trigger for change (being `Create`, `Update` or `Delete`). The resulting data that is published is the latest, not a snapshot in time (CDC captured). The reason for this is two-fold, a) given how the CDC data is retrieved there is no guarantee that the interim data represents a final intended state, and b) this process should be running near real-time so getting the latest version will produce the current committed version as at that time.
+The CDC capability is used specifically as a trigger for change (being `Create`, `Update` or `Delete`). The resulting data that is published is the latest, not a snapshot in time (CDC captured). The reason for this is two-fold, a) given how the CDC data is retrieved there is no guarantee that the interim data represents a final intended state suitable for publishing; and b) this process should be running near real-time so getting the latest version will produce the current committed version as at that time.
 
-To further guarantee only a single event for a specific version the resulting entity is JSON serialized and hashed; this value is then saved and checked to ensure that a version is not published more than once. This will minimize redundant publishing, whilst also making the underlying processing more efficient.
+To further guarantee only a single event for a specific version is published the resulting entity is JSON serialized and hashed; this value is checked (and saved) against the prior version to ensure a publish contains data that is actionable. This will minimize redundant publishing, whilst also making the underlying processing more efficient.
 
 <br/>
 
@@ -38,14 +38,14 @@ The first activity is to enable CDC on the database and then enable on each of t
 - [`sys.sp_cdc_enable_db`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-db-transact-sql) - enables the database.
 - [`sys.sp_cdc_enable_table`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql) - enables the table (`@supports_net_changes` _must_ be selected).
 
-An example is as follows:
+An example is as follows.
 
 ``` sql
 -- Enable for the database.
 EXEC sp_changedbowner 'sa'
 EXEC sys.sp_cdc_enable_db
 
--- Enable for the seleted table(s).
+-- Enable for the seleted table.
 EXEC sys.sp_cdc_enable_table  
   @source_schema = N'SchemaName',  
   @source_name   = N'TableName',  
@@ -53,11 +53,25 @@ EXEC sys.sp_cdc_enable_table
   @supports_net_changes = 1
 ```
 
+Where using [Migration](./../../tools/Beef.Database.Core/README.md) Scripts [code-generation](#Code-generation) can be leveraged to accelerate. The following command line executions will create the migration scripts that contain the contents described above.
+
+```
+-- Create sys.sp_cdc_enable_db script.
+dotnet run scriptnew cdcdb
+
+-- Create sys.sp_cdc_enable_table script; replace with actual Schema and Table names.
+dotnet run scriptnew cdc SchemaName TableName
+```
+
 <br/>
 
 ## Code-generation
 
 The remainder of the database objects required to support CDC event publishing is generated using [database code-generation](../../tools/Beef.Database.Core/README.md); as is the corresponding .NET code to process. This is achieved using the CDC-related configuration.
+
+The code-generation is applicable whether using a Data-tier application (DAC) or DbUp to manage the database.
+
+<br/>
 
 ### Configuration
 
@@ -79,26 +93,77 @@ Configuration details for each of the above are as follows:
 The following represents an [example](../../samples/Demo/Beef.Demo.Database/Beef.Demo.Database.xml) of the XML configuration.
 
 ``` xml
+<! -- Define default CdcSchema, and default Event configuration. -->
 <CodeGeneration CdcSchema="DemoCdc" EventSubjectRoot="Legacy" EventActionFormat="PastTense" ... >
+
+  <!-- Set up CDC for primary table Legacy.Contact. -->
   <Cdc Name="Contact" Schema="Legacy">
+    <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
+         Join on Address.Id = Contact.AddressId. -->
     <CdcJoin Name="Address" JoinCardinality="OneToOne">
       <CdcJoinOn Name="Id" ToColumn="AddressId" />
     </CdcJoin>
+    
+    <!-- Set up inner join relationship from Legacy.Contact to Legacy.ContactMapping.
+         Inner Join (only outputs where exists) on ContactMapping.ContactId = Contact.ContactId. 
+         Only include the joined 'UniqueId' column. -->
+    <CdcJoin Name="ContactMapping" Type="Inner" IncludeColumns="UniqueId">
+      <CdcJoinOn Name="ContactId" />
+    </CdcJoin>
   </Cdc>
 
+  <!-- Set up CDC for primary table Legacy.Posts. 
+       Relational hierarchy: Legacy.Posts
+                              - Legacy.Comments (1:n)
+                                 - Legacy.Tags (1:n)
+                              - Legacy.Tags (1:n). -->
   <Cdc Name="Posts" Schema="Legacy">
+    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Comments (1:n).
+         Join on Comments.PostsId = Posts.PostsId. -->
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
       <CdcJoinOn Name="PostsId" ToColumn="PostsId" />
     </CdcJoin>
+    
+    <!-- Set up secondary One-To-Many relationship from Legacy.Comments to Legacy.Tags (1:n).
+         Name as 'CommentsTags' for uniqueness for join referencing.
+         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
+         Rename 'ParentId' column to `CommentsId`.
+         Join on Tags.ParentType = 'C' AND Tags.ParentId = Comments.CommentsId. -->
     <CdcJoin Name="CommentsTags" Schema="Legacy" TableName="Tags" JoinTo="Comments" ExcludeColumns="ParentType" AliasColumns="ParentId^CommentsId">
       <CdcJoinOn Name="ParentType" ToStatement="'C'" />
       <CdcJoinOn Name="ParentId" ToColumn="CommentsId" />
     </CdcJoin>
+    
+    <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Tags (1:n).
+         Name as 'PostsTags' for uniqueness for join referencing.
+         Exclude the 'ParentType' column as not necessary for publishing (i.e. internal to database).
+         Rename 'ParentId' column to `PostsId`.
+         Join on Tags.ParentType = 'P' AND Tags.ParentId = Posts.PostsId. -->
     <CdcJoin Name="PostsTags" Schema="Legacy" TableName="Tags" JoinTo="Posts" ExcludeColumns="ParentType" AliasColumns="ParentId^PostsId">
       <CdcJoinOn Name="ParentType" ToStatement="'P'" />
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
     </CdcJoin>
   </Cdc>
+```
+
+<br/>
+
+### Database code generation
+
+The underlying [`Program.cs`](./../../samples/Demo/Beef.Demo.Database/Program.cs) should be updated to override the `DatabaseScript` depending on whether using a Data-tier application (DAC) or DbUp to manage the database. Where using DbUp the required database tables will need to be added as Migration scripts explicitly, versus being generated automatically.
+
+``` csharp
+// Using DbUp; use: DatabaseWithCdc.xml
+return DatabaseConsoleWrapper
+    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated ecurity=True", "Beef", "Demo")
+    .DatabaseScript("DatabaseWithCdc.xml")
+    .RunAsync(args);
+
+// Using DACPAC; use: DatabaseWithCdcDacpac.xml
+return DatabaseConsoleWrapper
+    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated ecurity=True", "Beef", "Demo")
+    .DatabaseScript("DatabaseWithCdcDacpac.xml")
+    .RunAsync(args);
 ```
 
 <br/>
@@ -109,16 +174,27 @@ The following database artefacts are generated.
 
 Type | Name | Description
 -|-|-
-`Table` | `CdcTracking.sql` | Represents the related _Entity Hash_ tracking table used to identify whether a version of a specific entity has been previously (successfully) processed. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Tables/Generated/CdcTracking.sql).
-`Table` | `XxxEnvelope` | Represents the _Entity_ envelope table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next envelope. An envelope is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Tables/Generated/ContactEnvelope.sql).
+`Table` | `CdcTracking.sql` | Represents the related _Entity Hash_ tracking table used to identify whether a version of a specific entity has been previously (successfully) processed. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163724-create-democdc-cdctracking.sql).
+`Table` | `XxxEnvelope.sql` | Represents the _Entity_ envelope table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next envelope. An envelope is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163747-create-democdc-postsenvelope.sql).
 `Type` | `udtTrackingList.sql` | Represents the user-defined type / table-valued parameter required to pass a list of key/hash values from .NET code to a SQL Stored Procedure. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Types/User-Defined%20Table%20Types/Generated/UdtCdcTrackingList.sql).
 `Stored Procedure` | `spExecuteXxxCdcEnvelope.sq` | Represents the **key** CDC-related logic. This stored procedure is responsible for getting the next envelope for an _Entity_, retrying an existing envelope, and completing an existing envelope. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcEnvelope.sql).
+
+As [stated](#Database-code-generation) earlier, where using DbUp the [Migration](./../../tools/Beef.Database.Core/README.md) Scripts [code-generation](#Code-generation) must be explicitly executed. The following represents the command line executions required.
+
+```
+-- Create the CdcTracking.sql
+dotnet run codegen --script DatabaseCdcTracking.xml
+
+-- Create (each) `XxxEnvelope.sql` by specifying the unique CdcName as configured.
+dotnet run database --script DatabaseCdcEnvelope.xml --param CdcName=Contact
+dotnet run database --script DatabaseCdcEnvelope.xml --param CdcName=Posts
+```
 
 <br/>
 
 ### .NET generated artefacts
 
-The following .NET aretfacts are generated. These artefacts are generated into a .NET Project named `Company.AppName.Cdc`; where `Company` and `AppName` are the configurable values.
+The following .NET aretfacts are generated. These artefacts are generated into a .NET Project named `Company.AppName.Cdc`; where `Company` and `AppName` are the configurable values. 
 
 Type | Name | Description
 -|-|-

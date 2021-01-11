@@ -1,6 +1,17 @@
 # `Beef.Database.Core`
 
-The `Beef.Database.Core` tool is a console application provided to automate the management of the SQL Server Database as part of the end-to-end development process.
+The `Beef.Database.Core` tool is a console application provided to automate the management of a Microsoft SQL Server Database as part of the end-to-end development process.
+
+<br/>
+
+## Data-tier Application vs DbUp
+
+- **[Data-tier Application DAC](https://docs.microsoft.com/en-us/sql/relational-databases/data-tier-applications/data-tier-applications?view=sql-server-ver15)** is a logical database management entity that defines all of the SQL Server objects - like tables, views, and instance objects, including logins - associated with a database. A DAC is a self-contained unit of SQL Server database deployment that enables data-tier developers and database administrators to package SQL Server objects into a portable artifact called a DAC package, also known as a DACPAC. This is the traditional means to manage a database.
+- **[DbUp](https://dbup.readthedocs.io/en/latest/)** is a .NET library that is used to deploy changes to SQL Server databases. It tracks which SQL scripts have been run already, and runs the change scripts that are needed to get a database up to date. 
+
+DbUp is directly integrated into `Beef.Database.Core` to simplify usage; and acts as the default approach. Usage is further integrated into the likes of the [Intra-domain Integration Testing](./../Beef.Test.NUnit/README.md) etc.
+
+A Data-tier Application (DAC) can still be leveraged to manage a database; with `Beef.Database.Core` still playing a key role in the code-generation of [Schema](#Schema) objects where applicable.
 
 <br/>
 
@@ -143,7 +154,7 @@ Option | Description
 `--connectionString` | Overrides the connection string for the database.
 `--entry-assembly-only` | Overrides the assemblies to use the entry assembly only. This will avoid any dependent Scripts and Schema being (re-)invoked.
 `--xmlToYaml` | Convert the XML configuration into YAML equivalent (will not codegen).
-`--param` | Additional parameter with a `Name:Value` pair value.
+`--param` | Additional parameter with a `Name=Value` pair value.
 `--script` | Overrides the script resource name.
 
 <br/>
@@ -235,4 +246,4 @@ Option | Description
 -|-
 `--assembly` | One or more [Assembly Names](https://docs.microsoft.com/en-us/dotnet/standard/assembly/names); being the assemblies that contain the required Scripts and Schema. These should be specified in the order in which they should be executed. Where the _Beef_ standard `dbo` objects should be added then the `Beef.Database.Core` assembly must also be specified.
 `--schemaorder` | One or more Schema names in the order in which they should be executed (otherwise, the default is alphabetical). This provides an additional level of control in addition to the specified Assembly order.
-`--param` | Additional parameter with a `Name:Value` pair value.
+`--param` | Additional parameter with a `Name=Value` pair value.

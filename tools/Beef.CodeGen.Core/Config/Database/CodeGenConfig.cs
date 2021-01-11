@@ -196,12 +196,20 @@ namespace Beef.CodeGen.Config.Database
         public string? PathBase { get; set; }
 
         /// <summary>
-        /// Gets or sets the path (directory) for the Database-related artefacts.
+        /// Gets or sets the path (directory) for the Schema Database-related artefacts.
         /// </summary>
-        [JsonProperty("pathDatabase", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the Database-related artefacts.",
-            Description = "Defaults to `PathBase` + `.Database` (literal). For example `Beef.Demo.Database`.")]
-        public string? PathDatabase { get; set; }
+        [JsonProperty("pathDatabaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
+            Description = "Defaults to `PathBase` + `.Database/Schema` (literal). For example `Beef.Demo.Database/Schema`.")]
+        public string? PathDatabaseSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path (directory) for the Schema Database-related artefacts.
+        /// </summary>
+        [JsonProperty("pathDatabaseMigrations", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Path", Title = "The path (directory) for the Schema Database-related artefacts.",
+            Description = "Defaults to `PathBase` + `.Database/Migrations` (literal). For example `Beef.Demo.Database/Migrations`.")]
+        public string? PathDatabaseMigrations { get; set; }
 
         /// <summary>
         /// Gets or sets the path (directory) for the Business-related (.NET) artefacts.
@@ -381,7 +389,8 @@ namespace Beef.CodeGen.Config.Database
             LoadDbTablesConfig();
 
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
-            PathDatabase = DefaultWhereNull(PathDatabase, () => $"{PathBase}.Database");
+            PathDatabaseSchema = DefaultWhereNull(PathDatabaseSchema, () => $"{PathBase}.Database/Schema");
+            PathDatabaseMigrations = DefaultWhereNull(PathDatabaseMigrations, () => $"{PathBase}.Database/Migrations");
             PathBusiness = DefaultWhereNull(PathBusiness, () => $"{PathBase}.Business");
             PathCdc = DefaultWhereNull(PathCdc, () => $"{PathBase}.Cdc");
             NamespaceBase = DefaultWhereNull(NamespaceBase, () => $"{Company}.{AppName}");

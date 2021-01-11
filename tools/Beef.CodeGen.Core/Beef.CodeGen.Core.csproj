@@ -37,8 +37,11 @@
 
   <ItemGroup>
     <None Remove="Scripts\DatabaseCdc.xml" />
+    <None Remove="Scripts\DatabaseCdcDacpac.xml" />
     <None Remove="Scripts\DatabaseCdcEnvelope.xml" />
+    <None Remove="Scripts\DatabaseCdcTracking.xml" />
     <None Remove="Scripts\DatabaseWithCdc.xml" />
+    <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
     <None Remove="Templates\DbCdcBackgroundService_cs.hb" />
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
@@ -98,7 +101,10 @@
     <EmbeddedResource Include="Resources\SelectTableGeneratedColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTableIdentityColumns.sql" />
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcEnvelope.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.xml" />
     <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
     <EmbeddedResource Include="Scripts\Database.xml" />

@@ -90,7 +90,7 @@ namespace Beef.CodeGen.Config
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="defaultValue">The default value function.</param>
-        public static string? DefaultWhereNull(string? value, Func<string?> defaultValue) => string.IsNullOrEmpty(value) ? Check.NotNull(defaultValue, nameof(defaultValue))() : value;
+        public static string? DefaultWhereNull(string? value, Func<string?> defaultValue) => value == null ? Check.NotNull(defaultValue, nameof(defaultValue))() : value;
 
         /// <summary>
         /// Defaults the <see cref="bool"/> <paramref name="value"/> where <c>null</c> using the <paramref name="defaultValue"/> function.

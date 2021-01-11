@@ -475,7 +475,7 @@ namespace Beef.Database.Core
             _logger.LogInformation("Executing the create of all (known) database objects.");
             foreach (var sr in list.OrderBy(x => x.Order).ThenBy(x => x.Reader!.Order).ThenBy(x => x.Name))
             {
-                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {sr.FileName ?? sr.Name}{(sr.Reader!.CreateOnlyIfNotExists ? " [IF NOT EXISTS]" : "")}", indent: 2).ConfigureAwait(false))
+                if (!await ExecuteSqlStatementAsync(() => _db!.SqlStatement(sr.Reader!.GetSql()).NonQueryAsync(), $"{(sr.FileName == null ? "resource" : "file")} {sr.FileName ?? sr.Name}", indent: 2).ConfigureAwait(false))
                     return false;
             }
 
