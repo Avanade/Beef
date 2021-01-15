@@ -736,10 +736,24 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Entity<TEntity, TProperty, TValidator>(this PropertyRuleBase<TEntity, TProperty> rule, TValidator validator)
             where TEntity : class
-            where TProperty : class?
-            where TValidator : IValidator
+            where TProperty : class
+            where TValidator : IValidator<TProperty>
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new EntityRule<TEntity, TProperty, TValidator>(validator));
+        }
+
+        /// <summary>
+        /// Enables the add of an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> with a validator <see cref="EntityRuleUsing{TEntity, TProperty}.TypeOf{TValidator}"/> leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
+        /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
+        /// <returns>An <see cref="EntityRuleUsing{TEntity, TProperty}"/>.</returns>
+        public static EntityRuleUsing<TEntity, TProperty> EntityUsing<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule)
+            where TEntity : class
+            where TProperty : class
+        {
+            return new EntityRuleUsing<TEntity, TProperty>(Check.NotNull(rule, nameof(rule)));
         }
 
         #endregion

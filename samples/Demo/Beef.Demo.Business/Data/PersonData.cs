@@ -13,15 +13,6 @@ namespace Beef.Demo.Business.Data
 {
     public partial class PersonData
     {
-        private readonly ILogger _logger;
-        private readonly Common.Agents.IPersonAgent _agent;
-
-        public PersonData(IDatabase db, IEfDb ef, ILogger<PersonData> logger, Common.Agents.IPersonAgent agent) : this(db, ef)
-        { 
-            _logger = Check.NotNull(logger, nameof(logger));
-            _agent = Check.NotNull(agent, nameof(agent));
-        }
-
         partial void PersonDataCtor()
         {
             _getByArgsOnQuery = GetByArgsOnQuery;
@@ -46,19 +37,6 @@ namespace Beef.Demo.Business.Data
 
         private async Task<Person> MergeOnImplementationAsync(Guid personFromId, Guid personToId)
         {
-            // This is an example (illustrative) of executing an Agent from an API - this should be used for cross-domain calls only; otherwise, use database (performance).
-            // TODO: Add back in.
-            //var pf = await new Common.Agents.PersonAgent().GetAsync(personFromId).ConfigureAwait(false);
-            //if (pf.Value == null)
-            //    throw new ValidationException($"Person from does not exist.");
-
-            //var pt = await new Common.Agents.PersonAgent().GetAsync(personToId).ConfigureAwait(false);
-            //if (pt.Value == null)
-            //    throw new ValidationException($"Person to does not exist.");
-
-            // Pretend a merge actually occured.
-
-            //return pt.Value;
             return await Task.FromResult((Person)null).ConfigureAwait(false);
         }
 
@@ -92,7 +70,7 @@ namespace Beef.Demo.Business.Data
 
         private async Task<string> InvokeApiViaAgentOnImplementationAsync(Guid id)
         {
-            var result = await _agent.GetAsync(id).ConfigureAwait(false);
+            var result = await _personAgent.GetAsync(id).ConfigureAwait(false);
             return result.Value.LastName;
         }
 

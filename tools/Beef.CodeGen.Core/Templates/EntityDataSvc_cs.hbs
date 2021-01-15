@@ -66,8 +66,17 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 {{#each DataSvcCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower DataSvcConstructor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+        {{lower DataSvcCtor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle DataSvcCtorParameters.Count 3}}
             { {{#each DataSvcCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+{{else}}
+        {
+  {{#each DataSvcCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}DataSvcCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}DataSvcCtor(); // Enables additional functionality to be added to the constructor.
 {{#each DataSvcOperations}}

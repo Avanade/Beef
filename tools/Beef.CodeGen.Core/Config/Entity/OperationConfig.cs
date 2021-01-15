@@ -771,8 +771,8 @@ operations: [
                 if (parts.Length > 1)
                 {
                     PatchGetOperation = parts[1];
-                    if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
-                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                    if (!Parent!.WebApiCtorParameters.Any(x => x.Type == parts[0]))
+                        Parent!.WebApiCtorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
 
                 PatchUpdateOperation = DefaultWhereNull(PatchUpdateOperation, () => "Update");
@@ -781,8 +781,8 @@ operations: [
                 if (parts.Length > 1)
                 {
                     PatchUpdateOperation = parts[1];
-                    if (!Parent!.WebApiConstructorParameters.Any(x => x.Type == parts[0]))
-                        Parent!.WebApiConstructorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
+                    if (!Parent!.WebApiCtorParameters.Any(x => x.Type == parts[0]))
+                        Parent!.WebApiCtorParameters.Add(new ParameterConfig { Name = parts[0][1..], Type = parts[0], Text = $"{{{{{parts[0]}}}}}" });
                 }
             }
 

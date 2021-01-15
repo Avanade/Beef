@@ -42,7 +42,7 @@ namespace {{Root.NamespaceApi}}.Controllers
 {{/ifval}}
     public partial class {{Name}}Controller : ControllerBase
     {
-{{#each WebApiConstructorParameters}}
+{{#each WebApiCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -51,11 +51,20 @@ namespace {{Root.NamespaceApi}}.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Controller"/> class.
         /// </summary>
-{{#each WebApiConstructorParameters}}
+{{#each WebApiCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower WebApiConstructor}} {{Name}}Controller({{#each WebApiConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each WebApiConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ControllerCtor(); }
+        {{lower WebApiCtor}} {{Name}}Controller({{#each WebApiCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle WebApiCtorParameters.Count 2}}
+            { {{#each WebApiCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ControllerCtor(); }
+{{else}}
+        {
+  {{#each WebApiCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}DataCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}ControllerCtor(); // Enables additional functionality to be added to the constructor.
 

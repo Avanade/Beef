@@ -202,13 +202,13 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Perform the actual IfLe equality check.
         /// </summary>
-        private static bool IfLe(object[] args)
+        private static bool IfLe(Arguments args)
         {
             bool func()
             {
                 for (int i = 1; i < args.Length; i++)
                 {
-                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) >= 0)
+                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) > 0)
                         return false;
                 }
 
@@ -226,13 +226,13 @@ namespace Beef.CodeGen.Generators
         /// <summary>
         /// Perform the actual IfGe equality check.
         /// </summary>
-        private static bool IfGe(object[] args)
+        private static bool IfGe(Arguments args)
         {
             bool func()
             {
                 for (int i = 1; i < args.Length; i++)
                 {
-                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) <= 0)
+                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) < 0)
                         return false;
                 }
 

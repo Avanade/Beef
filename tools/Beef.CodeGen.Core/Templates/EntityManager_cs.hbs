@@ -67,8 +67,8 @@ namespace {{Root.NamespaceBusiness}}
 {{#each ManagerCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower ManagerConstructor}} {{Name}}Manager({{#each ManagerCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-{{#ifle ManagerCtorParameters.Count 3}}
+        {{lower ManagerCtor}} {{Name}}Manager({{#each ManagerCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle ManagerCtorParameters.Count 2}}
             { {{#each ManagerCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ManagerCtor(); }
 {{else}}
         {

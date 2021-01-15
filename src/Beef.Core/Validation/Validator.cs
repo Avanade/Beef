@@ -11,34 +11,6 @@ using System.Threading.Tasks;
 namespace Beef.Validation
 {
     /// <summary>
-    /// Provides entity validation with a <see cref="Default"/> instance.
-    /// </summary>
-    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    /// <typeparam name="TValidator">The validator <see cref="Type"/>.</typeparam>
-    public abstract class Validator<TEntity, TValidator> : Validator<TEntity>
-        where TEntity : class
-        where TValidator : Validator<TEntity, TValidator>, new()
-    {
-        private readonly static TValidator _default = new TValidator();
-
-#pragma warning disable CA1000 // Do not declare static members on generic types; by-design, results in a consistent static defined default instance without the need to specify generic type to consume.
-        /// <summary>
-        /// Gets the current instance of the validator.
-        /// </summary>
-        public static TValidator Default
-#pragma warning restore CA1000
-        {
-            get
-            {
-                if (_default == null)
-                    throw new InvalidOperationException("An instance of this Validator cannot be referenced as it is still being constructed; beware that you may have a circular reference within the constructor.");
-
-                return _default;
-            }
-        }
-    }
-
-    /// <summary>
     /// Provides access to the validator capabilities.
     /// </summary>
     public static class Validator

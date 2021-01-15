@@ -641,23 +641,23 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Person"/> identifier.</param>
         /// <returns>A resultant <see cref="string"/>.</returns>
-        public Task<string?> InvokeApiViaAgentAsync(Guid id)
+        public async Task<string?> InvokeApiViaAgentAsync(Guid id)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(id);
                 if (_invokeApiViaAgentOnPreValidateAsync != null) await _invokeApiViaAgentOnPreValidateAsync(id).ConfigureAwait(false);
 
-                MultiValidator.Create()
+                (await MultiValidator.Create()
                     .Additional((__mv) => _invokeApiViaAgentOnValidate?.Invoke(__mv, id))
-                    .Run().ThrowOnError();
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
                 if (_invokeApiViaAgentOnBeforeAsync != null) await _invokeApiViaAgentOnBeforeAsync(id).ConfigureAwait(false);
                 var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
                 if (_invokeApiViaAgentOnAfterAsync != null) await _invokeApiViaAgentOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>

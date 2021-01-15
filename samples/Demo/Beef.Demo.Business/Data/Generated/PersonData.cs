@@ -30,6 +30,8 @@ namespace Beef.Demo.Business.Data
     {
         private readonly IDatabase _db;
         private readonly IEfDb _ef;
+        private readonly Microsoft.Extensions.Logging.ILogger<PersonData> _logger;
+        private readonly Common.Agents.IPersonAgent _personAgent;
 
         #region Extensions
         #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
@@ -93,8 +95,16 @@ namespace Beef.Demo.Business.Data
         /// </summary>
         /// <param name="db">The <see cref="IDatabase"/>.</param>
         /// <param name="ef">The <see cref="IEfDb"/>.</param>
-        private PersonData(IDatabase db, IEfDb ef)
-            { _db = Check.NotNull(db, nameof(db)); _ef = Check.NotNull(ef, nameof(ef)); PersonDataCtor(); }
+        /// <param name="logger">The <see cref="Microsoft.Extensions.Logging.ILogger{PersonData}"/>.</param>
+        /// <param name="personAgent">The <see cref="Common.Agents.IPersonAgent"/>.</param>
+        public PersonData(IDatabase db, IEfDb ef, Microsoft.Extensions.Logging.ILogger<PersonData> logger, Common.Agents.IPersonAgent personAgent)
+        {
+            _db = Check.NotNull(db, nameof(db));
+            _ef = Check.NotNull(ef, nameof(ef));
+            _logger = Check.NotNull(logger, nameof(logger));
+            _personAgent = Check.NotNull(personAgent, nameof(personAgent));
+            PersonDataCtor();
+        }
 
         partial void PersonDataCtor(); // Enables additional functionality to be added to the constructor.
 

@@ -54,7 +54,7 @@ namespace {{Root.NamespaceBusiness}}.Data
     /// </summary>
     public partial class ReferenceDataData : IReferenceDataData
     {
-{{#each RefData.DataConstructorParameters}}
+{{#each RefData.DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -63,11 +63,11 @@ namespace {{Root.NamespaceBusiness}}.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataData"/> class.
         /// </summary>
-{{#each RefData.DataConstructorParameters}}
+{{#each RefData.DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        public ReferenceDataData({{#each RefData.DataConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each RefData.DataConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+        public ReferenceDataData({{#each RefData.DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+            { {{#each RefData.DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
 
         partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
 

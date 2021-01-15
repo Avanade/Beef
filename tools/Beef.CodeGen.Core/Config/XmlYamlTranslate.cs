@@ -21,6 +21,9 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.Entity, "EntityFrameworkEntity", "entityFrameworkModel"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "CosmosEntity", "cosmosModel"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ODataEntity", "odataModel"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerConstructor", "managerCtor"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcConstructor", "dataSvcCtor"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataConstructor", "dataCtor"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseMapperInheritsFrom", "databaseMapperInheritsFrom"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseCustomMapper", "databaseCustomMapper"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataEntityFrameworkMapperInheritsFrom", "entityFrameworkMapperInheritsFrom"),
@@ -65,6 +68,10 @@ namespace Beef.CodeGen.Config
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "noNamespaceSchemaLocation", (xml) => NullValue()),
             (ConfigType.Entity, ConfigurationEntity.CodeGen, "WebApiAuthorize", (xml) => string.IsNullOrEmpty(xml) ? null : (xml == "true" ? "Authorize" : (xml == "false" ? "AllowAnonymous" : xml))),
 
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeEntity", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeAll", (xml) => ConvertBoolToYesNo(xml)),
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeIData", (xml) => ConvertBoolToYesNo(xml)),
@@ -135,6 +142,31 @@ namespace Beef.CodeGen.Config
                 { 
                     Title = "The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`).",
                     Description = "Defaults to `AllowAnonymous`. This can be overidden within the `Entity`(s) and/or their corresponding `Operation`(s)."
+                }),
+
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", typeof(string), new PropertySchemaAttribute("Manager")
+                {
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.", IsImportant = true,
+                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                        "Where the `Type` matches an already inferred value it will be ignored."
+                }),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", typeof(string), new PropertySchemaAttribute("DataSvc")
+                {
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.", IsImportant = true,
+                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                        "Where the `Type` matches an already inferred value it will be ignored."
+                }),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", typeof(string), new PropertySchemaAttribute("Data")
+                {
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.", IsImportant = true,
+                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                        "Where the `Type` matches an already inferred value it will be ignored."
+                }),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", typeof(string), new PropertySchemaAttribute("WebApi")
+                {
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.", IsImportant = true,
+                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                        "Where the `Type` matches an already inferred value it will be ignored."
                 }),
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ExcludeEntity", typeof(bool?), new PropertySchemaAttribute("Exclude") { Title = "Indicates whether to exclude the generation of the `Entity` class (`Xxx.cs`)." }),

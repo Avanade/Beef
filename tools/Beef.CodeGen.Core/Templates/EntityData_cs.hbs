@@ -119,8 +119,17 @@ namespace {{Root.NamespaceBusiness}}.Data
   {{#each DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
-        {{lower DataConstructor}} {{Name}}Data({{#each DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+        {{lower DataCtor}} {{Name}}Data({{#each DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle DataCtorParameters.Count 2}}
             { {{#each DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+{{else}}
+        {
+  {{#each DataCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}DataCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
   {{#each DataOperations}}

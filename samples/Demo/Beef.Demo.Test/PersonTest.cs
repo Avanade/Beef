@@ -1,6 +1,7 @@
 using Beef.Demo.Api;
 using Beef.Demo.Business;
 using Beef.Demo.Business.DataSvc;
+using Beef.Demo.Business.Validation;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
@@ -25,11 +26,11 @@ namespace Beef.Demo.Test
         public void A110_Validation_Null()
         {
             ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(null),
+                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(null),
                 "Value is required.");
 
             ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(null, 1.ToGuid()),
+                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).UpdateAsync(null, 1.ToGuid()),
                 "Value is required.");
         }
 
@@ -37,14 +38,14 @@ namespace Beef.Demo.Test
         public async Task A110_Validation_Empty()
         {
             await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()),
+                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(new Person()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
                 "Birthday is required.");
 
             await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(new Person(), 1.ToGuid()),
+                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).UpdateAsync(new Person(), 1.ToGuid()),
                 "First Name is required.",
                 "Last Name is required.",
                 "Gender is required.",
@@ -55,7 +56,7 @@ namespace Beef.Demo.Test
         public void A130_Validation_Invalid()
         {
             ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
+                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
                 "First Name must not exceed 50 characters in length.",
                 "Last Name must not exceed 50 characters in length.",
                 "Gender is invalid.",

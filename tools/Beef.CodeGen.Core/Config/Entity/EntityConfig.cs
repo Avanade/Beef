@@ -334,19 +334,19 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `Data` constructor.
         /// </summary>
-        [JsonProperty("dataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("dataCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Data", Title = "The access modifier for the generated `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
-        public string? DataConstructor { get; set; }
+        public string? DataCtor { get; set; }
 
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.
         /// </summary>
-        [JsonProperty("dataConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Data", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
+        [JsonProperty("dataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
             Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
-                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
-        public List<string>? DataConstructorParameters { get; set; }
+                "Where the `Type` matches an already inferred value it will be ignored.")]
+        public List<string>? DataCtorParams { get; set; }
 
         /// <summary>
         /// Indicates whether the `Data` extensions logic should be generated.
@@ -546,19 +546,19 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
-        [JsonProperty("dataSvcConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("dataSvcCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DataSvc", Title = "The access modifier for the generated `DataSvc` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
-        public string? DataSvcConstructor { get; set; }
+        public string? DataSvcCtor { get; set; }
 
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.
         /// </summary>
-        [JsonProperty("dataSvcConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("DataSvc", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
+        [JsonProperty("dataSvcCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
             Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
-                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
-        public List<string>? DataSvcConstructorParameters { get; set; }
+                "Where the `Type` matches an already inferred value it will be ignored.")]
+        public List<string>? DataSvcCtorParams { get; set; }
 
         /// <summary>
         /// Indicates whether the `DataSvc` extensions logic should be generated.
@@ -574,19 +574,19 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated `Manager` constructor.
         /// </summary>
-        [JsonProperty("managerConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("managerCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "The access modifier for the generated `Manager` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
-        public string? ManagerConstructor { get; set; }
+        public string? ManagerCtor { get; set; }
 
         /// <summary>
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.
         /// </summary>
-        [JsonProperty("managerConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Manager", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.",
+        [JsonProperty("managerCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.", IsImportant = true,
             Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
-                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
-        public List<string>? ManagerConstructorParameters { get; set; }
+                "Where the `Type` matches an already inferred value it will be ignored.")]
+        public List<string>? ManagerCtorParams { get; set; }
 
         /// <summary>
         /// Indicates whether the `Manager` extensions logic should be generated.
@@ -634,10 +634,19 @@ entities:
         /// <summary>
         /// Gets or sets the access modifier for the generated Web API `Controller` constructor.
         /// </summary>
-        [JsonProperty("webApiConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("webApiCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("WebApi", Title = "The access modifier for the generated Web API `Controller` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
-        public string? WebApiConstructor { get; set; }
+        public string? WebApiCtor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.
+        /// </summary>
+        [JsonProperty("webApiCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("WebApi", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.", IsImportant = true,
+            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored.")]
+        public List<string>? WebApiCtorParams { get; set; }
 
         #endregion
 
@@ -896,7 +905,7 @@ entities:
         /// <summary>
         /// Gets the WebApi Contructor parameters.
         /// </summary>
-        public List<ParameterConfig> WebApiConstructorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> WebApiCtorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
         /// Gets or sets the corresponding <see cref="ConstConfig"/> collection.
@@ -1034,7 +1043,7 @@ entities:
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => Parent!.JsonSerializer);
             MapperAddStandardProperties = DefaultWhereNull(MapperAddStandardProperties, () => true);
             AutoImplement = DefaultWhereNull(AutoImplement, () => "None");
-            DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
+            DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = InterfaceiseName(DefaultWhereNull(DatabaseName, () => Parent!.DatabaseName));
             DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             EntityFrameworkName = InterfaceiseName(DefaultWhereNull(EntityFrameworkName, () => Parent!.EntityFrameworkName));
@@ -1042,11 +1051,11 @@ entities:
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => "PartitionKey.None");
             ODataName = InterfaceiseName(DefaultWhereNull(ODataName, () => Parent!.ODataName));
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
-            DataSvcConstructor = DefaultWhereNull(DataSvcConstructor, () => "Public");
+            DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
-            ManagerConstructor = DefaultWhereNull(ManagerConstructor, () => "Public");
+            ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
-            WebApiConstructor = DefaultWhereNull(WebApiConstructor, () => "Public");
+            WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");
             ExcludeEntity = DefaultWhereNull(ExcludeEntity, () => NoOption);
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
@@ -1273,7 +1282,7 @@ entities:
                 }
             }
 
-            AddConfiguredParameters(ManagerConstructorParameters, ManagerCtorParameters);
+            AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
             foreach (var ctor in ManagerCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
@@ -1291,7 +1300,7 @@ entities:
             else 
                 DataSvcCaching = false;
 
-            AddConfiguredParameters(DataSvcConstructorParameters, DataSvcCtorParameters);
+            AddConfiguredParameters(DataSvcCtorParams, DataSvcCtorParameters);
             foreach (var ctor in DataSvcCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
@@ -1310,7 +1319,7 @@ entities:
             if (UsesOData)
                 DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
 
-            AddConfiguredParameters(DataConstructorParameters, DataCtorParameters);
+            AddConfiguredParameters(DataCtorParams, DataCtorParameters);
             foreach (var ctor in DataCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
@@ -1318,9 +1327,9 @@ entities:
 
             // WebAPI contstructors.
             if (RequiresManager)
-                WebApiConstructorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
+                WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
 
-            foreach (var ctor in WebApiConstructorParameters)
+            foreach (var ctor in WebApiCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }
@@ -1343,8 +1352,9 @@ entities:
                 var pc = new ParameterConfig { Type = parts[0], Text = $"{{{{{parts[0]}}}}}" };
                 if (parts.Length == 1)
                 {
-                    pc.Name = parts[0].Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
-                    if (pc.Name == "I" && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
+                    var nsparts = parts[0].Split(".", StringSplitOptions.RemoveEmptyEntries);
+                    pc.Name = nsparts.Last().Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
+                    if (pc.Name[0] == 'I' && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
                         pc.Name = pc.Name[1..];
                 }
                 else

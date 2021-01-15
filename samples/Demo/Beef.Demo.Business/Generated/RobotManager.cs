@@ -28,6 +28,7 @@ namespace Beef.Demo.Business
         private readonly IRobotDataSvc _dataService;
         private readonly IValidator<Robot> _robotValidator;
         private readonly IValidator<RobotArgs> _robotArgsValidator;
+        private readonly Beef.Events.IEventPublisher _eventPublisher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
@@ -35,11 +36,13 @@ namespace Beef.Demo.Business
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
         /// <param name="robotValidator">The <see cref="IValidator{Robot}"/>.</param>
         /// <param name="robotArgsValidator">The <see cref="IValidator{RobotArgs}"/>.</param>
-        private RobotManager(IRobotDataSvc dataService, IValidator<Robot> robotValidator, IValidator<RobotArgs> robotArgsValidator)
+        /// <param name="eventPublisher">The <see cref="Beef.Events.IEventPublisher"/>.</param>
+        public RobotManager(IRobotDataSvc dataService, IValidator<Robot> robotValidator, IValidator<RobotArgs> robotArgsValidator, Beef.Events.IEventPublisher eventPublisher)
         {
             _dataService = Check.NotNull(dataService, nameof(dataService));
             _robotValidator = Check.NotNull(robotValidator, nameof(robotValidator));
             _robotArgsValidator = Check.NotNull(robotArgsValidator, nameof(robotArgsValidator));
+            _eventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
             RobotManagerCtor();
         }
 
