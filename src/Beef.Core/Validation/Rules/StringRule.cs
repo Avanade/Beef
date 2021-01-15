@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -29,30 +30,29 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, string?> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, string?> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
             if (string.IsNullOrEmpty(context.Value))
-                return;
+                return Task.CompletedTask;
 
             if (context.Value.Length < MinLength)
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MinLengthFormat, MinLength);
-                return;
+                return Task.CompletedTask;
             }
 
             if (MaxLength.HasValue && context.Value.Length > MaxLength.Value)
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MaxLengthFormat, MaxLength);
-                return;
+                return Task.CompletedTask;
             }
 
             if (Regex != null && !Regex.IsMatch(context.Value))
-            {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.RegexFormat);
-                return;
-            }
+
+            return Task.CompletedTask;
         }
     }
 }

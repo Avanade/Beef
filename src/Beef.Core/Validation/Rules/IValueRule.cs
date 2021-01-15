@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Validation.Clauses;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
     /// <summary>
-    /// Provides the rule to <see cref="Validate"/> a value.
+    /// Provides the rule to <see cref="ValidateAsync">validate</see> a value.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="System.Type"/>.</typeparam>
     /// <typeparam name="TProperty">The value <see cref="System.Type"/>.</typeparam>
@@ -28,6 +29,6 @@ namespace Beef.Validation.Rules
         /// Validate the value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        void Validate(PropertyContext<TEntity, TProperty> context);
+        Task ValidateAsync(PropertyContext<TEntity, TProperty> context);
     }
 }

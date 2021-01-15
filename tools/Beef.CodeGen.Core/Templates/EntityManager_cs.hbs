@@ -85,13 +85,13 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
+        public async {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
         {
   {{#ifeq Type 'Create' 'Update'}}
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
   {{/ifeq}}
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {{#if HasReturnValue}}return {{/if}}await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
   {{#ifval AuthRole}}
                 ExecutionContext.Current.IsInRole("{{AuthRole}}", true);
@@ -122,10 +122,10 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-                {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.Run().ThrowOnError();
+                (await {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.RunAsync().ConfigureAwait(false)).ThrowOnError();
       {{/each}}
     {{else}}
-                MultiValidator.Create()
+                (await MultiValidator.Create()
       {{#each ValidateParameters}}
                     .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
@@ -134,7 +134,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
                     .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                    .Run().ThrowOnError();
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
     {{/if}}
     {{#if Parent.ManagerExtensions}}
@@ -148,7 +148,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business
                 {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
     {{/if}}
   {{/if}}
-            }{{#if ManagerTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+            }{{#if ManagerTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}).ConfigureAwait(false);
         }
 {{/each}}
     }

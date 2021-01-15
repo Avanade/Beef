@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -37,14 +38,14 @@ namespace Beef.Validation.Rules
         public override bool Check(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
-            return context.Parent.ShallowValidation ? false : base.Check(context);
+            return !context.Parent.ShallowValidation && base.Check(context);
         }
 
         /// <summary>
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             // Exit where nothing to validate.
             Beef.Check.NotNull(context, nameof(context));
@@ -55,7 +56,7 @@ namespace Beef.Validation.Rules
             var args = context.CreateValidationArgs();
 
             // Validate and merge.
-            context.MergeResult(Validator.Validate(context.Value, args));
+            context.MergeResult(await Validator.ValidateAsync(context.Value, args).ConfigureAwait(false));
         }
     }
 }

@@ -2,6 +2,7 @@
 
 using Beef.RefData;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -32,17 +33,17 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty?> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, TProperty?> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
             if (context.Value == null)
-                return;
+                return Task.CompletedTask;
 
             if (context.Value.ContainsInvalidItems())
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.InvalidFormat);
-                return;
+                return Task.CompletedTask;
             }
 
             // Check Min and Max counts.
@@ -58,11 +59,13 @@ namespace Beef.Validation.Rules
                 if (dict.ContainsKey(item.Code))
                 {
                     context.CreateErrorMessage(ErrorText ?? ValidatorStrings.DuplicateValueFormat, context.Text, item.ToString());
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 dict.Add(item.Code);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

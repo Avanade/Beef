@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -18,7 +19,7 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary> 
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
@@ -26,12 +27,14 @@ namespace Beef.Validation.Rules
             if (Comparer<TProperty>.Default.Compare(context.Value, default!) == 0)
             {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MandatoryFormat);
-                return;
+                return Task.CompletedTask;
             }
 
             // Also check for empty strings.
             if (context.Value is string val && val.Length == 0)
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.MandatoryFormat);
+
+            return Task.CompletedTask;
         }
     }
 }

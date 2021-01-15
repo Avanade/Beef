@@ -2,13 +2,17 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancwment:* **Breaking change** to _Validation_ to enable async. The existing methods `Validate` and `Run` have been changed to be `ValidateAsync` and `RunAsync` respectively with a response of `Task`. A number of the `Rules` have been updated to support async overloads.
+- *Enhancement:* `IValidator<TEntity>` has been added to enable Dependency Injection (DI) support for validators.
+
 ## v4.1.2
 - *Enhancement:* The `CodeGen` namespace has been moved to `Beef.CodeGen.Core`. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`). The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine.
 - *Enhancement:* The `ColoredConsoleLogger` was update to write using `Console.Error` where the `LogLevel` is either `Error` or `Critical`; otherwise, use `Console.Out`.
 - *Fixed:* `PropertyMapper` and `PropertySrceMapper` were not correctly updating the destination value(s) where the source was `null`.
 
 ## v4.1.1
-- *Enhancement:* Introduction of Dependency Injection support.
+- *Enhancement:* Introduction of Dependency Injection (DI) support.
 
 ## v3.1.14
 - *Fixed:* `CollectionRuleItem` updated to have an argument-less constructor where an item validator is not required. The existing constructor will now throw a `NullReferenceException` where no validator has been specified (intended to catch validators that have not been constructed correctly).

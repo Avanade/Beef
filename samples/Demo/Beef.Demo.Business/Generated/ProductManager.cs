@@ -41,15 +41,15 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Product"/> identifier.</param>
         /// <returns>The selected <see cref="Product"/> where found.</returns>
-        public Task<Product?> GetAsync(int id)
+        public async Task<Product?> GetAsync(int id)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
+                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -58,15 +58,15 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Common.Entities.ProductArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="ProductCollectionResult"/>.</returns>
-        public Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
+        public async Task<ProductCollectionResult> GetByArgsAsync(ProductArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                args.Validate(nameof(args)).Entity(ProductArgsValidator.Default).Run().ThrowOnError();
+                (await args.Validate(nameof(args)).Entity(ProductArgsValidator.Default).RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
     }
 }

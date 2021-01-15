@@ -41,15 +41,15 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The selected <see cref="Robot"/> where found.</returns>
-        public Task<Robot?> GetAsync(Guid id)
+        public async Task<Robot?> GetAsync(Guid id)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
-                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
+                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -57,17 +57,17 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <returns>The created <see cref="Robot"/>.</returns>
-        public Task<Robot> CreateAsync(Robot value)
+        public async Task<Robot> CreateAsync(Robot value)
         {
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
+                (await value.Validate(nameof(value)).Entity(RobotValidator.Default).RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -76,33 +76,33 @@ namespace Beef.Demo.Business
         /// <param name="value">The <see cref="Robot"/>.</param>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <returns>The updated <see cref="Robot"/>.</returns>
-        public Task<Robot> UpdateAsync(Robot value, Guid id)
+        public async Task<Robot> UpdateAsync(Robot value, Guid id)
         {
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                value.Validate(nameof(value)).Entity(RobotValidator.Default).Run().ThrowOnError();
+                (await value.Validate(nameof(value)).Entity(RobotValidator.Default).RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Deletes the specified <see cref="Robot"/>.
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
-                id.Validate(nameof(id)).Mandatory().Run().ThrowOnError();
+                (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -111,15 +111,15 @@ namespace Beef.Demo.Business
         /// <param name="args">The Args (see <see cref="Common.Entities.RobotArgs"/>).</param>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>
         /// <returns>The <see cref="RobotCollectionResult"/>.</returns>
-        public Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
+        public async Task<RobotCollectionResult> GetByArgsAsync(RobotArgs? args, PagingArgs? paging)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                args.Validate(nameof(args)).Entity(RobotArgsValidator.Default).Run().ThrowOnError();
+                (await args.Validate(nameof(args)).Entity(RobotArgsValidator.Default).RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -127,13 +127,13 @@ namespace Beef.Demo.Business
         /// </summary>
         /// <param name="id">The <see cref="Robot"/> identifier.</param>
         /// <param name="powerSource">The Power Source (see <see cref="RefDataNamespace.PowerSource"/>).</param>
-        public Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource)
+        public async Task RaisePowerSourceChangeAsync(Guid id, RefDataNamespace.PowerSource? powerSource)
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await RaisePowerSourceChangeOnImplementationAsync(id, powerSource).ConfigureAwait(false);
-            });
+            }).ConfigureAwait(false);
         }
     }
 }

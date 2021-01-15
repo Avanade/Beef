@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
@@ -28,10 +29,10 @@ namespace Beef.Validation
         /// Validates an entity given a <see cref="ValidationContext{TEntity}"/>.
         /// </summary>
         /// <param name="context">The <see cref="ValidationContext{TEntity}"/></param>
-        public void Validate(ValidationContext<TEntity> context)
+        public async Task ValidateAsync(ValidationContext<TEntity> context)
         {
             Check.NotNull(context, nameof(context));
-            if (!(context.Value is TInclude val))
+            if (context.Value is not TInclude val)
                 throw new InvalidOperationException($"Type {typeof(TEntity).Name} must inherit from {typeof(TInclude).Name}.");
 
             var ctx = new ValidationContext<TInclude>(val, new ValidationArgs
@@ -45,7 +46,7 @@ namespace Beef.Validation
 
             foreach (var r in _include.Rules)
             {
-                r.Validate(ctx);
+                await r.ValidateAsync(ctx).ConfigureAwait(false);
             }
 
             context.MergeResult(ctx);

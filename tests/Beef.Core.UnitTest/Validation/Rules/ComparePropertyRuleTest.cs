@@ -5,6 +5,7 @@ using Beef.Entities;
 using Beef.Validation;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -12,14 +13,14 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class ComparePropertyRuleTest
     {
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
             var v = Validator.Create<TestData>()
                 .HasProperty(x => x.DateA, p => p.CompareValue(CompareOperator.GreaterThan, new DateTime(1950, 1, 1), "Minimum"))
                 .HasProperty(x => x.DateB, p => p.CompareProperty(CompareOperator.GreaterThanEqual, y => y.DateA));
 
             // Date B will be bad.
-            var v1 = v.Validate(new TestData { DateA = new DateTime(2000, 1, 1), DateB = new DateTime(1999, 1, 1) });
+            var v1 = await v.ValidateAsync(new TestData { DateA = new DateTime(2000, 1, 1), DateB = new DateTime(1999, 1, 1) });
             Assert.IsNotNull(v1);
             Assert.IsTrue(v1.HasErrors);
             Assert.AreEqual(1, v1.Messages.Count);
@@ -28,7 +29,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
             Assert.AreEqual("DateB", v1.Messages[0].Property);
 
             // Date B should not validate as dependent DateA has already failed.
-            var v2 = v.Validate(new TestData { DateA = new DateTime(1949, 1, 1), DateB = new DateTime(1939, 1, 1) });
+            var v2 = await v.ValidateAsync(new TestData { DateA = new DateTime(1949, 1, 1), DateB = new DateTime(1939, 1, 1) });
             Assert.IsNotNull(v2);
             Assert.IsTrue(v2.HasErrors);
             Assert.AreEqual(1, v2.Messages.Count);
@@ -37,7 +38,7 @@ namespace Beef.Core.UnitTest.Validation.Rules
             Assert.AreEqual("DateA", v2.Messages[0].Property);
 
             // All is a-ok.
-            var v3 = v.Validate(new TestData { DateA = new DateTime(2001, 1, 1), DateB = new DateTime(2001, 1, 1) });
+            var v3 = await v.ValidateAsync(new TestData { DateA = new DateTime(2001, 1, 1), DateB = new DateTime(2001, 1, 1) });
             Assert.IsNotNull(v3);
             Assert.IsFalse(v3.HasErrors);
         }

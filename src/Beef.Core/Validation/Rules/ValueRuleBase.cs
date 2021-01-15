@@ -2,6 +2,7 @@
 
 using Beef.Validation.Clauses;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -61,6 +62,7 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public abstract void Validate(PropertyContext<TEntity, TProperty> context);
+        /// <returns>The corresponding <see cref="Task"/>.</returns>
+        public abstract Task ValidateAsync(PropertyContext<TEntity, TProperty> context);
     }
 }

@@ -35,13 +35,13 @@ namespace Beef.Demo.Business
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        public Task<System.Collections.IDictionary> GetEnvVarsAsync()
+        public async Task<System.Collections.IDictionary> GetEnvVarsAsync()
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Beef.Entities;
 using static Beef.Core.UnitTest.Validation.ValidatorTest;
 using Beef.Validation.Rules;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -13,46 +14,46 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class CollectionRuleTest
     {
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
-            var v1 = new int[] { 1 }.Validate().Collection(2).Run();
+            var v1 = await new int[] { 1 }.Validate().Collection(2).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must have at least 2 item(s).", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = new int[] { 1 }.Validate().Collection(1).Run();
+            v1 = await new int[] { 1 }.Validate().Collection(1).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = new int[] { 1, 2, 3 }.Validate().Collection(maxCount: 2).Run();
+            v1 = await new int[] { 1, 2, 3 }.Validate().Collection(maxCount: 2).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must not exceed 2 item(s).", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = new int[] { 1, 2 }.Validate().Collection(maxCount: 2).Run();
+            v1 = await new int[] { 1, 2 }.Validate().Collection(maxCount: 2).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = ((int[])null).Validate().Collection(1).Run();
+            v1 = await ((int[])null).Validate().Collection(1).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = new int[0].Validate().Collection(1).Run();
+            v1 = await new int[0].Validate().Collection(1).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must have at least 1 item(s).", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = new int[] { 1, 2, 3 }.Validate().Collection().Run();
+            v1 = await new int[] { 1, 2, 3 }.Validate().Collection().RunAsync();
             Assert.IsFalse(v1.HasError);
         }
 
         [Test]
-        public void Validate2()
+        public async Task Validate2()
         {
-            var v1 = new List<int> { 1 }.Validate().Collection(2).Run();
+            var v1 = await new List<int> { 1 }.Validate().Collection(2).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must have at least 2 item(s).", v1.Messages[0].Text);
@@ -61,14 +62,14 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
-        public void Validate_Item()
+        public async Task Validate_Item()
         {
             var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
-            var v1 = new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).Run();
+            var v1 = await new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = new TestItem[] { new TestItem() }.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).Run();
+            v1 = await new TestItem[] { new TestItem() }.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Code is required.", v1.Messages[0].Text);
@@ -77,20 +78,20 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
-        public void Validate_Item_Duplicates()
+        public async Task Validate_Item_Duplicates()
         {
             var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
-            var v1 = new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).Run();
+            var v1 = await new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
             var tis = new TestItem[] { new TestItem { Code = "ABC", Text = "Abc" }, new TestItem { Code = "DEF", Text = "Def" }, new TestItem { Code = "GHI", Text = "Ghi" } };
 
-            v1 = tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).Run();
+            v1 = await tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
             tis[2].Code = "ABC";
-            v1 = tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).Run();
+            v1 = await tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value contains duplicates; Code value 'ABC' specified more than once.", v1.Messages[0].Text);
