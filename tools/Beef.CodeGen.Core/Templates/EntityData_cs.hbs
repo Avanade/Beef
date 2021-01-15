@@ -68,7 +68,7 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
     public partial class {{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{#ifne Operations.Count 0}} : I{{Name}}Data{{#if GenericWithT}}<T>{{/if}}{{/ifne}}
     {
 {{#ifne Operations.Count 0}}
-  {{#each DataConstructorParameters}}
+  {{#each DataCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
     {{#if @last}}
 
@@ -116,11 +116,11 @@ namespace {{Root.Company}}.{{Root.AppName}}.Business.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Data"/> class.
         /// </summary>
-  {{#each DataConstructorParameters}}
+  {{#each DataCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
   {{/each}}
-        {{lower DataConstructor}} {{Name}}Data({{#each DataConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each DataConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
+        {{lower DataConstructor}} {{Name}}Data({{#each DataCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+            { {{#each DataCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataCtor(); }
 
         partial void {{Name}}DataCtor(); // Enables additional functionality to be added to the constructor.
   {{#each DataOperations}}

@@ -27,7 +27,8 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigManager"/> class.
         /// </summary>
-        public ConfigManager() => ConfigManagerCtor();
+        public ConfigManager()
+            { ConfigManagerCtor(); }
 
         partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
 

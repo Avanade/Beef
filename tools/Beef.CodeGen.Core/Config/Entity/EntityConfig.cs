@@ -249,14 +249,6 @@ namespace Beef.CodeGen.Config.Entity
         #region Operation
 
         /// <summary>
-        /// Gets or sets the name of the .NET Type that will perform the validation.
-        /// </summary>
-        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Operation", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true,
-            Description = "Only used for `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
-        public string? Validator { get; set; }
-
-        /// <summary>
         /// Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
         /// </summary>
         [JsonProperty("get", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -326,6 +318,15 @@ namespace Beef.CodeGen.Config.Entity
         [PropertySchema("Data", Title = "The access modifier for the generated `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
         public string? DataConstructor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.
+        /// </summary>
+        [JsonProperty("dataConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Data", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
+            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
+        public List<string>? DataConstructorParameters { get; set; }
 
         /// <summary>
         /// Indicates whether the `Data` extensions logic should be generated.
@@ -531,6 +532,15 @@ namespace Beef.CodeGen.Config.Entity
         public string? DataSvcConstructor { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.
+        /// </summary>
+        [JsonProperty("dataSvcConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
+            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
+        public List<string>? DataSvcConstructorParameters { get; set; }
+
+        /// <summary>
         /// Indicates whether the `DataSvc` extensions logic should be generated.
         /// </summary>
         [JsonProperty("dataSvcExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -550,11 +560,36 @@ namespace Beef.CodeGen.Config.Entity
         public string? ManagerConstructor { get; set; }
 
         /// <summary>
+        /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.
+        /// </summary>
+        [JsonProperty("managerConstructorParameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The list of extended (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.",
+            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored. Each _item_ in the list should be comma-separated.")]
+        public List<string>? ManagerConstructorParameters { get; set; }
+
+        /// <summary>
         /// Indicates whether the `Manager` extensions logic should be generated.
         /// </summary>
         [JsonProperty("managerExtensions", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "Indicates whether the `Manager` extensions logic should be generated.")]
         public bool? ManagerExtensions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the .NET Type that will perform the validation.
+        /// </summary>
+        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET `Type` that will perform the validation.", IsImportant = true,
+            Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
+        public string? Validator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
+        /// </summary>
+        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
+            Description = "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.")]
+        public string? IValidator { get; set; }
 
         #endregion
 
@@ -795,9 +830,14 @@ namespace Beef.CodeGen.Config.Entity
         public List<OperationConfig>? DataSvcAutoOperations => Operations!.Where(x => CompareNullOrValue(x.ExcludeDataSvc, false) && CompareNullOrValue(x.DataSvcCustom, false)).ToList();
 
         /// <summary>
+        /// Gets the Manager constructor parameters.
+        /// </summary>
+        public List<ParameterConfig> ManagerCtorParameters { get; } = new List<ParameterConfig>();
+
+        /// <summary>
         /// Gets the DataSvc constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataSvcConstructorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataSvcCtorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
         /// Gets the IEntityData <see cref="OperationConfig"/> collection.
@@ -817,7 +857,7 @@ namespace Beef.CodeGen.Config.Entity
         /// <summary>
         /// Gets the Data constructor parameters.
         /// </summary>
-        public List<ParameterConfig> DataConstructorParameters { get; } = new List<ParameterConfig>();
+        public List<ParameterConfig> DataCtorParameters { get; } = new List<ParameterConfig>();
 
         /// <summary>
         /// Gets the EntityController <see cref="OperationConfig"/> collection.
@@ -892,7 +932,7 @@ namespace Beef.CodeGen.Config.Entity
         public string? ModelImplements { get; set; }
 
         /// <summary>
-        /// Inidicates whether any of the operations use validators.
+        /// Indicates whether any of the operations use validators.
         /// </summary>
         public bool UsesValidators => Validator != null || Operations.Any(x => x.Validator != null || x.Parameters.Any(y => y.Validator != null));
 
@@ -1189,40 +1229,62 @@ namespace Beef.CodeGen.Config.Entity
         /// </summary>
         private void PrepareConstructors()
         {
-            // DataSvc constructors.
             var oc = new OperationConfig();
             oc.Prepare(Root!, this);
 
+            // Manager constructors.
+            if (RequiresDataSvc)
+                ManagerCtorParameters.Add(new ParameterConfig { Name = "DataService", Type = $"I{Name}DataSvc", Text = $"{{{{I{Name}DataSvc}}}}" });
+
+            foreach (var o in Operations!)
+            {
+                foreach (var p in o.Parameters!.Where(x => x.Validator != null))
+                {
+                    var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator, Text = $"{{{{{p.IValidator}}}}}" };
+                    if (!ManagerCtorParameters.Any(x => x.Name == pc.Name))
+                        ManagerCtorParameters.Add(pc);
+                }
+            }
+
+            AddConfiguredParameters(ManagerConstructorParameters, ManagerCtorParameters);
+            foreach (var ctor in ManagerCtorParameters)
+            {
+                ctor.Prepare(Root!, oc);
+            }
+
+            // DataSvc constructors.
             if (RequiresData)
-                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
+                DataSvcCtorParameters.Add(new ParameterConfig { Name = "Data", Type = $"I{Name}Data", Text = $"{{{{I{Name}Data}}}}" });
 
             if (SupportsEvents)
-                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
+                DataSvcCtorParameters.Add(new ParameterConfig { Name = "EvtPub", Type = $"IEventPublisher", Text = "{{IEventPublisher}}" });
 
             if (CompareValue(DataSvcCaching, true) && Operations.Any(x => x.SupportsCaching))
-                DataSvcConstructorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
+                DataSvcCtorParameters.Add(new ParameterConfig { Name = "Cache", Type = "IRequestCache", Text = "{{IRequestCache}}" });
             else 
                 DataSvcCaching = false;
 
-            foreach (var ctor in DataSvcConstructorParameters)
+            AddConfiguredParameters(DataSvcConstructorParameters, DataSvcCtorParameters);
+            foreach (var ctor in DataSvcCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }
 
             // Data constructors.
             if (UsesDatabase)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Db", Type = DatabaseName, Text = $"{{{{{DatabaseName}}}}}" });
 
             if (UsesEntityFramework)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Ef", Type = EntityFrameworkName, Text = $"{{{{{EntityFrameworkName}}}}}" });
 
             if (UsesCosmos)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "Cosmos", Type = CosmosName, Text = $"{{{{{CosmosName}}}}}" });
 
             if (UsesOData)
-                DataConstructorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
+                DataCtorParameters.Add(new ParameterConfig { Name = "OData", Type = ODataName, Text = $"{{{{{ODataName}}}}}" });
 
-            foreach (var ctor in DataConstructorParameters)
+            AddConfiguredParameters(DataConstructorParameters, DataCtorParameters);
+            foreach (var ctor in DataCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
             }
@@ -1234,6 +1296,35 @@ namespace Beef.CodeGen.Config.Entity
             foreach (var ctor in WebApiConstructorParameters)
             {
                 ctor.Prepare(Root!, oc);
+            }
+        }
+
+        /// <summary>
+        /// Add configured list to the parameters.
+        /// </summary>
+        private static void AddConfiguredParameters(List<string>? configList, List<ParameterConfig> paramList)
+        {
+            if (configList == null)
+                return;
+
+            foreach (var p in configList)
+            {
+                var parts = p.Split("^", StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 0)
+                    continue;
+
+                var pc = new ParameterConfig { Type = parts[0], Text = $"{{{{{parts[0]}}}}}" };
+                if (parts.Length == 1)
+                {
+                    pc.Name = parts[0].Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
+                    if (pc.Name == "I" && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
+                        pc.Name = pc.Name[1..];
+                }
+                else
+                    pc.Name = StringConversion.ToPascalCase(parts[1]);
+
+                if (!paramList.Any(x => x.Name == pc.Name))
+                    paramList.Add(pc);
             }
         }
     }
