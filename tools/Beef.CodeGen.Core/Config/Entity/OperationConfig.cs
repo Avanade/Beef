@@ -82,14 +82,6 @@ operations: [
         public string? Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the .NET Type that will perform the validation.
-        /// </summary>
-        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the .NET Type that will perform the validation.", IsImportant = true,
-            Description = "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.")]
-        public string? Validator { get; set; }
-
-        /// <summary>
         /// Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters. 
         /// </summary>
         [JsonProperty("uniqueKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -213,6 +205,22 @@ operations: [
         [JsonProperty("managerTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Manager", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer.")]
         public bool? ManagerTransaction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the .NET Type that will perform the validation.
+        /// </summary>
+        [JsonProperty("validator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET Type that will perform the validation.", IsImportant = true,
+            Description = "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.")]
+        public string? Validator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
+        /// </summary>
+        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
+            Description = "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.")]
+        public string? IValidator { get; set; }
 
         #endregion
 
@@ -670,6 +678,7 @@ operations: [
 
             PrivateName = DefaultWhereNull(PrivateName, () => StringConversion.ToPrivateCase(Name));
             Validator = DefaultWhereNull(Validator, () => Parent!.Validator);
+            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? Parent!.IValidator ?? $"IValidator<{ValueType}>" : null);
             AutoImplement = DefaultWhereNull(AutoImplement, () => Parent!.AutoImplement);
             if (Type == "Custom")
                 AutoImplement = "None";
@@ -811,7 +820,7 @@ operations: [
             var i = 0;
             var isCreateUpdate = new string[] { "Create", "Update", "Patch" }.Contains(Type);
             if (isCreateUpdate)
-                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IsValueArg = true, WebApiFrom = "FromBody" });
+                Parameters.Insert(i++, new ParameterConfig { Name = "Value", Type = ValueType, Text = $"{{{{{ValueType}}}}}", Nullable = false, IsMandatory = false, Validator = Validator, IValidator = IValidator, IsValueArg = true, WebApiFrom = "FromBody" });
 
             if (UniqueKey.HasValue && UniqueKey.Value)
             {

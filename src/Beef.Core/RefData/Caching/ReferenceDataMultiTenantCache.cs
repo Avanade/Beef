@@ -106,16 +106,15 @@ namespace Beef.RefData.Caching
                 coll = new TColl();
             else
             {
-                var t = _loader.LoadAsync(this, _loadCollection);
-                t.GetAwaiter().GetResult();
-                if (t.Result != null)
+                var res = _loader.LoadAsync(this, _loadCollection).GetAwaiter().GetResult();
+                if (res != null)
                 {
-                    foreach (var item in t.Result)
+                    foreach (var item in res)
                     {
                         item.MakeReadOnly();
                     }
 
-                    coll = t.Result;
+                    coll = res;
                 }
                 else
                     coll = new TColl();

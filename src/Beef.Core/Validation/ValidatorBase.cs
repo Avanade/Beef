@@ -3,11 +3,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation
 {
     /// <summary>
-    /// Enables a <see cref="Validate(object, ValidationArgs)"/>.
+    /// Enables a <see cref="ValidateAsync(object, ValidationArgs)"/>.
     /// </summary>
     public interface IValidator
     {
@@ -17,7 +18,7 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
-        IValidationContext Validate(object value, ValidationArgs args);
+        Task<IValidationContext> ValidateAsync(object value, ValidationArgs args);
 
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
@@ -26,10 +27,25 @@ namespace Beef.Validation
     }
 
     /// <summary>
+    /// Enables a <see cref="ValidateAsync(TEntity, ValidationArgs)"/>.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+    public interface IValidator<TEntity> : IValidator where TEntity : class
+    {
+        /// <summary>
+        /// Validate the entity value with specified <see cref="ValidationArgs"/>.
+        /// </summary>
+        /// <param name="value">The entity value.</param>
+        /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
+        Task<ValidationContext<TEntity>> ValidateAsync(TEntity value, ValidationArgs args);
+    }
+
+    /// <summary>
     /// Represents the base entity validator.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
-    public abstract class ValidatorBase<TEntity> : IValidator
+    public abstract class ValidatorBase<TEntity> : IValidator<TEntity>
         where TEntity : class
     {
         /// <summary>
@@ -58,7 +74,7 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="ValidationContext{TEntity}"/>.</returns>
-        public virtual ValidationContext<TEntity> Validate(TEntity value, ValidationArgs? args = null)
+        public virtual Task<ValidationContext<TEntity>> ValidateAsync(TEntity value, ValidationArgs? args = null)
         {
             throw new NotSupportedException("Validate is not supported by this class.");
         }
@@ -69,9 +85,9 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
-        IValidationContext IValidator.Validate(object value, ValidationArgs args)
+        async Task<IValidationContext> IValidator.ValidateAsync(object value, ValidationArgs args)
         {
-            return Validate((TEntity)value, args);
+            return await ValidateAsync((TEntity)value, args).ConfigureAwait(false);
         }
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, need not be overridden.

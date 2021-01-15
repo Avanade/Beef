@@ -42,7 +42,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     /// </summary>
     public partial class {{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}} : I{{Name}}DataSvc{{#if GenericWithT}}<T>{{/if}}
     {
-{{#each DataSvcConstructorParameters}}
+{{#each DataSvcCtorParameters}}
         private readonly {{Type}} {{PrivateName}};
   {{#if @last}}
 
@@ -63,11 +63,11 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}DataSvc"/> class.
         /// </summary>
-{{#each DataSvcConstructorParameters}}
+{{#each DataSvcCtorParameters}}
         /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
 {{/each}}
-        {{lower DataSvcConstructor}} {{Name}}DataSvc({{#each DataSvcConstructorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
-            { {{#each DataSvcConstructorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
+        {{lower DataSvcConstructor}} {{Name}}DataSvc({{#each DataSvcCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+            { {{#each DataSvcCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}DataSvcCtor(); }
 
         partial void {{Name}}DataSvcCtor(); // Enables additional functionality to be added to the constructor.
 {{#each DataSvcOperations}}

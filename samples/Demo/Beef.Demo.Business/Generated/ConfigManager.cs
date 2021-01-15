@@ -27,7 +27,8 @@ namespace Beef.Demo.Business
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigManager"/> class.
         /// </summary>
-        public ConfigManager() => ConfigManagerCtor();
+        public ConfigManager()
+            { ConfigManagerCtor(); }
 
         partial void ConfigManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -35,13 +36,13 @@ namespace Beef.Demo.Business
         /// Get Env Vars.
         /// </summary>
         /// <returns>A resultant <see cref="System.Collections.IDictionary"/>.</returns>
-        public Task<System.Collections.IDictionary> GetEnvVarsAsync()
+        public async Task<System.Collections.IDictionary> GetEnvVarsAsync()
         {
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
-            });
+            }).ConfigureAwait(false);
         }
     }
 }

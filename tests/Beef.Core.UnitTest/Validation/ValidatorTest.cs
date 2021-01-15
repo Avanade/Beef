@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Beef.Validation.Rules;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation
 {
@@ -14,12 +15,12 @@ namespace Beef.Core.UnitTest.Validation
     public class ValidatorTest
     {
         [Test]
-        public void Create_NewValidator()
+        public async Task Create_NewValidator()
         {
-            var r = Validator.Create<TestData>()
+            var r = await Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory().String(10))
                 .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
-                .Validate(new TestData { CountB = 0 });
+                .ValidateAsync(new TestData { CountB = 0 });
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
@@ -35,15 +36,15 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Create_NewValidator_WithIncludeBase()
+        public async Task Create_NewValidator_WithIncludeBase()
         {
             var v = Validator.Create<TestDataBase>()
                 .HasProperty(x => x.Text, p => p.Mandatory().String(10));
 
-            var r = Validator.Create<TestData>()
+            var r = await Validator.Create<TestData>()
                 .IncludeBase(v)
                 .HasProperty(x => x.CountB, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10))
-                .Validate(new TestData { CountB = 0 });
+                .ValidateAsync(new TestData { CountB = 0 });
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
@@ -59,31 +60,31 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Ruleset_UsingValidatorClass()
+        public async Task Ruleset_UsingValidatorClass()
         {
-            var r = TestItemValidator.Default.Validate(new TestItem { Code = "A", Text = "X" });
+            var r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "A", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = TestItemValidator.Default.Validate(new TestItem { Code = "A", Text = "A" });
+            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "A", Text = "A" });
             Assert.IsFalse(r.HasErrors);
 
-            r = TestItemValidator.Default.Validate(new TestItem { Code = "B", Text = "X" });
+            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "B", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = TestItemValidator.Default.Validate(new TestItem { Code = "B", Text = "B" });
+            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "B", Text = "B" });
             Assert.IsFalse(r.HasErrors);
         }
 
         [Test]
-        public void Ruleset_UsingInline()
+        public async Task Ruleset_UsingInline()
         {
             var v = Validator.Create<TestItem>()
                 .HasRuleSet(x => x.Value.Code == "A", y =>
@@ -95,42 +96,42 @@ namespace Beef.Core.UnitTest.Validation
                     y.Property(x => x.Text).Mandatory().Must(x => x.Text == "B");
                 });
 
-            var r = v.Validate(new TestItem { Code = "A", Text = "X" });
+            var r = await v.ValidateAsync(new TestItem { Code = "A", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = v.Validate(new TestItem { Code = "A", Text = "A" });
+            r = await v.ValidateAsync(new TestItem { Code = "A", Text = "A" });
             Assert.IsFalse(r.HasErrors);
 
-            r = v.Validate(new TestItem { Code = "B", Text = "X" });
+            r = await v.ValidateAsync(new TestItem { Code = "B", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = v.Validate(new TestItem { Code = "B", Text = "B" });
+            r = await v.ValidateAsync(new TestItem { Code = "B", Text = "B" });
             Assert.IsFalse(r.HasErrors);
         }
 
         [Test]
-        public void CheckJsonNamesUsage()
+        public async Task CheckJsonNamesUsage()
         {
             var v = Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Mandatory())
                 .HasProperty(x => x.DateA, p => p.Mandatory())
                 .HasProperty(x => x.DateA, p => p.Mandatory());
 
-            var r = v.Validate(new TestData(), new ValidationArgs { UseJsonNames = true });
+            var r = await v.ValidateAsync(new TestData(), new ValidationArgs { UseJsonNames = true });
         }
 
         [Test]
-        public void Override_OnValidate_WithCheckPredicate()
+        public async Task Override_OnValidate_WithCheckPredicate()
         {
-            var r = TestItemValidator2.Default.Validate(new TestItem(), new ValidationArgs { UseJsonNames = true });
+            var r = await TestItemValidator2.Default.ValidateAsync(new TestItem(), new ValidationArgs { UseJsonNames = true });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(2, r.Messages.Count);
 
@@ -144,14 +145,15 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Inline_OnValidate_WithWhen()
+        public async Task Inline_OnValidate_WithWhen()
         {
-            var r = Validator.Create<TestItem>()
+            var r = await Validator.Create<TestItem>()
                 .Additional(context =>
                 {
                     context.Check(x => x.Text, true, ValidatorStrings.MaxCountFormat, 10);
                     context.Check(x => x.Text, true, ValidatorStrings.MaxCountFormat, 10);
-                }).Validate(new TestItem());
+                    return Task.CompletedTask;
+                }).ValidateAsync(new TestItem());
 
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
@@ -162,7 +164,7 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Multi_Common_Validator()
+        public async Task Multi_Common_Validator()
         {
             var cv1 = CommonValidator.Create<string>(v => v.String(5).Must(x => x.Value != "XXXXX"));
             var cv2 = CommonValidator.Create<string>(v => v.String(2).Must(x => x.Value != "YYY"));
@@ -171,19 +173,19 @@ namespace Beef.Core.UnitTest.Validation
                 .HasProperty(x => x.Code, p => p.Common(cv2))
                 .HasProperty(x => x.Text, p => p.Common(cv1));
 
-            var r = vx.Validate(new TestItem { Code = "YYY", Text = "XXXXX" });
+            var r = await vx.ValidateAsync(new TestItem { Code = "YYY", Text = "XXXXX" });
 
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(2, r.Messages.Count);
         }
 
         [Test]
-        public void Entity_SubEntity_Mandatory()
+        public async Task Entity_SubEntity_Mandatory()
         {
-            var r = Validator.Create<TestEntity>()
+            var r = await Validator.Create<TestEntity>()
                 .HasProperty(x => x.Items, (p) => p.Mandatory())
                 .HasProperty(x => x.Item, (p) => p.Mandatory())
-                .Validate(new TestEntity { Items = null });
+                .ValidateAsync(new TestEntity { Items = null });
 
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(2, r.Messages.Count);
@@ -207,7 +209,7 @@ namespace Beef.Core.UnitTest.Validation
 
         public class TestItemValidator2 : Validator<TestItem, TestItemValidator2>
         {
-            protected override void OnValidate(ValidationContext<TestItem> context)
+            protected override Task OnValidateAsync(ValidationContext<TestItem> context)
             {
                 if (!context.HasError(x => x.Code))
                     context.AddError(x => x.Code, ValidatorStrings.InvalidFormat);
@@ -217,6 +219,7 @@ namespace Beef.Core.UnitTest.Validation
 
                 context.Check(x => x.Text, (v) => string.IsNullOrEmpty(v), ValidatorStrings.MaxCountFormat, 10);
                 context.Check(x => x.Text, (v) => throw new NotFoundException(), ValidatorStrings.MaxCountFormat, 10);
+                return Task.CompletedTask;
             }
         }
 
@@ -237,7 +240,7 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Create_NewValidator_CollectionDuplicate()
+        public async Task Create_NewValidator_CollectionDuplicate()
         {
             var e = new TestEntity();
             e.Items.Add(new TestItem { Code = "ABC", Text = "Abc" });
@@ -247,9 +250,9 @@ namespace Beef.Core.UnitTest.Validation
 
             var v = Validator.Create<TestItem>();
 
-            var r = Validator.Create<TestEntity>()
+            var r = await Validator.Create<TestEntity>()
                 .HasProperty(x => x.Items, p => p.Collection(item: new CollectionRuleItem<TestItem>(v).DuplicateCheck(y => y.Code)))
-                .Validate(e);
+                .ValidateAsync(e);
 
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
@@ -304,12 +307,12 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void ManualProperty_Inject()
+        public async Task ManualProperty_Inject()
         {
-            var vx = Validator.Create<TestInject>()
+            var vx = await Validator.Create<TestInject>()
                 .HasProperty(x => x.Text, p => p.Mandatory())
                 .HasProperty(x => x.Value, p => p.Mandatory().Custom(TestInjectValueValidate))
-                .Validate(new TestInject { Text = "X", Value = new TestInjectChild { Code = 5 } });
+                .ValidateAsync(new TestInject { Text = "X", Value = new TestInjectChild { Code = 5 } });
 
             Assert.AreEqual(1, vx.Messages.Count);
             Assert.AreEqual("Code must be greater than 10.", vx.Messages[0].Text);
@@ -322,24 +325,24 @@ namespace Beef.Core.UnitTest.Validation
                 .HasProperty(x => x.Code, p => p.Mandatory().CompareValue(CompareOperator.GreaterThan, 10));
 
             var type = vxc.GetType();
-            var mi = type.GetMethod("Validate");
-            var vc = mi.Invoke(vxc, new object[] { context.Value, context.CreateValidationArgs() });
-            context.Parent.MergeResult((Beef.Validation.IValidationContext)vc);
+            var mi = type.GetMethod("ValidateAsync");
+            var vc = ((Task<Beef.Validation.ValidationContext<TestInjectChild>>)mi.Invoke(vxc, new object[] { context.Value, context.CreateValidationArgs() })).GetAwaiter().GetResult();
+            context.Parent.MergeResult(vc);
         }
 
         [Test]
-        public void Entity_ValueOverrideAndDefault()
+        public async Task Entity_ValueOverrideAndDefault()
         {
             var vc = CommonValidator.Create<decimal>(v => v.Default(100));
 
             var ti = new TestData { Text = "ABC", CountA = 1 };
 
-            var vx = Validator.Create<TestData>()
+            var vx = await Validator.Create<TestData>()
                 .HasProperty(x => x.Text, p => p.Override("XYZ"))
                 .HasProperty(x => x.CountA, p => p.Default(x => 10))
                 .HasProperty(x => x.CountB, p => p.Default(x => 20))
                 .HasProperty(x => x.AmountA, p => p.Common(vc))
-                .Validate(ti);
+                .ValidateAsync(ti);
 
             Assert.IsFalse(vx.HasErrors);
             Assert.AreEqual(0, vx.Messages.Count);

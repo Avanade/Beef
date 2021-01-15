@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
+using System.Threading.Tasks;
+
 namespace Beef.Validation.Rules
 {
     /// <summary>
@@ -17,19 +19,18 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, string?> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, string?> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
             if (string.IsNullOrEmpty(context.Value))
-                return;
+                return Task.CompletedTask;
 
             var wildcard = Wildcard ?? Wildcard.Default ?? Wildcard.MultiAll;
             if (wildcard != null && !wildcard.Validate(context.Value))
-            {
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.WildcardFormat);
-                return;
-            }
+
+            return Task.CompletedTask;
         }
     }
 }

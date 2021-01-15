@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using System;
+using System.Threading.Tasks;
 using Beef.Entities;
 using Beef.RefData;
 using Beef.Validation;
@@ -25,17 +26,17 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Validate_Null()
+        public async Task Validate_Null()
         {
-            var r = (new ReferenceDataValidator<Gender>()).Validate(null);
+            var r = await (new ReferenceDataValidator<Gender>()).ValidateAsync(null);
             Assert.IsNotNull(r);
             Assert.IsFalse(r.HasErrors);
         }
 
         [Test]
-        public void Validate_Empty()
+        public async Task Validate_Empty()
         {
-            var r = GenderValidator.Default.Validate(new Gender());
+            var r = await GenderValidator.Default.ValidateAsync(new Gender());
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(3, r.Messages.Count);
@@ -45,9 +46,9 @@ namespace Beef.Core.UnitTest.Validation
         }
 
         [Test]
-        public void Validate_Dates()
+        public async Task Validate_Dates()
         {
-            var r = GenderValidator.Default.Validate(new Gender { Id = 1, Code = "X", Text = "XX", StartDate = new DateTime(2000, 01, 01), EndDate = new DateTime(1950, 01, 01) });
+            var r = await GenderValidator.Default.ValidateAsync(new Gender { Id = 1, Code = "X", Text = "XX", StartDate = new DateTime(2000, 01, 01), EndDate = new DateTime(1950, 01, 01) });
             Assert.IsNotNull(r);
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);

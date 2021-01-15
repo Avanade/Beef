@@ -3,6 +3,7 @@
 using Beef.Validation;
 using NUnit.Framework;
 using Beef.Entities;
+using System.Threading.Tasks;
 
 namespace Beef.Core.UnitTest.Validation.Rules
 {
@@ -10,22 +11,22 @@ namespace Beef.Core.UnitTest.Validation.Rules
     public class CompareValueRuleTest
     {
         [Test]
-        public void Validate()
+        public async Task Validate()
         {
-            var v1 = 1.Validate().CompareValue(CompareOperator.Equal, 1).Run();
+            var v1 = await 1.Validate().CompareValue(CompareOperator.Equal, 1).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = 1.Validate().CompareValue(CompareOperator.Equal, 2).Run();
+            v1 = await 1.Validate().CompareValue(CompareOperator.Equal, 2).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must be equal to 2.", v1.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, v1.Messages[0].Type);
             Assert.AreEqual("Value", v1.Messages[0].Property);
 
-            v1 = 1.Validate().CompareValue(CompareOperator.GreaterThan, 0).Run();
+            v1 = await 1.Validate().CompareValue(CompareOperator.GreaterThan, 0).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = 1.Validate().CompareValue(CompareOperator.GreaterThan, 2, "Two").Run();
+            v1 = await 1.Validate().CompareValue(CompareOperator.GreaterThan, 2, "Two").RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must be greater than Two.", v1.Messages[0].Text);
@@ -34,13 +35,13 @@ namespace Beef.Core.UnitTest.Validation.Rules
         }
 
         [Test]
-        public void Validate_Nullable()
+        public async Task Validate_Nullable()
         {
             int? v = 1;
-            var v1 = v.Validate().CompareValue(CompareOperator.Equal, 1).Run();
+            var v1 = await v.Validate().CompareValue(CompareOperator.Equal, 1).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = v.Validate().CompareValue(CompareOperator.Equal, 2).Run();
+            v1 = await v.Validate().CompareValue(CompareOperator.Equal, 2).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value must be equal to 2.", v1.Messages[0].Text);

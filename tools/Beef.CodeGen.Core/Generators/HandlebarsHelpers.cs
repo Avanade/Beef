@@ -52,6 +52,30 @@ namespace Beef.CodeGen.Generators
                     context.Template(writer, parameters);
             });
 
+            // Will check that the first argument is less than or equal to the subsequent arguments.
+            Handlebars.RegisterHelper("ifle", (writer, context, parameters, args) =>
+            {
+                if (!CheckArgs("ifle", writer, args))
+                    return;
+
+                if (IfLe(args))
+                    context.Template(writer, parameters);
+                else
+                    context.Inverse(writer, parameters);
+            });
+
+            // Will check that the first argument is greater than or equal to the subsequent arguments.
+            Handlebars.RegisterHelper("ifge", (writer, context, parameters, args) =>
+            {
+                if (!CheckArgs("ifge", writer, args))
+                    return;
+
+                if (IfGe(args))
+                    context.Template(writer, parameters);
+                else
+                    context.Inverse(writer, parameters);
+            });
+
             // Will check that all of the arguments have a non-<c>null</c> value.
             Handlebars.RegisterHelper("ifval", (writer, context, parameters, args) =>
             {
@@ -123,6 +147,9 @@ namespace Beef.CodeGen.Generators
             // Converts a value to pascalcase.
             Handlebars.RegisterHelper("pascal", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPascalCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
 
+            // Converts a value to private case.
+            Handlebars.RegisterHelper("private", (writer, context, parameters) => writer.WriteSafeString(StringConversion.ToPrivateCase(parameters.FirstOrDefault()?.ToString()) ?? ""));
+
             // Converts a value to the c# '<see cref="value"/>' comments equivalent.
             Handlebars.RegisterHelper("seecomments", (writer, context, parameters) => writer.WriteSafeString(ConfigBase.ToSeeComments(parameters.FirstOrDefault()?.ToString())));
 
@@ -168,6 +195,54 @@ namespace Beef.CodeGen.Generators
                 0 => true,
                 1 => args[0] == null,
                 2 => Comparer.Default.Compare(args[0], RValConvert(args[0], args[1])) == 0,
+                _ => func()
+            };
+        }
+
+        /// <summary>
+        /// Perform the actual IfLe equality check.
+        /// </summary>
+        private static bool IfLe(object[] args)
+        {
+            bool func()
+            {
+                for (int i = 1; i < args.Length; i++)
+                {
+                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) >= 0)
+                        return false;
+                }
+
+                return true;
+            }
+
+            return args.Length switch
+            {
+                0 => false,
+                1 => false,
+                _ => func()
+            };
+        }
+
+        /// <summary>
+        /// Perform the actual IfGe equality check.
+        /// </summary>
+        private static bool IfGe(object[] args)
+        {
+            bool func()
+            {
+                for (int i = 1; i < args.Length; i++)
+                {
+                    if (Comparer.Default.Compare(args[0], RValConvert(args[0], args[i])) <= 0)
+                        return false;
+                }
+
+                return true;
+            }
+
+            return args.Length switch
+            {
+                0 => false,
+                1 => false,
                 _ => func()
             };
         }

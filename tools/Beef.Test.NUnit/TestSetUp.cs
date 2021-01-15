@@ -33,7 +33,7 @@ namespace Beef.Test.NUnit
         private static Type? _refAgentServiceType;
         private static Type? _refAgentType;
         private static Func<object?, string> _usernameConverter = (x) => x?.ToString()!;
-        private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername! };
+        private static Func<string?, object?, ExecutionContext> _executionContextCreator = (username, _) => new ExecutionContext { Username = username ?? DefaultUsername! ?? throw new InvalidOperationException($"{nameof(DefaultUsername)} must not be null.") };
         internal static readonly Dictionary<Type, Type> _webApiAgentArgsTypes = new Dictionary<Type, Type>() { { typeof(IWebApiAgentArgs), typeof(WebApiAgentArgs) } };
 
         #region Setup

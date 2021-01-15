@@ -133,6 +133,14 @@ parameters: [
         public string? Validator { get; set; }
 
         /// <summary>
+        /// Gets or sets the name of the .NET Interface that the `Validator` implements/inherits.
+        /// </summary>
+        [JsonProperty("iValidator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The name of the .NET Interface that the `Validator` implements/inherits.",
+            Description = "Defaults to `IValidator<{Type}>` where the `{Type}` is `Type`.")]
+        public string? IValidator { get; set; }
+
+        /// <summary>
         /// Gets or sets the fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).
         /// </summary>
         [JsonProperty("validatorCode", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -298,6 +306,7 @@ parameters: [
             Nullable = DefaultWhereNull(Nullable, () => pc == null ? !IgnoreNullableTypes.Contains(Type!) : pc.Nullable);
             LayerPassing = DefaultWhereNull(LayerPassing, () => "All");
             RefDataList = DefaultWhereNull(RefDataList, () => pc?.RefDataList);
+            IValidator = DefaultWhereNull(IValidator, () => Validator != null ? $"IValidator<{Type}>" : null);
             DataConverter = DefaultWhereNull(DataConverter, () => pc?.DataConverter);
             DataConverterIsGeneric = DefaultWhereNull(DataConverterIsGeneric, () => pc?.DataConverterIsGeneric);
             WebApiFrom = DefaultWhereNull(WebApiFrom, () => RelatedEntity == null ? "FromQuery" : "FromEntityProperties");

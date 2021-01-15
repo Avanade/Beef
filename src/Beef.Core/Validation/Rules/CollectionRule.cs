@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -270,7 +271,7 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, IEnumerable}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
             if (context.Value == null)
@@ -290,7 +291,7 @@ namespace Beef.Validation.Rules
                 // Validate and merge.
                 if (Item?.Validator != null)
                 {
-                    var r = Item.Validator.Validate(item, args);
+                    var r = await Item.Validator.ValidateAsync(item, args).ConfigureAwait(false);
                     context.MergeResult(r);
                     if (r.HasErrors)
                         hasItemErrors = true;

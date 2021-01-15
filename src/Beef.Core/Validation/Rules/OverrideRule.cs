@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -13,6 +14,7 @@ namespace Beef.Validation.Rules
     public class OverrideRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
         private readonly Func<TEntity, TProperty>? _func;
+        private readonly Func<TEntity, Task<TProperty>>? _funcAsync;
         private readonly TProperty _value = default!;
 
         /// <summary>
@@ -22,6 +24,15 @@ namespace Beef.Validation.Rules
         public OverrideRule(Func<TEntity, TProperty> func)
         {
             _func = Beef.Check.NotNull(func, nameof(func));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OverrideRule{TEntity, TProperty}"/> class with a <paramref name="funcAsync"/>.
+        /// </summary>
+        /// <param name="funcAsync">The override function.</param>
+        public OverrideRule(Func<TEntity, Task<TProperty>> funcAsync)
+        {
+            _funcAsync = Beef.Check.NotNull(funcAsync, nameof(funcAsync));
         }
 
         /// <summary>
@@ -42,14 +53,20 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary> 
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
-            var overrideVal = _func != null ? _func(context.Parent.Value) : _value;
 
             // Compare the value against override to see if there is a difference.
             if (OnlyOverrideDefault && Comparer<TProperty>.Default.Compare(context.Value, default!) != 0)
                 return;
+
+            // Get the override value.
+            var overrideVal = _func != null 
+                ? _func(context.Parent.Value) 
+                : (_funcAsync != null
+                    ? await _funcAsync(context.Parent.Value).ConfigureAwait(false)
+                    : _value);
 
             context.OverrideValue(overrideVal);
         }

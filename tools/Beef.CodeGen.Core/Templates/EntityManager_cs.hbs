@@ -38,10 +38,12 @@ namespace {{Root.NamespaceBusiness}}
     /// </summary>
     public partial class {{Name}}Manager{{#if GenericWithT}}<T>{{/if}} : I{{Name}}Manager{{#if GenericWithT}}<T>{{/if}}
     {
-{{#if RequiresDataSvc}}
-        private readonly I{{Name}}DataSvc _dataService;
+{{#each ManagerCtorParameters}}
+        private readonly {{Type}} {{PrivateName}};
+  {{#if @last}}
 
-{{/if}}
+  {{/if}}
+{{/each}}
 {{#if ManagerExtensions}}
         #region Extensions
         #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
@@ -62,13 +64,20 @@ namespace {{Root.NamespaceBusiness}}
         /// <summary>
         /// Initializes a new instance of the <see cref="{{Name}}Manager"/> class.
         /// </summary>
-{{#if RequiresDataSvc}}
-        /// <param name="dataService">The <see cref="I{{Name}}DataSvc"/>.</param>
-        {{lower ManagerConstructor}} {{Name}}Manager(I{{Name}}DataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); {{Name}}ManagerCtor(); }
+{{#each ManagerCtorParameters}}
+        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+{{/each}}
+        {{lower ManagerConstructor}} {{Name}}Manager({{#each ManagerCtorParameters}}{{#unless @first}}, {{/unless}}{{Type}} {{ArgumentName}}{{/each}})
+{{#ifle ManagerCtorParameters.Count 3}}
+            { {{#each ManagerCtorParameters}}{{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}})); {{/each}}{{Name}}ManagerCtor(); }
 {{else}}
-        {{lower ManagerConstructor}} {{Name}}Manager() => {{Name}}ManagerCtor();
-{{/if}}
+        {
+  {{#each ManagerCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{Name}}ManagerCtor();
+        }
+{{/ifle}}
 
         partial void {{Name}}ManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -85,13 +94,13 @@ namespace {{Root.NamespaceBusiness}}
   {{#if HasReturnValue}}
         /// <returns>{{{ReturnText}}}</returns>
   {{/if}}
-        public {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
+        public async {{{OperationTaskReturnType}}} {{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{{ParameterType}}} {{ArgumentName}}{{/each}})
         {
   {{#ifeq Type 'Create' 'Update'}}
-            value.Validate(nameof(value)).Mandatory().Run().ThrowOnError();
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
 
   {{/ifeq}}
-            return ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {{#if HasReturnValue}}return {{/if}}await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
   {{#ifval AuthRole}}
                 ExecutionContext.Current.IsInRole("{{AuthRole}}", true);
@@ -122,19 +131,19 @@ namespace {{Root.NamespaceBusiness}}
     {{/if}}
     {{#if SingleValidateParameters}}
       {{#each ValidateParameters}}
-                {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.Run().ThrowOnError();
+                (await {{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{private Validator}}){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}}.RunAsync().ConfigureAwait(false)).ThrowOnError();
       {{/each}}
     {{else}}
-                MultiValidator.Create()
+                (await MultiValidator.Create()
       {{#each ValidateParameters}}
-                    .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{Validator}}.Default){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
+                    .Add({{ArgumentName}}.Validate(nameof({{ArgumentName}})){{#if IsMandatory}}.Mandatory(){{/if}}{{#ifval Validator}}.Entity({{private Validator}}){{/ifval}}{{#ifval ValidatorCode}}.{{ValidatorCode}}{{/ifval}})
       {{/each}}
       {{#if Parent.ManagerExtensions}}
         {{#unless SingleValidateParameters}}
                     .Additional((__mv) => {{PrivateName}}OnValidate?.Invoke(__mv{{#each Parameters}}, {{ArgumentName}}{{/each}}))
         {{/unless}}
       {{/if}}
-                    .Run().ThrowOnError();
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
     {{/if}}
     {{#if Parent.ManagerExtensions}}
@@ -148,7 +157,7 @@ namespace {{Root.NamespaceBusiness}}
                 {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
     {{/if}}
   {{/if}}
-            }{{#if ManagerTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
+            }{{#if ManagerTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}).ConfigureAwait(false);
         }
 {{/each}}
     }

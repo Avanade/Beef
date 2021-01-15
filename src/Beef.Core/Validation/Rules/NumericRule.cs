@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -21,13 +22,13 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             // Where allowing negatives or the value is null, do nothing; i.e. Nullable<Type>.
             Beef.Check.NotNull(context, nameof(context));
 
             if (AllowNegatives || Comparer<object>.Default.Compare(context.Value!, null!) == 0)
-                return;
+                return Task.CompletedTask;
 
             // Convert numeric to a double value.
             double value = Convert.ToDouble(context.Value, System.Globalization.CultureInfo.InvariantCulture);
@@ -35,6 +36,8 @@ namespace Beef.Validation.Rules
             // Determine if the value is negative and is/isn't allowed.
             if (!AllowNegatives && value < 0)
                 context.CreateErrorMessage(ErrorText ?? ValidatorStrings.AllowNegativesFormat);
+
+            return Task.CompletedTask;
         }
     }
 }

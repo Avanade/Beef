@@ -4,6 +4,7 @@ using Beef.WebApi;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Beef.Validation.Rules
 {
@@ -15,9 +16,9 @@ namespace Beef.Validation.Rules
     public class ExistsRule<TEntity, TProperty> : ValueRuleBase<TEntity, TProperty> where TEntity : class
     {
         private readonly Predicate<TEntity>? _predicate;
-        private readonly Func<bool>? _exists;
-        private readonly Func<TEntity, object>? _existsNotDefault;
-        private readonly Func<TEntity, WebApiAgentResult>? _agentResult;
+        private readonly Func<TEntity, Task<bool>>? _exists;
+        private readonly Func<TEntity, Task<object>>? _existsNotNull;
+        private readonly Func<TEntity, Task<WebApiAgentResult>>? _agentResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExistsRule{TEntity, TProperty}"/> class with a <paramref name="predicate"/>.
@@ -32,7 +33,7 @@ namespace Beef.Validation.Rules
         /// Initializes a new instance of the <see cref="ExistsRule{TEntity, TProperty}"/> class with an <paramref name="exists"/> function that must return true.
         /// </summary>
         /// <param name="exists">The exists function.</param>
-        public ExistsRule(Func<bool> exists)
+        public ExistsRule(Func<TEntity, Task<bool>> exists)
         {
             _exists = exists ?? throw new ArgumentNullException(nameof(exists));
         }
@@ -41,9 +42,9 @@ namespace Beef.Validation.Rules
         /// Initializes a new instance of the <see cref="ExistsRule{TEntity, TProperty}"/> class with an <paramref name="exists"/> function that must return a value.
         /// </summary>
         /// <param name="exists">The exists function.</param>
-        public ExistsRule(Func<TEntity, object> exists)
+        public ExistsRule(Func<TEntity, Task<object>> exists)
         {
-            _existsNotDefault = exists ?? throw new ArgumentNullException(nameof(exists));
+            _existsNotNull = exists ?? throw new ArgumentNullException(nameof(exists));
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace Beef.Validation.Rules
         /// <remarks>A result of <see cref="WebApiAgentResult.IsSuccess"/> implies exists, whilst a <see cref="WebApiAgentResult.StatusCode"/> of <see cref="HttpStatusCode.NotFound"/> does not.
         /// Any other status code will result in the underlying <see cref="WebApiAgentResult.Response"/> <see cref="HttpResponseMessage.EnsureSuccessStatusCode"/> being invoked resulting in an
         /// appropriate exception being thrown.</remarks>
-        public ExistsRule(Func<TEntity, WebApiAgentResult> agentResult)
+        public ExistsRule(Func<TEntity, Task<WebApiAgentResult>> agentResult)
         {
             _agentResult = agentResult ?? throw new ArgumentNullException(nameof(agentResult));
         }
@@ -62,7 +63,7 @@ namespace Beef.Validation.Rules
         /// Validate the property value.
         /// </summary>
         /// <param name="context">The <see cref="PropertyContext{TEntity, TProperty}"/>.</param>
-        public override void Validate(PropertyContext<TEntity, TProperty> context)
+        public override async Task ValidateAsync(PropertyContext<TEntity, TProperty> context)
         {
             Beef.Check.NotNull(context, nameof(context));
 
@@ -73,12 +74,12 @@ namespace Beef.Validation.Rules
             }
             else if (_exists != null)
             {
-                if (!_exists())
+                if (!await _exists(context.Parent.Value).ConfigureAwait(false))
                     CreateErrorMessage(context);
             }
             else if (_agentResult != null)
             {
-                var r = _agentResult(context.Parent.Value);
+                var r = await _agentResult(context.Parent.Value).ConfigureAwait(false);
                 if (r == null || r.Response == null)
                     throw new InvalidOperationException("The WebApiAgentResult value is in an invalid state; the underlying Response property must not be null.");
 
@@ -92,7 +93,7 @@ namespace Beef.Validation.Rules
             }
             else
             {
-                if (_existsNotDefault!(context.Parent.Value) == null)
+                if (await _existsNotNull!(context.Parent.Value).ConfigureAwait(false) == null)
                     CreateErrorMessage(context);
             }
         }
