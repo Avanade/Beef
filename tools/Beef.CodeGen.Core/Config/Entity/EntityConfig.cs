@@ -1272,16 +1272,6 @@ entities:
             if (RequiresDataSvc)
                 ManagerCtorParameters.Add(new ParameterConfig { Name = "DataService", Type = $"I{Name}DataSvc", Text = $"{{{{I{Name}DataSvc}}}}" });
 
-            foreach (var o in Operations!)
-            {
-                foreach (var p in o.Parameters!.Where(x => x.Validator != null))
-                {
-                    var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator, Text = $"{{{{{p.IValidator}}}}}" };
-                    if (!ManagerCtorParameters.Any(x => x.Name == pc.Name))
-                        ManagerCtorParameters.Add(pc);
-                }
-            }
-
             AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
             foreach (var ctor in ManagerCtorParameters)
             {

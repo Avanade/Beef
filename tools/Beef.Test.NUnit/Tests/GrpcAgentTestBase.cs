@@ -105,7 +105,7 @@ namespace Beef.Test.NUnit.Tests
                 Assert.Fail($"Expected ErrorMessage was '{_expectedErrorMessage}'; actual was '{result.ErrorMessage}'.");
 
             if (_expectedMessages != null)
-                ExpectValidationException.CompareExpectedVsActual(_expectedMessages, result.Messages);
+                TesterBase.CompareExpectedVsActualMessages(_expectedMessages, result.Messages);
         }
 
         /// <summary>

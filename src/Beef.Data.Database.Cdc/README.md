@@ -155,13 +155,13 @@ The underlying [`Program.cs`](./../../samples/Demo/Beef.Demo.Database/Program.cs
 ``` csharp
 // Using DbUp; use: DatabaseWithCdc.xml
 return DatabaseConsoleWrapper
-    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated ecurity=True", "Beef", "Demo")
+    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated security=True", "Beef", "Demo")
     .DatabaseScript("DatabaseWithCdc.xml")
     .RunAsync(args);
 
 // Using DACPAC; use: DatabaseWithCdcDacpac.xml
 return DatabaseConsoleWrapper
-    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated ecurity=True", "Beef", "Demo")
+    .Create("Data Source=.;Initial Catalog=Beef.Demo;Integrated security=True", "Beef", "Demo")
     .DatabaseScript("DatabaseWithCdcDacpac.xml")
     .RunAsync(args);
 ```
@@ -186,8 +186,8 @@ As [stated](#Database-code-generation) earlier, where using DbUp the [Migration]
 dotnet run codegen --script DatabaseCdcTracking.xml
 
 -- Create (each) `XxxEnvelope.sql` by specifying the unique CdcName as configured.
-dotnet run database --script DatabaseCdcEnvelope.xml --param CdcName=Contact
-dotnet run database --script DatabaseCdcEnvelope.xml --param CdcName=Posts
+dotnet run codegen --script DatabaseCdcEnvelope.xml --param CdcName=Contact
+dotnet run codegen --script DatabaseCdcEnvelope.xml --param CdcName=Posts
 ```
 
 <br/>

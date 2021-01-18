@@ -35,6 +35,44 @@ namespace Beef.Validation.Rules
     }
 
     /// <summary>
+    /// Provides the means to create a <see cref="CollectionRuleItem{TItemEntity}"/> instance.
+    /// </summary>
+    public static class CollectionRuleItem
+    {
+        /// <summary>
+        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with no <see cref="Validator"/>.
+        /// </summary>
+        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
+        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
+        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>() where TItemEntity : class
+        {
+            return new CollectionRuleItem<TItemEntity>(null);
+        }
+
+        /// <summary>
+        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
+        /// </summary>
+        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
+        /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
+        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
+        public static CollectionRuleItem<TItemEntity> Create<TItemEntity>(IValidator<TItemEntity> validator) where TItemEntity : class
+        {
+            return new CollectionRuleItem<TItemEntity>(validator ?? throw new ArgumentNullException(nameof(validator)));
+        }
+
+        /// <summary>
+        /// Create an instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// </summary>
+        /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValidator">The item validator <see cref="Type"/>.</typeparam>
+        /// <returns>The <see cref="CollectionRuleItem{TItemEntity}"/>.</returns>
+        public static CollectionRuleItem<TItemEntity> Create<TItemEntity, TValidator>() where TItemEntity : class where TValidator : IValidator<TItemEntity>
+        {
+            return new CollectionRuleItem<TItemEntity>(ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true));
+        }
+    }
+
+    /// <summary>
     /// Provides validation configuration for an item within a <see cref="CollectionRule{TEntity, TProperty}"/>.
     /// </summary>
     /// <typeparam name="TItemEntity">The item entity <see cref="Type"/>.</typeparam>
@@ -46,17 +84,12 @@ namespace Beef.Validation.Rules
         private bool _ignoreWhereUniqueKeyIsInitial = false;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with no <see cref="Validator"/>.
-        /// </summary>
-        public CollectionRuleItem() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CollectionRuleItem{TItemEntity}"/> class with a corresponding <paramref name="validator"/>.
         /// </summary>
-        /// <param name="validator">The corresponding item <see cref="Validator{TItemEntity}"/>.</param>
-        public CollectionRuleItem(Validator<TItemEntity>? validator)
+        /// <param name="validator">The corresponding item <see cref="IValidator{TItemEntity}"/>.</param>
+        internal CollectionRuleItem(IValidator<TItemEntity>? validator)
         {
-            Validator = validator ?? throw new ArgumentNullException(nameof(validator));
+            Validator = validator;
         }
 
         /// <summary>
@@ -65,9 +98,9 @@ namespace Beef.Validation.Rules
         IValidator? ICollectionRuleItem.Validator => Validator;
 
         /// <summary>
-        /// Gets the corresponding item <see cref="Validator{TItemEntity}"/>.
+        /// Gets the corresponding item <see cref="IValidator{TItemEntity}"/>.
         /// </summary>
-        public Validator<TItemEntity>? Validator { get; private set; }
+        public IValidator<TItemEntity>? Validator { get; private set; }
 
         /// <summary>
         /// Gets the item <see cref="Type"/>.

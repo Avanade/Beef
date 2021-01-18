@@ -62,6 +62,7 @@ namespace Beef.Demo.Api
 
             // Add the generated entity services for dependency injection requirements.
             services.AddGeneratedManagerServices()
+                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 

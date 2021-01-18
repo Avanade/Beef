@@ -1,18 +1,23 @@
 ﻿// Copyright (c) Avanade. Licensed under the MIT License. See https://github.com/Avanade/Beef
 
 using Beef.Caching.Policy;
+using Beef.Entities;
 using Beef.Events;
 using Beef.Test.NUnit.Events;
 using Beef.Test.NUnit.Logging;
 using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using System;
+using System.Linq;
+using System.Text;
 
 namespace Beef.Test.NUnit.Tests
 {
     /// <summary>
     /// Represents the generic base tester.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class TesterBase
     {
         private readonly ServiceCollection _serviceCollection = new ServiceCollection();
@@ -90,6 +95,38 @@ namespace Beef.Test.NUnit.Tests
         {
             sc.Remove<IEventPublisher>();
             sc.AddSingleton<IEventPublisher>(_ => ExpectEvent.EventPublisher);
+        }
+
+        /// <summary>
+        /// Compares the expected versus actual messages and reports the differences.
+        /// </summary>
+        /// <param name="expectedMessages">The expected messages.</param>
+        /// <param name="actualMessages">The actual messages.</param>
+        public static void CompareExpectedVsActualMessages(MessageItemCollection? expectedMessages, MessageItemCollection? actualMessages)
+        {
+            var exp = (from e in expectedMessages ?? new MessageItemCollection()
+                       where !(actualMessages ?? new MessageItemCollection()).Any(a => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
+                       select e).ToList();
+
+            var act = (from a in actualMessages ?? new MessageItemCollection()
+                       where !(expectedMessages ?? new MessageItemCollection()).Any(e => a.Type == e.Type && a.Text == e.Text && (e.Property == null || a.Property == e.Property))
+                       select a).ToList();
+
+            var sb = new StringBuilder();
+            if (exp.Count > 0)
+            {
+                sb.AppendLine(" Expected messages not matched:");
+                exp.ForEach(m => sb.AppendLine($"  {m.Type}: {m.Text} {(m.Property != null ? $"[{m.Property}]" : null)}"));
+            }
+
+            if (act.Count > 0)
+            {
+                sb.AppendLine(" Actual messages not matched:");
+                act.ForEach(m => sb.AppendLine($"  {m.Type}: {m.Text} {(m.Property != null ? $"[{m.Property}]" : null)}"));
+            }
+
+            if (sb.Length > 0)
+                Assert.Fail($"Messages mismatch:{System.Environment.NewLine}{sb}");
         }
     }
 }

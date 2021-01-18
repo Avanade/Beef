@@ -66,10 +66,10 @@ namespace Beef.Core.UnitTest.Validation.Rules
         {
             var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
-            var v1 = await new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).RunAsync();
+            var v1 = await new TestItem[0].Validate().Collection(item: CollectionRuleItem.Create(iv)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
-            v1 = await new TestItem[] { new TestItem() }.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv)).RunAsync();
+            v1 = await new TestItem[] { new TestItem() }.Validate().Collection(item: CollectionRuleItem.Create(iv)).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Code is required.", v1.Messages[0].Text);
@@ -82,16 +82,16 @@ namespace Beef.Core.UnitTest.Validation.Rules
         {
             var iv = Validator.Create<TestItem>().HasProperty(x => x.Code, p => p.Mandatory());
 
-            var v1 = await new TestItem[0].Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
+            var v1 = await new TestItem[0].Validate().Collection(item: CollectionRuleItem.Create(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
             var tis = new TestItem[] { new TestItem { Code = "ABC", Text = "Abc" }, new TestItem { Code = "DEF", Text = "Def" }, new TestItem { Code = "GHI", Text = "Ghi" } };
 
-            v1 = await tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
+            v1 = await tis.Validate().Collection(item:  CollectionRuleItem.Create(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsFalse(v1.HasError);
 
             tis[2].Code = "ABC";
-            v1 = await tis.Validate().Collection(item: new CollectionRuleItem<TestItem>(iv).DuplicateCheck(x => x.Code)).RunAsync();
+            v1 = await tis.Validate().Collection(item: CollectionRuleItem.Create(iv).DuplicateCheck(x => x.Code)).RunAsync();
             Assert.IsTrue(v1.HasError);
             Assert.AreEqual(1, v1.Messages.Count);
             Assert.AreEqual("Value contains duplicates; Code value 'ABC' specified more than once.", v1.Messages[0].Text);

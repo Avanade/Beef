@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* The `ExpectValidationException` class has been deprecated; the more fully featured `ValidationTester` should be used as the alternative.
+
 ## v4.1.3
 - *Fixed:* Issue [83](https://github.com/Avanade/Beef/issues/83) fixed. `ExpectEventPublisher` updated to swallow (ignore) events raised where the `ExecutionContext.CorrelationId` is `null`; versus throw an exception.
 

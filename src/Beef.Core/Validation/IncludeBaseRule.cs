@@ -14,13 +14,13 @@ namespace Beef.Validation
         where TEntity : class
         where TInclude : class
     {
-        private readonly ValidatorBase<TInclude> _include;
+        private readonly IValidator<TInclude> _include;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IncludeBaseRule{TEntity, TInclude}"/> class.
         /// </summary>
-        /// <param name="include">The base <see cref="ValidatorBase{TInclude}"/>.</param>
-        internal IncludeBaseRule(ValidatorBase<TInclude> include)
+        /// <param name="include">The base <see cref="IValidator{TInclude}"/>.</param>
+        internal IncludeBaseRule(IValidator<TInclude> include)
         {
             _include = Check.NotNull(include, nameof(include));
         }
@@ -44,9 +44,12 @@ namespace Beef.Validation
                 UseJsonNames = context.UseJsonNames
             });
 
-            foreach (var r in _include.Rules)
+            if (_include is ValidatorBase<TInclude> vb) // Victoria Bitter, for a hard-earned thirst: https://www.youtube.com/watch?v=WA1h9h7-_Z4
             {
-                await r.ValidateAsync(ctx).ConfigureAwait(false);
+                foreach (var r in vb.Rules)
+                {
+                    await r.ValidateAsync(ctx).ConfigureAwait(false);
+                }
             }
 
             context.MergeResult(ctx);

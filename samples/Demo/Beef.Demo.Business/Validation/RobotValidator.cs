@@ -6,7 +6,7 @@ namespace Beef.Demo.Business.Validation
     /// <summary>
     /// Represents a <see cref="Robot"/> validator.
     /// </summary>
-    public class RobotValidator : Validator<Robot, RobotValidator>
+    public class RobotValidator : Validator<Robot>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotValidator"/>.

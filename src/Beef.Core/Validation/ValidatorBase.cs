@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Beef.Validation
 {
     /// <summary>
-    /// Enables a <see cref="ValidateAsync(object, ValidationArgs)"/>.
+    /// Enables a <see cref="ValidateAsync(object?, ValidationArgs)"/>.
     /// </summary>
     public interface IValidator
     {
@@ -18,7 +18,7 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
-        Task<IValidationContext> ValidateAsync(object value, ValidationArgs args);
+        Task<IValidationContext> ValidateAsync(object? value, ValidationArgs args);
 
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
@@ -85,9 +85,9 @@ namespace Beef.Validation
         /// <param name="value">The entity value.</param>
         /// <param name="args">An optional <see cref="ValidationArgs"/>.</param>
         /// <returns>The resulting <see cref="IValidationContext"/>.</returns>
-        async Task<IValidationContext> IValidator.ValidateAsync(object value, ValidationArgs args)
+        async Task<IValidationContext> IValidator.ValidateAsync(object? value, ValidationArgs args)
         {
-            return await ValidateAsync((TEntity)value, args).ConfigureAwait(false);
+            return await ValidateAsync((TEntity)value!, args).ConfigureAwait(false);
         }
 
 #pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, need not be overridden.

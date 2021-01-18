@@ -495,6 +495,11 @@ entities:
         public RefDataConfig? RefData { get; private set; }
 
         /// <summary>
+        /// Gets the list of all the used validators.
+        /// </summary>
+        public List<ParameterConfig> Validators { get; } = new List<ParameterConfig>();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         protected override void Prepare()
@@ -532,6 +537,22 @@ entities:
 
             RefData = new RefDataConfig();
             RefData.Prepare(Root!, this);
+
+            if (Entities != null && Entities.Count > 0)
+            {
+                foreach (var e in Entities)
+                {
+                    foreach (var o in e.Operations!)
+                    {
+                        foreach (var p in o.Parameters!.Where(x => x.IValidator != null))
+                        {
+                            var pc = new ParameterConfig { Name = p.Validator, Type = p.IValidator };
+                            if (!Validators.Any(x => x.Type == pc.Type))
+                                Validators.Add(pc);
+                        }
+                    }
+                }
+            }
         }
     }
 }

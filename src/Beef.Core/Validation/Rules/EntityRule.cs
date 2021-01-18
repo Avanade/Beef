@@ -14,7 +14,7 @@ namespace Beef.Validation.Rules
     public class EntityRule<TEntity, TProperty, TValidator> : ValueRuleBase<TEntity, TProperty>
         where TEntity : class
         where TProperty : class?
-        where TValidator : class, IValidator<TProperty>
+        where TValidator : IValidator
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityRule{TEntity, TProperty, TValidator}"/> class.
@@ -61,30 +61,31 @@ namespace Beef.Validation.Rules
     }
 
     /// <summary>
-    /// Provides a means to add an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> with a validator <see cref="TypeOf"/> leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+    /// Provides a means to add an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> using a validator <see cref="With"/> a specified validator <see cref="Type"/>.
     /// </summary>
     /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
     /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
-    public class EntityRuleUsing<TEntity, TProperty> 
+    public class EntityRuleWith<TEntity, TProperty> 
         where TEntity : class
-        where TProperty : class
+        where TProperty : class?
     {
         private readonly PropertyRuleBase<TEntity, TProperty> _parent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityRuleUsing{TEntity, TProperty}"/> class.
+        /// Initializes a new instance of the <see cref="EntityRuleWith{TEntity, TProperty}"/> class.
         /// </summary>
         /// <param name="parent"></param>
-        public EntityRuleUsing(PropertyRuleBase<TEntity, TProperty> parent) => _parent = parent;
+        public EntityRuleWith(PropertyRuleBase<TEntity, TProperty> parent) => _parent = parent;
 
         /// <summary>
-        /// Adds an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> with a <i>type of</i> <typeparamref name="TValidator"/> leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// Adds an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> using a validator <see cref="With"/> a specified <typeparamref name="TValidator"/>
+        /// (leverages the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance at runtime).
         /// </summary>
         /// <typeparam name="TValidator">The property validator <see cref="Type"/>.</typeparam>
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
-        public PropertyRuleBase<TEntity, TProperty> TypeOf<TValidator>() where TValidator : IValidator<TProperty>
+        public PropertyRuleBase<TEntity, TProperty> With<TValidator>() where TValidator : IValidator
         {
-            _parent.AddRule(new EntityRule<TEntity, TProperty, TValidator>(ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)));
+            _parent.AddRule(new EntityRule<TEntity, TProperty, TValidator>(ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!));
             return _parent;
         }
     }

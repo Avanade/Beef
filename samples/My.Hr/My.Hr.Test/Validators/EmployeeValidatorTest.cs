@@ -37,6 +37,7 @@ namespace My.Hr.Test.Validators
         public void A110_Validate_Initial()
         {
             ValidationTester.Test()
+                .C
                 .ExpectMessages(
                     "First Name is required.",
                     "Email is required.",

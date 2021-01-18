@@ -2,12 +2,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Beef
 {
     /// <summary>
     /// Provides pre-condition checking.
     /// </summary>
+    [DebuggerStepThrough]
     public static class Check
     {
         /// <summary>

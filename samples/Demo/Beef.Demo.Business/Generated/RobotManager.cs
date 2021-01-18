@@ -26,25 +26,15 @@ namespace Beef.Demo.Business
     public partial class RobotManager : IRobotManager
     {
         private readonly IRobotDataSvc _dataService;
-        private readonly IValidator<Robot> _robotValidator;
-        private readonly IValidator<RobotArgs> _robotArgsValidator;
         private readonly Beef.Events.IEventPublisher _eventPublisher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
-        /// <param name="robotValidator">The <see cref="IValidator{Robot}"/>.</param>
-        /// <param name="robotArgsValidator">The <see cref="IValidator{RobotArgs}"/>.</param>
         /// <param name="eventPublisher">The <see cref="Beef.Events.IEventPublisher"/>.</param>
-        public RobotManager(IRobotDataSvc dataService, IValidator<Robot> robotValidator, IValidator<RobotArgs> robotArgsValidator, Beef.Events.IEventPublisher eventPublisher)
-        {
-            _dataService = Check.NotNull(dataService, nameof(dataService));
-            _robotValidator = Check.NotNull(robotValidator, nameof(robotValidator));
-            _robotArgsValidator = Check.NotNull(robotArgsValidator, nameof(robotArgsValidator));
-            _eventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
-            RobotManagerCtor();
-        }
+        public RobotManager(IRobotDataSvc dataService, Beef.Events.IEventPublisher eventPublisher)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); _eventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher)); RobotManagerCtor(); }
 
         partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -77,7 +67,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
-                (await value.Validate(nameof(value)).Entity(_robotValidator).RunAsync().ConfigureAwait(false)).ThrowOnError();
+                (await value.Validate(nameof(value)).Entity().With<IValidator<Robot>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
             }).ConfigureAwait(false);
         }
@@ -97,7 +87,7 @@ namespace Beef.Demo.Business
                 ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
-                (await value.Validate(nameof(value)).Entity(_robotValidator).RunAsync().ConfigureAwait(false)).ThrowOnError();
+                (await value.Validate(nameof(value)).Entity().With<IValidator<Robot>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
             }).ConfigureAwait(false);
         }
@@ -129,7 +119,7 @@ namespace Beef.Demo.Business
             {
                 ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
-                (await args.Validate(nameof(args)).Entity(_robotArgsValidator).RunAsync().ConfigureAwait(false)).ThrowOnError();
+                (await args.Validate(nameof(args)).Entity().With<IValidator<RobotArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
             }).ConfigureAwait(false);
         }

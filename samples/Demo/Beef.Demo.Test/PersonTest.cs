@@ -1,7 +1,6 @@
 using Beef.Demo.Api;
 using Beef.Demo.Business;
 using Beef.Demo.Business.DataSvc;
-using Beef.Demo.Business.Validation;
 using Beef.Demo.Common.Agents;
 using Beef.Demo.Common.Entities;
 using Beef.Entities;
@@ -23,45 +22,61 @@ namespace Beef.Demo.Test
         #region Validators
 
         [Test, TestSetUp]
-        public void A110_Validation_Null()
+        public async Task A110_Validation_Null()
         {
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(null),
-                "Value is required.");
+            await ValidationTester.Test()
+                .ExpectMessages("Value is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(null));
 
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).UpdateAsync(null, 1.ToGuid()),
-                "Value is required.");
+            await ValidationTester.Test()
+                .ExpectMessages("Value is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(null, 1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public async Task A110_Validation_Empty()
+        public async Task A120_Validation_Empty()
         {
-            await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(new Person()),
-                "First Name is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.");
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name is required.",
+                    "Last Name is required.",
+                    "Gender is required.",
+                    "Birthday is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()));
 
-            await ExpectValidationException.ThrowsAsync(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).UpdateAsync(new Person(), 1.ToGuid()),
-                "First Name is required.",
-                "Last Name is required.",
-                "Gender is required.",
-                "Birthday is required.");
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name is required.",
+                    "Last Name is required.",
+                    "Gender is required.",
+                    "Birthday is required.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(new Person(), 1.ToGuid()));
         }
 
         [Test, TestSetUp]
-        public void A130_Validation_Invalid()
+        public async Task A130_Validation_Invalid()
         {
-            ExpectValidationException.Throws(
-                () => new PersonManager(new Mock<IPersonDataSvc>().Object, new PersonValidator(), new PersonArgsValidator(), new PersonDetailValidator()).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
-                "First Name must not exceed 50 characters in length.",
-                "Last Name must not exceed 50 characters in length.",
-                "Gender is invalid.",
-                "Eye Color is invalid.",
-                "Birthday must be less than or equal to Today.");
+            //var rd = new Mock<IReferenceDataAgent>();
+            //rd.Setup(x => x.GenderGetAllAsync(null, null)).ReturnsWebApiAgentResultAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+            //rd.Setup(x => x.GenderGetAllAsync(null, null)).ReturnsWebApiAgentResultAsync(new GenderCollection { new Gender { Id = Guid.NewGuid(), Code = "F" } });
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .ExpectMessages(
+                    "First Name must not exceed 50 characters in length.",
+                    "Last Name must not exceed 50 characters in length.",
+                    "Gender is invalid.",
+                    "Eye Color is invalid.",
+                    "Birthday must be less than or equal to Today.")
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }));
+//ExpectValidationException.Throws(
+//                () => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }),
+//                "First Name must not exceed 50 characters in length.",
+//                "Last Name must not exceed 50 characters in length.",
+//                "Gender is invalid.",
+//                "Eye Color is invalid.",
+//                "Birthday must be less than or equal to Today.");
         }
 
         [Test, TestSetUp]

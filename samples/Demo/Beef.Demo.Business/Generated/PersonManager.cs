@@ -26,9 +26,6 @@ namespace Beef.Demo.Business
     public partial class PersonManager : IPersonManager
     {
         private readonly IPersonDataSvc _dataService;
-        private readonly IValidator<Person> _personValidator;
-        private readonly IValidator<PersonArgs> _personArgsValidator;
-        private readonly IValidator<PersonDetail> _personDetailValidator;
 
         #region Extensions
         #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
@@ -155,17 +152,8 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        /// <param name="personValidator">The <see cref="IValidator{Person}"/>.</param>
-        /// <param name="personArgsValidator">The <see cref="IValidator{PersonArgs}"/>.</param>
-        /// <param name="personDetailValidator">The <see cref="IValidator{PersonDetail}"/>.</param>
-        public PersonManager(IPersonDataSvc dataService, IValidator<Person> personValidator, IValidator<PersonArgs> personArgsValidator, IValidator<PersonDetail> personDetailValidator)
-        {
-            _dataService = Check.NotNull(dataService, nameof(dataService));
-            _personValidator = Check.NotNull(personValidator, nameof(personValidator));
-            _personArgsValidator = Check.NotNull(personArgsValidator, nameof(personArgsValidator));
-            _personDetailValidator = Check.NotNull(personDetailValidator, nameof(personDetailValidator));
-            PersonManagerCtor();
-        }
+        public PersonManager(IPersonDataSvc dataService)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
 
         partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -185,7 +173,7 @@ namespace Beef.Demo.Business
                 if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(_personValidator))
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
                     .Additional((__mv) => _createOnValidate?.Invoke(__mv, value))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -262,7 +250,7 @@ namespace Beef.Demo.Business
                 if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(_personValidator))
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
                     .Additional((__mv) => _updateOnValidate?.Invoke(__mv, value, id))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -333,7 +321,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(_personArgsValidator))
+                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
                     .Additional((__mv) => _getByArgsOnValidate?.Invoke(__mv, args, paging))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -359,7 +347,7 @@ namespace Beef.Demo.Business
                 if (_getDetailByArgsOnPreValidateAsync != null) await _getDetailByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(_personArgsValidator))
+                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
                     .Additional((__mv) => _getDetailByArgsOnValidate?.Invoke(__mv, args, paging))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -506,7 +494,7 @@ namespace Beef.Demo.Business
                 if (_updateDetailOnPreValidateAsync != null) await _updateDetailOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(_personDetailValidator))
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<PersonDetail>>())
                     .Additional((__mv) => _updateDetailOnValidate?.Invoke(__mv, value, id))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -605,7 +593,7 @@ namespace Beef.Demo.Business
                 if (_getByArgsWithEfOnPreValidateAsync != null) await _getByArgsWithEfOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(args.Validate(nameof(args)).Entity(_personArgsValidator))
+                    .Add(args.Validate(nameof(args)).Entity().With<IValidator<PersonArgs>>())
                     .Additional((__mv) => _getByArgsWithEfOnValidate?.Invoke(__mv, args, paging))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -701,7 +689,7 @@ namespace Beef.Demo.Business
                 if (_createWithEfOnPreValidateAsync != null) await _createWithEfOnPreValidateAsync(value).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(_personValidator))
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
                     .Additional((__mv) => _createWithEfOnValidate?.Invoke(__mv, value))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
@@ -730,7 +718,7 @@ namespace Beef.Demo.Business
                 if (_updateWithEfOnPreValidateAsync != null) await _updateWithEfOnPreValidateAsync(value, id).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
-                    .Add(value.Validate(nameof(value)).Entity(_personValidator))
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
                     .Additional((__mv) => _updateWithEfOnValidate?.Invoke(__mv, value, id))
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 

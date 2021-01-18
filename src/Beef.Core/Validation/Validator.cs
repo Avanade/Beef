@@ -103,11 +103,13 @@ namespace Beef.Validation
         /// Adds a <see cref="IncludeBaseRule{TEntity, TInclude}"/> to the validator to enable a base validator to be included within the validator rule set.
         /// </summary>
         /// <typeparam name="TInclude">The include <see cref="Type"/> in which <typeparamref name="TEntity"/> inherits from.</typeparam>
-        /// <param name="include">The <see cref="IncludeBaseRule{TEntity, TInclude}"/> to add.</param>
+        /// <param name="include">The <see cref="IValidator{TInclude}"/> to include (add).</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
-        public Validator<TEntity> IncludeBase<TInclude>(ValidatorBase<TInclude> include)
+        public Validator<TEntity> IncludeBase<TInclude>(IValidator<TInclude> include)
             where TInclude : class
         {
+            Check.NotNull(include, nameof(include));
+
             if (!typeof(TEntity).GetTypeInfo().IsSubclassOf(typeof(TInclude)))
                 throw new ArgumentException($"Type {typeof(TEntity).Name} must inherit from {typeof(TInclude).Name}.");
 
@@ -117,6 +119,18 @@ namespace Beef.Validation
                 _currentRuleSet.Rules.Add(new IncludeBaseRule<TEntity, TInclude>(include));
 
             return this;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="IncludeBaseRule{TEntity, TInclude}"/> to the validator to enable a base validator to be included within the validator rule set leveraging the underlying
+        /// <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// </summary>
+        /// <typeparam name="TInclude">The include <see cref="Type"/> in which <typeparamref name="TEntity"/> inherits from.</typeparam>
+        /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
+        public Validator<TEntity> IncludeBase<TInclude>()
+            where TInclude : class
+        {
+            return IncludeBase(ExecutionContext.GetService<IValidator<TInclude>>(throwExceptionOnNull: true)!);
         }
 
         /// <summary>

@@ -62,24 +62,24 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public async Task Ruleset_UsingValidatorClass()
         {
-            var r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "A", Text = "X" });
+            var r = await new TestItemValidator().ValidateAsync(new TestItem { Code = "A", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "A", Text = "A" });
+            r = await new TestItemValidator().ValidateAsync(new TestItem { Code = "A", Text = "A" });
             Assert.IsFalse(r.HasErrors);
 
-            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "B", Text = "X" });
+            r = await new TestItemValidator().ValidateAsync(new TestItem { Code = "B", Text = "X" });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(1, r.Messages.Count);
             Assert.AreEqual("Description is invalid.", r.Messages[0].Text);
             Assert.AreEqual(MessageType.Error, r.Messages[0].Type);
             Assert.AreEqual("Text", r.Messages[0].Property);
 
-            r = await TestItemValidator.Default.ValidateAsync(new TestItem { Code = "B", Text = "B" });
+            r = await new TestItemValidator().ValidateAsync(new TestItem { Code = "B", Text = "B" });
             Assert.IsFalse(r.HasErrors);
         }
 
@@ -131,7 +131,7 @@ namespace Beef.Core.UnitTest.Validation
         [Test]
         public async Task Override_OnValidate_WithCheckPredicate()
         {
-            var r = await TestItemValidator2.Default.ValidateAsync(new TestItem(), new ValidationArgs { UseJsonNames = true });
+            var r = await new TestItemValidator2().ValidateAsync(new TestItem(), new ValidationArgs { UseJsonNames = true });
             Assert.IsTrue(r.HasErrors);
             Assert.AreEqual(2, r.Messages.Count);
 
@@ -191,7 +191,7 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(2, r.Messages.Count);
         }
         
-        public class TestItemValidator : Validator<TestItem, TestItemValidator>
+        public class TestItemValidator : Validator<TestItem>
         {
             public TestItemValidator()
             {
@@ -207,7 +207,7 @@ namespace Beef.Core.UnitTest.Validation
             }
         }
 
-        public class TestItemValidator2 : Validator<TestItem, TestItemValidator2>
+        public class TestItemValidator2 : Validator<TestItem>
         {
             protected override Task OnValidateAsync(ValidationContext<TestItem> context)
             {
@@ -251,7 +251,7 @@ namespace Beef.Core.UnitTest.Validation
             var v = Validator.Create<TestItem>();
 
             var r = await Validator.Create<TestEntity>()
-                .HasProperty(x => x.Items, p => p.Collection(item: new CollectionRuleItem<TestItem>(v).DuplicateCheck(y => y.Code)))
+                .HasProperty(x => x.Items, p => p.Collection(item: CollectionRuleItem.Create(v).DuplicateCheck(y => y.Code)))
                 .ValidateAsync(e);
 
             Assert.IsNotNull(r);

@@ -92,6 +92,7 @@
     <None Remove="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsData_cs.hbs" />
     <None Remove="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
+    <None Remove="Templates\ServiceCollectionExtensionsValidation_cs.hbs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -161,6 +162,7 @@
     <EmbeddedResource Include="Templates\ReferenceDataProvider_cs.hbs" />
     <EmbeddedResource Include="Templates\ReferenceData_cs.hbs" />
     <EmbeddedResource Include="Templates\EntityWebApiAgentArgs_cs.hbs" />
+    <EmbeddedResource Include="Templates\ServiceCollectionExtensionsValidation_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsManager_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsDataSvc_cs.hbs" />
     <EmbeddedResource Include="Templates\ServiceCollectionExtensionsData_cs.hbs" />

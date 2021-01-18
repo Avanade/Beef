@@ -736,24 +736,25 @@ namespace Beef.Validation
         /// <returns>A <see cref="PropertyRule{TEntity, TProperty}"/>.</returns>
         public static PropertyRuleBase<TEntity, TProperty> Entity<TEntity, TProperty, TValidator>(this PropertyRuleBase<TEntity, TProperty> rule, TValidator validator)
             where TEntity : class
-            where TProperty : class
-            where TValidator : IValidator<TProperty>
+            where TProperty : class?
+            where TValidator : IValidator
         {
             return Check.NotNull(rule, nameof(rule)).AddRule(new EntityRule<TEntity, TProperty, TValidator>(validator));
         }
 
         /// <summary>
-        /// Enables the add of an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> with a validator <see cref="EntityRuleUsing{TEntity, TProperty}.TypeOf{TValidator}"/> leveraging the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance.
+        /// Enables the addition of an <see cref="EntityRule{TEntity, TProperty, TValidator}"/> using a validator <see cref="EntityRuleWith{TEntity, TProperty}.With{TValidator}"/> a specified validator <see cref="Type"/>
+        /// (leverages the underlying <see cref="ExecutionContext.GetService{T}(bool)">service provider</see> to get the instance at runtime).
         /// </summary>
         /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
         /// <typeparam name="TProperty">The property <see cref="Type"/>.</typeparam>
         /// <param name="rule">The <see cref="PropertyRule{TEntity, TProperty}"/> being extended.</param>
-        /// <returns>An <see cref="EntityRuleUsing{TEntity, TProperty}"/>.</returns>
-        public static EntityRuleUsing<TEntity, TProperty> EntityUsing<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule)
+        /// <returns>An <see cref="EntityRuleWith{TEntity, TProperty}"/>.</returns>
+        public static EntityRuleWith<TEntity, TProperty> Entity<TEntity, TProperty>(this PropertyRuleBase<TEntity, TProperty> rule)
             where TEntity : class
-            where TProperty : class
+            where TProperty : class?
         {
-            return new EntityRuleUsing<TEntity, TProperty>(Check.NotNull(rule, nameof(rule)));
+            return new EntityRuleWith<TEntity, TProperty>(Check.NotNull(rule, nameof(rule)));
         }
 
         #endregion
