@@ -110,7 +110,6 @@ Provides the _Operation_ configuration. These primarily provide a shorthand to c
 
 Property | Description
 -|-
-**`validator`** | The name of the .NET `Type` that will perform the validation. Only used for `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `get` | Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.
 `getAll` | Indicates that a `GetAll` operation will be automatically generated where not otherwise explicitly specified.
 `create` | Indicates that a `Create` operation will be automatically generated where not otherwise explicitly specified.
@@ -136,7 +135,8 @@ Property | Description
 -|-
 **`webApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s).
 **`webApiAuthorize`** | The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`. Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.
-`webApiConstructor` | The access modifier for the generated Web API `Controller` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`webApiCtor` | The access modifier for the generated Web API `Controller` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+**`webApiCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 
 <br/>
 
@@ -145,8 +145,11 @@ Provides the _Manager-layer_ configuration.
 
 Property | Description
 -|-
-`managerConstructor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`managerCtor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+**`managerCtorParams`** | The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `managerExtensions` | Indicates whether the `Manager` extensions logic should be generated.
+**`validator`** | The name of the .NET `Type` that will perform the validation. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
+`iValidator` | The name of the .NET Interface that the `Validator` implements/inherits. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 
 <br/>
 
@@ -157,7 +160,8 @@ Property | Description
 -|-
 `dataSvcCaching` | Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.
 `eventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
-`dataSvcConstructor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`dataSvcCtor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`dataSvcCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.
 
 <br/>
@@ -169,7 +173,8 @@ Property | Description
 -|-
 **`autoImplement`** | The data source auto-implementation option. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.
 `mapperAddStandardProperties` | Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`. Defaults to `true`.
-`dataConstructor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`dataCtor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
+`dataCtorParams` | The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `dataExtensions` | Indicates whether the `Data` extensions logic should be generated.
 
 <br/>

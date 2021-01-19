@@ -373,6 +373,11 @@
                             <xs:documentation>The name of the .NET `Type` that will perform the validation.</xs:documentation>
                           </xs:annotation>
                         </xs:attribute>
+                        <xs:attribute name="IValidator" use="optional" type="xs:string">
+                          <xs:annotation>
+                            <xs:documentation>The name of the .NET Interface that the `Validator` implements/inherits. Defaults to `IValidator&lt;{Type}&gt;` where the `{Type}` is `Type`.</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
                         <xs:attribute name="ValidatorFluent" use="optional" type="xs:string">
                           <xs:annotation>
                             <xs:documentation>The fluent-style method-chaining C# validator code to append to `IsMandatory` and `Validator` (where specified).</xs:documentation>
@@ -450,11 +455,6 @@
                   <xs:attribute name="Text" use="optional" type="xs:string">
                     <xs:annotation>
                       <xs:documentation>The text for use in comments. The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `&lt;see cref="XXX"/&gt;` within use moustache shorthand (e.g. {{Xxx}}).</xs:documentation>
-                    </xs:annotation>
-                  </xs:attribute>
-                  <xs:attribute name="Validator" use="optional" type="xs:string">
-                    <xs:annotation>
-                      <xs:documentation>The name of the .NET Type that will perform the validation. Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="UniqueKey" use="optional" type="xs:boolean">
@@ -539,6 +539,16 @@
                   <xs:attribute name="ManagerTransaction" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="Validator" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the .NET Type that will perform the validation. Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="IValidator" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The name of the .NET Interface that the `Validator` implements/inherits. Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator&lt;{Type}&gt;` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
                   <xs:attribute name="DataSvcCustom" use="optional" type="xs:boolean">
@@ -885,11 +895,6 @@
                 <xs:documentation>The base class that a `CollectionResult` inherits from. Defaults to `EntityCollectionResult`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Validator" use="optional" type="xs:string">
-              <xs:annotation>
-                <xs:documentation>The name of the .NET `Type` that will perform the validation. Only used for `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="Get" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified.</xs:documentation>
@@ -950,6 +955,11 @@
                   <xs:enumeration value="Protected" />
                 </xs:restriction>
               </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="DataCtorParams" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+              </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataExtensions" use="optional" type="xs:boolean">
               <xs:annotation>
@@ -1078,6 +1088,11 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="DataSvcCtorParams" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="DataSvcExtensions" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether the `DataSvc` extensions logic should be generated.</xs:documentation>
@@ -1095,9 +1110,24 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
+            <xs:attribute name="ManagerCtorParams" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="ManagerExtensions" use="optional" type="xs:boolean">
               <xs:annotation>
                 <xs:documentation>Indicates whether the `Manager` extensions logic should be generated.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="Validator" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The name of the .NET `Type` that will perform the validation. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="IValidator" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The name of the .NET Interface that the `Validator` implements/inherits. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="WebApiRoutePrefix" use="optional" type="xs:string">
@@ -1110,7 +1140,7 @@
                 <xs:documentation>The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`). Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="WebApiConstructor" use="optional">
+            <xs:attribute name="WebApiCtor" use="optional">
               <xs:annotation>
                 <xs:documentation>The access modifier for the generated Web API `Controller` constructor. Defaults to `Public`.</xs:documentation>
               </xs:annotation>
@@ -1121,6 +1151,11 @@
                   <xs:enumeration value="Protected" />
                 </xs:restriction>
               </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="WebApiCtorParams" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+              </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataModel" use="optional" type="xs:boolean">
               <xs:annotation>

@@ -354,11 +354,6 @@
               "title": "The base class that a `CollectionResult` inherits from.",
               "description": "Defaults to `EntityCollectionResult`."
             },
-            "validator": {
-              "type": "string",
-              "title": "The name of the .NET `Type` that will perform the validation.",
-              "description": "Only used for `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly."
-            },
             "get": {
               "type": "boolean",
               "title": "Indicates that a `Get` operation will be automatically generated where not otherwise explicitly specified."
@@ -400,7 +395,7 @@
               "title": "Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`.",
               "description": "Defaults to `true`."
             },
-            "dataConstructor": {
+            "dataCtor": {
               "type": "string",
               "title": "The access modifier for the generated `Data` constructor.",
               "description": "Defaults to `Public`.",
@@ -408,6 +403,17 @@
                 "Public",
                 "Private",
                 "Protected"
+              ]
+            },
+            "dataCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
+              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
               ]
             },
             "dataExtensions": {
@@ -516,7 +522,7 @@
               "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
               "description": "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc."
             },
-            "dataSvcConstructor": {
+            "dataSvcCtor": {
               "type": "string",
               "title": "The access modifier for the generated `DataSvc` constructor.",
               "description": "Defaults to `Public`.",
@@ -526,11 +532,22 @@
                 "Protected"
               ]
             },
+            "dataSvcCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
+              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
             "dataSvcExtensions": {
               "type": "boolean",
               "title": "Indicates whether the `DataSvc` extensions logic should be generated."
             },
-            "managerConstructor": {
+            "managerCtor": {
               "type": "string",
               "title": "The access modifier for the generated `Manager` constructor.",
               "description": "Defaults to `Public`.",
@@ -540,9 +557,30 @@
                 "Protected"
               ]
             },
+            "managerCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.",
+              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
             "managerExtensions": {
               "type": "boolean",
               "title": "Indicates whether the `Manager` extensions logic should be generated."
+            },
+            "validator": {
+              "type": "string",
+              "title": "The name of the .NET `Type` that will perform the validation.",
+              "description": "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly."
+            },
+            "iValidator": {
+              "type": "string",
+              "title": "The name of the .NET Interface that the `Validator` implements/inherits.",
+              "description": "Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly."
             },
             "webApiRoutePrefix": {
               "type": "string",
@@ -554,7 +592,7 @@
               "title": "The authorize attribute value to be used for the corresponding entity Web API controller; generally either `Authorize` or `AllowAnonymous`.",
               "description": "Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also."
             },
-            "webApiConstructor": {
+            "webApiCtor": {
               "type": "string",
               "title": "The access modifier for the generated Web API `Controller` constructor.",
               "description": "Defaults to `Public`.",
@@ -562,6 +600,17 @@
                 "Public",
                 "Private",
                 "Protected"
+              ]
+            },
+            "webApiCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.",
+              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
               ]
             },
             "dataModel": {
@@ -964,11 +1013,6 @@
                       "title": "The text for use in comments.",
                       "description": "The `Text` will be defaulted for all the `Operation.Type` options with the exception of `Custom`. To create a `<see cref=\"XXX\"/>` within use moustache shorthand (e.g. {{Xxx}})."
                     },
-                    "validator": {
-                      "type": "string",
-                      "title": "The name of the .NET Type that will perform the validation.",
-                      "description": "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`."
-                    },
                     "uniqueKey": {
                       "type": "boolean",
                       "title": "Indicates whether the properties marked as a unique key (`Property.UniqueKey`) are to be used as the parameters.",
@@ -1047,6 +1091,16 @@
                     "managerTransaction": {
                       "type": "boolean",
                       "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `Manager`-layer."
+                    },
+                    "validator": {
+                      "type": "string",
+                      "title": "The name of the .NET Type that will perform the validation.",
+                      "description": "Defaults to the `Entity.Validator` where not specified explicitly. Only used for `Operation.Type` options `Create` or `Update`."
+                    },
+                    "iValidator": {
+                      "type": "string",
+                      "title": "The name of the .NET Interface that the `Validator` implements/inherits.",
+                      "description": "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`."
                     },
                     "dataSvcCustom": {
                       "type": "boolean",
@@ -1289,6 +1343,11 @@
                             "validator": {
                               "type": "string",
                               "title": "The name of the .NET `Type` that will perform the validation."
+                            },
+                            "iValidator": {
+                              "type": "string",
+                              "title": "The name of the .NET Interface that the `Validator` implements/inherits.",
+                              "description": "Defaults to `IValidator<{Type}>` where the `{Type}` is `Type`."
                             },
                             "validatorCode": {
                               "type": "string",
