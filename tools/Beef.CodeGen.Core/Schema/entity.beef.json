@@ -407,8 +407,8 @@
             },
             "dataCtorParams": {
               "type": "array",
-              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
-              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
               "items": [
                 {
                   "type": "string",
@@ -534,8 +534,8 @@
             },
             "dataSvcCtorParams": {
               "type": "array",
-              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
-              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
               "items": [
                 {
                   "type": "string",
@@ -559,8 +559,8 @@
             },
             "managerCtorParams": {
               "type": "array",
-              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.",
-              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
               "items": [
                 {
                   "type": "string",
@@ -604,8 +604,8 @@
             },
             "webApiCtorParams": {
               "type": "array",
-              "title": "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.",
-              "description": "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
+              "title": "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.",
               "items": [
                 {
                   "type": "string",

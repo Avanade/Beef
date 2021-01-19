@@ -343,8 +343,8 @@ entities:
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.
         /// </summary>
         [JsonProperty("dataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.",
-            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+        [PropertyCollectionSchema("Data", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.",
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
         public List<string>? DataCtorParams { get; set; }
 
@@ -555,8 +555,8 @@ entities:
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.
         /// </summary>
         [JsonProperty("dataSvcCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("DataSvc", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.",
-            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+        [PropertyCollectionSchema("DataSvc", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.",
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
         public List<string>? DataSvcCtorParams { get; set; }
 
@@ -583,8 +583,8 @@ entities:
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.
         /// </summary>
         [JsonProperty("managerCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("Manager", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.", IsImportant = true,
-            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+        [PropertyCollectionSchema("Manager", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.", IsImportant = true,
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
         public List<string>? ManagerCtorParams { get; set; }
 
@@ -643,8 +643,8 @@ entities:
         /// Gets or sets the list of extended (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.
         /// </summary>
         [JsonProperty("webApiCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertyCollectionSchema("WebApi", Title = "The list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.", IsImportant = true,
-            Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+        [PropertyCollectionSchema("WebApi", Title = "The list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.", IsImportant = true,
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                 "Where the `Type` matches an already inferred value it will be ignored.")]
         public List<string>? WebApiCtorParams { get; set; }
 

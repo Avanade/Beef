@@ -146,26 +146,26 @@ namespace Beef.CodeGen.Config
 
             (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerCtorParams", typeof(string), new PropertySchemaAttribute("Manager")
                 {
-                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor.", IsImportant = true,
-                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor.", IsImportant = true,
+                    Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                         "Where the `Type` matches an already inferred value it will be ignored."
                 }),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcCtorParams", typeof(string), new PropertySchemaAttribute("DataSvc")
                 {
-                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor.", IsImportant = true,
-                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor.", IsImportant = true,
+                    Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                         "Where the `Type` matches an already inferred value it will be ignored."
                 }),
             (ConfigType.Entity, ConfigurationEntity.Entity, "DataCtorParams", typeof(string), new PropertySchemaAttribute("Data")
                 {
-                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor.", IsImportant = true,
-                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor.", IsImportant = true,
+                    Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                         "Where the `Type` matches an already inferred value it will be ignored."
                 }),
             (ConfigType.Entity, ConfigurationEntity.Entity, "WebApiCtorParams", typeof(string), new PropertySchemaAttribute("WebApi")
                 {
-                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor.", IsImportant = true,
-                    Description = "Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
+                    Title = "The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor.", IsImportant = true,
+                    Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. " +
                         "Where the `Type` matches an already inferred value it will be ignored."
                 }),
 

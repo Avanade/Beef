@@ -958,7 +958,7 @@
             </xs:attribute>
             <xs:attribute name="DataCtorParams" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataExtensions" use="optional" type="xs:boolean">
@@ -1090,7 +1090,7 @@
             </xs:attribute>
             <xs:attribute name="DataSvcCtorParams" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataSvcExtensions" use="optional" type="xs:boolean">
@@ -1112,7 +1112,7 @@
             </xs:attribute>
             <xs:attribute name="ManagerCtorParams" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ManagerExtensions" use="optional" type="xs:boolean">
@@ -1154,7 +1154,7 @@
             </xs:attribute>
             <xs:attribute name="WebApiCtorParams" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
+                <xs:documentation>The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataModel" use="optional" type="xs:boolean">

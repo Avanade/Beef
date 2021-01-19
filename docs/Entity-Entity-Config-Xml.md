@@ -118,7 +118,7 @@ Property | Description
 **`WebApiRoutePrefix`** | The `RoutePrefixAtttribute` for the corresponding entity Web API controller. This is the base (prefix) `URI` for the entity and can be further extended when defining the underlying `Operation`(s).
 `WebApiAuthorize` | The authorize attribute value to be used for the corresponding entity Web API controller; generally `Authorize` (or `true`), otherwise `AllowAnonymous` (or `false`). Defaults to the `CodeGeneration.WebApiAuthorize` configuration property (inherits) where not specified; can be overridden at the `Operation` level also.
 `WebApiCtor` | The access modifier for the generated Web API `Controller` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
-**`WebApiCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `WebApi` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
+**`WebApiCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `WebApi` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 
 <br/>
 
@@ -128,7 +128,7 @@ Provides the _Manager-layer_ configuration.
 Property | Description
 -|-
 `ManagerConstructor` | The access modifier for the generated `Manager` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
-**`ManagerCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Manager` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
+**`ManagerCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Manager` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `ManagerExtensions` | Indicates whether the `Manager` extensions logic should be generated.
 **`Validator`** | The name of the .NET `Type` that will perform the validation. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
 `IValidator` | The name of the .NET Interface that the `Validator` implements/inherits. Only used for defaulting the `Create` and `Update` operation types (`Operation.Type`) where not specified explicitly.
@@ -143,7 +143,7 @@ Property | Description
 `DataSvcCaching` | Indicates whether request-based `IRequestCache` caching is to be performed at the `DataSvc` layer to improve performance (i.e. reduce chattiness). Defaults to `true`.
 `EventPublish` | Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation. Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc.
 `DataSvcConstructor` | The access modifier for the generated `DataSvc` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
-**`DataSvcCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `DataSvc` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
+**`DataSvcCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `DataSvc` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `DataSvcExtensions` | Indicates whether the `DataSvc` extensions logic should be generated.
 
 <br/>
@@ -156,7 +156,7 @@ Property | Description
 **`AutoImplement`** | The data source auto-implementation option. Valid options are: `Database`, `EntityFramework`, `Cosmos`, `OData`, `None`. Defaults to `None`. Indicates that the implementation for the underlying `Operations` will be auto-implemented using the selected data source (unless explicity overridden). When selected some of the related attributes will also be required (as documented). Additionally, the `AutoImplement` indicator must be selected for each underlying `Operation` that is to be auto-implemented.
 `MapperAddStandardProperties` | Indicates that the `AddStandardProperties` method call is to be included for the generated (corresponding) `Mapper`. Defaults to `true`.
 `DataConstructor` | The access modifier for the generated `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
-**`DataCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) arguments for the generated `Data` constructor. Each constructor argument should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
+**`DataCtorParams`** | The comma seperated list of additional (non-inferred) Dependency Injection (DI) parameters for the generated `Data` constructor. Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored.
 `DataExtensions` | Indicates whether the `Data` extensions logic should be generated.
 
 <br/>
