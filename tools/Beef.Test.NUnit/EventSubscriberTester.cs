@@ -6,13 +6,15 @@ using Beef.Test.NUnit.Tests;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Manages the orchestration of the subscriber tester to execute one or more integration tests against. 
+    /// Manages the testing of an event subscriber with integrated mocking of services as required.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
+    [DebuggerStepThrough]
     public class EventSubscriberTester<TStartup> : TesterBase where TStartup : class, new()
     {
         private class Fhb : IFunctionsHostBuilder
@@ -25,7 +27,7 @@ namespace Beef.Test.NUnit
         /// <summary>
         /// Initializes a new instance of the <see cref="EventSubscriberTester{TStartup}"/> class.
         /// </summary>
-        public EventSubscriberTester() : base(false)
+        internal EventSubscriberTester() : base(configureLocalRefData: true, inheritServiceCollection: true)
         {
             // TODO: Come back and revisit.
             // string? environmentVariablePrefix = null, string embeddedFilePrefix = "funcsettings", string environment = TestSetUp.DefaultEnvironment, Action<ConfigurationBuilder>? configurationBuilder = null, Action<IServiceCollection>? services = null
@@ -33,13 +35,14 @@ namespace Beef.Test.NUnit
 
             var sc = new ServiceCollection();
 
+            // Load the service collection from TStartup.Configure(IFunctionsHostBuilder).
             var mi = typeof(TStartup).GetMethod("Configure", new Type[] { typeof(IFunctionsHostBuilder) });
             if (mi == null)
                 throw new InvalidOperationException($"TStartup '{typeof(TStartup).Name}' must implement a 'Configure(IFunctionsHostBuilder)' method.");
 
             mi.Invoke(new TStartup(), new object[] { new Fhb(sc) });
 
-            //services?.Invoke(_serviceCollection);
+            // Finish up and build the service provider.
             sc.AddLogging(configure => configure.AddCorrelationId());
             ReplaceEventPublisher(sc);
             ServiceProvider = sc.BuildServiceProvider();
@@ -61,6 +64,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Provides the default testing capabilities for the <see cref="EventSubscriberTester{TStartup}"/>.
     /// </summary>
+    [DebuggerStepThrough]
     public static class EventSubscriberTester
     {
         /// <summary>

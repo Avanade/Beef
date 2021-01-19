@@ -11,6 +11,7 @@ namespace Beef.Business
     /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <b> business tier</b> invocations using
     /// a <see cref="BusinessInvokerArgs"/> to configure the <see cref="TransactionScope"/> and <see cref="BusinessInvokerArgs.ExceptionHandler">exception handling</see>. 
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class BusinessInvokerBase : InvokerBase<BusinessInvokerArgs>
     {
         #region NoResult

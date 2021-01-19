@@ -17,7 +17,7 @@ namespace Beef.Test.NUnit.Tests
     /// Provides the base gRPC <b>Agent</b> test capabilities.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public abstract class GrpcAgentTestBase<TStartup> : AgentTestCore<TStartup> where TStartup : class
     {
         /// <summary>

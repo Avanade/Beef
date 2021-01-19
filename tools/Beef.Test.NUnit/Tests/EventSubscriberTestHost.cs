@@ -2,6 +2,7 @@
 
 using Beef.Events;
 using Beef.Events.Subscribe;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit.Tests
@@ -9,6 +10,7 @@ namespace Beef.Test.NUnit.Tests
     /// <summary>
     /// Provides a <see cref="EventSubscriberHost"/> for testing <see cref="EventSubscriberBase">Subscribers</see>.
     /// </summary>
+    [DebuggerStepThrough()]
     public class EventSubscriberTestHost : EventSubscriberHost
     {
         /// <summary>

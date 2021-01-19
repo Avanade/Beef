@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
@@ -19,6 +19,7 @@ namespace Beef.Test.NUnit
     /// <summary>
     /// Orchestrates the setup for testing; whilst also providing reusable utility methods.
     /// </summary>
+    [DebuggerStepThrough]
     public sealed class TestSetUp
     {
         private static readonly object _lock = new object();

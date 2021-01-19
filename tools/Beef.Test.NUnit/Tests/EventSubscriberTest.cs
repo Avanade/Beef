@@ -19,6 +19,7 @@ namespace Beef.Test.NUnit.Tests
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     /// <typeparam name="TSubscriber">The <see cref="IEventSubscriber"/> <see cref="Type"/> to test.</typeparam>
+    [DebuggerStepThrough()]
     public class EventSubscriberTest<TStartup, TSubscriber> where TStartup : class, new() where TSubscriber : IEventSubscriber
     {
         private readonly EventSubscriberTester<TStartup> _eventSubscriberTester;

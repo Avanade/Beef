@@ -15,7 +15,7 @@ namespace Beef.Test.NUnit.Tests
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
     /// <typeparam name="TAgent">The agent <see cref="Type"/>.</typeparam>
-    //[DebuggerStepThrough()]
+    [DebuggerStepThrough()]
     public class AgentTest<TStartup, TAgent> : AgentTestBase<TStartup> where TStartup : class where TAgent : WebApiAgentBase
     {
         /// <summary>

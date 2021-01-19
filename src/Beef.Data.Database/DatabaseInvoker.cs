@@ -12,6 +12,7 @@ namespace Beef.Data.Database
     /// Adds capabilities (wraps) an <see cref="InvokerBase{TParam}"/> enabling standard functionality to be added to all <see cref="DatabaseBase"/> invocations
     /// specifically exception handling (see <see cref="DatabaseBase.ExceptionHandler"/>).
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class DatabaseInvoker : InvokerBase<DatabaseBase>
     {
         #region NoResult

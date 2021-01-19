@@ -5,6 +5,7 @@ namespace Beef.Business
     /// <summary>
     /// Wraps a <b>Data Service invoke</b> enabling standard <b>business tier</b> functionality to be added to all invocations.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public class DataSvcInvoker : BusinessInvokerBase
     {
         /// <summary>

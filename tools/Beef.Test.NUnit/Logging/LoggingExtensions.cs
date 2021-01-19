@@ -3,12 +3,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace Beef.Test.NUnit.Logging
 {
     /// <summary>
     /// Provides the logging extensions.
     /// </summary>
+    [DebuggerStepThrough]
     public static class LoggingExtensions
     {
         /// <summary>

@@ -15,7 +15,7 @@ namespace Beef.Test.NUnit
     /// </summary>
     /// <remarks><see cref="TestSetUp.SetDefaultLocalReferenceData"/> is required to enable the reference data to function correctly. Where a <see cref="ExecutionContext.ServiceProvider"/> is 
     /// currently available this will be used versus creating new, minimizing the new to maintain (duplicate) the <see cref="ConfigureServices(Action{IServiceCollection})"/> logic.</remarks>
-    //[System.Diagnostics.DebuggerStepThrough]
+    [System.Diagnostics.DebuggerStepThrough]
     public sealed class ValidationTester : TesterBase
     {
         private readonly string? _username;
@@ -79,7 +79,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddSingletonService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceSingleton<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceSingleton(mockInstance));
             return this;
         }
 
@@ -90,7 +90,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddSingletonService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceSingleton<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceSingleton(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 
@@ -101,7 +101,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddScopedService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceScoped<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceScoped(mockInstance));
             return this;
         }
 
@@ -112,7 +112,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddScopedService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceScoped<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceScoped(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 
@@ -123,7 +123,7 @@ namespace Beef.Test.NUnit
         /// <param name="mockInstance">The instance value.</param>
         public ValidationTester AddTransientService<TService>(TService mockInstance) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceTransient<TService>(mockInstance));
+            ConfigureLocalServices(sc => sc.ReplaceTransient(mockInstance));
             return this;
         }
 
@@ -134,7 +134,7 @@ namespace Beef.Test.NUnit
         /// <param name="mock">The mock.</param>
         public ValidationTester AddTransientService<TService>(Moq.Mock<TService> mock) where TService : class
         {
-            ConfigureLocalServices(sc => sc.ReplaceTransient<TService>(Check.NotNull(mock, nameof(mock)).Object));
+            ConfigureLocalServices(sc => sc.ReplaceTransient(Check.NotNull(mock, nameof(mock)).Object));
             return this;
         }
 

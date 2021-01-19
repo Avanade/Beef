@@ -7,6 +7,7 @@ namespace Beef
     /// <summary>
     /// Provides the core capabilities for the <see cref="InvokerBase{TParam}"/> and enables the <see cref="GetCurrentInstance{TInvoker}(bool)"/>.
     /// </summary>
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class Invoker
     {
         /// <summary>

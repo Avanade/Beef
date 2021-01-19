@@ -11,6 +11,7 @@ namespace Beef.Entities
     /// Provides functions to clean a specified value.
     /// </summary>
     /// <seealso cref="ICleanUp"/>.
+    [System.Diagnostics.DebuggerStepThrough]
     public static class Cleaner
     {
         private static DateTimeTransform _dateTimeTransform = DateTimeTransform.DateTimeUtc;

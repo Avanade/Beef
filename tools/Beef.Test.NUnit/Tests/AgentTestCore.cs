@@ -16,7 +16,7 @@ namespace Beef.Test.NUnit.Tests
     /// Provides the core <b>Agent</b> test capabilities.
     /// </summary>
     /// <typeparam name="TStartup">The <see cref="Type"/> of the startup entry point.</typeparam>
-    //[DebuggerStepThrough()]
+    [System.Diagnostics.DebuggerStepThrough]
     public abstract class AgentTestCore<TStartup> where TStartup : class
     {
         internal HttpStatusCode? _expectedStatusCode;

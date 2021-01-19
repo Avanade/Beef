@@ -4,6 +4,7 @@ using Beef.Diagnostics;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Beef.Test.NUnit.Logging
@@ -12,6 +13,7 @@ namespace Beef.Test.NUnit.Logging
     /// Represents the <see cref="TestContextLogger"/> provider.
     /// </summary>
     [ProviderAlias("")]
+    [DebuggerStepThrough]
     public sealed class TestContextLoggerProvider : ILoggerProvider
     {
         /// <summary>
@@ -30,6 +32,7 @@ namespace Beef.Test.NUnit.Logging
     /// <summary>
     /// Represents a logger where all messages are written to an internal (in-memory) list by correlation identifier.
     /// </summary>
+    [DebuggerStepThrough]
     public sealed class TestContextLogger : ILogger
     {
         private readonly string _name;

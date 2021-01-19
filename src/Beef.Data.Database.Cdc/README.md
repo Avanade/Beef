@@ -36,7 +36,7 @@ To further guarantee only a single event for a specific version is published the
 
 The first activity is to enable CDC on the database and then enable on each of the tables; using the SQL Server system (native) stored procedures:
 - [`sys.sp_cdc_enable_db`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-db-transact-sql) - enables the database.
-- [`sys.sp_cdc_enable_table`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql) - enables the table (`@supports_net_changes` _must_ be selected).
+- [`sys.sp_cdc_enable_table`](https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sys-sp-cdc-enable-table-transact-sql) - enables the table. Please note that  `@supports_net_changes` **must** be selected (set to `1`).
 
 An example is as follows.
 
@@ -166,6 +166,11 @@ return DatabaseConsoleWrapper
     .RunAsync(args);
 ```
 
+Where _only_ looking to leverage CDC capabilities, and not the other _Beef_ related database artefacts, then substitute the `DatabaseScript` with the following.
+
+- `DatabaseScript("DatabaseWithCdc.xml")` -> `DatabaseScript("DatabaseCdc.xml")`.
+- `DatabaseScript("DatabaseWithCdcDacpac.xml")` -> `DatabaseScript("DatabaseCdcDacpac.xml")`.
+
 <br/>
 
 ### Database generated artefacts
@@ -178,6 +183,8 @@ Type | Name | Description
 `Table` | `XxxEnvelope.sql` | Represents the _Entity_ envelope table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next envelope. An envelope is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163747-create-democdc-postsenvelope.sql).
 `Type` | `udtTrackingList.sql` | Represents the user-defined type / table-valued parameter required to pass a list of key/hash values from .NET code to a SQL Stored Procedure. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Types/User-Defined%20Table%20Types/Generated/UdtCdcTrackingList.sql).
 `Stored Procedure` | `spExecuteXxxCdcEnvelope.sq` | Represents the **key** CDC-related logic. This stored procedure is responsible for getting the next envelope for an _Entity_, retrying an existing envelope, and completing an existing envelope. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcEnvelope.sql).
+
+_Tip:_ If any of the generated files are not automatically added to the Visual Studio Project structure, the _Show All Files_ in the _Solution Explorer_ can be used to view, and then individually added using _Include In Project_.
 
 As [stated](#Database-code-generation) earlier, where using DbUp the [Migration](./../../tools/Beef.Database.Core/README.md) Scripts [code-generation](#Code-generation) must be explicitly executed. The following represents the command line executions required.
 

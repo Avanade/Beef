@@ -6,6 +6,7 @@
 #nullable enable
 #pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
+using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;

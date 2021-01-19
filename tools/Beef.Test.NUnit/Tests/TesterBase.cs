@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -18,7 +19,7 @@ namespace Beef.Test.NUnit.Tests
     /// <summary>
     /// Represents the generic base tester.
     /// </summary>
-    [System.Diagnostics.DebuggerStepThrough]
+    [DebuggerStepThrough]
     public abstract class TesterBase
     {
         private const string ServiceCollectionKey = "!nt3rn4lS3rv1c3C0ll3ct10n"; // Obfuscated InternalServiceCollection
@@ -36,7 +37,7 @@ namespace Beef.Test.NUnit.Tests
             if (inheritServiceCollection && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ServiceCollectionKey, out var sc))
             {
                 var coll = (ICollection<ServiceDescriptor>)_serviceCollection;
-                foreach (var sd in ((ICollection<ServiceDescriptor>)sc))
+                foreach (var sd in (ICollection<ServiceDescriptor>)sc)
                 {
                     coll.Add(sd);
                 }

@@ -283,10 +283,10 @@ entities:
         #region Path
 
         /// <summary>
-        /// Gets or sets the base path (directory) for the artefacts.
+        /// Gets or sets the base path (directory) prefix for the artefacts.
         /// </summary>
         [JsonProperty("pathBase", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Path", Title = "The path (directory) for the Database-related artefacts.",
+        [PropertySchema("Path", Title = "The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
             Description = "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.")]
         public string? PathBase { get; set; }
 
