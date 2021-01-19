@@ -93,8 +93,8 @@ namespace My.Hr.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public EmployeeAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IHrWebApiAgentArgs"/>.</param>
+        public EmployeeAgent(IHrWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="Employee"/>.

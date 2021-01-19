@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--#if (implement_database) -->
-<CodeGeneration RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
+<CodeGeneration RefDataNamespace="Company.AppName.Common.Entities" RefDataWebApiRoute="api/v1/ref" AppBasedAgentArgs="true" xmlns="http://schemas.beef.com/codegen/2015/01/entity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.entity.xsd">
   <!-- The following is an example read-only reference data Entity accessing a SQL Database using Stored Procedures. -->
   <Entity Name="Gender" RefDataType="Guid" Collection="true" WebApiRoutePrefix="api/v1/ref/genders" AutoImplement="Database" DatabaseSchema="Ref" />
 <!--#endif -->

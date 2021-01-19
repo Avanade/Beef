@@ -72,6 +72,7 @@ namespace Cdr.Banking.Api
 
             // Add the generated services for dependency injection requirements.
             services.AddGeneratedManagerServices()
+                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 

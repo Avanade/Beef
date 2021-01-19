@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Cdr.Banking.Test
 {
@@ -15,11 +16,12 @@ namespace Cdr.Banking.Test
         #region ArgsValidator
 
         [Test, TestSetUp]
-        public void A110_ArgsValidator_Empty()
+        public async Task A110_ArgsValidator_Empty()
         {
             var ta = new TransactionArgs();
-            var r = TransactionArgsValidator.Default.Validate(ta);
-            Assert.IsFalse(r.HasErrors);
+            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
+
+            Assert.IsFalse(r!.HasErrors);
             Assert.AreEqual(DateTime.UtcNow.Date.AddDays(-90), ta.FromDate!.Value.Date);
             Assert.IsNull(ta.ToDate);
             Assert.IsNull(ta.MinAmount);
@@ -28,11 +30,12 @@ namespace Cdr.Banking.Test
         }
 
         [Test, TestSetUp]
-        public void A120_ArgsValidator_ToDateOnly()
+        public async Task A120_ArgsValidator_ToDateOnly()
         {
             var ta = new TransactionArgs { ToDate = new DateTime(2020, 03, 01) };
-            var r = TransactionArgsValidator.Default.Validate(ta);
-            Assert.IsFalse(r.HasErrors);
+            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
+
+            Assert.IsFalse(r!.HasErrors);
             Assert.AreEqual(new DateTime(2020, 03, 01).AddDays(-90), ta.FromDate);
             Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
             Assert.IsNull(ta.MinAmount);
@@ -41,11 +44,12 @@ namespace Cdr.Banking.Test
         }
 
         [Test, TestSetUp]
-        public void A130_ArgsValidator_ValidSame()
+        public async Task A130_ArgsValidator_ValidSame()
         {
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 03, 01), MinAmount = 100m, MaxAmount = 100m, Text = "Best Buy" };
-            var r = TransactionArgsValidator.Default.Validate(ta);
-            Assert.IsFalse(r.HasErrors);
+            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
+
+            Assert.IsFalse(r!.HasErrors);
             Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
             Assert.AreEqual(new DateTime(2020, 03, 01), ta.ToDate);
             Assert.AreEqual(100m, ta.MinAmount);
@@ -54,11 +58,12 @@ namespace Cdr.Banking.Test
         }
 
         [Test, TestSetUp]
-        public void A140_ArgsValidator_ValidDiff()
+        public async Task A140_ArgsValidator_ValidDiff()
         {
             var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 04, 01), MinAmount = 100m, MaxAmount = 120m, Text = "Best Buy" };
-            var r = TransactionArgsValidator.Default.Validate(ta);
-            Assert.IsFalse(r.HasErrors);
+            var r = await ValidationTester.Test().RunAsync(async () => await new TransactionArgsValidator().ValidateAsync(ta));
+
+            Assert.IsFalse(r!.HasErrors);
             Assert.AreEqual(new DateTime(2020, 03, 01), ta.FromDate);
             Assert.AreEqual(new DateTime(2020, 04, 01), ta.ToDate);
             Assert.AreEqual(100m, ta.MinAmount);
@@ -67,16 +72,18 @@ namespace Cdr.Banking.Test
         }
 
         [Test, TestSetUp]
-        public void A150_ArgsValidator_Invalid()
+        public async Task A150_ArgsValidator_Invalid()
         {
-            ExpectValidationException.Throws(() =>
-            {
-                var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 02, 01), MinAmount = 100m, MaxAmount = 80m, Text = "Best*Buy" };
-                TransactionArgsValidator.Default.Validate(ta).ThrowOnError();
-            },
-            "Oldest time must be less than or equal to Newest time.",
-            "Min Amount must be less than or equal to Max Amount.",
-            "Text contains invalid or non-supported wildcard selection.");
+            await ValidationTester.Test()
+                .ExpectMessages(
+                    "Oldest time must be less than or equal to Newest time.",
+                    "Min Amount must be less than or equal to Max Amount.",
+                    "Text contains invalid or non-supported wildcard selection.")
+                .RunAsync(async () =>
+                {
+                    var ta = new TransactionArgs { FromDate = new DateTime(2020, 03, 01), ToDate = new DateTime(2020, 02, 01), MinAmount = 100m, MaxAmount = 80m, Text = "Best*Buy" };
+                    (await new TransactionArgsValidator().ValidateAsync(ta).ConfigureAwait(false)).ThrowOnError();
+                });
         }
 
         #endregion

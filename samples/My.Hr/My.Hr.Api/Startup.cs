@@ -69,6 +69,7 @@ namespace My.Hr.Api
 
             // Add the generated entity services.
             services.AddGeneratedManagerServices()
+                    .AddGeneratedValidationServices()
                     .AddGeneratedDataSvcServices()
                     .AddGeneratedDataServices();
 

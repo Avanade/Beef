@@ -77,10 +77,10 @@ COMMIT TRANSACTION
 
 ## Create Emergency Contacts table
 
-Use the following command line to create the `EmergencyContact` table migration script.
+Use the following command line to generate the migration script to create the `EmergencyContact` table within the `Hr` schema.
 
 ```
-dotnet run scriptnew -create Hr.EmergencyContact
+dotnet run scriptnew create Hr EmergencyContact
 ```
 
 Replace the contents with the following. _Note_: that we removed the row version and auditing columns as these are not required as this table is to be tightly-coupled to the `Employee`, and therefore can only (and should only) be updated in that context (i.e. is a sub-table).
@@ -115,10 +115,10 @@ To support the capabilities of the tables above the following Reference Data tab
 At the command line execute the following commands. This will automatically create the tables as required using the reference data template given the `-creatref` option specified. No further changes will be needed for these tables.
 
 ```
-dotnet run scriptnew -createref Ref.Gender
-dotnet run scriptnew -createref Ref.TerminationReason
-dotnet run scriptnew -createref Ref.RelationshipType
-dotnet run scriptnew -createref Ref.USState
+dotnet run scriptnew createref Ref Gender
+dotnet run scriptnew createref Ref TerminationReason
+dotnet run scriptnew createref Ref RelationshipType
+dotnet run scriptnew createref Ref USState
 ```
 
 <br/>

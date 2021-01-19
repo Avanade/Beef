@@ -21,7 +21,7 @@ A new `PerformanceReview` table and related Entity Framework model will be requi
 First step, as was previously the case, is to create the `PerformanceReview` table migration script. Execute the following to create the migration script.
 
 ```
-dotnet run scriptnew -create Hr.PerformanceReview
+dotnet run scriptnew create Hr PerformanceReview
 ```
 
 Open the newly created migration script and replace its contents with the following.
@@ -55,7 +55,7 @@ COMMIT TRANSACTION
 To support the above a `Ref.PerformanceOutcome` table is also required. Execute the following to create the migration script. No further changes will be needed.
 
 ```
-dotnet run scriptnew -createref Ref.PerformanceOutcome
+dotnet run scriptnew  createref Ref PerformanceOutcome
 ```
 
 <br/>
@@ -224,7 +224,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="PerformanceReview"/> validator.
     /// </summary>
-    public class PerformanceReviewValidator : Validator<PerformanceReview, PerformanceReviewValidator>
+    public class PerformanceReviewValidator : Validator<PerformanceReview>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewValidator"/> class.
@@ -241,7 +241,7 @@ namespace My.Hr.Business.Validation
         /// <summary>
         /// Add further validation logic.
         /// </summary>
-        protected override void OnValidate(ValidationContext<PerformanceReview> context)
+        protected override async Task OnValidateAsync(ValidationContext<PerformanceReview> context)
         {
             if (!context.HasError(x => x.EmployeeId))
             {

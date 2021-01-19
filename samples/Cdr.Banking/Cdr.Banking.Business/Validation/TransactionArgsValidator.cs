@@ -7,7 +7,7 @@ namespace Cdr.Banking.Business.Validation
     /// <summary>
     /// Represents a <see cref="TransactionArgs"/> validator.
     /// </summary>
-    public class TransactionArgsValidator : Validator<TransactionArgs, TransactionArgsValidator>
+    public class TransactionArgsValidator : Validator<TransactionArgs>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionArgsValidator"/>.

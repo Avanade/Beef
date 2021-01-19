@@ -6,16 +6,16 @@ using Beef.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Beef.Test.NUnit
 {
     /// <summary>
-    /// Manages the testing of a validator outside of an API execution context with integrated mocking of services as required. 
+    /// Manages the testing of a validator with integrated mocking of services as required.
     /// </summary>
-    /// <remarks><see cref="TestSetUp.SetDefaultLocalReferenceData"/> is required to enable the reference data to function correctly.</remarks>
-    [System.Diagnostics.DebuggerStepThrough]
+    /// <remarks><see cref="TestSetUp.SetDefaultLocalReferenceData"/> is required to enable the reference data to function correctly. Where a <see cref="ExecutionContext.ServiceProvider"/> is 
+    /// currently available this will be used versus creating new, minimizing the new to maintain (duplicate) the <see cref="ConfigureServices(Action{IServiceCollection})"/> logic.</remarks>
+    //[System.Diagnostics.DebuggerStepThrough]
     public sealed class ValidationTester : TesterBase
     {
         private readonly string? _username;
@@ -46,19 +46,10 @@ namespace Beef.Test.NUnit
         /// </summary>
         /// <param name="username">The username (<c>null</c> indicates to use the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.Username"/>).</param>
         /// <param name="args">Optional argument that can be referenced within the test.</param>
-        private ValidationTester(string? username = null, object? args = null) : base(true)
+        private ValidationTester(string? username = null, object? args = null) : base(configureLocalRefData: true, inheritServiceCollection: true)
         {
             _username = username;
             _args = args;
-
-            // The following is a slight Hack that allows access to any parent Service Provider to get access to the HttpClient (where applicable) and include.
-            // This assists where the ValidationTester is used when "scoped" within the likes of a AgentTesterServer or AgentTesterWaf.
-            if (ExecutionContext.HasCurrent && ExecutionContext.Current.ServiceProvider != null)
-            {
-                var httpClient = ExecutionContext.Current.ServiceProvider.GetService<HttpClient>();
-                if (httpClient != null)
-                    ConfigureLocalServices(sc => sc.AddScoped(_ => httpClient));
-            }
         }
 
         /// <summary>
@@ -210,15 +201,38 @@ namespace Beef.Test.NUnit
         private bool IsExpectingError => _expectedErrorType.HasValue || _expectedErrorMessage != null || _expectedMessages != null;
 
         /// <summary>
-        /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContextBase"/> response against the expected outcomes.
+        /// Creates (instantiates) the <typeparamref name="TValidator"/> using Dependency Injection (DI) and validates the <typeparamref name="TEntity"/> <paramref name="value"/>.
         /// </summary>
-        /// <param name="func">The function to execute.</param>
-        /// <returns>The resulting <see cref="IValidationContextBase"/> where applicable; otherwise, <c>null</c>.</returns>
-        public async Task<IValidationContextBase?> RunAsync(Func<Task<IValidationContextBase>> func)
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValidator">The validator <see cref="Type"/> to instantiate.</typeparam>
+        /// <param name="value">The <typeparamref name="TEntity"/> value.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public async Task<IValidationContext?> CreateAndRunAsync<TValidator, TEntity>(TEntity? value) where TEntity : class where TValidator : class, IValidator<TEntity>
         {
             PrepareExecutionContext(_username, _args);
             ExecutionContext.Current.OperationType = _operationType;
 
+            var v = ExecutionContext.GetService<TValidator>(throwExceptionOnNull: true)!;
+            return await RunInternalAsync(async () => await v.ValidateAsync(value!, null!).ConfigureAwait(false)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContext"/> response against the expected outcomes.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public async Task<IValidationContext?> RunAsync(Func<Task<IValidationContext>> func)
+        {
+            PrepareExecutionContext(_username, _args);
+            ExecutionContext.Current.OperationType = _operationType;
+            return await RunInternalAsync(func).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContext"/> response against the expected outcomes (internal logic)
+        /// </summary>
+        private async Task<IValidationContext?> RunInternalAsync(Func<Task<IValidationContext>> func)
+        {
             if (IsExpectingError && !_expectedErrorType.HasValue)
                 _expectedErrorType = ErrorType.ValidationError;
 
@@ -292,7 +306,8 @@ namespace Beef.Test.NUnit
             try
             {
                 await Check.NotNull(func, nameof(func))().ConfigureAwait(false);
-                Assert.Fail("The function completed successfully; expected a ValidationException.");
+                if (IsExpectingError)
+                    Assert.Fail("The function completed successfully; expected a ValidationException.");
             }
             catch (AssertionException) { throw; }
             catch (Exception ex)

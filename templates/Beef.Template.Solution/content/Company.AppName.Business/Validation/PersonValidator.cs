@@ -7,7 +7,7 @@ namespace Company.AppName.Business.Validation
     /// <summary>
     /// Represents a <see cref="Person"/> validator.
     /// </summary>
-    public class PersonValidator : Validator<Person, PersonValidator>
+    public class PersonValidator : Validator<Person>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonValidator"/> class.

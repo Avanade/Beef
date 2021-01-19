@@ -9,6 +9,7 @@ using Beef.WebApi;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace Beef.Test.NUnit.Tests
     [System.Diagnostics.DebuggerStepThrough]
     public abstract class TesterBase
     {
+        private const string ServiceCollectionKey = "!nt3rn4lS3rv1c3C0ll3ct10n"; // Obfuscated InternalServiceCollection
         private readonly ServiceCollection _serviceCollection = new ServiceCollection();
         private IServiceProvider? _serviceProvider;
 
@@ -27,8 +29,22 @@ namespace Beef.Test.NUnit.Tests
         /// Initializes a new instance of the <see cref="AgentTesterBase"/> class.
         /// </summary>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
-        protected TesterBase(bool configureLocalRefData = true)
+        /// <param name="inheritServiceCollection">Indicates whether to use the inherit (copy) the tester <see cref="ServiceCollection"/> (advanced use only).</param>
+        protected TesterBase(bool configureLocalRefData = true, bool inheritServiceCollection = false)
         {
+            // Where inheriting then copy the service collection.
+            if (inheritServiceCollection && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ServiceCollectionKey, out var sc))
+            {
+                var coll = (ICollection<ServiceDescriptor>)_serviceCollection;
+                foreach (var sd in ((ICollection<ServiceDescriptor>)sc))
+                {
+                    coll.Add(sd);
+                }
+
+                return;
+            }
+
+            // Where nothing to inherit then create from scratch.
             _serviceCollection.AddLogging(configure => configure.AddTestContext());
             _serviceCollection.AddSingleton(_ => new CachePolicyManager());
 
@@ -69,6 +85,7 @@ namespace Beef.Test.NUnit.Tests
             ExecutionContext.Reset();
             var ec = TestSetUp.CreateExecutionContext(TestSetUpAttribute.Username, TestSetUpAttribute.Args);
             ec.ServiceProvider = LocalServiceProvider;
+            ec.Properties.Add(ServiceCollectionKey, _serviceCollection);
             ExecutionContext.SetCurrent(ec);
         }
 
@@ -84,6 +101,7 @@ namespace Beef.Test.NUnit.Tests
             ExecutionContext.Reset();
             var ec = TestSetUp.CreateExecutionContext(username ?? TestSetUp.DefaultUsername, args);
             ec.ServiceProvider = LocalServiceProvider;
+            ec.Properties.Add(ServiceCollectionKey, _serviceCollection);
             ExecutionContext.SetCurrent(ec);
         }
 

@@ -2,7 +2,6 @@ using Beef.Database.Core;
 using Beef.Test.NUnit;
 using NUnit.Framework;
 using System.Reflection;
-using System.Threading.Tasks;
 using My.Hr.Api;
 using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
@@ -17,6 +16,7 @@ namespace My.Hr.Test
         {
             TestSetUp.DefaultEnvironmentVariablePrefix = "Hr";
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
+            TestSetUp.AddWebApiAgentArgsType<IHrWebApiAgentArgs, HrWebApiAgentArgs>();
             TestSetUp.DefaultExpectNoEvents = true;
             var config = AgentTester.BuildConfiguration<Startup>();
 

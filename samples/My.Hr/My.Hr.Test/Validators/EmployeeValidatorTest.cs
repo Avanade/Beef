@@ -1,11 +1,14 @@
 ﻿using Beef.Test.NUnit;
+using Beef.Validation;
 using Moq;
+using My.Hr.Business;
 using My.Hr.Business.DataSvc;
 using My.Hr.Business.Validation;
 using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace My.Hr.Test.Validators
 {
@@ -13,6 +16,7 @@ namespace My.Hr.Test.Validators
     public class EmployeeValidatorTest
     {
         private readonly Mock<IReferenceDataAgent> _referenceData = new Mock<IReferenceDataAgent>();
+        private readonly Mock<IEmployeeDataSvc> _employeeDataSvc = new Mock<IEmployeeDataSvc>();
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -34,10 +38,11 @@ namespace My.Hr.Test.Validators
         };
 
         [Test]
-        public void A110_Validate_Initial()
+        public async Task A110_Validate_Initial()
         {
-            ValidationTester.Test()
-                .C
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .ExpectMessages(
                     "First Name is required.",
                     "Email is required.",
@@ -46,11 +51,11 @@ namespace My.Hr.Test.Validators
                     "Birthday is required.",
                     "Start Date is required.",
                     "Phone No is required.")
-                .Run(() => EmployeeValidator.Default.Validate(new Employee()));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(new Employee());
         }
 
         [Test]
-        public void A120_Validate_BadData()
+        public async Task A120_Validate_BadData()
         {
             var e = new Employee
             {
@@ -63,7 +68,9 @@ namespace My.Hr.Test.Validators
                 PhoneNo = "(425) 333 4444"
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages(
                     "Email is invalid.",
@@ -72,27 +79,29 @@ namespace My.Hr.Test.Validators
                     "Gender is invalid.",
                     "Birthday is invalid as the Employee must be at least 18 years of age.",
                     "Start Date must be greater than or equal to January 1, 1999.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Address_Empty()
+        public async Task A130_Validate_Address_Empty()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.Address = new Address();
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages(
                     "Street1 is required.",
                     "City is required.",
                     "State is required.",
                     "Post Code is required.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Address_Invalid()
+        public async Task A140_Validate_Address_Invalid()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.Address = new Address
@@ -103,16 +112,18 @@ namespace My.Hr.Test.Validators
                 PostCode = "XXXXXXXXXX"
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages(
                     "State is invalid.",
                     "Post Code is invalid.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Address_OK()
+        public async Task A150_Validate_Address_OK()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.Address = new Address
@@ -123,29 +134,33 @@ namespace My.Hr.Test.Validators
                 PostCode = "98052"
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Contacts_Empty()
+        public async Task A160_Validate_Contacts_Empty()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.EmergencyContacts = new EmergencyContactCollection { new EmergencyContact() };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages(
                     "First Name is required.",
                     "Last Name is required.",
                     "Phone No is required.",
                     "Relationship is required.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Contacts_Invalid()
+        public async Task A170_Validate_Contacts_Invalid()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.EmergencyContacts = new EmergencyContactCollection 
@@ -159,14 +174,16 @@ namespace My.Hr.Test.Validators
                 }
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages("Relationship is invalid.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_Contacts_TooMany()
+        public async Task A180_Validate_Contacts_TooMany()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.EmergencyContacts = new EmergencyContactCollection();
@@ -182,14 +199,16 @@ namespace My.Hr.Test.Validators
                 });
             }
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_employeeDataSvc)
                 .AddScopedService(_referenceData)
                 .ExpectMessages("Emergency Contacts must not exceed 5 item(s).")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void A130_Validate_UpdateTerminated()
+        public async Task A190_Validate_UpdateTerminated()
         {
             var e = (Employee)ValidEmployee.Clone();
             e.Id = 1.ToGuid();
@@ -197,36 +216,39 @@ namespace My.Hr.Test.Validators
             var eds = new Mock<IEmployeeDataSvc>();
             eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { Termination = new TerminationDetail { Date = DateTime.UtcNow } });
 
-            ValidationTester.Test()
-                .OperationType(Beef.OperationType.Update)
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(eds)
                 .ExpectErrorType(Beef.ErrorType.ValidationError, "Once an Employee has been Terminated the data can no longer be updated.")
-                .Run(() => EmployeeValidator.Default.Validate(e));
+                .OperationType(Beef.OperationType.Update)
+                .CreateAndRunAsync<IValidator<Employee>, Employee>(e);
         }
 
         [Test]
-        public void B110_CanDelete_NotFound()
+        public async Task B110_CanDelete_NotFound()
         {
             var eds = new Mock<IEmployeeDataSvc>();
             eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync((Employee)null!);
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(eds)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
-                .Run(() => EmployeeValidator.CanDelete.Validate(1.ToGuid()));
+                .RunAsync(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
         }
 
         [Test]
-        public void B110_CanDelete_Invalid()
+        public async Task B110_CanDelete_Invalid()
         {
             var eds = new Mock<IEmployeeDataSvc>();
             eds.Setup(x => x.GetAsync(1.ToGuid())).ReturnsAsync(new Employee { StartDate = DateTime.UtcNow.AddDays(-1) });
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(eds)
                 .ExpectErrorType(Beef.ErrorType.ValidationError, "An employee cannot be deleted after they have started their employment.")
-                .Run(() => EmployeeValidator.CanDelete.Validate(1.ToGuid()));
+                .RunAsync(async () => await EmployeeValidator.CanDelete.ValidateAsync(1.ToGuid()));
         }
     }
 }

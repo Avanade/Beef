@@ -85,8 +85,8 @@ namespace My.Hr.Common.Agents
         /// <summary>
         /// Initializes a new instance of the <see cref="PerformanceReviewAgent"/> class.
         /// </summary>
-        /// <param name="args">The <see cref="IWebApiAgentArgs"/>.</param>
-        public PerformanceReviewAgent(IWebApiAgentArgs args) : base(args) { }
+        /// <param name="args">The <see cref="IHrWebApiAgentArgs"/>.</param>
+        public PerformanceReviewAgent(IHrWebApiAgentArgs args) : base(args) { }
 
         /// <summary>
         /// Gets the specified <see cref="PerformanceReview"/>.

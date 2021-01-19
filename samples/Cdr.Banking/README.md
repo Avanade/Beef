@@ -327,7 +327,7 @@ The validation for the [`AccountArgs`](./Cdr.Banking.Common/Entities/Generated/A
 /// <summary>
 /// Represents a <see cref="AccountArgs"/> validator.
 /// </summary>
-public class AccountArgsValidator : Validator<AccountArgs, AccountArgsValidator>
+public class AccountArgsValidator : Validator<AccountArgs>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AccountArgsValidator"/>.
@@ -356,7 +356,7 @@ The [`TransactionArgsValidator.cs`](./Cdr.Banking.Business/Validation/Transactio
 /// <summary>
 /// Represents a <see cref="TransactionArgs"/> validator.
 /// </summary>
-public class TransactionArgsValidator : Validator<TransactionArgs, TransactionArgsValidator>
+public class TransactionArgsValidator : Validator<TransactionArgs>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TransactionArgsValidator"/>.

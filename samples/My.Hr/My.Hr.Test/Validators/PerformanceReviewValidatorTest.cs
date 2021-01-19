@@ -1,4 +1,5 @@
 ﻿using Beef.Test.NUnit;
+using Beef.Validation;
 using Moq;
 using My.Hr.Business;
 using My.Hr.Business.Validation;
@@ -6,6 +7,7 @@ using My.Hr.Common.Agents;
 using My.Hr.Common.Entities;
 using NUnit.Framework;
 using System;
+using System.Threading.Tasks;
 
 namespace My.Hr.Test.Validators
 {
@@ -29,19 +31,23 @@ namespace My.Hr.Test.Validators
         }
 
         [Test]
-        public void A110_Validate_Initial()
+        public async Task A110_Validate_Initial()
         {
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
+                .AddScopedService(_referenceData)
+                .AddScopedService(_employeeManager)
+                .AddScopedService(_perfReviewManager)
                 .ExpectMessages(
                     "Employee is required.",
                     "Date is required.",
                     "Outcome is required.",
                     "Reviewer is required.")
-                .Run(() => PerformanceReviewValidator.Default.Validate(new PerformanceReview()));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(new PerformanceReview());
         }
 
         [Test]
-        public void A120_Validate_BadData()
+        public async Task A120_Validate_BadData()
         {
             var pr = new PerformanceReview
             {
@@ -52,20 +58,22 @@ namespace My.Hr.Test.Validators
                 Notes = new string('X', 5000)
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(_employeeManager)
+                .AddScopedService(_perfReviewManager)
                 .ExpectMessages(
                     "Date must be less than or equal to today.",
                     "Outcome is invalid.",
                     "Employee is not found; a valid value is required.",
                     "Reviewer must not exceed 256 characters in length.",
                     "Notes must not exceed 4000 characters in length.")
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A130_Validate_BeforeStarting()
+        public async Task A130_Validate_BeforeStarting()
         {
             var pr = new PerformanceReview
             {
@@ -76,15 +84,17 @@ namespace My.Hr.Test.Validators
                 Notes = "Thumbs up!"
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(_employeeManager)
+                .AddScopedService(_perfReviewManager)
                 .ExpectMessages("Date must not be prior to the Employee starting.")
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A140_Validate_AfterTermination()
+        public async Task A140_Validate_AfterTermination()
         {
             var pr = new PerformanceReview
             {
@@ -95,15 +105,17 @@ namespace My.Hr.Test.Validators
                 Notes = "Thumbs up!"
             };
 
-            ValidationTester.Test()
+            await ValidationTester.Test()
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(_employeeManager)
+                .AddScopedService(_perfReviewManager)
                 .ExpectMessages("Date must not be after the Employee has terminated.")
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A150_Validate_EmployeeNotFound()
+        public async Task A150_Validate_EmployeeNotFound()
         {
             var pr = new PerformanceReview
             {
@@ -116,16 +128,18 @@ namespace My.Hr.Test.Validators
             };
 
             // Need to set the OperationType to Update to exercise logic.
-            ValidationTester.Test()
+            await ValidationTester.Test()
                 .OperationType(Beef.OperationType.Update)
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
+                .AddScopedService(_employeeManager)
                 .AddScopedService(_perfReviewManager)
                 .ExpectErrorType(Beef.ErrorType.NotFoundError)
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A160_Validate_EmployeeImmutable()
+        public async Task A160_Validate_EmployeeImmutable()
         {
             var pr = new PerformanceReview
             {
@@ -138,16 +152,18 @@ namespace My.Hr.Test.Validators
             };
 
             // Need to set the OperationType to Update to exercise logic.
-            ValidationTester.Test()
+            await ValidationTester.Test()
                 .OperationType(Beef.OperationType.Update)
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
+                .AddScopedService(_employeeManager)
                 .AddScopedService(_perfReviewManager)
                 .ExpectMessages("Employee is not allowed to change; please reset value.")
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A170_Validate_CreateOK()
+        public async Task A170_Validate_CreateOK()
         {
             var pr = new PerformanceReview
             {
@@ -159,16 +175,17 @@ namespace My.Hr.Test.Validators
             };
 
             // Need to set the OperationType to Create to exercise logic.
-            ValidationTester.Test()
+            await ValidationTester.Test()
                 .OperationType(Beef.OperationType.Create)
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(_employeeManager)
                 .AddScopedService(_perfReviewManager)
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
 
         [Test]
-        public void A180_Validate_UpdateOK()
+        public async Task A180_Validate_UpdateOK()
         {
             var pr = new PerformanceReview
             {
@@ -181,12 +198,13 @@ namespace My.Hr.Test.Validators
             };
 
             // Need to set the OperationType to Update to exercise logic.
-            ValidationTester.Test()
+            await ValidationTester.Test()
                 .OperationType(Beef.OperationType.Update)
+                .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
                 .AddScopedService(_referenceData)
                 .AddScopedService(_employeeManager)
                 .AddScopedService(_perfReviewManager)
-                .Run(() => PerformanceReviewValidator.Default.Validate(pr));
+                .CreateAndRunAsync<IValidator<PerformanceReview>, PerformanceReview>(pr);
         }
     }
 }

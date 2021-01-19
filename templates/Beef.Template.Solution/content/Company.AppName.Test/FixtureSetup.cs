@@ -30,10 +30,12 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var config = AgentTester.BuildConfiguration<Startup>("AppName");
+            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
-            TestSetUp.DefaultExpectNoEvents = false;
             TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
+            TestSetUp.DefaultExpectNoEvents = false;
+
+            var config = AgentTester.BuildConfiguration<Startup>("AppName");
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
@@ -54,10 +56,12 @@ namespace Company.AppName.Test
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var config = AgentTester.BuildConfiguration<Startup>("AppName");
+            TestSetUp.DefaultEnvironmentVariablePrefix = "AppName";
             TestSetUp.SetDefaultLocalReferenceData<IReferenceData, ReferenceDataAgentProvider, IReferenceDataAgent, ReferenceDataAgent>();
-            TestSetUp.DefaultExpectNoEvents = false;
             TestSetUp.AddWebApiAgentArgsType<IAppNameWebApiAgentArgs, AppNameWebApiAgentArgs>();
+            TestSetUp.DefaultExpectNoEvents = false;
+
+            var config = AgentTester.BuildConfiguration<Startup>("AppName");
 
             TestSetUp.RegisterSetUp(async (count, _) =>
             {
