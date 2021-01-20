@@ -3,10 +3,10 @@
 Represents the **NuGet** versions.
 
 ## v4.1.4
-- *Enhancement:* **Breaking change** to [`ValidationTester`](https://github.com/Avanade/Beef/blob/master/tools/Beef.Test.NUnit/ValidationTester.cs) to enable async. The existing `Run` method has been changed to `RunAsync`, with a response of `Task`.
-- *Enhancement:* A new `ValidationTester.CreateAndRunAsync` method has been added that creates (instantiates) the `Validator` using the underlying Dependency Injection (DI) capability and validates the passed value.
-- *Enhancement:* The `ValidationTester` inherits the Dependency Injection (DI) `ServiceCollection` where used within the context of a `TestSetUp` and `UsingAgentTesterServer` combination to avoid the need to re-specify in these scenarios.
 - *Removed:* **Breaking change** to `ExpectValidationException` with its deprecation (removal). Existing usage should be migrated to the more feature rich [`ValidationTester`](https://github.com/Avanade/Beef/blob/master/tools/Beef.Test.NUnit/ValidationTester.cs).
+- *Enhancement:* New `ValidationTester.CreateAndRunAsync` and `ValidationTester.CreateAndRun` methods have been added that creates (instantiates) the `Validator` using the underlying Dependency Injection (DI) capability and validates the passed value.
+- *Enhancement:* The `ValidationTester` inherits the Dependency Injection (DI) `ServiceCollection` where used within the context of a `TestSetUp` and `UsingAgentTesterServer` combination to avoid the need to re-specify in these scenarios.
+- *Enhancement*: The `EventSubscriberTester` has had Dependency Injection (DI) support enabled similar to the `ValidationTester`.
 
 ## v4.1.3
 - *Fixed:* Issue [83](https://github.com/Avanade/Beef/issues/83) fixed. `ExpectEventPublisher` updated to swallow (ignore) events raised where the `ExecutionContext.CorrelationId` is `null`; versus throw an exception.

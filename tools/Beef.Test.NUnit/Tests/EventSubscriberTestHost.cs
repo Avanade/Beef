@@ -46,6 +46,6 @@ namespace Beef.Test.NUnit.Tests
         /// <summary>
         /// Gets the corresponding <see cref="Result"/>.
         /// </summary>
-        public Result? Result { get; private set; }
+        public Result? Result { get; internal set; }
     }
 }

@@ -207,6 +207,16 @@ namespace Beef.Test.NUnit
         /// <typeparam name="TValidator">The validator <see cref="Type"/> to instantiate.</typeparam>
         /// <param name="value">The <typeparamref name="TEntity"/> value.</param>
         /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public IValidationContext? CreateAndRun<TValidator, TEntity>(TEntity? value) where TEntity : class where TValidator : class, IValidator<TEntity>
+            => Task.Run(() => CreateAndRunAsync<TValidator, TEntity>(value)).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Creates (instantiates) the <typeparamref name="TValidator"/> using Dependency Injection (DI) and validates asynchronously the <typeparamref name="TEntity"/> <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity <see cref="Type"/>.</typeparam>
+        /// <typeparam name="TValidator">The validator <see cref="Type"/> to instantiate.</typeparam>
+        /// <param name="value">The <typeparamref name="TEntity"/> value.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
         public async Task<IValidationContext?> CreateAndRunAsync<TValidator, TEntity>(TEntity? value) where TEntity : class where TValidator : class, IValidator<TEntity>
         {
             PrepareExecutionContext(_username, _args);
@@ -218,6 +228,13 @@ namespace Beef.Test.NUnit
 
         /// <summary>
         /// Runs the validation <paramref name="func"/> checking the <see cref="IValidationContext"/> response against the expected outcomes.
+        /// </summary>
+        /// <param name="func">The function to execute.</param>
+        /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>
+        public IValidationContext? Run(Func<Task<IValidationContext>> func) => Task.Run(() => RunAsync(func)).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Runs the validation <paramref name="func"/> asynchronously checking the <see cref="IValidationContext"/> response against the expected outcomes.
         /// </summary>
         /// <param name="func">The function to execute.</param>
         /// <returns>The resulting <see cref="IValidationContext"/> where applicable; otherwise, <c>null</c>.</returns>

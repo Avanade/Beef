@@ -31,7 +31,8 @@ namespace Beef.Test.NUnit.Tests
         /// </summary>
         /// <param name="configureLocalRefData">Indicates whether the pre-set local <see cref="TestSetUp.SetDefaultLocalReferenceData{TRefService, TRefProvider, TRefAgentService, TRefAgent}">reference data</see> is configured.</param>
         /// <param name="inheritServiceCollection">Indicates whether to use the inherit (copy) the tester <see cref="ServiceCollection"/> (advanced use only).</param>
-        protected TesterBase(bool configureLocalRefData = true, bool inheritServiceCollection = false)
+        /// <param name="useCorrelationIdLogger">Indicates whether to use the <see cref="CorrelationIdLogger"/> versus defaulting to <see cref="TestContextLogger"/>.</param>
+        protected TesterBase(bool configureLocalRefData = true, bool inheritServiceCollection = false, bool useCorrelationIdLogger = false)
         {
             // Where inheriting then copy the service collection.
             if (inheritServiceCollection && ExecutionContext.HasCurrent && ExecutionContext.Current.Properties.TryGetValue(ServiceCollectionKey, out var sc))
@@ -46,8 +47,14 @@ namespace Beef.Test.NUnit.Tests
             }
 
             // Where nothing to inherit then create from scratch.
-            _serviceCollection.AddLogging(configure => configure.AddTestContext());
             _serviceCollection.AddSingleton(_ => new CachePolicyManager());
+            _serviceCollection.AddLogging(configure =>
+            {
+                if (useCorrelationIdLogger)
+                    configure.AddCorrelationId();
+                else
+                    configure.AddTestContext();
+            });
 
             _serviceCollection.AddTransient<IWebApiAgentArgs, WebApiAgentArgs>();
             foreach (var kvp in TestSetUp._webApiAgentArgsTypes)
@@ -76,19 +83,12 @@ namespace Beef.Test.NUnit.Tests
         /// <summary>
         /// Gets the <i>local</i> (non-API) test Service Provider (used for the likes of the service agents).
         /// </summary>
-        public IServiceProvider LocalServiceProvider => _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+        protected internal IServiceProvider LocalServiceProvider => _serviceProvider ??= _serviceCollection.BuildServiceProvider();
 
         /// <summary>
         /// Prepares the <see cref="ExecutionContext"/> using the <see cref="TestSetUpAttribute"/> configuration, whilst also ensuring that the <see cref="LocalServiceProvider"/> scope is correctly configured.
         /// </summary>
-        public void PrepareExecutionContext()
-        {
-            ExecutionContext.Reset();
-            var ec = TestSetUp.CreateExecutionContext(TestSetUpAttribute.Username, TestSetUpAttribute.Args);
-            ec.ServiceProvider = LocalServiceProvider;
-            ec.Properties.Add(ServiceCollectionKey, _serviceCollection);
-            ExecutionContext.SetCurrent(ec);
-        }
+        protected internal void PrepareExecutionContext() => PrepareExecutionContext(TestSetUpAttribute.Username, TestSetUpAttribute.Args);
 
         /// <summary>
         /// Prepares the <see cref="ExecutionContext"/> using the specified <paramref name="username"/>, whilst also ensuring that the <see cref="LocalServiceProvider"/> scope is correctly configured.

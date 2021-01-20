@@ -30,7 +30,7 @@ namespace Beef.Test.NUnit.Logging
     }
 
     /// <summary>
-    /// Represents a logger where all messages are written to an internal (in-memory) list by correlation identifier.
+    /// Represents a logger where all messages are written directly to <see cref="TestContext.Out"/>.
     /// </summary>
     [DebuggerStepThrough]
     public sealed class TestContextLogger : ILogger
