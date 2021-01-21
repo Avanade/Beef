@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.TerminationReason'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.TerminationReason'.
     /// </summary>
     public partial class TerminationReason
     {
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<TerminationReason>(entity =>
             {
-                entity.ToTable("TerminationReason", "Ref");
+                entity.ToTable("TerminationReason", "Hr");
                 entity.HasKey("TerminationReasonId");
                 entity.Property(p => p.TerminationReasonId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");

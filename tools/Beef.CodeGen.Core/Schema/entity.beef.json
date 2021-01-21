@@ -92,6 +92,11 @@
       "title": "The .NET database interface name (used where `Operation.AutoImplement` is `Database`).",
       "description": "Defaults to `IDatabase`. This can be overridden within the `Entity`(s)."
     },
+    "databaseSchema": {
+      "type": "string",
+      "title": "The default database schema name.",
+      "description": "Defaults to `dbo`."
+    },
     "entityFrameworkName": {
       "type": "string",
       "title": "The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.",
@@ -167,7 +172,7 @@
     },
     "pathBase": {
       "type": "string",
-      "title": "The path (directory) for the Database-related artefacts.",
+      "title": "The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
       "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
     },
     "pathCommon": {

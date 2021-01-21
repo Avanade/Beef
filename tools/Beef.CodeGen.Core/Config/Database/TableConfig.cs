@@ -70,7 +70,8 @@ tables:
         /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
         /// </summary>
         [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsMandatory = true, IsImportant = true)]
+        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsImportant = true,
+            Description = "Defaults to `CodeGeneration.Schema`.")]
         public string? Schema { get; set; }
 
         /// <summary>
@@ -462,7 +463,7 @@ tables:
             CheckKeyHasValue(Name);
             CheckOptionsProperties();
 
-            Schema = DefaultWhereNull(Schema, () => "dbo");
+            Schema = DefaultWhereNull(Schema, () => Parent!.Schema);
             DbTable = Root!.DbTables!.Where(x => x.Name == Name && x.Schema == Schema).SingleOrDefault();
             if (DbTable == null)
                 throw new CodeGenException(this, nameof(Name), $"Specified Schema.Table '{Schema}.{Name}' not found in database.");

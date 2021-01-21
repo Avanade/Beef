@@ -172,6 +172,14 @@ entities:
         public string? DatabaseName { get; set; }
 
         /// <summary>
+        /// Gets or sets the default database schema name.
+        /// </summary>
+        [JsonProperty("databaseSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "The default database schema name.", IsImportant = true,
+            Description = "Defaults to `dbo`.")]
+        public string? DatabaseSchema { get; set; }
+
+        /// <summary>
         /// Gets or sets the default .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`.
         /// </summary>
         [JsonProperty("entityFrameworkName", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -520,6 +528,7 @@ entities:
             EventPublish = DefaultWhereNull(EventPublish, () => true);
             EventActionFormat = DefaultWhereNull(EventActionFormat, () => "None");
             EntityUsing = DefaultWhereNull(EntityUsing, () => "Common");
+            DatabaseSchema = DefaultWhereNull(DatabaseSchema, () => "dbo");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
             EntityFrameworkName = DefaultWhereNull(EntityFrameworkName, () => "IEfDb");
             CosmosName = DefaultWhereNull(CosmosName, () => "ICosmosDb");

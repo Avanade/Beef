@@ -59,7 +59,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`name`** | The name of the `Table` in the database.
-**`schema`** | The name of the `Schema` where the `Table` is defined in the database.
+**`schema`** | The name of the `Schema` where the `Table` is defined in the database. Defaults to `CodeGeneration.Schema`.
 `alias` | The `Schema.Table` alias name. Will automatically default where not specified.
 
 <br/>

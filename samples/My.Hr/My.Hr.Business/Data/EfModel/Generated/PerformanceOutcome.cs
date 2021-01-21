@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.PerformanceOutcome'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.PerformanceOutcome'.
     /// </summary>
     public partial class PerformanceOutcome
     {
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<PerformanceOutcome>(entity =>
             {
-                entity.ToTable("PerformanceOutcome", "Ref");
+                entity.ToTable("PerformanceOutcome", "Hr");
                 entity.HasKey("PerformanceOutcomeId");
                 entity.Property(p => p.PerformanceOutcomeId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");

@@ -112,6 +112,7 @@ Provides the _Database Data-layer_ configuration.
 Property | Description
 -|-
 **`databaseName`** | The .NET database interface name (used where `Operation.AutoImplement` is `Database`). Defaults to `IDatabase`. This can be overridden within the `Entity`(s).
+**`databaseSchema`** | The default database schema name. Defaults to `dbo`.
 `databaseUsingNamespace` | The additional Namespace using statement to the added to the generated `Data` code where `Operation.AutoImplement` is `Database`.
 
 <br/>
@@ -160,7 +161,7 @@ Provides the _Path (Directory)_ configuration for the generated artefacts.
 
 Property | Description
 -|-
-`pathBase` | The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
+`pathBase` | The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.
 `pathCommon` | The path (directory) for the Database-related artefacts. Defaults to `PathBase` + `.Common` (literal). For example `Beef.Demo.Common`.
 `pathBusiness` | The path (directory) for the Business-related (.NET) artefacts. Defaults to `PathBase` + `.Business` (literal). For example `Beef.Demo.Business`.
 `pathApi` | The path (directory) for the API-related (.NET) artefacts. Defaults to `PathBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.

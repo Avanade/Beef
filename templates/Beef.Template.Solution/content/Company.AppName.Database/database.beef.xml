@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeGeneration xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration Schema="AppName" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://github.com/Avanade/Beef/raw/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!--#if (implement_database) -->
   <!-- Reference data stored procedures -->
-  <Table Name="Gender" Schema="Ref" GetAll="true" />
+  <Table Name="Gender" GetAll="true" />
 
   <!-- Master data stored procedures. -->
-  <Table Name="Person" Schema="AppName" Get="true" Create="true" Update="true" Delete="true">
+  <Table Name="Person" Get="true" Create="true" Update="true" Delete="true">
     <StoredProcedure Name="GetByArgs" Paging="true">
       <Parameter Name="FirstName" IsNullable="true" Operator="LIKE" />
       <Parameter Name="LastName" IsNullable="true" Operator="LIKE" />
@@ -17,9 +17,9 @@
   <!--#endif -->
   <!--#if (implement_entityframework) -->
   <!-- Reference data tables/models. -->
-  <Table Name="Gender" Schema="Ref" EfModel="true" />
+  <Table Name="Gender" EfModel="true" />
 
   <!-- Master data tables/models. -->
-  <Table Name="Person" Schema="AppName" EfModel="true" />
+  <Table Name="Person" EfModel="true" />
   <!--#endif -->
 </CodeGeneration>

@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Migrations\20190101-000000-create-ref-schema.sql" />
     <None Remove="Migrations\20190101-000001-create-Hr-schema.sql" />
   </ItemGroup>
 

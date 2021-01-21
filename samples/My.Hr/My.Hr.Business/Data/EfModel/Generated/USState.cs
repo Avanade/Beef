@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.USState'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.USState'.
     /// </summary>
     public partial class USState
     {
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<USState>(entity =>
             {
-                entity.ToTable("USState", "Ref");
+                entity.ToTable("USState", "Hr");
                 entity.HasKey("USStateId");
                 entity.Property(p => p.USStateId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");

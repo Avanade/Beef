@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.Gender'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.Gender'.
     /// </summary>
     public partial class Gender
     {
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<Gender>(entity =>
             {
-                entity.ToTable("Gender", "Ref");
+                entity.ToTable("Gender", "Hr");
                 entity.HasKey("GenderId");
                 entity.Property(p => p.GenderId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");

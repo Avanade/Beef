@@ -32,7 +32,7 @@ Provides the _key_ configuration.
 Property | Description
 -|-
 **`Name`** | The name of the `Table` in the database.
-**`Schema`** | The name of the `Schema` where the `Table` is defined in the database.
+**`Schema`** | The name of the `Schema` where the `Table` is defined in the database. Defaults to `CodeGeneration.Schema`.
 `Alias` | The `Schema.Table` alias name. Will automatically default where not specified.
 
 <br/>

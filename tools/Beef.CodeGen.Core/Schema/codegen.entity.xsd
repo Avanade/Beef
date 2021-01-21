@@ -1331,6 +1331,11 @@
           <xs:documentation>The .NET database interface name (used where `Operation.AutoImplement` is `Database`). Defaults to `IDatabase`. This can be overridden within the `Entity`(s).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="DatabaseSchema" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The default database schema name. Defaults to `dbo`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="EntityFrameworkName" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The .NET Entity Framework interface name used where `Operation.AutoImplement` is `EntityFramework`. Defaults to `IEfDb`. This can be overridden within the `Entity`(s).</xs:documentation>
@@ -1415,7 +1420,7 @@
       </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
+          <xs:documentation>The base path (directory) prefix for the artefacts; other `Path*` properties append to this value when they are not specifically overridden. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathCommon" use="optional" type="xs:string">

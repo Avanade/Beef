@@ -194,9 +194,9 @@
                 <xs:documentation>The name of the `Table` in the database.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="Schema" use="required" type="xs:string">
+            <xs:attribute name="Schema" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
+                <xs:documentation>The name of the `Schema` where the `Table` is defined in the database. Defaults to `CodeGeneration.Schema`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="Alias" use="optional" type="xs:string">
@@ -787,6 +787,11 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+      <xs:attribute name="Schema" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The name of the `Schema` where the `Table` is defined in the database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `IsDeleted`.</xs:documentation>
@@ -898,7 +903,7 @@
       </xs:attribute>
       <xs:attribute name="PathBase" use="optional" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The path (directory) for the Database-related artefacts. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
+          <xs:documentation>The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden. Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="PathDatabaseSchema" use="optional" type="xs:string">

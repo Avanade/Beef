@@ -3,6 +3,10 @@
   "$schema": "http://json-schema.org/draft-04/schema",
   "type": "object",
   "properties": {
+    "schema": {
+      "type": "string",
+      "title": "The name of the `Schema` where the `Table` is defined in the database."
+    },
     "columnNameIsDeleted": {
       "type": "string",
       "title": "The column name for the `IsDeleted` capability.",
@@ -109,7 +113,7 @@
     },
     "pathBase": {
       "type": "string",
-      "title": "The path (directory) for the Database-related artefacts.",
+      "title": "The base path (directory) prefix for the Database-related artefacts; other `Path*` properties append to this value when they are not specifically overridden.",
       "description": "Defaults to `Company` (runtime parameter) + `.` + `AppName` (runtime parameter). For example `Beef.Demo`."
     },
     "pathDatabaseSchema": {
@@ -165,7 +169,8 @@
             },
             "schema": {
               "type": "string",
-              "title": "The name of the `Schema` where the `Table` is defined in the database."
+              "title": "The name of the `Schema` where the `Table` is defined in the database.",
+              "description": "Defaults to `CodeGeneration.Schema`."
             },
             "alias": {
               "type": "string",
@@ -539,8 +544,7 @@
             }
           },
           "required": [
-            "name",
-            "schema"
+            "name"
           ]
         }
       ]
@@ -1125,5 +1129,8 @@
         }
       ]
     }
-  }
+  },
+  "required": [
+    "schema"
+  ]
 }

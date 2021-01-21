@@ -72,7 +72,7 @@ So that the code-gen knows what Entity Framework model is to be used this needs 
 
 ``` xml
        - The EntityFrameworkEntity is required so that the GetByArgs code-gen knows what EfModel is to be used; however, DataEntityFrameworkCustomMapper is also used so that a corresponding EfMapper is not output (not required). -->
-  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DatabaseSchema="Hr" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
+  <Entity Name="Employee" Inherits="EmployeeBase" Validator="EmployeeValidator" WebApiRoutePrefix="api/v1/employees" AutoImplement="Database" DataDatabaseMapperInheritsFrom="EmployeeBaseData.DbMapper" EntityFrameworkEntity="EfModel.Employee" DataEntityFrameworkCustomMapper="true">
 
 ```
 
@@ -129,7 +129,7 @@ namespace My.Hr.Business.Validation
     /// <summary>
     /// Represents a <see cref="EmployeeArgs"/> validator.
     /// </summary>
-    public class EmployeeArgsValidator : Validator<EmployeeArgs, EmployeeArgsValidator>
+    public class EmployeeArgsValidator : Validator<EmployeeArgs>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EmployeeValidator"/> class.

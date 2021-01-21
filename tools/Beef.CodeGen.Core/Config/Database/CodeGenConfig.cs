@@ -26,6 +26,17 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
+        #region Key
+
+        /// <summary>
+        /// Gets or sets the name of the `Schema` where the `Table` is defined in the database.
+        /// </summary>
+        [JsonProperty("schema", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Key", Title = "The name of the `Schema` where the `Table` is defined in the database.", IsMandatory = true, IsImportant = true)]
+        public string? Schema { get; set; }
+
+        #endregion
+
         #region Infer
 
         /// <summary>
@@ -387,6 +398,8 @@ namespace Beef.CodeGen.Config.Database
         {
             CheckOptionsProperties();
             LoadDbTablesConfig();
+
+            Schema = DefaultWhereNull(Schema, () => "dbo");
 
             PathBase = DefaultWhereNull(PathBase, () => $"{Company}.{AppName}");
             PathDatabaseSchema = DefaultWhereNull(PathDatabaseSchema, () => $"{PathBase}.Database/Schema");

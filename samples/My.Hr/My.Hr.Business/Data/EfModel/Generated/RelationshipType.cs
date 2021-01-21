@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace My.Hr.Business.Data.EfModel
 {
     /// <summary>
-    /// Represents the Entity Framework (EF) model for database object 'Ref.RelationshipType'.
+    /// Represents the Entity Framework (EF) model for database object 'Hr.RelationshipType'.
     /// </summary>
     public partial class RelationshipType
     {
@@ -78,7 +78,7 @@ namespace My.Hr.Business.Data.EfModel
 
             modelBuilder.Entity<RelationshipType>(entity =>
             {
-                entity.ToTable("RelationshipType", "Ref");
+                entity.ToTable("RelationshipType", "Hr");
                 entity.HasKey("RelationshipTypeId");
                 entity.Property(p => p.RelationshipTypeId).HasColumnType("UNIQUEIDENTIFIER");
                 entity.Property(p => p.Code).HasColumnType("NVARCHAR(50)");
