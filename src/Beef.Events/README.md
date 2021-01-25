@@ -27,7 +27,7 @@ Property | Description
 `Key` | The corresponding entity key (could be single value or an array of values).
 `Value` | The optional value that contains the underlying message data.
 
-The code-generation of _Beef_ will automatically infer the `Subject` and `Action` for an entity and the operation being performed; this can be overridden. The `Subject` defaults to `<domain>.<entity>.<uniquekey>`; there is a code-gen configuration attribute [`EventSubjectRoot`](../../docs/Entity-CodeGeneration-element.md) that prepends the specified value to the `Subject`. The `Action` defaults to the `Operation` name; there is a code-gen configuration attribute [`EventActionFormat`](../../docs/Entity-CodeGeneration-element.md) that enables automatic reformatting to past tense where required (`Create` would be renamed to `Created` for example).
+The code-generation of _Beef_ will automatically infer the `Subject` and `Action` for an entity and the operation being performed; this can be overridden. The `Subject` defaults to `<domain>.<entity>.<uniquekey>`; there is a code-gen configuration attribute [`EventSubjectRoot`](../../docs/Entity-CodeGeneration-Config.md) that prepends the specified value to the `Subject`. The `Action` defaults to the `Operation` name; there is a code-gen configuration attribute [`EventActionFormat`](../../docs/Entity-CodeGeneration-Config.md) that enables automatic reformatting to past tense where required (`Create` would be renamed to `Created` for example).
 
 For example, an invoice creation event could result in the following:
 - `Subject:` `Billing.Invoice.7634626f-edee-e911-bd3b-bc8385e26041`
@@ -38,7 +38,7 @@ For example, an invoice creation event could result in the following:
 
 ## Publishing
 
-The [`Event`](../../src/Beef.Core/Events/Event.cs) provides the standardised event processing/publishing. The underlying `PublishAsync` set of methods provide the means to publish the event(s). By default, the events are not processed until a publisher has been registered; the `Register` method will allow one or more publishers to be registered.
+The [`Event`](../../src/Beef.Core/Events/IEventPublisher.cs) provides the standardised event processing/publishing. The underlying `PublishAsync` set of methods provide the means to publish the event(s). A runtime instance should be set using Dependency Injection (DI).
 
 > To publish to Azure Event Hubs the [`EventHubPublisher`](../../src/Beef.Events/Publish/EventHubPublisher.cs) can be used. 
 
@@ -57,7 +57,9 @@ Within the _Beef_ context each Domain would subscribe (listen) to events and pro
 
 ### Subscribers
 
-To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) or [`EventSubscriber<T>`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) (defines the `Event.Value` `Type` to automatically deserialize) specifying the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. The `ReceiveAsync` must return a [`Result`](./Subscribe/Result.cs) to describer the processing outcome; being one of: `Success`, `DataNotFound` (also inferred from a [`NotFoundException`](../../src/Beef.Core/NotFoundException.cs)), `InvalidData` (also inferred from a [`ValidationException`](../../src/Beef.Core/ValidationException.cs) or [`BusinessException`](../../src/Beef.Core/BusinessException.cs)). 
+To start with a developer would create one or more subcribers; one per `Subject` and `Action` combination. A subscriber is created by inheriting from [`EventSubscriber`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) or [`EventSubscriber<T>`](../../src/Beef.Events/Subscribe/EventSubscriber.cs) (defines the `Event.Value` `Type` to automatically deserialize).
+
+Additionally, the [`EventSubscriberAttribute`](../../src/Beef.Events/Subscribe/EventSubscriberAttribute.cs) must be used to specify the `Subject` template (supports wildcards) and optional `Action`(s); finally implementing the `ReceiveAsync` logic. The `ReceiveAsync` must return a [`Result`](./Subscribe/Result.cs) to describe the processing outcome; being one of: `Success`, `DataNotFound` (also inferred from a [`NotFoundException`](../../src/Beef.Core/NotFoundException.cs)), `InvalidData` (also inferred from a [`ValidationException`](../../src/Beef.Core/ValidationException.cs) or [`BusinessException`](../../src/Beef.Core/BusinessException.cs)). 
 
 There are the following properties that can be set that will change the runtime logic:
 
@@ -72,17 +74,38 @@ Property | Description
 See [example](../../samples/Demo/Beef.Demo.Functions/Subscribers/PowerSourceChangeSubscriber.cs) below:
 
 ``` csharp
+[EventSubscriber("Demo.Robot.*", "PowerSourceChange")]
 public class PowerSourceChangeSubscriber : EventSubscriber<string>
 {
-    // Subscribe to all events with a Subject starting with 'Demo.Robot.' as per wildcard
-    // and Action 'PowerSourceChange'.
-    public PowerSourceChangeSubscriber() : base("Demo.Robot.*", "PowerSourceChange") { }
+    private readonly IRobotManager _mgr;
+    private readonly ILogger _log;
+
+    public PowerSourceChangeSubscriber(IRobotManager mgr, ILogger<PowerSourceChangeSubscriber> log)
+    {
+        _mgr = Check.NotNull(mgr, nameof(mgr));
+        _log = Check.NotNull(log, nameof(log));
+        DataNotFoundHandling = ResultHandling.ContinueWithAudit;
+    }
 
     public override async Task<Result> ReceiveAsync(EventData<string> @event)
     {
-        var val = @event.Value;
-        // Processing logic...
-        return Result.Success();
+        _log.LogInformation("A trace message to prove it works!");
+
+        if (@event.Key is Guid id)
+        {
+            var robot = await _mgr.GetAsync(id);
+            if (robot == null)
+                return Result.DataNotFound();
+
+            robot.AcceptChanges();
+            robot.PowerSource = @event.Value;
+            if (robot.IsChanged)
+                await _mgr.UpdateAsync(robot, id);
+
+            return Result.Success();
+        }
+        else
+            return Result.InvalidData($"Key '{@event.Key}' must be a GUID.", ResultHandling.ContinueWithAudit);
     }
 }
 ``` 
@@ -119,13 +142,14 @@ The process host, for example an [Azure Function](https://docs.microsoft.com/en-
 An [example](../../samples/Demo/Beef.Demo.Functions/EventSubscriber.cs) using a [Resilient Event Hub Trigger](#Resilient-Event-Hub-Trigger) is as follows:
 
 ``` csharp
-public static class EventSubscriber
+public class EventSubscriber
 {
+    private readonly EventHubSubscriberHost _subscriber;
+
+    public EventSubscriber(EventHubSubscriberHost subscriber) => _subscriber = Check.NotNull(subscriber, nameof(subscriber));
+
     [FunctionName("EventSubscriber")]
-    public static async Task Run([ResilientEventHubTrigger] EventHubs.EventData @event, ILogger log)
-    {
-        await EventHubSubscriberHost.Create(log).ReceiveAsync(@event);
-    }
+    public async Task Run([ResilientEventHubTrigger] EventHubs.EventData @event) => await _subscriber.ReceiveAsync(@event);
 }
 ```
 
