@@ -89,6 +89,8 @@ namespace Beef.Events
         /// </summary>
         public EventData()
         {
+            EventId = Guid.NewGuid();
+
             if (ExecutionContext.HasCurrent)
             {
                 TenantId = ExecutionContext.Current.TenantId;
@@ -100,6 +102,12 @@ namespace Beef.Events
             else
                 Timestamp = Cleaner.Clean(DateTime.Now);
         }
+
+        /// <summary>
+        /// Gets or sets the unique event identifier.
+        /// </summary>
+        [JsonProperty("eventId", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Guid? EventId { get; set; }
 
         /// <summary>
         /// Gets or sets the tenant identifier.

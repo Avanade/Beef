@@ -45,6 +45,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(1, tep.Events.Count);
             var ed = tep.Events[0];
             Assert.IsNotNull(ed);
+            Assert.IsNotNull(ed.EventId);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
             Assert.AreEqual(123, ed.Key);
@@ -69,6 +70,7 @@ namespace Beef.Core.UnitTest.Events
             await tep.PublishValueAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<Entity>)tep.Events[0];
+            Assert.IsNotNull(ed.EventId);
             Assert.IsNotNull(ed);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
@@ -103,6 +105,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<Entity2>)tep.Events[0];
             Assert.IsNotNull(ed);
+            Assert.IsNotNull(ed.EventId);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
             Assert.AreEqual(new object[] { 123, "Abc" }, ed.Key);
@@ -123,6 +126,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(1, tep.Events.Count);
             var ed = tep.Events[0];
             Assert.IsNotNull(ed);
+            Assert.IsNotNull(ed.EventId);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
             Assert.AreEqual(null, ed.Key);
@@ -142,6 +146,7 @@ namespace Beef.Core.UnitTest.Events
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<string>)tep.Events[0];
             Assert.IsNotNull(ed);
+            Assert.IsNotNull(ed.EventId);
             Assert.AreEqual("domain.entity.123", ed.Subject);
             Assert.AreEqual("create", ed.Action);
             Assert.AreEqual(123, ed.Key);

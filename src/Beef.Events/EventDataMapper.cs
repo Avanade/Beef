@@ -10,10 +10,16 @@ namespace Beef.Events
     /// <summary>
     /// Provides <see cref="EventHubs.EventData"/> to / from <see cref="Beef.Events.EventData"/> mapping (as extension methods). <b>Beef</b> automatically adds the following <see cref="EventHubs.EventData.Properties"/>
     /// to an <see cref="EventHubs.EventData"/> for usage: <see cref="Beef.Events.EventData.Subject"/> (named <see cref="SubjectPropertyName"/>), <see cref="Beef.Events.EventData.Action"/> (named
-    /// <see cref="ActionPropertyName"/>) and <see cref="Beef.Events.EventData.TenantId"/> (named <see cref="TenantIdPropertyName"/>).
+    /// <see cref="ActionPropertyName"/>), <see cref="Beef.Events.EventData.EventId"/> (named <see cref="EventIdPropertyName"/>) and <see cref="Beef.Events.EventData.TenantId"/> 
+    /// (named <see cref="TenantIdPropertyName"/>).
     /// </summary>
     public static class EventDataMapper
     {
+        /// <summary>
+        /// Gets or sets the <b>EventId</b> property name.
+        /// </summary>
+        public static string EventIdPropertyName { get; set; } = "Beef.EventId";
+
         /// <summary>
         /// Gets or sets the <b>Subject</b> property name.
         /// </summary>
@@ -108,6 +114,7 @@ namespace Beef.Events
             var bytes = Encoding.UTF8.GetBytes(json);
             var ed = new EventHubs.EventData(bytes);
 
+            ed.Properties.Add(EventIdPropertyName, eventData.EventId);
             ed.Properties.Add(SubjectPropertyName, eventData.Subject);
             ed.Properties.Add(ActionPropertyName, eventData.Action);
             ed.Properties.Add(TenantIdPropertyName, eventData.TenantId);
@@ -121,7 +128,7 @@ namespace Beef.Events
         /// </summary>
         /// <param name="eventData">The <see cref="EventHubs.EventData"/>.</param>
         /// <returns>The values of the following properties: <see cref="SubjectPropertyName"/>, <see cref="ActionPropertyName"/> and <see cref="TenantIdPropertyName"/>.</returns>
-        public static (string? subject, string? action, Guid? tenantId) GetBeefMetadata(this EventHubs.EventData eventData)
+        public static (Guid? eventId, string? subject, string? action, Guid? tenantId) GetBeefMetadata(this EventHubs.EventData eventData)
         {
             if (eventData == null)
                 throw new ArgumentNullException(nameof(eventData));
@@ -129,10 +136,10 @@ namespace Beef.Events
             eventData.Properties.TryGetValue(SubjectPropertyName, out var subject);
             eventData.Properties.TryGetValue(ActionPropertyName, out var action);
 
-            if (eventData.Properties.TryGetValue(TenantIdPropertyName, out var tenantId) && tenantId != null && tenantId is Guid?)
-                return ((string)subject, (string)action, (Guid?)tenantId);
-            else
-                return ((string)subject, (string)action, (Guid?)null);
+            var eventId = (eventData.Properties.TryGetValue(EventIdPropertyName, out var eid) && eid != null && eid is Guid?) ? (Guid?)eid : null;
+            var tenantId = (eventData.Properties.TryGetValue(TenantIdPropertyName, out var tid) && tid != null && tid is Guid?) ? (Guid?)tid : null;
+
+            return (eventId, (string?)subject, (string?)action, tenantId);
         }
     }
 }

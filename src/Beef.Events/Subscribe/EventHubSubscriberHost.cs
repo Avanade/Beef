@@ -34,7 +34,7 @@ namespace Beef.Events.Subscribe
                 return;
 
             // Convert EventHubs.EventData to Beef.EventData.
-            var (subject, action, _) = @event.GetBeefMetadata();
+            var (_, subject, action, _) = @event.GetBeefMetadata();
             await ReceiveAsync(subject, action, (subscriber) =>
             {
                 try

@@ -2,6 +2,9 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.3
+- *Enhancement:* Added support for the new unique `EventData.EventId`.
+
 ## v4.1.2
 - *Enhancement:* Moved all subscriber host arguments to `EventSubscriberHostArgs` to centralize and enable simple configuration via DI.
 
