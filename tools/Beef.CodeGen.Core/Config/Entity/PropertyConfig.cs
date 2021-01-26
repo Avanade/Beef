@@ -27,6 +27,7 @@ properties: [
     [CategorySchema("Property", Title = "Provides additional _Property_ configuration.")]
     [CategorySchema("RefData", Title = "Provides the _Reference Data_ configuration.")]
     [CategorySchema("Serialization", Title = "Provides the _Serialization_ configuration.")]
+    [CategorySchema("Manager", Title = "Provides the _Manager-layer_ configuration.")]
     [CategorySchema("Data", Title = "Provides the generic _Data-layer_ configuration.")]
     [CategorySchema("Database", Title = "Provides the specific _Database (ADO.NET)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Database`.")]
     [CategorySchema("EntityFramework", Title = "Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.")]
@@ -258,6 +259,20 @@ properties: [
         [PropertySchema("Serialization", Title = "The override JSON property name where outputting as a data model.",
             Description = "Defaults to `JsonName` where not specified.")]
         public string? DataModelJsonName { get; set; }
+
+        #endregion
+
+        #region Manager
+
+        /// <summary>
+        /// Gets or sets the Identifier Generator Type to generate the identifier on create via Dependency Injection (<see cref="Entities.IIdentifierGenerator"/>).
+        /// </summary>
+        [JsonProperty("identifierGenerator", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
+            Description = "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. " +
+                "Where the `Type` matches an already inferred value it will be ignored. " +
+                "See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.")]
+        public string? IdentifierGenerator { get; set; }
 
         #endregion
 
@@ -540,6 +555,11 @@ properties: [
         public string WebApiParameterType => (string.IsNullOrEmpty(RefDataType) ? (string.IsNullOrEmpty(WebApiQueryStringConverter) ? Type! : "string") : (CompareValue(RefDataList, true) ? $"List<{RefDataType}>" : RefDataType!)) + (CompareValue(Nullable, true) ? "?" : "");
 
         /// <summary>
+        /// Gets the name of the IdentifierGenerator as passed in as a parameter via DI.
+        /// </summary>
+        public string? IdentifierGeneratorName { get; set; }
+
+        /// <summary>
         /// Gets or sets the gRPC converter.
         /// </summary>
         public string? GrpcConverter { get; set; }
@@ -617,6 +637,16 @@ properties: [
 
             if (CompareValue(RefDataType, "string") && CompareValue(DataConverter, "ReferenceDataCodeConverter"))
                 DataConverter = null;
+
+            if (!string.IsNullOrEmpty(IdentifierGenerator))
+            {
+                var pc = EntityConfig.CreateParameterConfigFromInterface(IdentifierGenerator);
+                if (pc != null)
+                {
+                    IdentifierGenerator = pc.Type;
+                    IdentifierGeneratorName = pc.Name;
+                }
+            }
 
             GrpcType = DefaultWhereNull(GrpcType, () => InferGrpcType(string.IsNullOrEmpty(RefDataType) ? Type! : RefDataType!, RefDataType, RefDataList, DateTimeTransform));
             GrpcMapper = SystemTypes.Contains(Type) || RefDataType != null ? null : Type;

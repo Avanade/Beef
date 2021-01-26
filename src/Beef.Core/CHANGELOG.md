@@ -14,6 +14,7 @@ Represents the **NuGet** versions.
 - *Enhancement:* Added `EntityBasicBase.GenerateETag` that will generate an ETag for a value by serializing to JSON and performing an MD5 hash.
 - *Enhancement:* Added `LoggerEventPublisher` that simply logs the `Subject`, `Action` and `Value` and then swallows/discards.
 - *Removed:* `ShortGuid` has been removed.
+- *Enhancement:* Added `IGuidIdentifierGenerator`, `IIntIdentifierGenerator` and `IStringIdentifierGenerator` to enable runtime generation of identifier values. A default `GuidIdentifierGenerator` that uses `Guid.NewGuid` is also provided. To use, leverage the new `Property.IdentifierGenerator` to specify the `Type` for Dependency Injection (DI) support.
 
 ## v4.1.2
 - *Enhancement:* The `CodeGen` namespace has been moved to `Beef.CodeGen.Core`. A new `StringConversion` now provides access to the existing string conversion functions (e.g. `ToSentenceCase`). The is the first stage of the custom code-gen capability retirement; to be replaced by [`Handlebars.Net`](https://github.com/rexm/Handlebars.Net) as the code-generation engine.

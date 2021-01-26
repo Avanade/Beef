@@ -408,7 +408,7 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public DbMapper()
             {
-                Property(s => s.Id, "PersonId").SetUniqueKey(true);
+                Property(s => s.Id, "PersonId").SetUniqueKey(false);
                 Property(s => s.FirstName);
                 Property(s => s.LastName);
                 Property(s => s.UniqueCode);
@@ -434,7 +434,7 @@ namespace Beef.Demo.Business.Data
             /// </summary>
             public EfMapper()
             {
-                Property(s => s.Id, d => d.PersonId).SetUniqueKey(true);
+                Property(s => s.Id, d => d.PersonId).SetUniqueKey(false);
                 Property(s => s.FirstName, d => d.FirstName);
                 Property(s => s.LastName, d => d.LastName);
                 Property(s => s.UniqueCode, d => d.UniqueCode);

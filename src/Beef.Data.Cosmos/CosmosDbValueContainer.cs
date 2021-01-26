@@ -168,7 +168,7 @@ namespace Beef.Data.Cosmos
 
             return await CosmosDb.Invoker.InvokeAsync(this, async () =>
             {
-                CosmosDbBase.PrepareEntityForCreate(value, DbArgs.SetIdentifierOnCreate);
+                CosmosDbBase.PrepareEntityForCreate(value);
                 var model = DbArgs.Mapper.MapToDest(value, Mapper.OperationTypes.Create);
                 var cvm = new CosmosDbValue<TModel>(model!);
                 CheckAuthorized(cvm);

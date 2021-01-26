@@ -109,6 +109,13 @@ namespace {{Root.NamespaceBusiness}}
                 ExecutionContext.Current.IsAuthorized("{{AuthPermission}}", true);
   {{/ifval}}
                 ExecutionContext.Current.OperationType = OperationType.{{WebApiOperationType}};
+  {{#ifeq Type 'Create'}}
+    {{#each Parent.Properties}}
+      {{#ifval IdentifierGeneratorName}}
+                value.{{Name}} = await {{private IdentifierGeneratorName}}.GenerateIdentifierAsync<{{../../ValueType}}>().ConfigureAwait(false);
+      {{/ifval}}
+    {{/each}}
+  {{/ifeq}}
   {{#each Parameters}}
     {{#ifeq LayerPassing 'ToManagerSet'}}
                 value.{{Name}} = {{ArgumentName}};

@@ -30,6 +30,7 @@ Category | Description
 [`Property`](#Property) | Provides additional _Property_ configuration.
 [`RefData`](#RefData) | Provides the _Reference Data_ configuration.
 [`Serialization`](#Serialization) | Provides the _Serialization_ configuration.
+[`Manager`](#Manager) | Provides the _Manager-layer_ configuration.
 [`Data`](#Data) | Provides the generic _Data-layer_ configuration.
 [`Database`](#Database) | Provides the specific _Database (ADO.NET)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `Database`.
 [`EntityFramework`](#EntityFramework) | Provides the specific _Entity Framework (EF)_ configuration where `Entity.AutoImplement` or `Operation.AutoImplement` is `EntityFramework`.
@@ -96,6 +97,15 @@ Property | Description
 `serializationIgnore` | Indicates whether the property is not to be serialized. All properties are serialized by default.
 `serializationEmitDefault` | Indicates whether to emit the default value when serializing.
 `dataModelJsonName` | The override JSON property name where outputting as a data model. Defaults to `JsonName` where not specified.
+
+<br/>
+
+## Manager
+Provides the _Manager-layer_ configuration.
+
+Property | Description
+-|-
+`identifierGenerator` | The Identifier Generator Type to generate the identifier on create via Dependency Injection. Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements.
 
 <br/>
 

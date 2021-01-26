@@ -73,6 +73,10 @@ namespace Beef.Demo.Api
             else
                 services.AddBeefNullEventPublisher();
 
+            // Add 
+            services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
+                    .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
+
             // Add custom services; in this instance to allow it to call itself for testing purposes.
             services.AddHttpClient("demo", c => c.BaseAddress = new Uri(_config.GetValue<string>("DemoServiceAgentUrl")));
             services.AddScoped<Common.Agents.IDemoWebApiAgentArgs>(sp => new Common.Agents.DemoWebApiAgentArgs(sp.GetService<System.Net.Http.IHttpClientFactory>().CreateClient("demo")));

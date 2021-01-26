@@ -1264,7 +1264,7 @@ entities:
         /// </summary>
         private void PrepareConstructors()
         {
-            // DataSvc constructors.
+            // Manager constructors.
             var oc = new OperationConfig { Name = "<internal>" };
             oc.Prepare(Root!, this);
 
@@ -1273,6 +1273,14 @@ entities:
                 ManagerCtorParameters.Add(new ParameterConfig { Name = "DataService", Type = $"I{Name}DataSvc", Text = $"{{{{I{Name}DataSvc}}}}" });
 
             AddConfiguredParameters(ManagerCtorParams, ManagerCtorParameters);
+
+            // Get the identifier generator(s).
+            foreach (var p in Properties!.Where(x => !string.IsNullOrEmpty(x.IdentifierGenerator)))
+            {
+                if (!ManagerCtorParameters.Any(x => x.Name == p.IdentifierGeneratorName))
+                    ManagerCtorParameters.Add(new ParameterConfig { Name = p.IdentifierGeneratorName, Type = p.IdentifierGenerator, Text = $"{{{{{p.IdentifierGenerator}}}}}" });
+            }
+
             foreach (var ctor in ManagerCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
@@ -1319,6 +1327,7 @@ entities:
             if (RequiresManager)
                 WebApiCtorParameters.Insert(0, new ParameterConfig { Name = "Manager", Type = $"I{Name}Manager", Text = $"{{{{I{Name}Manager}}}}" });
 
+            AddConfiguredParameters(WebApiCtorParams, WebApiCtorParameters);
             foreach (var ctor in WebApiCtorParameters)
             {
                 ctor.Prepare(Root!, oc);
@@ -1335,24 +1344,35 @@ entities:
 
             foreach (var p in configList)
             {
-                var parts = p.Split("^", StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length == 0)
-                    continue;
-
-                var pc = new ParameterConfig { Type = parts[0], Text = $"{{{{{parts[0]}}}}}" };
-                if (parts.Length == 1)
-                {
-                    var nsparts = parts[0].Split(".", StringSplitOptions.RemoveEmptyEntries);
-                    pc.Name = nsparts.Last().Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
-                    if (pc.Name[0] == 'I' && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
-                        pc.Name = pc.Name[1..];
-                }
-                else
-                    pc.Name = StringConversion.ToPascalCase(parts[1]);
-
-                if (!paramList.Any(x => x.Name == pc.Name))
+                var pc = CreateParameterConfigFromInterface(p);
+                if (pc != null && !paramList.Any(x => x.Name == pc.Name))
                     paramList.Add(pc);
             }
+        }
+
+        /// <summary>
+        /// Create parameter configuration from interface definition.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static ParameterConfig? CreateParameterConfigFromInterface(string text)
+        {
+            var parts = text.Split("^", StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+                return null;
+
+            var pc = new ParameterConfig { Type = parts[0], Text = $"{{{{{parts[0]}}}}}" };
+            if (parts.Length == 1)
+            {
+                var nsparts = parts[0].Split(".", StringSplitOptions.RemoveEmptyEntries);
+                pc.Name = nsparts.Last().Replace("<", "", StringComparison.InvariantCulture).Replace(">", "", StringComparison.InvariantCulture);
+                if (pc.Name[0] == 'I' && pc.Name.Length > 1 && char.IsUpper(pc.Name[1]))
+                    pc.Name = pc.Name[1..];
+            }
+            else
+                pc.Name = StringConversion.ToPascalCase(parts[1]);
+
+            return pc;
         }
     }
 }

@@ -26,11 +26,11 @@ namespace Beef.Demo.Test
         {
             await ValidationTester.Test()
                 .ExpectMessages("Value is required.")
-                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(null));
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).CreateAsync(null));
 
             await ValidationTester.Test()
                 .ExpectMessages("Value is required.")
-                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(null, 1.ToGuid()));
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).UpdateAsync(null, 1.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -43,7 +43,7 @@ namespace Beef.Demo.Test
                     "Last Name is required.",
                     "Gender is required.",
                     "Birthday is required.")
-                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person()));
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).CreateAsync(new Person()));
 
             await ValidationTester.Test()
                 .ConfigureServices(ServiceCollectionsValidationExtension.AddGeneratedValidationServices)
@@ -52,7 +52,7 @@ namespace Beef.Demo.Test
                     "Last Name is required.",
                     "Gender is required.",
                     "Birthday is required.")
-                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).UpdateAsync(new Person(), 1.ToGuid()));
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object).UpdateAsync(new Person(), 1.ToGuid()));
         }
 
         [Test, TestSetUp]
@@ -66,7 +66,8 @@ namespace Beef.Demo.Test
                     "Gender is invalid.",
                     "Eye Color is invalid.",
                     "Birthday must be less than or equal to Today.")
-                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object).CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }));
+                .RunAsync(() => new PersonManager(new Mock<IPersonDataSvc>().Object, new Mock<IGuidIdentifierGenerator>().Object)
+                    .CreateAsync(new Person() { FirstName = 'x'.ToLongString(), LastName = 'x'.ToLongString(), Birthday = DateTime.Now.AddDays(1), Gender = "X", EyeColor = "Y" }));
         }
 
         [Test, TestSetUp]

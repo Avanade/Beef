@@ -40,11 +40,6 @@ namespace Beef.Data.Cosmos
         bool NullOnNotFoundResponse { get; }
 
         /// <summary>
-        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the entity implements <see cref="IGuidIdentifier"/> or <see cref="IStringIdentifier"/>.
-        /// </summary>
-        bool SetIdentifierOnCreate { get; }
-
-        /// <summary>
         /// Gets or sets the <see cref="Microsoft.Azure.Cosmos.RequestOptions"/>.
         /// </summary>
         ItemRequestOptions? ItemRequestOptions { get; set; }
@@ -144,12 +139,6 @@ namespace Beef.Data.Cosmos
         /// Indicates that a <c>null</c> is to be returned where the <b>response</b> has a <see cref="HttpStatusCode"/> of <see cref="HttpStatusCode.NotFound"/> on <b>Get</b>.
         /// </summary>
         public bool NullOnNotFoundResponse { get; set; } = true;
-
-        /// <summary>
-        /// Indicates whether to the set (override) the identifier on <b>Create</b> where the entity implements <see cref="IGuidIdentifier"/> or <see cref="IStringIdentifier"/>.
-        /// </summary>
-        /// <remarks>The value will be set using <see cref="System.Guid.NewGuid"/>.</remarks>
-        public bool SetIdentifierOnCreate { get; set; } = true;
 
         /// <summary>
         /// Gets the <b>CosmosDb/DocumentDb</b> key from the specified keys.

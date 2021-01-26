@@ -26,6 +26,7 @@ namespace Beef.Demo.Business
     public partial class PersonManager : IPersonManager
     {
         private readonly IPersonDataSvc _dataService;
+        private readonly IGuidIdentifierGenerator _guidIdGen;
 
         #region Extensions
         #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
@@ -152,8 +153,9 @@ namespace Beef.Demo.Business
         /// Initializes a new instance of the <see cref="PersonManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IPersonDataSvc"/>.</param>
-        public PersonManager(IPersonDataSvc dataService)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); PersonManagerCtor(); }
+        /// <param name="guidIdGen">The <see cref="IGuidIdentifierGenerator"/>.</param>
+        public PersonManager(IPersonDataSvc dataService, IGuidIdentifierGenerator guidIdGen)
+            { _dataService = Check.NotNull(dataService, nameof(dataService)); _guidIdGen = Check.NotNull(guidIdGen, nameof(guidIdGen)); PersonManagerCtor(); }
 
         partial void PersonManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -169,6 +171,7 @@ namespace Beef.Demo.Business
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
+                value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
                 Cleaner.CleanUp(value);
                 if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
 
@@ -685,6 +688,7 @@ namespace Beef.Demo.Business
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
+                value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
                 Cleaner.CleanUp(value);
                 if (_createWithEfOnPreValidateAsync != null) await _createWithEfOnPreValidateAsync(value).ConfigureAwait(false);
 

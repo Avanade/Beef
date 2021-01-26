@@ -27,14 +27,21 @@ namespace Beef.Demo.Business
     {
         private readonly IRobotDataSvc _dataService;
         private readonly Beef.Events.IEventPublisher _eventPublisher;
+        private readonly IGuidIdentifierGenerator _guidIdentifierGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotManager"/> class.
         /// </summary>
         /// <param name="dataService">The <see cref="IRobotDataSvc"/>.</param>
         /// <param name="eventPublisher">The <see cref="Beef.Events.IEventPublisher"/>.</param>
-        public RobotManager(IRobotDataSvc dataService, Beef.Events.IEventPublisher eventPublisher)
-            { _dataService = Check.NotNull(dataService, nameof(dataService)); _eventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher)); RobotManagerCtor(); }
+        /// <param name="guidIdentifierGenerator">The <see cref="IGuidIdentifierGenerator"/>.</param>
+        public RobotManager(IRobotDataSvc dataService, Beef.Events.IEventPublisher eventPublisher, IGuidIdentifierGenerator guidIdentifierGenerator)
+        {
+            _dataService = Check.NotNull(dataService, nameof(dataService));
+            _eventPublisher = Check.NotNull(eventPublisher, nameof(eventPublisher));
+            _guidIdentifierGenerator = Check.NotNull(guidIdentifierGenerator, nameof(guidIdentifierGenerator));
+            RobotManagerCtor();
+        }
 
         partial void RobotManagerCtor(); // Enables additional functionality to be added to the constructor.
 
@@ -66,6 +73,7 @@ namespace Beef.Demo.Business
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
                 ExecutionContext.Current.OperationType = OperationType.Create;
+                value.Id = await _guidIdentifierGenerator.GenerateIdentifierAsync<Robot>().ConfigureAwait(false);
                 Cleaner.CleanUp(value);
                 (await value.Validate(nameof(value)).Entity().With<IValidator<Robot>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));

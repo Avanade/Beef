@@ -66,7 +66,6 @@ Property | Description
 `ItemRequestOptions` | The [`ItemRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.itemrequestoptions) used for `Get`, `Create`, `Update` and `Delete`.
 `QueryRequestOptions` | The [`QueryRequestOptions`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.cosmos.queryrequestoptions) used for `Query` only.
 `NullOnNotFoundResponse` | Indicates that a `null` is to be returned where the *response* has an `HttpStatusCode.NotFound` on a `Get`.
-`SetIdentifierOnCreate` | Indicates whether to the set (override) the identifier on `Create` where the entity implements [`IIdentifer`](../Beef.Core/Entities/IIdentifier.cs).
 `SetAuthorizedFilter` | Sets the filter (`IQueryable`) for all operations to ensure consistent authorisation is applied. Applies automatically to all queries, in that the filter is applied each time a `CosmosDbQuery` or `CosmosDbValueQuery` is executed. Additionally, the filter is applied to the standard `Get`, `Create`, `Update` and `Delete` (CRUD) operations to ensure only authorised data is accessed and modified.
 
 The following demonstrates the usage:

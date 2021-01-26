@@ -233,7 +233,7 @@ namespace Beef.Grpc
         /// <summary>
         /// Does the actual execution of the <paramref name="func"/> asynchronously where there is a <typeparamref name="TResult"/>.
         /// </summary>
-        //[DebuggerStepThrough()]
+        [DebuggerStepThrough()]
         private async Task<TResult> ExecuteResultAsyncInternal<TResult>(Func<Task<TResult>> func)
         {
             try

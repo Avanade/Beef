@@ -879,6 +879,11 @@
                       "title": "The override JSON property name where outputting as a data model.",
                       "description": "Defaults to `JsonName` where not specified."
                     },
+                    "identifierGenerator": {
+                      "type": "string",
+                      "title": "The Identifier Generator Type to generate the identifier on create via Dependency Injection.",
+                      "description": "Should be formatted as `Type` + `^` + `Name`; e.g. `IGuidIdentifierGenerator^GuidIdGen`. Where the `Name` portion is not specified it will be inferred. Where the `Type` matches an already inferred value it will be ignored. See `Beef.Entities.IIntIdentifierGenerator`, `Beef.Entities.IGuidIdentifierGenerator` or `Beef.Entities.IStringIdentifierGenerator` for underlying implementation requirements."
+                    },
                     "dataName": {
                       "type": "string",
                       "title": "The data name where Entity.AutoImplement is selected.",
