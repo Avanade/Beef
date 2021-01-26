@@ -7,23 +7,23 @@ using System;
 namespace Beef.Data.Database.Cdc
 {
     /// <summary>
-    /// Represents the standard CDC (Change Data Capture) outbox envelope.
+    /// Represents the standard CDC (Change Data Capture) outbox.
     /// </summary>
-    public class CdcEnvelope : IIntIdentifier
+    public class CdcOutbox : IIntIdentifier
     {
         /// <summary>
-        /// Gets or sets the outbox envelope identifer.
+        /// Gets or sets the outbox outbox identifer.
         /// </summary>
-        [MapperProperty("EnvelopeId")]
+        [MapperProperty("OutboxId")]
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the outbox envelope created date.
+        /// Gets or sets the outbox outbox created date.
         /// </summary>
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
-        /// Indicates whether the changes within the envelope have been marked as completed.
+        /// Indicates whether the changes within the outbox have been marked as completed.
         /// </summary>
         public bool IsComplete { get; set; }
 

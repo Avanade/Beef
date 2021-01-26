@@ -5,6 +5,7 @@
 #nullable enable
 #pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
 
+using Beef;
 using Beef.Data.Database;
 using Beef.Data.Database.Cdc;
 using Beef.Events;
@@ -40,17 +41,17 @@ namespace Beef.Demo.Cdc.Data
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
         public PostsCdcData(IDatabase db, IEventPublisher evtPub, ILogger<PostsCdcData> logger) :
-            base(db, "[DemoCdc].[spExecutePostsCdcEnvelope]", evtPub, logger) => PostsCdcDataCtor();
+            base(db, "[DemoCdc].[spExecutePostsCdcOutbox]", evtPub, logger) => PostsCdcDataCtor();
 
         partial void PostsCdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the envelope entity data from the database.
+        /// Gets the outbox entity data from the database.
         /// </summary>
         /// <param name="maxBatchSize">The recommended maximum batch size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
+        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<PostsCdcWrapperCollection, PostsCdcWrapper>> GetOutboxEntityDataAsync(int maxBatchSize, bool incomplete)
         {
             var pColl = new PostsCdcWrapperCollection();
 

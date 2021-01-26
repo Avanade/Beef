@@ -11,7 +11,7 @@ namespace Beef.Data.Database.Cdc
     public interface ICdcDataOrchestrator
     {
         /// <summary>
-        /// Executes the next (new) envelope.
+        /// Executes the next (new) outbox.
         /// </summary>
         /// <param name="maxQuerySize">The maximum query size. Defaults to 100.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
@@ -19,7 +19,7 @@ namespace Beef.Data.Database.Cdc
         public Task<CdcDataOrchestratorResult> ExecuteNextAsync(int maxQuerySize, CancellationToken? cancellationToken);
 
         /// <summary>
-        /// Executes any previously incomplete envelope.
+        /// Executes any previously incomplete outbox.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="CdcDataOrchestratorResult"/>.</returns>

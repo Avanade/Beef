@@ -9,6 +9,6 @@ CREATE TABLE [{{CdcSchema}}].[{{CdcTrackingTableName}}] (
   [Table] VARCHAR(128) NOT NULL,
   [Key] NVARCHAR(128) NOT NULL,
   [Hash] NVARCHAR(32) NOT NULL,
-  [EnvelopeId] INT NOT NULL,
+  [OutboxId] INT NOT NULL,
   CONSTRAINT [IX_{{CdcSchema}}_{{CdcTrackingTableName}}_SchemaTableKey] UNIQUE CLUSTERED ([Schema], [Table], [Key])
 );

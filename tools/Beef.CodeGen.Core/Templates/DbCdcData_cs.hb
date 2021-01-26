@@ -47,12 +47,12 @@ namespace {{Root.NamespaceCdc}}.Data
         partial void {{ModelName}}CdcDataCtor(); // Enables additional functionality to be added to the constructor.
 
         /// <summary>
-        /// Gets the envelope entity data from the database.
+        /// Gets the outbox entity data from the database.
         /// </summary>
         /// <param name="maxBatchSize">The recommended maximum batch size.</param>
-        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> envelope where <c>true</c>; othewise, <c>false</c> for the next new envelope.</param>
+        /// <param name="incomplete">Indicates whether to return the last <b>incomplete</b> outbox where <c>true</c>; othewise, <c>false</c> for the next new outbox.</param>
         /// <returns>The corresponding result.</returns>
-        protected override async Task<CdcDataOrchestratorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetEnvelopeEntityDataAsync(int maxBatchSize, bool incomplete)
+        protected override async Task<CdcDataOrchestratorResult<{{ModelName}}CdcWrapperCollection, {{ModelName}}CdcWrapper>> GetOutboxEntityDataAsync(int maxBatchSize, bool incomplete)
         {
             var {{Alias}}Coll = new {{ModelName}}CdcWrapperCollection();
 

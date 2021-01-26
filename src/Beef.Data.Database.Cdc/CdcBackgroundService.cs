@@ -126,7 +126,7 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Executes the data orchestration for the next envelope and/or incomplete envelope.
+        /// Executes the data orchestration for the next outbox and/or incomplete outbox.
         /// </summary>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task"/> that represents the long running operations.</returns>
@@ -147,7 +147,7 @@ namespace Beef.Data.Database.Cdc
         }
 
         /// <summary>
-        /// Executes the data orchestration for the next envelope and/or incomplete envelope.
+        /// Executes the data orchestration for the next outbox and/or incomplete outbox.
         /// </summary>
         /// <param name="cdcDataOrchestrator">The <typeparamref name="TCdcDataOrchestrator"/> instance.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
@@ -166,19 +166,19 @@ namespace Beef.Data.Database.Cdc
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                // Where successful, then the next envelope should be attempted immediately.
-                if (cdor.EnvelopeExecuted)
+                // Where successful, then the next outbox should be attempted immediately.
+                if (cdor.OutboxExecuted)
                     _processIncomplete = false;
                 else
                 {
                     // Nothing found to process so retry later.
-                    if (cdor.Envelope == null)
+                    if (cdor.Outbox == null)
                         return;
 
-                    if (!cdor.Envelope.IsComplete && !_processIncomplete)
+                    if (!cdor.Outbox.IsComplete && !_processIncomplete)
                     {
                         _processIncomplete = true;
-                        Logger.LogInformation($"Subsequent executions will attempt to complete envelope '{cdor.Envelope.Id}' prior to executing next.");
+                        Logger.LogInformation($"Subsequent executions will attempt to complete outbox '{cdor.Outbox.Id}' prior to executing next.");
                     }
                     else
                         return; // Retry later.

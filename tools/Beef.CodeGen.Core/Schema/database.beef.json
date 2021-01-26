@@ -950,18 +950,18 @@
             },
             "storedProcedureName": {
               "type": "string",
-              "title": "The `CDC` get envelope data stored procedure name.",
-              "description": "Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`."
+              "title": "The `CDC` get outbox data stored procedure name.",
+              "description": "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`."
             },
             "cdcSchema": {
               "type": "string",
               "title": "The schema name for the generated `CDC`-related database artefacts.",
               "description": "Defaults to `CodeGenConfig.CdcSchema`."
             },
-            "envelopeTableName": {
+            "outboxTableName": {
               "type": "string",
-              "title": "The corresponding `CDC` Envelope table name.",
-              "description": "Defaults to `Name` + `Envelope` (literal)."
+              "title": "The corresponding `CDC` Outbox table name.",
+              "description": "Defaults to `Name` + `Outbox` (literal)."
             },
             "modelName": {
               "type": "string",

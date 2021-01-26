@@ -52,9 +52,9 @@ Provides the _database_ configuration.
 
 Property | Description
 -|-
-`storedProcedureName` | The `CDC` get envelope data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.
+`storedProcedureName` | The `CDC` get outbox data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.
 `cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGenConfig.CdcSchema`.
-`envelopeTableName` | The corresponding `CDC` Envelope table name. Defaults to `Name` + `Envelope` (literal).
+`outboxTableName` | The corresponding `CDC` Outbox table name. Defaults to `Name` + `Outbox` (literal).
 
 <br/>
 

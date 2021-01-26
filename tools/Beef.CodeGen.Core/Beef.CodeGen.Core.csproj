@@ -38,7 +38,7 @@
   <ItemGroup>
     <None Remove="Scripts\DatabaseCdc.xml" />
     <None Remove="Scripts\DatabaseCdcDacpac.xml" />
-    <None Remove="Scripts\DatabaseCdcEnvelope.xml" />
+    <None Remove="Scripts\DatabaseCdcOutbox.xml" />
     <None Remove="Scripts\DatabaseCdcTracking.xml" />
     <None Remove="Scripts\DatabaseWithCdc.xml" />
     <None Remove="Scripts\DatabaseWithCdcDacpac.xml" />
@@ -46,8 +46,8 @@
     <None Remove="Templates\DbCdcDataSce_cs.hb" />
     <None Remove="Templates\DbCdcData_cs.hb" />
     <None Remove="Templates\DbCdcEntity_cs.hb" />
-    <None Remove="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
-    <None Remove="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
+    <None Remove="Templates\DbCdcOutboxTableCreate_sql.hb" />
+    <None Remove="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <None Remove="Templates\DbCdcTrackingTvp_cs.hb" />
     <None Remove="Templates\DbCdcTrackingUdt_sql.hb" />
@@ -104,7 +104,7 @@
     <EmbeddedResource Include="Resources\SelectTablePrimaryKey.sql" />
     <EmbeddedResource Include="Scripts\DatabaseCdcTracking.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdcDacpac.xml" />
-    <EmbeddedResource Include="Scripts\DatabaseCdcEnvelope.xml" />
+    <EmbeddedResource Include="Scripts\DatabaseCdcOutbox.xml" />
     <EmbeddedResource Include="Scripts\DatabaseWithCdcDacpac.xml" />
     <EmbeddedResource Include="Scripts\DatabaseWithCdc.xml" />
     <EmbeddedResource Include="Scripts\DatabaseCdc.xml" />
@@ -123,10 +123,10 @@
     <EmbeddedResource Include="Templates\DbCdcTrackingTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbEfModelBuilder_cs.hbs" />
     <EmbeddedResource Include="Templates\DbCdcEntity_cs.hb" />
-    <EmbeddedResource Include="Templates\DbCdcEnvelopeTableCreate_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcOutboxTableCreate_sql.hb" />
     <EmbeddedResource Include="Templates\DbSpTableDelete_sql.hbs" />
     <EmbeddedResource Include="Templates\DbEfModel_cs.hbs" />
-    <EmbeddedResource Include="Templates\DbCdcSpExecuteEnvelope_sql.hb" />
+    <EmbeddedResource Include="Templates\DbCdcSpExecuteOutbox_sql.hb" />
     <EmbeddedResource Include="Templates\DbVwQuery_sql.hbs" />
     <EmbeddedResource Include="Templates\DbVwTable_sql.hbs" />
     <EmbeddedResource Include="Templates\DbTvpTable_cs.hbs" />

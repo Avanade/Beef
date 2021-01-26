@@ -180,9 +180,9 @@ The following database artefacts are generated.
 Type | Name | Description
 -|-|-
 `Table` | `CdcTracking.sql` | Represents the related _Entity Hash_ tracking table used to identify whether a version of a specific entity has been previously (successfully) processed. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163724-create-democdc-cdctracking.sql).
-`Table` | `XxxEnvelope.sql` | Represents the _Entity_ envelope table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next envelope. An envelope is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163747-create-democdc-postsenvelope.sql).
+`Table` | `XxxOutbox.sql` | Represents the _Entity_ outbox table used to track the log sequence number (LSN) for the primary and secondary tables. This acts as a pointer of where the processing is at in relation to each table to aid both reprocessing, and to determine where to begin processing of next outbox set. An outbox set is essentially just a batch of one or more entities for processing. See [example](../../samples/Demo/Beef.Demo.Database/Migrations/20210111-163747-create-democdc-postsoutbox.sql).
 `Type` | `udtTrackingList.sql` | Represents the user-defined type / table-valued parameter required to pass a list of key/hash values from .NET code to a SQL Stored Procedure. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Types/User-Defined%20Table%20Types/Generated/UdtCdcTrackingList.sql).
-`Stored Procedure` | `spExecuteXxxCdcEnvelope.sq` | Represents the **key** CDC-related logic. This stored procedure is responsible for getting the next envelope for an _Entity_, retrying an existing envelope, and completing an existing envelope. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcEnvelope.sql).
+`Stored Procedure` | `spExecuteXxxCdcOutbox.sql` | Represents the **key** CDC-related logic. This stored procedure is responsible for getting the next outbox set for an _Entity_, retrying an existing outbox set, and completing an existing outbox set. See [example](../../samples/Demo/Beef.Demo.Database/Schema/DemoCdc/Stored%20Procedures/Generated/spExecuteContactCdcOutbox.sql).
 
 _Tip:_ If any of the generated files are not automatically added to the Visual Studio Project structure, the _Show All Files_ in the _Solution Explorer_ can be used to view, and then individually added using _Include In Project_.
 
@@ -192,9 +192,9 @@ As [stated](#Database-code-generation) earlier, where using DbUp the [Migration]
 -- Create the CdcTracking.sql
 dotnet run codegen --script DatabaseCdcTracking.xml
 
--- Create (each) `XxxEnvelope.sql` by specifying the unique CdcName as configured.
-dotnet run codegen --script DatabaseCdcEnvelope.xml --param CdcName=Contact
-dotnet run codegen --script DatabaseCdcEnvelope.xml --param CdcName=Posts
+-- Create (each) `XxxOutbox.sql` by specifying the unique CdcName as configured.
+dotnet run codegen --script DatabaseCdcOutbox.xml --param CdcName=Contact
+dotnet run codegen --script DatabaseCdcOutbox.xml --param CdcName=Posts
 ```
 
 <br/>

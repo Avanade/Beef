@@ -92,11 +92,11 @@ namespace Beef.CodeGen.Config.Database
         #region Database
 
         /// <summary>
-        /// Gets or sets the `Cdc` execute envelope stored procedure name.
+        /// Gets or sets the `Cdc` execute outbox stored procedure name.
         /// </summary>
         [JsonProperty("storedProcedureName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The `CDC` get envelope data stored procedure name.",
-            Description = "Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.")]
+        [PropertySchema("Database", Title = "The `CDC` get outbox data stored procedure name.",
+            Description = "Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.")]
         public string? StoredProcedureName { get; set; }
 
         /// <summary>
@@ -108,12 +108,12 @@ namespace Beef.CodeGen.Config.Database
         public string? CdcSchema { get; set; }
 
         /// <summary>
-        /// Gets or sets the corresponding `Cdc` Envelope table name.
+        /// Gets or sets the corresponding `Cdc` Outbox table name.
         /// </summary>
-        [JsonProperty("envelopeTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Database", Title = "The corresponding `CDC` Envelope table name.",
-            Description = "Defaults to `Name` + `Envelope` (literal).")]
-        public string? EnvelopeTableName { get; set; }
+        [JsonProperty("outboxTableName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Database", Title = "The corresponding `CDC` Outbox table name.",
+            Description = "Defaults to `Name` + `Outbox` (literal).")]
+        public string? OutboxTableName { get; set; }
 
         #endregion
 
@@ -294,9 +294,9 @@ namespace Beef.CodeGen.Config.Database
 
             Alias = DefaultWhereNull(Alias, () => new string(StringConversion.ToSentenceCase(Name)!.Split(' ').Select(x => x.Substring(0, 1).ToLower(System.Globalization.CultureInfo.InvariantCulture).ToCharArray()[0]).ToArray()));
 
-            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcEnvelope");
+            StoredProcedureName = DefaultWhereNull(StoredProcedureName, () => $"spExecute{StringConversion.ToPascalCase(Name)}CdcOutbox");
             CdcSchema = DefaultWhereNull(CdcSchema, () => Root.CdcSchema);
-            EnvelopeTableName = DefaultWhereNull(EnvelopeTableName, () => Name + "Envelope");
+            OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
             DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");

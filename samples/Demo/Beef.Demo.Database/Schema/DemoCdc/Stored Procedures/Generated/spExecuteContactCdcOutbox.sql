@@ -1,7 +1,7 @@
-CREATE PROCEDURE [DemoCdc].[spExecuteContactCdcEnvelope]
+CREATE PROCEDURE [DemoCdc].[spExecuteContactCdcOutbox]
   @MaxQuerySize INT NULL = 100,
-  @GetIncompleteEnvelope BIT NULL = 0,
-  @EnvelopeIdToMarkComplete INT NULL = NULL,
+  @GetIncompleteOutbox BIT NULL = 0,
+  @OutboxIdToMarkComplete INT NULL = NULL,
   @CompleteTrackingList AS [DemoCdc].[udtCdcTrackingList] READONLY
 AS
 BEGIN
@@ -15,14 +15,14 @@ BEGIN
     -- Wrap in a transaction.
     BEGIN TRANSACTION
 
-    -- Mark the envelope as complete and merge the tracking info; then return the updated envelope data and stop!
-    IF (@EnvelopeIdToMarkComplete IS NOT NULL)
+    -- Mark the outbox as complete and merge the tracking info; then return the updated outbox data and stop!
+    IF (@OutboxIdToMarkComplete IS NOT NULL)
     BEGIN
-      UPDATE [_env] SET
-          [_env].[IsComplete] = 1,
-          [_env].[CompletedDate] = GETUTCDATE()
-        FROM [DemoCdc].[ContactEnvelope] AS [_env]
-        WHERE EnvelopeId = @EnvelopeIdToMarkComplete 
+      UPDATE [_outbox] SET
+          [_outbox].[IsComplete] = 1,
+          [_outbox].[CompletedDate] = GETUTCDATE()
+        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+        WHERE OutboxId = @OutboxIdToMarkComplete 
 
       MERGE INTO [DemoCdc].[CdcTracking] WITH (HOLDLOCK) AS [_ct]
         USING @CompleteTrackingList AS [_list] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = [_list].[Key])
@@ -30,14 +30,14 @@ BEGIN
             SELECT [_list].[Key], [_list].[Hash]
             EXCEPT
             SELECT [_ct].[Key], [_ct].[Hash])
-          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[EnvelopeId] = @EnvelopeIdToMarkComplete
+          THEN UPDATE SET [_ct].[Hash] = [_list].[Hash], [_ct].[OutboxId] = @OutboxIdToMarkComplete
         WHEN NOT MATCHED BY TARGET
-          THEN INSERT ([Schema], [Table], [Key], [Hash], [EnvelopeId])
-            VALUES ('Legacy', 'Contact', [_list].[Key], [_list].[Hash], @EnvelopeIdToMarkComplete);
+          THEN INSERT ([Schema], [Table], [Key], [Hash], [OutboxId])
+            VALUES ('Legacy', 'Contact', [_list].[Key], [_list].[Hash], @OutboxIdToMarkComplete);
 
-      SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
-        FROM [DemoCdc].[ContactEnvelope] AS [_env]
-        WHERE [_env].EnvelopeId = @EnvelopeIdToMarkComplete
+      SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+        WHERE [_outbox].OutboxId = @OutboxIdToMarkComplete
 
       COMMIT TRANSACTION
       RETURN 0;
@@ -46,27 +46,27 @@ BEGIN
     -- Declare variables.
     DECLARE @ContactBaseMinLsn BINARY(10), @ContactMinLsn BINARY(10), @ContactMaxLsn BINARY(10)
     DECLARE @AddressBaseMinLsn BINARY(10), @AddressMinLsn BINARY(10), @AddressMaxLsn BINARY(10)
-    DECLARE @EnvelopeId INT
+    DECLARE @OutboxId INT
 
     -- Get the latest 'base' minimum.
     SET @ContactBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Contact');
     SET @AddressBaseMinLsn = sys.fn_cdc_get_min_lsn('Legacy_Address');
 
-    -- Where requesting for incomplete envelope, get first that is marked as incomplete.
-    IF (@GetIncompleteEnvelope = 1)
+    -- Where requesting for incomplete outbox, get first that is marked as incomplete.
+    IF (@GetIncompleteOutbox = 1)
     BEGIN
       SELECT TOP 1
-          @ContactMinLsn = [_env].[ContactMinLsn],
-          @ContactMaxLsn = [_env].[ContactMaxLsn],
-          @AddressMinLsn = [_env].[AddressMinLsn],
-          @AddressMaxLsn = [_env].[AddressMaxLsn],
-          @EnvelopeId = [EnvelopeId]
-        FROM [DemoCdc].[ContactEnvelope] AS [_env]
-        WHERE [_env].[IsComplete] = 0 
-        ORDER BY [_env].[EnvelopeId]
+          @ContactMinLsn = [_outbox].[ContactMinLsn],
+          @ContactMaxLsn = [_outbox].[ContactMaxLsn],
+          @AddressMinLsn = [_outbox].[AddressMinLsn],
+          @AddressMaxLsn = [_outbox].[AddressMaxLsn],
+          @OutboxId = [OutboxId]
+        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+        WHERE [_outbox].[IsComplete] = 0 
+        ORDER BY [_outbox].[OutboxId]
 
-      -- Where no incomplete envelope is found then stop!
-      IF (@EnvelopeId IS NULL)
+      -- Where no incomplete outbox is found then stop!
+      IF (@OutboxId IS NULL)
       BEGIN
         COMMIT TRANSACTION
         RETURN 0;
@@ -76,32 +76,32 @@ BEGIN
     END
     ELSE
     BEGIN
-      -- Check that there are no incomplete envelopes; if there are then stop with error; otherwise, continue!
+      -- Check that there are no incomplete outboxs; if there are then stop with error; otherwise, continue!
       DECLARE @IsComplete BIT
 
       SELECT TOP 1
-          @EnvelopeId = [_env].[EnvelopeId],
-          @ContactMinLsn = [_env].[ContactMaxLsn],
-          @AddressMinLsn = [_env].[AddressMaxLsn],
-          @IsComplete = [_env].IsComplete
-        FROM [DemoCdc].[ContactEnvelope] AS [_env]
-        ORDER BY [_env].[IsComplete] ASC, [_env].[EnvelopeId] DESC
+          @OutboxId = [_outbox].[OutboxId],
+          @ContactMinLsn = [_outbox].[ContactMaxLsn],
+          @AddressMinLsn = [_outbox].[AddressMaxLsn],
+          @IsComplete = [_outbox].IsComplete
+        FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+        ORDER BY [_outbox].[IsComplete] ASC, [_outbox].[OutboxId] DESC
 
-      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete envelope; must be completed.
+      IF (@IsComplete = 0) -- Cannot continue where there is an incomplete outbox; must be completed.
       BEGIN
-        SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
-          FROM [DemoCdc].[ContactEnvelope] AS [_env]
-          WHERE [_env].EnvelopeId = @EnvelopeId 
+        SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+          FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+          WHERE [_outbox].OutboxId = @OutboxId 
 
         COMMIT TRANSACTION
         RETURN -1;
       END
       ELSE
       BEGIN
-        SET @EnvelopeId = null -- Force creation of a new envelope.
+        SET @OutboxId = null -- Force creation of a new outbox.
       END
 
-      IF (@IsComplete IS NULL) -- No previous envelope; i.e. is the first time!
+      IF (@IsComplete IS NULL) -- No previous outbox; i.e. is the first time!
       BEGIN
         SET @ContactMinLsn = @ContactBaseMinLsn;
         SET @AddressMinLsn = @AddressBaseMinLsn;
@@ -173,12 +173,12 @@ BEGIN
       END
     END
 
-    -- Create a new envelope where not processing an existing.
-    IF (@EnvelopeId IS NULL AND @hasChanges = 1)
+    -- Create a new outbox where not processing an existing.
+    IF (@OutboxId IS NULL AND @hasChanges = 1)
     BEGIN
-      DECLARE @InsertedEnvelopeId TABLE([EnvelopeId] INT)
+      DECLARE @InsertedOutboxId TABLE([OutboxId] INT)
 
-      INSERT INTO [DemoCdc].[ContactEnvelope] (
+      INSERT INTO [DemoCdc].[ContactOutbox] (
           [ContactMinLsn],
           [ContactMaxLsn],
           [AddressMinLsn],
@@ -186,7 +186,7 @@ BEGIN
           [CreatedDate],
           [IsComplete]
         ) 
-        OUTPUT inserted.EnvelopeId INTO @InsertedEnvelopeId
+        OUTPUT inserted.OutboxId INTO @InsertedOutboxId
         VALUES (
           @ContactMinLsn,
           @ContactMaxLsn,
@@ -196,13 +196,13 @@ BEGIN
           0
         )
 
-        SELECT @EnvelopeId = [EnvelopeId] FROM @InsertedEnvelopeId
+        SELECT @OutboxId = [OutboxId] FROM @InsertedOutboxId
     END
 
-    -- Return the *latest* envelope data.
-    SELECT [_env].[EnvelopeId], [_env].[CreatedDate], [_env].[IsComplete], [_env].[CompletedDate]
-      FROM [DemoCdc].[ContactEnvelope] AS [_env]
-      WHERE [_env].EnvelopeId = @EnvelopeId 
+    -- Return the *latest* outbox data.
+    SELECT [_outbox].[OutboxId], [_outbox].[CreatedDate], [_outbox].[IsComplete], [_outbox].[CompletedDate]
+      FROM [DemoCdc].[ContactOutbox] AS [_outbox]
+      WHERE [_outbox].OutboxId = @OutboxId 
 
     -- Exit here if there were no changes found.
     IF (@hasChanges = 0)

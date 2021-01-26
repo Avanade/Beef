@@ -1,9 +1,9 @@
-CREATE TABLE [DemoCdc].[PostsEnvelope] (
+CREATE TABLE [DemoCdc].[PostsOutbox] (
   /*
    * This is automatically generated; any changes will be lost.
    */
 
-  [EnvelopeId] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY CLUSTERED ([EnvelopeId] ASC),
+  [OutboxId] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY CLUSTERED ([OutboxId] ASC),
   [CreatedDate] DATETIME NOT NULL,
   [PostsMinLsn] BINARY(10) NOT NULL,  -- Primary table: Legacy.Posts
   [PostsMaxLsn] BINARY(10) NOT NULL,

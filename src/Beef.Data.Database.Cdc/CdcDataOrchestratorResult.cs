@@ -16,14 +16,14 @@ namespace Beef.Data.Database.Cdc
         public int ReturnCode { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="CdcEnvelope"/>.
+        /// Gets or sets the <see cref="CdcOutbox"/>.
         /// </summary>
-        public CdcEnvelope? Envelope { get; internal set; }
+        public CdcOutbox? Outbox { get; internal set; }
 
         /// <summary>
-        /// Indicates that a envelope execution was successful and can continue.
+        /// Indicates that a outbox execution was successful and can continue.
         /// </summary>
-        public bool EnvelopeExecuted => ReturnCode == 0 && Envelope != null;
+        public bool OutboxExecuted => ReturnCode == 0 && Outbox != null;
     }
 
     /// <summary>

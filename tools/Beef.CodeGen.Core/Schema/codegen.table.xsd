@@ -744,7 +744,7 @@
             </xs:attribute>
             <xs:attribute name="StoredProcedureName" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The `CDC` get envelope data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcEnvelope` (literal); e.g. `spExecuteTableNameCdcEnvelope`.</xs:documentation>
+                <xs:documentation>The `CDC` get outbox data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="CdcSchema" use="optional" type="xs:string">
@@ -752,9 +752,9 @@
                 <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGenConfig.CdcSchema`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="EnvelopeTableName" use="optional" type="xs:string">
+            <xs:attribute name="OutboxTableName" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The corresponding `CDC` Envelope table name. Defaults to `Name` + `Envelope` (literal).</xs:documentation>
+                <xs:documentation>The corresponding `CDC` Outbox table name. Defaults to `Name` + `Outbox` (literal).</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ModelName" use="optional" type="xs:string">
