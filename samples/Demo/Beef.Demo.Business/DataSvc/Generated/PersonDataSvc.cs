@@ -36,6 +36,7 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Guid, Task>? _deleteOnAfterAsync;
         private Func<Person?, Guid, Task>? _getOnAfterAsync;
         private Func<Person, Task>? _updateOnAfterAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
         private Func<PersonCollectionResult, PagingArgs?, Task>? _getAllOnAfterAsync;
         private Func<PersonCollectionResult, Task>? _getAll2OnAfterAsync;
         private Func<PersonCollectionResult, PersonArgs?, PagingArgs?, Task>? _getByArgsOnAfterAsync;
@@ -79,11 +80,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Create").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
-                if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -95,10 +96,10 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
+                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
-                if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -115,8 +116,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -131,9 +132,26 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
-                if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
+                return __result;
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> UpdateWithRollbackAsync(Person value)
+        {
+            return DataSvcInvoker.Current.InvokeAsync(this, async () =>
+            {
+                var __result = await _data.UpdateWithRollbackAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result).ConfigureAwait(false);
+                await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -210,13 +228,13 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.MergeAsync(fromId, toId).ConfigureAwait(false);
+                if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 await _evtPub.PublishAsync(
                     _evtPub.CreateValueEvent(__result, $"Demo.Person.{fromId}", "MergeFrom", fromId, toId),
                     _evtPub.CreateValueEvent(__result, $"Demo.Person.{toId}", "MergeTo", fromId, toId)).ConfigureAwait(false);
 
-                if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -259,8 +277,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetNoArgsAsync().ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -279,8 +297,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetDetailAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -295,11 +313,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
-                if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -382,8 +400,8 @@ namespace Beef.Demo.Business.DataSvc
                     return __val;
 
                 var __result = await _data.GetWithEfAsync(id).ConfigureAwait(false);
-                _cache.SetValue(__key, __result);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
+                _cache.SetValue(__key, __result);
                 return __result;
             });
         }
@@ -398,8 +416,8 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
+                _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
         }
@@ -414,11 +432,11 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValueAsync(__result, $"Demo.Person.{__result.Id}", "Update").ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
-                if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
 
         /// <summary>
@@ -430,10 +448,10 @@ namespace Beef.Demo.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteWithEfAsync(id).ConfigureAwait(false);
+                if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
                 await _evtPub.PublishAsync($"Demo.Person.{id}", "Delete", id).ConfigureAwait(false);
                 _cache.Remove<Person>(new UniqueKey(id));
-                if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
-            });
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
     }
 }

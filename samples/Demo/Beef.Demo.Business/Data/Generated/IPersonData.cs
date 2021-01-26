@@ -49,6 +49,13 @@ namespace Beef.Demo.Business.Data
         Task<Person> UpdateAsync(Person value);
 
         /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        Task<Person> UpdateWithRollbackAsync(Person value);
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="paging">The <see cref="PagingArgs"/>.</param>

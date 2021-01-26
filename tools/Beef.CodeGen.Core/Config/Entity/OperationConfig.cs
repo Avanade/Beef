@@ -698,6 +698,8 @@ operations: [
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
 
+            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => Root!.EventTransaction);
+
             WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : (HasReturnValue ? "OK" : "NoContent"));
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
             {
@@ -730,7 +732,7 @@ operations: [
                 _ => "Unspecified"
             });
 
-            EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+            EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
                 "Create" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
@@ -741,6 +743,7 @@ operations: [
 
             PrepareEvents();
 
+            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => CompareValue(EventPublish, true) && CompareValue(Parent!.EventTransaction, true));
             ExcludeIData = DefaultWhereNull(ExcludeIData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeData = DefaultWhereNull(ExcludeData, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);
             ExcludeIDataSvc = DefaultWhereNull(ExcludeIDataSvc, () => CompareValue(ExcludeAll, YesOption) ? YesOption : NoOption);

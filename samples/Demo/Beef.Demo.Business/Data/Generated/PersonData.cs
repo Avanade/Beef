@@ -48,6 +48,9 @@ namespace Beef.Demo.Business.Data
         private Func<Person, IDatabaseArgs, Task>? _updateOnBeforeAsync;
         private Func<Person, Task>? _updateOnAfterAsync;
         private Action<Exception>? _updateOnException;
+        private Func<Person, IDatabaseArgs, Task>? _updateWithRollbackOnBeforeAsync;
+        private Func<Person, Task>? _updateWithRollbackOnAfterAsync;
+        private Action<Exception>? _updateWithRollbackOnException;
         private Action<DatabaseParameters, IDatabaseArgs>? _getAllOnQuery;
         private Func<IDatabaseArgs, Task>? _getAllOnBeforeAsync;
         private Func<PersonCollectionResult, Task>? _getAllOnAfterAsync;
@@ -175,6 +178,24 @@ namespace Beef.Demo.Business.Data
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 return __result;
             }, new BusinessInvokerArgs { ExceptionHandler = _updateOnException });
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> UpdateWithRollbackAsync(Person value)
+        {
+            return DataInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Person __result;
+                var __dataArgs = DbMapper.Default.CreateArgs("[Demo].[spPersonUpdate]");
+                if (_updateWithRollbackOnBeforeAsync != null) await _updateWithRollbackOnBeforeAsync(value, __dataArgs).ConfigureAwait(false);
+                __result = await _db.UpdateAsync(__dataArgs, Check.NotNull(value, nameof(value))).ConfigureAwait(false);
+                if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result).ConfigureAwait(false);
+                return __result;
+            }, new BusinessInvokerArgs { ExceptionHandler = _updateWithRollbackOnException });
         }
 
         /// <summary>

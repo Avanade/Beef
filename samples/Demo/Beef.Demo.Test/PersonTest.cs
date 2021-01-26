@@ -661,6 +661,33 @@ namespace Beef.Demo.Test
         }
 
         [Test, TestSetUp]
+        public void F160_Update_WithRollback()
+        {
+            // Get an existing person.
+            var p = AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .Run(a => a.GetAsync(1.ToGuid())).Value;
+
+            var orig = (Person)p.Clone();
+
+            // Update the person with an address.
+            p.FirstName += "X";
+            p.LastName += "Y";
+            p.Gender = "M";
+            p.Address = new Address { Street = "400 George Street", City = "Brisbane" };
+
+            AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.InternalServerError)
+                .Run(a => a.UpdateWithRollbackAsync(p, 1.ToGuid()));
+
+            // Check the person was **NOT** updated.
+            AgentTester.Test<PersonAgent, Person>()
+                .ExpectStatusCode(HttpStatusCode.OK)
+                .ExpectValue(_ => orig)
+                .Run(a => a.GetAsync(p.Id));
+        }
+
+        [Test, TestSetUp]
         public void F210_UpdateWithEF_NotFound()
         {
             // Get an existing person.

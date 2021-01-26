@@ -274,6 +274,16 @@ entities:
             Description = "Defaults to `None` (no formatting required)`.")]
         public string? EventActionFormat { get; set; }
 
+        /// <summary>
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
+        /// </summary>
+        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
+                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
+                "Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified.")]
+        public bool? EventTransaction { get; set; }
+
         #endregion
 
         #region Grpc

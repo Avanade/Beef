@@ -94,6 +94,20 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [HttpPut("withRollback/{id}")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        public IActionResult UpdateWithRollback([FromBody] Person value, Guid id)
+        {
+            return new WebApiPut<Person>(this, () => _manager.UpdateWithRollbackAsync(WebApiActionBase.Value(value), id),
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        }
+
+        /// <summary>
         /// Patches an existing <see cref="Person"/>.
         /// </summary>
         /// <param name="value">The <see cref="JToken"/> that contains the patch content for the <see cref="Person"/>.</param>

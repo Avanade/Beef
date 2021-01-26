@@ -544,6 +544,16 @@ entities:
         public bool? EventPublish { get; set; }
 
         /// <summary>
+        /// Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.
+        /// </summary>
+        [JsonProperty("eventTransaction", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("DataSvc", Title = "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.", IsImportant = true,
+            Description = "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. " +
+                "This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. " +
+                "Defaults to `CodeGenConfig.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.")]
+        public bool? EventTransaction { get; set; }
+
+        /// <summary>
         /// Gets or sets the access modifier for the generated `DataSvc` constructor.
         /// </summary>
         [JsonProperty("dataSvcCtor", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -1053,6 +1063,7 @@ entities:
             DataSvcCaching = DefaultWhereNull(DataSvcCaching, () => true);
             DataSvcCtor = DefaultWhereNull(DataSvcCtor, () => "Public");
             EventPublish = DefaultWhereNull(EventPublish, () => Parent!.EventPublish);
+            EventTransaction = DefaultWhereNull(EventTransaction, () => Parent!.EventTransaction);
             ManagerCtor = DefaultWhereNull(ManagerCtor, () => "Public");
             WebApiAuthorize = DefaultWhereNull(WebApiAuthorize, () => Parent!.WebApiAuthorize);
             WebApiCtor = DefaultWhereNull(WebApiCtor, () => "Public");

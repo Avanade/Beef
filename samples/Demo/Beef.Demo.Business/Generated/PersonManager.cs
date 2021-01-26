@@ -51,6 +51,11 @@ namespace Beef.Demo.Business
         private Func<Person, Guid, Task>? _updateOnBeforeAsync;
         private Func<Person, Guid, Task>? _updateOnAfterAsync;
 
+        private Func<Person, Guid, Task>? _updateWithRollbackOnPreValidateAsync;
+        private Action<MultiValidator, Person, Guid>? _updateWithRollbackOnValidate;
+        private Func<Person, Guid, Task>? _updateWithRollbackOnBeforeAsync;
+        private Func<Person, Guid, Task>? _updateWithRollbackOnAfterAsync;
+
         private Func<PagingArgs?, Task>? _getAllOnPreValidateAsync;
         private Action<MultiValidator, PagingArgs?>? _getAllOnValidate;
         private Func<PagingArgs?, Task>? _getAllOnBeforeAsync;
@@ -260,6 +265,35 @@ namespace Beef.Demo.Business
                 if (_updateOnBeforeAsync != null) await _updateOnBeforeAsync(value, id).ConfigureAwait(false);
                 var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
+                return Cleaner.Clean(__result);
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public async Task<Person> UpdateWithRollbackAsync(Person value, Guid id)
+        {
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                ExecutionContext.Current.OperationType = OperationType.Update;
+                value.Id = id;
+                Cleaner.CleanUp(value);
+                if (_updateWithRollbackOnPreValidateAsync != null) await _updateWithRollbackOnPreValidateAsync(value, id).ConfigureAwait(false);
+
+                (await MultiValidator.Create()
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                    .Additional((__mv) => _updateWithRollbackOnValidate?.Invoke(__mv, value, id))
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+                if (_updateWithRollbackOnBeforeAsync != null) await _updateWithRollbackOnBeforeAsync(value, id).ConfigureAwait(false);
+                var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
+                if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
             }).ConfigureAwait(false);
         }

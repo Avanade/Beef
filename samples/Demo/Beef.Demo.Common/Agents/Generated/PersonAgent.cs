@@ -57,6 +57,15 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Patches an existing <see cref="Person"/>.
         /// </summary>
         /// <param name="patchOption">The <see cref="WebApiPatchOption"/>.</param>
@@ -292,6 +301,17 @@ namespace Beef.Demo.Common.Agents
         /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
         public Task<WebApiAgentResult<Person>> UpdateAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
             PutAsync<Person>("api/v1/persons/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
+
+        /// <summary>
+        /// Updates an existing <see cref="Person"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="id">The <see cref="Person"/> identifier.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> UpdateWithRollbackAsync(Person value, Guid id, WebApiRequestOptions? requestOptions = null) =>
+            PutAsync<Person>("api/v1/persons/withRollback/{id}", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<Guid>("id", id) });
 
         /// <summary>

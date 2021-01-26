@@ -106,6 +106,9 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{/ifeq}}
     {{/if}}         
                 {{#if HasReturnValue}}var __result = {{/if}}await _data.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Check.NotNull(value, nameof(value)){{else}}{{ArgumentName}}{{/if}}{{/each}}).ConfigureAwait(false);
+    {{#if Parent.DataSvcExtensions}}
+                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
+    {{/if}}
     {{#if EventPublish}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
@@ -130,13 +133,10 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{else}}
                 _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}__result.UniqueKey{{/ifeq}}, __result);
       {{/ifeq}}
-    {{/if}}         
-    {{#if Parent.DataSvcExtensions}}
-                if ({{PrivateName}}OnAfterAsync != null) await {{PrivateName}}OnAfterAsync({{#if HasReturnValue}}__result{{/if}}{{#each ValueLessDataParameters}}{{#if @first}}{{#if Parent.HasReturnValue}}, {{/if}}{{else}}, {{/if}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false);
-    {{/if}}
-      {{#if HasReturnValue}}
+    {{/if}}   
+    {{#if HasReturnValue}}
                 return __result;
-      {{/if}}
+    {{/if}}
             }{{#if DataSvcTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}});
         }
   {{/if}}
