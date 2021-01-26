@@ -178,6 +178,12 @@ namespace Beef.Events
         /// </summary>
         /// <returns>The <see cref="EventData{T}.Value"/> or <c>null</c>.</returns>
         public virtual object? GetValue() => null;
+
+        /// <summary>
+        /// Gets the <see cref="EventData"/> <b>value</b>; will throw <see cref="NotSupportedException"/> where appropriate.
+        /// </summary>
+        /// <param name="value"></param>
+        public virtual void SetValue(object? value) => throw new NotSupportedException();
     }
 
     /// <summary>
@@ -224,5 +230,11 @@ namespace Beef.Events
         /// </summary>
         /// <returns>The <see cref="Value"/>.</returns>
         public override object? GetValue() => Value;
+
+        /// <summary>
+        /// Sets the <see cref="EventData"/> <see cref="Value"/>.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        public override void SetValue(object? value) => Value = (T)value!;
     }
 }

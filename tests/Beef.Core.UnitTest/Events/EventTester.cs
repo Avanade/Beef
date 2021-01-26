@@ -182,6 +182,22 @@ namespace Beef.Core.UnitTest.Events
             Assert.IsNull(ed2.GetValue());
         }
 
+        [Test]
+        public void EventData_SetValue()
+        {
+            var ed1 = new EventData<int> { Value = 123 };
+            Assert.IsTrue(ed1.HasValue);
+            Assert.AreEqual(123, ed1.Value);
+            Assert.AreEqual(123, ed1.GetValue());
+            Assert.IsNull(ed1.ETag);
+
+            ed1.SetValue(987);
+            Assert.IsTrue(ed1.HasValue);
+            Assert.AreEqual(987, ed1.Value);
+            Assert.AreEqual(987, ed1.GetValue());
+            Assert.IsNull(ed1.ETag);
+        }
+
         public class TestData : IETag
         {
             public string Blah { get; set; }
