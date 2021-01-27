@@ -784,6 +784,16 @@
                 <xs:documentation>The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ColumnNameRowVersion" use="optional" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

@@ -165,6 +165,11 @@
         "PastTenseUpperCase"
       ]
     },
+    "eventTransaction": {
+      "type": "boolean",
+      "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.",
+      "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `false`. This essentially defaults the `Entity.EventTransaction` where not otherwise specified."
+    },
     "grpc": {
       "type": "boolean",
       "title": "Indicates whether gRPC support (more specifically service-side) is required.",
@@ -526,6 +531,11 @@
               "type": "boolean",
               "title": "Indicates whether to add logic to publish an event on the successful completion of the `DataSvc` layer invocation for a `Create`, `Update` or `Delete` operation.",
               "description": "Defaults to the `CodeGeneration.EventPublish` configuration property (inherits) where not specified. Used to enable the sending of messages to the likes of EventGrid, Service Broker, SignalR, etc."
+            },
+            "eventTransaction": {
+              "type": "boolean",
+              "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.",
+              "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGenConfig.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified."
             },
             "dataSvcCtor": {
               "type": "string",

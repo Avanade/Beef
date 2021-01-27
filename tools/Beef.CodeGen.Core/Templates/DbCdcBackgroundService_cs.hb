@@ -18,7 +18,7 @@ namespace {{Root.NamespaceCdc}}.Services
     /// <summary>
     /// Provides the CDC background service for database object '{{Schema}}.{{Name}}'.
     /// </summary>
-    public class {{ModelName}}CdcBackgroundService : CdcBackgroundService<I{{ModelName}}CdcData>
+    public partial class {{ModelName}}CdcBackgroundService : CdcBackgroundService<I{{ModelName}}CdcData>
     {
         private readonly IConfiguration _config;
 

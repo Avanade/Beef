@@ -1348,7 +1348,7 @@ entities:
         /// <summary>
         /// Add configured list to the parameters.
         /// </summary>
-        private static void AddConfiguredParameters(List<string>? configList, List<ParameterConfig> paramList)
+        internal static void AddConfiguredParameters(List<string>? configList, List<ParameterConfig> paramList)
         {
             if (configList == null)
                 return;

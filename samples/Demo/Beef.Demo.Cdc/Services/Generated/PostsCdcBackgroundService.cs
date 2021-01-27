@@ -17,7 +17,7 @@ namespace Beef.Demo.Cdc.Services
     /// <summary>
     /// Provides the CDC background service for database object 'Legacy.Posts'.
     /// </summary>
-    public class PostsCdcBackgroundService : CdcBackgroundService<IPostsCdcData>
+    public partial class PostsCdcBackgroundService : CdcBackgroundService<IPostsCdcData>
     {
         private readonly IConfiguration _config;
 

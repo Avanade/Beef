@@ -91,7 +91,7 @@ namespace Beef.Demo.Cdc.Data
         /// <summary>
         /// Gets the <see cref="EventData.Subject"/> without the appended key value(s).
         /// </summary>
-        protected override string EventSubject => "Legacy.Posts";
+        protected override string EventSubject => "Legacy.Post";
 
         /// <summary>
         /// Gets the <see cref="Events.EventActionFormat"/>.

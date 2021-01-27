@@ -22,6 +22,7 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("Columns", Title = "Provides the _Columns_ configuration.")]
     [CategorySchema("Database", Title = "Provides the _database_ configuration.")]
     [CategorySchema("DotNet", Title = "Provides the _.NET_ configuration.")]
+    [CategorySchema("Infer", Title = "Provides the _special Column Name inference_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CdcConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, ITableReference, ISpecialColumns
     {
@@ -133,7 +134,15 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("dataConstructor", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The access modifier for the generated CDC `Data` constructor.", Options = new string[] { "Public", "Private", "Protected" },
             Description = "Defaults to `Public`.")]
-        public string? DataConstructor { get; set; }
+        public string? DataCtor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of extended (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.
+        /// </summary>
+        [JsonProperty("dataCtorParams", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertyCollectionSchema("Data", Title = "The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.",
+            Description = "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred.")]
+        public List<string>? DataCtorParams { get; set; }
 
         /// <summary>
         /// Gets or sets the CDC .NET database interface name.
@@ -150,6 +159,26 @@ namespace Beef.CodeGen.Config.Database
         [PropertySchema("DotNet", Title = "The event subject.",
             Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
+
+        #endregion
+
+        #region Infer
+
+        /// <summary>
+        /// Gets or sets the column name for the `IsDeleted` capability.
+        /// </summary>
+        [JsonProperty("columnNameIsDeleted", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `IsDeleted` capability.",
+            Description = "Defaults to `CodeGeneration.IsDeleted`.")]
+        public string? ColumnNameIsDeleted { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column name for the `RowVersion` capability.
+        /// </summary>
+        [JsonProperty("columnNameRowVersion", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Infer", Title = "The column name for the `RowVersion` capability.",
+            Description = "Defaults to `CodeGeneration.RowVersion`.")]
+        public string? ColumnNameRowVersion { get; set; }
 
         #endregion
 
@@ -171,7 +200,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the related IsDeleted column.
         /// </summary>
-        public IColumnConfig? ColumnIsDeleted => null;
+        public IColumnConfig? ColumnIsDeleted => GetSpecialColumn(ColumnNameIsDeleted);
 
         /// <summary>
         /// Gets the related TenantId column.
@@ -186,7 +215,7 @@ namespace Beef.CodeGen.Config.Database
         /// <summary>
         /// Gets the related RowVersion column.
         /// </summary>
-        public IColumnConfig? ColumnRowVersion => null;
+        public IColumnConfig? ColumnRowVersion => GetSpecialColumn(ColumnNameRowVersion);
 
         /// <summary>
         /// Gets the related CreatedBy column.
@@ -218,6 +247,23 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         public IColumnConfig? ColumnDeletedDate => null;
 
+        /// <summary>
+        /// Gets the named special column.
+        /// </summary>
+        private IColumnConfig? GetSpecialColumn(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var c = DbTable!.Columns.Where(x => x.Name == name && !x.IsPrimaryKey).SingleOrDefault();
+            if (c == null)
+                return null;
+
+            var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
+            cc.Prepare(Root!, this);
+            return cc;
+        }
+
         #endregion
 
         /// <summary>
@@ -234,6 +280,11 @@ namespace Beef.CodeGen.Config.Database
         /// Gets the SQL formatted selected columns excluding the <see cref="PrimaryKeyColumns"/>.
         /// </summary>
         public List<CdcColumnConfig> SelectedColumnsExcludingPrimaryKey => SelectedColumns.Where(x => !(x.DbColumn!.DbTable == DbTable && x.DbColumn.IsPrimaryKey)).ToList();
+
+        /// <summary>
+        /// Gets the SQL formatted selected columns for the .NET Entity (sans IsDeleted and RowVersion columns).
+        /// </summary>
+        public List<CdcColumnConfig> SelectedEntityColumns => SelectedColumns.Where(x => !x.IsIsDeletedColumn && !x.IsRowVersionColumn).ToList();
 
         /// <summary>
         /// Gets the selected column configurations.
@@ -276,6 +327,11 @@ namespace Beef.CodeGen.Config.Database
         public string? EventSubjectFormat { get; set; }
 
         /// <summary>
+        /// Gets the Data constructor parameters.
+        /// </summary>
+        public List<CtorParameterConfig> DataCtorParameters { get; } = new List<CtorParameterConfig>();
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
@@ -299,23 +355,25 @@ namespace Beef.CodeGen.Config.Database
             OutboxTableName = DefaultWhereNull(OutboxTableName, () => Name + "Outbox");
             ModelName = DefaultWhereNull(ModelName, () => StringConversion.ToPascalCase(Name));
             EventSubject = DefaultWhereNull(EventSubject, () => ModelName);
-            DataConstructor = DefaultWhereNull(DataConstructor, () => "Public");
+            DataCtor = DefaultWhereNull(DataCtor, () => "Public");
             DatabaseName = DefaultWhereNull(DatabaseName, () => "IDatabase");
+
+            ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => Root!.ColumnNameIsDeleted);
+            ColumnNameRowVersion = DefaultWhereNull(ColumnNameRowVersion, () => Root!.ColumnNameRowVersion);
 
             PrepareJoins();
 
             foreach (var c in DbTable.Columns)
             {
+                var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
                 if (c.IsPrimaryKey)
                 {
-                    var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
                     cc.Prepare(Root!, this);
                     PrimaryKeyColumns.Add(cc);
                 }
 
                 if ((ExcludeColumns == null || !ExcludeColumns.Contains(c.Name!)) && (IncludeColumns == null || IncludeColumns.Contains(c.Name!)))
                 {
-                    var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c };
                     var ca = AliasColumns?.Where(x => x.StartsWith(c.Name + "^", StringComparison.Ordinal)).FirstOrDefault();
                     if (ca != null)
                     {
@@ -324,6 +382,14 @@ namespace Beef.CodeGen.Config.Database
                             cc.NameAlias = parts[1];
                     }
 
+                    if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
+                        continue;
+
+                    cc.Prepare(Root!, this);
+                    Columns.Add(cc);
+                }
+                else if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
+                {
                     cc.Prepare(Root!, this);
                     Columns.Add(cc);
                 }
@@ -335,6 +401,16 @@ namespace Beef.CodeGen.Config.Database
                 var cc = new CdcColumnConfig { Name = c.Name, DbColumn = c.DbColumn, NameAlias = c.NameAlias };
                 cc.Prepare(Root!, this);
                 SelectedColumns.Add(cc);
+            }
+
+            // Data constructors. 
+            var tmp = new List<Entity.ParameterConfig>();
+            Entity.EntityConfig.AddConfiguredParameters(DataCtorParams, tmp);
+            foreach (var t in tmp)
+            {
+                var ctor = new CtorParameterConfig { Name = t.Name, Type = t.Type };
+                ctor.Prepare(Root!, Root!);
+                DataCtorParameters.Add(ctor);
             }
         }
 

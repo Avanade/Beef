@@ -126,6 +126,7 @@ namespace Beef.CodeGen.Config
             (ConfigType.Database, ConfigurationEntity.Cdc, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Cdc, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.Cdc, "AliasColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
+            (ConfigType.Database, ConfigurationEntity.Cdc, "DataCtorParams", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
 
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "IncludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),
             (ConfigType.Database, ConfigurationEntity.CdcJoin, "ExcludeColumns", (xml) => string.IsNullOrEmpty(xml) ? null : $"[ {xml} ]"),

@@ -84,7 +84,7 @@ BEGIN
     END
     ELSE
     BEGIN
-      -- Check that there are no incomplete outboxs; if there are then stop with error; otherwise, continue!
+      -- Check that there are no incomplete outboxes; if there are then stop with error; otherwise, continue!
       DECLARE @IsComplete BIT
 
       SELECT TOP 1
@@ -294,7 +294,7 @@ BEGIN
         [p].[Text] AS [Text],
         [p].[Date] AS [Date]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR))
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Posts' AND [_ct].[Key] = CAST([_chg].[PostsId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Posts] AS [p] ON ([p].[PostsId] = [_chg].[PostsId])
 
     -- Related table: Comments (Legacy.Comments) - only use INNER JOINS to get what is actually there right now.

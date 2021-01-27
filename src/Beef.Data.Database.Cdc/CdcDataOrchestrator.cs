@@ -169,8 +169,16 @@ namespace Beef.Data.Database.Cdc
             var tracking = new List<CdcTracker>();
             foreach (var item in result.Result)
             {
+                // Where supports logical delete and IsDeleted, then override DatabaseOperationType.
+                if (item is ILogicallyDeleted ild && ild.IsDeleted)
+                    item.DatabaseOperationType = OperationType.Delete;
+
+                // Where there is a ETag/RowVersion column use; otherwise, calculate (serialized hash).
                 var entity = item as TCdcEntity;
-                entity.ETag = ETag.Generate(entity, item.DatabaseOperationType.ToString());
+                if (entity.ETag == null)
+                    entity.ETag = ETag.Generate(entity, item.DatabaseOperationType.ToString());
+
+                // Where the ETag and TrackingHash match then skip (has already been published).
                 if (item.DatabaseTrackingHash == null || item.DatabaseTrackingHash != entity.ETag)
                 {
                     coll.Add(item);
@@ -235,18 +243,6 @@ namespace Beef.Data.Database.Cdc
         /// <returns>The <see cref="EventData{T}"/>.</returns>
         protected EventData<T> CreateValueEvent<T>(T value, string subjectPrefix, OperationType operationType) where T : class
             => EventData.CreateValueEvent(value, CreateValueFullyQualifiedSubject(value, subjectPrefix), EventActionFormatter.Format(operationType, EventActionFormat));
-
-        /// <summary>
-        /// Creates an <see cref="EventData{T}"/> instance with the specified <paramref name="value"/> and <paramref name="key"/>.
-        /// </summary>
-        /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
-        /// <param name="value">The event value</param>
-        /// <param name="subjectPrefix">The <see cref="EventData.Subject"/> prefix.</param>
-        /// <param name="operationType">The <see cref="OperationType"/> to infer the <see cref="EventData.Action"/>.</param>
-        /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="EventData{T}"/>.</returns>
-        protected EventData<T> CreateValueEvent<T>(T value, string subjectPrefix, OperationType operationType, params IComparable?[] key)
-            => EventData.CreateValueEvent(value, CreateFullyQualifiedSubject(subjectPrefix, key), EventActionFormatter.Format(operationType, EventActionFormat), key);
 
         /// <summary>
         /// Creates an <see cref="EventData"/> with the specified <paramref name="key"/>.
@@ -341,7 +337,7 @@ namespace Beef.Data.Database.Cdc
         /// <param name="coll">The wrapper entity collection.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>None or more <see cref="EventData">events</see> to be published.</returns>
-        protected virtual Task<IEnumerable<EventData>> CreateEventsAsync(TCdcEntityWrapperColl coll, CancellationToken? cancellationToken = null)
+        protected virtual Task<IEnumerable<EventData>> CreateEventsAsync(TCdcEntityWrapperColl coll, CancellationToken cancellationToken)
         {
             var events = new List<EventData>();
 
@@ -351,6 +347,42 @@ namespace Beef.Data.Database.Cdc
             }
 
             return Task.FromResult(events.AsEnumerable());
+        }
+
+        /// <summary>
+        /// Provides the capability to create none or more <see cref="EventData">events</see> from the entity <paramref name="coll">collection.</paramref> using the <paramref name="getEntityFunc"/>
+        /// to get the entity value to publish. A <c>null</c> function response indicates entity is not found and/or do not publish (i.e. skip).
+        /// </summary>
+        /// <param name="coll">The wrapper entity collection.</param>
+        /// <param name="getEntityFunc">The function to get the entity value to publish.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>None or more <see cref="EventData">events</see> to be published.</returns>
+        protected async Task<IEnumerable<EventData>> CreateEventsWithGetAsync<TEntity>(TCdcEntityWrapperColl coll, Func<TCdcEntityWrapper, Task<TEntity>> getEntityFunc, CancellationToken cancellationToken)
+            where TEntity : class
+        {
+            var events = new List<EventData>();
+
+            foreach (var item in coll ?? throw new ArgumentNullException(nameof(coll)))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    await Task.FromCanceled(cancellationToken).ConfigureAwait(false);
+
+                switch (item.DatabaseOperationType)
+                {
+                    case OperationType.Delete:
+                        events.Add(CreateValueEvent(item, EventSubject, OperationType.Delete));
+                        break;
+
+                    default:
+                        var entity = await getEntityFunc(item).ConfigureAwait(false);
+                        if (entity != null)
+                            events.Add(CreateValueEvent(entity, EventSubject, item.DatabaseOperationType));
+
+                        break;
+                }
+            }
+
+            return events;
         }
     }
 }

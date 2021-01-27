@@ -9,6 +9,8 @@
     <ProjectReference Include="..\..\..\src\Beef.Core\Beef.Core.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Data.Database.Cdc\Beef.Data.Database.Cdc.csproj" />
     <ProjectReference Include="..\..\..\src\Beef.Data.Database\Beef.Data.Database.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Business\Beef.Demo.Business.csproj" />
+    <ProjectReference Include="..\Beef.Demo.Common\Beef.Demo.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

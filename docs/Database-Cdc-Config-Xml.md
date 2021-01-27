@@ -13,6 +13,7 @@ Category | Description
 [`Columns`](#Columns) | Provides the _Columns_ configuration.
 [`Database`](#Database) | Provides the _database_ configuration.
 [`DotNet`](#DotNet) | Provides the _.NET_ configuration.
+[`Infer`](#Infer) | Provides the _special Column Name inference_ configuration.
 [`Collections`](#Collections) | Provides related child (hierarchical) configuration.
 
 <br/>
@@ -59,6 +60,16 @@ Property | Description
 `DataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `DatabaseName` | The .NET database interface name. Defaults to `IDatabase`.
 `EventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.
+
+<br/>
+
+## Infer
+Provides the _special Column Name inference_ configuration.
+
+Property | Description
+-|-
+`ColumnNameIsDeleted` | The column name for the `IsDeleted` capability. Defaults to `CodeGeneration.IsDeleted`.
+`ColumnNameRowVersion` | The column name for the `RowVersion` capability. Defaults to `CodeGeneration.RowVersion`.
 
 <br/>
 

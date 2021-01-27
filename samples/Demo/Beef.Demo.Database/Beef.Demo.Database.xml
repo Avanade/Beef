@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<CodeGeneration CdcSchema="DemoCdc" EventSubjectRoot="Legacy" EventActionFormat="PastTense" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Avanade/Beef/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
+<CodeGeneration CdcSchema="DemoCdc" EventActionFormat="PastTense" xmlns="http://schemas.beef.com/codegen/2015/01/database" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Avanade/Beef/master/tools/Beef.CodeGen.Core/Schema/codegen.table.xsd">
   <!-- New "Query" configuration. -->
   <Query Name="Table" Schema="Test" View="true" ViewName="vwTestQuery" ExcludeColumns="CreatedBy, UpdatedBy" Permission="TestSec">
     <QueryJoin Name="Person" Schema="Demo" ExcludeColumns="CreatedDate, UpdatedDate" AliasColumns="RowVersion^RowVersionP">
@@ -15,7 +15,7 @@
   </Table>
 
   <!-- Set up CDC for primary table Legacy.Contact. -->
-  <Cdc Name="Contact" Schema="Legacy">
+  <Cdc Name="Contact" Schema="Legacy" EventSubject="Legacy.Contact">
     <!-- Set up secondary One-To-One relationship from Legacy.Contact to Legacy.Address (1:1).
          Join on Address.Id = Contact.AddressId. -->
     <CdcJoin Name="Address" JoinCardinality="OneToOne">
@@ -35,7 +35,7 @@
                               - Legacy.Comments (1:n)
                                  - Legacy.Tags (1:n)
                               - Legacy.Tags (1:n). -->
-  <Cdc Name="Posts" Schema="Legacy">
+  <Cdc Name="Posts" Schema="Legacy" EventSubject="Legacy.Post">
     <!-- Set up secondary One-To-Many relationship from Legacy.Posts to Legacy.Comments (1:n).
          Join on Comments.PostsId = Posts.PostsId. -->
     <CdcJoin Name="Comments" Schema="Legacy" JoinTo="Posts">
@@ -62,6 +62,14 @@
       <CdcJoinOn Name="ParentId" ToColumn="PostsId" />
     </CdcJoin>
   </Cdc>
+  
+  <!-- Set up CDC for primary table Demo.Person (this is a _non-legacy_ scenario).
+       Relational hierarchy is not important as the primary table *is* (must be) updated always (ETag and Audit columns); therefore, they can be ignored.
+       Will retrieve the Id column only as the Get Business-logic will be used to retrieve and publish (as this enables the required Entity DTO). -->
+  <Cdc Name="Person" Schema="Demo" IncludeColumns="PersonId" EventSubject="Demo.Cdc.Person" DataCtorParams="Beef.Demo.Business.IPersonManager" />
+
+  <!-- As above for Person2; validate logical delete. -->
+  <Cdc Name="Person2" Schema="Demo" IncludeColumns="PersonId" EventSubject="Demo.Cdc.Person2" />
 
   <!-- Special test to generate all variations. -->
   <Table Name="Table" Schema="Test" Create="true" Update="true" Upsert="true" Delete="true" Merge="true" Udt="true" GetAll="true" GetAllOrderBy="Name Des" ExcludeColumns="Other" Permission="TestSec">

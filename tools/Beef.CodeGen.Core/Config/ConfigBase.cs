@@ -212,6 +212,13 @@ namespace Beef.CodeGen.Config
         /// </summary>
         protected internal ConfigBase? ParentConfig { get; set; }
 
+
+        /// <summary>
+        /// Gets the list of .NET pragma warnings to disable then restore.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Needs to be!")]
+        public string PragmaWarnings => "IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034";
+
         /// <summary>
         /// Gets the qualified key name for the configuration.
         /// </summary>
@@ -366,9 +373,11 @@ namespace Beef.CodeGen.Config
             }
         }
 
+
         /// <summary>
         /// Gets the <see cref="DateTime.UtcNow"/> as a formatted timestamp.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "By design.")]
         public string UtcDateTimeStamp => DateTime.UtcNow.ToString("yyyyMMdd-HHmmss", System.Globalization.CultureInfo.InvariantCulture);
     }
 

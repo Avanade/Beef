@@ -4,8 +4,11 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning disable {{PragmaWarnings}}
 
+{{#ifval ColumnIsDeleted}}
+using Beef.Data.Database.Cdc;
+{{/ifval}}
 using Beef.Entities;
 using Beef.Mapper;
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
@@ -22,9 +25,9 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{#ifeq Root.JsonSerializer 'Newtonsoft'}}
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
 {{/ifeq}}
-    public partial class {{ModelName}}Cdc : IUniqueKey, IETag
+    public partial class {{ModelName}}Cdc : IUniqueKey, IETag{{#ifval ColumnIsDeleted}}, ILogicallyDeleted{{/ifval}}
     {
-{{#each SelectedColumns}}
+{{#each SelectedEntityColumns}}
         /// <summary>
         /// Gets or sets the '{{Name}}' column value.
         /// </summary>
@@ -78,6 +81,25 @@ namespace {{Root.NamespaceCdc}}.Entities
 {{/each}}
 
         /// <summary>
+        /// Gets or sets the entity tag {{#ifval ColumnRowVersion}}('{{ColumnRowVersion.Name}}' column){{else}}(calculated as JSON serialized hash value){{/ifval}}.
+        /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+  {{#ifval ColumnRowVersion}}
+        [MapperProperty("{{ColumnRowVersion.Name}}", ConverterType = typeof(Beef.Data.Database.DatabaseRowVersionConverter))]
+  {{else}}
+        [MapperIgnore()]
+  {{/ifval}}
+        public string? ETag { get; set; }
+
+  {{#ifval ColumnIsDeleted}}
+        /// <summary>
+        /// Indicates whether the entity is logically deleted ('{{ColumnIsDeleted.Name}}' column).
+        /// </summary>
+        [MapperProperty("{{ColumnIsDeleted.Name}}")]
+        public bool IsDeleted { get; set; }
+
+  {{/ifval}}
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
@@ -94,13 +116,6 @@ namespace {{Root.NamespaceCdc}}.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { {{#each PrimaryKeyColumns}}{{#unless @first}}, {{/unless}}nameof({{pascal NameAlias}}){{/each}} };
-
-        /// <summary>
-        /// Gets or sets the entity tag.
-        /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
-        [MapperIgnore()]
-        public string? ETag { get; set; }
 {{#each CdcJoins}}
 
         #region {{ModelName}}Cdc
@@ -206,5 +221,5 @@ namespace {{Root.NamespaceCdc}}.Entities
     }
 }
 
-#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning restore {{PragmaWarnings}}
 #nullable restore

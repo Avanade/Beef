@@ -978,6 +978,17 @@
                 "Protected"
               ]
             },
+            "dataCtorParams": {
+              "type": "array",
+              "title": "The list of additional (non-default) Dependency Injection (DI) parameters for the generated CDC `Data` constructor.",
+              "description": "Each constructor parameter should be formatted as `Type` + `^` + `Name`; e.g. `IConfiguration^Config`. Where the `Name` portion is not specified it will be inferred.",
+              "items": [
+                {
+                  "type": "string",
+                  "uniqueItems": true
+                }
+              ]
+            },
             "databaseName": {
               "type": "string",
               "title": "The .NET database interface name.",
@@ -987,6 +998,16 @@
               "type": "string",
               "title": "The event subject.",
               "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified."
+            },
+            "columnNameIsDeleted": {
+              "type": "string",
+              "title": "The column name for the `IsDeleted` capability.",
+              "description": "Defaults to `CodeGeneration.IsDeleted`."
+            },
+            "columnNameRowVersion": {
+              "type": "string",
+              "title": "The column name for the `RowVersion` capability.",
+              "description": "Defaults to `CodeGeneration.RowVersion`."
             },
             "joins": {
               "type": "array",

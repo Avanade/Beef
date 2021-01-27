@@ -117,8 +117,8 @@ namespace Beef.Reflection
 
             // Check cache and reuse as this is an expensive operation.
             var key = new ExpressionKey { Type = me.Member.DeclaringType, Name = me.Member.Name, ProbeForJsonRefDataSidProperties = probeForJsonRefDataSidProperties };
-            if (_expressions.ContainsKey(key))
-                return _expressions[key];
+            if (_expressions.TryGetValue(key, out var exp))
+                return exp;
 
             if (me.Member.MemberType != MemberTypes.Property)
                 throw new InvalidOperationException("Expression results in a Member that is not a Property.");
@@ -153,8 +153,8 @@ namespace Beef.Reflection
             // Recheck cache and use/update accordingly.
             lock (_lock)
             {
-                if (_expressions.ContainsKey(key))
-                    return _expressions[key];
+                if (_expressions.TryGetValue(key, out exp))
+                    return exp;
 
                 _expressions.Add(key, pe);
             }

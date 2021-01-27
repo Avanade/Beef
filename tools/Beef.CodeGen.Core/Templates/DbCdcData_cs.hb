@@ -34,6 +34,12 @@ namespace {{Root.NamespaceCdc}}.Data
 {{#each CdcJoins}}
         private static readonly DatabaseMapper<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc> _{{camel ModelName}}CdcMapper = DatabaseMapper.CreateAuto<{{Parent.ModelName}}Cdc.{{ModelName}}Cdc>();
 {{/each}}
+{{#each DataCtorParameters}}
+  {{#if @first}}
+
+  {{/if}}
+        private readonly {{Type}} {{PrivateName}};
+{{/each}}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="{{ModelName}}CdcData"/> class.
@@ -41,8 +47,19 @@ namespace {{Root.NamespaceCdc}}.Data
         /// <param name="db">The <see cref="{{DatabaseName}}"/>.</param>
         /// <param name="evtPub">The <see cref="IEventPublisher"/>.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        {{lower DataConstructor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger) :
-            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", evtPub, logger) => {{ModelName}}CdcDataCtor();
+{{#each DataCtorParameters}}
+        /// <param name="{{ArgumentName}}">{{{SummaryText}}}</param>
+{{/each}}
+        {{lower DataCtor}} {{ModelName}}CdcData({{DatabaseName}} db, IEventPublisher evtPub, ILogger<{{ModelName}}CdcData> logger{{#each DataCtorParameters}}, {{Type}} {{ArgumentName}}{{/each}}) :
+            base(db, "[{{CdcSchema}}].[{{StoredProcedureName}}]", evtPub, logger){{#ifeq DataCtorParameters.Count 0}} => {{ModelName}}CdcDataCtor();{{/ifeq}}
+{{#ifne DataCtorParameters.Count 0}}
+        {
+  {{#each DataCtorParameters}}
+            {{PrivateName}} = Check.NotNull({{ArgumentName}}, nameof({{ArgumentName}}));
+  {{/each}}
+            {{ModelName}}CdcDataCtor();
+        }
+{{/ifne}}
 
         partial void {{ModelName}}CdcDataCtor(); // Enables additional functionality to be added to the constructor.
 

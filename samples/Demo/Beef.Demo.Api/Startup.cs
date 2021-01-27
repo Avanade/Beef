@@ -73,7 +73,7 @@ namespace Beef.Demo.Api
             else
                 services.AddBeefNullEventPublisher();
 
-            // Add 
+            // Add identifier generator services.
             services.AddSingleton<IGuidIdentifierGenerator, GuidIdentifierGenerator>()
                     .AddSingleton<IStringIdentifierGenerator, StringIdentifierGenerator>();
 

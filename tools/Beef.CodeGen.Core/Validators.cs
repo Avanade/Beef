@@ -41,9 +41,6 @@ namespace Beef.CodeGen
                 if (pd.ContainsKey(parts[0]))
                     return new ValidationResult($"The parameter '{p}' is not valid; name has been specified more than once.");
 
-                if (parts[0].StartsWith("Param", StringComparison.InvariantCultureIgnoreCase))
-                    return new ValidationResult($"The parameter '{p}' is not valid; a name that starts with 'Param' is reserved for internal use only.");
-
                 pd.Add(parts[0], parts[1]);
             }
 

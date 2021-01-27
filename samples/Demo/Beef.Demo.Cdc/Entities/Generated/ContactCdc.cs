@@ -75,6 +75,13 @@ namespace Beef.Demo.Cdc.Entities
         public ContactCdc.AddressCdc? Address { get; set; }
 
         /// <summary>
+        /// Gets or sets the entity tag (calculated as JSON serialized hash value).
+        /// </summary>
+        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [MapperIgnore()]
+        public string? ETag { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         [MapperIgnore()]
@@ -91,13 +98,6 @@ namespace Beef.Demo.Cdc.Entities
         /// </summary>
         [MapperIgnore()]
         public string[] UniqueKeyProperties => new string[] { nameof(ContactId) };
-
-        /// <summary>
-        /// Gets or sets the entity tag.
-        /// </summary>
-        [JsonProperty("etag", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [MapperIgnore()]
-        public string? ETag { get; set; }
 
         #region AddressCdc
 

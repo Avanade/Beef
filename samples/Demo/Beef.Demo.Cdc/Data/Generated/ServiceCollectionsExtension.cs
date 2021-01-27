@@ -21,7 +21,9 @@ namespace Beef.Demo.Cdc.Data
         public static IServiceCollection AddGeneratedCdcDataServices(this IServiceCollection services)
         {
             return services.AddScoped<IContactCdcData, ContactCdcData>()
-                           .AddScoped<IPostsCdcData, PostsCdcData>();
+                           .AddScoped<IPostsCdcData, PostsCdcData>()
+                           .AddScoped<IPersonCdcData, PersonCdcData>()
+                           .AddScoped<IPerson2CdcData, Person2CdcData>();
         }
     }
 }

@@ -76,7 +76,7 @@ BEGIN
     END
     ELSE
     BEGIN
-      -- Check that there are no incomplete outboxs; if there are then stop with error; otherwise, continue!
+      -- Check that there are no incomplete outboxes; if there are then stop with error; otherwise, continue!
       DECLARE @IsComplete BIT
 
       SELECT TOP 1
@@ -224,7 +224,7 @@ BEGIN
         [c].[AddressId] AS [AddressId],
         [cm].[UniqueId] AS [UniqueId]
       FROM #_changes AS [_chg]
-      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR))
+      LEFT OUTER JOIN [DemoCdc].[CdcTracking] AS [_ct] ON ([_ct].[Schema] = 'Legacy' AND [_ct].[Table] = 'Contact' AND [_ct].[Key] = CAST([_chg].[ContactId] AS NVARCHAR(128)))
       LEFT OUTER JOIN [Legacy].[Contact] AS [c] ON ([c].[ContactId] = [_chg].[ContactId])
       INNER JOIN [Legacy].[ContactMapping] AS [cm] ON ([cm].[ContactId] = [c].[ContactId])
 
