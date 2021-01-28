@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Beef.Validation.Rules;
 using System.Threading.Tasks;
+using System;
 
 namespace Beef.Core.UnitTest.Validation
 {
@@ -350,6 +351,53 @@ namespace Beef.Core.UnitTest.Validation
             Assert.AreEqual(1, ti.CountA);
             Assert.AreEqual(20, ti.CountB);
             Assert.AreEqual(100, ti.AmountA);
+        }
+
+        public class Employee
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public DateTime Birthdate { get; set; }
+            public decimal Salary { get; set; }
+            public int WorkingYears { get; set; }
+        }
+
+        public class EmployeeValidator : Validator<Employee> 
+        {
+            public EmployeeValidator()
+            {
+                Property(x => x.FirstName).Mandatory().String(100);
+                Property(x => x.LastName).Mandatory().String(100);
+                Property(x => x.Birthdate).Mandatory().CompareValue(CompareOperator.LessThanEqual, DateTime.UtcNow, "today");
+                Property(x => x.Salary).Mandatory().Numeric(allowNegatives: false, maxDigits: 10, decimalPlaces: 2);
+                Property(x => x.WorkingYears).Numeric(allowNegatives: false).CompareValue(CompareOperator.LessThanEqual, 50);
+            }
+        }
+
+        [Test]
+        public void Entity_ValueCachePerfSync()
+        {
+            InstantiateValidators();
+        }
+
+        private void InstantiateValidators()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                _ = new EmployeeValidator();
+            }
+        }
+
+        [Test]
+        public void Entity_ValueCachePerfAsync()
+        {
+            var tasks = new Task[10];
+            for (int i = 0; i < 10; i++)
+            {
+                tasks[i] = Task.Run(() => InstantiateValidators());
+            }
+
+            Task.WaitAll(tasks);
         }
     }
 }

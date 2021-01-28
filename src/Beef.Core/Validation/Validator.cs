@@ -136,7 +136,7 @@ namespace Beef.Validation
         /// <summary>
         /// Validate the entity value (post all configured property rules) enabling additional validation logic to be added.
         /// </summary>
-        /// <param name="additionalAsync">The action to invoke.</param>
+        /// <param name="additionalAsync">The asynchronous function to invoke.</param>
         /// <returns>The <see cref="Validator{TEntity}"/>.</returns>
         public Validator<TEntity> Additional(Func<ValidationContext<TEntity>, Task> additionalAsync)
         {
