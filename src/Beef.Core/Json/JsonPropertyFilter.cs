@@ -15,24 +15,24 @@ namespace Beef.Json
     public static class JsonPropertyFilter
     {
         /// <summary>
-        /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> resulting in the same <paramref name="value"/> instance where no <paramref name="include"/> or <paramref name="exclude"/>
-        /// specified; otherwise, a <see cref="JsonToken"/> representation of the <paramref name="value"/>.
+        /// Applies the inclusion and exclusion of properties (using JSON names) to a <paramref name="value"/> returning a JSON representation only where serialized 
+        /// (i.e <paramref name="include"/> or <paramref name="exclude"/> were specified).
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The value.</param>
         /// <param name="include">The list of JSON property names to include.</param>
         /// <param name="exclude">The list of JSON property names to exclude.</param>
-        /// <returns>The resulting <see cref="JToken"/>.</returns>
+        /// <returns>The JSON <see cref="string"/> where serialized; otherwise <c>null</c>.</returns>
         /// <remarks>The <paramref name="include"/> and <paramref name="exclude"/> arrays are mutually exclusive; the <paramref name="include"/> will take precedence where both are specified.</remarks>
-        public static object? ApplyAsObject<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
+        public static string? ApplyAsObject<T>(T value, IEnumerable<string>? include = null, IEnumerable<string>? exclude = null)
         {
             if (value == null)
-                return value;
+                return null;
 
             if (IsEmpty(include) && IsEmpty(exclude))
-                return value;
+                return null;
 
-            return Apply(value, include, exclude)!;
+            return Apply(value, include, exclude)?.ToString(Formatting.None);
         }
 
         /// <summary>

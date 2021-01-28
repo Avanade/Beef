@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace Beef.WebApi
     public abstract class WebApiAgentBase
     {
         /// <summary>
-        /// Sets the accept header for the <paramref name="httpClient"/> to 'application/json'. 
+        /// Sets the accept header for the <paramref name="httpClient"/> to <see cref="MediaTypeNames.Application.Json"/>. 
         /// </summary>
         /// <param name="httpClient">The <see cref="System.Net.Http.HttpClient"/>.</param>
         public static void SetAcceptApplicationJson(HttpClient httpClient)
@@ -28,7 +29,7 @@ namespace Beef.WebApi
                 throw new ArgumentNullException(nameof(httpClient));
 
             httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
         }
 
         /// <summary>
@@ -558,7 +559,7 @@ namespace Beef.WebApi
 
                     if (result.Response.Content.Headers.ContentLength == 0)
                     { }
-                    else if (result.Response.Content.Headers.ContentType.MediaType != "application/json")
+                    else if (result.Response.Content.Headers.ContentType.MediaType != MediaTypeNames.Application.Json)
                         result.ErrorMessage = result.Content;
                     else
                     {
@@ -600,7 +601,7 @@ namespace Beef.WebApi
                 return null;
 
             var content = new StringContent(JsonConvert.SerializeObject(value));
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(MediaTypeNames.Application.Json);
             return content;
         }
 

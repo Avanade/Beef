@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,8 +28,6 @@ namespace Beef.AspNetCore.WebApi
     /// </summary>
     public abstract class WebApiActionBase : IActionResult
     {
-        private const string AsciiDivider = "|";
-
         /// <summary>
         /// Gets the <see cref="ExecutionContext.Properties"/> key for storing <c>this</c> (<see cref="WebApiActionBase"/>) request within the <see cref="ExecutionContext"/>.
         /// </summary>
@@ -288,16 +287,19 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
-        /// Creates a result for a <see cref="HttpStatusCode"/> and <see cref="JToken"/> value.
+        /// Creates a result for a <paramref name="statusCode"/> and, <paramref name="json"/> (where not <c>null</c>) or <paramref name="result"/>.
         /// </summary>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
         /// <param name="statusCode">The <see cref="HttpStatusCode"/>.</param>
-        /// <param name="result">The result value or <see cref="JToken"/>.</param>
+        /// <param name="result">The result value.</param>
+        /// <param name="json">The result as JSON where previsouly serialized.</param>
         /// <returns>The <see cref="IActionResult"/>.</returns>
-        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, object? result)
+        protected static IActionResult CreateResult(ActionContext context, HttpStatusCode statusCode, object? result, string? json)
         {
             Check.NotNull(context, nameof(context));
-            return new ObjectResult(result) { StatusCode = (int)statusCode };
+            return (json != null) 
+                ? new ContentResult { Content = json, ContentType = MediaTypeNames.Application.Json, StatusCode = (int)statusCode }
+                : new JsonResult(result) { StatusCode = (int)statusCode };
         }
 
         /// <summary>
@@ -383,7 +385,7 @@ namespace Beef.AspNetCore.WebApi
 
                 await ((result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
+                    CreateResult(context, StatusCode, result, json).ExecuteResultAsync(context)).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -397,7 +399,7 @@ namespace Beef.AspNetCore.WebApi
         }
 
         /// <summary>
-        /// Creates the <b>JSON</b> representation of the result whilst applying the <see cref="JsonPropertyFilter"/> whilst also returning the related <see cref="IETag.ETag"/>.
+        /// Creates the <b>JSON</b> representation of the result <i>where</i> applying the <see cref="JsonPropertyFilter"/>, whilst also returning the related <see cref="IETag.ETag"/>.
         /// </summary>
         /// <typeparam name="TResult">The result <see cref="Type"/>.</typeparam>
         /// <param name="context">The <see cref="ActionContext"/>.</param>
@@ -410,7 +412,7 @@ namespace Beef.AspNetCore.WebApi
         /// <item><description>Where the result is an <see cref="System.Collections.IEnumerable"/> a hash of the requesting query string and each item's <see cref="IETag"/> will be hashed.</description></item>
         /// <item><description>Otherwise, will generate by hashing the resulting JSON and requesting query string.</description></item>
         /// </list></remarks>
-        protected (object? valueOrJson, string? etag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
+        protected (string? Json, string? ETag) CreateJsonResultAndETag<TResult>(ActionContext context, TResult result)
         {
             Check.NotNull(context, nameof(context));
 
@@ -420,13 +422,13 @@ namespace Beef.AspNetCore.WebApi
             if (ExecutionContext.HasCurrent && Controller.IncludeRefDataText())
                 ExecutionContext.Current.IsRefDataTextSerializationEnabled = true;
 
-            var valOrJson = JsonPropertyFilter.ApplyAsObject(result, IncludeFields, ExcludeFields)!;
+            var json = JsonPropertyFilter.ApplyAsObject(result, IncludeFields, ExcludeFields)!;
 
             if (ExecutionContext.HasCurrent && !string.IsNullOrEmpty(ExecutionContext.Current.ETag))
-                return (valOrJson, ExecutionContext.Current.ETag);
+                return (json, ExecutionContext.Current.ETag);
 
             if (result is IETag ietag)
-                return (valOrJson, ietag?.ETag);
+                return (json, ietag?.ETag);
 
             StringBuilder? sb = null;
             if (result is System.Collections.IEnumerable coll)
@@ -438,8 +440,10 @@ namespace Beef.AspNetCore.WebApi
                 {
                     if (item is IETag cetag && cetag.ETag != null)
                     {
+                        if (sb.Length > 0)
+                            sb.Append(ETag.DividerCharacter);
+
                         sb.Append(cetag.ETag);
-                        sb.Append(AsciiDivider);
                         continue;
                     }
 
@@ -451,12 +455,15 @@ namespace Beef.AspNetCore.WebApi
                     sb = null;
             }
 
-#pragma warning disable CA5351 // Do Not Use Broken Cryptographic Algorithms; not used for security, only used to calculate an etag.
-            using var md5 = System.Security.Cryptography.MD5.Create();
-#pragma warning restore CA5351 
-            var buf = Encoding.UTF8.GetBytes($"{(sb != null && sb.Length > 0 ? sb.ToString() : valOrJson.GetHashCode().ToString(CultureInfo.InvariantCulture))}{AsciiDivider}{context?.HttpContext.Request.QueryString.Value}");
-            var hash = md5.ComputeHash(buf, 0, buf.Length);
-            return (valOrJson, Convert.ToBase64String(hash));
+            string txt;
+            if (json != null)
+                txt = json;
+            else if (sb != null && sb.Length > 0)
+                txt = sb.ToString();
+            else
+                txt = json = JsonConvert.SerializeObject(result);
+
+            return (json, ETag.Generate(txt));
         }
 
         /// <summary>
@@ -589,7 +596,7 @@ namespace Beef.AspNetCore.WebApi
 
                     await (((result == null || result.Result == null) ?
                         (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                        CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
+                        CreateResult(context, StatusCode, result?.Result, json).ExecuteResultAsync(context)).ConfigureAwait(false));
                 }
                 catch (Exception ex)
                 {
@@ -1024,7 +1031,7 @@ namespace Beef.AspNetCore.WebApi
 
                 await ((result == null ?
                     (AlternateStatusCode.HasValue ? CreateResult(context, AlternateStatusCode.Value).ExecuteResultAsync(context) : throw new InvalidOperationException("Function has not returned a result; no AlternateStatusCode has been configured to return.")) :
-                    CreateResult(context, StatusCode, json).ExecuteResultAsync(context)).ConfigureAwait(false));
+                    CreateResult(context, StatusCode, result, json).ExecuteResultAsync(context)).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -1064,13 +1071,13 @@ namespace Beef.AspNetCore.WebApi
                 return (WebApiPatchOption.JsonPatch, patch);
             }
             else if (context.HttpContext.Request.ContentType.Equals("application/merge-patch+json", StringComparison.InvariantCultureIgnoreCase)
-                || context.HttpContext.Request.ContentType.Equals("application/json", StringComparison.InvariantCultureIgnoreCase))
+                || context.HttpContext.Request.ContentType.Equals(MediaTypeNames.Application.Json, StringComparison.InvariantCultureIgnoreCase))
             {
                 return (WebApiPatchOption.MergePatch, null);
             }
             else
             {
-                await new ObjectResult("Unsupported Content-Type for a PATCH; support JSON-Patch: 'application/json-patch+json' or, JSON-Merge: `application/merge-patch+json` or `application/json`.") { StatusCode = (int)HttpStatusCode.UnsupportedMediaType }.ExecuteResultAsync(context).ConfigureAwait(false);
+                await new ObjectResult($"Unsupported Content-Type for a PATCH; support JSON-Patch: 'application/json-patch+json' or, JSON-Merge: `application/merge-patch+json` or `{MediaTypeNames.Application.Json}`.") { StatusCode = (int)HttpStatusCode.UnsupportedMediaType }.ExecuteResultAsync(context).ConfigureAwait(false);
                 return (WebApiPatchOption.NotSpecified, null);
             }
         }

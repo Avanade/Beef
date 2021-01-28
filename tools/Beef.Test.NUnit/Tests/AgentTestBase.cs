@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 
 namespace Beef.Test.NUnit.Tests
@@ -120,7 +121,7 @@ namespace Beef.Test.NUnit.Tests
             }
 
             json = null;
-            if (!string.IsNullOrEmpty(result.Content) && result.Response?.Content?.Headers?.ContentType?.MediaType == "application/json")
+            if (!string.IsNullOrEmpty(result.Content) && result.Response?.Content?.Headers?.ContentType?.MediaType == MediaTypeNames.Application.Json)
             {
                 try
                 {
