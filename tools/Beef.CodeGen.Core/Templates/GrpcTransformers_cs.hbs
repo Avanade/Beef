@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable {{Root.PragmaWarnings}}
 
 using System;
 using Beef.Mapper;
@@ -126,5 +126,5 @@ namespace {{Root.NamespaceCommon}}.Grpc
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore {{Root.PragmaWarnings}}
 #nullable restore

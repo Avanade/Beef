@@ -156,6 +156,11 @@
       "title": "The Namespace (root) for the CDC-related .NET artefacts.",
       "description": "Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`."
     },
+    "pragmaWarnings": {
+      "type": "string",
+      "title": "The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.",
+      "description": "Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs)."
+    },
     "tables": {
       "type": "array",
       "title": "The corresponding `Table` collection.",

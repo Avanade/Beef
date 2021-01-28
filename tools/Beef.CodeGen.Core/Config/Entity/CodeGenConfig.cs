@@ -34,6 +34,7 @@ entities:
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
+    [CategorySchema("Adhoc", Title = "Provides any additional _Adhoc_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig
     {
@@ -370,6 +371,18 @@ entities:
 
         #endregion
 
+        #region Adhoc
+
+        /// <summary>
+        /// Gets or sets the comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.
+        /// </summary>
+        [JsonProperty("pragmaWarnings", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Adhoc", Title = "The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.",
+            Description = @"Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs).")]
+        public string? PragmaWarnings { get; set; }
+
+        #endregion
+
         #region RuntimeParameters
 
         /// <summary>
@@ -545,6 +558,11 @@ entities:
             ODataName = DefaultWhereNull(ODataName, () => "IOData");
             JsonSerializer = DefaultWhereNull(JsonSerializer, () => "Newtonsoft");
             RefDataDefaultMapperConverter = DefaultWhereNull(RefDataDefaultMapperConverter, () => "ReferenceDataCodeConverter");
+
+            if (string.IsNullOrEmpty(PragmaWarnings))
+                PragmaWarnings = DefaultPragmaWarnings;
+            else
+                PragmaWarnings = $"{DefaultPragmaWarnings}, {PragmaWarnings}";
 
             if (Entities != null && Entities.Count > 0)
             {

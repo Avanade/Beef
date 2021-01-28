@@ -156,7 +156,7 @@ namespace Beef.Caching
         /// <returns><c>true</c> if the key exists and policy has not expired; otherwise, <c>false</c>.</returns>
         public bool ContainsKey(TKey key)
         {
-            return (!_dict.TryGetValue(key, out CacheValue<TValue> cv) || cv.Policy.HasExpired()) ? false : true;
+            return _dict.TryGetValue(key, out CacheValue<TValue> cv) && !cv.Policy.HasExpired();
         }
 
         /// <summary>

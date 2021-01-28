@@ -4,8 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable {{Root.PragmaWarnings}}, CA2225
 
 {{! ===== Using ===== }}
 using System;
@@ -271,7 +270,6 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         /// </summary>
         /// <param name="id">The <b>Id</b>.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityName}}}({{RefDataType}} id) => ConvertFromId<{{{EntityName}}}>(id);
 
         /// <summary>
@@ -279,7 +277,6 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         /// </summary>
         /// <param name="code">The <b>Code</b>.</param>
         /// <returns>The corresponding {{{EntityNameSeeComments}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityName}}}(string? code) => ConvertFromCode<{{{EntityName}}}>(code);
 
         #endregion
@@ -483,7 +480,6 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class {{{EntityCollectionName}}} : {{{EntityCollectionInherits}}}
     {
         /// <summary>
@@ -527,7 +523,6 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         /// </summary>
         /// <param name="result">The {{{seecomments EntityCollectionResultName}}}.</param>
         /// <returns>The corresponding {{{seecomments EntityCollectionName}}}.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator {{{EntityCollectionName}}}({{{EntityCollectionResultName}}} result) => result?.Result!;
   {{/if}}
     }
@@ -542,7 +537,6 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
     /// <summary>
     /// Represents the {{{EntityNameSeeComments}}} collection result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class {{{EntityCollectionResultName}}} : {{{CollectionResultInherits}}}
     {
         /// <summary>
@@ -579,6 +573,5 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
 {{/if}}
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore {{Root.PragmaWarnings}}, CA2225
 #nullable restore

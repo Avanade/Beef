@@ -215,6 +215,11 @@
       "title": "The Namespace (root) for the Api-related .NET artefacts.",
       "description": "Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
     },
+    "pragmaWarnings": {
+      "type": "string",
+      "title": "The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.",
+      "description": "Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs)."
+    },
     "entities": {
       "type": "array",
       "title": "The corresponding `Entity` collection.",

@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable {{Root.PragmaWarnings}}
 
 using System;
 using System.Collections.Generic;
@@ -50,13 +50,11 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
 {{/each}}
 {{#if DataSvcExtensions}}
         #region Extensions
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
   {{#each DataSvcAutoOperations}}
         private Func<{{#if HasReturnValue}}{{OperationReturnType}}, {{/if}}{{#each ValueLessDataParameters}}{{{ParameterType}}}, {{/each}}Task>? {{PrivateName}}OnAfterAsync;
   {{/each}}
 
-        #pragma warning restore CS0649
         #endregion
 
 {{/if}}
@@ -144,5 +142,5 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore {{Root.PragmaWarnings}}
 #nullable restore

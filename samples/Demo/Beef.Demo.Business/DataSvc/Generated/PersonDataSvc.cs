@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005, IDE0044 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,6 @@ namespace Beef.Demo.Business.DataSvc
         private readonly IRequestCache _cache;
 
         #region Extensions
-        #pragma warning disable CS0649 // Defaults to null by design; can be overridden in constructor.
 
         private Func<Person, Task>? _createOnAfterAsync;
         private Func<Guid, Task>? _deleteOnAfterAsync;
@@ -56,7 +55,6 @@ namespace Beef.Demo.Business.DataSvc
         private Func<Person, Task>? _updateWithEfOnAfterAsync;
         private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
 
-        #pragma warning restore CS0649
         #endregion
 
         /// <summary>
@@ -456,5 +454,5 @@ namespace Beef.Demo.Business.DataSvc
     }
 }
 
-#pragma warning restore IDE0005, IDE0044
+#pragma warning restore IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 #nullable restore

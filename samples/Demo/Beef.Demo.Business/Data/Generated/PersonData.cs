@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 
 using System;
 using System.Collections.Generic;
@@ -25,7 +25,6 @@ namespace Beef.Demo.Business.Data
     /// <summary>
     /// Provides the <see cref="Person"/> data access.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class PersonData : IPersonData
     {
         private readonly IDatabase _db;
@@ -34,7 +33,6 @@ namespace Beef.Demo.Business.Data
         private readonly Common.Agents.IPersonAgent _personAgent;
 
         #region Extensions
-        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
 
         private Func<Person, IDatabaseArgs, Task>? _createOnBeforeAsync;
         private Func<Person, Task>? _createOnAfterAsync;
@@ -90,7 +88,6 @@ namespace Beef.Demo.Business.Data
         private Func<Guid, Task>? _deleteWithEfOnAfterAsync;
         private Action<Exception>? _deleteWithEfOnException;
 
-        #pragma warning restore CS0649, IDE0044
         #endregion
 
         /// <summary>
@@ -421,7 +418,6 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> property and database column mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class DbMapper : DatabaseMapper<Person, DbMapper>
         {
             /// <summary>
@@ -447,7 +443,6 @@ namespace Beef.Demo.Business.Data
         /// <summary>
         /// Provides the <see cref="Person"/> and Entity Framework <see cref="EfModel.Person"/> property mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class EfMapper : EfDbMapper<Person, EfModel.Person, EfMapper>
         {
             /// <summary>
@@ -471,5 +466,5 @@ namespace Beef.Demo.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 #nullable restore

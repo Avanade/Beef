@@ -74,6 +74,11 @@ namespace Beef.CodeGen.Config
         };
 
         /// <summary>
+        /// Gets the default list of .NET pragma warnings to disable then restore.
+        /// </summary>
+        public static string DefaultPragmaWarnings => "IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649";
+
+        /// <summary>
         /// Checks whether the <see cref="string"/> value is <see cref="NoOption"/>.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -90,7 +95,7 @@ namespace Beef.CodeGen.Config
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="defaultValue">The default value function.</param>
-        public static string? DefaultWhereNull(string? value, Func<string?> defaultValue) => value == null ? Check.NotNull(defaultValue, nameof(defaultValue))() : value;
+        public static string? DefaultWhereNull(string? value, Func<string?> defaultValue) => value ?? Check.NotNull(defaultValue, nameof(defaultValue))();
 
         /// <summary>
         /// Defaults the <see cref="bool"/> <paramref name="value"/> where <c>null</c> using the <paramref name="defaultValue"/> function.
@@ -211,13 +216,6 @@ namespace Beef.CodeGen.Config
         /// Gets the <b>Parent</b> configuration.
         /// </summary>
         protected internal ConfigBase? ParentConfig { get; set; }
-
-
-        /// <summary>
-        /// Gets the list of .NET pragma warnings to disable then restore.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Needs to be!")]
-        public string PragmaWarnings => "IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034";
 
         /// <summary>
         /// Gets the qualified key name for the configuration.
@@ -372,7 +370,6 @@ namespace Beef.CodeGen.Config
                 return false;
             }
         }
-
 
         /// <summary>
         /// Gets the <see cref="DateTime.UtcNow"/> as a formatted timestamp.

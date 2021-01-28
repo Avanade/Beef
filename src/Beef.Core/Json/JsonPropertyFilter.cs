@@ -135,7 +135,7 @@ namespace Beef.Json
                     for (int i = 0; i < parts.Length; i++)
                     {
                         if (i > 0)
-                            sb.Append(".");
+                            sb.Append('.');
 
                         sb.Append(parts[i]);
                         kod.Add(sb.ToString());
@@ -220,7 +220,7 @@ namespace Beef.Json
                 txt = txt.Remove(li, ri - li + 1);
             }
 
-            return (txt.Length > 1 && txt[0] == '.') ? txt.Substring(1) : txt;
+            return (txt.Length > 1 && txt[0] == '.') ? txt[1..] : txt;
         }
     }
 }

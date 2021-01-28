@@ -956,6 +956,11 @@
           <xs:documentation>The Namespace (root) for the CDC-related .NET artefacts. Defaults to `NamespaceBase` + `.Cdc` (literal). For example `Beef.Demo.Cdc`.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="PragmaWarnings" use="optional" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings. Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 </xs:schema>

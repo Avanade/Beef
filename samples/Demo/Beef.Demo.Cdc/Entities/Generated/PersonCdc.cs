@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning disable IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 
 using Beef.Entities;
 using Beef.Mapper;
@@ -52,5 +52,5 @@ namespace Beef.Demo.Cdc.Entities
     }
 }
 
-#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning restore IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 #nullable restore

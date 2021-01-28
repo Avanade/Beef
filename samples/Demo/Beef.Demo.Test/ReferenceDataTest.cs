@@ -16,7 +16,7 @@ namespace Beef.Demo.Test
     [TestFixture, Parallelizable(ParallelScope.Children)]
     public class ReferenceDataTest : UsingAgentTesterServer<Startup>
     {
-        private static RobotTest _robotTest = new RobotTest();
+        private static readonly RobotTest _robotTest = new RobotTest();
 
         [OneTimeSetUp]
         public async Task OneTimeSetUp() => await _robotTest.CosmosOneTimeSetUp();

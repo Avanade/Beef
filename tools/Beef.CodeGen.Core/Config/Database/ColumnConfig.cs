@@ -142,11 +142,6 @@ namespace Beef.CodeGen.Config.Database
         public bool IsDeleteColumn { get; }
 
         /// <summary>
-        /// Indicates that the name ends with URL.
-        /// </summary>
-        public bool IsNameEndsWithUrl { get; }
-
-        /// <summary>
         /// Gets the EF SQL Type.
         /// </summary>
         public string? EfSqlType { get; }
@@ -315,11 +310,6 @@ namespace Beef.CodeGen.Config.Database
         /// Indicates where the column should be considered for a 'Delete' operation.
         /// </summary>
         public bool IsDeleteColumn => (!DbColumn!.IsComputed && !IsAudit) || IsDeleted;
-
-        /// <summary>
-        /// Indicates that the name ends with URL.
-        /// </summary>
-        public bool IsNameEndsWithUrl => Name!.EndsWith("Url", System.StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets or sets the EF SQL Type.

@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning disable {{Root.PragmaWarnings}}
 
 using Beef;
 using Beef.Data.Database.Cdc;
@@ -38,5 +38,5 @@ namespace {{Root.NamespaceCdc}}.Services
     }
 }
 
-#pragma warning restore IDE0079, IDE0001, IDE0005, CA2227, CA1819, CA1056, CA1034
+#pragma warning restore {{Root.PragmaWarnings}}
 #nullable restore

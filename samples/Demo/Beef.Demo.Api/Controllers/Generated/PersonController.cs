@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 
 using System;
 using System.Collections.Generic;
@@ -414,5 +414,5 @@ namespace Beef.Demo.Api.Controllers
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 #nullable restore

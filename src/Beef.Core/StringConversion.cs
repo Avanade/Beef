@@ -92,7 +92,7 @@ namespace Beef
             if (!ignoreSpecialNames)
                 s = SpecialCaseHandling(s);
 
-            return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s.Substring(1); // Make sure the first character is always upper case.
+            return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s[1..]; // Make sure the first character is always upper case.
         }
 
         /// <summary>

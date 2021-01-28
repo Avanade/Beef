@@ -476,7 +476,7 @@ namespace Beef.WebApi
                 fullUrl += "/";
 
             if (!string.IsNullOrEmpty(urlSuffix))
-                fullUrl += ((urlSuffix[0] == '/') ? urlSuffix.Substring(1) : urlSuffix);
+                fullUrl += ((urlSuffix[0] == '/') ? urlSuffix[1..] : urlSuffix);
 
             // Replace known url tokens with passed argument values.
             if (args != null)
@@ -522,7 +522,7 @@ namespace Beef.WebApi
                     fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + WebApiRequestOptions.IncludeInactiveQueryStringName + "=true";
 
                 if (!string.IsNullOrEmpty(requestOptions.UrlQueryString))
-                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString.Substring(1) : requestOptions.UrlQueryString);
+                    fullUrl = fullUrl + (fullUrl.Contains("?", StringComparison.InvariantCulture) ? "&" : "?") + (requestOptions.UrlQueryString.StartsWith("?", StringComparison.InvariantCultureIgnoreCase) ? requestOptions.UrlQueryString[1..] : requestOptions.UrlQueryString);
             }
 
             return new Uri(fullUrl.Replace(" ", "%20", StringComparison.InvariantCulture));
