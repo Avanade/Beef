@@ -956,7 +956,7 @@
             "cdcSchema": {
               "type": "string",
               "title": "The schema name for the generated `CDC`-related database artefacts.",
-              "description": "Defaults to `CodeGenConfig.CdcSchema`."
+              "description": "Defaults to `CodeGeneration.CdcSchema`."
             },
             "outboxTableName": {
               "type": "string",
@@ -997,7 +997,7 @@
             "eventSubject": {
               "type": "string",
               "title": "The event subject.",
-              "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified."
+              "description": "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified."
             },
             "columnNameIsDeleted": {
               "type": "string",

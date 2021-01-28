@@ -749,7 +749,7 @@
             </xs:attribute>
             <xs:attribute name="CdcSchema" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGenConfig.CdcSchema`.</xs:documentation>
+                <xs:documentation>The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGeneration.CdcSchema`.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="OutboxTableName" use="optional" type="xs:string">
@@ -781,7 +781,7 @@
             </xs:attribute>
             <xs:attribute name="EventSubject" use="optional" type="xs:string">
               <xs:annotation>
-                <xs:documentation>The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.</xs:documentation>
+                <xs:documentation>The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="ColumnNameIsDeleted" use="optional" type="xs:string">

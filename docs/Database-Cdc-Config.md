@@ -54,7 +54,7 @@ Provides the _database_ configuration.
 Property | Description
 -|-
 `storedProcedureName` | The `CDC` get outbox data stored procedure name. Defaults to `spExecute` (literal) + `Name` + `CdcOutbox` (literal); e.g. `spExecuteTableNameCdcOutbox`.
-`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGenConfig.CdcSchema`.
+`cdcSchema` | The schema name for the generated `CDC`-related database artefacts. Defaults to `CodeGeneration.CdcSchema`.
 `outboxTableName` | The corresponding `CDC` Outbox table name. Defaults to `Name` + `Outbox` (literal).
 
 <br/>
@@ -67,7 +67,7 @@ Property | Description
 `modelName` | The .NET model name. Defaults to `Name`.
 `dataConstructor` | The access modifier for the generated CDC `Data` constructor. Valid options are: `Public`, `Private`, `Protected`. Defaults to `Public`.
 `databaseName` | The .NET database interface name. Defaults to `IDatabase`.
-`eventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.
+`eventSubject` | The event subject. Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.
 
 <br/>
 

@@ -166,6 +166,11 @@
                       <xs:documentation>The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase).</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="JsonDataModelName" use="optional" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation>The JSON property name for the corresponding data model (see `Entity.DataModel`). Defaults to `JsonName` where not specified.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
                   <xs:attribute name="IgnoreSerialization" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether the property is not to be serialized. All properties are serialized by default.</xs:documentation>
@@ -1083,7 +1088,7 @@
             </xs:attribute>
             <xs:attribute name="EventTransaction" use="optional" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGenConfig.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.</xs:documentation>
+                <xs:documentation>Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic. Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified.</xs:documentation>
               </xs:annotation>
             </xs:attribute>
             <xs:attribute name="DataSvcConstructor" use="optional">

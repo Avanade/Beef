@@ -77,6 +77,7 @@ Provides the _Serialization_ configuration.
 Property | Description
 -|-
 `JsonName` | The JSON property name. Defaults to `ArgumentName` where not specified (i.e. camelCase).
+`JsonDataModelName` | The JSON property name for the corresponding data model (see `Entity.DataModel`). Defaults to `JsonName` where not specified.
 `IgnoreSerialization` | Indicates whether the property is not to be serialized. All properties are serialized by default.
 `EmitDefaultValue` | Indicates whether to emit the default value when serializing.
 `DataModelJsonName` | The override JSON property name where outputting as a data model. Defaults to `JsonName` where not specified.

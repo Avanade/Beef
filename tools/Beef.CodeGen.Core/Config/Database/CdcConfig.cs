@@ -105,7 +105,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("cdcSchema", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("Database", Title = "The schema name for the generated `CDC`-related database artefacts.",
-            Description = "Defaults to `CodeGenConfig.CdcSchema`.")]
+            Description = "Defaults to `CodeGeneration.CdcSchema`.")]
         public string? CdcSchema { get; set; }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace Beef.CodeGen.Config.Database
         /// </summary>
         [JsonProperty("eventSubject", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertySchema("DotNet", Title = "The event subject.",
-            Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGenConfig.EventSubjectRoot` will be prepended where specified.")]
+            Description = "Defaults to `ModelName`. Note: when used in code-generation the `CodeGeneration.EventSubjectRoot` will be prepended where specified.")]
         public string? EventSubject { get; set; }
 
         #endregion

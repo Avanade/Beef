@@ -535,7 +535,7 @@
             "eventTransaction": {
               "type": "boolean",
               "title": "Indicates whether a `System.TransactionScope` should be created and orchestrated at the `DataSvc`-layer whereever generating event publishing logic.",
-              "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGenConfig.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified."
+              "description": "Usage will force a rollback of any underlying data transaction (where the provider supports TransactionScope) on failure, such as an `EventPublish` error. This is by no means implying a Distributed Transaction (DTC) should be invoked; this is only intended for a single data source that supports a TransactionScope to guarantee reliable event publishing. Defaults to `CodeGeneration.EventTransaction`. This essentially defaults the `Operation.DataSvcTransaction` where not otherwise specified."
             },
             "dataSvcCtor": {
               "type": "string",
@@ -874,6 +874,11 @@
                       "type": "string",
                       "title": "The JSON property name.",
                       "description": "Defaults to `ArgumentName` where not specified (i.e. camelCase)."
+                    },
+                    "jsonDataModelName": {
+                      "type": "string",
+                      "title": "The JSON property name for the corresponding data model (see `Entity.DataModel`).",
+                      "description": "Defaults to `JsonName` where not specified."
                     },
                     "serializationIgnore": {
                       "type": "boolean",
