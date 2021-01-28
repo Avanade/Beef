@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
+#pragma warning disable IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
 
 using System;
 using System.Collections.Generic;
@@ -203,5 +203,5 @@ namespace Beef.Demo.Common.Entities
     }
 }
 
-#pragma warning restore IDE0001, IDE0005, IDE0044, IDE0079, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
+#pragma warning restore IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
 #nullable restore

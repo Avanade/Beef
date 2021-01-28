@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, 1046
 
 using System;
 using System.Threading.Tasks;
@@ -45,7 +45,6 @@ namespace My.Hr.Common.Entities
         /// </summary>
         /// <param name="type">The associated <see cref="ReferenceDataBase"/> <see cref="Type"/>.</param>
         /// <returns>The corresponding <see cref="IReferenceDataCollection"/>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Logical for type")]
         public abstract IReferenceDataCollection this[Type type] { get; }
 
         /// <summary>
@@ -87,5 +86,5 @@ namespace My.Hr.Common.Entities
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, 1046
 #nullable restore

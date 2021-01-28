@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
+#pragma warning disable IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 
 using System;
 using System.Collections.Generic;
@@ -25,19 +25,12 @@ namespace Cdr.Banking.Business.Data
     /// <summary>
     /// Provides the <see cref="Transaction"/> data access.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "Will not always appear static depending on code-gen options")]
     public partial class TransactionData : ITransactionData
     {
         private readonly ICosmosDb _cosmos;
 
-        #region Extensions
-        #pragma warning disable CS0649, IDE0044 // Defaults to null by design; can be overridden in constructor.
-
         private Action<ICosmosDbArgs>? _onDataArgsCreate;
         private Func<IQueryable<Model.Transaction>, string?, TransactionArgs?, ICosmosDbArgs, IQueryable<Model.Transaction>>? _getTransactionsOnQuery;
-
-        #pragma warning restore CS0649, IDE0044
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionData"/> class.
@@ -69,7 +62,6 @@ namespace Cdr.Banking.Business.Data
         /// <summary>
         /// Provides the <see cref="Transaction"/> and Cosmos  property mapping.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "By design; as there is a direct relationship")]
         public partial class CosmosMapper : CosmosDbMapper<Transaction, Model.Transaction, CosmosMapper>
         {
             /// <summary>
@@ -102,5 +94,5 @@ namespace Cdr.Banking.Business.Data
     }
 }
 
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
 #nullable restore

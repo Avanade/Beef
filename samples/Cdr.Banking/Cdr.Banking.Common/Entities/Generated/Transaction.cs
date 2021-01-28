@@ -3,8 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0005 // Using directive is unnecessary; are required depending on code-gen options
-#pragma warning disable CA2227, CA1819 // Collection/Array properties should be read only; ignored, as acceptable for a DTO.
+#pragma warning disable IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
 
 using System;
 using System.Collections.Generic;
@@ -487,7 +486,6 @@ namespace Cdr.Banking.Common.Entities
     /// <summary>
     /// Represents the <see cref="Transaction"/> collection.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public partial class TransactionCollection : EntityBaseCollection<Transaction>
     {
         /// <summary>
@@ -521,7 +519,6 @@ namespace Cdr.Banking.Common.Entities
         /// </summary>
         /// <param name="result">The <see cref="TransactionCollectionResult"/>.</param>
         /// <returns>The corresponding <see cref="TransactionCollection"/>.</returns>
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Improves useability")]
         public static implicit operator TransactionCollection(TransactionCollectionResult result) => result?.Result!;
     }
 
@@ -532,7 +529,6 @@ namespace Cdr.Banking.Common.Entities
     /// <summary>
     /// Represents the <see cref="Transaction"/> collection result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Tightly coupled; OK.")]
     public class TransactionCollectionResult : EntityCollectionResult<TransactionCollection, Transaction>
     {
         /// <summary>
@@ -568,6 +564,5 @@ namespace Cdr.Banking.Common.Entities
     #endregion
 }
 
-#pragma warning restore CA2227, CA1819
-#pragma warning restore IDE0005
+#pragma warning restore IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649, CA2225
 #nullable restore
