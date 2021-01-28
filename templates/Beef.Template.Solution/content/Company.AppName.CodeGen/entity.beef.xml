@@ -8,7 +8,7 @@
     <Property Name="LastName" Type="string" />
     <Property Name="Gender" Type="RefDataNamespace.Gender" DataName="GenderCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
-    <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
+    <Property Name="ETag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
 <!--#endif -->
 <!--#if (implement_entityframework) -->
@@ -20,7 +20,7 @@
     <Property Name="LastName" Type="string" />
     <Property Name="Gender" Type="RefDataNamespace.Gender" DataName="GenderCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
-    <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
+    <Property Name="ETag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
 <!--#endif -->
 <!--#if (implement_cosmos) -->
@@ -32,7 +32,7 @@
     <Property Name="LastName" Type="string" />
     <Property Name="Gender" Type="RefDataNamespace.Gender" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" />
-    <Property Name="ETag" ArgumentName="etag" JsonName="_etag" Type="string" />
+    <Property Name="ETag" JsonDataModelName="_etag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
 <!--#endif -->
 <!--#if (implement_database || implement_entityframework || implement_cosmos) -->

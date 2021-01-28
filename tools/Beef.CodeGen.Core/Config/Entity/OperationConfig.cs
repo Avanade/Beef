@@ -698,8 +698,6 @@ operations: [
             CosmosPartitionKey = DefaultWhereNull(CosmosPartitionKey, () => Parent!.CosmosPartitionKey);
             ODataCollectionName = DefaultWhereNull(ODataCollectionName, () => Parent!.ODataCollectionName);
 
-            DataSvcTransaction = DefaultWhereNull(DataSvcTransaction, () => Root!.EventTransaction);
-
             WebApiStatus = DefaultWhereNull(WebApiStatus, () => Type! == "Create" ? "Created" : (HasReturnValue ? "OK" : "NoContent"));
             WebApiMethod = Type == "Patch" ? "HttpPatch" : DefaultWhereNull(WebApiMethod, () => Type switch
             {

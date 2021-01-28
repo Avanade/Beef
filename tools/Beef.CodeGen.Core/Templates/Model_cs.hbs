@@ -56,7 +56,7 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
         /// </summary>
     {{#ifeq Parent.JsonSerializer 'Newtonsoft'}}
       {{#unless SerializationIgnore}}
-        [JsonProperty("{{JsonName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
+        [JsonProperty("{{JsonDataModelName}}", DefaultValueHandling = {{#if SerializationEmitDefault}}DefaultValueHandling.Include{{else}}DefaultValueHandling.Ignore{{/if}})]
       {{/unless}}
     {{/ifeq}}
     {{#unless IsDataModel}}

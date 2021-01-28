@@ -109,7 +109,7 @@ namespace {{Root.NamespaceCommon}}.Grpc
         /// </summary>
         public static EntityMapper<entities.{{Name}}, proto.{{Name}}> {{Name}} => EntityMapper.Create<entities.{{Name}}, proto.{{Name}}>()
   {{#each GrpcProperties}}
-            .HasProperty(e => e.{{PropertyName}}, g => g.{{pascal ArgumentName}}{{#ifval GrpcConverter}}, p => p.SetConverter({{GrpcConverter}}){{/ifval}}{{#ifval GrpcMapper}}, p => p.SetMapper({{GrpcMapper}}){{/ifval}}){{#if @last}};{{/if}}
+            .HasProperty(e => e.{{PropertyName}}, g => g.{{pascalx ArgumentName}}{{#ifval GrpcConverter}}, p => p.SetConverter({{GrpcConverter}}){{/ifval}}{{#ifval GrpcMapper}}, p => p.SetMapper({{GrpcMapper}}){{/ifval}}){{#if @last}};{{/if}}
   {{/each}}
   {{#if CollectionResult}}
 

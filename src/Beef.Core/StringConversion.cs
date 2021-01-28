@@ -33,59 +33,65 @@ namespace Beef
         /// Converts <paramref name="text"/> to camelCase (e.g. 'SomeValue' would return 'someValue').
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToCamelCase(string? text)
+        public static string? ToCamelCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            if (text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase))
-                return $"{char.ToLower(text[0], CultureInfo.InvariantCulture)}{char.ToLower(text[1], CultureInfo.InvariantCulture)}{text.Substring(2)}";
+            if (!ignoreSpecialNames && (text.StartsWith("ETag", StringComparison.InvariantCultureIgnoreCase) || text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase)))
+                return $"{char.ToLower(text[0], CultureInfo.InvariantCulture)}{char.ToLower(text[1], CultureInfo.InvariantCulture)}{text[2..]}";
             else
-                return char.ToLower(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
+                return char.ToLower(text[0], CultureInfo.InvariantCulture) + text[1..];
         }
 
         /// <summary>
         /// Converts <paramref name="text"/> to _camelCase (e.g. 'SomeValue' would return '_someValue').
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToPrivateCase(string? text)
+        public static string? ToPrivateCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            return "_" + ToCamelCase(text);
+            return "_" + ToCamelCase(text, ignoreSpecialNames);
         }
 
         /// <summary>
         /// Converts <paramref name="text"/> to PascalCase (e.g. 'someValue' would return 'SomeValue').
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToPascalCase(string? text)
+        public static string? ToPascalCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            if (text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase))
-                return $"{char.ToUpper(text[0], CultureInfo.InvariantCulture)}{char.ToUpper(text[1], CultureInfo.InvariantCulture)}{text.Substring(2)}";
+            if (!ignoreSpecialNames && (text.StartsWith("ETag", StringComparison.InvariantCultureIgnoreCase) || text.StartsWith("OData", StringComparison.InvariantCultureIgnoreCase)))
+                return $"{char.ToUpper(text[0], CultureInfo.InvariantCulture)}{char.ToUpper(text[1], CultureInfo.InvariantCulture)}{text[2..]}";
             else
-                return char.ToUpper(text[0], CultureInfo.InvariantCulture) + text.Substring(1);
+                return char.ToUpper(text[0], CultureInfo.InvariantCulture) + text[1..];
         }
 
         /// <summary>
         /// Converts <paramref name="text"/> to a Sentence Case ('someValueXML' would return 'Some Value XML'); splits on capitals and attempts to keep acronyms.
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToSentenceCase(string? text)
+        public static string? ToSentenceCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = SpecialCaseHandling(s);
+            if (!ignoreSpecialNames)
+                s = SpecialCaseHandling(s);
+
             return char.ToUpper(s[0], CultureInfo.InvariantCulture) + s.Substring(1); // Make sure the first character is always upper case.
         }
 
@@ -93,14 +99,17 @@ namespace Beef
         /// Converts <paramref name="text"/> to a Snake Case ('someValueXML' would return 'some_value_xml'); splits on capitals and attempts to keep acronyms.
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToSnakeCase(string? text)
+        public static string? ToSnakeCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = SpecialCaseHandling(s);
+            if (!ignoreSpecialNames)
+                s = SpecialCaseHandling(s);
+
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "_", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
 #pragma warning restore CA1308 
@@ -110,14 +119,17 @@ namespace Beef
         /// Converts <paramref name="text"/> to a Kebab Case ('someValueXML' would return 'some-value-xml'); splits on capitals and attempts to keep acronyms.
         /// </summary>
         /// <param name="text">The text.</param>
+        /// <param name="ignoreSpecialNames">Indicates whether to ignore specific handling of special names.</param>
         /// <returns>The converted text.</returns>
-        public static string? ToKebabCase(string? text)
+        public static string? ToKebabCase(string? text, bool ignoreSpecialNames = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
             var s = Regex.Replace(text, WordSplitPattern, "$1 "); // Split the string into words.
-            s = SpecialCaseHandling(s);
+            if (!ignoreSpecialNames)
+                s = SpecialCaseHandling(s);
+
 #pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "-", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with - and make lowercase.
 #pragma warning restore CA1308 

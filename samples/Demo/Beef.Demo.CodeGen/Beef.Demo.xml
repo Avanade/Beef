@@ -9,7 +9,7 @@
     <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" GrpcFieldNo="6" DataName="EyeColorCode" />
     <Property Name="Birthday" Type="DateTime" DateTimeTransform="DateOnly" GrpcFieldNo="7" />
     <Property Name="Address" Type="Address" IsEntity="true" GrpcFieldNo="8" DataDatabaseMapper="AddressData.DbMapper" DataEntityFrameworkIgnore="true" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" GrpcFieldNo="500" />
+    <Property Name="ETag" Type="string" GrpcFieldNo="500" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="501" />
 
     <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" />
@@ -123,7 +123,7 @@
     <Property Name="SerialNo" Text="Unique serial number" Type="string" GrpcFieldNo="3" />
     <Property Name="EyeColor" Type="RefDataNamespace.EyeColor" RefDataType="string" GrpcFieldNo="4" />
     <Property Name="PowerSource" Type="RefDataNamespace.PowerSource" RefDataType="string" GrpcFieldNo="5" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" GrpcFieldNo="6" />
+    <Property Name="ETag" Type="string" GrpcFieldNo="6" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" GrpcFieldNo="7" />
 
     <Operation Name="Get" OperationType="Get" UniqueKey="true" WebApiRoute="{id}" Grpc="true" />
@@ -172,7 +172,7 @@
     <Property Name="Id" Text="{{Person}} identifier" Type="Guid" />
     <Property Name="FirstName" Type="string" />
     <Property Name="LastName" Type="string" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" />
+    <Property Name="ETag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
   </Entity> 
  </CodeGeneration>

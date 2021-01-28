@@ -238,6 +238,14 @@ properties: [
         public string? JsonName { get; set; }
 
         /// <summary>
+        /// Gets or sets the JSON property name for the corresponding data model.
+        /// </summary>
+        [JsonProperty("jsonDataModelName", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Serialization", Title = "The JSON property name for the corresponding data model (see `Entity.DataModel`).",
+            Description = "Defaults to `JsonName` where not specified.")]
+        public string? JsonDataModelName { get; set; }
+
+        /// <summary>
         /// Indicates whether the property is not to be serialized.
         /// </summary>
         [JsonProperty("serializationIgnore", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -621,6 +629,7 @@ properties: [
             DisplayName = DefaultWhereNull(DisplayName, () => GenerateDisplayName());
             Nullable = DefaultWhereNull(Nullable, () => !IgnoreNullableTypes.Contains(Type!));
             JsonName = DefaultWhereNull(JsonName, () => ArgumentName);
+            JsonDataModelName = DefaultWhereNull(JsonDataModelName, () => JsonName);
             SerializationEmitDefault = DefaultWhereNull(SerializationEmitDefault, () => CompareValue(UniqueKey, true));
             DataModelJsonName = DefaultWhereNull(DataModelJsonName, () => JsonName);
             DataOperationTypes = DefaultWhereNull(DataOperationTypes, () => "Any");

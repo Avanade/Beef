@@ -33,7 +33,7 @@ namespace My.Hr.Common.Entities
         private string? _outcomeText;
         private string? _reviewer;
         private string? _notes;
-        private string? _eTag;
+        private string? _etag;
         private ChangeLog? _changeLog;
 
         #endregion
@@ -130,8 +130,8 @@ namespace My.Hr.Common.Entities
         [Display(Name="ETag")]
         public string? ETag
         {
-            get => _eTag;
-            set => SetValue(ref _eTag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
+            get => _etag;
+            set => SetValue(ref _etag, value, false, StringTrim.UseDefault, StringTransform.UseDefault, nameof(ETag));
         }
 
         /// <summary>

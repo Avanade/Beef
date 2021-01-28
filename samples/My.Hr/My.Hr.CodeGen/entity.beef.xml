@@ -22,7 +22,7 @@
     <Property Name="StartDate" Type="DateTime" DateTimeTransform="DateOnly" />
     <Property Name="Termination" Type="TerminationDetail" DataDatabaseMapper="TerminationDetailData.DbMapper" DataEntityFrameworkIgnore="true" />
     <Property Name="PhoneNo" Type="string" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" />
+    <Property Name="ETag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" />
   </Entity>
 
@@ -129,7 +129,7 @@
     <Property Name="Outcome" Type="RefDataNamespace.PerformanceOutcome" DataName="PerformanceOutcomeCode" />
     <Property Name="Reviewer" Type="string" />
     <Property Name="Notes" Type="string" />
-    <Property Name="ETag" ArgumentName="etag" Type="string" />
+    <Property Name="ETag" Type="string" />
     <Property Name="ChangeLog" Type="ChangeLog" IsEntity="true" />
     
     <!-- Operations 

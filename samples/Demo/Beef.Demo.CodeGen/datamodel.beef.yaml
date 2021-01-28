@@ -7,7 +7,7 @@ entities:
       { name: SerialNo },
       { name: EyeColor },
       { name: PowerSource },
-      { name: ETag, argumentName: etag, jsonName: _etag },
+      { name: ETag, jsonName: _etag },
       { name: ChangeLog, type: ChangeLog }
     ]
   }
