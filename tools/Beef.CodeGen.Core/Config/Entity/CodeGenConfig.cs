@@ -457,7 +457,6 @@ entities:
         [JsonProperty("entities", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Entity` collection.", IsImportant = true,
             Markdown = "An `Entity` object provides the primary configuration for an entity, its properties and operations.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<EntityConfig>? Entities { get; set; }
 
         /// <summary>

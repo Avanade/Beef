@@ -90,11 +90,9 @@ namespace Beef.Validation
             return await ValidateAsync((TEntity)value!, args).ConfigureAwait(false);
         }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types; by-design, need not be overridden.
         /// <summary>
         /// Gets the <see cref="Type"/> for the entity that is being validated.
         /// </summary>
         Type IValidator.EntityType => typeof(TEntity);
-#pragma warning restore CA1033
     }
 }

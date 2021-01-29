@@ -110,9 +110,7 @@ namespace Beef
             if (!ignoreSpecialNames)
                 s = SpecialCaseHandling(s);
 
-#pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "_", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with _ and make lowercase.
-#pragma warning restore CA1308 
         }
 
         /// <summary>
@@ -130,9 +128,7 @@ namespace Beef
             if (!ignoreSpecialNames)
                 s = SpecialCaseHandling(s);
 
-#pragma warning disable CA1308 // Normalize strings to uppercase; lowercase is correct!
             return s.Replace(" ", "-", StringComparison.InvariantCulture).ToLowerInvariant(); // Replace space with - and make lowercase.
-#pragma warning restore CA1308 
         }
 
         /// <summary>

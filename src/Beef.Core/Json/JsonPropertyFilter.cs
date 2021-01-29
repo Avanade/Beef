@@ -92,9 +92,7 @@ namespace Beef.Json
             {
                 foreach (var jp in json.Children().ToArray())
                 {
-#pragma warning disable CA1062 // Validate arguments of public methods; is checked; false negative.
                     Filter(jp, isInclude, isInclude ? Expand(include) : exclude);
-#pragma warning restore CA1062
                 }
             }
         }
@@ -112,11 +110,7 @@ namespace Beef.Json
 
             bool isInclude = include != null && include.Any();
             if ((isInclude) || (exclude != null && exclude.Any()))
-            {
-#pragma warning disable CA1062 // Validate arguments of public methods; is checked; false negative.
                 Filter(json, isInclude, isInclude ? Expand(include) : exclude);
-#pragma warning restore CA1062 
-            }
         }
 
         /// <summary>

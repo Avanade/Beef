@@ -126,7 +126,6 @@ tables:
         /// <summary>
         /// Gets or sets the column names to be used in the `Merge` statement to determine whether to insert, update or delete.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         [JsonProperty("mergeOverrideIdentityColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Merge", Title = "The list of `Column` names to be used in the `Merge` statement to determine whether to _insert_, _update_ or _delete_.",
             Description = "This is used to override the default behaviour of using the primary key column(s).")]
@@ -153,7 +152,6 @@ tables:
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated _settable_ output (further filters `Table.IncludeColumns`).", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
 
         /// <summary>
@@ -162,7 +160,6 @@ tables:
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated _settable_ output (further filters `Table.ExcludeColumns`).", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded. Only filters the columns where `Type` is `Get`, `GetColl`, `Create`, `Update` or `Upsert`.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
 
         #endregion
@@ -174,7 +171,6 @@ tables:
         /// </summary>
         [JsonProperty("parameters", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Parameter` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ParameterConfig>? Parameters { get; set; }
 
         /// <summary>
@@ -182,7 +178,6 @@ tables:
         /// </summary>
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<WhereConfig>? Where { get; set; }
 
         /// <summary>
@@ -190,7 +185,6 @@ tables:
         /// </summary>
         [JsonProperty("orderby", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `OrderBy` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<OrderByConfig>? OrderBy { get; set; }
 
         /// <summary>
@@ -198,7 +192,6 @@ tables:
         /// </summary>
         [JsonProperty("execute", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Execute` collection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<ExecuteConfig>? Execute { get; set; }
 
         #endregion

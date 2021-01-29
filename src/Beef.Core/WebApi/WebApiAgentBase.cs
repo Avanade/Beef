@@ -79,8 +79,6 @@ namespace Beef.WebApi
 
         #region Get/Put/Post/Delete Async
 
-#pragma warning disable CA1054 // Uri parameters should not be strings; by-design, is a suffix only.
-#pragma warning disable IDE0063 // 'using' statement can be simplified; by-design, leave as-is.
         /// <summary>
         /// Send a <see cref="HttpMethod.Get"/> request as an asynchronous operation.
         /// </summary>
@@ -527,8 +525,6 @@ namespace Beef.WebApi
 
             return new Uri(fullUrl.Replace(" ", "%20", StringComparison.InvariantCulture));
         }
-#pragma warning restore CA1054
-#pragma warning restore IDE0063
 
 #pragma warning disable CA1822 // Mark members as static; by-design as it can be overridden.
         /// <summary>

@@ -46,7 +46,6 @@ entities:
     [CategorySchema("gRPC", Title = "Provides the _gRPC_ configuration.")]
     [CategorySchema("Exclude", Title = "Provides the _Exclude_ configuration.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
     public class EntityConfig : ConfigBase<CodeGenConfig, CodeGenConfig>
     {
         /// <summary>

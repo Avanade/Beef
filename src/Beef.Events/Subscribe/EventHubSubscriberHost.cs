@@ -41,9 +41,7 @@ namespace Beef.Events.Subscribe
                 {
                     return subscriber.ValueType == null ? @event.ToBeefEventData() : @event.ToBeefEventData(subscriber.ValueType);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types; by design, need this to be a catch-all.
                 catch (Exception ex) { throw new InvalidEventDataException(ex); }
-#pragma warning restore CA1031
             }).ConfigureAwait(false);
         }
     }

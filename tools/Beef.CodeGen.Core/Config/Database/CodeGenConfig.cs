@@ -363,7 +363,6 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("tables", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Table` collection.", IsImportant = true,
             Markdown = "A `Table` object provides the relationship to an existing table within the database.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<TableConfig>? Tables { get; set; }
 
         /// <summary>
@@ -372,7 +371,6 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("queries", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Query` collection.", IsImportant = true,
             Markdown = "A `Query` object provides the primary configuration for a query, including multiple table joins.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<QueryConfig>? Queries { get; set; }
 
         /// <summary>
@@ -381,7 +379,6 @@ namespace Beef.CodeGen.Config.Database
         [JsonProperty("cdc", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Cdc` collection.", IsImportant = true,
             Markdown = "A `Cdc` object provides the primary configuration for Change Data Capture (CDC), including multiple table joins to form a composite entity.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<CdcConfig>? Cdc { get; set; }
 
         /// <summary>

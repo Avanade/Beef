@@ -56,9 +56,7 @@ namespace Beef.Events.Publish
             {
                 await _invoker.InvokeAsync(this, async () => await _client.SendAsync(eventHubEvents, partitionKey).ConfigureAwait(false)).ConfigureAwait(false);
             }
-#pragma warning disable CA1031 // Do not catch general exception types; by-design, is a catch all.
             catch (Exception ex)
-#pragma warning restore CA1031 
             {
                 OnException(events, partitionKey, ex);
                 if (!SwallowException)

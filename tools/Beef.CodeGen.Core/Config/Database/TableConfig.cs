@@ -92,7 +92,6 @@ tables:
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
 
         /// <summary>
@@ -101,7 +100,6 @@ tables:
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
 
         #endregion
@@ -129,7 +127,6 @@ tables:
         [JsonProperty("getAllOrderBy", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("CodeGen", Title = "The list of `Column` names (including sort order `ASC`/`DESC` literal) to be used as the `GetAll` query sort order.",
             Description = "This relates to the `GetAll` selection.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? GetAllOrderBy { get; set; }
 
         /// <summary>
@@ -204,7 +201,6 @@ tables:
         [JsonProperty("udtExcludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("UDT", Title = "The list of `Column` names to be excluded from the `User Defined Table (UDT)`.",
             Description = "Where not specified this indicates that no `Columns` are to be excluded.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? UdtExcludeColumns { get; set; }
 
         /// <summary>
@@ -457,7 +453,6 @@ tables:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             CheckKeyHasValue(Name);

@@ -78,7 +78,6 @@ queries:
         [JsonProperty("includeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be included in the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates that all `Columns` are to be included.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? IncludeColumns { get; set; }
 
         /// <summary>
@@ -87,7 +86,6 @@ queries:
         [JsonProperty("excludeColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` names to be excluded from the underlying generated output.", IsImportant = true,
             Description = "Where not specified this indicates no `Columns` are to be excluded.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? ExcludeColumns { get; set; }
 
         /// <summary>
@@ -96,7 +94,6 @@ queries:
         [JsonProperty("aliasColumns", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Columns", Title = "The list of `Column` and `Alias` pairs (split by a `^` lookup character) to enable column aliasing/renaming.", IsImportant = true,
             Description = "Each alias value should be formatted as `Column` + `^` + `Alias`; e.g. `PCODE^ProductCode`")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "DTO.")]
         public List<string>? AliasColumns { get; set; }
 
         #endregion
@@ -232,7 +229,6 @@ queries:
         [JsonProperty("joins", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Join` collection.", IsImportant = true,
             Markdown = "A `Join` object provides the configuration for a joining table.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<QueryJoinConfig>? Joins { get; set; }
 
         /// <summary>
@@ -241,7 +237,6 @@ queries:
         [JsonProperty("order", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Order` collection.",
             Markdown = "An `Order` object defines the order (sequence).")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<QueryOrderConfig>? Order { get; set; }
 
         /// <summary>
@@ -250,7 +245,6 @@ queries:
         [JsonProperty("where", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `Where` collection.",
             Markdown = "A `Where` object defines the selection/filtering.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<QueryWhereConfig>? Where { get; set; }
 
         #endregion
@@ -355,7 +349,6 @@ queries:
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Requirement is for lowercase.")]
         protected override void Prepare()
         {
             CheckKeyHasValue(Name);

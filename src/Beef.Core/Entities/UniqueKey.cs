@@ -26,7 +26,6 @@ namespace Beef.Entities
             _args = Check.NotNull(args, nameof(args));
         }
 
-#pragma warning disable CA1819 // Properties should not return arrays; by-design, returns an immutable list.
         /// <summary>
         /// Gets the argument values for the key.
         /// </summary>
@@ -40,7 +39,6 @@ namespace Beef.Entities
                 return _args;
             }
         }
-#pragma warning restore CA1819
 
         /// <summary>
         /// Determines whether the current <see cref="UniqueKey"/> is equal to another <see cref="UniqueKey"/>.
