@@ -4,6 +4,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using System.Collections.Generic;
 using System.Data;
@@ -44,4 +45,5 @@ namespace {{Root.NamespaceCdc}}.Data
     }
 }
 
+#pragma warning restore
 #nullable restore

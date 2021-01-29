@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable {{Root.PragmaWarnings}}
+#pragma warning disable
 
 {{! ===== Using ===== }}
 using System;
@@ -83,5 +83,5 @@ namespace {{#if Root.IsDataModel}}{{Root.NamespaceBusiness}}.Data.Model{{else}}{
 {{/if}}
 }
 
-#pragma warning restore {{Root.PragmaWarnings}}
+#pragma warning restore
 #nullable restore

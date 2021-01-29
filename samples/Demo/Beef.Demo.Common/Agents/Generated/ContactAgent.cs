@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -127,5 +127,5 @@ namespace Beef.Demo.Common.Agents
     }
 }
 
-#pragma warning restore IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649
+#pragma warning restore
 #nullable restore

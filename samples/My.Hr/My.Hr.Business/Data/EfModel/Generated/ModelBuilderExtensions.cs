@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -34,4 +35,5 @@ namespace My.Hr.Business.Data.EfModel
     }
 }
 
+#pragma warning restore
 #nullable restore

@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using System.Collections.Generic;
 using System.Data;
@@ -43,4 +44,5 @@ namespace Beef.Demo.Cdc.Data
     }
 }
 
+#pragma warning restore
 #nullable restore

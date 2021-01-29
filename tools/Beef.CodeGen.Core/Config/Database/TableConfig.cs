@@ -315,7 +315,6 @@ tables:
         [JsonProperty("storedProcedures", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [PropertyCollectionSchema("Collections", Title = "The corresponding `StoredProcedure` collection.",
             Markdown = "A `StoredProcedure` object defines the stored procedure code-generation characteristics.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This is appropriate for what is obstensibly a DTO.")]
         public List<StoredProcedureConfig>? StoredProcedures { get; set; }
 
         #endregion

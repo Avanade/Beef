@@ -4,6 +4,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,4 +29,5 @@ namespace {{Root.NamespaceCdc}}.Data
     }
 }
 
+#pragma warning restore
 #nullable restore

@@ -23,7 +23,6 @@ namespace Beef.CodeGen.Config.Database
     [CategorySchema("CDC", Title = "Provides the _Change Data Capture (CDC)_ configuration.")]
     [CategorySchema("Path", Title = "Provides the _Path (Directory)_ configuration for the generated artefacts.")]
     [CategorySchema("Namespace", Title = "Provides the _.NET Namespace_ configuration for the generated artefacts.")]
-    [CategorySchema("Adhoc", Title = "Provides any additional _Adhoc_ configuration for the generated artefacts.")]
     [CategorySchema("Collections", Title = "Provides related child (hierarchical) configuration.")]
     public class CodeGenConfig : ConfigBase<CodeGenConfig, CodeGenConfig>, IRootConfig, ISpecialColumnNames
     {
@@ -277,18 +276,6 @@ namespace Beef.CodeGen.Config.Database
 
         #endregion
 
-        #region Adhoc
-
-        /// <summary>
-        /// Gets or sets the comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.
-        /// </summary>
-        [JsonProperty("pragmaWarnings", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Adhoc", Title = "The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.",
-            Description = @"Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs).")]
-        public string? PragmaWarnings { get; set; }
-
-        #endregion
-
         #region RuntimeParameters
 
         /// <summary>
@@ -420,11 +407,6 @@ namespace Beef.CodeGen.Config.Database
             NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{PathBase}.Common");
             NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{PathBase}.Business");
             NamespaceCdc = DefaultWhereNull(NamespaceCdc, () => $"{PathBase}.Cdc");
-
-            if (string.IsNullOrEmpty(PragmaWarnings))
-                PragmaWarnings = DefaultPragmaWarnings;
-            else
-                PragmaWarnings = $"{DefaultPragmaWarnings}, {PragmaWarnings}";
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");

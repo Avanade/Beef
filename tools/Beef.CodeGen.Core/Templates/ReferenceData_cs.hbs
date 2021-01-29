@@ -3,7 +3,7 @@
  */
 
 #nullable enable
-#pragma warning disable {{Root.PragmaWarnings}}, 1046
+#pragma warning disable
 
 using System;
 using System.Threading.Tasks;
@@ -71,5 +71,5 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
     }
 }
 
-#pragma warning restore {{Root.PragmaWarnings}}, 1046
+#pragma warning restore
 #nullable restore

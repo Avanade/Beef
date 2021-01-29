@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable {{Root.PragmaWarnings}}
+#pragma warning disable
 
 using Beef;
 using Beef.Data.Database.Cdc;
@@ -38,5 +38,5 @@ namespace {{Root.NamespaceCdc}}.Services
     }
 }
 
-#pragma warning restore {{Root.PragmaWarnings}}
+#pragma warning restore
 #nullable restore

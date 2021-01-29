@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using System;
 using System.Collections.Generic;
@@ -38,4 +39,5 @@ namespace My.Hr.Business.Data
     }
 }
 
+#pragma warning restore
 #nullable restore

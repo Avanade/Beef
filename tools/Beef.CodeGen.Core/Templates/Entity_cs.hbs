@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable {{Root.PragmaWarnings}}, CA2225
+#pragma warning disable
 
 {{! ===== Using ===== }}
 using System;
@@ -573,5 +573,5 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
 {{/if}}
 }
 
-#pragma warning restore {{Root.PragmaWarnings}}, CA2225
+#pragma warning restore
 #nullable restore

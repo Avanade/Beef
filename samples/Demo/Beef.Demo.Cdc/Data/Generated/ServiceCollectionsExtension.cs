@@ -3,6 +3,7 @@
  */
 
 #nullable enable
+#pragma warning disable
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,4 +29,5 @@ namespace Beef.Demo.Cdc.Data
     }
 }
 
+#pragma warning restore
 #nullable restore

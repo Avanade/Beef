@@ -4,7 +4,7 @@
  */
 
 #nullable enable
-#pragma warning disable {{Root.PragmaWarnings}}
+#pragma warning disable
 
 {{#ifval ColumnIsDeleted}}
 using Beef.Data.Database.Cdc;
@@ -221,5 +221,5 @@ namespace {{Root.NamespaceCdc}}.Entities
     }
 }
 
-#pragma warning restore {{Root.PragmaWarnings}}
+#pragma warning restore
 #nullable restore

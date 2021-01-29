@@ -74,11 +74,6 @@ namespace Beef.CodeGen.Config
         };
 
         /// <summary>
-        /// Gets the default list of .NET pragma warnings to disable then restore.
-        /// </summary>
-        public static string DefaultPragmaWarnings => "IDE0079, IDE0001, IDE0005, IDE0044, CA1034, CA1052, CA1056, CA1819, CA2227, CS0649";
-
-        /// <summary>
         /// Checks whether the <see cref="string"/> value is <see cref="NoOption"/>.
         /// </summary>
         /// <param name="value">The value.</param>
