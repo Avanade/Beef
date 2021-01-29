@@ -48,6 +48,7 @@ namespace Beef.CodeGen.Config
 
             (ConfigType.Entity, ConfigurationEntity.Operation, "OperationType", "type"),
             (ConfigType.Entity, ConfigurationEntity.Operation, "PagingArgs", "paging"),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", "managerOperationType"),
             (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId"),
             (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
 

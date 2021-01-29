@@ -123,7 +123,7 @@ namespace {{Root.NamespaceApi}}.Controllers
   {{#ifeq WebApiMethod 'HttpDelete'}}
             return new WebApiDelete{{#if HasReturnValue}}<{{OperationReturnType}}>{{/if}}(this, () => _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}WebApiActionBase.Value({{ArgumentName}}){{else}}{{#if IsPagingArgs}}WebApiQueryString.CreatePagingArgs(this){{else}}{{ArgumentName}}{{/if}}{{/if}}{{/each}}),
   {{/ifeq}}
-                operationType: OperationType.{{WebApiOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}});
+                operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}});
         }
 {{/each}}
     }

@@ -45,11 +45,10 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -62,11 +61,10 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 (await args.Validate(nameof(args)).Entity().With<IValidator<ProductArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
     }
 }

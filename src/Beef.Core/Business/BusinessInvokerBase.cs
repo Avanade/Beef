@@ -32,6 +32,8 @@ namespace Beef.Business
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
             OperationType ot = ExecutionContext.Current.OperationType;
+            if (bia.OperationType.HasValue)
+                ExecutionContext.Current.OperationType = bia.OperationType.Value;
 
             try
             {
@@ -69,6 +71,8 @@ namespace Beef.Business
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
             OperationType ot = ExecutionContext.Current.OperationType;
+            if (bia.OperationType.HasValue)
+                ExecutionContext.Current.OperationType = bia.OperationType.Value;
 
             try
             {
@@ -112,6 +116,8 @@ namespace Beef.Business
             BusinessInvokerArgs bia = param ?? BusinessInvokerArgs.Default;
             TransactionScope? txn = null;
             OperationType ot = ExecutionContext.Current.OperationType;
+            if (bia.OperationType.HasValue)
+                ExecutionContext.Current.OperationType = bia.OperationType.Value;
 
             try
             {
@@ -152,6 +158,8 @@ namespace Beef.Business
             BusinessInvokerArgs bia = Check.NotNull(param ?? BusinessInvokerArgs.Default, nameof(param));
             TransactionScope? txn = null;
             OperationType ot = ExecutionContext.Current.OperationType;
+            if (bia.OperationType.HasValue)
+                ExecutionContext.Current.OperationType = bia.OperationType.Value;
 
             try
             {
@@ -183,18 +191,43 @@ namespace Beef.Business
     public class BusinessInvokerArgs
     {
         /// <summary>
-        /// Gets or sets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// Gets or sets the <i>default</i> <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>false</c> and <see cref="OperationType"/> is <c>null</c>.
         /// </summary>
         public static BusinessInvokerArgs Default { get; set; } = new BusinessInvokerArgs();
 
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="OperationType"/> is <see cref="Beef.OperationType.Read"/> and <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// </summary>
+        public static BusinessInvokerArgs Read { get; } = new BusinessInvokerArgs { OperationType = Beef.OperationType.Read };
+
+        /// <summary>
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="OperationType"/> is <see cref="Beef.OperationType.Create"/> and <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// </summary>
+        public static BusinessInvokerArgs Create { get; } = new BusinessInvokerArgs { OperationType = Beef.OperationType.Create };
+
+        /// <summary>
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="OperationType"/> is <see cref="Beef.OperationType.Update"/> and <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// </summary>
+        public static BusinessInvokerArgs Update { get; } = new BusinessInvokerArgs { OperationType = Beef.OperationType.Update };
+
+        /// <summary>
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="OperationType"/> is <see cref="Beef.OperationType.Delete"/> and <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// </summary>
+        public static BusinessInvokerArgs Delete { get; } = new BusinessInvokerArgs { OperationType = Beef.OperationType.Delete };
+
+        /// <summary>
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="OperationType"/> is <see cref="Beef.OperationType.Unspecified"/> and <see cref="IncludeTransactionScope"/> is <c>false</c>.
+        /// </summary>
+        public static BusinessInvokerArgs Unspecified { get; } = new BusinessInvokerArgs { OperationType = Beef.OperationType.Unspecified };
+
+        /// <summary>
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
         /// and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.Suppress"/>.
         /// </summary>
         public static BusinessInvokerArgs TransactionSuppress { get; } = new BusinessInvokerArgs { IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.Suppress };
 
         /// <summary>
-        /// Gets the default <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
+        /// Gets the <see cref="BusinessInvokerArgs"/> where <see cref="IncludeTransactionScope"/> is <c>true</c> 
         /// and <see cref="TransactionScopeOption"/> is <see cref="TransactionScopeOption.RequiresNew"/>.
         /// </summary>
         public static BusinessInvokerArgs TransactionRequiresNew { get; } = new BusinessInvokerArgs { IncludeTransactionScope = true, TransactionScopeOption = TransactionScopeOption.RequiresNew };
@@ -208,6 +241,11 @@ namespace Beef.Business
         /// Gets or sets the <see cref="System.Transactions.TransactionScopeOption"/> (see <see cref="IncludeTransactionScope"/>). Defaults to <see cref="TransactionScopeOption.Required"/>.
         /// </summary>
         public TransactionScopeOption TransactionScopeOption { get; set; } = TransactionScopeOption.Required;
+
+        /// <summary>
+        /// Gets or sets the <see cref="Beef.OperationType"/> to override the <see cref="ExecutionContext.Current"/> <see cref="ExecutionContext.OperationType"/>.
+        /// </summary>
+        public Beef.OperationType? OperationType { get; set; }
 
         /// <summary>
         /// Gets or sets the unhandled <see cref="Exception"/> handler.

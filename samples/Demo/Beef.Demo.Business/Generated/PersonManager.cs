@@ -173,7 +173,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Create;
                 value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
                 Cleaner.CleanUp(value);
                 if (_createOnPreValidateAsync != null) await _createOnPreValidateAsync(value).ConfigureAwait(false);
@@ -187,7 +186,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.CreateAsync(value).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -198,7 +197,6 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
                 if (_deleteOnPreValidateAsync != null) await _deleteOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -210,7 +208,7 @@ namespace Beef.Demo.Business
                 if (_deleteOnBeforeAsync != null) await _deleteOnBeforeAsync(id).ConfigureAwait(false);
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
                 if (_deleteOnAfterAsync != null) await _deleteOnAfterAsync(id).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -222,7 +220,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 if (_getOnPreValidateAsync != null) await _getOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -235,7 +232,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetAsync(id).ConfigureAwait(false);
                 if (_getOnAfterAsync != null) await _getOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -250,7 +247,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 if (_updateOnPreValidateAsync != null) await _updateOnPreValidateAsync(value, id).ConfigureAwait(false);
@@ -264,7 +260,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.UpdateAsync(value).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -279,7 +275,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 if (_updateWithRollbackOnPreValidateAsync != null) await _updateWithRollbackOnPreValidateAsync(value, id).ConfigureAwait(false);
@@ -293,7 +288,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.UpdateWithRollbackAsync(value).ConfigureAwait(false);
                 if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -305,7 +300,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAllOnPreValidateAsync != null) await _getAllOnPreValidateAsync(paging).ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -316,7 +310,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetAllAsync(paging).ConfigureAwait(false);
                 if (_getAllOnAfterAsync != null) await _getAllOnAfterAsync(__result, paging).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -327,7 +321,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getAll2OnPreValidateAsync != null) await _getAll2OnPreValidateAsync().ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -338,7 +331,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetAll2Async().ConfigureAwait(false);
                 if (_getAll2OnAfterAsync != null) await _getAll2OnAfterAsync(__result).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -351,7 +344,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 if (_getByArgsOnPreValidateAsync != null) await _getByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
@@ -364,7 +356,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsOnAfterAsync != null) await _getByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -377,7 +369,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 if (_getDetailByArgsOnPreValidateAsync != null) await _getDetailByArgsOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
@@ -390,7 +381,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetDetailByArgsAsync(args, paging).ConfigureAwait(false);
                 if (_getDetailByArgsOnAfterAsync != null) await _getDetailByArgsOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -403,7 +394,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 Cleaner.CleanUp(fromId, toId);
                 if (_mergeOnPreValidateAsync != null) await _mergeOnPreValidateAsync(fromId, toId).ConfigureAwait(false);
 
@@ -417,7 +407,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.MergeAsync(fromId, toId).ConfigureAwait(false);
                 if (_mergeOnAfterAsync != null) await _mergeOnAfterAsync(__result, fromId, toId).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -427,7 +417,6 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 if (_markOnPreValidateAsync != null) await _markOnPreValidateAsync().ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -437,7 +426,7 @@ namespace Beef.Demo.Business
                 if (_markOnBeforeAsync != null) await _markOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.MarkAsync().ConfigureAwait(false);
                 if (_markOnAfterAsync != null) await _markOnAfterAsync().ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -449,7 +438,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 if (_mapOnPreValidateAsync != null) await _mapOnPreValidateAsync(args).ConfigureAwait(false);
 
@@ -461,7 +449,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.MapAsync(args).ConfigureAwait(false);
                 if (_mapOnAfterAsync != null) await _mapOnAfterAsync(__result, args).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -472,7 +460,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 if (_getNoArgsOnPreValidateAsync != null) await _getNoArgsOnPreValidateAsync().ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -483,7 +470,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetNoArgsAsync().ConfigureAwait(false);
                 if (_getNoArgsOnAfterAsync != null) await _getNoArgsOnAfterAsync(__result).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -495,7 +482,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 if (_getDetailOnPreValidateAsync != null) await _getDetailOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -508,7 +494,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetDetailAsync(id).ConfigureAwait(false);
                 if (_getDetailOnAfterAsync != null) await _getDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -523,7 +509,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 if (_updateDetailOnPreValidateAsync != null) await _updateDetailOnPreValidateAsync(value, id).ConfigureAwait(false);
@@ -537,7 +522,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.UpdateDetailAsync(value).ConfigureAwait(false);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -548,9 +533,8 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 await AddOnImplementationAsync(person).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -561,7 +545,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (_dataSvcCustomOnPreValidateAsync != null) await _dataSvcCustomOnPreValidateAsync().ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -572,7 +555,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.DataSvcCustomAsync().ConfigureAwait(false);
                 if (_dataSvcCustomOnAfterAsync != null) await _dataSvcCustomOnAfterAsync(__result).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -583,9 +566,8 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 return Cleaner.Clean(await ManagerCustomOnImplementationAsync().ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -598,7 +580,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(name, names);
                 if (_getNullOnPreValidateAsync != null) await _getNullOnPreValidateAsync(name, names).ConfigureAwait(false);
 
@@ -610,7 +591,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetNullAsync(name, names).ConfigureAwait(false);
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name, names).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -623,7 +604,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 if (_getByArgsWithEfOnPreValidateAsync != null) await _getByArgsWithEfOnPreValidateAsync(args, paging).ConfigureAwait(false);
 
@@ -636,7 +616,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetByArgsWithEfAsync(args, paging).ConfigureAwait(false);
                 if (_getByArgsWithEfOnAfterAsync != null) await _getByArgsWithEfOnAfterAsync(__result, args, paging).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -646,7 +626,6 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 if (_throwErrorOnPreValidateAsync != null) await _throwErrorOnPreValidateAsync().ConfigureAwait(false);
 
                 (await MultiValidator.Create()
@@ -656,7 +635,7 @@ namespace Beef.Demo.Business
                 if (_throwErrorOnBeforeAsync != null) await _throwErrorOnBeforeAsync().ConfigureAwait(false);
                 await _dataService.ThrowErrorAsync().ConfigureAwait(false);
                 if (_throwErrorOnAfterAsync != null) await _throwErrorOnAfterAsync().ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.Unspecified }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -668,7 +647,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 Cleaner.CleanUp(id);
                 if (_invokeApiViaAgentOnPreValidateAsync != null) await _invokeApiViaAgentOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -680,7 +658,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.InvokeApiViaAgentAsync(id).ConfigureAwait(false);
                 if (_invokeApiViaAgentOnAfterAsync != null) await _invokeApiViaAgentOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -692,7 +670,6 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 if (_getWithEfOnPreValidateAsync != null) await _getWithEfOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -705,7 +682,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.GetWithEfAsync(id).ConfigureAwait(false);
                 if (_getWithEfOnAfterAsync != null) await _getWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -719,7 +696,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Create;
                 value.Id = await _guidIdGen.GenerateIdentifierAsync<Person>().ConfigureAwait(false);
                 Cleaner.CleanUp(value);
                 if (_createWithEfOnPreValidateAsync != null) await _createWithEfOnPreValidateAsync(value).ConfigureAwait(false);
@@ -733,7 +709,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.CreateWithEfAsync(value).ConfigureAwait(false);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -748,7 +724,6 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 if (_updateWithEfOnPreValidateAsync != null) await _updateWithEfOnPreValidateAsync(value, id).ConfigureAwait(false);
@@ -762,7 +737,7 @@ namespace Beef.Demo.Business
                 var __result = await _dataService.UpdateWithEfAsync(value).ConfigureAwait(false);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result, id).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -773,7 +748,6 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
                 if (_deleteWithEfOnPreValidateAsync != null) await _deleteWithEfOnPreValidateAsync(id).ConfigureAwait(false);
 
@@ -785,7 +759,7 @@ namespace Beef.Demo.Business
                 if (_deleteWithEfOnBeforeAsync != null) await _deleteWithEfOnBeforeAsync(id).ConfigureAwait(false);
                 await _dataService.DeleteWithEfAsync(id).ConfigureAwait(false);
                 if (_deleteWithEfOnAfterAsync != null) await _deleteWithEfOnAfterAsync(id).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
         }
     }
 }

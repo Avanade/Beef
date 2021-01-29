@@ -45,11 +45,10 @@ namespace My.Hr.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -63,11 +62,10 @@ namespace My.Hr.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
                 (await value.Validate(nameof(value)).Entity().With<IValidator<Employee>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -82,12 +80,11 @@ namespace My.Hr.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 (await value.Validate(nameof(value)).Entity().With<IValidator<Employee>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -98,11 +95,10 @@ namespace My.Hr.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
                 (await id.Validate(nameof(id)).Mandatory().Common(EmployeeValidator.CanDelete).RunAsync().ConfigureAwait(false)).ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -115,11 +111,10 @@ namespace My.Hr.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 (await args.Validate(nameof(args)).Entity().With<IValidator<EmployeeArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetByArgsAsync(args, paging).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -134,11 +129,10 @@ namespace My.Hr.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 Cleaner.CleanUp(value, id);
                 (await value.Validate(nameof(value)).Entity().With<IValidator<TerminationDetail>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.TerminateAsync(value, id).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
     }
 }

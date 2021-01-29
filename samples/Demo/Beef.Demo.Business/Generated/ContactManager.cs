@@ -43,9 +43,8 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 return Cleaner.Clean(await _dataService.GetAllAsync().ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -57,11 +56,10 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(id);
                 (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAsync(id).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -75,10 +73,9 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Create;
                 Cleaner.CleanUp(value);
                 return Cleaner.Clean(await _dataService.CreateAsync(value).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Create).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -93,11 +90,10 @@ namespace Beef.Demo.Business
 
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Update;
                 value.Id = id;
                 Cleaner.CleanUp(value);
                 return Cleaner.Clean(await _dataService.UpdateAsync(value).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -108,11 +104,10 @@ namespace Beef.Demo.Business
         {
             await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Delete;
                 Cleaner.CleanUp(id);
                 (await id.Validate(nameof(id)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 await _dataService.DeleteAsync(id).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Delete).ConfigureAwait(false);
         }
     }
 }

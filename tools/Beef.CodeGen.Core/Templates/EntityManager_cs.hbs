@@ -106,7 +106,6 @@ namespace {{Root.NamespaceBusiness}}
   {{#ifval AuthPermission}}
                 ExecutionContext.Current.IsAuthorized("{{AuthPermission}}", true);
   {{/ifval}}
-                ExecutionContext.Current.OperationType = OperationType.{{WebApiOperationType}};
   {{#ifeq Type 'Create'}}
     {{#each Parent.Properties}}
       {{#ifval IdentifierGeneratorName}}
@@ -162,7 +161,11 @@ namespace {{Root.NamespaceBusiness}}
                 {{#if HasReturnValue}}return Cleaner.Clean({{/if}}await _dataService.{{Name}}Async({{#each DataParameters}}{{#unless @first}}, {{/unless}}{{{ArgumentName}}}{{/each}}).ConfigureAwait(false){{#if HasReturnValue}}){{/if}};
     {{/if}}
   {{/if}}
-            }{{#if ManagerTransaction}}, new BusinessInvokerArgs { IncludeTransactionScope = true }{{/if}}).ConfigureAwait(false);
+  {{#if ManagerTransaction}}
+            }, new BusinessInvokerArgs { IncludeTransactionScope = true, OperationType = OperationType.{{ManagerOperationType}} }).ConfigureAwait(false);
+  {{else}}
+            }, BusinessInvokerArgs.{{ManagerOperationType}}).ConfigureAwait(false);
+  {{/if}}
         }
 {{/each}}
     }

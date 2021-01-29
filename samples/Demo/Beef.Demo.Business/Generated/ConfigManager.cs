@@ -40,9 +40,8 @@ namespace Beef.Demo.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Unspecified;
                 return Cleaner.Clean(await GetEnvVarsOnImplementationAsync().ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
         }
     }
 }

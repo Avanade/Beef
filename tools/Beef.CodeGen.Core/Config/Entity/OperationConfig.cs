@@ -65,10 +65,10 @@ operations: [
         public string? Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation type.
+        /// Gets or sets the type of operation that is to be code-generated.
         /// </summary>
         [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("Key", Title = "The operation type.", IsMandatory = true, IsImportant = true,
+        [PropertySchema("Key", Title = "The type of operation that is to be code-generated.", IsMandatory = true, IsImportant = true,
             Options = new string[] { "Get", "GetColl", "Create", "Update", "Patch", "Delete", "Custom" })]
         public string? Type { get; set; }
 
@@ -221,6 +221,14 @@ operations: [
             Description = "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.")]
         public string? IValidator { get; set; }
 
+        /// <summary>
+        /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.
+        /// </summary>
+        [JsonProperty("managerOperationType", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [PropertySchema("Manager", Title = "The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.", Options = new string[] { "Create", "Read", "Update", "Delete", "Unspecified" },
+            Description = "The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.")]
+        public string? ManagerOperationType { get; set; }
+
         #endregion
 
         #region DataSvc
@@ -300,14 +308,6 @@ operations: [
         [PropertySchema("WebApi", Title = "The primary HTTP Status Code that will be returned for the operation where there is a `null` return value.", Options = new string[] { "OK", "Accepted", "Created", "NoContent", "NotFound", "ThrowException" },
             Description = "The value defaults as follows: `NotFound` for `Operation.Type` value `Get`, `NoContent` for `Operation.Type` value `GetColl`, `Create`, `Update` or `Patch`; otherwise, `ThrowException` which will result in an `InvalidOperationException`.")]
         public string? WebApiAlternateStatus { get; set; }
-
-        /// <summary>
-        /// Gets or sets the `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).
-        /// </summary>
-        [JsonProperty("webApiOperationType", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [PropertySchema("WebApi", Title = "The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).", Options = new string[] { "Create", "Read", "Update", "Delete", "Unspecified" },
-            Description = "The default will be inferred where possible; otherwise, set to `Unspecified`.")]
-        public string? WebApiOperationType { get; set; }
 
         /// <summary>
         /// Gets or sets the override for the corresponding `Get` method name (in the `XxxManager`) where the `Operation.Type` is `Patch`.
@@ -718,7 +718,7 @@ operations: [
                 _ => HasReturnValue ? "NoContent" : "ThrowException"
             });
 
-            WebApiOperationType = DefaultWhereNull(WebApiOperationType, () => Type switch
+            ManagerOperationType = DefaultWhereNull(ManagerOperationType, () => Type switch
             {
                 "Get" => "Read",
                 "GetColl" => "Read",
@@ -732,9 +732,9 @@ operations: [
             EventPublish = DefaultWhereNull(EventPublish, () => CompareValue(Parent!.EventPublish, true) && new string[] { "Create", "Update", "Delete" }.Contains(Type));
             EventSubject = DefaultWhereNull(EventSubject, () => Type switch
             {
-                "Create" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
-                "Update" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
-                "Delete" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}:{ConvertEventAction(WebApiOperationType!)}",
+                "Create" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
+                "Update" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{__result.{x.PropertyName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
+                "Delete" => $"{Root!.AppName}.{Parent!.Name}.{string.Join(",", Parent!.Properties.Where(p => p.UniqueKey.HasValue && p.UniqueKey.Value).Select(x => $"{{{x.ArgumentName}}}"))}:{ConvertEventAction(ManagerOperationType!)}",
                 _ => null
             });
 
@@ -857,7 +857,7 @@ operations: [
                 if (parts.Length > 1)
                     ed.Action = parts[1];
                 else
-                    ed.Action = ConvertEventAction(WebApiOperationType!);
+                    ed.Action = ConvertEventAction(ManagerOperationType!);
 
                 if (Root!.EventSubjectRoot != null)
                     ed.Subject = Root!.EventSubjectRoot + "." + ed.Subject;

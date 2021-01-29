@@ -58,7 +58,7 @@
       <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />
     </Operation>
     
-    <Operation Name="ThrowError" OperationType="Custom" ReturnType="void" WebApiRoute="error" AutoImplement="None" />
+    <Operation Name="ThrowError" OperationType="Custom" ReturnType="void" WebApiRoute="error" AutoImplement="None" ManagerTransaction="true" />
     <Operation Name="InvokeApiViaAgent" OperationType="Custom" ReturnType="string" UniqueKey="true" WebApiRoute="invokeApi" AutoImplement="None" />
     
     <Operation Name="GetWithEf" OperationType="Get" UniqueKey="true" WebApiRoute="ef/{id}" AutoImplement="EntityFramework" />

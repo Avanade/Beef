@@ -64,7 +64,7 @@ namespace {{Root.NamespaceApi}}.Grpc
                 var __req = request ?? new {{Parent.Name}}{{Name}}Request();
                 {{#if HasReturnValue}}var __result = {{/if}}await _manager.{{Name}}Async({{#each Parameters}}{{#unless @first}}, {{/unless}}{{#if IsValueArg}}Transformers.{{Type}}.MapToSrce(__req.Value)!{{else}}{{#if IsPagingArgs}}__req.Paging == null ? new Entities.PagingArgs() : Transformers.PagingArgsToPagingArgsConverter.ConvertToSrce(__req.Paging){{else}}{{#if GrpcConverter}}Transformers.{{GrpcConverter}}.ConvertToSrce(__req.{{Name}}){{else}}{{#if GrpcMapper}}Transformers.{{GrpcMapper}}.MapToSrce(__req.{{Name}})!{{else}}__req.{{Name}}{{/if}}{{/if}}{{/if}}{{/if}}{{/each}});
                 return {{#if HasReturnValue}}Transformers.{{ReturnType}}.MapToDest(__result!)!;{{else}}new Google.Protobuf.WellKnownTypes.Empty();{{/if}}
-            }, operationType: OperationType.{{WebApiOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}).ExecuteAsync();
+            }, operationType: OperationType.{{ManagerOperationType}}, statusCode: HttpStatusCode.{{WebApiStatus}}{{#if HasReturnValue}}, alternateStatusCode: {{#ifeq WebApiAlternateStatus 'ThrowException'}}null{{else}}HttpStatusCode.{{WebApiAlternateStatus}}{{/ifeq}}{{/if}}).ExecuteAsync();
         }
 {{/each}}
     }

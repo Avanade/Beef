@@ -46,11 +46,10 @@ namespace Cdr.Banking.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(args);
                 (await args.Validate(nameof(args)).Entity().With<IValidator<AccountArgs>>().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetAccountsAsync(args, paging).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -62,11 +61,10 @@ namespace Cdr.Banking.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
                 (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetDetailAsync(accountId).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -78,11 +76,10 @@ namespace Cdr.Banking.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId);
                 (await accountId.Validate(nameof(accountId)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
                 return Cleaner.Clean(await _dataService.GetBalanceAsync(accountId).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
     }
 }

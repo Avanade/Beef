@@ -47,7 +47,6 @@ namespace Cdr.Banking.Business
         {
             return await ManagerInvoker.Current.InvokeAsync(this, async () =>
             {
-                ExecutionContext.Current.OperationType = OperationType.Read;
                 Cleaner.CleanUp(accountId, args);
                 (await MultiValidator.Create()
                     .Add(accountId.Validate(nameof(accountId)).Mandatory().Common(Validators.AccountId))
@@ -55,7 +54,7 @@ namespace Cdr.Banking.Business
                     .RunAsync().ConfigureAwait(false)).ThrowOnError();
 
                 return Cleaner.Clean(await _dataService.GetTransactionsAsync(accountId, args, paging).ConfigureAwait(false));
-            }).ConfigureAwait(false);
+            }, BusinessInvokerArgs.Read).ConfigureAwait(false);
         }
     }
 }
