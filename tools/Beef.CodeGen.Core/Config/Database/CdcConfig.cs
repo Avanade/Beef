@@ -377,13 +377,15 @@ namespace Beef.CodeGen.Config.Database
                             cc.NameAlias = parts[1];
                     }
 
-                    if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
-                        continue;
-
-                    cc.Prepare(Root!, this);
-                    Columns.Add(cc);
+                    if (cc.Name != ColumnIsDeleted?.Name && cc.Name != ColumnRowVersion?.Name)
+                    {
+                        cc.Prepare(Root!, this);
+                        Columns.Add(cc);
+                    }
                 }
-                else if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
+
+                // Always include IsDeleted and RowVersion!
+                if (cc.Name == ColumnIsDeleted?.Name || cc.Name == ColumnRowVersion?.Name)
                 {
                     cc.Prepare(Root!, this);
                     Columns.Add(cc);

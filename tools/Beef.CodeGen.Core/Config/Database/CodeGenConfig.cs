@@ -404,9 +404,9 @@ namespace Beef.CodeGen.Config.Database
             PathBusiness = DefaultWhereNull(PathBusiness, () => $"{PathBase}.Business");
             PathCdc = DefaultWhereNull(PathCdc, () => $"{PathBase}.Cdc");
             NamespaceBase = DefaultWhereNull(NamespaceBase, () => $"{Company}.{AppName}");
-            NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{PathBase}.Common");
-            NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{PathBase}.Business");
-            NamespaceCdc = DefaultWhereNull(NamespaceCdc, () => $"{PathBase}.Cdc");
+            NamespaceCommon = DefaultWhereNull(NamespaceCommon, () => $"{NamespaceBase}.Common");
+            NamespaceBusiness = DefaultWhereNull(NamespaceBusiness, () => $"{NamespaceBase}.Business");
+            NamespaceCdc = DefaultWhereNull(NamespaceCdc, () => $"{NamespaceBase}.Cdc");
 
             ColumnNameIsDeleted = DefaultWhereNull(ColumnNameIsDeleted, () => "IsDeleted");
             ColumnNameTenantId = DefaultWhereNull(ColumnNameTenantId, () => "TenantId");
