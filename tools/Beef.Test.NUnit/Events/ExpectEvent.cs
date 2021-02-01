@@ -15,10 +15,7 @@ namespace Beef.Test.NUnit.Events
     /// </summary>
     public static class ExpectEvent
     {
-        /// <summary>
-        /// Gets or sets the singleton <see cref="ExpectEventPublisher"/> instance.
-        /// </summary>
-        public static ExpectEventPublisher EventPublisher { get; set; } = new ExpectEventPublisher();
+        private static readonly ExpectEventPublisher _eventPublisher = new ExpectEventPublisher();
 
         /// <summary>
         /// Gets the events for the <paramref name="correlationId"/>.
@@ -39,7 +36,7 @@ namespace Beef.Test.NUnit.Events
             Check.NotEmpty(template, nameof(template));
 
             var events = GetEvents(correlationId);
-            if (events == null || events.Count == 0 || !events.Any(x => EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
+            if (events == null || events.Count == 0 || !events.Any(x => EventSubjectMatcher.Match(_eventPublisher.TemplateWildcard, _eventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
                 Assert.Fail($"Event with a subject template '{template}' and Action '{action ?? "any"}' was expected and did not match one of the events published.");
         }
 
@@ -57,7 +54,7 @@ namespace Beef.Test.NUnit.Events
             if (events == null || events.Count == 0)
                 return;
 
-            if (events.Any(x => EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
+            if (events.Any(x => EventSubjectMatcher.Match(_eventPublisher.TemplateWildcard, _eventPublisher.PathSeparator, template, x.Subject) && (action == null || StringComparer.OrdinalIgnoreCase.Compare(action, x.Action) == 0)))
                 Assert.Fail($"Event with a subject template '{template}' and Action '{action ?? "any"}' was not expected; however, it was published.");
         }
 
@@ -84,7 +81,7 @@ namespace Beef.Test.NUnit.Events
                 var exp = expectedEvents[i].EventData;
                 var act = actualEvents[i];
 
-                if (!EventSubjectMatcher.Match(EventPublisher.TemplateWildcard, EventPublisher.PathSeparator, exp.Subject, act.Subject))
+                if (!EventSubjectMatcher.Match(_eventPublisher.TemplateWildcard, _eventPublisher.PathSeparator, exp.Subject, act.Subject))
                     Assert.Fail($"Expected published Event[{i}].Subject '{exp.Subject}' is not equal to actual '{act.Subject}'.");
 
                 if (!string.IsNullOrEmpty(exp.Action) && string.CompareOrdinal(exp.Action, act.Action) != 0)

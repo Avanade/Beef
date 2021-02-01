@@ -11,9 +11,10 @@ namespace Beef.Demo.Business.DataSvc
             _updateWithRollbackOnAfterAsync = _ => throw new InvalidOperationException("Some made up exception to validate that the update rolled back as expected.");
         }
 
-        private async Task MarkOnAfterAsync()
+        private Task MarkOnAfterAsync()
         {
-            await _evtPub.PublishValueAsync("Wahlberg", "Demo.Mark", "Marked").ConfigureAwait(false);
+            _evtPub.PublishValue("Wahlberg", "Demo.Mark", "Marked");
+            return Task.CompletedTask;
         }
 
         private Task<int> DataSvcCustomOnImplementationAsync()

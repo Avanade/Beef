@@ -27,13 +27,13 @@
       <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />
     </Operation>
 
-    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" WebApiOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:MergeFrom;Demo.Person.{toId}:MergeTo" >
+    <Operation Name="Merge" Text="Merge first {{Person}} into second" OperationType="Custom" ReturnType="Person" WebApiRoute="merge" ManagerOperationType="Update" WebApiAlternateStatus="ThrowException" EventPublish="true" EventSubject="Demo.Person.{fromId}:MergeFrom;Demo.Person.{toId}:MergeTo" >
       <Parameter Name="FromId" Text="from {{Person}} identifier" Type="Guid" IsMandatory="true"  />
       <Parameter Name="ToId" Text="to {{Person}} identifier" Type="Guid" IsMandatory="true" ValidatorFluent="CompareValue(CompareOperator.NotEqual, fromId, nameof(fromId).ToSentenceCase()!)" />
     </Operation>
     
-    <Operation Name="Mark" Text="Mark {{Person}}" OperationType="Custom" WebApiRoute="mark" WebApiStatus="Accepted" WebApiOperationType="Update" />
-    <Operation Name="Map" Text="Get {{Person}} at specified {{MapCoordinates}}" OperationType="Custom" ReturnType="MapCoordinates" WebApiRoute="map" WebApiStatus="OK" WebApiOperationType="Read">
+    <Operation Name="Mark" Text="Mark {{Person}}" OperationType="Custom" WebApiRoute="mark" WebApiStatus="Accepted" ManagerOperationType="Update" EventPublish="true" />
+    <Operation Name="Map" Text="Get {{Person}} at specified {{MapCoordinates}}" OperationType="Custom" ReturnType="MapCoordinates" WebApiRoute="map" WebApiStatus="OK" ManagerOperationType="Read">
       <Parameter Name="Args" Type="MapArgs" />
     </Operation>
     <Operation Name="GetNoArgs" Text="Get no arguments" OperationType="Get" WebApiRoute="noargsforme" AutoImplement="None" />

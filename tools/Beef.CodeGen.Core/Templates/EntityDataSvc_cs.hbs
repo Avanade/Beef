@@ -110,14 +110,15 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
     {{#if EventPublish}}
       {{#ifeq Events.Count 1}}
         {{#each Events}}
-                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}Async({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).ConfigureAwait(false);
+                await _evtPub.Publish{{#if ../HasReturnValue}}Value{{/if}}({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}).SendAsync().ConfigureAwait(false);
         {{/each}}
       {{else}}
         {{#ifeq Events.Count 0}}
+                await _evtPub.SendAsync().ConfigureAwait(false);
         {{else}}
-                await _evtPub.PublishAsync(
+                await _evtPub.Publish(
           {{#each Events}}
-                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).ConfigureAwait(false);{{else}},{{/if}}
+                    _evtPub.Create{{#if ../HasReturnValue}}Value{{/if}}Event({{#if ../HasReturnValue}}__result, {{/if}}$"{{Subject}}", "{{Action}}"{{#each ../ValueLessDataParameters}}, {{ArgumentName}}{{/each}}){{#if @last}}).SendAsync().ConfigureAwait(false);{{else}},{{/if}}
             {{#if @last}}
 
             {{/if}}

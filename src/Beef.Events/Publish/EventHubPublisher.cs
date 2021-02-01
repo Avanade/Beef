@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Beef.Events.Publish
 {
     /// <summary>
-    /// <see cref="PublishEventsAsync(EventData[])">Publishes</see> (sends) the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
+    /// <see cref="SendEventsAsync(EventData[])">Send</see> the <see cref="EventData"/> array (converted to <see cref="EventHubs.EventData"/>) using the same partition key (see <see cref="GetPartitionKey(EventData[])"/>.
     /// </summary>
     public class EventHubPublisher : EventPublisherBase
     {
@@ -36,11 +36,11 @@ namespace Beef.Events.Publish
         public bool SwallowException { get; set; }
 
         /// <summary>
-        /// Publishes the <paramref name="events"/>.
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="events">The <see cref="EventData"/> instances.</param>
-        /// <returns>The corresponding <see cref="Task"/>.</returns>
-        protected override async Task PublishEventsAsync(params EventData[] events)
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        protected override async Task SendEventsAsync(params EventData[] events)
         {
             if (events == null || events.Length == 0)
                 return;

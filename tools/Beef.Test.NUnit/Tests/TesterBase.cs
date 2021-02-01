@@ -107,13 +107,13 @@ namespace Beef.Test.NUnit.Tests
         }
 
         /// <summary>
-        /// Replaces the <see cref="IEventPublisher"/> with the <see cref="ExpectEvent.EventPublisher"/> instance (as a singleton).
+        /// Replaces the <see cref="IEventPublisher"/> with a <see cref="ExpectEventPublisher"/> instance (as scoped).
         /// </summary>
         /// <param name="sc">The <see cref="IServiceCollection"/>.</param>
         protected static void ReplaceEventPublisher(IServiceCollection sc)
         {
             sc.Remove<IEventPublisher>();
-            sc.AddSingleton<IEventPublisher>(_ => ExpectEvent.EventPublisher);
+            sc.AddScoped<IEventPublisher>(_ => new ExpectEventPublisher());
         }
 
         /// <summary>

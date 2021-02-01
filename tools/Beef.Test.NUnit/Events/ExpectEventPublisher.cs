@@ -38,11 +38,11 @@ namespace Beef.Test.NUnit.Events
             _eventDict.TryRemove(correlationId ?? ExecutionContext.Current.CorrelationId ?? throw new ArgumentNullException(nameof(correlationId)), out var _);
 
         /// <summary>
-        /// Publishes one of more <see cref="EventData"/> objects.
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="events">One or more <see cref="EventData"/> objects.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        protected override Task PublishEventsAsync(params EventData[] events)
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        protected override Task SendEventsAsync(params EventData[] events)
         {
             if (ExecutionContext.HasCurrent && ExecutionContext.Current.CorrelationId != null)
             {

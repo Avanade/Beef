@@ -30,7 +30,7 @@ namespace Beef.Core.UnitTest.Events
         {
             public List<EventData> Events { get; } = new List<EventData>();
 
-            protected override Task PublishEventsAsync(params EventData[] events) { Events.AddRange(events); return Task.CompletedTask; }
+            protected override Task SendEventsAsync(params EventData[] events) { Events.AddRange(events); return Task.CompletedTask; }
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace Beef.Core.UnitTest.Events
 
             var tep = new TestEventPublisher();
 
-            await tep.PublishAsync("domain.entity.123", "create", 123).ConfigureAwait(false);
+            await tep.Publish("domain.entity.123", "create", 123).SendAsync().ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = tep.Events[0];
             Assert.IsNotNull(ed);
@@ -67,7 +67,7 @@ namespace Beef.Core.UnitTest.Events
             var tep = new TestEventPublisher();
             var v = new Entity { Id = 123 };
 
-            await tep.PublishValueAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            await tep.PublishValue(v, "domain.entity.123", "create").SendAsync().ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<Entity>)tep.Events[0];
             Assert.IsNotNull(ed.EventId);
@@ -101,7 +101,7 @@ namespace Beef.Core.UnitTest.Events
             var tep = new TestEventPublisher();
             var v = new Entity2 { A = 123, B = "Abc" };
 
-            await tep.PublishValueAsync(v, "domain.entity.123", "create").ConfigureAwait(false);
+            await tep.PublishValue(v, "domain.entity.123", "create").SendAsync().ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<Entity2>)tep.Events[0];
             Assert.IsNotNull(ed);
@@ -122,7 +122,7 @@ namespace Beef.Core.UnitTest.Events
 
             var tep = new TestEventPublisher();
 
-            await tep.PublishAsync("domain.entity.123", "create").ConfigureAwait(false);
+            await tep.Publish("domain.entity.123", "create").SendAsync().ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = tep.Events[0];
             Assert.IsNotNull(ed);
@@ -142,7 +142,7 @@ namespace Beef.Core.UnitTest.Events
 
             var tep = new TestEventPublisher();
 
-            await tep.PublishValueAsync("TESTER", "domain.entity.123", "create", 123).ConfigureAwait(false);
+            await tep.PublishValue("TESTER", "domain.entity.123", "create", 123).SendAsync().ConfigureAwait(false);
             Assert.AreEqual(1, tep.Events.Count);
             var ed = (EventData<string>)tep.Events[0];
             Assert.IsNotNull(ed);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Beef.Events
 {
     /// <summary>
-    /// Represents an <see cref="ILogger"/> event publisher; whereby the events are simply logged then swallowed/discarded.
+    /// Represents an <see cref="ILogger"/> event publisher; whereby the events are simply logged then swallowed/discarded on send.
     /// </summary>
     public class LoggerEventPublisher : EventPublisherBase
     {
@@ -20,11 +20,11 @@ namespace Beef.Events
         public LoggerEventPublisher(ILogger<LoggerEventPublisher> logger) => _logger = Check.NotNull(logger, nameof(logger));
 
         /// <summary>
-        /// Publishes one of more <see cref="EventData"/> objects.
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="events">One or more <see cref="EventData"/> objects.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        protected override async Task PublishEventsAsync(params EventData[] events)
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        protected override async Task SendEventsAsync(params EventData[] events)
         {
             if (events == null || events.Length == 0)
                 _logger.LogInformation("No events were published.");

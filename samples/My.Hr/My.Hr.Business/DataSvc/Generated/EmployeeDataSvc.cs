@@ -69,7 +69,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"My.Hr.Employee.{__result.Id}", "Created").ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{__result.Id}", "Created").SendAsync().ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
@@ -85,7 +85,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"My.Hr.Employee.{__result.Id}", "Updated").ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{__result.Id}", "Updated").SendAsync().ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });
@@ -100,7 +100,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 await _data.DeleteAsync(id).ConfigureAwait(false);
-                await _evtPub.PublishAsync($"My.Hr.Employee.{id}", "Deleted", id).ConfigureAwait(false);
+                await _evtPub.Publish($"My.Hr.Employee.{id}", "Deleted", id).SendAsync().ConfigureAwait(false);
                 _cache.Remove<Employee>(new UniqueKey(id));
             });
         }
@@ -131,7 +131,7 @@ namespace My.Hr.Business.DataSvc
             return DataSvcInvoker.Current.InvokeAsync(this, async () =>
             {
                 var __result = await _data.TerminateAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
-                await _evtPub.PublishValueAsync(__result, $"My.Hr.Employee.{id}", "Terminated", id).ConfigureAwait(false);
+                await _evtPub.PublishValue(__result, $"My.Hr.Employee.{id}", "Terminated", id).SendAsync().ConfigureAwait(false);
                 _cache.SetValue(__result.UniqueKey, __result);
                 return __result;
             });

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 namespace Beef.Events
 {
     /// <summary>
-    /// Provides the standardised <b>Event</b> processing/publishing. 
+    /// Provides the standardised <b>Event</b> publishing and sending. 
     /// </summary>
+    /// <remarks>Note to implementers: The <i>Publish*</i> methods should only cache/store the events queue (order must be maintained) to be sent; they should only be sent where <see cref="SendAsync"/> is explicitly requested.
+    /// <para>The key reason for queuing the published events it to promote a single atomic send operation; i.e. all events should be sent together, and either succeed or fail together.</para></remarks>
     public interface IEventPublisher
     {
         /// <summary>
@@ -25,6 +27,17 @@ namespace Beef.Events
         /// Gets the template wildcard <see cref="string"/>.
         /// </summary>
         string TemplateWildcard { get; }
+
+        /// <summary>
+        /// Indicates whether the published (queued) events have been sent.
+        /// </summary>
+        bool HasBeenSent { get; }
+
+        /// <summary>
+        /// Gets the published/queued events.
+        /// </summary>
+        /// <returns>An <see cref="EventData"/> array.</returns>
+        EventData[] GetEvents();
 
         /// <summary>
         /// Creates an <see cref="EventData"/> instance with no <see cref="EventData.Key"/>.
@@ -65,48 +78,59 @@ namespace Beef.Events
         EventData<T> CreateValueEvent<T>(T value, string subject, string? action = null, params IComparable?[] key);
 
         /// <summary>
-        /// Publishes an <see cref="EventData"/> instance (with no <see cref="EventData.Key"/>).
+        /// Publishes (queues) an <see cref="EventData"/> instance (with no <see cref="EventData.Key"/>).
         /// </summary>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        Task PublishAsync(string subject, string? action = null);
+        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
+        IEventPublisher Publish(string subject, string? action = null);
 
         /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
+        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
         /// </summary>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        Task PublishAsync(string subject, string? action = null, params IComparable?[] key);
+        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
+        IEventPublisher Publish(string subject, string? action = null, params IComparable?[] key);
 
         /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
+        /// Publishes (queues) an <see cref="EventData"/> instance using the <paramref name="value"/> (infers <see cref="EventData.Key"/>).
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        Task PublishValueAsync<T>(T value, string subject, string? action = null) where T : class;
+        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
+        IEventPublisher PublishValue<T>(T value, string subject, string? action = null) where T : class;
 
         /// <summary>
-        /// Publishes an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
+        /// Publishes (queues) an <see cref="EventData"/> instance using the specified <see cref="EventData.Key"/>.
         /// </summary>
         /// <typeparam name="T">The value <see cref="Type"/>.</typeparam>
         /// <param name="value">The event value</param>
         /// <param name="subject">The event subject.</param>
         /// <param name="action">The event action.</param>
         /// <param name="key">The event key.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        Task PublishValueAsync<T>(T value, string subject, string? action = null, params IComparable?[] key);
+        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
+        IEventPublisher PublishValue<T>(T value, string subject, string? action = null, params IComparable?[] key);
 
         /// <summary>
-        /// Publishes one of more <see cref="EventData"/> objects.
+        /// Publishes (queues) one of more <see cref="EventData"/> objects.
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> objects.</param>
+        /// <returns>The <see cref="IEventPublisher"/> for fluent-style method-chaining.</returns>
+        IEventPublisher Publish(params EventData[] events);
+
+        /// <summary>
+        /// Sends all previously published events.
+        /// </summary>
         /// <returns>The <see cref="Task"/>.</returns>
-        Task PublishAsync(params EventData[] events);
+        Task SendAsync();
+
+        /// <summary>
+        /// Resets by clearning the internal cache/store and <see cref="HasBeenSent"/>.
+        /// </summary>
+        void Reset();
     }
 }

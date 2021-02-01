@@ -429,6 +429,7 @@ namespace Beef.Demo.Test
                 .ExpectChangeLogCreated()
                 .ExpectETag()
                 .ExpectUniqueKey()
+                .ExpectEvent("Demo.Person.*", "Create")
                 .ExpectValue((t) => p)
                 .Run(a => a.CreateAsync(p)).Value;
 

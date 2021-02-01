@@ -11,55 +11,55 @@ namespace Beef.CodeGen.Config
     /// </summary>
     internal static class XmlYamlTranslate
     {
-        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, string YamlName)> _config = new List<(ConfigType, ConfigurationEntity, string, string)>(new (ConfigType, ConfigurationEntity, string, string)[]
+        private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, string YamlName, CodeGenException? Exception)> _config = new List<(ConfigType, ConfigurationEntity, string, string, CodeGenException?)>(new (ConfigType, ConfigurationEntity, string, string, CodeGenException?)[]
         {
             // Entity oriented configuration.
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace"),
-            (ConfigType.Entity, ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter"),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "AppendToNamespace", "refDataAppendToNamespace", null),
+            (ConfigType.Entity, ConfigurationEntity.CodeGen, "MapperDefaultRefDataConverter", "refDataDefaultMapperConverter", null),
 
-            (ConfigType.Entity, ConfigurationEntity.Entity, "AutoInferImplements", "implementsAutoInfer"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "EntityFrameworkEntity", "entityFrameworkModel"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "CosmosEntity", "cosmosModel"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ODataEntity", "odataModel"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerConstructor", "managerCtor"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcConstructor", "dataSvcCtor"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataConstructor", "dataCtor"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseMapperInheritsFrom", "databaseMapperInheritsFrom"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseCustomMapper", "databaseCustomMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataEntityFrameworkMapperInheritsFrom", "entityFrameworkMapperInheritsFrom"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataEntityFrameworkCustomMapper", "entityFrameworkCustomMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosValueContainer", "cosmosValueContainer"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosMapperInheritsFrom", "cosmosMapperInheritsFrom"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom"),
-            (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper"),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "AutoInferImplements", "implementsAutoInfer", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "EntityFrameworkEntity", "entityFrameworkModel", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "CosmosEntity", "cosmosModel", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ODataEntity", "odataModel", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "ManagerConstructor", "managerCtor", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataSvcConstructor", "dataSvcCtor", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataConstructor", "dataCtor", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseMapperInheritsFrom", "databaseMapperInheritsFrom", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataDatabaseCustomMapper", "databaseCustomMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataEntityFrameworkMapperInheritsFrom", "entityFrameworkMapperInheritsFrom", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataEntityFrameworkCustomMapper", "entityFrameworkCustomMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosValueContainer", "cosmosValueContainer", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosMapperInheritsFrom", "cosmosMapperInheritsFrom", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataCosmosCustomMapper", "cosmosCustomMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataMapperInheritsFrom", "odataMapperInheritsFrom", null),
+            (ConfigType.Entity, ConfigurationEntity.Entity, "DataODataCustomMapper", "odataCustomMapper", null),
 
-            (ConfigType.Entity, ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseMapper", "databaseMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseIgnore", "databaseIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkMapper", "entityFrameworkMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkIgnore", "entityFrameworkIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosMapper", "cosmosMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosIgnore", "cosmosIgnore"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataMapper", "odataMapper"),
-            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataIgnore", "odataIgnore"),
+            (ConfigType.Entity, ConfigurationEntity.Property, "IgnoreSerialization", "serializationIgnore", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "EmitDefaultValue", "serializationEmitDefault", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "IsDataConverterGeneric", "dataConverterIsGeneric", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseMapper", "databaseMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataDatabaseIgnore", "databaseIgnore", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkMapper", "entityFrameworkMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataEntityFrameworkIgnore", "entityFrameworkIgnore", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosMapper", "cosmosMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataCosmosIgnore", "cosmosIgnore", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataMapper", "odataMapper", null),
+            (ConfigType.Entity, ConfigurationEntity.Property, "DataODataIgnore", "odataIgnore", null),
 
-            (ConfigType.Entity, ConfigurationEntity.Operation, "OperationType", "type"),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "PagingArgs", "paging"),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", "managerOperationType"),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId"),
-            (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey"),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "OperationType", "type", null),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "PagingArgs", "paging", null),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "WebApiOperationType", "", new CodeGenException("Operation.WebApiOperationType has been renamed; please change to Operation.ManagerOperationType")),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosContainerId", "cosmosContainerId", null),
+            (ConfigType.Entity, ConfigurationEntity.Operation, "DataCosmosPartitionKey", "cosmosPartitionKey", null),
 
-            (ConfigType.Entity, ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric"),
-            (ConfigType.Entity, ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode"),
+            (ConfigType.Entity, ConfigurationEntity.Parameter, "IsDataConverterGeneric", "dataConverterIsGeneric", null),
+            (ConfigType.Entity, ConfigurationEntity.Parameter, "ValidatorFluent", "validatorCode", null),
 
             // Database oriented configuration.
-            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "OrderBy", "orderby"),
+            (ConfigType.Database, ConfigurationEntity.StoredProcedure, "OrderBy", "orderby", null),
 
-            (ConfigType.Database, ConfigurationEntity.Parameter, "IsNullable", "nullable"),
-            (ConfigType.Database, ConfigurationEntity.Parameter, "IsCollection", "collection")
+            (ConfigType.Database, ConfigurationEntity.Parameter, "IsNullable", "nullable", null),
+            (ConfigType.Database, ConfigurationEntity.Parameter, "IsCollection", "collection", null)
         });
 
         private static readonly List<(ConfigType ConvertType, ConfigurationEntity Entity, string XmlName, Func<string?, string?> Converter)> _xmlToYamlConvert = new List<(ConfigType, ConfigurationEntity, string, Func<string?, string?>)>(new (ConfigType, ConfigurationEntity, string, Func<string?, string?>)[]
@@ -294,6 +294,9 @@ namespace Beef.CodeGen.Config
         internal static string GetYamlName(ConfigType convertType, ConfigurationEntity entity, string xmlName)
         {
             var item = _config.FirstOrDefault(x => x.ConvertType == convertType && x.Entity == entity && x.XmlName == xmlName);
+            if (item.Exception != null)
+                throw item.Exception!;
+
             return item.YamlName ?? (StringConversion.ToCamelCase(xmlName)!);
         }
 

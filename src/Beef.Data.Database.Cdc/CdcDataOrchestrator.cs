@@ -190,7 +190,7 @@ namespace Beef.Data.Database.Cdc
             if (coll.Count > 0)
             {
                 var events = (await CreateEventsAsync(coll, cancellationToken).ConfigureAwait(false)).ToArray();
-                await EventPublisher.PublishAsync(events).ConfigureAwait(false);
+                await EventPublisher.Publish(events).SendAsync().ConfigureAwait(false);
                 Logger.LogInformation($"{ServiceName} Outbox '{result.Outbox.Id}': {events.Length} event(s) were published successfully.");
             }
             else

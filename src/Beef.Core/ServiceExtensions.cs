@@ -91,7 +91,7 @@ namespace Beef
         }
 
         /// <summary>
-        /// Adds a singleton service to instantiate a new <see cref="IEventPublisher"/> <see cref="NullEventPublisher"/> instance.
+        /// Adds a scoped service to instantiate a new <see cref="IEventPublisher"/> <see cref="NullEventPublisher"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <returns>The <see cref="IServiceCollection"/> for fluent-style method-chaining.</returns>
@@ -100,7 +100,7 @@ namespace Beef
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            return services.AddSingleton<IEventPublisher, NullEventPublisher>();
+            return services.AddScoped<IEventPublisher, NullEventPublisher>();
         }
 
         /// <summary>

@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 namespace Beef.Events
 {
     /// <summary>
-    /// Represents a <c>null</c> event publisher; whereby the events are simply swallowed/discarded.
+    /// Represents a <c>null</c> event publisher; whereby the events are simply swallowed/discarded on send.
     /// </summary>
     public class NullEventPublisher : EventPublisherBase
     {
         /// <summary>
-        /// Publishes one of more <see cref="EventData"/> objects.
+        /// <inheritdoc/>
         /// </summary>
-        /// <param name="events">One or more <see cref="EventData"/> objects.</param>
-        /// <returns>The <see cref="Task"/>.</returns>
-        protected override Task PublishEventsAsync(params EventData[] events) => Task.CompletedTask;
+        /// <param name="events"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
+        protected override Task SendEventsAsync(params EventData[] events) => Task.CompletedTask;
     }
 }
