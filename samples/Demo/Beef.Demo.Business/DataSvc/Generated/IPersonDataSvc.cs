@@ -139,6 +139,13 @@ namespace Beef.Demo.Business.DataSvc
         Task<Person?> GetNullAsync(string? name, List<string>? names);
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        Task<Person> EventPublishNoSendAsync(Person value);
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>

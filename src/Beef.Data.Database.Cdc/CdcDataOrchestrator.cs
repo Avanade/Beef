@@ -288,7 +288,7 @@ namespace Beef.Data.Database.Cdc
                     break;
 
                 case IUniqueKey uk:
-                    if (!uk.HasUniqueKey)
+                    if (uk.UniqueKey.Args.Length == 0)
                         throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
 
                     for (int i = 0; i < uk.UniqueKey.Args.Length; i++)

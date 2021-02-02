@@ -21,7 +21,7 @@ namespace My.Hr.Common.Entities
     /// Represents the Performance Review entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class PerformanceReview : EntityBase, IGuidIdentifier, IETag, IChangeLog, IEquatable<PerformanceReview>
+    public partial class PerformanceReview : EntityBase, IGuidIdentifier, IUniqueKey, IETag, IChangeLog, IEquatable<PerformanceReview>
     {
         #region Privates
 
@@ -170,16 +170,11 @@ namespace My.Hr.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="PerformanceReview"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -191,7 +186,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Id);
+        public UniqueKey UniqueKey => CreateUniqueKey(Id);
 
         #endregion
 

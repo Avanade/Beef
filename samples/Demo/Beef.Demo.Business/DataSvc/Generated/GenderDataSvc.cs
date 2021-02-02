@@ -70,7 +70,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Gender.{__result.Id}", "Create").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -86,7 +86,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Gender.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }

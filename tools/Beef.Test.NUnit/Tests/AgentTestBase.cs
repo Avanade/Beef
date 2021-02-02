@@ -143,7 +143,20 @@ namespace Beef.Test.NUnit.Tests
 
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = ExpectEvent.GetEvents(CorrelationId);
+            var events = ExpectEvent.GetPublishedEvents(CorrelationId);
+            if (events.Count == 0)
+                TestContext.Out.WriteLine("  None.");
+            else
+            {
+                foreach (var e in events)
+                {
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                }
+            }
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS SENT >");
+            events = ExpectEvent.GetSentEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else

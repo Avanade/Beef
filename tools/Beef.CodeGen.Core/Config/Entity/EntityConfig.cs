@@ -1233,6 +1233,7 @@ entities:
             }
 
             var i = 0;
+            var m = 0;
             var id = Properties.FirstOrDefault(x => x.Name == "Id" && CompareNullOrValue(x.Inherited, false));
             if (id != null)
             {
@@ -1244,26 +1245,27 @@ entities:
                     _ => "IIdentifier",
                 };
 
-                implements.Insert(i, iid);
-                modelImplements.Insert(i++, iid);
+                implements.Insert(i++, iid);
+                modelImplements.Insert(m++, iid);
             }
+
+            if (Properties.Any(x => CompareValue(x.UniqueKey, true) && CompareNullOrValue(x.Inherited, false)))
+                implements.Insert(i++, "IUniqueKey");
 
             if (Properties.Any(x => x.Name == "ETag" && x.Type == "string" && CompareNullOrValue(x.Inherited, false)))
             {
-                implements.Insert(i, "IETag");
-                modelImplements.Insert(i++, "IETag");
+                implements.Insert(i++, "IETag");
+                modelImplements.Insert(m++, "IETag");
             }
 
             if (Properties.Any(x => x.Name == "ChangeLog" && x.Type == "ChangeLog" && CompareNullOrValue(x.Inherited, false)))
             {
-                implements.Insert(i, "IChangeLog");
-                modelImplements.Insert(i++, "IChangeLog");
+                implements.Insert(i++, "IChangeLog");
+                modelImplements.Insert(m++, "IChangeLog");
             }
 
-            //Implements = implements.Count == 0 ? null : string.Join(", ", implements.ToArray());
-
             if (RefDataType == null)
-                implements.Add($"IEquatable<{EntityName}>");
+                implements.Insert(i++, $"IEquatable<{EntityName}>");
 
             EntityImplements = implements.Count == 0 ? null : string.Join(", ", implements.GroupBy(x => x).Select(y => y.First()).ToArray());
             ModelImplements = modelImplements.Count == 0 ? null : string.Join(", ", modelImplements.GroupBy(x => x).Select(y => y.First()).ToArray());

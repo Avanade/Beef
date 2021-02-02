@@ -53,6 +53,8 @@
       <Parameter Name="Names" Type="List&lt;string&gt;" Default="default" />
     </Operation>
 
+    <Operation Name="EventPublishNoSend" OperationType="Update" Text="Validate when an Event is published but not sent" WebApiRoute="publishnosend" DataSvcCustom="true" ExcludeData="true" ExcludeIData="true" />
+
     <!-- Entity Framework -->
     <Operation Name="GetByArgsWithEf" OperationType="GetColl" PagingArgs="true" WebApiRoute="args" AutoImplement="EntityFramework">
       <Parameter Name="Args" Type="PersonArgs" Validator="PersonArgsValidator" />

@@ -127,11 +127,11 @@ namespace Beef.Validation.Rules
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"A CollectionRuleItem ItemType '{ItemType.Name}' could not be constructed as an IUniqueKey to infer UniqueKeyProperties: {ex.Message}");
+                throw new InvalidOperationException($"A CollectionRuleItem ItemType '{ItemType.Name}' could not be constructed as an IUniqueKey is required to infer UniqueKeyProperties: {ex.Message}");
             }
 
-            if (!uk.HasUniqueKey || uk.UniqueKeyProperties == null || uk.UniqueKeyProperties.Length == 0)
-                throw new InvalidOperationException("A CollectionRule TProperty ItemType '{_itemType.Name}' must define the 'IUniqueKey.UniqueKeyProperties' to support CheckForDuplicates.");
+            if (uk.UniqueKeyProperties == null || uk.UniqueKeyProperties.Length == 0)
+                throw new InvalidOperationException("A CollectionRule TProperty ItemType '{_itemType.Name}' must define one or more 'IUniqueKey.UniqueKeyProperties' to support CheckForDuplicates.");
 
             _duplicateText = duplicateText;
             if (_duplicateText == null && uk.UniqueKeyProperties.Length == 1)

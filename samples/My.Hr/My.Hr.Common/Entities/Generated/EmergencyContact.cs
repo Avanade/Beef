@@ -21,7 +21,7 @@ namespace My.Hr.Common.Entities
     /// Represents the Emergency Contact entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class EmergencyContact : EntityBase, IGuidIdentifier, IEquatable<EmergencyContact>
+    public partial class EmergencyContact : EntityBase, IGuidIdentifier, IUniqueKey, IEquatable<EmergencyContact>
     {
         #region Privates
 
@@ -111,16 +111,11 @@ namespace My.Hr.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="EmergencyContact"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -132,7 +127,7 @@ namespace My.Hr.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Id);
+        public UniqueKey UniqueKey => CreateUniqueKey(Id);
 
         #endregion
 

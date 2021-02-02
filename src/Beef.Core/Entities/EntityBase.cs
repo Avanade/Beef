@@ -10,7 +10,7 @@ namespace Beef.Entities
     /// <summary>
     /// Represents the base <b>Entity</b> class.
     /// </summary>
-    public abstract class EntityBase : EntityBasicBase, IEditableObject, ICloneable, ICopyFrom, ICleanUp, IUniqueKey, IChangeTrackingLogging
+    public abstract class EntityBase : EntityBasicBase, IEditableObject, ICloneable, ICopyFrom, ICleanUp, IChangeTrackingLogging
     {
         private object? _editCopy;
 
@@ -42,7 +42,7 @@ namespace Beef.Entities
         {
             Check.NotNull(from, nameof(from));
 
-            if (!(from is T val))
+            if (from is not T val)
                 throw new ArgumentException($"Cannot copy from Type '{from?.GetType().FullName}' as it is incompatible.", nameof(from));
 
             return val;
@@ -156,27 +156,6 @@ namespace Beef.Entities
         /// Indicates whether considered initial; i.e. all properties have their initial value.
         /// </summary>
         public abstract bool IsInitial { get; }
-
-        #endregion
-
-        #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="Object"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public virtual bool HasUniqueKey => false;
-
-        /// <summary>
-        /// Gets the <see cref="UniqueKey"/>.
-        /// </summary>
-        public virtual UniqueKey UniqueKey => UniqueKey.Empty;
-
-#pragma warning disable CA1819 // Properties should not return arrays; by-design, acceptable usage for DTO's and is OK as changes cannot have a side-effect.
-        /// <summary>
-        /// Gets the list of property names that represent the unique key.
-        /// </summary>
-        public virtual string[] UniqueKeyProperties => Array.Empty<string>();
-#pragma warning restore CA1819
 
         #endregion
 

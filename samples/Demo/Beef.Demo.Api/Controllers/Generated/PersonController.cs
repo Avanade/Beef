@@ -304,6 +304,19 @@ namespace Beef.Demo.Api.Controllers
         }
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        [HttpPut("publishnosend")]
+        [ProducesResponseType(typeof(Person), (int)HttpStatusCode.OK)]
+        public IActionResult EventPublishNoSend([FromBody] Person value)
+        {
+            return new WebApiPut<Person>(this, () => _manager.EventPublishNoSendAsync(WebApiActionBase.Value(value)),
+                operationType: OperationType.Update, statusCode: HttpStatusCode.OK, alternateStatusCode: null);
+        }
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="firstName">The First Name.</param>

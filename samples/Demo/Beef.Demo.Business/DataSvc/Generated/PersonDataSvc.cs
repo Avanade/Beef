@@ -80,7 +80,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_createOnAfterAsync != null) await _createOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Create").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -132,7 +132,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_updateOnAfterAsync != null) await _updateOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -149,7 +149,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.UpdateWithRollbackAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_updateWithRollbackOnAfterAsync != null) await _updateWithRollbackOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -314,7 +314,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.UpdateDetailAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_updateDetailOnAfterAsync != null) await _updateDetailOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }
@@ -341,6 +341,14 @@ namespace Beef.Demo.Business.DataSvc
                 return __result;
             });
         }
+
+        /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public Task<Person> EventPublishNoSendAsync(Person value)
+            => DataSvcInvoker.Current.InvokeAsync(this, () => EventPublishNoSendOnImplementationAsync(value), new BusinessInvokerArgs { IncludeTransactionScope = true });
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
@@ -416,7 +424,7 @@ namespace Beef.Demo.Business.DataSvc
             {
                 var __result = await _data.CreateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_createWithEfOnAfterAsync != null) await _createWithEfOnAfterAsync(__result).ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -433,7 +441,7 @@ namespace Beef.Demo.Business.DataSvc
                 var __result = await _data.UpdateWithEfAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 if (_updateWithEfOnAfterAsync != null) await _updateWithEfOnAfterAsync(__result).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"Demo.Person.{__result.Id}", "Update").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             }, new BusinessInvokerArgs { IncludeTransactionScope = true });
         }

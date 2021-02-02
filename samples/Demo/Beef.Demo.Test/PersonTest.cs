@@ -1115,6 +1115,17 @@ namespace Beef.Demo.Test
                 .Run(a => a.InvokeApiViaAgentAsync(1.ToGuid()));
         }
 
+        [Test, TestSetUp]
+        public void I310_EventPublishNoSend()
+        {
+            ExpectException.Throws<AssertionException>("Publish/Send mismatch 1 Event(s) were published; there were 0 sent.", () =>
+                AgentTester.Test<PersonAgent, Person>()
+                    .ExpectStatusCode(HttpStatusCode.OK)
+                    .Run(a => a.EventPublishNoSendAsync(new Person { FirstName = "John", LastName = "Doe", GenderSid = "M", Birthday = new DateTime(200, 01, 01) })));
+
+            Assert.Pass("Expected Publish/Send mismatch.");
+        }
+
         #endregion
     }
 }

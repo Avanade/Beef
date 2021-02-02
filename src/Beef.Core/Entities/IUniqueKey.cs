@@ -8,11 +8,6 @@ namespace Beef.Entities
     public interface IUniqueKey
     {
         /// <summary>
-        /// Indicates whether the <see cref="System.Object"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        bool HasUniqueKey { get; }
-
-        /// <summary>
         /// Gets the <see cref="UniqueKey"/>.
         /// </summary>
         UniqueKey UniqueKey { get; }

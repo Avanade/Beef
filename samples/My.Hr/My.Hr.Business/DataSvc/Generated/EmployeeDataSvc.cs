@@ -70,7 +70,7 @@ namespace My.Hr.Business.DataSvc
             {
                 var __result = await _data.CreateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"My.Hr.Employee.{__result.Id}", "Created").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -86,7 +86,7 @@ namespace My.Hr.Business.DataSvc
             {
                 var __result = await _data.UpdateAsync(Check.NotNull(value, nameof(value))).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"My.Hr.Employee.{__result.Id}", "Updated").SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }
@@ -132,7 +132,7 @@ namespace My.Hr.Business.DataSvc
             {
                 var __result = await _data.TerminateAsync(Check.NotNull(value, nameof(value)), id).ConfigureAwait(false);
                 await _evtPub.PublishValue(__result, $"My.Hr.Employee.{id}", "Terminated", id).SendAsync().ConfigureAwait(false);
-                _cache.SetValue(__result.UniqueKey, __result);
+                _cache.SetValue((__result as IUniqueKey).UniqueKey, __result);
                 return __result;
             });
         }

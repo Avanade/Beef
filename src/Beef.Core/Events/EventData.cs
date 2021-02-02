@@ -60,11 +60,7 @@ namespace Beef.Events
                     break;
 
                 case IUniqueKey uk:
-                    if (uk.HasUniqueKey)
-                        ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
-                    else
-                        throw new InvalidOperationException("A Value that implements IUniqueKey must have one; i.e. HasUniqueKey = true.");
-
+                    ed.Key = uk.UniqueKey.Args.Length == 1 ? uk.UniqueKey.Args[0] : uk.UniqueKey.Args;
                     break;
             }
 

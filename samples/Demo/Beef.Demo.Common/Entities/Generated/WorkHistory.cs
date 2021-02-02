@@ -21,7 +21,7 @@ namespace Beef.Demo.Common.Entities
     /// Represents the Work History entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class WorkHistory : EntityBase, IEquatable<WorkHistory>
+    public partial class WorkHistory : EntityBase, IUniqueKey, IEquatable<WorkHistory>
     {
         #region Privates
 
@@ -80,16 +80,11 @@ namespace Beef.Demo.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="WorkHistory"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Name) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Name) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -101,7 +96,7 @@ namespace Beef.Demo.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Name"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Name);
+        public UniqueKey UniqueKey => CreateUniqueKey(Name);
 
         #endregion
 

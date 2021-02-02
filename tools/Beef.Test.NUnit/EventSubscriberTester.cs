@@ -42,6 +42,7 @@ namespace Beef.Test.NUnit
         private string? _expectedExceptionMessage;
         private readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
         private bool _expectedNonePublished;
+        private bool _ignoreEventMismatch;
 
         private class Fhb : IFunctionsHostBuilder
         {
@@ -124,6 +125,16 @@ namespace Beef.Test.NUnit
         public EventSubscriberTester<TStartup> ExpectNoEvents()
         {
             _expectedNonePublished = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        /// <returns>The <see cref="AgentTest{TStartup, TAgent}"/> instance to support fluent/chaining usage.</returns>
+        public EventSubscriberTester<TStartup> IgnorePublishSendEventMismatch()
+        {
+            _ignoreEventMismatch = true;
             return this;
         }
 
@@ -228,10 +239,13 @@ namespace Beef.Test.NUnit
                         eventNeedingValueUpdateAction?.Invoke(ee);
                     }
 
-                    Events.ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList(), CorrelationId);
+                    Events.ExpectEvent.AreSent(_expectedPublished.Select((v) => v.expectedEvent).ToList(), CorrelationId);
                 }
                 else if (_expectedNonePublished)
-                    Events.ExpectEvent.NonePublished(CorrelationId);
+                    Events.ExpectEvent.NoneSent(CorrelationId);
+
+                if (!_ignoreEventMismatch)
+                    Events.ExpectEvent.PublishedVersusSent(CorrelationId);
             }
             finally
             {
@@ -295,7 +309,20 @@ namespace Beef.Test.NUnit
 
             TestContext.Out.WriteLine("");
             TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = Events.ExpectEvent.GetEvents(CorrelationId);
+            var events = Events.ExpectEvent.GetPublishedEvents(CorrelationId);
+            if (events.Count == 0)
+                TestContext.Out.WriteLine("  None.");
+            else
+            {
+                foreach (var e in events)
+                {
+                    TestContext.Out.WriteLine($"  Subject: {e.Subject}, Action: {e.Action}");
+                }
+            }
+
+            TestContext.Out.WriteLine("");
+            TestContext.Out.WriteLine($"EVENTS SENT >");
+            events = Events.ExpectEvent.GetSentEvents(CorrelationId);
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else

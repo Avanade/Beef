@@ -56,6 +56,7 @@ namespace Beef.Entities
     public abstract class EntityBaseCollection<TEntity> : ObservableCollection<TEntity>, IEntityBaseCollection, IEquatable<EntityBaseCollection<TEntity>> where TEntity : EntityBase
     {
         private object? _editCopy;
+        private readonly Lazy<bool> _hasUniqueKey = new Lazy<bool>(() => typeof(IUniqueKey).IsAssignableFrom(typeof(TEntity)));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityBaseCollection{TEntity}" /> class.
@@ -111,10 +112,13 @@ namespace Beef.Entities
         /// Gets the first item by the specified <paramref name="key"/>.
         /// </summary>
         /// <param name="key">The <see cref="UniqueKey"/>.</param>
-        /// <returns>The first item where found; otherwise, <c>null</c>.</returns>
+        /// <returns>The first item where found; otherwise, <c>null</c>. Where the underlying entity item does not implement <see cref="IUniqueKey"/> this will always return <c>null</c>.</returns>
         public TEntity GetByUniqueKey(UniqueKey key)
         {
-            return Items.Where(x => x.HasUniqueKey && key.Equals(x.UniqueKey)).FirstOrDefault();
+            if (!_hasUniqueKey.Value)
+                return default!;
+
+            return Items.Where(x => x is IUniqueKey uk && key.Equals(uk)).FirstOrDefault();
         }
 
         /// <summary>
@@ -258,7 +262,7 @@ namespace Beef.Entities
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is EntityBaseCollection<TEntity> val))
+            if (obj == null || obj is not EntityBaseCollection<TEntity> val)
                 return false;
 
             return Equals(val);

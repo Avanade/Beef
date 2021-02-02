@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Beef.Demo.Common.Entities;
+using System;
 using System.Threading.Tasks;
 
 namespace Beef.Demo.Business.DataSvc
@@ -20,6 +21,12 @@ namespace Beef.Demo.Business.DataSvc
         private Task<int> DataSvcCustomOnImplementationAsync()
         {
             throw new NotImplementedException();
+        }
+
+        private Task<Person> EventPublishNoSendOnImplementationAsync(Person value)
+        {
+            _evtPub.PublishValue(value, $"Beef.Demo.NoSend.{value.Id}");
+            return Task.FromResult(value);
         }
     }
 }

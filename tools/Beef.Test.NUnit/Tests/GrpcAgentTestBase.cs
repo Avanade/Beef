@@ -78,8 +78,8 @@ namespace Beef.Test.NUnit.Tests
                 TestContext.Out.WriteLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
 
             TestContext.Out.WriteLine("");
-            TestContext.Out.WriteLine($"EVENTS PUBLISHED >");
-            var events = ExpectEvent.GetEvents();
+            TestContext.Out.WriteLine($"EVENTS SENT >");
+            var events = ExpectEvent.GetSentEvents();
             if (events.Count == 0)
                 TestContext.Out.WriteLine("  None.");
             else

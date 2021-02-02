@@ -74,7 +74,7 @@ namespace Beef.Json
     /// </summary>
     /// <remarks>This is enabled to largely support: https://tools.ietf.org/html/rfc7386. 
     /// <para>Additional logic has been added to the merge where dealing with JSON arrays into a collection where the underlying entity implements <see cref="IUniqueKey"/>. Where
-    /// <see cref="IUniqueKey.HasUniqueKey"/> is set for the <see cref="Type"/> then the item will be matched (finds existing item) and updates, versus full array replacement (normal
+    /// <see cref="IUniqueKey.UniqueKey"/> is set for the <see cref="Type"/> then the item will be matched (finds existing item) and updates, versus full array replacement (normal
     /// behaviour).</para>
     /// </remarks>
     public static class JsonEntityMerge
@@ -158,8 +158,8 @@ namespace Beef.Json
                 if (pr.IsComplexType && pr.ComplexTypeReflector!.IsCollection && pr.ComplexTypeReflector.ItemType.IsSubclassOf(typeof(EntityBase)))
                 {
                     var ival = (EntityBase)pr.ComplexTypeReflector.CreateItemValue();
-                    if (ival.HasUniqueKey)
-                        pr.Tag = new UniqueKeyConfig(pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)), ival.UniqueKeyProperties);
+                    if (ival is IUniqueKey uk)
+                        pr.Tag = new UniqueKeyConfig(pr.PropertyType.IsInstanceOfType(typeof(IEntityBaseCollection)), uk.UniqueKeyProperties);
                 }
 
                 return true;
@@ -396,7 +396,7 @@ namespace Beef.Json
                 var uniqueKey = new UniqueKey(uk);
                 var item = current == null ? null : ukc.IsEntityBaseCollection
                     ? ((IEntityBaseCollection)current).GetByUniqueKey(uniqueKey)
-                    : current.OfType<EntityBase>().FirstOrDefault(x => uniqueKey.Equals(x.UniqueKey));
+                    : current.OfType<IUniqueKey>().FirstOrDefault(x => uniqueKey.Equals(x.UniqueKey));
 
                 // Create new if not found.
                 if (item == null)

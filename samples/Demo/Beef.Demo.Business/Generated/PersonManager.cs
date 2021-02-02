@@ -115,6 +115,11 @@ namespace Beef.Demo.Business
         private Func<string?, List<string>?, Task>? _getNullOnBeforeAsync;
         private Func<Person?, string?, List<string>?, Task>? _getNullOnAfterAsync;
 
+        private Func<Person, Task>? _eventPublishNoSendOnPreValidateAsync;
+        private Action<MultiValidator, Person>? _eventPublishNoSendOnValidate;
+        private Func<Person, Task>? _eventPublishNoSendOnBeforeAsync;
+        private Func<Person, Task>? _eventPublishNoSendOnAfterAsync;
+
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnPreValidateAsync;
         private Action<MultiValidator, PersonArgs?, PagingArgs?>? _getByArgsWithEfOnValidate;
         private Func<PersonArgs?, PagingArgs?, Task>? _getByArgsWithEfOnBeforeAsync;
@@ -592,6 +597,32 @@ namespace Beef.Demo.Business
                 if (_getNullOnAfterAsync != null) await _getNullOnAfterAsync(__result, name, names).ConfigureAwait(false);
                 return Cleaner.Clean(__result);
             }, BusinessInvokerArgs.Unspecified).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <returns>The updated <see cref="Person"/>.</returns>
+        public async Task<Person> EventPublishNoSendAsync(Person value)
+        {
+            (await value.Validate(nameof(value)).Mandatory().RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+            return await ManagerInvoker.Current.InvokeAsync(this, async () =>
+            {
+                Cleaner.CleanUp(value);
+                if (_eventPublishNoSendOnPreValidateAsync != null) await _eventPublishNoSendOnPreValidateAsync(value).ConfigureAwait(false);
+
+                (await MultiValidator.Create()
+                    .Add(value.Validate(nameof(value)).Entity().With<IValidator<Person>>())
+                    .Additional((__mv) => _eventPublishNoSendOnValidate?.Invoke(__mv, value))
+                    .RunAsync().ConfigureAwait(false)).ThrowOnError();
+
+                if (_eventPublishNoSendOnBeforeAsync != null) await _eventPublishNoSendOnBeforeAsync(value).ConfigureAwait(false);
+                var __result = await _dataService.EventPublishNoSendAsync(value).ConfigureAwait(false);
+                if (_eventPublishNoSendOnAfterAsync != null) await _eventPublishNoSendOnAfterAsync(__result).ConfigureAwait(false);
+                return Cleaner.Clean(__result);
+            }, BusinessInvokerArgs.Update).ConfigureAwait(false);
         }
 
         /// <summary>

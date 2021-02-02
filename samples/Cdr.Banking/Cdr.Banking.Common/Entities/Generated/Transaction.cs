@@ -21,7 +21,7 @@ namespace Cdr.Banking.Common.Entities
     /// Represents the Transaction entity.
     /// </summary>
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    public partial class Transaction : EntityBase, IStringIdentifier, IEquatable<Transaction>
+    public partial class Transaction : EntityBase, IStringIdentifier, IUniqueKey, IEquatable<Transaction>
     {
         #region Privates
 
@@ -247,16 +247,11 @@ namespace Cdr.Banking.Common.Entities
         #endregion
 
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the <see cref="Transaction"/> has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { nameof(Id) };
+        public string[] UniqueKeyProperties => new string[] { nameof(Id) };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -268,7 +263,7 @@ namespace Cdr.Banking.Common.Entities
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): <see cref="Id"/>).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey(Id);
+        public UniqueKey UniqueKey => CreateUniqueKey(Id);
 
         #endregion
 

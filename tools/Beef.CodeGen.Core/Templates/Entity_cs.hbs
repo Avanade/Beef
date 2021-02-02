@@ -231,16 +231,11 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
 {{#unless RefDataType}}
   {{#ifne UniqueKeyProperties.Count 0}}
         #region IUniqueKey
-
-        /// <summary>
-        /// Indicates whether the {{{EntityNameSeeComments}}} has a <see cref="UniqueKey"/> value.
-        /// </summary>
-        public override bool HasUniqueKey => true;
         
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
-        public override string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
+        public string[] UniqueKeyProperties => new string[] { {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}nameof({{PropertyName}}){{/each}} };
 
         /// <summary>
         /// Creates the <see cref="UniqueKey"/>.
@@ -254,7 +249,7 @@ namespace {{#ifeq Root.EntityScope 'Common'}}{{Root.NamespaceCommon}}{{else}}{{R
         /// <summary>
         /// Gets the <see cref="UniqueKey"/> (consists of the following property(s): {{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{{PropertyNameSeeComments}}}{{/each}}).
         /// </summary>
-        public override UniqueKey UniqueKey => new UniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
+        public UniqueKey UniqueKey => CreateUniqueKey({{#each UniqueKeyProperties}}{{#unless @first}}, {{/unless}}{{PropertyName}}{{/each}});
 
         #endregion
 

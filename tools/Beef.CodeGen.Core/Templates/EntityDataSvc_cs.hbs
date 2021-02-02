@@ -130,7 +130,7 @@ namespace {{Root.NamespaceBusiness}}.DataSvc
       {{#ifeq Type 'Delete'}}
                 _cache.Remove<{{Parent.Name}}>(new UniqueKey({{#each ValueLessDataParameters}}{{#unless @first}}, {{/unless}}{{ArgumentName}}{{/each}}));
       {{else}}
-                _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}__result.UniqueKey{{/ifeq}}, __result);
+                _cache.SetValue({{#ifeq Type 'Get'}}__key{{else}}(__result as IUniqueKey).UniqueKey{{/ifeq}}, __result);
       {{/ifeq}}
     {{/if}}   
     {{#if HasReturnValue}}

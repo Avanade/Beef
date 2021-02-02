@@ -143,7 +143,7 @@ namespace Beef.Events
         /// </summary>
         /// <param name="events">One or more <see cref="EventData"/> objects.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public IEventPublisher Publish(params EventData[] events)
+        public virtual IEventPublisher Publish(params EventData[] events)
         {
             if (HasBeenSent)
                 throw new InvalidOperationException("No further events can be published (queued) once they have been sent.");

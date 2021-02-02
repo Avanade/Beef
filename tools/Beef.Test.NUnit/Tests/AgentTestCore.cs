@@ -23,8 +23,9 @@ namespace Beef.Test.NUnit.Tests
         internal ErrorType? _expectedErrorType;
         internal string? _expectedErrorMessage;
         internal MessageItemCollection? _expectedMessages;
-        internal readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedPublished = new List<(ExpectedEvent, bool)>();
-        internal bool _expectedNonePublished;
+        internal readonly List<(ExpectedEvent expectedEvent, bool useReturnedValue)> _expectedSent = new List<(ExpectedEvent, bool)>();
+        internal bool _expectedNoneSent;
+        internal bool _ignoreEventMismatch;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AgentTestCore{TStartup}"/> class using the specified details.
@@ -126,7 +127,7 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="action">The optional expected action; <c>null</c> indicates any.</param>
         protected void SetExpectEvent(string template, string action)
         {
-            _expectedPublished.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
+            _expectedSent.Add((new ExpectedEvent(new EventData { Subject = template, Action = action }), false));
         }
 
         /// <summary>
@@ -143,16 +144,18 @@ namespace Beef.Test.NUnit.Tests
         {
             var ee = new ExpectedEvent(new EventData<T> { Subject = template, Action = action, Value = eventValue });
             ee.MembersToIgnore.AddRange(membersToIgnore);
-            _expectedPublished.Add((ee, useReturnedValue));
+            _expectedSent.Add((ee, useReturnedValue));
         }
 
         /// <summary>
         /// Verifies that no events were published.
         /// </summary>
-        protected void SetExpectNoEvents()
-        {
-            _expectedNonePublished = true;
-        }
+        protected void SetExpectNoEvents() =>_expectedNoneSent = true;
+
+        /// <summary>
+        /// Ignores (does not verify) that the events that are published must match those finally sent.
+        /// </summary>
+        protected void SetIgnorePublishSendEventMismatch() => _ignoreEventMismatch = true;
 
         /// <summary>
         /// Check the published events to make sure they are valid.
@@ -160,17 +163,20 @@ namespace Beef.Test.NUnit.Tests
         /// <param name="eventNeedingValueUpdateAction">Action that will be called where the value needs to be updated.</param>
         protected void PublishedEventsCheck(Action<ExpectedEvent>? eventNeedingValueUpdateAction = null)
         {
-            if (_expectedPublished.Count > 0)
+            if (_expectedSent.Count > 0)
             {
-                foreach (var ee in _expectedPublished.Where((v) => v.useReturnedValue).Select((v) => v.expectedEvent))
+                foreach (var ee in _expectedSent.Where((v) => v.useReturnedValue).Select((v) => v.expectedEvent))
                 {
                     eventNeedingValueUpdateAction?.Invoke(ee);
                 }
 
-                ExpectEvent.ArePublished(_expectedPublished.Select((v) => v.expectedEvent).ToList());
+                ExpectEvent.AreSent(_expectedSent.Select((v) => v.expectedEvent).ToList());
             }
-            else if (_expectedNonePublished)
-                ExpectEvent.NonePublished();
+            else if (_expectedNoneSent)
+                ExpectEvent.NoneSent();
+
+            if (!_ignoreEventMismatch)
+                ExpectEvent.PublishedVersusSent();
 
             ExpectEventPublisher.Remove();
         }

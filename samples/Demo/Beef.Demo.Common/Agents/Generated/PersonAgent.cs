@@ -184,6 +184,14 @@ namespace Beef.Demo.Common.Agents
         Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, List<string>? names, WebApiRequestOptions? requestOptions = null);
 
         /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        Task<WebApiAgentResult<Person>> EventPublishNoSendAsync(Person value, WebApiRequestOptions? requestOptions = null);
+
+        /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.
         /// </summary>
         /// <param name="args">The Args (see <see cref="Common.Entities.PersonArgs"/>).</param>
@@ -459,6 +467,16 @@ namespace Beef.Demo.Common.Agents
         public Task<WebApiAgentResult<Person?>> GetNullAsync(string? name, List<string>? names, WebApiRequestOptions? requestOptions = null) =>
             GetAsync<Person?>("api/v1/persons/null", requestOptions: requestOptions,
                 args: new WebApiArg[] { new WebApiArg<string?>("name", name), new WebApiArg<List<string>?>("names", names) });
+
+        /// <summary>
+        /// Validate when an Event is published but not sent.
+        /// </summary>
+        /// <param name="value">The <see cref="Person"/>.</param>
+        /// <param name="requestOptions">The optional <see cref="WebApiRequestOptions"/>.</param>
+        /// <returns>A <see cref="WebApiAgentResult"/>.</returns>
+        public Task<WebApiAgentResult<Person>> EventPublishNoSendAsync(Person value, WebApiRequestOptions? requestOptions = null) =>
+            PutAsync<Person>("api/v1/persons/publishnosend", Beef.Check.NotNull(value, nameof(value)), requestOptions: requestOptions,
+                args: Array.Empty<WebApiArg>());
 
         /// <summary>
         /// Gets the <see cref="PersonCollectionResult"/> that contains the items that match the selection criteria.

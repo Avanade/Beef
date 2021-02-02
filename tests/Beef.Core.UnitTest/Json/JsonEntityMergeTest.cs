@@ -36,7 +36,7 @@ namespace Beef.Core.UnitTest.Json
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-        public class KeyData : EntityBase
+        public class KeyData : EntityBase, IUniqueKey
         {
             [JsonProperty("code")]
             public string Code { get; set; }
@@ -52,11 +52,9 @@ namespace Beef.Core.UnitTest.Json
                 throw new NotImplementedException();
             }
 
-            public override bool HasUniqueKey => true;
+            public string[] UniqueKeyProperties => new string[] { "Code" };
 
-            public override string[] UniqueKeyProperties => new string[] { "Code" };
-
-            public override UniqueKey UniqueKey => new UniqueKey(Code);
+            public UniqueKey UniqueKey => new UniqueKey(Code);
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
@@ -103,11 +101,9 @@ namespace Beef.Core.UnitTest.Json
                 throw new NotImplementedException();
             }
 
-            public override bool HasUniqueKey => true;
+            public string[] UniqueKeyProperties => new string[] { "Code" };
 
-            public override string[] UniqueKeyProperties => new string[] { "Code" };
-
-            public override UniqueKey UniqueKey => new UniqueKey(Code);
+            public UniqueKey UniqueKey => new UniqueKey(Code);
         }
 
         [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
