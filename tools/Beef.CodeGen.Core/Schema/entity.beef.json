@@ -215,11 +215,6 @@
       "title": "The Namespace (root) for the Api-related .NET artefacts.",
       "description": "Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`."
     },
-    "pragmaWarnings": {
-      "type": "string",
-      "title": "The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings.",
-      "description": "Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs)."
-    },
     "entities": {
       "type": "array",
       "title": "The corresponding `Entity` collection.",
@@ -1027,7 +1022,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "title": "The operation type.",
+                      "title": "The type of operation that is to be code-generated.",
                       "enum": [
                         "Get",
                         "GetColl",
@@ -1132,6 +1127,18 @@
                       "title": "The name of the .NET Interface that the `Validator` implements/inherits.",
                       "description": "Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator<{Type}>` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`."
                     },
+                    "managerOperationType": {
+                      "type": "string",
+                      "title": "The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer.",
+                      "description": "The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.",
+                      "enum": [
+                        "Create",
+                        "Read",
+                        "Update",
+                        "Delete",
+                        "Unspecified"
+                      ]
+                    },
                     "dataSvcCustom": {
                       "type": "boolean",
                       "title": "Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated."
@@ -1193,18 +1200,6 @@
                         "NoContent",
                         "NotFound",
                         "ThrowException"
-                      ]
-                    },
-                    "webApiOperationType": {
-                      "type": "string",
-                      "title": "The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred).",
-                      "description": "The default will be inferred where possible; otherwise, set to `Unspecified`.",
-                      "enum": [
-                        "Create",
-                        "Read",
-                        "Update",
-                        "Delete",
-                        "Unspecified"
                       ]
                     },
                     "patchGetOperation": {

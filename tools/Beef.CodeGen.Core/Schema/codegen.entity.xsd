@@ -448,7 +448,7 @@
                   </xs:attribute>
                   <xs:attribute name="OperationType" use="required">
                     <xs:annotation>
-                      <xs:documentation>The operation type.</xs:documentation>
+                      <xs:documentation>The type of operation that is to be code-generated.</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
@@ -561,6 +561,20 @@
                       <xs:documentation>The name of the .NET Interface that the `Validator` implements/inherits. Defaults to the `Entity.IValidator` where specified; otherwise, defaults to `IValidator&lt;{Type}&gt;` where the `{Type}` is `ValueType`. Only used `Operation.Type` options `Create` or `Update`.</xs:documentation>
                     </xs:annotation>
                   </xs:attribute>
+                  <xs:attribute name="ManagerOperationType" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>The `ExecutionContext.OperationType` (CRUD denotation) defined at the `Manager`-layer. The default will be inferred from the `Operation.Type`; however, where the `Operation.Type` is `Custom` it will default to `Unspecified`.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="Create" />
+                        <xs:enumeration value="Read" />
+                        <xs:enumeration value="Update" />
+                        <xs:enumeration value="Delete" />
+                        <xs:enumeration value="Unspecified" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
                   <xs:attribute name="DataSvcCustom" use="optional" type="xs:boolean">
                     <xs:annotation>
                       <xs:documentation>Indicates whether the `DataSvc` logic is a custom implementation; i.e. no auto-`DataSvc` invocation logic is to be generated.</xs:documentation>
@@ -630,20 +644,6 @@
                         <xs:enumeration value="NoContent" />
                         <xs:enumeration value="NotFound" />
                         <xs:enumeration value="ThrowException" />
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:attribute>
-                  <xs:attribute name="WebApiOperationType" use="optional">
-                    <xs:annotation>
-                      <xs:documentation>The `ExecutionContext.OperationType` (CRUD denotation) where the `Operation.Type` is `Custom` (i.e. can not be inferred). The default will be inferred where possible; otherwise, set to `Unspecified`.</xs:documentation>
-                    </xs:annotation>
-                    <xs:simpleType>
-                      <xs:restriction base="xs:string">
-                        <xs:enumeration value="Create" />
-                        <xs:enumeration value="Read" />
-                        <xs:enumeration value="Update" />
-                        <xs:enumeration value="Delete" />
-                        <xs:enumeration value="Unspecified" />
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:attribute>
@@ -1476,11 +1476,6 @@
       <xs:attribute name="NamespaceApi" use="optional" type="xs:string">
         <xs:annotation>
           <xs:documentation>The Namespace (root) for the Api-related .NET artefacts. Defaults to `NamespaceBase` + `.` + `ApiName` (runtime parameter). For example `Beef.Demo.Api`.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="PragmaWarnings" use="optional" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The comma-separated list of Pragma Warnings to enable/diable within the cde-generated C# code to minimize noisy compile-time warnings. Defaults to the list as defined by [`ConfigBase.DefaultPragmaWarnings`](https://github.com/Avanade/Beef/blob/master/tools/Beef.CodeGen.Core/Config/ConfigBase.cs).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

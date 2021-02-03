@@ -107,12 +107,10 @@ namespace Beef.Entities
                 item.CleanUp();
         }
 
-#pragma warning disable CA1033 // Interface methods should be callable by child types; intended that value should always be false (not applicable).
         /// <summary>
         /// Collections do not support an initial state; will always be <c>false</c>.
         /// </summary>
         bool ICleanUp.IsInitial => false;
-#pragma warning restore CA1033
 
         /// <summary>
         /// When implemented in a derived class, extracts the key from the specified element.

@@ -12,11 +12,9 @@ namespace Beef.Entities
         /// </summary>
         UniqueKey UniqueKey { get; }
 
-#pragma warning disable CA1819 // Properties should not return arrays; by-design, returns an immutable array.
         /// <summary>
         /// Gets the list of property names that represent the unique key.
         /// </summary>
         string[] UniqueKeyProperties { get; }
-#pragma warning restore CA1819
     }
 }
