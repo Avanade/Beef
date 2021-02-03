@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Issue [97](https://github.com/Avanade/Beef/issues/97). 
+- *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
+
 ## v4.1.3
 - *Enhancement:* **Breaking change** to _Validation_ to enable async. The existing methods `Validate` and `Run` have been changed to be `ValidateAsync` and `RunAsync` respectively, with a response of `Task`. A number of the validator `Rules` have been updated to support async overloads.
 - *Enhancement:* Dependency Injection (DI) for validation has been enabled.

@@ -96,7 +96,7 @@ namespace Beef.Events
                 CorrelationId = ExecutionContext.Current.CorrelationId;
             }
             else
-                Timestamp = Cleaner.Clean(DateTime.Now);
+                Timestamp = Cleaner.Clean(DateTime.UtcNow);
         }
 
         /// <summary>

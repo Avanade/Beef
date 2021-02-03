@@ -2,6 +2,10 @@
 
 Represents the **NuGet** versions.
 
+## v4.1.4
+- *Enhancement:* Issue [97](https://github.com/Avanade/Beef/issues/97). 
+- *Enhancement:* Issue [98](https://github.com/Avanade/Beef/issues/98). 
+
 ## v4.1.3
 - *Fixed:* Where calculating an `ETag` for a response that does not support `IETag` it was previously using the `Hashcode` to calculate. This is problematic as per this [article](https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/). The new approach is to MD5 hash the serialized JSON. 
 
